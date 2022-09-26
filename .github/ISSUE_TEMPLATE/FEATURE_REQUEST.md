@@ -3,7 +3,7 @@ name: 機能追加・修正
 about: 機能追加・修正はこのテンプレートをご利用ください。
 title: タイトルをセットしてください。
 labels: enhancement
-assignees: mustacheyork
+assignees: kensuke242424
 ---
 <!-- Issueのテンプレートです。入力できるところを埋めてください。 -->
 <!-- 記入しない項目は特になしと記入してください。。 -->

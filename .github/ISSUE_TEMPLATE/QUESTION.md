@@ -3,7 +3,7 @@ name: ご質問
 about: 質問はこのテンプレートをご利用ください。
 title: タイトルをセットしてください。
 labels: question
-assignees: mustacheyork
+assignees: kensuke242424
 ---
 <!-- Issueのテンプレートです。入力できるところを埋めてください。例：https://code-candy.com/courses/1259994/lectures/33129629 -->
 <!-- 記入しない項目は特になしと記入してください。。 -->

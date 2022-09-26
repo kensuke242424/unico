@@ -3,7 +3,7 @@ name: バグ報告
 about: バグ報告はこのテンプレートをご利用ください。
 title: タイトルをセットしてください。
 labels: bug
-assignees: mustacheyork
+assignees: kensuke242424
 ---
 
 <!-- Issueのテンプレートです。入力できるところを埋めてください。 -->
