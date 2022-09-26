@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SalesView: View {
     var body: some View {
-        Text("売上画面")
+        Text("総売上グラフ？")
             .font(.title)
     }
 }

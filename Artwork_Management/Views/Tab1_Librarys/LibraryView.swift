@@ -9,47 +9,46 @@ import SwiftUI
 
 struct LibraryView: View {
 
+    @State var itemName = ""
+    @Binding var isShowItemDetail: Bool
+
     var body: some View {
 
-        VStack {
-            ScrollView(.horizontal) {
+        NavigationView {
 
-                LazyHStack {
-                    
-                    ForEach(1...20, id: \.self) {value in
-                        Rectangle()
-                            .fill(Color.gray)
-                            .frame(width: 100, height: 100)
-                    } // ForEachここまで
+            ZStack {
+
+                ScrollView(.vertical) {
+
+                    VStack(spacing: 20) {
+
+                        LibraryListView(itemWidth: 250, itemHeight: 250, itemSpase: 60, itemNameTag: "Album",
+                                      itemColor: .gray, isShowItemDetail: $isShowItemDetail)
+
+                        LibraryListView(itemWidth: 180, itemHeight: 180, itemSpase: 40, itemNameTag: "Single",
+                                      itemColor: .yellow, isShowItemDetail: $isShowItemDetail)
+
+                        LibraryListView(itemWidth: 350, itemHeight: 300, itemSpase: 5, itemNameTag: "Picture",
+                                      itemColor: .red, isShowItemDetail: $isShowItemDetail)
+
+                        LibraryListView(itemWidth: 200, itemHeight: 150, itemSpase: 20, itemNameTag: "Goods",
+                                      itemColor: .blue, isShowItemDetail: $isShowItemDetail)
 
 
-                } // LazyHStackここまで
-            } // ScrollViewここまで
+                    } // VStack
+                } // ScrollView
+            } // ZStack
 
-            ScrollView(.horizontal) {
-                LazyHStack {
-
-
-                    ForEach(1...20, id: \.self) {value in
-                        Circle()
-                            .fill(Color.gray)
-                            .frame(width: 100, height: 100)
-                    } // ForEachここまで
-                } // LazyHStackここまで
-            }
-
-            Text("ライブラリ画面")
-                .font(.title)
-
-            Text("(アイテムのコレクションライブラリ)")
-                .padding()
-
-        } // VStackここまで
-    }
-}
+            .overlay(
+                LibraryDetailShow(itemName: "a")
+                    .opacity(isShowItemDetail ? 0.6 : 0)
+            )
+        } // NavigationView
+    } // body
+} // View
 
 struct ItemLibraryView_Previews: PreviewProvider {
     static var previews: some View {
-        LibraryView()
+        LibraryView(isShowItemDetail: .constant(false))
     }
 }
