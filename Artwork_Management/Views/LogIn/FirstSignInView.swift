@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct FirstSignInView: View {
+
+    let user: User
+    
     var body: some View {
         NavigationView {
 
@@ -24,14 +27,7 @@ struct FirstSignInView: View {
                     .fontWeight(.medium)
                     .padding(30)
 
-                FirstLogInInfomation()
-
-                Button {
-
-                } label: {
-                    Text("サインイン")
-                }
-                .buttonStyle(.borderedProminent)
+                FirstLogInInfomation(user: user)
 
                 Spacer()
 
@@ -49,6 +45,9 @@ struct FirstLogInInfomation: View {
     @State private var password2 = ""
     @State private var passHidden = true
     @State private var passHidden2 = true
+    @State private var resultPassword = true
+    @State private var isActive = false
+    let user: User
 
     var body: some View {
 
@@ -56,12 +55,10 @@ struct FirstLogInInfomation: View {
             Group { // 入力欄全体
 
                 Text("メールアドレス")
-                    .foregroundColor(.gray)
 
                 TextField("artwork/@gmail.com", text: $address)
 
                 Text("パスワード")
-                    .foregroundColor(.gray)
 
                 ZStack {
                     if passHidden {
@@ -84,8 +81,17 @@ struct FirstLogInInfomation: View {
                     .padding(.horizontal)
                 } // ZStack
 
-                Text("再度入力してください")
-                    .foregroundColor(.gray)
+                HStack {
+                    Text("再度入力してください")
+                        .foregroundColor(.gray)
+
+                    if resultPassword == false {
+                        Text("※再入力パスワードが異なります")
+                            .font(.caption2)
+                            .foregroundColor(.red)
+
+                    } // if
+                } // HStack
 
                 ZStack {
 
@@ -116,13 +122,43 @@ struct FirstLogInInfomation: View {
             .keyboardType(.emailAddress)
             .padding(.bottom, 10)
 
+
         } // VStack
         .padding()
+
+        NavigationLink(destination: HomeTabView(),
+                       isActive: $isActive,
+                       label: {
+            Button {
+
+                if password != password2 {
+                    resultPassword = false
+                }
+                else {
+                    resultPassword = true
+                }
+
+                if resultPassword {
+                    isActive.toggle()
+                }
+
+            } label: {
+                Text("サインイン")
+            }
+            .buttonStyle(.borderedProminent)
+
+        }) // NavigationLink
+            .padding()
+
     } // body
 } // View
 
 struct FirstLogInView_Previews: PreviewProvider {
     static var previews: some View {
-        FirstSignInView()
+
+        FirstSignInView(user: User(name:     "中川賢亮",
+                                    address:  "kennsuke242424@gmail.com",
+                                    password: "ninnzinn2424"
+          )) // testUser)
     }
 }

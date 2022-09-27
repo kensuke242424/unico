@@ -10,6 +10,12 @@ import SwiftUI
 // ✅ ログイン画面の親Viewです。
 struct LogInView: View {
 
+    // テスト用のダミーデータです。
+    let testUser: User = User(name:     "中川賢亮",
+                              address:  "kennsuke242424@gmail.com",
+                              password: "ninnzinn2424"
+    ) // testUser
+
     var body: some View {
 
         NavigationView {
@@ -25,7 +31,7 @@ struct LogInView: View {
                     Spacer()
 
                     // ログイン画面のインフォメーション部品のカスタムView
-                    LogInInfomation()
+                    LogInInfomation(user: testUser)
 
                     Spacer()
 
@@ -60,7 +66,11 @@ struct LogInInfomation: View {
     @State private var address = ""
     @State private var password = ""
     @State private var passHidden = true
-    @State private var isLogInCheck = false
+    @State private var isActive = false
+    @State private var resultAddress = true
+    @State private var resultPassword = true
+
+    let user: User
 
     var body: some View {
 
@@ -69,13 +79,29 @@ struct LogInInfomation: View {
             // 入力欄全体
             Group {
 
-                Text("メールアドレス")
-                    .foregroundColor(.gray)
+                HStack {
+                    Text("メールアドレス")
+
+                    if resultAddress == false {
+                        Text("※該当するアドレスがありません。")
+                            .font(.caption2)
+                            .foregroundColor(.red)
+                    }
+                } // HStack
+
 
                 TextField("artwork/@gmail.com", text: $address)
 
-                Text("パスワード")
-                    .foregroundColor(.gray)
+                HStack {
+                    Text("パスワード")
+
+                    if resultPassword == false {
+                        Text("※パスワードが間違っています。")
+                            .font(.caption2)
+                            .foregroundColor(.red)
+                    } // if
+                } // HStack
+
 
                 ZStack {
                     if passHidden {
@@ -110,10 +136,32 @@ struct LogInInfomation: View {
         VStack {
 
             NavigationLink(destination: HomeTabView(),
-                           isActive: $isLogInCheck,
+                           isActive: $isActive,
                            label: {
                 Button {
-                    isLogInCheck.toggle()
+
+                    // アドレスが存在するかチェック
+                    if user.address != address {
+                        resultAddress = false
+                    }
+                    else {
+                        resultAddress = true
+                    }
+
+                    // メールアドレスが存在したら、パスワードが合っているかチェック
+                    if resultAddress {
+                        if user.password != password {
+                            resultPassword = false
+                        }
+                        else {
+                            resultPassword = true
+                        }
+                    }
+
+                    // アドレス、パスワードが一致したらログイン、遷移
+                    if resultAddress, resultPassword {
+                        isActive.toggle()
+                    }
 
                 } label: {
                     Text("ログイン")
@@ -124,7 +172,7 @@ struct LogInInfomation: View {
 
             Group {
                 NavigationLink("初めての方はこちら>>",
-                               destination: FirstSignInView())
+                               destination: FirstSignInView(user: user))
                 .foregroundColor(.blue)
                 .padding()
 
