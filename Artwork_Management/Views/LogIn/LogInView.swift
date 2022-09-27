@@ -61,8 +61,6 @@ struct LogInInfomation: View {
     @State private var password = ""
     @State private var passHidden = true
     @State private var isLogInCheck = false
-    @State private var isAccountCheckStart = false
-    @State private var count = 3
 
     var body: some View {
 
@@ -111,21 +109,11 @@ struct LogInInfomation: View {
 
         VStack {
 
-            if isAccountCheckStart {
-                if count <= 3, count >= 2 {
-                    LogInCheckView()
-                }
-                else if count <= 1 {
-                    SuccsessView()
-                }
-            }
-
             NavigationLink(destination: HomeTabView(),
                            isActive: $isLogInCheck,
                            label: {
                 Button {
-                    isAccountCheckStart = true
-                    dummyTextTimer()
+                    isLogInCheck.toggle()
 
                 } label: {
                     Text("ログイン")
@@ -150,30 +138,7 @@ struct LogInInfomation: View {
             } // Group
             .font(.subheadline)
         } // VStack
-
-//        .onAppear {
-//            isAccountCheckStart = false
-//        }
-        .onDisappear {
-            isAccountCheckStart = false
-            count = 3
-        }
     } // body
-
-    func dummyTextTimer() {
-        // 仮でログインチェックをTimerを用いて表現しています。
-        Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
-
-            self.count -= 1
-
-            if count == 0 {
-                isLogInCheck.toggle()
-
-                timer.invalidate()
-
-            }
-        } // Timer
-    }
 } // View
 
 struct LogInView_Previews: PreviewProvider {

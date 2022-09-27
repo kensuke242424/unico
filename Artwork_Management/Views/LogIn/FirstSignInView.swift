@@ -33,7 +33,6 @@ struct FirstSignInView: View {
                 }
                 .buttonStyle(.borderedProminent)
 
-
                 Spacer()
 
             } // VStack
