@@ -84,7 +84,7 @@ struct FirstLogInInfomation: View {
                         .foregroundColor(.gray)
 
                     if resultPassword == false {
-                        Text("※再入力パスワードが異なります")
+                        Text("※パスワードが一致しません")
                             .font(.caption2)
                             .foregroundColor(.red)
 
@@ -146,7 +146,6 @@ struct FirstLogInInfomation: View {
             .buttonStyle(.borderedProminent)
 
         }) // NavigationLink
-            .padding()
     } // body
 } // View
 
