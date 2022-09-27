@@ -9,31 +9,29 @@ import SwiftUI
 
 struct FirstSignInView: View {
 
+    // テスト用のデータ
     let user: User
     
     var body: some View {
-        NavigationView {
 
-            VStack {
+        VStack {
 
-                Spacer()
+            Spacer()
 
-                RogoMark()
+            RogoMark()
 
-                Spacer()
+            Spacer()
 
-                Text("アカウント登録")
-                    .font(.title2)
-                    .fontWeight(.medium)
-                    .padding(30)
+            Text("アカウント登録")
+                .font(.title2)
+                .fontWeight(.medium)
+                .padding(30)
 
-                FirstLogInInfomation(user: user)
+            FirstLogInInfomation(user: user)
 
-                Spacer()
+            Spacer()
 
-            } // VStack
-
-        } // NavigationView
+        } // VStack
     }
 }
 
@@ -149,7 +147,6 @@ struct FirstLogInInfomation: View {
 
         }) // NavigationLink
             .padding()
-
     } // body
 } // View
 
@@ -158,7 +155,7 @@ struct FirstLogInView_Previews: PreviewProvider {
 
         FirstSignInView(user: User(name:     "中川賢亮",
                                     address:  "kennsuke242424@gmail.com",
-                                    password: "ninnzinn2424"
-          )) // testUser)
+                                    password: "ninnzinn2424")
+        )
     }
 }

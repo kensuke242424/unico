@@ -33,7 +33,7 @@ struct SuccsessView: View {
     }
 }
 
-struct MistakeView: View {
+struct ErrorView: View {
     var body: some View {
         HStack {
             Image(systemName: "lock.slash.fill")
@@ -48,6 +48,7 @@ struct LodingView_Previews: PreviewProvider {
         Group {
             LogInCheckView()
             SuccsessView()
+            ErrorView()
         }
 
     }
