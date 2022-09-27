@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct HomeView: View {
+struct HomeTabView: View {
 
     @State private var tabIndex = 0
     @State var isShowItemDetail = false
@@ -41,13 +41,12 @@ struct HomeView: View {
                 }.badge("!")
 
         } // TabViewここまで
-
     } // body
 } // View
 
-struct HomeView_Previews: PreviewProvider {
+struct HomeTabView_Previews: PreviewProvider {
     static var previews: some View {
 
-            HomeView()
+            HomeTabView()
     }
 }

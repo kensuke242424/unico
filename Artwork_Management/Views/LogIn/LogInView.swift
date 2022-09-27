@@ -7,47 +7,35 @@
 
 import SwiftUI
 
+// ✅ ログイン画面の親Viewです。
 struct LogInView: View {
 
     var body: some View {
 
         NavigationView {
 
-            VStack {
+            ZStack {
+                VStack {
 
-                Spacer()
+                    Spacer()
 
-                RogoMark()
+                    // ロゴマークのカスタムView
+                    RogoMark()
 
-                Spacer()
+                    Spacer()
 
-                Text("ログイン")
-                    .font(.title2)
-                    .fontWeight(.medium)
-                    .padding(30)
+                    // ログイン画面のインフォメーション部品のカスタムView
+                    LogInInfomation()
 
-                LogInInfomation()
+                    Spacer()
 
-                NavigationLink("初めての方はこちら>>",
-                               destination: FirstLogInView())
-                .foregroundColor(.blue)
-                .padding()
-
-                Spacer()
-
-            } // VStack
-
+                } // VStack
+            } // ZStack
         } // NavigationView
     } // body
 } // View
 
-struct LogInView_Previews: PreviewProvider {
-    static var previews: some View {
-        LogInView()
-    }
-}
-
-// ログイン画面に表示されるロゴマークのカスタムViewです。
+// ✅ログイン画面に表示されるロゴマークのカスタムViewです。
 struct RogoMark: View {
     var body: some View {
 
@@ -66,64 +54,130 @@ struct RogoMark: View {
     } // body
 } // View
 
-// ログイン時の入力欄のカスタムViewです。
+// ✅ログイン時の入力欄のカスタムViewです。
 struct LogInInfomation: View {
 
     @State private var address = ""
     @State private var password = ""
     @State private var passHidden = true
+    @State private var isLogInCheck = false
+    @State private var isAccountCheckStart = false
+    @State private var count = 3
 
     var body: some View {
 
         VStack(alignment: .leading) {
 
-            Text("メールアドレス")
-                .foregroundColor(.gray)
+            // 入力欄全体
+            Group {
 
-            TextField("●●●●", text: $address)
-                .autocapitalization(.none)
-                .textFieldStyle(.roundedBorder)
-                .keyboardType(.emailAddress)
-                .padding(.bottom, 20)
+                Text("メールアドレス")
+                    .foregroundColor(.gray)
 
-            ZStack {
+                TextField("artwork/@gmail.com", text: $address)
 
-                Group {
+                Text("パスワード")
+                    .foregroundColor(.gray)
+
+                ZStack {
                     if passHidden {
-                        Text("パスワード")
-                            .foregroundColor(.gray)
-
                         SecureField("●●●●", text: $password)
-                            .autocapitalization(.none)
-                            .textFieldStyle(.roundedBorder)
-                            .keyboardType(.emailAddress)
                     } else {
-                        Text("パスワード")
-                            .foregroundColor(.gray)
-
                         TextField("●●●●", text: $password)
-                            .autocapitalization(.none)
-                            .textFieldStyle(.roundedBorder)
-                            .keyboardType(.emailAddress)
                     } // if passHidden
-                } // Group
 
-                HStack {
-                    Spacer()
+                    HStack {
+                        Spacer()
 
-                    Button {
-                        passHidden.toggle()
-                        print("passHidden: \(passHidden)")
-                    } label: {
-                        Image(systemName: "eye.fill")
-                            .foregroundColor(.gray)
-                    } // Button
-                }
-                .padding()
+                        Button {
+                            passHidden.toggle()
+                        } label: {
+                            Image(systemName: "eye.fill")
+                                .foregroundColor(.gray)
+                        } // Button
+                    } // HStack
+                    .padding(.horizontal)
+                } // ZStack
 
-            } // ZStack
-        } // VStack
+            } // Group(入力欄全体)
+            .font(.subheadline)
+            .autocapitalization(.none)
+            .textFieldStyle(.roundedBorder)
+            .keyboardType(.emailAddress)
+            .padding(.bottom, 15)
+
+        } // VStack(.leading)
         .padding()
 
+        VStack {
+
+            if isAccountCheckStart {
+                if count <= 3, count >= 2 {
+                    LogInCheckView()
+                }
+                else if count <= 1 {
+                    SuccsessView()
+                }
+            }
+
+            NavigationLink(destination: HomeTabView(),
+                           isActive: $isLogInCheck,
+                           label: {
+                Button {
+                    isAccountCheckStart = true
+                    dummyTextTimer()
+
+                } label: {
+                    Text("ログイン")
+                }
+                .buttonStyle(.borderedProminent)
+
+            }) // NavigationLink
+
+            Group {
+                NavigationLink("初めての方はこちら>>",
+                               destination: FirstSignInView())
+                .foregroundColor(.blue)
+                .padding()
+
+                Text("- または -")
+                    .padding()
+
+                NavigationLink("試しに始めてみる",
+                               destination: HomeTabView())
+
+
+            } // Group
+            .font(.subheadline)
+        } // VStack
+
+//        .onAppear {
+//            isAccountCheckStart = false
+//        }
+        .onDisappear {
+            isAccountCheckStart = false
+            count = 3
+        }
     } // body
+
+    func dummyTextTimer() {
+        // 仮でログインチェックをTimerを用いて表現しています。
+        Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+
+            self.count -= 1
+
+            if count == 0 {
+                isLogInCheck.toggle()
+
+                timer.invalidate()
+
+            }
+        } // Timer
+    }
 } // View
+
+struct LogInView_Previews: PreviewProvider {
+    static var previews: some View {
+        LogInView()
+    }
+}
