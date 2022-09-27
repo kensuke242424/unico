@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E0149BFA28E31F9F00038BDD /* UserModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0149BF928E31F9F00038BDD /* UserModel.swift */; };
 		E08F272528DDA08E00329C5E /* Artwork_ManagementApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E08F272428DDA08E00329C5E /* Artwork_ManagementApp.swift */; };
 		E08F272928DDA09000329C5E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E08F272828DDA09000329C5E /* Assets.xcassets */; };
 		E08F272C28DDA09000329C5E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E08F272B28DDA09000329C5E /* Preview Assets.xcassets */; };
@@ -29,6 +30,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		E0149BF928E31F9F00038BDD /* UserModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserModel.swift; sourceTree = "<group>"; };
 		E08F272128DDA08E00329C5E /* Artwork_Management.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Artwork_Management.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E08F272428DDA08E00329C5E /* Artwork_ManagementApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Artwork_ManagementApp.swift; sourceTree = "<group>"; };
 		E08F272828DDA09000329C5E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -124,6 +126,7 @@
 		E08F273428DDB3CA00329C5E /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				E0149BF928E31F9F00038BDD /* UserModel.swift */,
 				E0CF7EEF28DF152D00735142 /* ItemModel.swift */,
 			);
 			path = Models;
@@ -262,6 +265,7 @@
 				E08F273A28DDB53700329C5E /* SystemView.swift in Sources */,
 				E0CF7EF628DF6E6F00735142 /* AccountIconView.swift in Sources */,
 				E0CF7EEC28DEEED700735142 /* LibraryListView.swift in Sources */,
+				E0149BFA28E31F9F00038BDD /* UserModel.swift in Sources */,
 				E0DE98D828E2DBB800471AB4 /* LogInViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
