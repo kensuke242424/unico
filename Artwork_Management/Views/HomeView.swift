@@ -28,7 +28,7 @@ struct HomeView: View {
                     Text("inventory")
                 }
 
-            SalesView()
+            SalesManageView()
                 .tabItem {
                     Image(systemName: "chart.xyaxis.line")
                     Text("Manage")

@@ -10,6 +10,7 @@ import Foundation
 struct Item: Identifiable {
 
     let id = UUID()
+    let index: Int
     let tag: String
     let name: String
     let detail: String
