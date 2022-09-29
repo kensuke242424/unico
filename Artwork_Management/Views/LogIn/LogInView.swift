@@ -87,7 +87,7 @@ struct LogInInfomation: View {
                             .font(.caption2)
                             .foregroundColor(.red)
                     }
-                } // HStack
+                } // HStack‚
 
 
                 TextField("artwork/@gmail.com", text: $address)
