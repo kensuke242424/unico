@@ -10,7 +10,7 @@ import SwiftUI
 struct HomeTabView: View {
 
     @State private var tabIndex = 0
-    @State var isShowItemDetail = false
+    @State private var isShowItemDetail = false
 
     var body: some View {
 
