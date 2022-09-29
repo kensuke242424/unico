@@ -7,10 +7,10 @@
 
 import SwiftUI
 
-struct HomeView: View {
+struct HomeTabView: View {
 
     @State private var tabIndex = 0
-    @State var isShowItemDetail = false
+    @State private var isShowItemDetail = false
 
     var body: some View {
 
@@ -41,13 +41,13 @@ struct HomeView: View {
                 }.badge("!")
 
         } // TabViewここまで
-
+//        .navigationBarBackButtonHidden(true)
     } // body
 } // View
 
-struct HomeView_Previews: PreviewProvider {
+struct HomeTabView_Previews: PreviewProvider {
     static var previews: some View {
 
-            HomeView()
+            HomeTabView()
     }
 }
