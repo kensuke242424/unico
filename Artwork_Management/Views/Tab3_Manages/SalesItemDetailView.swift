@@ -36,7 +36,7 @@ struct SalesItemDetailView: View {
 
         RoundedRectangle (cornerRadius: 20)
             .frame(width: size.width / 1.3, height: size.height / 2)
-            .opacity(0.5)
+            .opacity(0.7)
 
                 VStack(spacing: 10) {
                     Text(item[index].name)

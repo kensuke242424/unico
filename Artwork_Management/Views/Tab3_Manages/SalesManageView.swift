@@ -53,7 +53,7 @@ struct SalesManageView: View {
                             ForEach(Array(items.enumerated()), id: \.offset) { offset, item in
 
                                 if item.tag == tag {
-                                    ContactsForItem(item: item)
+                                    ContactsForItem(item: item, index: offset)
                                 }
                             } // ForEach item
                         } // ForEach tag
@@ -74,7 +74,7 @@ struct SalesManageView: View {
     } // body
 
     @ViewBuilder
-    func ContactsForItem(item: Item) -> some View {
+    func ContactsForItem(item: Item, index: Int) -> some View {
 
         let size = UIScreen.main.bounds
 
@@ -92,7 +92,8 @@ struct SalesManageView: View {
                         .font(.subheadline.bold())
 
                         Button {
-                            index = index
+                            self.index = index
+                            print("index: \(index)")
                             isShowItemDetail.toggle()
                             print("isShowItemDetail: \(isShowItemDetail)")
 
