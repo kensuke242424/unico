@@ -43,9 +43,9 @@ struct SalesManageView: View {
                         ForEach(tags, id: \.self) { tag in
 
                             // タグ
-                            Text(tag)
+                            Text("- \(tag) -")
                                 .font(.largeTitle.bold())
-                                .shadow(radius: 2, x: 4, y: 10)
+                                .shadow(radius: 2, x: 4, y: 6)
                                 .padding(.vertical)
 
                             // タグごとに分配してリスト表示
@@ -53,7 +53,7 @@ struct SalesManageView: View {
                             ForEach(Array(items.enumerated()), id: \.offset) { offset, item in
 
                                 if item.tag == tag {
-                                    ContactsForItem(item: item, index: offset)
+                                    SalesItemListRow(item: item, index: offset)
                                 }
                             } // ForEach item
                         } // ForEach tag
@@ -74,7 +74,7 @@ struct SalesManageView: View {
     } // body
 
     @ViewBuilder
-    func ContactsForItem(item: Item, index: Int) -> some View {
+    func SalesItemListRow(item: Item, index: Int) -> some View {
 
         let size = UIScreen.main.bounds
 
@@ -117,6 +117,7 @@ struct SalesManageView: View {
                                     .frame(width: CGFloat(item.sales) / 1000, height: 13)
                                     .foregroundColor(.red)
                                     .opacity(0.7)
+                                    .shadow(color: .gray, radius: 3, x: 4, y: 4)
                             } // case 赤
 
                     case "青":
@@ -128,6 +129,7 @@ struct SalesManageView: View {
                                     .frame(width: CGFloat(item.sales) / 1000, height: 13)
                                     .foregroundColor(.blue)
                                     .opacity(0.7)
+                                    .shadow(color: .gray, radius: 3, x: 4, y: 4)
                             } // case 青
 
                     case "黄":
@@ -139,6 +141,7 @@ struct SalesManageView: View {
                                     .frame(width: CGFloat(item.sales) / 1000, height: 13)
                                     .foregroundColor(.yellow)
                                     .opacity(0.7)
+                                    .shadow(color: .gray, radius: 3, x: 4, y: 4)
                             } // case 黄
 
 
