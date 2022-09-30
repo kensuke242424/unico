@@ -49,6 +49,8 @@ struct ShowsItemDetail: View {
                         Button {
                             // NOTE: アイテム編集画面へ遷移するかをアラートで選択
                             self.isShowAlert = true
+                            self.tabIndex = 2
+                            print("isShowAlert_tabIndex: \(tabIndex)")
                             print("isShowAlert: \(isShowAlert)")
                             
                         } label: {
@@ -96,9 +98,11 @@ struct ShowsItemDetail: View {
         // NOTE: opacityの設定によって遷移時のアニメーションを付与
         .opacity(self.opacity)
         .onAppear {
-            withAnimation(.linear(duration: 0.3)) {
+            withAnimation(.linear(duration: 0.2)) {
                 self.opacity = 1.0
             }
+//            self.tabIndex = 2
+            print("onAppear_tabIndex: \(tabIndex)")
         } // .onAppear
     } // body
 } // View

@@ -70,9 +70,9 @@ struct SalesManageView: View {
                     ShowsItemDetail(item: items, index: $index,
                                     isShowitemDetail: $isShowItemDetail,
                                     tabIndex: $tabIndex)
-                }
 
-            }
+                } // if isShowItemDetail
+            } // ZStack
 
         } // NavigationView
     } // body
@@ -96,6 +96,8 @@ struct SalesManageView: View {
                         Button {
                             self.index = index
                             print("index: \(index)")
+//                            self.tabIndex = 2
+                            print("tabIndex: \(tabIndex)")
                             isShowItemDetail.toggle()
                             print("isShowItemDetail: \(isShowItemDetail)")
 
@@ -117,7 +119,6 @@ struct SalesManageView: View {
                         IndicatorView(salesValue: item.sales, tagColor: .yellow)
                     default:
                         IndicatorView(salesValue: item.sales, tagColor: .gray)
-
                     }
 
                     Text(item.name)

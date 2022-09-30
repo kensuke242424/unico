@@ -9,8 +9,8 @@ import SwiftUI
 
 struct HomeView: View {
 
-    @State private var tabIndex = 0
     @State var isShowItemDetail = false
+    @State private var tabIndex = 0
 
     var body: some View {
 
@@ -21,24 +21,29 @@ struct HomeView: View {
                     Image(systemName: "house")
                     Text("Home")
                 }
+//                .tag(0)
 
             ItemStockView()
                 .tabItem {
                     Image(systemName: "shippingbox.fill")
                     Text("inventory")
                 }
+//                .tag(1)
 
             SalesManageView(tabIndex: $tabIndex)
                 .tabItem {
                     Image(systemName: "chart.xyaxis.line")
                     Text("Manage")
                 }
+//                .tag(2)
 
             SystemView()
                 .tabItem {
                     Image(systemName: "person.fill")
                     Text("System")
-                }.badge("!")
+                }
+                .badge("!")
+//                .tag(3)
 
         } // TabViewここまで
     } // body
