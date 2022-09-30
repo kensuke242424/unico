@@ -41,6 +41,7 @@ struct ItemStockView: View {
             } // VStack
             .navigationTitle("ItemStock")
             .padding(.top)
+            .navigationBarTitleDisplayMode(.inline)
         } // NavigationView
     } // body
 } // View
