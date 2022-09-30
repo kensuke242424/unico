@@ -36,7 +36,7 @@ struct ShowsItemDetail: View {
 
         RoundedRectangle (cornerRadius: 20)
                 .foregroundColor(.black)
-                .frame(width: 300, height: 500)
+                .frame(width: 300, height: 470)
             .opacity(0.7)
 
             if let showItem = item[index] {
@@ -46,7 +46,7 @@ struct ShowsItemDetail: View {
                         .foregroundColor(.white)
 
                     RoundedRectangle(cornerRadius: 4)
-                        .frame(width: 170, height: 170)
+                        .frame(width: 150, height: 150)
                         .foregroundColor(.yellow)
 
                     HStack {
@@ -137,18 +137,17 @@ struct SalesItemContents: View {
             } // HStack
 
             HStack {
-
                 Text("価格　　　:　　")
                 Text("\(price) 円")
 
             } // HStack
 
             HStack {
-
                 Text("総売上　　:　　")
                 Text("\(sales) 円")
 
             } // HStack
+            .padding(.bottom, 12)
 
             // NOTE: こちらにはTimestampによる登録日が記述されます
             HStack {
