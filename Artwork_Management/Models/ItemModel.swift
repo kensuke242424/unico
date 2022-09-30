@@ -11,7 +11,13 @@ struct Item: Identifiable {
 
     let id = UUID()
     let tag: String
+    let tagColor: String
     let name: String
     let detail: String
     let photo: String
+    let price: Int
+    let sales: Int
+    let inventory: Int
+    let createAt: Date
+    let updateAt: Date
 }

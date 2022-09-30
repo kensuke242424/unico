@@ -32,7 +32,6 @@ struct ItemStockView: View {
                     } // Button
                 } // HStack(検索ボタン)
                 .padding()
-
                 
                 ItemShowBlock(itemWidth: 180,
                               itemHeight: 200,
