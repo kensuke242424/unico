@@ -32,8 +32,9 @@ struct ShowsItemDetail: View {
                 .frame(width: 300, height: 500)
             .opacity(0.7)
 
+            if let showItem = item[index] {
                 VStack(spacing: 10) {
-                    Text(item[index].name)
+                    Text(showItem.name)
                         .fontWeight(.black)
                         .foregroundColor(.white)
 
@@ -48,11 +49,11 @@ struct ShowsItemDetail: View {
 
                         Button {
                             // NOTE: アイテム編集画面へ遷移するかをアラートで選択
-                            self.isShowAlert = true
-                            self.tabIndex = 2
+                            isShowAlert = true
+//                            tabIndex = 2
                             print("isShowAlert_tabIndex: \(tabIndex)")
                             print("isShowAlert: \(isShowAlert)")
-                            
+
                         } label: {
                             Image(systemName: "highlighter")
                                 .foregroundColor(.yellow)
@@ -81,20 +82,24 @@ struct ShowsItemDetail: View {
                         .foregroundColor(.white)
 
                     // NOTE: アイテムの情報が格納羅列されたカスタムViewです
-                    SalesItemContents(sales:     item[index].sales,
-                                      price:     item[index].price,
-                                      inventory: item[index].inventory,
-                                      createAt:  item[index].createAt,
-                                      updateAt:  item[index].updateAt,
-                                      tabIndex: $tabIndex
+                    SalesItemContents(sales:     showItem.sales,
+                                      price:     showItem.price,
+                                      inventory: showItem.inventory,
+                                      createAt:  showItem.createAt,
+                                      updateAt:  showItem.updateAt,
+                                      tabIndex:  $tabIndex
                     )
 
                     Text("ーーーーーーーーーーーーー")
                         .foregroundColor(.white)
 
                 } // VStack
-                .padding()
-            } // ZStack
+
+            } else {
+                Text("アイテムデータが取得できませんでした")
+            } // if let item[index]
+
+        } // ZStack
         // NOTE: opacityの設定によって遷移時のアニメーションを付与
         .opacity(self.opacity)
         .onAppear {
@@ -164,10 +169,16 @@ struct SalesItemContents: View {
 
 struct SalesItemDetailView_Previews: PreviewProvider {
     static var previews: some View {
-        ShowsItemDetail(item: [Item(tag: "Album", tagColor: "赤", name: "Album1",
+        ShowsItemDetail(item: [Item(tag: "Album",
+                                    tagColor: "赤",
+                                    name: "Album1",
                                     detail: "Album1のアイテム紹介テキストです。",
-                                    photo: "", price: 1800, sales: 88000, inventory: 200,
-                                    createAt: Date(), updateAt: Date())],
+                                    photo: "",
+                                    price: 1800,
+                                    sales: 88000,
+                                    inventory: 200,
+                                    createAt: Date(),
+                                    updateAt: Date())],
                         index: .constant(0),
                         isShowitemDetail: .constant(false),
                         tabIndex: .constant(2)

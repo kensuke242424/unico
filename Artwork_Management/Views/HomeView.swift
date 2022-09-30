@@ -21,21 +21,21 @@ struct HomeView: View {
                     Image(systemName: "house")
                     Text("Home")
                 }
-//                .tag(0)
+                .tag(0)
 
             ItemStockView()
                 .tabItem {
                     Image(systemName: "shippingbox.fill")
                     Text("inventory")
                 }
-//                .tag(1)
+                .tag(1)
 
             SalesManageView(tabIndex: $tabIndex)
                 .tabItem {
                     Image(systemName: "chart.xyaxis.line")
                     Text("Manage")
                 }
-//                .tag(2)
+                .tag(2)
 
             SystemView()
                 .tabItem {
@@ -43,7 +43,7 @@ struct HomeView: View {
                     Text("System")
                 }
                 .badge("!")
-//                .tag(3)
+                .tag(3)
 
         } // TabViewここまで
     } // body
