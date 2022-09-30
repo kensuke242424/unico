@@ -9,10 +9,5 @@ import Foundation
 
 class ItemViewModel: ObservableObject {
 
-    @Published var ItemsList: [Item] = [
-
-       
-
-    ]
-
+    @Published var ItemsList: [Item] = []
 }

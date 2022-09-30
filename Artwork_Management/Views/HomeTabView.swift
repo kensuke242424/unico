@@ -46,6 +46,7 @@ struct HomeTabView: View {
                 .tag(3)
 
         } // TabViewここまで
+        .navigationBarBackButtonHidden()
     } // body
 } // View
 

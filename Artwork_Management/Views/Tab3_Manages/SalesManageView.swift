@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SalesManageView: View {
 
+    // NOTE: アイテム、タグのテストデータです
     @State private var items: [Item] =
     [
         Item(tag: "Album", tagColor: "赤", name: "Album1", detail: "Album1のアイテム紹介テキストです。", photo: "", price: 1800, sales: 88000, inventory: 200, createAt: Date(), updateAt: Date()),
@@ -23,11 +24,12 @@ struct SalesManageView: View {
         Item(tag: "Goods", tagColor: "黄", name: "グッズ2", detail: "グッズ2のアイテム紹介テキストです。", photo: "",
              price: 4000, sales: 520000, inventory: 97, createAt: Date(), updateAt: Date())
     ]
+    var tags = ["Album", "Single", "Goods"]
 
-    // NOTE: リスト内のアイテム詳細を表示するトリガー
+    // NOTE: isShowItemDetail ⇨ リスト内のアイテム詳細を表示するトリガー
+    // NOTE: listIndex ⇨ リストの一要素Indexを、アイテム詳細画面表示時に渡します
     @State private var isShowItemDetail = false
     @State private var listIndex = 0
-    var tags = ["Album", "Single", "Goods"]
 
     // NOTE: アイテムごとのタグカラーをもとに、売上ゲージ色を決定します
 
