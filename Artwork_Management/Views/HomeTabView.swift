@@ -7,10 +7,10 @@
 
 import SwiftUI
 
-struct HomeView: View {
+struct HomeTabView: View {
 
     @State private var tabIndex = 0
-    @State var isShowItemDetail = false
+    @State private var isShowItemDetail = false
 
     var body: some View {
 
@@ -21,32 +21,37 @@ struct HomeView: View {
                     Image(systemName: "house")
                     Text("Home")
                 }
+                .tag(0)
 
             ItemStockView()
                 .tabItem {
                     Image(systemName: "shippingbox.fill")
                     Text("inventory")
                 }
+                .tag(1)
 
             SalesManageView()
                 .tabItem {
                     Image(systemName: "chart.xyaxis.line")
                     Text("Manage")
                 }
+                .tag(2)
 
             SystemView()
                 .tabItem {
                     Image(systemName: "person.fill")
                     Text("System")
-                }.badge("!")
+                }
+                .badge("!")
+                .tag(3)
 
         } // TabViewここまで
     } // body
 } // View
 
-struct HomeView_Previews: PreviewProvider {
+struct HomeTabView_Previews: PreviewProvider {
     static var previews: some View {
+            HomeTabView()
 
-        HomeView()
     }
 }

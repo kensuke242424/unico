@@ -11,6 +11,7 @@ struct Item: Identifiable {
 
     let id = UUID()
     let tag: String
+    let tagColor: String
     let name: String
     let detail: String
     let photo: String
