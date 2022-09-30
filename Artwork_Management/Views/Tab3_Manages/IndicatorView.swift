@@ -10,7 +10,8 @@ import SwiftUI
 struct IndicatorView: View {
 
     let size = UIScreen.main.bounds
-    let salesValue: Int
+    var salesValue: Int
+    @State private var animationValue: Int = 0
     let tagColor: Color
 
     var body: some View {
@@ -19,16 +20,24 @@ struct IndicatorView: View {
            .foregroundColor(.clear)
            .overlay(alignment: .leading) {
                Rectangle()
-                   .frame(width: CGFloat(salesValue) / 1000, height: 13)
+                   .frame(width: CGFloat(animationValue) / 1000, height: 13)
                    .foregroundColor(tagColor)
                    .opacity(0.7)
-                   .shadow(color: .gray, radius: 3, x: 4, y: 4)
+                   .shadow(radius: 2, x: 7, y: 4)
            } // case 黄
+           .onAppear {
+               withAnimation(.linear(duration: 0.5)) {
+                   self.animationValue = salesValue
+               }
+           }
+           .onDisappear {
+               self.animationValue = 0
+           }
     }
 }
 
 struct IndicatorView_Previews: PreviewProvider {
     static var previews: some View {
-        IndicatorView(salesValue: 200000, tagColor: .red)
+        IndicatorView(salesValue: 220000, tagColor: .red)
     }
 }
