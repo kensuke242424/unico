@@ -11,16 +11,16 @@ struct SalesManageView: View {
 
     @State var items: [Item] =
     [
-        Item(tag: "Album", name: "Album1", detail: "Album1のアイテム紹介テキストです。", photo: "", price: 1800, sales: 88000, inventory: 200, createAt: Date(), updateAt: Date()),
-        Item(tag: "Album", name: "Album2", detail: "Album2のアイテム紹介テキストです。", photo: "",
+        Item(tag: "Album", tagColor: "赤", name: "Album1", detail: "Album1のアイテム紹介テキストです。", photo: "", price: 1800, sales: 88000, inventory: 200, createAt: Date(), updateAt: Date()),
+        Item(tag: "Album", tagColor: "赤", name: "Album2", detail: "Album2のアイテム紹介テキストです。", photo: "",
              price: 2800, sales: 230000, inventory: 420, createAt: Date(), updateAt: Date()),
-        Item(tag: "Single", name: "Single1", detail: "Single1のアイテム紹介テキストです。", photo: "",
+        Item(tag: "Single", tagColor: "青", name: "Single1", detail: "Single1のアイテム紹介テキストです。", photo: "",
              price: 1100, sales: 182000, inventory: 199, createAt: Date(), updateAt: Date()),
-        Item(tag: "Single", name: "Single2", detail: "Single2のアイテム紹介テキストです。", photo: "",
+        Item(tag: "Single", tagColor: "青", name: "Single2", detail: "Single2のアイテム紹介テキストです。", photo: "",
              price: 1310, sales: 105000, inventory: 43, createAt: Date(), updateAt: Date()),
-        Item(tag: "Goods", name: "グッズ1", detail: "グッズ1のアイテム紹介テキストです。", photo: "",
+        Item(tag: "Goods", tagColor: "黄", name: "グッズ1", detail: "グッズ1のアイテム紹介テキストです。", photo: "",
              price: 2300, sales: 329000, inventory: 88, createAt: Date(), updateAt: Date()),
-        Item(tag: "Goods", name: "グッズ2", detail: "グッズ2のアイテム紹介テキストです。", photo: "",
+        Item(tag: "Goods", tagColor: "黄", name: "グッズ2", detail: "グッズ2のアイテム紹介テキストです。", photo: "",
              price: 4000, sales: 520000, inventory: 97, createAt: Date(), updateAt: Date())
     ]
 
@@ -30,7 +30,7 @@ struct SalesManageView: View {
 
         NavigationView {
 
-            ScrollView(.vertical, showsIndicators: false) {
+            ScrollView(.vertical) {
 
                 VStack(alignment: .leading) {
                     // タグの要素数の分リストを作成
@@ -52,7 +52,7 @@ struct SalesManageView: View {
                         } // ForEach item
                     } // ForEach tag
                 } // VStack
-                .padding()
+                .padding(.leading)
                 .navigationTitle("Sales")
                 .navigationBarTitleDisplayMode(.inline)
 
@@ -62,41 +62,79 @@ struct SalesManageView: View {
 
     @ViewBuilder
     func ContactsForItem(item: Item) -> some View {
+
+        let size = UIScreen.main.bounds
+
         VStack(alignment: .leading, spacing: 20) {
 
             HStack(spacing: 20) {
                 RoundedRectangle(cornerRadius: 10)
                     .fill(Color.gray)
-                    .frame(width: 100,height: 100)
+                    .frame(width: 70,height: 70)
                     .shadow(radius: 4, x: 5, y: 5)
 
                 VStack(alignment: .leading, spacing: 10) {
                     HStack(spacing: 20) {
-                        Text(item.name)
-                            .font(.title3.bold())
-
+                    Text("\(item.sales)円")
+                        .font(.subheadline.bold())
 
                         Button {
 
                         } label: {
                             Image(systemName: "questionmark.circle")
                                 .foregroundColor(.gray)
-                        }
+
+                        } // Button
+                    } // HStack
+
+
+                    switch item.tagColor {
+                    case "赤":
+
+                        // NOTE: ラインの外枠を透明フレームで置いておくことで、ラインが端まで行ってもレイアウトが崩れない
+                        Rectangle()
+                            .frame(width: size.width - 150, height: 13)
+                            .foregroundColor(.clear)
+                            .overlay(alignment: .leading) {
+                                Rectangle()
+                                    .frame(width: CGFloat(item.sales) / 1000, height: 13)
+                                    .foregroundColor(.red)
+                                    .opacity(0.7)
+                            } // case 赤
+
+                    case "青":
+                         Rectangle()
+                            .frame(width: size.width - 150, height: 13)
+                            .foregroundColor(.clear)
+                            .overlay(alignment: .leading) {
+                                Rectangle()
+                                    .frame(width: CGFloat(item.sales) / 1000, height: 13)
+                                    .foregroundColor(.blue)
+                                    .opacity(0.7)
+                            } // case 青
+
+                    case "黄":
+                         Rectangle()
+                            .frame(width: size.width - 150, height: 13)
+                            .foregroundColor(.clear)
+                            .overlay(alignment: .leading) {
+                                Rectangle()
+                                    .frame(width: CGFloat(item.sales) / 1000, height: 13)
+                                    .foregroundColor(.yellow)
+                                    .opacity(0.7)
+                            } // case 黄
+
+
+                    default:
+                        Rectangle()
+                            .frame(height: 13)
 
                     }
 
+                    Text(item.name)
+                        .font(.caption.bold())
+                        .foregroundColor(.gray)
 
-                    Text("\(item.sales)円")
-                        .font(.title.bold())
-                        .underline(color: .gray)
-
-                    HStack(spacing: 20) {
-                        Text("価格 \(item.price)")
-                            .fontWeight(.light)
-                        Text("在庫 \(item.inventory)")
-                            .fontWeight(.light)
-
-                    } // HStack
                 } // VStack
                 Spacer()
             } // HStack
@@ -110,4 +148,11 @@ struct SalesView_Previews: PreviewProvider {
     static var previews: some View {
         SalesManageView()
     }
+}
+
+// 売上表現ゲージの長さ変更
+enum gaugeOption {
+    case day
+    case month
+    case year
 }
