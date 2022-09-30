@@ -27,6 +27,8 @@ struct SalesManageView: View {
     // NOTE: リスト内のアイテム詳細を表示するトリガー
     @State private var isShowItemDetail = false
     @State private var index = 0
+    // NOTE: タブのセレクションインデックスをもらっておかないと、Alert表示時にHOMEへ戻ってしまう
+    @Binding var tabIndex: Int
 
     // NOTE: アイテムごとのタグカラーをもとに、売上ゲージ色を決定します
     var tags = ["Album", "Single", "Goods"]
@@ -65,7 +67,9 @@ struct SalesManageView: View {
                 } // ScrollView
 
                 if isShowItemDetail {
-                    SalesItemDetailView(item: items, index: $index, isShowitemDetail: $isShowItemDetail)
+                    ShowsItemDetail(item: items, index: $index,
+                                    isShowitemDetail: $isShowItemDetail,
+                                    tabIndex: $tabIndex)
                 }
 
             }
@@ -75,8 +79,6 @@ struct SalesManageView: View {
 
     @ViewBuilder
     func SalesItemListRow(item: Item, index: Int) -> some View {
-
-        let size = UIScreen.main.bounds
 
         VStack(alignment: .leading, spacing: 20) {
 
@@ -98,56 +100,23 @@ struct SalesManageView: View {
                             print("isShowItemDetail: \(isShowItemDetail)")
 
                         } label: {
-                            Image(systemName: "questionmark.circle")
+                            Image(systemName: "list.bullet")
                                 .foregroundColor(.gray)
 
                         } // Button
                     } // HStack
 
-
+                    // NOTE: ラインの外枠を透明フレームで置いておくことで、
+                    // ラインが端まで行ってもレイアウトが崩れない
                     switch item.tagColor {
                     case "赤":
-
-                        // NOTE: ラインの外枠を透明フレームで置いておくことで、ラインが端まで行ってもレイアウトが崩れない
-                        Rectangle()
-                            .frame(width: size.width - 150, height: 13)
-                            .foregroundColor(.clear)
-                            .overlay(alignment: .leading) {
-                                Rectangle()
-                                    .frame(width: CGFloat(item.sales) / 1000, height: 13)
-                                    .foregroundColor(.red)
-                                    .opacity(0.7)
-                                    .shadow(color: .gray, radius: 3, x: 4, y: 4)
-                            } // case 赤
-
+                        IndicatorView(salesValue: item.sales, tagColor: .red)
                     case "青":
-                         Rectangle()
-                            .frame(width: size.width - 150, height: 13)
-                            .foregroundColor(.clear)
-                            .overlay(alignment: .leading) {
-                                Rectangle()
-                                    .frame(width: CGFloat(item.sales) / 1000, height: 13)
-                                    .foregroundColor(.blue)
-                                    .opacity(0.7)
-                                    .shadow(color: .gray, radius: 3, x: 4, y: 4)
-                            } // case 青
-
+                        IndicatorView(salesValue: item.sales, tagColor: .blue)
                     case "黄":
-                         Rectangle()
-                            .frame(width: size.width - 150, height: 13)
-                            .foregroundColor(.clear)
-                            .overlay(alignment: .leading) {
-                                Rectangle()
-                                    .frame(width: CGFloat(item.sales) / 1000, height: 13)
-                                    .foregroundColor(.yellow)
-                                    .opacity(0.7)
-                                    .shadow(color: .gray, radius: 3, x: 4, y: 4)
-                            } // case 黄
-
-
+                        IndicatorView(salesValue: item.sales, tagColor: .yellow)
                     default:
-                        Rectangle()
-                            .frame(height: 13)
+                        IndicatorView(salesValue: item.sales, tagColor: .gray)
 
                     }
 
@@ -161,11 +130,10 @@ struct SalesManageView: View {
         } // VStack
         .padding(.top)
     } // リストレイアウト
-
 } // View
 
 struct SalesView_Previews: PreviewProvider {
     static var previews: some View {
-        SalesManageView()
+        SalesManageView(tabIndex: .constant(2))
     }
 }
