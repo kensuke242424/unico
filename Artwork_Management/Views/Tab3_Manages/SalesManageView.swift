@@ -7,6 +7,18 @@
 
 import SwiftUI
 
+enum SortType {
+    case salesUp
+    case salesDown
+    case updateAtUp
+    case createAtUp
+}
+
+enum TagGroup {
+    case groupOn
+    case groupOff
+}
+
 struct SalesManageView: View {
 
     @StateObject var itemVM = ItemViewModel()
@@ -16,57 +28,92 @@ struct SalesManageView: View {
     @State private var isShowItemDetail = false
     @State private var listIndex = 0
 
+    // NOTE: タググループ表示の切り替えに用います
+    @State private var tagGroup: TagGroup = .groupOn
+
+
+
     // NOTE: アイテムごとのタグカラーをもとに、売上ゲージ色を決定します
 
     var body: some View {
 
         NavigationView {
-
             ZStack {
-
                 ScrollView(.vertical) {
 
                     VStack(alignment: .leading) {
-                        // タグの要素数の分リストを作成
-                        ForEach(itemVM.tags, id: \.self) { tag in
 
-                            // タグ
-                            Text("- \(tag) -")
-                                .font(.largeTitle.bold())
-                                .shadow(radius: 2, x: 4, y: 6)
-                                .padding(.vertical)
+                        // NOTE: タグ表示の「ON」「OFF」で表示を切り替えます
+                        switch tagGroup {
 
-                            // タグごとに分配してリスト表示
-                            // enumerated ⇨ 要素とインデックス両方取得
+                        case .groupOn:
+                            // タグの要素数の分リストを作成
+                            ForEach(itemVM.tags, id: \.self) { tag in
+
+                                Text("- \(tag) -")
+                                    .font(.largeTitle.bold())
+                                    .shadow(radius: 2, x: 4, y: 6)
+                                    .padding(.vertical)
+
+                                // タグごとに分配してリスト表示
+                                // enumerated ⇨ 要素とインデックス両方取得
+                                ForEach(Array(itemVM.items.enumerated()), id: \.offset) { offset, item in
+
+                                    if item.tag == tag {
+                                        SalesItemListRow(item: item, listIndex: offset)
+                                    }
+                                } // ForEach item
+                            } // case .groupOn
+
+                        case .groupOff:
+
                             ForEach(Array(itemVM.items.enumerated()), id: \.offset) { offset, item in
 
-                                if item.tag == tag {
+
                                     SalesItemListRow(item: item, listIndex: offset)
-                                }
-                            } // ForEach item
-                        } // ForEach tag
+
+                            } // case .groupOff
+                        } // switch tagGroup
                     } // VStack
+
                     .padding(.leading)
                     .navigationTitle("Sales")
                     .toolbar {
                         ToolbarItem(placement: .navigationBarTrailing) {
                             Menu {
-                                Button("売り上げ(上り順)", action: {})
-                                Button("売り上げ(下り順)", action: {})
-                                Button("最終更新日", action: {})
-                                Button("追加日", action: {})
+                                Menu("タググループ") {
+                                    Button("ON", action: {
+                                        tagGroup = .groupOn
+                                    })
+
+                                    Button("OFF", action: {
+                                        tagGroup = .groupOff
+                                    })
+                                } // タググループオプション
+
+                                Menu("並び替え") {
+                                    Button("売り上げ(↑)", action: {
+                                        itemVM.items = itemsSort(sortType: .salesUp, items: itemVM.items)
+                                    })
+                                    Button("売り上げ(↓)", action: {
+                                        itemVM.items = itemsSort(sortType: .salesDown, items: itemVM.items)
+                                    })
+                                    Button("最終更新日- 後日実装 -", action: {
+                                        itemVM.items = itemsSort(sortType: .updateAtUp, items: itemVM.items)
+                                    })
+                                    Button("追加日- 後日実装 -", action: {
+                                        itemVM.items = itemsSort(sortType: .createAtUp, items: itemVM.items)
+                                    })
+                                } // 並び替えオプション
+
                             } label: {
                                 Image(systemName: "list.bullet.indent")
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 30, height: 30)
-                                    .foregroundColor(.white)
                             }
                         }
-                    }
-
-                    .navigationBarTitleDisplayMode(.inline)
-
+                    } // .toolbar
                 } // ScrollView
 
                 if isShowItemDetail {
@@ -76,7 +123,7 @@ struct SalesManageView: View {
 
                 } // if isShowItemDetail
             } // ZStack
-
+            .navigationBarTitleDisplayMode(.inline)
         } // NavigationView
     } // body
 
@@ -133,6 +180,27 @@ struct SalesManageView: View {
         } // VStack
         .padding(.top)
     } // リストレイアウト
+
+    func itemsSort(sortType: SortType, items: [Item]) -> [Item] {
+
+        // NOTE: 更新可能な値として格納しています
+        var varItems = items
+
+        switch sortType {
+
+        case .salesUp:
+            varItems.sort { $0.sales > $1.sales }
+        case .salesDown:
+            varItems.sort { $0.sales < $1.sales }
+        case .createAtUp:
+            print("createAtUp ⇨ Timestampが格納され次第、実装します。")
+        case .updateAtUp:
+            print("updateAtUp ⇨ Timestampが格納され次第、実装します。")
+        }
+
+        return varItems
+    } // func itemsSort
+
 } // View
 
 struct SalesView_Previews: PreviewProvider {

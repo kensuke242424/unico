@@ -17,7 +17,6 @@ struct ShowsItemDetail: View {
     @State private var isShowAlert = false
     @State private var isShowItemEdit = false
     @Binding var isShowitemDetail: Bool
-//    @Binding var tabIndex: Int
 
     var body: some View {
 
@@ -87,7 +86,7 @@ struct ShowsItemDetail: View {
                         .foregroundColor(.white)
 
                     // NOTE: アイテムの情報が格納羅列されたカスタムViewです
-                    SalesItemContents(sales:     showItem.sales,
+                    ItemDetailContents(sales:     showItem.sales,
                                       price:     showItem.price,
                                       inventory: showItem.inventory,
                                       createAt:  showItem.createAt,
@@ -115,60 +114,6 @@ struct ShowsItemDetail: View {
     } // body
 } // View
 
-struct SalesItemContents: View {
-
-    let sales: Int
-    let price: Int
-    let inventory: Int
-    let createAt: Date
-    let updateAt: Date
-//    @Binding var tabIndex: Int
-
-    var body: some View {
-
-
-        VStack(alignment: .listRowSeparatorLeading, spacing: 8) {
-
-            HStack {
-
-                Text("在庫残り　:　　")
-                Text("\(inventory) 個")
-
-            } // HStack
-
-            HStack {
-                Text("価格　　　:　　")
-                Text("\(price) 円")
-
-            } // HStack
-
-            HStack {
-                Text("総売上　　:　　")
-                Text("\(sales) 円")
-
-            } // HStack
-            .padding(.bottom, 12)
-
-            // NOTE: こちらにはTimestampによる登録日が記述されます
-            HStack {
-                Text("登録日　　:　　")
-                Text("2022. 8.30")
-
-            } // HStack
-
-            // NOTE: こちらにはTimestampによる最終更新日が記述されます
-            HStack {
-                Text("更新日　　:　　")
-                Text("2022. 9.24")
-
-            } // HStack
-        } // VStack
-        .fontWeight(.light)
-        .foregroundColor(.white)
-
-    } // body
-} // View
-
 struct SalesItemDetailView_Previews: PreviewProvider {
     static var previews: some View {
         ShowsItemDetail(item: [Item(tag: "Album",
@@ -183,7 +128,6 @@ struct SalesItemDetailView_Previews: PreviewProvider {
                                     updateAt: Date())],
                         index: .constant(0),
                         isShowitemDetail: .constant(false)
-//                        tabIndex: .constant(2)
         )
     }
 }
