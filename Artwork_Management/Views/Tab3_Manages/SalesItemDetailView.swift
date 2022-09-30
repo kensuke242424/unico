@@ -9,14 +9,19 @@ import SwiftUI
 
 struct SalesItemDetailView: View {
 
-    let name: String
-    let sales: Int
-    let price: Int
-    let inventory: Int
-    let photo: String
-    let size = UIScreen.main.bounds
-    @State private var opacity: Double = 0
+//    let name: String
+//    let sales: Int
+//    let price: Int
+//    let inventory: Int
+//    let photo: String
 
+    // NOTE: 親ViewからItem配列とインデックスを取得
+    let item: [Item]
+    @Binding var index: Int
+
+    let size = UIScreen.main.bounds
+
+    @State private var opacity: Double = 0
     @State private var isShowAlert = false
     @State private var isShowItemEdit = false
     @Binding var isShowitemDetail: Bool
@@ -34,7 +39,7 @@ struct SalesItemDetailView: View {
             .opacity(0.5)
 
                 VStack(spacing: 10) {
-                    Text(name)
+                    Text(item[index].name)
                         .fontWeight(.black)
                         .foregroundColor(.white)
 
@@ -79,7 +84,9 @@ struct SalesItemDetailView: View {
                         .foregroundColor(.white)
 
                     // NOTE: アイテムの情報が格納羅列されたカスタムViewです
-                    SalesItemContents(sales: sales, price: price, inventory: inventory)
+                    SalesItemContents(sales: item[index].sales,
+                                      price: item[index].price,
+                                      inventory: item[index].inventory)
 
                     Text("ーーーーーーーーーーーーー")
                         .foregroundColor(.white)
@@ -134,6 +141,12 @@ struct SalesItemContents: View {
 
 struct SalesItemDetailView_Previews: PreviewProvider {
     static var previews: some View {
-        SalesItemDetailView(name: "Album1", sales: 220000, price: 1800, inventory: 290, photo: "", isShowitemDetail: .constant(false))
+        SalesItemDetailView(item: [Item(tag: "Album", tagColor: "赤", name: "Album1",
+                                        detail: "Album1のアイテム紹介テキストです。",
+                                        photo: "", price: 1800, sales: 88000, inventory: 200,
+                                        createAt: Date(), updateAt: Date())],
+                            index: .constant(0),
+                            isShowitemDetail: .constant(false)
+        )
     }
 }

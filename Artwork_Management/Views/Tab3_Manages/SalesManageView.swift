@@ -26,6 +26,7 @@ struct SalesManageView: View {
 
     // NOTE: リスト内のアイテム詳細を表示するトリガー
     @State private var isShowItemDetail = false
+    @State private var index = 0
 
     // NOTE: アイテムごとのタグカラーをもとに、売上ゲージ色を決定します
     var tags = ["Album", "Single", "Goods"]
@@ -48,8 +49,8 @@ struct SalesManageView: View {
                                 .padding(.vertical)
 
                             // タグごとに分配してリスト表示
-
-                            ForEach(items) { item in
+                            // enumerated ⇨ 要素とインデックス両方取得
+                            ForEach(Array(items.enumerated()), id: \.offset) { offset, item in
 
                                 if item.tag == tag {
                                     ContactsForItem(item: item)
@@ -63,7 +64,9 @@ struct SalesManageView: View {
 
                 } // ScrollView
 
-
+                if isShowItemDetail {
+                    SalesItemDetailView(item: items, index: $index, isShowitemDetail: $isShowItemDetail)
+                }
 
             }
 
@@ -89,7 +92,8 @@ struct SalesManageView: View {
                         .font(.subheadline.bold())
 
                         Button {
-                                isShowItemDetail.toggle()
+                            index = index
+                            isShowItemDetail.toggle()
                             print("isShowItemDetail: \(isShowItemDetail)")
 
                         } label: {
