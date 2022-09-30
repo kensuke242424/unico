@@ -15,13 +15,23 @@ struct SalesItemDetailView: View {
     let inventory: Int
     let photo: String
     let size = UIScreen.main.bounds
+    @State private var opacity: Double = 0
+
+    @State private var isShowAlert = false
+    @State private var isShowItemEdit = false
+    @Binding var isShowitemDetail: Bool
 
     var body: some View {
-        Rectangle()
-            .frame(width: size.width / 1.3, height: size.height / 2)
-            .opacity(0.6)
 
-            .overlay {
+        ZStack {
+
+            Color(.gray)
+                .ignoresSafeArea()
+                .opacity(0.3)
+
+        RoundedRectangle (cornerRadius: 20)
+            .frame(width: size.width / 1.3, height: size.height / 2)
+            .opacity(0.5)
 
                 VStack(spacing: 10) {
                     Text(name)
@@ -38,29 +48,53 @@ struct SalesItemDetailView: View {
                             .foregroundColor(.white)
 
                         Button {
-                            // アイテム編集画面
+                            // NOTE: アイテム編集画面へ遷移するかをアラートで選択
+                            isShowAlert.toggle()
+                            
                         } label: {
                             Image(systemName: "highlighter")
                                 .foregroundColor(.yellow)
                         }
+                        .alert("編集", isPresented: $isShowAlert) {
 
-                    }
+                            Button {
+                                isShowItemEdit.toggle()
+                                print("isShowItemEdit: \(isShowItemEdit)")
+                            } label: {
+                                Text("戻る")
+                            }
+
+                            Button {
+                                isShowItemEdit.toggle()
+                                print("isShowItemEdit: \(isShowItemEdit)")
+                            } label: {
+                                Text("はい")
+                            }
+                        } message: {
+                            Text("アイテム情報を編集しますか？")
+                        } // alert
+                    } // HStack
 
                     Text("ーーーーーーーーーーーーー")
                         .foregroundColor(.white)
 
                     // NOTE: アイテムの情報が格納羅列されたカスタムViewです
-                    SalesItemDetail(sales: sales, price: price, inventory: inventory)
+                    SalesItemContents(sales: sales, price: price, inventory: inventory)
 
                     Text("ーーーーーーーーーーーーー")
                         .foregroundColor(.white)
 
                 } // VStack
-            } // overlay
+            } // ZStack
+        .onAppear {
+            withAnimation(.linear(duration: 0.3)) {
+                self.opacity = 1.0
+            }
+        }
     } // body
 } // View
 
-struct SalesItemDetail: View {
+struct SalesItemContents: View {
 
     let sales: Int
     let price: Int
@@ -100,6 +134,6 @@ struct SalesItemDetail: View {
 
 struct SalesItemDetailView_Previews: PreviewProvider {
     static var previews: some View {
-        SalesItemDetailView(name: "Album1", sales: 220000, price: 1800, inventory: 290, photo: "")
+        SalesItemDetailView(name: "Album1", sales: 220000, price: 1800, inventory: 290, photo: "", isShowitemDetail: .constant(false))
     }
 }

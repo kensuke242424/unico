@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SalesManageView: View {
 
-    @State var items: [Item] =
+    @State private var items: [Item] =
     [
         Item(tag: "Album", tagColor: "赤", name: "Album1", detail: "Album1のアイテム紹介テキストです。", photo: "", price: 1800, sales: 88000, inventory: 200, createAt: Date(), updateAt: Date()),
         Item(tag: "Album", tagColor: "赤", name: "Album2", detail: "Album2のアイテム紹介テキストです。", photo: "",
@@ -24,39 +24,49 @@ struct SalesManageView: View {
              price: 4000, sales: 520000, inventory: 97, createAt: Date(), updateAt: Date())
     ]
 
+    // NOTE: リスト内のアイテム詳細を表示するトリガー
+    @State private var isShowItemDetail = false
+
+    // NOTE: アイテムごとのタグカラーをもとに、売上ゲージ色を決定します
     var tags = ["Album", "Single", "Goods"]
 
     var body: some View {
 
         NavigationView {
 
-            ScrollView(.vertical) {
+            ZStack {
+                ScrollView(.vertical) {
 
-                VStack(alignment: .leading) {
-                    // タグの要素数の分リストを作成
-                    ForEach(tags, id: \.self) { tag in
+                    VStack(alignment: .leading) {
+                        // タグの要素数の分リストを作成
+                        ForEach(tags, id: \.self) { tag in
 
-                        // タグ
-                        Text(tag)
-                            .font(.largeTitle.bold())
-                            .shadow(radius: 2, x: 4, y: 10)
-                            .padding(.vertical)
+                            // タグ
+                            Text(tag)
+                                .font(.largeTitle.bold())
+                                .shadow(radius: 2, x: 4, y: 10)
+                                .padding(.vertical)
 
-                        // タグごとに分配してリスト表示
-                        
-                        ForEach(items) { item in
+                            // タグごとに分配してリスト表示
 
-                            if item.tag == tag {
-                                ContactsForItem(item: item)
-                            }
-                        } // ForEach item
-                    } // ForEach tag
-                } // VStack
-                .padding(.leading)
-                .navigationTitle("Sales")
-                .navigationBarTitleDisplayMode(.inline)
+                            ForEach(items) { item in
 
-            } // ScrollView
+                                if item.tag == tag {
+                                    ContactsForItem(item: item)
+                                }
+                            } // ForEach item
+                        } // ForEach tag
+                    } // VStack
+                    .padding(.leading)
+                    .navigationTitle("Sales")
+                    .navigationBarTitleDisplayMode(.inline)
+
+                } // ScrollView
+
+
+
+            }
+
         } // NavigationView
     } // body
 
@@ -79,6 +89,8 @@ struct SalesManageView: View {
                         .font(.subheadline.bold())
 
                         Button {
+                                isShowItemDetail.toggle()
+                            print("isShowItemDetail: \(isShowItemDetail)")
 
                         } label: {
                             Image(systemName: "questionmark.circle")
