@@ -26,12 +26,10 @@ struct SalesManageView: View {
 
     // NOTE: リスト内のアイテム詳細を表示するトリガー
     @State private var isShowItemDetail = false
-    @State private var index = 0
-    // NOTE: タブのセレクションインデックスをもらっておかないと、Alert表示時にHOMEへ戻ってしまう
-    @Binding var tabIndex: Int
+    @State private var listIndex = 0
+    var tags = ["Album", "Single", "Goods"]
 
     // NOTE: アイテムごとのタグカラーをもとに、売上ゲージ色を決定します
-    var tags = ["Album", "Single", "Goods"]
 
     var body: some View {
 
@@ -55,7 +53,7 @@ struct SalesManageView: View {
                             ForEach(Array(items.enumerated()), id: \.offset) { offset, item in
 
                                 if item.tag == tag {
-                                    SalesItemListRow(item: item, index: offset)
+                                    SalesItemListRow(item: item, listIndex: offset)
                                 }
                             } // ForEach item
                         } // ForEach tag
@@ -67,9 +65,9 @@ struct SalesManageView: View {
                 } // ScrollView
 
                 if isShowItemDetail {
-                    ShowsItemDetail(item: items, index: $index,
-                                    isShowitemDetail: $isShowItemDetail,
-                                    tabIndex: $tabIndex)
+                    ShowsItemDetail(item: items, index: $listIndex,
+                                    isShowitemDetail: $isShowItemDetail
+                    )
 
                 } // if isShowItemDetail
             } // ZStack
@@ -78,7 +76,7 @@ struct SalesManageView: View {
     } // body
 
     @ViewBuilder
-    func SalesItemListRow(item: Item, index: Int) -> some View {
+    func SalesItemListRow(item: Item, listIndex: Int) -> some View {
 
         VStack(alignment: .leading, spacing: 20) {
 
@@ -94,10 +92,10 @@ struct SalesManageView: View {
                         .font(.subheadline.bold())
 
                         Button {
-                            self.index = index
-                            print("index: \(index)")
+                            self.listIndex = listIndex
+                            print("listIndex: \(listIndex)")
 //                            self.tabIndex = 2
-                            print("tabIndex: \(tabIndex)")
+
                             isShowItemDetail.toggle()
                             print("isShowItemDetail: \(isShowItemDetail)")
 
@@ -135,6 +133,6 @@ struct SalesManageView: View {
 
 struct SalesView_Previews: PreviewProvider {
     static var previews: some View {
-        SalesManageView(tabIndex: .constant(2))
+        SalesManageView()
     }
 }

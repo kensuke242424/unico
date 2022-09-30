@@ -17,7 +17,7 @@ struct ShowsItemDetail: View {
     @State private var isShowAlert = false
     @State private var isShowItemEdit = false
     @Binding var isShowitemDetail: Bool
-    @Binding var tabIndex: Int
+//    @Binding var tabIndex: Int
 
     var body: some View {
 
@@ -26,6 +26,13 @@ struct ShowsItemDetail: View {
             Color(.gray)
                 .ignoresSafeArea()
                 .opacity(0.3)
+                // NOTE: アイテム詳細の外側をタップすると、詳細画面を閉じます
+                .onTapGesture {
+                    withAnimation(.linear(duration: 0.2)) {
+                        isShowitemDetail = false
+                    }
+                    print("onTapGesture_isShowitemDetail: \(isShowitemDetail)")
+                } // onTapGesture
 
         RoundedRectangle (cornerRadius: 20)
                 .foregroundColor(.black)
@@ -50,8 +57,6 @@ struct ShowsItemDetail: View {
                         Button {
                             // NOTE: アイテム編集画面へ遷移するかをアラートで選択
                             isShowAlert = true
-//                            tabIndex = 2
-                            print("isShowAlert_tabIndex: \(tabIndex)")
                             print("isShowAlert: \(isShowAlert)")
 
                         } label: {
@@ -61,7 +66,7 @@ struct ShowsItemDetail: View {
                         .alert("編集", isPresented: $isShowAlert) {
 
                             Button {
-                                isShowAlert.toggle()
+                                isShowAlert = false
                                 print("isShowAlert: \(isShowAlert)")
                             } label: {
                                 Text("戻る")
@@ -74,7 +79,7 @@ struct ShowsItemDetail: View {
                                 Text("はい")
                             }
                         } message: {
-                            Text("アイテム情報を編集しますか？")
+                            Text("アイテムデータを編集しますか？")
                         } // alert
                     } // HStack
 
@@ -86,8 +91,8 @@ struct ShowsItemDetail: View {
                                       price:     showItem.price,
                                       inventory: showItem.inventory,
                                       createAt:  showItem.createAt,
-                                      updateAt:  showItem.updateAt,
-                                      tabIndex:  $tabIndex
+                                      updateAt:  showItem.updateAt
+//                                      tabIndex:  $tabIndex
                     )
 
                     Text("ーーーーーーーーーーーーー")
@@ -106,8 +111,6 @@ struct ShowsItemDetail: View {
             withAnimation(.linear(duration: 0.2)) {
                 self.opacity = 1.0
             }
-//            self.tabIndex = 2
-            print("onAppear_tabIndex: \(tabIndex)")
         } // .onAppear
     } // body
 } // View
@@ -119,7 +122,7 @@ struct SalesItemContents: View {
     let inventory: Int
     let createAt: Date
     let updateAt: Date
-    @Binding var tabIndex: Int
+//    @Binding var tabIndex: Int
 
     var body: some View {
 
@@ -180,8 +183,8 @@ struct SalesItemDetailView_Previews: PreviewProvider {
                                     createAt: Date(),
                                     updateAt: Date())],
                         index: .constant(0),
-                        isShowitemDetail: .constant(false),
-                        tabIndex: .constant(2)
+                        isShowitemDetail: .constant(false)
+//                        tabIndex: .constant(2)
         )
     }
 }
