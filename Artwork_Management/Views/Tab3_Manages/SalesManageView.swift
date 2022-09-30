@@ -149,10 +149,3 @@ struct SalesView_Previews: PreviewProvider {
         SalesManageView()
     }
 }
-
-// 売上表現ゲージの長さ変更
-enum gaugeOption {
-    case day
-    case month
-    case year
-}
