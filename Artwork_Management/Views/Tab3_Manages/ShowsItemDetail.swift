@@ -95,8 +95,8 @@ struct ShowsItemDetail: View {
                     ItemDetailContents(sales:     showItem.sales,
                                       price:     showItem.price,
                                       inventory: showItem.inventory,
-                                      createAt:  showItem.createAt,
-                                      updateAt:  showItem.updateAt
+                                      createAt:  showItem.createAtTime,
+                                      updateAt:  showItem.updateAtTime
                     )
 
                     Text("ーーーーーーーーーーーーー")
@@ -129,8 +129,8 @@ struct SalesItemDetailView_Previews: PreviewProvider {
                                     price: 1800,
                                     sales: 88000,
                                     inventory: 200,
-                                    createAt: Date(),
-                                    updateAt: Date())],
+                                    createAtTime: Date(),
+                                    updateAtTime: Date())],
                         index: .constant(0),
                         isShowitemDetail: .constant(false)
         )

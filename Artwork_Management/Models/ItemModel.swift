@@ -18,6 +18,6 @@ struct Item: Identifiable, Hashable {
     let price: Int
     let sales: Int
     let inventory: Int
-    let createAt: Date
-    let updateAt: Date
+    let createAtTime: Date
+    let updateAtTime: Date
 }

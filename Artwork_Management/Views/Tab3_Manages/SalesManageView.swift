@@ -18,8 +18,8 @@ enum SortType {
 
 // NOTE: アイテムのタググループ有無を管理します
 enum TagGroup {
-    case groupOn
-    case groupOff
+    case on
+    case off
 }
 
 struct SalesManageView: View {
@@ -32,7 +32,7 @@ struct SalesManageView: View {
     @State private var listIndex = 0
 
     // NOTE: タググループ表示の切り替えに用います
-    @State private var tagGroup: TagGroup = .groupOn
+    @State private var tagGroup: TagGroup = .on
     @State private var sortType: SortType = .start
 
     var body: some View {
@@ -46,7 +46,7 @@ struct SalesManageView: View {
                         // NOTE: タグ表示の「ON」「OFF」で表示を切り替えます
                         switch tagGroup {
 
-                        case .groupOn:
+                        case .on:
                             // タグの要素数の分リストを作成
                             ForEach(itemVM.tags, id: \.self) { tag in
 
@@ -65,7 +65,7 @@ struct SalesManageView: View {
                                 } // ForEach item
                             } // case .groupOn
 
-                        case .groupOff:
+                        case .off:
 
                             Text("- 全てのアイテム -")
                                 .font(.largeTitle.bold())
@@ -97,9 +97,9 @@ struct SalesManageView: View {
                         Menu("タググループ") {
 
                             Button {
-                                tagGroup = .groupOn
+                                tagGroup = .on
                             } label: {
-                                if tagGroup == .groupOn {
+                                if tagGroup == .on {
                                     Text("ON   　　　　　 ✔︎")
                                 } else {
                                     Text("ON")
@@ -107,9 +107,9 @@ struct SalesManageView: View {
                             } // ON
 
                             Button {
-                                tagGroup = .groupOff
+                                tagGroup = .off
                             } label: {
-                                if tagGroup == .groupOff {
+                                if tagGroup == .off {
                                     Text("OFF   　　　　　 ✔︎")
                                 } else {
                                     Text("OFF")

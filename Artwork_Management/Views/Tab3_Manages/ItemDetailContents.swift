@@ -20,39 +20,15 @@ struct ItemDetailContents: View {
 
         VStack(alignment: .listRowSeparatorLeading, spacing: 8) {
 
-            HStack {
+            Text("在庫残り　:　　  \(inventory) 個")
+            Text("価格　　　:　　  \(price) 円")
+            Text("総売上　　:　　  \(sales) 円")
+                .padding(.bottom, 12)
 
-                Text("在庫残り　:　　")
-                Text("\(inventory) 個")
+            // NOTE: 下記二つの要素にはTimestampによる登録日が記述されます
+                Text("登録日　　:　　  2022. 8.30")
+                Text("最終更新　:　　  2022. 9.24")
 
-            } // HStack
-
-            HStack {
-                Text("価格　　　:　　")
-                Text("\(price) 円")
-
-            } // HStack
-
-            HStack {
-                Text("総売上　　:　　")
-                Text("\(sales) 円")
-
-            } // HStack
-            .padding(.bottom, 12)
-
-            // NOTE: こちらにはTimestampによる登録日が記述されます
-            HStack {
-                Text("登録日　　:　　")
-                Text("2022. 8.30")
-
-            } // HStack
-
-            // NOTE: こちらにはTimestampによる最終更新日が記述されます
-            HStack {
-                Text("最終更新　:　　")
-                Text("2022. 9.24")
-
-            } // HStack
         } // VStack
         .fontWeight(.light)
         .foregroundColor(.white)
