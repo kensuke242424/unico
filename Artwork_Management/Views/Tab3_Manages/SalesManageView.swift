@@ -67,8 +67,12 @@ struct SalesManageView: View {
 
                         case .groupOff:
 
-                            ForEach(Array(itemVM.items.enumerated()), id: \.offset) { offset, item in
+                            Text("- 全てのアイテム -")
+                                .font(.largeTitle.bold())
+                                .shadow(radius: 2, x: 4, y: 6)
+                                .padding(.vertical)
 
+                            ForEach(Array(itemVM.items.enumerated()), id: \.offset) { offset, item in
 
                                     SalesItemListRow(item: item, listIndex: offset)
 
@@ -77,52 +81,66 @@ struct SalesManageView: View {
                     } // VStack
 
                     .padding(.leading)
-                    .navigationTitle("Sales")
-                    .toolbar {
-                        ToolbarItem(placement: .navigationBarTrailing) {
-                            Menu {
-                                Menu("タググループ") {
-                                    Button("ON", action: {
-                                        tagGroup = .groupOn
-                                    })
 
-                                    Button("OFF", action: {
-                                        tagGroup = .groupOff
-                                    })
-                                } // タググループオプション
-
-                                Menu("並び替え") {
-                                    Button("売り上げ(↑)", action: {
-                                        itemVM.items = itemsSort(sortType: .salesUp, items: itemVM.items)
-                                    })
-                                    Button("売り上げ(↓)", action: {
-                                        itemVM.items = itemsSort(sortType: .salesDown, items: itemVM.items)
-                                    })
-                                    Button("最終更新日- 後日実装 -", action: {
-                                        itemVM.items = itemsSort(sortType: .updateAtUp, items: itemVM.items)
-                                    })
-                                    Button("追加日- 後日実装 -", action: {
-                                        itemVM.items = itemsSort(sortType: .createAtUp, items: itemVM.items)
-                                    })
-                                } // 並び替えオプション
-
-                            } label: {
-                                Image(systemName: "list.bullet.indent")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 30, height: 30)
-                            }
-                        }
-                    } // .toolbar
                 } // ScrollView
 
                 if isShowItemDetail {
                     ShowsItemDetail(item: itemVM.items, index: $listIndex,
                                     isShowitemDetail: $isShowItemDetail
                     )
-
                 } // if isShowItemDetail
+
             } // ZStack
+            .navigationTitle("Sales")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Menu {
+                        Menu("タググループ") {
+
+                            Button {
+                                tagGroup = .groupOn
+                            } label: {
+                                if tagGroup == .groupOn {
+                                    Text("ON   　　　　　 ✔︎")
+                                } else {
+                                    Text("ON")
+                                }
+                            } // ON
+
+                            Button {
+                                tagGroup = .groupOff
+                            } label: {
+                                if tagGroup == .groupOff {
+                                    Text("OFF   　　　　　 ✔︎")
+                                } else {
+                                    Text("OFF")
+                                }
+                            } // OFF
+                        } // タググループオプション
+
+                        Menu("並び替え") {
+                            Button("売り上げ(↑)", action: {
+                                itemVM.items = itemsSort(sortType: .salesUp, items: itemVM.items)
+                            })
+                            Button("売り上げ(↓)", action: {
+                                itemVM.items = itemsSort(sortType: .salesDown, items: itemVM.items)
+                            })
+                            Button("最終更新日- 後日実装 -", action: {
+                                itemVM.items = itemsSort(sortType: .updateAtUp, items: itemVM.items)
+                            })
+                            Button("追加日- 後日実装 -", action: {
+                                itemVM.items = itemsSort(sortType: .createAtUp, items: itemVM.items)
+                            })
+                        } // 並び替えオプション
+
+                    } label: {
+                        Image(systemName: "list.bullet.indent")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 30, height: 30)
+                    }
+                }
+            } // .toolbar
             .navigationBarTitleDisplayMode(.inline)
         } // NavigationView
     } // body
@@ -137,6 +155,11 @@ struct SalesManageView: View {
                     .fill(Color.gray)
                     .frame(width: 70,height: 70)
                     .shadow(radius: 4, x: 5, y: 5)
+                    .overlay {
+                        Text("No Image.")
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+                    }
 
                 VStack(alignment: .leading, spacing: 10) {
                     HStack(spacing: 20) {
@@ -181,6 +204,7 @@ struct SalesManageView: View {
         .padding(.top)
     } // リストレイアウト
 
+    // ✅ NOTE: アイテム配列を各項目に沿ってソートするメソッド
     func itemsSort(sortType: SortType, items: [Item]) -> [Item] {
 
         // NOTE: 更新可能な値として格納しています

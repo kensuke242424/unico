@@ -16,7 +16,7 @@ class ItemViewModel: ObservableObject {
         Item(tag: "Album", tagColor: "赤", name: "Album2", detail: "Album2のアイテム紹介テキストです。", photo: "",
              price: 2800, sales: 230000, inventory: 420, createAt: Date(), updateAt: Date()),
         Item(tag: "Album", tagColor: "赤", name: "Album3", detail: "Album3のアイテム紹介テキストです。", photo: "",
-             price: 3200, sales: 360000, inventory: 402, createAt: Date(), updateAt: Date()),
+             price: 3200, sales: 367000, inventory: 402, createAt: Date(), updateAt: Date()),
         Item(tag: "Single", tagColor: "青", name: "Single1", detail: "Single1のアイテム紹介テキストです。", photo: "",
              price: 1100, sales: 182000, inventory: 199, createAt: Date(), updateAt: Date()),
         Item(tag: "Single", tagColor: "青", name: "Single2", detail: "Single2のアイテム紹介テキストです。", photo: "",

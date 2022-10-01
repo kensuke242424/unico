@@ -161,8 +161,8 @@
 			children = (
 				E08F273728DDB51600329C5E /* SalesManageView.swift */,
 				E04ACF4028E6DD600054A6C4 /* ShowsItemDetail.swift */,
-				E04ACF4228E73C660054A6C4 /* IndicatorView.swift */,
 				E0CC79B728E7811500CE0B19 /* ItemDetailContents.swift */,
+				E04ACF4228E73C660054A6C4 /* IndicatorView.swift */,
 			);
 			path = Tab3_Manages;
 			sourceTree = "<group>";

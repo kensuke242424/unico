@@ -46,7 +46,13 @@ struct ShowsItemDetail: View {
 
                     RoundedRectangle(cornerRadius: 4)
                         .frame(width: 150, height: 150)
-                        .foregroundColor(.yellow)
+                        .foregroundColor(.gray)
+                        .overlay {
+                            Text("No Image.")
+                                .font(.title2)
+                                .fontWeight(.black)
+                                .foregroundColor(.white)
+                        }
 
                     HStack {
                         Text("　アイテム情報")
@@ -91,7 +97,6 @@ struct ShowsItemDetail: View {
                                       inventory: showItem.inventory,
                                       createAt:  showItem.createAt,
                                       updateAt:  showItem.updateAt
-//                                      tabIndex:  $tabIndex
                     )
 
                     Text("ーーーーーーーーーーーーー")

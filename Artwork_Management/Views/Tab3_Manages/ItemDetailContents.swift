@@ -49,7 +49,7 @@ struct ItemDetailContents: View {
 
             // NOTE: こちらにはTimestampによる最終更新日が記述されます
             HStack {
-                Text("更新日　　:　　")
+                Text("最終更新　:　　")
                 Text("2022. 9.24")
 
             } // HStack

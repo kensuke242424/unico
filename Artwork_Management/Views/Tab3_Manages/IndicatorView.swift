@@ -9,9 +9,9 @@ import SwiftUI
 
 struct IndicatorView: View {
 
-    let size = UIScreen.main.bounds
-    var salesValue: Int
     @State private var animationValue: Int = 0
+    let size = UIScreen.main.bounds
+    let salesValue: Int
     let tagColor: Color
 
     var body: some View {
@@ -26,9 +26,12 @@ struct IndicatorView: View {
                    .shadow(radius: 2, x: 7, y: 4)
            } // case 黄
            .onAppear {
-               withAnimation(.linear(duration: 0.5)) {
-                   self.animationValue = salesValue
-               }
+//               DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                   withAnimation(.linear(duration: 0.8)) {
+
+                       self.animationValue = salesValue
+                   }
+//               }
            }
            .onDisappear {
                self.animationValue = 0
