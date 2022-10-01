@@ -12,6 +12,7 @@ enum SortType {
     case salesDown
     case updateAtUp
     case createAtUp
+    case start
 }
 
 enum TagGroup {
@@ -30,6 +31,7 @@ struct SalesManageView: View {
 
     // NOTE: タググループ表示の切り替えに用います
     @State private var tagGroup: TagGroup = .groupOn
+    @State private var sortType: SortType = .start
 
 
 
@@ -119,18 +121,46 @@ struct SalesManageView: View {
                         } // タググループオプション
 
                         Menu("並び替え") {
-                            Button("売り上げ(↑)", action: {
-                                itemVM.items = itemsSort(sortType: .salesUp, items: itemVM.items)
-                            })
-                            Button("売り上げ(↓)", action: {
-                                itemVM.items = itemsSort(sortType: .salesDown, items: itemVM.items)
-                            })
-                            Button("最終更新日- 後日実装 -", action: {
-                                itemVM.items = itemsSort(sortType: .updateAtUp, items: itemVM.items)
-                            })
-                            Button("追加日- 後日実装 -", action: {
-                                itemVM.items = itemsSort(sortType: .createAtUp, items: itemVM.items)
-                            })
+                            Button {
+                                self.sortType = .salesUp
+                                itemVM.items = itemsSort(sort: sortType, items: itemVM.items)
+                            } label: {
+                                if sortType == .salesUp {
+                                    Text("売り上げ(↑)　　 ✔︎")
+                                } else {
+                                    Text("売り上げ(↑)")
+                                }
+                            }
+                            Button {
+                                self.sortType = .salesDown
+                                itemVM.items = itemsSort(sort: sortType, items: itemVM.items)
+                            } label: {
+                                if sortType == .salesDown {
+                                    Text("売り上げ(↓)　　 ✔︎")
+                                } else {
+                                    Text("売り上げ(↓)")
+                                }
+                            }
+                            Button {
+                                self.sortType = .updateAtUp
+                                itemVM.items = itemsSort(sort: sortType, items: itemVM.items)
+                            } label: {
+                                if sortType == .updateAtUp {
+                                    Text("最終更新日　　　✔︎")
+                                } else {
+                                    Text("最終更新日")
+                                }
+                            }
+                            Button {
+                                self.sortType = .createAtUp
+                                itemVM.items = itemsSort(sort: sortType, items: itemVM.items)
+                            } label: {
+                                if sortType == .createAtUp {
+                                    Text("追加日　　　✔︎")
+                                } else {
+                                    Text("追加日")
+                                }
+                            }
                         } // 並び替えオプション
 
                     } label: {
@@ -205,12 +235,12 @@ struct SalesManageView: View {
     } // リストレイアウト
 
     // ✅ NOTE: アイテム配列を各項目に沿ってソートするメソッド
-    func itemsSort(sortType: SortType, items: [Item]) -> [Item] {
+    func itemsSort(sort: SortType, items: [Item]) -> [Item] {
 
         // NOTE: 更新可能な値として格納しています
         var varItems = items
 
-        switch sortType {
+        switch sort {
 
         case .salesUp:
             varItems.sort { $0.sales > $1.sales }
@@ -220,6 +250,8 @@ struct SalesManageView: View {
             print("createAtUp ⇨ Timestampが格納され次第、実装します。")
         case .updateAtUp:
             print("updateAtUp ⇨ Timestampが格納され次第、実装します。")
+        case .start:
+            print("起動時の初期値です")
         }
 
         return varItems
