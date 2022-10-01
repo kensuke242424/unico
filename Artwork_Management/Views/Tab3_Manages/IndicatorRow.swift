@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct IndicatorView: View {
+struct IndicatorRow: View {
 
     @State private var animationValue: Int = 0
     let size = UIScreen.main.bounds
@@ -22,16 +22,16 @@ struct IndicatorView: View {
                Rectangle()
                    .frame(width: CGFloat(animationValue) / 1000, height: 13)
                    .foregroundColor(tagColor)
-                   .opacity(0.7)
+                   .opacity(0.6)
                    .shadow(radius: 2, x: 7, y: 4)
            } // case 黄
            .onAppear {
-//               DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+               DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                    withAnimation(.linear(duration: 0.8)) {
 
                        self.animationValue = salesValue
-                   }
-//               }
+                   } // withAnimation
+               } // DispatchQueue
            }
            .onDisappear {
                self.animationValue = 0
@@ -41,6 +41,6 @@ struct IndicatorView: View {
 
 struct IndicatorView_Previews: PreviewProvider {
     static var previews: some View {
-        IndicatorView(salesValue: 220000, tagColor: .red)
+        IndicatorRow(salesValue: 220000, tagColor: .red)
     }
 }

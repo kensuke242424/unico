@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// NOTE: アイテムのソートタイプを管理します
 enum SortType {
     case salesUp
     case salesDown
@@ -15,6 +16,7 @@ enum SortType {
     case start
 }
 
+// NOTE: アイテムのタググループ有無を管理します
 enum TagGroup {
     case groupOn
     case groupOff
@@ -22,9 +24,9 @@ enum TagGroup {
 
 struct SalesManageView: View {
 
-    @StateObject var itemVM = ItemViewModel()
+    @StateObject private var itemVM = ItemViewModel()
 
-    // NOTE: isShowItemDetail ⇨ リスト内のアイテム詳細を表示するトリガー
+    // NOTE: isShowItemDetail ⇨ リスト内のアイテム詳細を表示するトリガーです
     // NOTE: listIndex ⇨ リストの一要素Indexを、アイテム詳細画面表示時に渡します
     @State private var isShowItemDetail = false
     @State private var listIndex = 0
@@ -32,10 +34,6 @@ struct SalesManageView: View {
     // NOTE: タググループ表示の切り替えに用います
     @State private var tagGroup: TagGroup = .groupOn
     @State private var sortType: SortType = .start
-
-
-
-    // NOTE: アイテムごとのタグカラーをもとに、売上ゲージ色を決定します
 
     var body: some View {
 
@@ -81,7 +79,6 @@ struct SalesManageView: View {
                             } // case .groupOff
                         } // switch tagGroup
                     } // VStack
-
                     .padding(.leading)
 
                 } // ScrollView
@@ -214,13 +211,13 @@ struct SalesManageView: View {
                     // ラインが端まで行ってもレイアウトが崩れない
                     switch item.tagColor {
                     case "赤":
-                        IndicatorView(salesValue: item.sales, tagColor: .red)
+                        IndicatorRow(salesValue: item.sales, tagColor: .red)
                     case "青":
-                        IndicatorView(salesValue: item.sales, tagColor: .blue)
+                        IndicatorRow(salesValue: item.sales, tagColor: .blue)
                     case "黄":
-                        IndicatorView(salesValue: item.sales, tagColor: .yellow)
+                        IndicatorRow(salesValue: item.sales, tagColor: .yellow)
                     default:
-                        IndicatorView(salesValue: item.sales, tagColor: .gray)
+                        IndicatorRow(salesValue: item.sales, tagColor: .gray)
                     }
 
                     Text(item.name)
@@ -237,7 +234,7 @@ struct SalesManageView: View {
     // ✅ NOTE: アイテム配列を各項目に沿ってソートするメソッド
     func itemsSort(sort: SortType, items: [Item]) -> [Item] {
 
-        // NOTE: 更新可能な値として格納しています
+        // NOTE: 更新可能なvar値として再格納しています
         var varItems = items
 
         switch sort {
@@ -255,7 +252,7 @@ struct SalesManageView: View {
         }
 
         return varItems
-    } // func itemsSort
+    } // func itemsSortr
 
 } // View
 
