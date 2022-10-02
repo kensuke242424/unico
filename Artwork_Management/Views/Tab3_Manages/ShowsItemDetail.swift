@@ -61,7 +61,7 @@ struct ShowsItemDetail: View {
 
                         Button {
                             // NOTE: アイテム編集画面へ遷移するかをアラートで選択
-                            isShowAlert = true
+                            isShowAlert.toggle()
                             print("isShowAlert: \(isShowAlert)")
 
                         } label: {
@@ -71,7 +71,7 @@ struct ShowsItemDetail: View {
                         .alert("編集", isPresented: $isShowAlert) {
 
                             Button {
-                                isShowAlert = false
+                                isShowAlert.toggle()
                                 print("isShowAlert: \(isShowAlert)")
                             } label: {
                                 Text("戻る")
