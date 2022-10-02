@@ -19,7 +19,6 @@ struct ItemStockView: View {
                     TextField("　　　　　キーワード検索", text: $searchItemText)
                         .textFieldStyle(.roundedBorder)
 
-
                     Button {
 
                     } label: {
@@ -32,7 +31,6 @@ struct ItemStockView: View {
                     } // Button
                 } // HStack(検索ボタン)
                 .padding()
-                
                 ItemShowBlock(itemWidth: 180,
                               itemHeight: 200,
                               itemSpase: 20,

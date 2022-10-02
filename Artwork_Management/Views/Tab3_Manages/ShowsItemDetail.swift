@@ -33,7 +33,7 @@ struct ShowsItemDetail: View {
                     print("onTapGesture_isShowitemDetail: \(isShowitemDetail)")
                 } // onTapGesture
 
-        RoundedRectangle (cornerRadius: 20)
+        RoundedRectangle(cornerRadius: 20)
                 .foregroundColor(.black)
                 .frame(width: 300, height: 470)
             .opacity(0.7)
@@ -92,11 +92,11 @@ struct ShowsItemDetail: View {
                         .foregroundColor(.white)
 
                     // NOTE: アイテムの情報が格納羅列されたカスタムViewです
-                    ItemDetailContents(sales:     showItem.sales,
-                                      price:     showItem.price,
+                    ItemDetailContents(sales: showItem.sales,
+                                      price: showItem.price,
                                       inventory: showItem.inventory,
-                                      createAt:  showItem.createAtTime,
-                                      updateAt:  showItem.updateAtTime
+                                      createAt: showItem.createAtTime,
+                                      updateAt: showItem.updateAtTime
                     )
 
                     Text("ーーーーーーーーーーーーー")

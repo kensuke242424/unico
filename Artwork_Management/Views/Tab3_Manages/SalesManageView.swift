@@ -18,7 +18,7 @@ enum SortType {
 
 // NOTE: アイテムのタググループ有無を管理します
 enum TagGroup {
-    case on
+    case on // swiftlint:disable:this identifier_name
     case off
 }
 
@@ -60,7 +60,7 @@ struct SalesManageView: View {
                                 ForEach(Array(itemVM.items.enumerated()), id: \.offset) { offset, item in
 
                                     if item.tag == tag {
-                                        SalesItemListRow(item: item, listIndex: offset)
+                                        salesItemListRow(item: item, listIndex: offset)
                                     }
                                 } // ForEach item
                             } // case .groupOn
@@ -74,7 +74,7 @@ struct SalesManageView: View {
 
                             ForEach(Array(itemVM.items.enumerated()), id: \.offset) { offset, item in
 
-                                    SalesItemListRow(item: item, listIndex: offset)
+                                    salesItemListRow(item: item, listIndex: offset)
 
                             } // case .groupOff
                         } // switch tagGroup
@@ -173,14 +173,14 @@ struct SalesManageView: View {
     } // body
 
     @ViewBuilder
-    func SalesItemListRow(item: Item, listIndex: Int) -> some View {
+    func salesItemListRow(item: Item, listIndex: Int) -> some View {
 
         VStack(alignment: .leading, spacing: 20) {
 
             HStack(spacing: 20) {
                 RoundedRectangle(cornerRadius: 10)
                     .fill(Color.gray)
-                    .frame(width: 70,height: 70)
+                    .frame(width: 70, height: 70)
                     .shadow(radius: 4, x: 5, y: 5)
                     .overlay {
                         Text("No Image.")

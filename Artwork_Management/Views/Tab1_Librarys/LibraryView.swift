@@ -34,7 +34,6 @@ struct LibraryView: View {
                         LibraryListView(itemWidth: 200, itemHeight: 150, itemSpase: 20, itemNameTag: "Goods",
                                       itemColor: .blue, isShowItemDetail: $isShowItemDetail)
 
-
                     } // VStack
                 } // ScrollView
             } // ZStack

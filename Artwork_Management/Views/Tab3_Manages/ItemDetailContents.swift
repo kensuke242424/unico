@@ -17,7 +17,6 @@ struct ItemDetailContents: View {
 
     var body: some View {
 
-
         VStack(alignment: .listRowSeparatorLeading, spacing: 8) {
 
             Text("在庫残り　:　　  \(inventory) 個")

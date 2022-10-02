@@ -11,7 +11,7 @@ struct FirstSignInView: View {
 
     // テスト用のデータ
     let user: User
-    
+
     var body: some View {
 
         VStack {
@@ -120,7 +120,6 @@ struct FirstLogInInfomation: View {
             .keyboardType(.emailAddress)
             .padding(.bottom, 10)
 
-
         } // VStack
         .padding()
 
@@ -131,8 +130,7 @@ struct FirstLogInInfomation: View {
 
                 if password != password2 {
                     resultPassword = false
-                }
-                else {
+                } else {
                     resultPassword = true
                 }
 
@@ -152,8 +150,8 @@ struct FirstLogInInfomation: View {
 struct FirstLogInView_Previews: PreviewProvider {
     static var previews: some View {
 
-        FirstSignInView(user: User(name:     "中川賢亮",
-                                    address:  "kennsuke242424@gmail.com",
+        FirstSignInView(user: User(name: "中川賢亮",
+                                    address: "kennsuke242424@gmail.com",
                                     password: "ninnzinn2424")
         )
     }

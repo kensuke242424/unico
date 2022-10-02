@@ -8,7 +8,7 @@
 import SwiftUI
 
 @main
-struct Artwork_ManagementApp: App {
+struct ArtworkManagementApp: App {
     var body: some Scene {
         WindowGroup {
             LogInView()

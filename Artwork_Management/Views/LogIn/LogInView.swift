@@ -11,8 +11,8 @@ import SwiftUI
 struct LogInView: View {
 
     // テスト用のダミーデータです。
-    let testUser: User = User(name:     "中川賢亮",
-                              address:  "kennsuke242424@gmail.com",
+    let testUser: User = User(name: "中川賢亮",
+                              address: "kennsuke242424@gmail.com",
                               password: "ninnzinn2424"
     ) // testUser
 
@@ -89,7 +89,6 @@ struct LogInInfomation: View {
                     }
                 } // HStack
 
-
                 TextField("artwork/@gmail.com", text: $address)
 
                 HStack {
@@ -101,7 +100,6 @@ struct LogInInfomation: View {
                             .foregroundColor(.red)
                     } // if
                 } // HStack
-
 
                 ZStack {
                     if passHidden {
@@ -143,8 +141,7 @@ struct LogInInfomation: View {
                     // アドレスが存在するかチェック
                     if user.address != address {
                         resultAddress = false
-                    }
-                    else {
+                    } else {
                         resultAddress = true
                     }
 
@@ -152,8 +149,7 @@ struct LogInInfomation: View {
                     if resultAddress {
                         if user.password != password {
                             resultPassword = false
-                        }
-                        else {
+                        } else {
                             resultPassword = true
                         }
                     }
@@ -181,8 +177,6 @@ struct LogInInfomation: View {
 
                 NavigationLink("試しに始めてみる",
                                destination: HomeTabView())
-
-
             } // Group
             .font(.subheadline)
         } // VStack

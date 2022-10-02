@@ -11,12 +11,12 @@ struct SystemView: View {
     var body: some View {
 
         VStack {
+
             AccountIconView()
 
             SystemListView()
-        }
 
-
+        } // VStack
     } // body
 } // View
 
