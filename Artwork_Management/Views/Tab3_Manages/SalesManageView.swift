@@ -25,14 +25,13 @@ enum TagGroup {
 struct SalesManageView: View {
 
     @StateObject private var itemVM = ItemViewModel()
-
-    // NOTE: isShowItemDetail ⇨ リスト内のアイテム詳細を表示するトリガーです
-    // NOTE: listIndex ⇨ リストの一要素Indexを、アイテム詳細画面表示時に渡します
+    // NOTE: リスト内のアイテム詳細を表示するトリガーです
     @State private var isShowItemDetail = false
+    // NOTE: リストの一要素Indexを、アイテム詳細画面表示時に渡します
     @State private var listIndex = 0
-
     // NOTE: タググループ表示の切り替えに用います
     @State private var tagGroup: TagGroup = .on
+    // NOTE: アイテムのソート処理の切り替えに用います
     @State private var sortType: SortType = .start
 
     var body: some View {

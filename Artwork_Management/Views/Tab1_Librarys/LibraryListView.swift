@@ -18,7 +18,6 @@ struct LibraryListView: View {
     let itemSpase: CGFloat
     let itemNameTag: String
     let itemColor: Color
-
     @Binding var isShowItemDetail: Bool
 
     var body: some View {

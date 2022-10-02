@@ -12,11 +12,11 @@ struct ShowsItemDetail: View {
     // NOTE: 親ViewからItem配列とインデックスを取得
     let item: [Item]
     @Binding var index: Int
+    @Binding var isShowitemDetail: Bool
 
     @State private var opacity: Double = 0
     @State private var isShowAlert = false
     @State private var isShowItemEdit = false
-    @Binding var isShowitemDetail: Bool
 
     var body: some View {
 

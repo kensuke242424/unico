@@ -9,10 +9,11 @@ import SwiftUI
 
 struct IndicatorRow: View {
 
-    @State private var animationValue: Int = 0
-    let size = UIScreen.main.bounds
     let salesValue: Int
     let tagColor: Color
+
+    private let size = UIScreen.main.bounds
+    @State private var animationValue: Int = 0
 
     var body: some View {
         Rectangle()

@@ -9,8 +9,9 @@ import SwiftUI
 
 struct LibraryView: View {
 
-    @State var itemName = ""
     @Binding var isShowItemDetail: Bool
+
+    @State var itemName = ""
 
     var body: some View {
 

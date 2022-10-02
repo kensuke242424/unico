@@ -63,14 +63,14 @@ struct RogoMark: View {
 // ✅ログイン時の入力欄のカスタムViewです。
 struct LogInInfomation: View {
 
+    let user: User
+
     @State private var address = ""
     @State private var password = ""
     @State private var passHidden = true
     @State private var isActive = false
     @State private var resultAddress = true
     @State private var resultPassword = true
-
-    let user: User
 
     var body: some View {
 

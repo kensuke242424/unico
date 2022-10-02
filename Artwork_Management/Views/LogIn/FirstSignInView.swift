@@ -38,6 +38,8 @@ struct FirstSignInView: View {
 // ログイン時の入力欄のカスタムViewです。
 struct FirstLogInInfomation: View {
 
+    let user: User
+
     @State private var address = ""
     @State private var password = ""
     @State private var password2 = ""
@@ -45,7 +47,6 @@ struct FirstLogInInfomation: View {
     @State private var passHidden2 = true
     @State private var resultPassword = true
     @State private var isActive = false
-    let user: User
 
     var body: some View {
 
