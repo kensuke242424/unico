@@ -74,7 +74,7 @@ struct SalesManageView: View {
 
                             ForEach(Array(itemVM.items.enumerated()), id: \.offset) { offset, item in
 
-                                    salesItemListRow(item: item, listIndex: offset)
+                                salesItemListRow(item: item, listIndex: offset)
 
                             } // case .groupOff
                         } // switch tagGroup
@@ -190,8 +190,8 @@ struct SalesManageView: View {
 
                 VStack(alignment: .leading, spacing: 10) {
                     HStack(spacing: 20) {
-                    Text("\(item.sales)円")
-                        .font(.subheadline.bold())
+                        Text("\(item.sales)円")
+                            .font(.subheadline.bold())
 
                         Button {
                             self.listIndex = listIndex

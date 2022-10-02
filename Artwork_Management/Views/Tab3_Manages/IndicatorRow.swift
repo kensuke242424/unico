@@ -16,26 +16,26 @@ struct IndicatorRow: View {
 
     var body: some View {
         Rectangle()
-           .frame(width: size.width - 150, height: 13)
-           .foregroundColor(.clear)
-           .overlay(alignment: .leading) {
-               Rectangle()
-                   .frame(width: CGFloat(animationValue) / 1000, height: 13)
-                   .foregroundColor(tagColor)
-                   .opacity(0.6)
-                   .shadow(radius: 2, x: 7, y: 4)
-           } // case 黄
-           .onAppear {
-               DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                   withAnimation(.linear(duration: 0.8)) {
+            .frame(width: size.width - 150, height: 13)
+            .foregroundColor(.clear)
+            .overlay(alignment: .leading) {
+                Rectangle()
+                    .frame(width: CGFloat(animationValue) / 1000, height: 13)
+                    .foregroundColor(tagColor)
+                    .opacity(0.6)
+                    .shadow(radius: 2, x: 7, y: 4)
+            } // case 黄
+            .onAppear {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    withAnimation(.linear(duration: 0.8)) {
 
-                       self.animationValue = salesValue
-                   } // withAnimation
-               } // DispatchQueue
-           }
-           .onDisappear {
-               self.animationValue = 0
-           }
+                        self.animationValue = salesValue
+                    } // withAnimation
+                } // DispatchQueue
+            }
+            .onDisappear {
+                self.animationValue = 0
+            }
     }
 }
 

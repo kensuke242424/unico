@@ -25,7 +25,7 @@ struct ShowsItemDetail: View {
             Color(.gray)
                 .ignoresSafeArea()
                 .opacity(0.3)
-                // NOTE: アイテム詳細の外側をタップすると、詳細画面を閉じます
+            // NOTE: アイテム詳細の外側をタップすると、詳細画面を閉じます
                 .onTapGesture {
                     withAnimation(.linear(duration: 0.2)) {
                         isShowitemDetail = false
@@ -33,10 +33,10 @@ struct ShowsItemDetail: View {
                     print("onTapGesture_isShowitemDetail: \(isShowitemDetail)")
                 } // onTapGesture
 
-        RoundedRectangle(cornerRadius: 20)
+            RoundedRectangle(cornerRadius: 20)
                 .foregroundColor(.black)
                 .frame(width: 300, height: 470)
-            .opacity(0.7)
+                .opacity(0.7)
 
             if let showItem = item[index] {
                 VStack(spacing: 10) {
@@ -93,10 +93,10 @@ struct ShowsItemDetail: View {
 
                     // NOTE: アイテムの情報が格納羅列されたカスタムViewです
                     ItemDetailContents(sales: showItem.sales,
-                                      price: showItem.price,
-                                      inventory: showItem.inventory,
-                                      createAt: showItem.createAtTime,
-                                      updateAt: showItem.updateAtTime
+                                       price: showItem.price,
+                                       inventory: showItem.inventory,
+                                       createAt: showItem.createAtTime,
+                                       updateAt: showItem.updateAtTime
                     )
 
                     Text("ーーーーーーーーーーーーー")
