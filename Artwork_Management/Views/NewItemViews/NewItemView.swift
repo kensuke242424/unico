@@ -8,7 +8,6 @@
 import SwiftUI
 
 enum Field {
-    case start
     case tag
     case name
     case stock
@@ -90,6 +89,9 @@ struct NewItemDetailForm: View {
                     .foregroundColor(.gray)
                 TextField("ホイールで作成", text: $itemtag)
                     .focused($focusedField, equals: .tag)
+                    .onSubmit {
+                        focusedField = .name
+                    }
 
                 FocusedLineRow(select: focusedField == .tag ? true : false)
 
@@ -102,6 +104,9 @@ struct NewItemDetailForm: View {
                     .foregroundColor(.gray)
                 TextField("1st Album「...」", text: $itemName)
                     .focused($focusedField, equals: .name)
+                    .onSubmit {
+                        focusedField = .stock
+                    }
 
                 FocusedLineRow(select: focusedField == .name ? true : false)
             } // アイテム名
@@ -112,6 +117,10 @@ struct NewItemDetailForm: View {
                     .foregroundColor(.gray)
                 TextField("100", text: $itemStock)
                     .focused($focusedField, equals: .stock)
+                    .onSubmit {
+                        focusedField = .place
+                    }
+
 
                 FocusedLineRow(select: focusedField == .stock ? true : false)
             } // 在庫数
@@ -122,6 +131,9 @@ struct NewItemDetailForm: View {
                     .foregroundColor(.gray)
                 TextField("2000", text: $itemPlace)
                     .focused($focusedField, equals: .place)
+                    .onSubmit {
+                        focusedField = .detail
+                    }
 
                 FocusedLineRow(select: focusedField == .place ? true : false)
             } // 価格
@@ -138,9 +150,16 @@ struct NewItemDetailForm: View {
                     .shadow(radius: 1, x: 0, y: 0)
                     .focused($focusedField, equals: .detail)
                     .overlay(alignment: .topLeading) {
-                        Text("◯◯月◯◯日 追加...")
-                            .foregroundColor(.gray)
-                            .padding()
+                        if focusedField != .detail {
+                            if itemDetail.isEmpty {
+                                Text("アイテムについてメモを残しましょう。")
+                                    .opacity(0.3)
+                                    .padding()
+                            }
+                        }
+                    }
+                    .onSubmit {
+                        focusedField = nil
                     }
             } // アイテム詳細
             .padding(.top)
