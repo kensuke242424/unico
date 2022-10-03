@@ -12,30 +12,33 @@ struct NewItemView: View {
     let screenSize = UIScreen.main.bounds
 
     @State private var itemName = ""
+    @State private var itemtag = ""
     @State private var itemStock = ""
+    @State private var itemPlace = ""
     @State private var itemDetail = ""
 
     var body: some View {
 
         NavigationView {
 
-            ZStack {
                 VStack {
 
                     LinearGradient(colors: [.red, .black], startPoint: .top, endPoint: .bottom)
                         .frame(width: screenSize.width, height: screenSize.height / 2)
-                        .ignoresSafeArea(edges: .top)
+//                        .ignoresSafeArea(edges: .top)
                         .overlay {
                             VStack {
-                                Text("新規アイテム登録")
+                                Text("New Item")
+                                    .font(.title2)
                                     .fontWeight(.black)
+                                    .padding(.bottom)
 
-                                Spacer()
+//                                Spacer()
 
                                 RoundedRectangle(cornerRadius: 10)
                                     .foregroundColor(.gray)
                                     .frame(width: 270, height: 270)
-                                    .opacity(0.7)
+                                    .opacity(0.6)
                                     .overlay {
                                         Text("No Image...")
                                             .foregroundColor(.white)
@@ -53,46 +56,44 @@ struct NewItemView: View {
                                                 .offset(x: 7, y: 7)
                                         } // Button
                                     } // .overlay(ボタン)
-                                Spacer()
+//                                Spacer()
                             } // VStack
-                            .padding(.bottom, dispSize())
                         } // .overlay
 
                     //                    ScrollView {
                     VStack(spacing: 20) {
 
-                        VStack(alignment: .leading) {
+                        VStack(spacing: 10) {
 
-                            // 機種によって表示どうなるか要検証
-                            Text("アイテム名")
-                            TextField("アイテム名", text: $itemName)
-                                .frame(width: screenSize.width - 80, height: 30)
-                                .textFieldStyle(.roundedBorder)
-                            Text("タグ設定")
-                            // ホイールで指定
-                            TextField("ホイール", text: $itemStock)
-                                .textFieldStyle(.roundedBorder)
-                                .frame(width: 200, height: 20)
-                                .padding(.bottom, 20)
 
-                            HStack(spacing: 30) {
-                                VStack(alignment: .trailing) {
-                                    Text("在庫数")
-                                    TextField("100", text: $itemStock)
-                                        .textFieldStyle(.roundedBorder)
-                                        .multilineTextAlignment(.trailing)
-                                        .frame(width: 80, height: 20)
-
-                                } // 在庫数
-                                VStack(alignment: .trailing) {
-                                    Text("価格(税込)")
-                                    TextField("2000", text: $itemStock)
-                                        .textFieldStyle(.roundedBorder)
-                                        .multilineTextAlignment(.trailing)
-                                        .frame(width: 150, height: 20)
-                                } // 価格
+                            VStack(alignment: .leading) {
+                                Text("■タグ設定")
+                                TextField("ホイールで作成", text: $itemtag)
+                                Divider()
                             } // タグ
-                        } // HStack
+
+                            VStack(alignment: .leading) {
+                                // 機種によって表示どうなるか要検証
+                                Text("■アイテム名")
+                                TextField("1st Album「...」", text: $itemName)
+                                Divider()
+                            } // アイテム名
+
+
+                            VStack(alignment: .leading) {
+                                Text("■在庫数")
+                                TextField("100", text: $itemStock)
+                                Divider()
+                            } // 在庫数
+
+                            VStack(alignment: .leading) {
+                                Text("■価格(税込)")
+                                TextField("2000", text: $itemPlace)
+                                Divider()
+                            } // 価格
+
+                        } // VStack(記入欄)
+                        .padding()
 
                         TextEditor(text: $itemDetail)
                             .border(.gray, width: 1)
@@ -105,7 +106,7 @@ struct NewItemView: View {
                     } // VStack
                     //                    } // ScrollView
                 } // VStack
-            } // ZStack
+
         } // NavigationView
     } // body
 

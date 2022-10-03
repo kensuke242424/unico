@@ -27,6 +27,8 @@ struct SalesManageView: View {
     @StateObject private var itemVM = ItemViewModel()
     // NOTE: リスト内のアイテム詳細を表示するトリガーです
     @State private var isShowItemDetail = false
+    // NOTE: 新規アイテム追加Viewの発現を管理します
+    @State private var isPresentedNewItem = false
     // NOTE: リストの一要素Indexを、アイテム詳細画面表示時に渡します
     @State private var listIndex = 0
     // NOTE: タググループ表示の切り替えに用います
@@ -167,6 +169,20 @@ struct SalesManageView: View {
                     }
                 }
             } // .toolbar
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+
+                    Button {
+                        isPresentedNewItem.toggle()
+                    } label: {
+                        Image(systemName: "rectangle.stack.fill.badge.plus")
+                    }
+                }
+            } // .toolbar(新規アイテム追加ボタン)
+            .sheet(isPresented: $isPresentedNewItem) {
+                NewItemView()
+            } // sheet
+
             .navigationBarTitleDisplayMode(.inline)
         } // NavigationView
     } // body
