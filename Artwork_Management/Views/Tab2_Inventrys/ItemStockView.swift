@@ -10,7 +10,7 @@ import SwiftUI
 struct ItemStockView: View {
 
     @State var searchItemText = ""
-    
+
     var body: some View {
 
         NavigationView {
