@@ -9,8 +9,9 @@ import SwiftUI
 
 struct LibraryView: View {
 
-    @State var itemName = ""
     @Binding var isShowItemDetail: Bool
+
+    @State var itemName = ""
 
     var body: some View {
 
@@ -33,7 +34,6 @@ struct LibraryView: View {
 
                         LibraryListView(itemWidth: 200, itemHeight: 150, itemSpase: 20, itemNameTag: "Goods",
                                       itemColor: .blue, isShowItemDetail: $isShowItemDetail)
-
 
                     } // VStack
                 } // ScrollView

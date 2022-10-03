@@ -9,8 +9,9 @@ import SwiftUI
 
 struct LibraryDetailShow: View {
 
-    let screenSize = UIScreen.main.bounds
     let itemName: String
+
+    private let screenSize = UIScreen.main.bounds
 
     var body: some View {
 

@@ -11,7 +11,7 @@ struct FirstSignInView: View {
 
     // テスト用のデータ
     let user: User
-    
+
     var body: some View {
 
         VStack {
@@ -38,6 +38,8 @@ struct FirstSignInView: View {
 // ログイン時の入力欄のカスタムViewです。
 struct FirstLogInInfomation: View {
 
+    let user: User
+
     @State private var address = ""
     @State private var password = ""
     @State private var password2 = ""
@@ -45,7 +47,6 @@ struct FirstLogInInfomation: View {
     @State private var passHidden2 = true
     @State private var resultPassword = true
     @State private var isActive = false
-    let user: User
 
     var body: some View {
 
@@ -120,7 +121,6 @@ struct FirstLogInInfomation: View {
             .keyboardType(.emailAddress)
             .padding(.bottom, 10)
 
-
         } // VStack
         .padding()
 
@@ -131,8 +131,7 @@ struct FirstLogInInfomation: View {
 
                 if password != password2 {
                     resultPassword = false
-                }
-                else {
+                } else {
                     resultPassword = true
                 }
 
@@ -152,8 +151,8 @@ struct FirstLogInInfomation: View {
 struct FirstLogInView_Previews: PreviewProvider {
     static var previews: some View {
 
-        FirstSignInView(user: User(name:     "中川賢亮",
-                                    address:  "kennsuke242424@gmail.com",
+        FirstSignInView(user: User(name: "中川賢亮",
+                                    address: "kennsuke242424@gmail.com",
                                     password: "ninnzinn2424")
         )
     }

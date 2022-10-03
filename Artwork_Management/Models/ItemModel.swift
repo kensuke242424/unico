@@ -7,11 +7,17 @@
 
 import Foundation
 
-struct Item: Identifiable {
+struct Item: Identifiable, Hashable {
 
     let id = UUID()
     let tag: String
+    let tagColor: String
     let name: String
     let detail: String
     let photo: String
+    let price: Int
+    let sales: Int
+    let inventory: Int
+    let createTime: Date
+    let updateTime: Date
 }

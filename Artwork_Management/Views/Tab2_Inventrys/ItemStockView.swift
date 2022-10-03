@@ -10,6 +10,7 @@ import SwiftUI
 struct ItemStockView: View {
 
     @State var searchItemText = ""
+    
     var body: some View {
 
         NavigationView {
@@ -18,7 +19,6 @@ struct ItemStockView: View {
                 HStack {
                     TextField("　　　　　キーワード検索", text: $searchItemText)
                         .textFieldStyle(.roundedBorder)
-
 
                     Button {
 
@@ -32,8 +32,6 @@ struct ItemStockView: View {
                     } // Button
                 } // HStack(検索ボタン)
                 .padding()
-
-                
                 ItemShowBlock(itemWidth: 180,
                               itemHeight: 200,
                               itemSpase: 20,
@@ -42,6 +40,7 @@ struct ItemStockView: View {
             } // VStack
             .navigationTitle("ItemStock")
             .padding(.top)
+            .navigationBarTitleDisplayMode(.inline)
         } // NavigationView
     } // body
 } // View
