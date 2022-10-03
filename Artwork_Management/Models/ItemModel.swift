@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Item: Identifiable, Hashable {
+struct Item: Identifiable {
 
     let id = UUID()
     let tag: String
