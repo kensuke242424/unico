@@ -18,6 +18,7 @@ enum Field {
 struct NewItemView: View {
 
     let screenSize = UIScreen.main.bounds
+    let itemVM: ItemViewModel
 
     @State private var itemName = ""
     @State private var itemtag = ""
@@ -25,6 +26,8 @@ struct NewItemView: View {
     @State private var itemPlace = ""
     @State private var itemDetail = ""
     @State private var scrollID = 0
+    @State private var selectionTag = ""
+    @State private var isButtonDisabled = true
     @FocusState private var focusedField: Field?
 
     var body: some View {
@@ -41,16 +44,16 @@ struct NewItemView: View {
                             .frame(width: screenSize.width, height: screenSize.height / 2)
                             .overlay {
                                 VStack {
-                                    Text("New Item")
-                                        .font(.title2)
-                                        .fontWeight(.black)
-
-                                    Rectangle()
-                                        .frame(height: 1)
-                                        .opacity(0.3)
-                                        .shadow(radius: 4, x: 2)
-                                        .padding(.horizontal, 50)
-                                        .padding(.bottom, 20)
+//                                    Text("New Item")
+//                                        .font(.title2)
+//                                        .fontWeight(.black)
+//
+//                                    Rectangle()
+//                                        .frame(height: 1)
+//                                        .opacity(0.3)
+//                                        .shadow(radius: 4, x: 2)
+//                                        .padding(.horizontal, 50)
+//                                        .padding(.bottom, 20)
 
                                     RoundedRectangle(cornerRadius: 10)
                                         .foregroundColor(.gray)
@@ -79,17 +82,21 @@ struct NewItemView: View {
                         // -------- グラデーション部分ここまで ----------
                         // -------- 入力フォームここから ----------
 
-                        VStack(spacing: 20) {
+                        VStack(spacing: 30) {
 
                             VStack(alignment: .leading) {
                                 Text("■タグ設定")
                                     .fontWeight(.bold)
                                     .foregroundColor(.gray)
-                                TextField("ホイールで作成", text: $itemtag)
-                                    .focused($focusedField, equals: .tag)
-                                    .onTapGesture {
-                                        focusedField = .tag
+
+                                Picker("", selection: $selectionTag) {
+                                    ForEach(0 ..< itemVM.tags.count, id: \.self) { index in
+
+                                        Text(itemVM.tags[index]).tag(itemVM.tags[index])
                                     }
+                                    Text("＋タグを追加").tag("＋タグを追加")
+
+                                } // Picker
 
                                 FocusedLineRow(select: focusedField == .tag ? true : false)
 
@@ -102,9 +109,7 @@ struct NewItemView: View {
                                     .foregroundColor(.gray)
                                 TextField("1st Album「...」", text: $itemName)
                                     .focused($focusedField, equals: .name)
-                                    .onTapGesture {
-                                        focusedField = .name
-                                    }
+                                    .onTapGesture { focusedField = .name }
                                     .onSubmit { focusedField = .stock }
 
                                 FocusedLineRow(select: focusedField == .name ? true : false)
@@ -117,9 +122,7 @@ struct NewItemView: View {
                                 TextField("100", text: $itemStock)
                                     .keyboardType(.numberPad)
                                     .focused($focusedField, equals: .stock)
-                                    .onTapGesture {
-                                        focusedField = .stock
-                                    }
+                                    .onTapGesture { focusedField = .stock }
 
                                 FocusedLineRow(select: focusedField == .stock ? true : false)
                             } // 在庫数
@@ -131,9 +134,7 @@ struct NewItemView: View {
                                 TextField("2000", text: $itemPlace)
                                     .keyboardType(.numberPad)
                                     .focused($focusedField, equals: .place)
-                                    .onTapGesture {
-                                        focusedField = .place
-                                    }
+                                    .onTapGesture { focusedField = .place }
 
                                 FocusedLineRow(select: focusedField == .place ? true : false)
                             } // 価格
@@ -170,6 +171,19 @@ struct NewItemView: View {
                         // -------- 入力フォームここまで ----------
 
                     } // VStack 全体
+                    .navigationTitle("新規アイテム")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem {
+                            Button {
+                                // アイテム追加処理
+                                print(selectionTag)
+                            } label: {
+                                Text("追加する")
+                            }
+//                            .disabled(true)
+                        }
+                    } // .toolbar
                     .onTapGesture { focusedField = nil }
                 } // ScrollView
                 .onChange(of: scrollID) { id in
@@ -177,24 +191,20 @@ struct NewItemView: View {
                         proxy.scrollTo(id)
                     }
                 } // onChange
-            .navigationTitle("新規アイテム")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem {
-                    Button {
-                        // アイテム追加処理
-                    } label: {
-                        Text("追加する")
-                    }
-                }
-            } // .toolbar
             } // ScrollReader
         } // NavigationView
+        .onAppear {
+            if let firstTag = itemVM.tags.first {
+                self.selectionTag = firstTag
+                print("onAppear時に格納したタグ: \(selectionTag)")
+            }
+
+        }
     } // body
 } // View
 
 struct NewItemView_Previews: PreviewProvider {
     static var previews: some View {
-        NewItemView()
+        NewItemView(itemVM: ItemViewModel())
     }
 }
