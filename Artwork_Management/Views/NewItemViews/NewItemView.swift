@@ -44,16 +44,6 @@ struct NewItemView: View {
                             .frame(width: screenSize.width, height: screenSize.height / 2)
                             .overlay {
                                 VStack {
-//                                    Text("New Item")
-//                                        .font(.title2)
-//                                        .fontWeight(.black)
-//
-//                                    Rectangle()
-//                                        .frame(height: 1)
-//                                        .opacity(0.3)
-//                                        .shadow(radius: 4, x: 2)
-//                                        .padding(.horizontal, 50)
-//                                        .padding(.bottom, 20)
 
                                     RoundedRectangle(cornerRadius: 10)
                                         .foregroundColor(.gray)
@@ -158,7 +148,7 @@ struct NewItemView: View {
                                         if focusedField != .detail {
                                             if itemDetail.isEmpty {
                                                 Text("アイテムについてメモを残しましょう。")
-                                                    .opacity(0.3)
+                                                    .opacity(0.5)
                                                     .padding()
                                             }
                                         }
