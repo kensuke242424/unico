@@ -90,7 +90,7 @@ struct NewItemView: View {
 
                                 FocusedLineRow(select: focusedField == .tag ? true : false)
 
-                            } // タグ
+                            } // ■タグ設定
 
                             VStack(alignment: .leading) {
                                 // 機種によって表示どうなるか要検証
@@ -103,7 +103,7 @@ struct NewItemView: View {
                                     .onSubmit { focusedField = .stock }
 
                                 FocusedLineRow(select: focusedField == .name ? true : false)
-                            } // アイテム名
+                            } // ■アイテム名
 
                             VStack(alignment: .leading) {
                                 Text("■在庫数")
@@ -115,7 +115,7 @@ struct NewItemView: View {
                                     .onTapGesture { focusedField = .stock }
 
                                 FocusedLineRow(select: focusedField == .stock ? true : false)
-                            } // 在庫数
+                            } // ■在庫数
 
                             VStack(alignment: .leading) {
                                 Text("■価格(税込)")
@@ -127,7 +127,7 @@ struct NewItemView: View {
                                     .onTapGesture { focusedField = .place }
 
                                 FocusedLineRow(select: focusedField == .place ? true : false)
-                            } // 価格
+                            } // ■価格
 
                             VStack(alignment: .leading) {
 
@@ -153,7 +153,7 @@ struct NewItemView: View {
                                             }
                                         }
                                     } // overlay
-                            } // アイテム詳細
+                            } // ■アイテム詳細
                             .padding(.top)
                         } // VStack(記入欄)
                         .padding()
@@ -176,20 +176,22 @@ struct NewItemView: View {
                     } // .toolbar
                     .onTapGesture { focusedField = nil }
                 } // ScrollView
+
                 .onChange(of: scrollID) { id in
                     withAnimation {
                         proxy.scrollTo(id)
                     }
                 } // onChange
+
+                .onAppear {
+                    if let firstTag = itemVM.tags.first {
+                        self.selectionTag = firstTag
+                        print("onAppear時に格納したタグ: \(selectionTag)")
+                    }
+                } // onAppear
+
             } // ScrollReader
         } // NavigationView
-        .onAppear {
-            if let firstTag = itemVM.tags.first {
-                self.selectionTag = firstTag
-                print("onAppear時に格納したタグ: \(selectionTag)")
-            }
-
-        }
     } // body
 } // View
 
