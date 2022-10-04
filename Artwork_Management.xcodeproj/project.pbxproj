@@ -22,6 +22,7 @@
 		E094F10228E21EBA00D3C845 /* FirstSignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E094F10128E21EBA00D3C845 /* FirstSignInView.swift */; };
 		E09F09BC28EAF33500D07669 /* FocusedLineRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09F09BB28EAF33500D07669 /* FocusedLineRow.swift */; };
 		E09F09BE28EBF94000D07669 /* NewTagView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09F09BD28EBF94000D07669 /* NewTagView.swift */; };
+		E09F09C128EC4A1800D07669 /* ResizableSheet in Frameworks */ = {isa = PBXBuildFile; productRef = E09F09C028EC4A1800D07669 /* ResizableSheet */; };
 		E0CC79B628E761EA00CE0B19 /* UserModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0CC79B528E761EA00CE0B19 /* UserModel.swift */; };
 		E0CC79B828E7811500CE0B19 /* ItemDetailContents.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0CC79B728E7811500CE0B19 /* ItemDetailContents.swift */; };
 		E0CF7EEC28DEEED700735142 /* LibraryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0CF7EEB28DEEED700735142 /* LibraryListView.swift */; };
@@ -69,6 +70,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E09F09C128EC4A1800D07669 /* ResizableSheet in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -221,6 +223,9 @@
 			dependencies = (
 			);
 			name = Artwork_Management;
+			packageProductDependencies = (
+				E09F09C028EC4A1800D07669 /* ResizableSheet */,
+			);
 			productName = Artwork_Management;
 			productReference = E08F272128DDA08E00329C5E /* Artwork_Management.app */;
 			productType = "com.apple.product-type.application";
@@ -249,6 +254,9 @@
 				Base,
 			);
 			mainGroup = E08F271828DDA08E00329C5E;
+			packageReferences = (
+				E09F09BF28EC4A1800D07669 /* XCRemoteSwiftPackageReference "ResizableSheet" */,
+			);
 			productRefGroup = E08F272228DDA08E00329C5E /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -519,6 +527,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		E09F09BF28EC4A1800D07669 /* XCRemoteSwiftPackageReference "ResizableSheet" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/mtj0928/ResizableSheet.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		E09F09C028EC4A1800D07669 /* ResizableSheet */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E09F09BF28EC4A1800D07669 /* XCRemoteSwiftPackageReference "ResizableSheet" */;
+			productName = ResizableSheet;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E08F271928DDA08E00329C5E /* Project object */;
 }
