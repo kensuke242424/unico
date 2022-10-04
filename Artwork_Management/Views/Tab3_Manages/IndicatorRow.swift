@@ -27,12 +27,12 @@ struct IndicatorRow: View {
                     .shadow(radius: 2, x: 7, y: 4)
             } // case 黄
             .onAppear {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+//                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                     withAnimation(.linear(duration: 0.8)) {
 
                         self.animationValue = salesValue
                     } // withAnimation
-                } // DispatchQueue
+//                } // DispatchQueue
             }
             .onDisappear {
                 self.animationValue = 0

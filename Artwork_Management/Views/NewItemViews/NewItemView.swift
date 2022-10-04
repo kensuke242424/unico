@@ -28,6 +28,7 @@ struct NewItemView: View {
     @State private var scrollID = 0
     @State private var selectionTag = ""
     @State private var isButtonDisabled = true
+    @State private var isShowNewTagCreate = false
     @FocusState private var focusedField: Field?
 
     var body: some View {
@@ -171,7 +172,6 @@ struct NewItemView: View {
                             } label: {
                                 Text("追加する")
                             }
-//                            .disabled(true)
                         }
                     } // .toolbar
                     .onTapGesture { focusedField = nil }
@@ -180,6 +180,13 @@ struct NewItemView: View {
                 .onChange(of: scrollID) { id in
                     withAnimation {
                         proxy.scrollTo(id)
+                    }
+                } // onChange
+
+                .onChange(of: selectionTag) { selection in
+                    if selection == "＋タグを追加" {
+                        self.isShowNewTagCreate.toggle()
+                        print("新規タグ作成: \(isShowNewTagCreate)")
                     }
                 } // onChange
 
