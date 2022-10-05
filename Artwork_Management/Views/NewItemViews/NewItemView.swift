@@ -42,6 +42,7 @@ struct NewItemView: View {
                         // ✅カスタムView
                         SelectItemPhotoArea(gradientColor1: .red, gradientColor2: .black)
 
+
                         // -------- 入力フォームここから ----------
 
                         VStack(spacing: 30) {
@@ -147,6 +148,24 @@ struct NewItemView: View {
                                            geometryMinY: $geometryMinY)
                     } // if isOpenSideMenu
 
+//                    Button {
+//                        //
+//                    } label: {
+//                        Image(systemName: "shippingbox.fill")
+//                            .resizable()
+//                            .scaledToFit()
+//                            .frame(width: 40, height: 40)
+//                            .overlay(alignment: .topTrailing) {
+//                                Image(systemName: "plus.circle.fill")
+//                                    .resizable()
+//                                    .scaledToFit()
+//                                    .frame(width: 20, height: 20)
+//                                    .offset(x: 10, y: -10)
+//                            }
+//                    }
+////                    .offset(x: , y: )
+
+
                 } // ZStack(View全体)
                 .background(
                     GeometryReader { geometry in
@@ -190,18 +209,18 @@ struct NewItemView: View {
                 }
             } // onAppear
 
-            .navigationTitle("新規アイテム")
-            .navigationBarTitleDisplayMode(.inline)
+//            .navigationTitle("新規アイテム")
+//            .navigationBarTitleDisplayMode(.inline)
 
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        // アイテム追加
-                    } label: {
-                        Text("追加する")
-                    }
-                }
-            } // toolbar
+//            .toolbar {
+//                ToolbarItem(placement: .navigationBarTrailing) {
+//                    Button {
+//                        // アイテム追加
+//                    } label: {
+//                        Text("追加する")
+//                    }
+//                }
+//            } // toolbar
 
         } // NavigationView
     } // body
@@ -217,6 +236,7 @@ struct SelectItemPhotoArea: View {
 
         LinearGradient(colors: [gradientColor1, gradientColor2], startPoint: .top, endPoint: .bottom)
             .frame(width: UIScreen.main.bounds.width, height: 350)
+            .blur(radius: 4.0, opaque: false)
             .overlay {
                 VStack {
 
