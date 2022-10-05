@@ -105,12 +105,12 @@ struct NewTagView: View {
                         } // VStack
                         .padding()
                     } // overlay 全体
-            }
+            } // VStack
 
-        }
+        } // ZStack
 
-    }
-}
+    } // body
+} // View
 
 struct NewTagView_Previews: PreviewProvider {
     static var previews: some View {
