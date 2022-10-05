@@ -24,7 +24,7 @@ enum TagGroup {
 
 struct SalesManageView: View {
 
-    @StateObject private var itemVM = ItemViewModel()
+    @StateObject var itemVM: ItemViewModel
     // NOTE: リスト内のアイテム詳細を表示するトリガーです
     @State private var isShowItemDetail = false
     // NOTE: 新規アイテム追加Viewの発現を管理します
@@ -273,6 +273,6 @@ struct SalesManageView: View {
 
 struct SalesView_Previews: PreviewProvider {
     static var previews: some View {
-        SalesManageView()
+        SalesManageView(itemVM: ItemViewModel())
     }
 }

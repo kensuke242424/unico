@@ -9,9 +9,9 @@ import SwiftUI
 
 struct LibraryView: View {
 
+    @StateObject var itemVM: ItemViewModel
     @Binding var isShowItemDetail: Bool
 
-    @StateObject var itemVM = ItemViewModel()
     @State private var itemName = ""
     @State private var isPresentedNewItem = false
 
@@ -63,6 +63,7 @@ struct LibraryView: View {
 
 struct ItemLibraryView_Previews: PreviewProvider {
     static var previews: some View {
-        LibraryView(isShowItemDetail: .constant(false))
+        LibraryView(itemVM: ItemViewModel(),
+                    isShowItemDetail: .constant(false))
     }
 }

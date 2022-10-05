@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct SystemView: View {
+    @StateObject var itemVM: ItemViewModel
     var body: some View {
 
         VStack {
@@ -22,6 +23,6 @@ struct SystemView: View {
 
 struct SystemView_Previews: PreviewProvider {
     static var previews: some View {
-        SystemView()
+        SystemView(itemVM: ItemViewModel())
     }
 }

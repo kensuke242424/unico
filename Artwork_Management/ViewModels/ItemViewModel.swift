@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 class ItemViewModel: ObservableObject {
 
@@ -32,4 +33,36 @@ class ItemViewModel: ObservableObject {
     ]
 
     @Published var tags = ["Album", "Single", "Goods"]
-}
+
+    func castStringIntoColor(color: String) -> Color {
+        switch color {
+        case "赤":
+            return .red
+        case "青":
+            return .blue
+        case "黄":
+            return .yellow
+        case "緑":
+            return .green
+        default:
+            return .gray
+        }
+    } // func castStringIntoColor
+
+    func castColorIntoString(color: Color) -> String {
+
+        switch color {
+        case Color(.red):
+            return "赤"
+        case Color(.blue):
+            return "青"
+        case Color(.yellow):
+            return "黄"
+        case Color(.green):
+            return "緑"
+       default:
+            return "灰"
+        }
+    } // func castColorIntoString
+
+} // class

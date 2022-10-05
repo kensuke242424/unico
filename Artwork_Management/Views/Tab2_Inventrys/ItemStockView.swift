@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ItemStockView: View {
 
-    @StateObject var itemVM = ItemViewModel()
+    @StateObject var itemVM: ItemViewModel
 
     @State private var searchItemText = ""
     @State private var isPresentedNewItem = false
@@ -64,6 +64,6 @@ struct ItemStockView: View {
 
 struct ItemStockControlView_Previews: PreviewProvider {
     static var previews: some View {
-        ItemStockView()
+        ItemStockView(itemVM: ItemViewModel())
     }
 }
