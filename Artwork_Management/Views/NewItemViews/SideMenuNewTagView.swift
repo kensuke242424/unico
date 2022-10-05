@@ -119,8 +119,11 @@ struct SideMenuNewTagView: View {
                     IndicatorRow(salesValue: 170000, tagColor: Color(selectionTagColor))
 
                     Button {
-                        // 新規タグを配列の１番目に保存
-                        itemVM.tags.insert(newTagName, at: 0)
+                        // 新規タグをオブジェクトに詰め、配列の１番目に保存
+                        itemVM.tags.insert(Tag(tagName: newTagName,
+                                               tagColor: Color(selectionTagColor)),
+                                           at: 0
+                        )
 
                         withAnimation(.easeIn(duration: 0.25)) {
                             self.defaultOffsetX = screenSize.width

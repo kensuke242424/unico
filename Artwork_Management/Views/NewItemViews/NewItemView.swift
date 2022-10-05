@@ -60,7 +60,7 @@ struct NewItemView: View {
                                         ForEach(0 ..< itemVM.tags.count, id: \.self) { index in
 
                                             if let tagsRow = itemVM.tags[index] {
-                                                Text(tagsRow).tag(tagsRow)
+                                                Text(tagsRow.tagName).tag(tagsRow.tagName)
                                             }
                                         }
                                         Text("＋タグを追加").tag("＋タグを追加")
@@ -180,7 +180,7 @@ struct NewItemView: View {
             .onChange(of: isOpenSideMenu) { newValue in
                 if newValue == false {
                     if let firstTag = itemVM.tags.first {
-                        selectionTag = firstTag
+                        selectionTag = firstTag.tagName
                     }
                 }
             } // onChange
@@ -188,7 +188,7 @@ struct NewItemView: View {
             // NOTE: 新規アイテムView生成時に、タグ配列の１番目の要素をPickerが参照するselectionTagに初期値として代入します。
             .onAppear {
                 if let firstTag = itemVM.tags.first {
-                    self.selectionTag = firstTag
+                    self.selectionTag = firstTag.tagName
                     print("onAppear時に格納したタグ: \(selectionTag)")
                 }
             } // onAppear

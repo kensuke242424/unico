@@ -49,9 +49,9 @@ struct SalesManageView: View {
 
                         case .on:
                             // タグの要素数の分リストを作成
-                            ForEach(itemVM.tags, id: \.self) { tag in
+                            ForEach(itemVM.tags) { tag in
 
-                                Text("- \(tag) -")
+                                Text("- \(tag.tagName) -")
                                     .font(.largeTitle.bold())
                                     .shadow(radius: 2, x: 4, y: 6)
                                     .padding(.vertical)
@@ -60,7 +60,7 @@ struct SalesManageView: View {
                                 // enumerated ⇨ 要素とインデックス両方取得
                                 ForEach(Array(itemVM.items.enumerated()), id: \.offset) { offset, item in
 
-                                    if item.tag == tag {
+                                    if item.tag == tag.tagName {
                                         salesItemListRow(item: item, listIndex: offset)
                                     }
                                 } // ForEach item

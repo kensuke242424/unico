@@ -32,7 +32,13 @@ class ItemViewModel: ObservableObject {
              price: 4000, sales: 520000, inventory: 97, createTime: Date(), updateTime: Date())
     ]
 
-    @Published var tags = ["Album", "Single", "Goods"]
+//    @Published var tags = ["Album", "Single", "Goods"]
+    @Published var tags =
+    [
+        Tag(tagName: "Album", tagColor: .red),
+        Tag(tagName: "Single", tagColor: .blue),
+        Tag(tagName: "Goods", tagColor: .yellow)
+    ]
 
     func castStringIntoColor(color: String) -> Color {
         switch color {
