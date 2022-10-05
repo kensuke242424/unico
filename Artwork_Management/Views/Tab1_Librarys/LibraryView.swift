@@ -11,7 +11,9 @@ struct LibraryView: View {
 
     @Binding var isShowItemDetail: Bool
 
-    @State var itemName = ""
+    @StateObject var itemVM = ItemViewModel()
+    @State private var itemName = ""
+    @State private var isPresentedNewItem = false
 
     var body: some View {
 
@@ -38,11 +40,23 @@ struct LibraryView: View {
                     } // VStack
                 } // ScrollView
             } // ZStack
+            .navigationTitle("Home")
 
-            .overlay(
-                LibraryDetailShow(itemName: "a")
-                    .opacity(isShowItemDetail ? 0.6 : 0)
-            )
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+
+                    Button {
+                        isPresentedNewItem.toggle()
+                    } label: {
+                        Image(systemName: "rectangle.stack.fill.badge.plus")
+                    }
+                }
+            } // toolbar
+
+            .sheet(isPresented: $isPresentedNewItem) {
+                NewItemView(itemVM: itemVM)
+            } // sheet
+
         } // NavigationView
     } // body
 } // View

@@ -9,7 +9,10 @@ import SwiftUI
 
 struct ItemStockView: View {
 
-    @State var searchItemText = ""
+    @StateObject var itemVM = ItemViewModel()
+
+    @State private var searchItemText = ""
+    @State private var isPresentedNewItem = false
 
     var body: some View {
 
@@ -41,6 +44,20 @@ struct ItemStockView: View {
             .navigationTitle("ItemStock")
             .padding(.top)
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+
+                    Button {
+                        isPresentedNewItem.toggle()
+                    } label: {
+                        Image(systemName: "rectangle.stack.fill.badge.plus")
+                    }
+                }
+            } // toolbar
+
+            .sheet(isPresented: $isPresentedNewItem) {
+                NewItemView(itemVM: itemVM)
+            } // sheet
         } // NavigationView
     } // body
 } // View

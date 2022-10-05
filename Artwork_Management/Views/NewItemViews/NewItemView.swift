@@ -17,7 +17,6 @@ enum Field {
 
 struct NewItemView: View {
 
-    let screenSize = UIScreen.main.bounds
     let itemVM: ItemViewModel
 
     @State private var itemName = ""
@@ -43,7 +42,7 @@ struct NewItemView: View {
                         // -------- グラデーション部分ここから ----------
 
                         LinearGradient(colors: [.red, .black], startPoint: .top, endPoint: .bottom)
-                            .frame(width: screenSize.width, height: 350)
+                            .frame(width: UIScreen.main.bounds.width, height: 350)
                         //                        .ignoresSafeArea()
                             .overlay {
                                 VStack {
