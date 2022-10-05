@@ -12,12 +12,11 @@ struct SideMenuNewTagView: View {
     @StateObject var itemVM: ItemViewModel
     @Binding var isOpenSideMenu: Bool
     @Binding var geometryMinY: CGFloat
+    @Binding var selectionTagColor: UIColor
 
     let screenSize = UIScreen.main.bounds
 
     @State private var newTagName = ""
-    @State private var newTagColor = ""
-    @State private var selectionTagColor = UIColor.red
     @State private var disableButton = true
     @State private var opacity = 0.0
     @State private var defaultOffsetX: CGFloat = UIScreen.main.bounds.width
@@ -173,6 +172,9 @@ struct SideMenuNewTagView: View {
 struct SideMenuNewTagView_Previews: PreviewProvider {
     static var previews: some View {
         SideMenuNewTagView(itemVM: ItemViewModel(),
-                           isOpenSideMenu: .constant(true), geometryMinY: .constant(-150))
+                           isOpenSideMenu: .constant(true),
+                           geometryMinY: .constant(-150),
+                           selectionTagColor: .constant(UIColor.red)
+        )
     }
 }

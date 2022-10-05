@@ -28,6 +28,7 @@ struct NewItemView: View {
     @State private var isButtonDisabled = true
     @State private var isOpenSideMenu = false
     @State private var geometryMinY = CGFloat(0)
+    @State private var selectionTagColor = UIColor.red
     @FocusState private var focusedField: Field?
 
     var body: some View {
@@ -144,7 +145,9 @@ struct NewItemView: View {
 
                         SideMenuNewTagView(itemVM: itemVM,
                                            isOpenSideMenu: $isOpenSideMenu,
-                                           geometryMinY: $geometryMinY)
+                                           geometryMinY: $geometryMinY,
+                                           selectionTagColor: $selectionTagColor
+                        )
                     } // if isOpenSideMenu
 
                 } // ZStack(View全体)
@@ -199,7 +202,7 @@ struct NewItemView: View {
                         // アイテム追加
                         if !itemtag.isEmpty, !itemName.isEmpty {
 
-//                            itemVM.castColorIntoString(color: )
+                            let tagColorString = itemVM.castColorIntoString(color: Color(selectionTagColor))
 
 //                            itemVM.items.append(Item(tag: itemtag,
 //                                                     tagColor: <#T##String#>,
