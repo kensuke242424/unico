@@ -37,7 +37,7 @@ struct NewItemView: View {
         NavigationView {
 
                 ScrollView(showsIndicators: false) {
-                    GeometryReader { geometry in
+//                    GeometryReader { geometry in
                     ZStack {
                         VStack { // 全体
 
@@ -169,16 +169,19 @@ struct NewItemView: View {
 
                         SideMenuNewTagView(itemVM: itemVM, isOpenSideMenu: $isOpenSideMenu)
                     } // ZStack
-
-                    // Geometryを使うと座標がずれるため、frameで修正
-                    .frame(width: geometry.frame(in: .local).width)
-                    .onChange(of: geometry.frame(in: .global).minY) { newValue in
-                        self.geometryMinY = newValue
-                        print(geometryMinY)
-                    }
-                } // Geometry
+                    .background(
+                        GeometryReader {geometry in
+                            Color.clear
+                                .preference(key: OffsetPreferenceKey.self,
+                                            value: geometry.frame(in: .named("scrollSpace")).minY)
+                                .onChange(of: geometry.frame(in: .named("scrollSpace")).minY) {newValue in
+                                    print(newValue)
+                                }
+                        }
+                    )
 
                 } // ScrollView
+                .coordinateSpace(name: "scrollSpace")
             .onTapGesture { focusedField = nil }
 
             .onChange(of: selectionTag) { selection in
@@ -197,6 +200,11 @@ struct NewItemView: View {
         } // NavigationView
     } // body
 } // View
+
+private struct OffsetPreferenceKey: PreferenceKey {
+  static var defaultValue: CGFloat = .zero
+  static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {}
+}
 
 struct NewItemView_Previews: PreviewProvider {
     static var previews: some View {
