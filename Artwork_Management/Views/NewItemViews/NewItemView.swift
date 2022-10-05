@@ -83,14 +83,23 @@ struct NewItemView: View {
                                         .fontWeight(.bold)
                                         .foregroundColor(.gray)
 
-                                    Picker("", selection: $selectionTag) {
-                                        ForEach(0 ..< itemVM.tags.count, id: \.self) { index in
+                                    HStack {
+//                                        RoundedRectangle(cornerRadius: 5)
+//                                            .frame(width: 20, height: 20)
+//                                            .foregroundColor(selectionTag)
+                                        Image(systemName: "tag.fill")
+                                            .foregroundColor(.red)
 
-                                            Text(itemVM.tags[index]).tag(itemVM.tags[index])
-                                        }
-                                        Text("＋タグを追加").tag("＋タグを追加")
+                                        Picker("", selection: $selectionTag) {
+                                            ForEach(0 ..< itemVM.tags.count, id: \.self) { index in
 
-                                    } // Picker
+                                                if let tagsRow = itemVM.tags[index] {
+                                                    Text(tagsRow).tag(tagsRow)
+                                                }
+                                            }
+                                            Text("＋タグを追加").tag("＋タグを追加")
+                                        } // Picker
+                                    } // HStack
 
                                     FocusedLineRow(select: focusedField == .tag ? true : false)
 
@@ -189,6 +198,7 @@ struct NewItemView: View {
 
                 } // ScrollView
                 .coordinateSpace(name: "scrollFrame_Space")
+
             .onTapGesture { focusedField = nil }
 
             .onChange(of: selectionTag) { selection in
@@ -197,6 +207,14 @@ struct NewItemView: View {
                     print("サイドメニュー: \(isOpenSideMenu)")
                 }
             } // onChange
+
+            .onChange(of: isOpenSideMenu) { newValue in
+                if newValue == false {
+                    if let firstTag = itemVM.tags.first {
+                        selectionTag = firstTag
+                    }
+                }
+            }
 
             .onAppear {
                 if let firstTag = itemVM.tags.first {

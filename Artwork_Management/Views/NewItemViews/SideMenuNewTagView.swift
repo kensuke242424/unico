@@ -34,7 +34,8 @@ struct SideMenuNewTagView: View {
                         self.defaultOffsetX = screenSize.width
                         self.opacity = 0.0
                     }
-
+                    // NOTE: 表示管理Bool値をずらさないとView非表示時のアニメーションが不自然になるため、
+                    //       DispatchQueueを用いて処理をずらしています。
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                         self.isOpenSideMenu = false
                     }
@@ -48,7 +49,7 @@ struct SideMenuNewTagView: View {
                     .frame(width: screenSize.width, height: 600)
                     .opacity(0.7)
 
-                VStack(alignment: .leading, spacing: 30) {
+                VStack(alignment: .leading, spacing: 20) {
 
                     VStack(alignment: .leading) {
                         Text("新規タグ")
@@ -62,14 +63,15 @@ struct SideMenuNewTagView: View {
                             .opacity(0.2)
                             .frame(width: screenSize.width, height: 5)
                             .padding(.bottom, 50)
-                    }
+
+                    } // タイトル(新規タグ)
 
                     VStack(alignment: .leading) {
                         Text("■タグネーム")
+                            .fontWeight(.heavy)
                             .foregroundColor(.white)
 
                         TextField("No name...", text: $newTagName)
-//                            .multilineTextAlignment(.center)
                             .foregroundColor(.white)
                             .padding()
                             .frame(width: 200, height: 20)
@@ -85,7 +87,18 @@ struct SideMenuNewTagView: View {
 
                     VStack(alignment: .leading) {
                         Text("■タグ色")
+                            .fontWeight(.heavy)
                             .foregroundColor(.white)
+
+                        HStack(spacing: 20) {
+                            Text("◀︎")
+                            Image(systemName: "rectangle.and.hand.point.up.left.filled")
+                            Text("▶︎")
+                        }
+                        .foregroundColor(.white)
+                        .opacity(0.5)
+                        .padding(.top)
+//                        .padding(.leading, 40)
 
                         Picker("色を選択", selection: $selectionTagColor) {
 
@@ -99,31 +112,47 @@ struct SideMenuNewTagView: View {
                         .padding(.trailing, screenSize.width / 2)
                     } // タグ色
 
-                    if !newTagName.isEmpty {
-                        Text("- \(newTagName) -")
-                            .fontWeight(.bold)
-                            .frame(width: screenSize.width / 2)
-                            .foregroundColor(.white)
-                            .shadow(radius: 4, x: 4, y: 6)
-                            .allowsTightening(true)
-                    }
+                    Text("-  \(newTagName)  -")
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                        .shadow(radius: 4, x: 4, y: 6)
 
-                    IndicatorRow(salesValue: 150000, tagColor: Color(selectionTagColor))
+                    IndicatorRow(salesValue: 170000, tagColor: Color(selectionTagColor))
 
                     Button {
-                        // タグ追加処理
+                        // 新規タグを配列の１番目に保存
+                        itemVM.tags.insert(newTagName, at: 0)
+
+                        withAnimation(.easeIn(duration: 0.25)) {
+                            self.defaultOffsetX = screenSize.width
+                            self.opacity = 0.0
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            self.isOpenSideMenu = false
+                        }
+
                     } label: {
                         Text("追加")
                     }
                     .frame(width: 70, height: 30)
                     .buttonStyle(.borderedProminent)
-                    //                    .disabled(disableButton)
+                    .disabled(disableButton)
                     .padding(.top)
 
                 } // VStack
                 .padding(.leading, 30)
             } // ZStack (ブロック)
             .offset(x: defaultOffsetX)
+
+            .onChange(of: newTagName) {newValue in
+                withAnimation(.easeIn(duration: 0.15)) {
+                    if newValue.isEmpty {
+                        disableButton = true
+                    } else {
+                        disableButton = false
+                    }
+                }
+            } // .onChange
 
             // サイドメニューViewレイアウト ここまで
 
