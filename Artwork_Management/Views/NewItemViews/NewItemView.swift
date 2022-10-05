@@ -35,51 +35,21 @@ struct NewItemView: View {
         NavigationView {
 
             ScrollView(showsIndicators: false) {
-                //                    GeometryReader { geometry in
+
                 ZStack {
                     VStack { // 全体
 
-                        // -------- グラデーション部分ここから ----------
+                        // ✅カスタムView
+                        SelectItemPhotoArea(gradientColor1: .red, gradientColor2: .black)
 
-                        LinearGradient(colors: [.red, .black], startPoint: .top, endPoint: .bottom)
-                            .frame(width: UIScreen.main.bounds.width, height: 350)
-                        //                        .ignoresSafeArea()
-                            .overlay {
-                                VStack {
-
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .foregroundColor(.gray)
-                                        .frame(width: 270, height: 270)
-                                        .opacity(0.6)
-                                        .overlay {
-                                            Text("No Image...")
-                                                .foregroundColor(.white)
-                                                .font(.title2)
-                                                .fontWeight(.black)
-                                        }
-                                        .overlay(alignment: .bottomTrailing) {
-                                            Button {
-                                                // Todo: アイテム写真追加処理
-                                            } label: {
-                                                Image(systemName: "plus.rectangle.fill.on.rectangle.fill")
-                                                    .resizable()
-                                                    .scaledToFit()
-                                                    .frame(width: 40, height: 40)
-                                                    .offset(x: 7, y: 7)
-                                            } // Button
-                                        } // .overlay(ボタン)
-                                } // VStack
-                            } // .overlay
-
-                        // -------- グラデーション部分ここまで ----------
                         // -------- 入力フォームここから ----------
 
                         VStack(spacing: 30) {
 
                             VStack(alignment: .leading) {
-                                Text("■タグ設定")
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.gray)
+
+                                InputFormTitle(title: "■タグ設定", isNeed: true)
+                                    .padding(.bottom)
 
                                 HStack {
                                     Image(systemName: "tag.fill")
@@ -94,7 +64,7 @@ struct NewItemView: View {
                                         }
                                         Text("＋タグを追加").tag("＋タグを追加")
                                     } // Picker
-                                } // HStack(タグ要素)
+                                } // HStack(Pickerタグ要素)
 
                                 // NOTE: フォーカスの有無によって、入力欄の下線の色をスイッチします。(カスタムView)
                                 FocusedLineRow(select: focusedField == .tag ? true : false)
@@ -102,10 +72,10 @@ struct NewItemView: View {
                             } // ■タグ設定
 
                             VStack(alignment: .leading) {
-                                // 機種によって表示どうなるか要検証
-                                Text("■アイテム名")
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.gray)
+
+                                InputFormTitle(title: "■アイテム名", isNeed: true)
+                                    .padding(.bottom)
+
                                 TextField("1st Album「...」", text: $itemName)
                                     .focused($focusedField, equals: .name)
                                     .onTapGesture { focusedField = .name }
@@ -115,9 +85,10 @@ struct NewItemView: View {
                             } // ■アイテム名
 
                             VStack(alignment: .leading) {
-                                Text("■在庫数")
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.gray)
+
+                                InputFormTitle(title: "■在庫数", isNeed: false)
+                                    .padding(.bottom)
+
                                 TextField("100", text: $itemStock)
                                     .keyboardType(.numberPad)
                                     .focused($focusedField, equals: .stock)
@@ -127,9 +98,10 @@ struct NewItemView: View {
                             } // ■在庫数
 
                             VStack(alignment: .leading) {
-                                Text("■価格(税込)")
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.gray)
+
+                                InputFormTitle(title: "■価格(税込)", isNeed: false)
+                                    .padding(.bottom)
+
                                 TextField("2000", text: $itemPlace)
                                     .keyboardType(.numberPad)
                                     .focused($focusedField, equals: .place)
@@ -140,10 +112,8 @@ struct NewItemView: View {
 
                             VStack(alignment: .leading) {
 
-                                Text("■アイテム詳細").id(1)
+                                InputFormTitle(title: "■アイテム詳細(メモ)", isNeed: false)
                                     .font(.title3)
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.gray)
 
                                 TextEditor(text: $itemDetail)
                                     .frame(width: UIScreen.main.bounds.width - 20, height: 200)
@@ -161,13 +131,14 @@ struct NewItemView: View {
                                     } // overlay
                             } // ■アイテム詳細
                             .padding(.top)
-                        } // VStack(記入欄)
+
+                        } // VStack(入力フォーム全体)
                         .padding(.vertical, 20)
                         .padding(.horizontal, 30)
 
                         // -------- 入力フォームここまで ----------
 
-                    } // VStack 全体
+                    } // VStack
 
                     if isOpenSideMenu {
 
@@ -176,7 +147,7 @@ struct NewItemView: View {
                                            geometryMinY: $geometryMinY)
                     } // if isOpenSideMenu
 
-                } // ZStack
+                } // ZStack(View全体)
                 .background(
                     GeometryReader { geometry in
                         Color.clear
@@ -185,7 +156,7 @@ struct NewItemView: View {
                             .onChange(of: geometry.frame(in: .named("scrollFrame_Space")).minY) {newValue in
                                 self.geometryMinY = newValue
                             }
-                    }
+                    } // Geometry
                 ) // .background(geometry)
 
             } // ScrollView
@@ -219,9 +190,63 @@ struct NewItemView: View {
                 }
             } // onAppear
 
+            .navigationTitle("新規アイテム")
+            .navigationBarTitleDisplayMode(.inline)
+
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        // アイテム追加
+                    } label: {
+                        Text("追加する")
+                    }
+                }
+            } // toolbar
+
         } // NavigationView
     } // body
 } // View
+
+struct SelectItemPhotoArea: View {
+
+    let gradientColor1: Color
+    let gradientColor2: Color
+
+    var body: some View {
+        // -------- グラデーション部分ここから ----------
+
+        LinearGradient(colors: [gradientColor1, gradientColor2], startPoint: .top, endPoint: .bottom)
+            .frame(width: UIScreen.main.bounds.width, height: 350)
+            .overlay {
+                VStack {
+
+                    RoundedRectangle(cornerRadius: 10)
+                        .foregroundColor(.gray)
+                        .frame(width: 270, height: 270)
+                        .opacity(0.6)
+                        .overlay {
+                            Text("No Image...")
+                                .foregroundColor(.white)
+                                .font(.title2)
+                                .fontWeight(.black)
+                        }
+                        .overlay(alignment: .bottomTrailing) {
+                            Button {
+                                // Todo: アイテム写真追加処理
+                            } label: {
+                                Image(systemName: "plus.rectangle.fill.on.rectangle.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 40, height: 40)
+                                    .offset(x: 7, y: 7)
+                            } // Button
+                        } // .overlay(ボタン)
+                } // VStack
+            } // .overlay
+
+        // -------- グラデーション部分ここまで ----------
+    }
+}
 
 // NOTE: スクロールView全体に対しての画面の現在位置座標をgeometry内で検知し、値を渡すために用いる
 private struct OffsetPreferenceKey: PreferenceKey {

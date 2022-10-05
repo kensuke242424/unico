@@ -144,6 +144,7 @@ struct SideMenuNewTagView: View {
             } // ZStack (ブロック)
             .offset(x: defaultOffsetX)
 
+            // NOTE: タグネームの入力値がisEmptyの場合、追加ボタンを無効化します
             .onChange(of: newTagName) {newValue in
                 withAnimation(.easeIn(duration: 0.15)) {
                     if newValue.isEmpty {
@@ -154,18 +155,18 @@ struct SideMenuNewTagView: View {
                 }
             } // .onChange
 
-            // サイドメニューViewレイアウト ここまで
-
-        } // ZStack
+        } // ZStack(全体)
         .offset(y: -self.geometryMinY - 150)
         .opacity(self.opacity)
         // View表示時
+
         .onAppear {
             withAnimation(.easeIn(duration: 0.25)) {
                 self.opacity = 1.0
                 self.defaultOffsetX = defaultOffsetX / 2 - 30
             }
-        }
+        } // onAppear
+
     } // body
 } // View
 
