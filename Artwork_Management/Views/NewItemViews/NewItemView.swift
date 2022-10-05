@@ -167,21 +167,28 @@ struct NewItemView: View {
 
                         } // VStack 全体
 
-                        SideMenuNewTagView(itemVM: itemVM, isOpenSideMenu: $isOpenSideMenu)
+                        if isOpenSideMenu {
+
+                                SideMenuNewTagView(itemVM: itemVM,
+                                                   isOpenSideMenu: $isOpenSideMenu,
+                                                   geometryMinY: $geometryMinY)
+                        } // if isOpenSideMenu
+
                     } // ZStack
                     .background(
-                        GeometryReader {geometry in
+                        GeometryReader { geometry in
                             Color.clear
                                 .preference(key: OffsetPreferenceKey.self,
                                             value: geometry.frame(in: .named("scrollSpace")).minY)
-                                .onChange(of: geometry.frame(in: .named("scrollSpace")).minY) {newValue in
+                                .onChange(of: geometry.frame(in: .named("scrollFrame_Space")).minY) {newValue in
                                     print(newValue)
+                                    self.geometryMinY = newValue
                                 }
                         }
-                    )
+                    ) // .background(geometry)
 
                 } // ScrollView
-                .coordinateSpace(name: "scrollSpace")
+                .coordinateSpace(name: "scrollFrame_Space")
             .onTapGesture { focusedField = nil }
 
             .onChange(of: selectionTag) { selection in
@@ -201,6 +208,7 @@ struct NewItemView: View {
     } // body
 } // View
 
+// NOTE: スクロールView全体に対して画面がどの位置にいるかをgeometry内で検知し、値を渡すために用いる
 private struct OffsetPreferenceKey: PreferenceKey {
   static var defaultValue: CGFloat = .zero
   static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {}

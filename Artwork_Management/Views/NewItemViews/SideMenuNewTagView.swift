@@ -11,6 +11,7 @@ struct SideMenuNewTagView: View {
 
     @StateObject var itemVM: ItemViewModel
     @Binding var isOpenSideMenu: Bool
+    @Binding var geometryMinY: CGFloat
 
     let screenSize = UIScreen.main.bounds
 
@@ -18,6 +19,8 @@ struct SideMenuNewTagView: View {
     @State private var newTagColor = ""
     @State private var selectionTagColor = UIColor.red
     @State private var disableButton = true
+    @State private var opacity = 0.0
+    @State private var defaultOffsetX: CGFloat = UIScreen.main.bounds.width
 
     var body: some View {
 
@@ -25,11 +28,17 @@ struct SideMenuNewTagView: View {
 
             // 背景
             Color(.gray).opacity(0.5)
-                .opacity(self.isOpenSideMenu ? 1.0 : 0.0)
-                .animation(.easeIn(duration: 0.25))
+                .opacity(self.opacity)
                 .onTapGesture {
-                    self.isOpenSideMenu = false
-                }
+                    withAnimation(.easeIn(duration: 0.25)) {
+                        self.defaultOffsetX = screenSize.width
+                        self.opacity = 0.0
+                    }
+
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        self.isOpenSideMenu = false
+                    }
+                } // .onTapGesture
 
             // Todo: サイドメニューViewレイアウトここから
 
@@ -93,8 +102,10 @@ struct SideMenuNewTagView: View {
                     if !newTagName.isEmpty {
                         Text("- \(newTagName) -")
                             .fontWeight(.bold)
+                            .frame(width: screenSize.width / 2)
                             .foregroundColor(.white)
                             .shadow(radius: 4, x: 4, y: 6)
+                            .allowsTightening(true)
                     }
 
                     IndicatorRow(salesValue: 150000, tagColor: Color(selectionTagColor))
@@ -112,19 +123,26 @@ struct SideMenuNewTagView: View {
                 } // VStack
                 .padding(.leading, 30)
             } // ZStack (ブロック)
-            .offset(x: self.isOpenSideMenu ? screenSize.width / 2 - 30 : screenSize.width)
-            .animation(.easeIn(duration: 0.25))
+            .offset(x: defaultOffsetX)
 
             // サイドメニューViewレイアウト ここまで
 
         } // ZStack
-//        .offset(y: 100)
+        .offset(y: -self.geometryMinY - 150)
+        .opacity(self.opacity)
+        // View表示時
+        .onAppear {
+            withAnimation(.easeIn(duration: 0.25)) {
+                self.opacity = 1.0
+                self.defaultOffsetX = defaultOffsetX / 2 - 30
+            }
+        }
     } // body
 } // View
 
 struct SideMenuNewTagView_Previews: PreviewProvider {
     static var previews: some View {
         SideMenuNewTagView(itemVM: ItemViewModel(),
-                           isOpenSideMenu: .constant(true))
+                           isOpenSideMenu: .constant(true), geometryMinY: .constant(0))
     }
 }
