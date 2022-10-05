@@ -6,7 +6,9 @@
 //
 
 import Foundation
+import SwiftUI
 
+// Firestore内で管理されるItemオブジェクト
 struct Item: Identifiable {
 
     let id = UUID()
@@ -20,4 +22,11 @@ struct Item: Identifiable {
     let inventory: Int
     let createTime: Date
     let updateTime: Date
+}
+
+// iPhone本体で扱われる
+struct Tag: Identifiable {
+    var id = UUID()
+    var tagName: String
+    var tagColor: Color
 }
