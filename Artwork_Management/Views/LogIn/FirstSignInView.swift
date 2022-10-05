@@ -35,7 +35,7 @@ struct FirstSignInView: View {
     }
 }
 
-// ログイン時の入力欄のカスタムViewです。
+// ✅ログイン時の入力欄のカスタムViewです。
 struct FirstLogInInfomation: View {
 
     let user: User

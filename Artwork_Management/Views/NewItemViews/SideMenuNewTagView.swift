@@ -172,6 +172,6 @@ struct SideMenuNewTagView: View {
 struct SideMenuNewTagView_Previews: PreviewProvider {
     static var previews: some View {
         SideMenuNewTagView(itemVM: ItemViewModel(),
-                           isOpenSideMenu: .constant(true), geometryMinY: .constant(0))
+                           isOpenSideMenu: .constant(true), geometryMinY: .constant(-150))
     }
 }
