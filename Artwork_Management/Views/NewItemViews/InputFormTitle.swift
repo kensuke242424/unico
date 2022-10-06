@@ -14,7 +14,7 @@ struct InputFormTitle: View {
 
     var body: some View {
 
-        HStack(spacing: 10) {
+        HStack(spacing: 20) {
             Text(title)
                 .fontWeight(.bold)
                 .foregroundColor(.gray)
@@ -28,7 +28,7 @@ struct InputFormTitle: View {
                         Text("必須")
                             .font(.caption)
                     } // overlay
-                    .opacity(0.8)
+                    .opacity(0.6)
             } // if isNeed
 
         } // HStack

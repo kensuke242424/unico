@@ -11,7 +11,7 @@ enum Field {
     case tag
     case name
     case stock
-    case place
+    case price
     case detail
 }
 
@@ -24,11 +24,12 @@ struct NewItemView: View {
     @State private var selectionTagColor = Color.red
     @State private var newItemName = ""
     @State private var newItemInventry = ""
-    @State private var newItemPlice = ""
+    @State private var newItemPrice = ""
     @State private var newItemDetail = ""
     @State private var disableButton = true
     @State private var isOpenSideMenu = false
     @State private var geometryMinY = CGFloat(0)
+
     @FocusState private var focusedField: Field?
 
     var body: some View {
@@ -38,12 +39,12 @@ struct NewItemView: View {
             ScrollView(showsIndicators: false) {
 
                 ZStack {
-                    VStack { // 全体
+                    VStack {
 
                         // ✅カスタムView
                         SelectItemPhotoArea(selectTagColor: selectionTagColor)
 
-                        // -------- 入力フォームここから ----------
+                        // -------- 入力フォームここから ---------- //
 
                         VStack(spacing: 30) {
 
@@ -96,6 +97,7 @@ struct NewItemView: View {
                                     .keyboardType(.numberPad)
                                     .focused($focusedField, equals: .stock)
                                     .onTapGesture { focusedField = .stock }
+                                    .onSubmit { focusedField = .price }
 
                                 FocusedLineRow(select: focusedField == .stock ? true : false)
 
@@ -106,12 +108,13 @@ struct NewItemView: View {
                                 InputFormTitle(title: "■価格(税込)", isNeed: false)
                                     .padding(.bottom)
 
-                                TextField("2000", text: $newItemPlice)
+                                TextField("2000", text: $newItemPrice)
                                     .keyboardType(.numberPad)
-                                    .focused($focusedField, equals: .place)
-                                    .onTapGesture { focusedField = .place }
+                                    .focused($focusedField, equals: .price)
+                                    .onTapGesture { focusedField = .price }
+                                    .onSubmit { focusedField = .detail }
 
-                                FocusedLineRow(select: focusedField == .place ? true : false)
+                                FocusedLineRow(select: focusedField == .price ? true : false)
 
                             } // ■価格
 
@@ -141,7 +144,7 @@ struct NewItemView: View {
                         .padding(.vertical, 20)
                         .padding(.horizontal, 30)
 
-                        // -------- 入力フォームここまで ----------
+                        // -------- 入力フォームここまで ---------- //
 
                     } // VStack
 
@@ -173,21 +176,21 @@ struct NewItemView: View {
 
             .onTapGesture { focusedField = nil }
 
-            // NOTE: タグ選択で「+タグを追加」が選択された時、新規タグ追加Viewを表示します。
             .onChange(of: selectionTagName) { selection in
 
+                // NOTE: 選択されたタグネームと紐づいたタグカラーを取り出し、selectionTagColorに格納します。
                 let searchedTagColor = itemVM.searchSelectTagColor(selectTagName: selection,
-                                                                        tags: itemVM.tags)
-
+                                                                   tags: itemVM.tags)
                 withAnimation(.easeIn(duration: 0.25)) {
                     selectionTagColor = searchedTagColor
                 }
 
+                // NOTE: タグ選択で「+タグを追加」が選択された時、新規タグ追加Viewを表示します。
                 if selection == "＋タグを追加" {
                     self.isOpenSideMenu.toggle()
                     print("サイドメニュー: \(isOpenSideMenu)")
                 }
-            } // onChange
+            } // onChange (selectionTagName)
 
             .onChange(of: newItemName) { newValue in
 
@@ -198,9 +201,9 @@ struct NewItemView: View {
                         self.disableButton = false
                     }
                 }
-            } // onChange
+            } // onChange(ボタンdisable分岐)
 
-            // NOTE: 新規タグ追加Viewが閉じられた時、タグ配列の一番目を再代入します。
+            // NOTE: 新規タグ追加サイドViewが閉じられた時、タグ配列の一番目を再代入します。
             //       新規作成されたタグは配列の１番目に格納するよう処理されています。
             .onChange(of: isOpenSideMenu) { isOpen in
 
@@ -209,9 +212,9 @@ struct NewItemView: View {
                         selectionTagName = firstTag.tagName
                     }
                 }
-            } // onChange
+            } // onChange(タグ設定内の選択タグ更新)
 
-            // NOTE: 新規アイテムView生成時に、タグ配列のfirst要素をPickerが参照するselectionTagに初期値として代入します。
+            // NOTE: NewItemView生成時に、タグ配列のfirst要素をPickerが参照するselectionTagに初期値として代入します。
             .onAppear {
                 if let firstTag = itemVM.tags.first {
                     self.selectionTagName = firstTag.tagName
@@ -239,7 +242,7 @@ struct NewItemView: View {
                                                  name: newItemName,
                                                  detail: newItemDetail != "" ? newItemDetail : "none.",
                                                  photo: "", // Todo: 写真取り込み実装後、変更
-                                                 price: Int(newItemPlice) ?? 0,
+                                                 price: Int(newItemPrice) ?? 0,
                                                  sales: 0,
                                                  inventory: Int(newItemInventry) ?? 0,
                                                  createTime: Date(), // Todo: Timestamp実装後、変更

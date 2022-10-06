@@ -20,6 +20,7 @@ struct SideMenuNewTagView: View {
     @State private var opacity = 0.0
     @State private var selectionTagColor = Color.red
     @State private var defaultOffsetX: CGFloat = UIScreen.main.bounds.width
+    @FocusState var focusedField: Field?
 
     var body: some View {
 
@@ -74,12 +75,10 @@ struct SideMenuNewTagView: View {
                             .foregroundColor(.white)
                             .padding()
                             .frame(width: 200, height: 20)
+                            .focused($focusedField, equals: .tag)
 
-                        Rectangle()
-                            .foregroundColor(.white)
-                            .opacity(0.8)
-                            .frame(width: screenSize.width / 2, height: 1)
-                            .padding(.bottom)
+                        FocusedLineRow(select: focusedField == .tag ? true : false)
+                            .frame(width: screenSize.width / 2)
 
                     } // タグネーム
                     .padding(.bottom)
@@ -143,8 +142,9 @@ struct SideMenuNewTagView: View {
 
                 } // VStack
                 .padding(.leading, 30)
-            } // ZStack (ブロック)
+            } // ZStack (新規タグブロック)
             .offset(x: defaultOffsetX)
+            .onTapGesture { self.focusedField = nil }
 
             // NOTE: タグネームの入力値がisEmptyの場合、追加ボタンを無効化します
             .onChange(of: newTagName) {newValue in
@@ -158,7 +158,8 @@ struct SideMenuNewTagView: View {
             } // .onChange
 
         } // ZStack(全体)
-        .offset(y: -self.geometryMinY - 170)
+        .offset(y: focusedField == .tag ? -self.geometryMinY - 330 : -self.geometryMinY - 170)
+        .animation(.easeIn(duration: 0.3), value: focusedField)
         .opacity(self.opacity)
         // View表示時
 

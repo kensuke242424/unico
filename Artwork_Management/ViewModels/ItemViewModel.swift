@@ -13,7 +13,8 @@ class ItemViewModel: ObservableObject {
     // NOTE: アイテム、タグのテストデータです
      @Published var items: [Item] =
     [
-        Item(tag: "Album", tagColor: "赤", name: "Album1", detail: "Album1のアイテム紹介テキストです。", photo: "", price: 1800, sales: 88000, inventory: 200, createTime: Date(), updateTime: Date()),
+        Item(tag: "Album", tagColor: "赤", name: "Album1", detail: "Album1のアイテム紹介テキストです。", photo: "",
+             price: 1800, sales: 88000, inventory: 200, createTime: Date(), updateTime: Date()),
         Item(tag: "Album", tagColor: "赤", name: "Album2", detail: "Album2のアイテム紹介テキストです。", photo: "",
              price: 2800, sales: 230000, inventory: 420, createTime: Date(), updateTime: Date()),
         Item(tag: "Album", tagColor: "赤", name: "Album3", detail: "Album3のアイテム紹介テキストです。", photo: "",
@@ -39,6 +40,32 @@ class ItemViewModel: ObservableObject {
         Tag(tagName: "Goods", tagColor: .yellow)
     ]
 
+    // ✅ NOTE: アイテム配列を各項目に沿ってソートするメソッド
+    func itemsSort(sort: SortType, items: [Item]) -> [Item] {
+
+        print("＝＝＝＝＝＝＝＝itemsSortメソッド実行＝＝＝＝＝＝＝＝＝＝")
+
+        // NOTE: 更新可能なvar値として再格納しています
+        var varItems = items
+
+        switch sort {
+
+        case .salesUp:
+            varItems.sort { $0.sales > $1.sales }
+        case .salesDown:
+            varItems.sort { $0.sales < $1.sales }
+        case .createAtUp:
+            print("createAtUp ⇨ Timestampが格納され次第、実装します。")
+        case .updateAtUp:
+            print("updateAtUp ⇨ Timestampが格納され次第、実装します。")
+        case .start:
+            print("起動時の初期値です")
+        }
+
+        return varItems
+    } // func itemsSortr
+
+    // ✅ NOTE: 新規アイテム作成時に選んだタグの登録カラーを取り出します。
     func searchSelectTagColor(selectTagName: String, tags: [Tag]) -> Color {
 
         print("＝＝＝＝＝＝＝searchSelectTagColor_実行＝＝＝＝＝＝＝＝＝")
@@ -59,6 +86,7 @@ class ItemViewModel: ObservableObject {
         }
     } // func castStringIntoColor
 
+    // ✅ NOTE: String型の色データをもとに、当てはまるColorデータを返します
     func castStringIntoColor(color: String) -> Color {
 
         print("===========castStringIntoColor実行=============")
@@ -84,6 +112,7 @@ class ItemViewModel: ObservableObject {
         }
     } // func castStringIntoColor
 
+    // ✅ NOTE: Color型の色データをもとに、当てはまるStringデータを返します
     func castColorIntoString(color: Color) -> String {
 
         print("===========castColorIntoString実行=============")
