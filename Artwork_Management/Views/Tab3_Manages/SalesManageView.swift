@@ -180,7 +180,7 @@ struct SalesManageView: View {
                 }
             } // .toolbar(新規アイテム追加ボタン)
             .sheet(isPresented: $isPresentedNewItem) {
-                NewItemView(itemVM: itemVM)
+                NewItemView(itemVM: itemVM, isPresentedNewItem: $isPresentedNewItem)
             } // sheet
 
             .navigationBarTitleDisplayMode(.inline)

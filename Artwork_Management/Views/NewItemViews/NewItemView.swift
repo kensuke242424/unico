@@ -18,6 +18,7 @@ enum Field {
 struct NewItemView: View {
 
     @StateObject var itemVM: ItemViewModel
+    @Binding var isPresentedNewItem: Bool
 
     @State private var selectionTagName = ""
     @State private var selectionTagColor = Color.red
@@ -247,12 +248,15 @@ struct NewItemView: View {
 
                         print("アイテム追加後の配列: \(itemVM.items.last!)")
 
+                        // シートを閉じる
+                        self.isPresentedNewItem.toggle()
+
                     } label: {
                         Text("追加する")
                     }
                     .disabled(disableButton)
                 }
-            } // toolbar
+            } // toolbar(アイテム追加ボタン)
 
         } // NavigationView
     } // body
@@ -298,8 +302,8 @@ struct SelectItemPhotoArea: View {
                         } // .overlay(ボタン)
                 } // VStack
             } // .overlay
-    }
-}
+    } // body
+} // カスタムView
 
 // NOTE: スクロールView全体に対しての画面の現在位置座標をgeometry内で検知し、値を渡すために用いる
 private struct OffsetPreferenceKey: PreferenceKey {
@@ -309,6 +313,6 @@ private struct OffsetPreferenceKey: PreferenceKey {
 
 struct NewItemView_Previews: PreviewProvider {
     static var previews: some View {
-        NewItemView(itemVM: ItemViewModel())
+        NewItemView(itemVM: ItemViewModel(), isPresentedNewItem: .constant(true))
     }
 }

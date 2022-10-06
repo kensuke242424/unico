@@ -42,20 +42,20 @@ struct LibraryView: View {
             } // ZStack
             .navigationTitle("Home")
 
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-
-                    Button {
-                        isPresentedNewItem.toggle()
-                    } label: {
-                        Image(systemName: "rectangle.stack.fill.badge.plus")
-                    }
-                }
-            } // toolbar
-
-            .sheet(isPresented: $isPresentedNewItem) {
-                NewItemView(itemVM: itemVM)
-            } // sheet
+//            .toolbar {
+//                ToolbarItem(placement: .navigationBarTrailing) {
+//
+//                    Button {
+//                        isPresentedNewItem.toggle()
+//                    } label: {
+//                        Image(systemName: "rectangle.stack.fill.badge.plus")
+//                    }
+//                }
+//            } // toolbar
+//
+//            .sheet(isPresented: $isPresentedNewItem) {
+//                NewItemView(itemVM: itemVM)
+//            } // sheet
 
         } // NavigationView
     } // body
