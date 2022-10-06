@@ -30,9 +30,11 @@ struct UsefulButton: View {
         } label: {
             Circle()
                 .foregroundColor(.white)
+//                .opacity(0.7)
                 .frame(width: 78)
-                .blur(radius: 2)
-                .shadow(radius: 5, x: 7, y: 10)
+                .padding()
+                .blur(radius: 1)
+                .shadow(color: .black, radius: 10, x: 4, y: 11)
                 .overlay {
                     Image(systemName: "shippingbox.fill")
                         .resizable()

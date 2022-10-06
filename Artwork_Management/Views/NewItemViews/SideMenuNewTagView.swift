@@ -158,12 +158,12 @@ struct SideMenuNewTagView: View {
             } // .onChange
 
         } // ZStack(全体)
-        .offset(y: -self.geometryMinY - 150)
+        .offset(y: -self.geometryMinY - 170)
         .opacity(self.opacity)
         // View表示時
 
         .onAppear {
-            withAnimation(.easeIn(duration: 0.25)) {
+            withAnimation(.easeIn(duration: 0.3)) {
                 self.opacity = 1.0
                 self.defaultOffsetX = defaultOffsetX / 2 - 30
             }

@@ -19,13 +19,13 @@ struct NewItemView: View {
 
     @StateObject var itemVM: ItemViewModel
 
-    @State private var itemName = ""
-    @State private var itemtag = ""
-    @State private var itemStock = ""
-    @State private var itemPlace = ""
-    @State private var itemDetail = ""
+    @State private var newItemName = ""
+    @State private var newItemtag = ""
+    @State private var newItemInventry = ""
+    @State private var newItemPlice = ""
+    @State private var newItemDetail = ""
     @State private var selectionTag = ""
-    @State private var isButtonDisabled = true
+    @State private var disableButton = true
     @State private var isOpenSideMenu = false
     @State private var geometryMinY = CGFloat(0)
     @State private var selectionTagColor = Color.red
@@ -78,12 +78,13 @@ struct NewItemView: View {
                                 InputFormTitle(title: "■アイテム名", isNeed: true)
                                     .padding(.bottom)
 
-                                TextField("1st Album「...」", text: $itemName)
+                                TextField("1st Album「...」", text: $newItemName)
                                     .focused($focusedField, equals: .name)
                                     .onTapGesture { focusedField = .name }
                                     .onSubmit { focusedField = .stock }
 
                                 FocusedLineRow(select: focusedField == .name ? true : false)
+
                             } // ■アイテム名
 
                             VStack(alignment: .leading) {
@@ -91,12 +92,13 @@ struct NewItemView: View {
                                 InputFormTitle(title: "■在庫数", isNeed: false)
                                     .padding(.bottom)
 
-                                TextField("100", text: $itemStock)
+                                TextField("100", text: $newItemInventry)
                                     .keyboardType(.numberPad)
                                     .focused($focusedField, equals: .stock)
                                     .onTapGesture { focusedField = .stock }
 
                                 FocusedLineRow(select: focusedField == .stock ? true : false)
+
                             } // ■在庫数
 
                             VStack(alignment: .leading) {
@@ -104,12 +106,13 @@ struct NewItemView: View {
                                 InputFormTitle(title: "■価格(税込)", isNeed: false)
                                     .padding(.bottom)
 
-                                TextField("2000", text: $itemPlace)
+                                TextField("2000", text: $newItemPlice)
                                     .keyboardType(.numberPad)
                                     .focused($focusedField, equals: .place)
                                     .onTapGesture { focusedField = .place }
 
                                 FocusedLineRow(select: focusedField == .place ? true : false)
+
                             } // ■価格
 
                             VStack(alignment: .leading) {
@@ -117,14 +120,14 @@ struct NewItemView: View {
                                 InputFormTitle(title: "■アイテム詳細(メモ)", isNeed: false)
                                     .font(.title3)
 
-                                TextEditor(text: $itemDetail)
+                                TextEditor(text: $newItemDetail)
                                     .frame(width: UIScreen.main.bounds.width - 20, height: 200)
                                     .shadow(radius: 3, x: 0, y: 0)
                                     .focused($focusedField, equals: .detail)
                                     .onTapGesture { focusedField = .detail }
                                     .overlay(alignment: .topLeading) {
                                         if focusedField != .detail {
-                                            if itemDetail.isEmpty {
+                                            if newItemDetail.isEmpty {
                                                 Text("アイテムについてメモを残しましょう。")
                                                     .opacity(0.5)
                                                     .padding()
@@ -156,9 +159,12 @@ struct NewItemView: View {
                         Color.clear
                             .preference(key: OffsetPreferenceKey.self,
                                         value: geometry.frame(in: .named("scrollSpace")).minY)
-                            .onChange(of: geometry.frame(in: .named("scrollFrame_Space")).minY) {newValue in
-                                self.geometryMinY = newValue
-                            }
+                            .onChange(of: geometry.frame(in: .named("scrollFrame_Space")).minY) { newValue in
+
+                                withAnimation(.easeIn(duration: 0.1)) {
+                                    self.geometryMinY = newValue
+                                }
+                            } // onChange
                     } // Geometry
                 ) // .background(geometry)
 
@@ -170,11 +176,11 @@ struct NewItemView: View {
             // NOTE: タグ選択で「+タグを追加」が選択された時、新規タグ追加Viewを表示します。
             .onChange(of: selectionTag) { selection in
 
-                let castTagColor = itemVM.searchSelectTagColor(selectTagName: selection,
+                let searchedTagColor = itemVM.searchSelectTagColor(selectTagName: selection,
                                                                         tags: itemVM.tags)
 
                 withAnimation(.easeIn(duration: 0.25)) {
-                    selectionTagColor = castTagColor
+                    selectionTagColor = searchedTagColor
                 }
 
                 if selection == "＋タグを追加" {
@@ -183,17 +189,29 @@ struct NewItemView: View {
                 }
             } // onChange
 
+            .onChange(of: newItemName) { newValue in
+
+                withAnimation(.easeIn(duration: 0.2)) {
+                    if newValue.isEmpty {
+                        self.disableButton = true
+                    } else {
+                        self.disableButton = false
+                    }
+                }
+            } // onChange
+
             // NOTE: 新規タグ追加Viewが閉じられた時、タグ配列の一番目を再代入します。
-            //       新規作成されたタグは配列の１番目に格納するよう処理されます。
-            .onChange(of: isOpenSideMenu) { newValue in
-                if newValue == false {
+            //       新規作成されたタグは配列の１番目に格納するよう処理されています。
+            .onChange(of: isOpenSideMenu) { isOpen in
+
+                if isOpen == false {
                     if let firstTag = itemVM.tags.first {
                         selectionTag = firstTag.tagName
                     }
                 }
             } // onChange
 
-            // NOTE: 新規アイテムView生成時に、タグ配列の１番目の要素をPickerが参照するselectionTagに初期値として代入します。
+            // NOTE: 新規アイテムView生成時に、タグ配列のfirst要素をPickerが参照するselectionTagに初期値として代入します。
             .onAppear {
                 if let firstTag = itemVM.tags.first {
                     self.selectionTag = firstTag.tagName
@@ -206,28 +224,30 @@ struct NewItemView: View {
 
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
+
                     Button {
-                        // アイテム追加
-                        if !itemtag.isEmpty, !itemName.isEmpty {
 
-                            let tagColorString = itemVM.castColorIntoString(color: selectionTagColor)
+                        let castTagColorString = itemVM.castColorIntoString(color: selectionTagColor)
 
-//                            itemVM.items.append(Item(tag: itemtag,
-//                                                     tagColor: <#T##String#>,
-//                                                     name: <#T##String#>,
-//                                                     detail: <#T##String#>,
-//                                                     photo: <#T##String#>,
-//                                                     price: <#T##Int#>,
-//                                                     sales: <#T##Int#>,
-//                                                     inventory: <#T##Int#>,
-//                                                     createTime: <#T##Date#>,
-//                                                     updateTime: <#T##Date#>)
-//                            )
+                        // NOTE: テストデータに新規アイテムを保存
+                        itemVM.items.append(Item(tag: newItemtag,
+                                                 tagColor: castTagColorString,
+                                                 name: newItemName,
+                                                 detail: newItemDetail != "" ? newItemDetail : "",
+                                                 photo: "", // Todo: 写真取り込み実装後、変更
+                                                 price: Int(newItemPlice) ?? 0,
+                                                 sales: 0,
+                                                 inventory: Int(newItemInventry) ?? 0,
+                                                 createTime: Date(), // Todo: Timestamp実装後、変更
+                                                 updateTime: Date()) // Todo: Timestamp実装後、変更
+                        )
 
-                        }
+
+
                     } label: {
                         Text("追加する")
                     }
+                    .disabled(disableButton)
                 }
             } // toolbar
 
@@ -240,12 +260,15 @@ struct SelectItemPhotoArea: View {
     let selectTagColor: Color
 
     var body: some View {
-        // -------- グラデーション部分ここから ----------
 
-//        LinearGradient(colors: [gradientColor1, gradientColor2], startPoint: .top, endPoint: .bottom)
         selectTagColor
             .frame(width: UIScreen.main.bounds.width, height: 350)
             .blur(radius: 2.0, opaque: false)
+
+            .overlay {
+                LinearGradient(colors: [Color.clear, Color.black], startPoint: .top, endPoint: .bottom)
+            }
+
             .overlay {
                 VStack {
 
@@ -272,8 +295,6 @@ struct SelectItemPhotoArea: View {
                         } // .overlay(ボタン)
                 } // VStack
             } // .overlay
-
-        // -------- グラデーション部分ここまで ----------
     }
 }
 
