@@ -28,7 +28,7 @@ struct NewItemView: View {
     @State private var isButtonDisabled = true
     @State private var isOpenSideMenu = false
     @State private var geometryMinY = CGFloat(0)
-    @State private var selectionTagColor = UIColor.red
+    @State private var selectionTagColor = Color.red
     @FocusState private var focusedField: Field?
 
     var body: some View {
@@ -41,8 +41,7 @@ struct NewItemView: View {
                     VStack { // 全体
 
                         // ✅カスタムView
-                        SelectItemPhotoArea(gradientColor1: itemVM.searchSelectTagColor(selectTagName: selectionTag,
-                                                                                        tags: itemVM.tags),
+                        SelectItemPhotoArea(gradientColor1: selectionTagColor,
                                             gradientColor2: .black)
 
                         // -------- 入力フォームここから ----------
@@ -57,9 +56,7 @@ struct NewItemView: View {
                                 HStack {
                                     Image(systemName: "tag.fill")
                                     // NOTE: メソッドで選択タグと紐づいたカラーを取り出す
-                                        .foregroundColor(itemVM.searchSelectTagColor(selectTagName: selectionTag,
-                                                                                     tags: itemVM.tags)
-                                        )
+                                        .foregroundColor(selectionTagColor)
 
                                     Picker("", selection: $selectionTag) {
                                         ForEach(0 ..< itemVM.tags.count, id: \.self) { index in
@@ -174,6 +171,11 @@ struct NewItemView: View {
 
             // NOTE: タグ選択で「+タグを追加」が選択された時、新規タグ追加Viewを表示します。
             .onChange(of: selectionTag) { selection in
+
+                let castTagColor = itemVM.searchSelectTagColor(selectTagName: selection,
+                                                                        tags: itemVM.tags)
+                    selectionTagColor = castTagColor
+
                 if selection == "＋タグを追加" {
                     self.isOpenSideMenu.toggle()
                     print("サイドメニュー: \(isOpenSideMenu)")
@@ -207,7 +209,7 @@ struct NewItemView: View {
                         // アイテム追加
                         if !itemtag.isEmpty, !itemName.isEmpty {
 
-                            let tagColorString = itemVM.castColorIntoString(color: Color(selectionTagColor))
+                            let tagColorString = itemVM.castColorIntoString(color: selectionTagColor)
 
 //                            itemVM.items.append(Item(tag: itemtag,
 //                                                     tagColor: <#T##String#>,

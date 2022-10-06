@@ -12,7 +12,7 @@ struct SideMenuNewTagView: View {
     @StateObject var itemVM: ItemViewModel
     @Binding var isOpenSideMenu: Bool
     @Binding var geometryMinY: CGFloat
-    @Binding var selectionTagColor: UIColor
+    @Binding var selectionTagColor: Color
 
     let screenSize = UIScreen.main.bounds
 
@@ -116,12 +116,12 @@ struct SideMenuNewTagView: View {
                         .foregroundColor(.white)
                         .shadow(radius: 4, x: 4, y: 6)
 
-                    IndicatorRow(salesValue: 170000, tagColor: Color(selectionTagColor))
+                    IndicatorRow(salesValue: 170000, tagColor: selectionTagColor)
 
                     Button {
                         // 新規タグをオブジェクトに詰め、配列の１番目に保存
                         itemVM.tags.insert(Tag(tagName: newTagName,
-                                               tagColor: Color(selectionTagColor)),
+                                               tagColor: selectionTagColor),
                                            at: 0
                         )
 
@@ -177,7 +177,7 @@ struct SideMenuNewTagView_Previews: PreviewProvider {
         SideMenuNewTagView(itemVM: ItemViewModel(),
                            isOpenSideMenu: .constant(true),
                            geometryMinY: .constant(-150),
-                           selectionTagColor: .constant(UIColor.red)
+                           selectionTagColor: .constant(Color.red)
         )
     }
 }
