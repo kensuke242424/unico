@@ -32,55 +32,84 @@ class ItemViewModel: ObservableObject {
              price: 4000, sales: 520000, inventory: 97, createTime: Date(), updateTime: Date())
     ]
 
-//    @Published var tags = ["Album", "Single", "Goods"]
-    @Published var tags =
+    @Published var tags: [Tag] =
     [
         Tag(tagName: "Album", tagColor: .red),
         Tag(tagName: "Single", tagColor: .blue),
         Tag(tagName: "Goods", tagColor: .yellow)
     ]
 
-    func castStringIntoColor(color: String) -> Color {
-        switch color {
-        case "赤":
-            return .red
-        case "青":
-            return .blue
-        case "黄":
-            return .yellow
-        case "緑":
-            return .green
-        default:
-            return .gray
-        }
-    } // func castStringIntoColor
-
     func searchSelectTagColor(selectTagName: String, tags: [Tag]) -> Color {
+
+        print("＝＝＝＝＝＝＝searchSelectTagColor_実行＝＝＝＝＝＝＝＝＝")
 
         let filterTag = tags.filter { $0.tagName == selectTagName }
 
-        if let filterTag = filterTag.first {
+        print("　filterで取得したタグデータ: \(filterTag)")
 
-            return filterTag.tagColor
+        if let firstFilterTag = filterTag.first {
+
+            print("　\(selectTagName)の登録タグColor: \(firstFilterTag.tagColor)")
+
+            return firstFilterTag.tagColor
 
         } else {
+            print("　firstFilterTagの取得に失敗しました")
             return.gray
+        }
+    } // func castStringIntoColor
+
+    func castStringIntoColor(color: String) -> Color {
+
+        print("===========castStringIntoColor実行=============")
+        print("　引数で受け取ったstring値: 「\(color)」")
+
+        switch color {
+        case "赤":
+            print("　赤と判定されました。「.red」が返り値です。")
+            return .red
+        case "青":
+            print("　青と判定されました。「.blue」が返り値です。")
+            return .blue
+        case "黄":
+            print("　黄と判定されました。「.yellow」が返り値です。")
+            return .yellow
+        case "緑":
+            print("　緑と判定されました。「.green」が返り値です。")
+            return .green
+        default:
+            print("　どれにも判定されませんでした。「.gray」が返り値です。")
+            return .gray
+
         }
     } // func castStringIntoColor
 
     func castColorIntoString(color: Color) -> String {
 
+        print("===========castColorIntoString実行=============")
+        print("　引数で受け取ったColor値: 「\(color)」")
+
         switch color {
-        case Color(.red):
+        case .red:
+            print("　.redと判定されました。返り値は「赤」です。")
             return "赤"
-        case Color(.blue):
+
+        case .blue:
+            print("　.blueと判定されました。返り値は「青」です。")
             return "青"
-        case Color(.yellow):
+
+        case .yellow:
+            print("　.yellowと判定されました。返り値は「黄」です。")
             return "黄"
-        case Color(.green):
+
+        case .green:
+            print("　.greenと判定されました。返り値は「緑」です。")
             return "緑"
+
         default:
+            print("　どれも判定されませんでした。返り値は「灰」です。")
             return "灰"
+
         }
     } // func castColorIntoString
 

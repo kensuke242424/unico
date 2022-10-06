@@ -24,7 +24,7 @@ struct Item: Identifiable {
     let updateTime: Date
 }
 
-// iPhone本体で扱われるオブジェクト
+// iPhone側で扱われるオブジェクト
 struct Tag: Identifiable {
     var id = UUID()
     var tagName: String

@@ -226,7 +226,11 @@ struct NewItemView: View {
 
                     Button {
 
+                        print("追加ボタンタップ_selectionTagColor: \(selectionTagColor)")
+
                         let castTagColorString = itemVM.castColorIntoString(color: selectionTagColor)
+
+                        print("追加ボタンタップ_castTagColorString: \(castTagColorString)")
 
                         // NOTE: テストデータに新規アイテムを保存
                         itemVM.items.append(Item(tag: selectionTagName,
@@ -241,7 +245,7 @@ struct NewItemView: View {
                                                  updateTime: Date()) // Todo: Timestamp実装後、変更
                         )
 
-                        print("アイテム追加後の配列: \(itemVM.items)")
+                        print("アイテム追加後の配列: \(itemVM.items.last!)")
 
                     } label: {
                         Text("追加する")
