@@ -67,9 +67,21 @@ struct SideMenuNewTagView: View {
                     } // タイトル(新規タグ)
 
                     VStack(alignment: .leading) {
-                        Text("■タグネーム")
-                            .fontWeight(.heavy)
-                            .foregroundColor(.white)
+
+                        HStack(spacing: 10) {
+                            Text("■タグネーム")
+                                .fontWeight(.heavy)
+                                .foregroundColor(.white)
+
+                            RoundedRectangle(cornerRadius: 5)
+                                .frame(width: 30, height: 15)
+                                .foregroundColor(.gray)
+                                .overlay {
+                                    Text("必須")
+                                        .font(.caption)
+                                } // overlay
+                                .opacity(0.8)
+                        } // HStack
 
                         TextField("No name...", text: $newTagName)
                             .foregroundColor(.white)

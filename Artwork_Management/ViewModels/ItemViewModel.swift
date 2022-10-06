@@ -65,7 +65,7 @@ class ItemViewModel: ObservableObject {
         return varItems
     } // func itemsSortr
 
-    // ✅ NOTE: 新規アイテム作成時に選んだタグの登録カラーを取り出します。
+    // ✅ NOTE: 新規アイテム作成時に選択したタグの登録カラーを取り出します。
     func searchSelectTagColor(selectTagName: String, tags: [Tag]) -> Color {
 
         print("＝＝＝＝＝＝＝searchSelectTagColor_実行＝＝＝＝＝＝＝＝＝")
@@ -76,7 +76,7 @@ class ItemViewModel: ObservableObject {
 
         if let firstFilterTag = filterTag.first {
 
-            print("　\(selectTagName)の登録タグColor: \(firstFilterTag.tagColor)")
+            print("　現在選択タグ「\(selectTagName)」の登録タグColor: \(firstFilterTag.tagColor)")
 
             return firstFilterTag.tagColor
 

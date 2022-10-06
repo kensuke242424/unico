@@ -19,6 +19,9 @@ struct FocusedLineRow: View {
             .opacity(select ? 0.4 : 0.3)
             .shadow(radius: select ? 2 : 0,
                     x: select ? 1 : 0)
+            .shadow(color: .white.opacity(0.5),
+                    radius: select ? 7 : 0,
+                    x: select ? 1 : 0)
     }
 }
 
