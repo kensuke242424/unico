@@ -19,16 +19,15 @@ struct NewItemView: View {
 
     @StateObject var itemVM: ItemViewModel
 
+    @State private var selectionTagName = ""
+    @State private var selectionTagColor = Color.red
     @State private var newItemName = ""
-    @State private var newItemtag = ""
     @State private var newItemInventry = ""
     @State private var newItemPlice = ""
     @State private var newItemDetail = ""
-    @State private var selectionTag = ""
     @State private var disableButton = true
     @State private var isOpenSideMenu = false
     @State private var geometryMinY = CGFloat(0)
-    @State private var selectionTagColor = Color.red
     @FocusState private var focusedField: Field?
 
     var body: some View {
@@ -57,7 +56,7 @@ struct NewItemView: View {
                                     // NOTE: メソッドで選択タグと紐づいたカラーを取り出す
                                         .foregroundColor(selectionTagColor)
 
-                                    Picker("", selection: $selectionTag) {
+                                    Picker("", selection: $selectionTagName) {
                                         ForEach(0 ..< itemVM.tags.count, id: \.self) { index in
 
                                             if let tagsRow = itemVM.tags[index] {
@@ -174,7 +173,7 @@ struct NewItemView: View {
             .onTapGesture { focusedField = nil }
 
             // NOTE: タグ選択で「+タグを追加」が選択された時、新規タグ追加Viewを表示します。
-            .onChange(of: selectionTag) { selection in
+            .onChange(of: selectionTagName) { selection in
 
                 let searchedTagColor = itemVM.searchSelectTagColor(selectTagName: selection,
                                                                         tags: itemVM.tags)
@@ -206,7 +205,7 @@ struct NewItemView: View {
 
                 if isOpen == false {
                     if let firstTag = itemVM.tags.first {
-                        selectionTag = firstTag.tagName
+                        selectionTagName = firstTag.tagName
                     }
                 }
             } // onChange
@@ -214,8 +213,8 @@ struct NewItemView: View {
             // NOTE: 新規アイテムView生成時に、タグ配列のfirst要素をPickerが参照するselectionTagに初期値として代入します。
             .onAppear {
                 if let firstTag = itemVM.tags.first {
-                    self.selectionTag = firstTag.tagName
-                    print("onAppear時に格納したタグ: \(selectionTag)")
+                    self.selectionTagName = firstTag.tagName
+                    print("onAppear時に格納したタグ: \(selectionTagName)")
                 }
             } // onAppear
 
@@ -230,10 +229,10 @@ struct NewItemView: View {
                         let castTagColorString = itemVM.castColorIntoString(color: selectionTagColor)
 
                         // NOTE: テストデータに新規アイテムを保存
-                        itemVM.items.append(Item(tag: newItemtag,
+                        itemVM.items.append(Item(tag: selectionTagName,
                                                  tagColor: castTagColorString,
                                                  name: newItemName,
-                                                 detail: newItemDetail != "" ? newItemDetail : "",
+                                                 detail: newItemDetail != "" ? newItemDetail : "none.",
                                                  photo: "", // Todo: 写真取り込み実装後、変更
                                                  price: Int(newItemPlice) ?? 0,
                                                  sales: 0,
@@ -242,7 +241,7 @@ struct NewItemView: View {
                                                  updateTime: Date()) // Todo: Timestamp実装後、変更
                         )
 
-
+                        print("アイテム追加後の配列: \(itemVM.items)")
 
                     } label: {
                         Text("追加する")
