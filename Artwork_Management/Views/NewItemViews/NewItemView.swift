@@ -41,7 +41,9 @@ struct NewItemView: View {
                     VStack { // 全体
 
                         // ✅カスタムView
-                        SelectItemPhotoArea(gradientColor1: .red, gradientColor2: .black)
+                        SelectItemPhotoArea(gradientColor1: itemVM.searchSelectTagColor(selectTagName: selectionTag,
+                                                                                        tags: itemVM.tags),
+                                            gradientColor2: .black)
 
                         // -------- 入力フォームここから ----------
 
@@ -54,7 +56,10 @@ struct NewItemView: View {
 
                                 HStack {
                                     Image(systemName: "tag.fill")
-                                        .foregroundColor(.red)
+                                    // NOTE: メソッドで選択タグと紐づいたカラーを取り出す
+                                        .foregroundColor(itemVM.searchSelectTagColor(selectTagName: selectionTag,
+                                                                                     tags: itemVM.tags)
+                                        )
 
                                     Picker("", selection: $selectionTag) {
                                         ForEach(0 ..< itemVM.tags.count, id: \.self) { index in

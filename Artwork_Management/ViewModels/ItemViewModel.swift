@@ -55,6 +55,19 @@ class ItemViewModel: ObservableObject {
         }
     } // func castStringIntoColor
 
+    func searchSelectTagColor(selectTagName: String, tags: [Tag]) -> Color {
+
+        let filterTag = tags.filter { $0.tagName == selectTagName }
+
+        if let filterTag = filterTag.first {
+
+            return filterTag.tagColor
+
+        } else {
+            return.gray
+        }
+    } // func castStringIntoColor
+
     func castColorIntoString(color: Color) -> String {
 
         switch color {
@@ -66,7 +79,7 @@ class ItemViewModel: ObservableObject {
             return "黄"
         case Color(.green):
             return "緑"
-       default:
+        default:
             return "灰"
         }
     } // func castColorIntoString
