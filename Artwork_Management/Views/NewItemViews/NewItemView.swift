@@ -41,8 +41,7 @@ struct NewItemView: View {
                     VStack { // 全体
 
                         // ✅カスタムView
-                        SelectItemPhotoArea(gradientColor1: selectionTagColor,
-                                            gradientColor2: .black)
+                        SelectItemPhotoArea(selectTagColor: selectionTagColor)
 
                         // -------- 入力フォームここから ----------
 
@@ -147,8 +146,7 @@ struct NewItemView: View {
 
                         SideMenuNewTagView(itemVM: itemVM,
                                            isOpenSideMenu: $isOpenSideMenu,
-                                           geometryMinY: $geometryMinY,
-                                           selectionTagColor: $selectionTagColor
+                                           geometryMinY: $geometryMinY
                         )
                     } // if isOpenSideMenu
 
@@ -174,7 +172,10 @@ struct NewItemView: View {
 
                 let castTagColor = itemVM.searchSelectTagColor(selectTagName: selection,
                                                                         tags: itemVM.tags)
+
+                withAnimation(.easeIn(duration: 0.25)) {
                     selectionTagColor = castTagColor
+                }
 
                 if selection == "＋タグを追加" {
                     self.isOpenSideMenu.toggle()
@@ -236,13 +237,13 @@ struct NewItemView: View {
 
 struct SelectItemPhotoArea: View {
 
-    let gradientColor1: Color
-    let gradientColor2: Color
+    let selectTagColor: Color
 
     var body: some View {
         // -------- グラデーション部分ここから ----------
 
-        LinearGradient(colors: [gradientColor1, gradientColor2], startPoint: .top, endPoint: .bottom)
+//        LinearGradient(colors: [gradientColor1, gradientColor2], startPoint: .top, endPoint: .bottom)
+        selectTagColor
             .frame(width: UIScreen.main.bounds.width, height: 350)
             .blur(radius: 2.0, opaque: false)
             .overlay {

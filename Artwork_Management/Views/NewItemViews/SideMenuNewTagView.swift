@@ -12,13 +12,13 @@ struct SideMenuNewTagView: View {
     @StateObject var itemVM: ItemViewModel
     @Binding var isOpenSideMenu: Bool
     @Binding var geometryMinY: CGFloat
-    @Binding var selectionTagColor: Color
 
     let screenSize = UIScreen.main.bounds
 
     @State private var newTagName = ""
     @State private var disableButton = true
     @State private var opacity = 0.0
+    @State private var selectionTagColor = Color.red
     @State private var defaultOffsetX: CGFloat = UIScreen.main.bounds.width
 
     var body: some View {
@@ -101,10 +101,10 @@ struct SideMenuNewTagView: View {
 
                         Picker("色を選択", selection: $selectionTagColor) {
 
-                            Text("赤").tag(UIColor.red)
-                            Text("青").tag(UIColor.blue)
-                            Text("黄").tag(UIColor.yellow)
-                            Text("緑").tag(UIColor.green)
+                            Text("赤").tag(Color.red)
+                            Text("青").tag(Color.blue)
+                            Text("黄").tag(Color.yellow)
+                            Text("緑").tag(Color.green)
                         }
                         .pickerStyle(.segmented)
                         .padding(.bottom)
@@ -167,6 +167,7 @@ struct SideMenuNewTagView: View {
                 self.opacity = 1.0
                 self.defaultOffsetX = defaultOffsetX / 2 - 30
             }
+            self.selectionTagColor = .red
         } // onAppear
 
     } // body
@@ -176,8 +177,7 @@ struct SideMenuNewTagView_Previews: PreviewProvider {
     static var previews: some View {
         SideMenuNewTagView(itemVM: ItemViewModel(),
                            isOpenSideMenu: .constant(true),
-                           geometryMinY: .constant(-150),
-                           selectionTagColor: .constant(Color.red)
+                           geometryMinY: .constant(-150)
         )
     }
 }
