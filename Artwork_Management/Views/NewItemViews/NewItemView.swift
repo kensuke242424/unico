@@ -18,6 +18,7 @@ enum Field {
 struct NewItemView: View {
 
     @StateObject var itemVM: ItemViewModel
+
     @Binding var isPresentedNewItem: Bool
 
     @State private var selectionTagName = ""
@@ -28,7 +29,8 @@ struct NewItemView: View {
     @State private var newItemDetail = ""
     @State private var disableButton = true
     @State private var isOpenSideMenu = false
-    @State private var geometryMinY = CGFloat(0)
+    @State private var offset: CGFloat = 0
+    @State private var geometryMinY: CGFloat = 0
 
     @FocusState private var focusedField: Field?
 
@@ -41,7 +43,7 @@ struct NewItemView: View {
                 ZStack {
                     VStack {
 
-                        // ✅カスタムView
+                        // ✅カスタムView 写真ゾーン
                         SelectItemPhotoArea(selectTagColor: selectionTagColor)
 
                         // -------- 入力フォームここから ---------- //
@@ -49,7 +51,6 @@ struct NewItemView: View {
                         VStack(spacing: 30) {
 
                             VStack(alignment: .leading) {
-
                                 InputFormTitle(title: "■タグ設定", isNeed: true)
                                     .padding(.bottom)
 
@@ -81,6 +82,7 @@ struct NewItemView: View {
 
                                 TextField("1st Album「...」", text: $newItemName)
                                     .focused($focusedField, equals: .name)
+                                    .autocapitalization(.none)
                                     .onTapGesture { focusedField = .name }
                                     .onSubmit { focusedField = .stock }
 
@@ -126,6 +128,7 @@ struct NewItemView: View {
                                 TextEditor(text: $newItemDetail)
                                     .frame(width: UIScreen.main.bounds.width - 20, height: 200)
                                     .shadow(radius: 3, x: 0, y: 0)
+                                    .autocapitalization(.none)
                                     .focused($focusedField, equals: .detail)
                                     .onTapGesture { focusedField = .detail }
                                     .overlay(alignment: .topLeading) {
@@ -154,9 +157,13 @@ struct NewItemView: View {
                                            isOpenSideMenu: $isOpenSideMenu,
                                            geometryMinY: $geometryMinY
                         )
+
                     } // if isOpenSideMenu
 
                 } // ZStack(View全体)
+                // アイテム詳細
+                .offset(y: focusedField == .detail && -500.0 <= geometryMinY ? offset - 300 : 0)
+                .animation(.easeIn(duration: 0.3), value: offset)
                 .background(
                     GeometryReader { geometry in
                         Color.clear
@@ -165,6 +172,7 @@ struct NewItemView: View {
                             .onChange(of: geometry.frame(in: .named("scrollFrame_Space")).minY) { newValue in
 
                                 withAnimation(.easeIn(duration: 0.1)) {
+                                    print(newValue)
                                     self.geometryMinY = newValue
                                 }
                             } // onChange
@@ -249,7 +257,9 @@ struct NewItemView: View {
                                                  updateTime: Date()) // Todo: Timestamp実装後、変更
                         )
 
-                        print("アイテム追加後の配列: \(itemVM.items.last!)")
+                        if let itemsLast = itemVM.items.last {
+                            print("新規追加されたアイテム: \(itemsLast)")
+                        }
 
                         // シートを閉じる
                         self.isPresentedNewItem.toggle()
@@ -265,48 +275,7 @@ struct NewItemView: View {
     } // body
 } // View
 
-struct SelectItemPhotoArea: View {
-
-    let selectTagColor: Color
-
-    var body: some View {
-
-        selectTagColor
-            .frame(width: UIScreen.main.bounds.width, height: 350)
-            .blur(radius: 2.0, opaque: false)
-
-            .overlay {
-                LinearGradient(colors: [Color.clear, Color.black], startPoint: .top, endPoint: .bottom)
-            }
-
-            .overlay {
-                VStack {
-
-                    RoundedRectangle(cornerRadius: 10)
-                        .foregroundColor(.gray)
-                        .frame(width: 270, height: 270)
-                        .opacity(0.6)
-                        .overlay {
-                            Text("No Image...")
-                                .foregroundColor(.white)
-                                .font(.title2)
-                                .fontWeight(.black)
-                        }
-                        .overlay(alignment: .bottomTrailing) {
-                            Button {
-                                // Todo: アイテム写真追加処理
-                            } label: {
-                                Image(systemName: "plus.rectangle.fill.on.rectangle.fill")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 40, height: 40)
-                                    .offset(x: 7, y: 7)
-                            } // Button
-                        } // .overlay(ボタン)
-                } // VStack
-            } // .overlay
-    } // body
-} // カスタムView
+// ✅カスタムView
 
 // NOTE: スクロールView全体に対しての画面の現在位置座標をgeometry内で検知し、値を渡すために用いる
 private struct OffsetPreferenceKey: PreferenceKey {

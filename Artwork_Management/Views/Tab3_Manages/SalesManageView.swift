@@ -169,16 +169,6 @@ struct SalesManageView: View {
                     }
                 }
             } // .toolbar
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-
-                    Button {
-                        isPresentedNewItem.toggle()
-                    } label: {
-                        Image(systemName: "rectangle.stack.fill.badge.plus")
-                    }
-                }
-            } // .toolbar(新規アイテム追加ボタン)
             .sheet(isPresented: $isPresentedNewItem) {
                 NewItemView(itemVM: itemVM, isPresentedNewItem: $isPresentedNewItem)
             } // sheet

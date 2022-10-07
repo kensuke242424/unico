@@ -90,7 +90,7 @@ struct ButtonStyleView: View {
             .frame(width: 70)
             .padding()
             .blur(radius: 1)
-            .shadow(color: .black, radius: 10, x: 4, y: 11)
+            .shadow(color: .gray, radius: 10, x: 4, y: 11)
 
             // ボタンのアイコン
             .overlay {

@@ -19,6 +19,7 @@ struct SideMenuNewTagView: View {
     @State private var disableButton = true
     @State private var opacity = 0.0
     @State private var selectionTagColor = Color.red
+    // NOTE: 初期値として画面横幅分をoffset(x)軸に渡すことで、呼び出されるまでの間、画面外へ除いておく
     @State private var defaultOffsetX: CGFloat = UIScreen.main.bounds.width
     @FocusState var focusedField: Field?
 
@@ -35,7 +36,7 @@ struct SideMenuNewTagView: View {
                         self.opacity = 0.0
                     }
                     // NOTE: 表示管理Bool値をずらさないとView非表示時のアニメーションが不自然になるため、
-                    //       DispatchQueueを用いて処理をずらしています。
+                    //       DispatchQueueを用いてtoggle処理をずらしています。
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                         self.isOpenSideMenu = false
                     }
@@ -48,6 +49,8 @@ struct SideMenuNewTagView: View {
                     .foregroundColor(.black)
                     .frame(width: screenSize.width, height: 600)
                     .opacity(0.7)
+                    .shadow(radius: 5, x: -5, y: 5)
+                    .shadow(radius: 5, x: -5, y: 5)
 
                 VStack(alignment: .leading, spacing: 20) {
 
@@ -85,6 +88,7 @@ struct SideMenuNewTagView: View {
 
                         TextField("No name...", text: $newTagName)
                             .foregroundColor(.white)
+                            .autocapitalization(.none)
                             .padding()
                             .frame(width: 200, height: 20)
                             .focused($focusedField, equals: .tag)
@@ -108,7 +112,6 @@ struct SideMenuNewTagView: View {
                         .foregroundColor(.white)
                         .opacity(0.5)
                         .padding(.top)
-//                        .padding(.leading, 40)
 
                         Picker("色を選択", selection: $selectionTagColor) {
 
@@ -133,8 +136,7 @@ struct SideMenuNewTagView: View {
                         // 新規タグをオブジェクトに詰め、配列の１番目に保存
                         itemVM.tags.insert(Tag(tagName: newTagName,
                                                tagColor: selectionTagColor),
-                                           at: 0
-                        )
+                                           at: 0)
 
                         withAnimation(.easeIn(duration: 0.25)) {
                             self.defaultOffsetX = screenSize.width
@@ -170,17 +172,17 @@ struct SideMenuNewTagView: View {
             } // .onChange
 
         } // ZStack(全体)
-        .offset(y: focusedField == .tag ? -self.geometryMinY - 330 : -self.geometryMinY - 170)
-        .animation(.easeIn(duration: 0.3), value: focusedField)
+        .offset(y: focusedField == .tag ? -self.geometryMinY - 330 : -self.geometryMinY - 200)
+        .animation(.easeOut(duration: 0.3), value: focusedField)
         .opacity(self.opacity)
         // View表示時
 
         .onAppear {
             withAnimation(.easeIn(duration: 0.3)) {
                 self.opacity = 1.0
+                // NOTE: View呼び出し時に「画面横幅 / 2 - (微調整)」で横から入力ブロックを出現
                 self.defaultOffsetX = defaultOffsetX / 2 - 30
             }
-            self.selectionTagColor = .red
         } // onAppear
 
     } // body
@@ -190,7 +192,7 @@ struct SideMenuNewTagView_Previews: PreviewProvider {
     static var previews: some View {
         SideMenuNewTagView(itemVM: ItemViewModel(),
                            isOpenSideMenu: .constant(true),
-                           geometryMinY: .constant(-150)
+                           geometryMinY: .constant(-200)
         )
     }
 }
