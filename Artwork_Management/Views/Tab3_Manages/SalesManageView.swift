@@ -170,8 +170,9 @@ struct SalesManageView: View {
                 }
             } // .toolbar
             .sheet(isPresented: $isPresentedNewItem) {
-                NewItemView(itemVM: itemVM, isPresentedNewItem: $isPresentedNewItem)
-            } // sheet
+                NewItemView(itemVM: itemVM,
+                            isPresentedNewItem: $isPresentedNewItem)
+            } // sheet(新規アイテム)
 
             .navigationBarTitleDisplayMode(.inline)
         } // NavigationView
