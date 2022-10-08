@@ -167,13 +167,13 @@ struct SideMenuNewTagView: View {
                             self.selectionTagColor = selectionSideMenuTagColor
 
                             // メソッド: 更新内容を受け取って、itemVM.tagsの対象タグデータを更新するメソッドです。
-                            updateTagsData(tags: itemVM.tags,
+                            itemVM.updateTagsData(itemVM: itemVM,
                                            itemTagName: itemTagName,
                                            selectTagName: newTagName,
                                            selectTagColor: selectionSideMenuTagColor)
 
                             // メソッド: 更新内容を受け取って、itemVM.itemsの対象タグデータを更新するメソッドです。
-                            updateItemsTagData(itemVM: itemVM,
+                            itemVM.updateItemsTagData(itemVM: itemVM,
                                                itemTagName: itemTagName,
                                                newTagName: newTagName,
                                                newTagColorString: itemVM.castColorIntoString(color: selectionTagColor))
@@ -237,40 +237,40 @@ struct SideMenuNewTagView: View {
 
     } // body
 
-    // ✅ メソッド: 変更内容をもとに、tags内の対象データのタグネーム、タグカラーを更新します。
-    func updateTagsData(tags: [Tag], itemTagName: String, selectTagName: String, selectTagColor: Color) {
-
-        print("ーーーーーーー　updateTagsDataメソッド_実行　ーーーーーーーーー")
-
-        // NOTE: for where文で更新対象要素を選出し、enumurated()でデータとインデックスを両方取得します。
-        for (index, tagData) in itemVM.tags.enumerated()
-        where tagData.tagName == itemTagName {
-
-            itemVM.tags[index] = Tag(tagName: selectTagName,
-                                     tagColor: selectTagColor)
-
-            print("更新されたitemVM.tags: \(itemVM.tags[index])")
-
-        } // for where
-    } // func updateTagsData
-
-    // ✅ メソッド: 変更内容をもとに、items内の対象データのタグネーム、タグカラーを更新します。
-    func updateItemsTagData(itemVM: ItemViewModel, itemTagName: String,
-                            newTagName: String, newTagColorString: String) {
-
-        print("ーーーーーーー　updateItemsTagDataメソッド_実行　ーーーーーーーーー")
-
-        // NOTE: アイテムデータ内の更新対象タグを取り出して、同じタググループアイテムをまとめて更新します。
-        for (index, itemData) in itemVM.items.enumerated()
-        where itemData.tag == itemTagName {
-
-            itemVM.items[index].tag = newTagName
-            itemVM.items[index].tagColor = newTagColorString
-
-            print("更新されたitemVM.items: \(itemVM.items[index])")
-
-        } // for where
-    } // func updateItemsTagData
+//    // ✅ メソッド: 変更内容をもとに、tags内の対象データのタグネーム、タグカラーを更新します。
+//    func updateTagsData(tags: [Tag], itemTagName: String, selectTagName: String, selectTagColor: Color) {
+//
+//        print("ーーーーーーー　updateTagsDataメソッド_実行　ーーーーーーーーー")
+//
+//        // NOTE: for where文で更新対象要素を選出し、enumurated()でデータとインデックスを両方取得します。
+//        for (index, tagData) in itemVM.tags.enumerated()
+//        where tagData.tagName == itemTagName {
+//
+//            itemVM.tags[index] = Tag(tagName: selectTagName,
+//                                     tagColor: selectTagColor)
+//
+//            print("更新されたitemVM.tags: \(itemVM.tags[index])")
+//
+//        } // for where
+//    } // func updateTagsData
+//
+//    // ✅ メソッド: 変更内容をもとに、items内の対象データのタグネーム、タグカラーを更新します。
+//    func updateItemsTagData(itemVM: ItemViewModel, itemTagName: String,
+//                            newTagName: String, newTagColorString: String) {
+//
+//        print("ーーーーーーー　updateItemsTagDataメソッド_実行　ーーーーーーーーー")
+//
+//        // NOTE: アイテムデータ内の更新対象タグを取り出して、同じタググループアイテムをまとめて更新します。
+//        for (index, itemData) in itemVM.items.enumerated()
+//        where itemData.tag == itemTagName {
+//
+//            itemVM.items[index].tag = newTagName
+//            itemVM.items[index].tagColor = newTagColorString
+//
+//            print("更新されたitemVM.items: \(itemVM.items[index])")
+//
+//        } // for where
+//    } // func updateItemsTagData
 
 } // View
 
