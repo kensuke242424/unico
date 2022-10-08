@@ -85,7 +85,9 @@ struct SalesManageView: View {
                 } // ScrollView
 
                 if isShowItemDetail {
-                    ShowsItemDetail(item: itemVM.items, index: $listIndex,
+                    ShowsItemDetail(itemVM: itemVM,
+                                    item: itemVM.items[listIndex],
+                                    itemIndex: listIndex,
                                     isShowitemDetail: $isShowItemDetail
                     )
                 } // if isShowItemDetail

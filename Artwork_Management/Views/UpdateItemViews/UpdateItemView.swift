@@ -7,18 +7,21 @@
 
 import SwiftUI
 
-struct NewItemView: View {
+struct UpdateItemView: View {
 
     @StateObject var itemVM: ItemViewModel
 
-    @Binding var isPresentedNewItem: Bool
+    let itemIndex: Int
+    let updateItem: Item
+    @Binding var isPresentedUpdateItem: Bool
     @State private var photoURL = ""  // Todo: 写真取り込み機能追加後使用
     @State private var selectionTagName = ""
     @State private var selectionTagColor = Color.red
-    @State private var newItemName = ""
-    @State private var newItemInventry = ""
-    @State private var newItemPrice = ""
-    @State private var newItemDetail = ""
+    @State private var updateItemName = ""
+    @State private var updateItemInventry = ""
+    @State private var updateItemPrice = ""
+    @State private var updateItemSales = ""
+    @State private var updateItemDetail = ""
     @State private var disableButton = true
     @State private var isOpenSideMenu = false
     @State private var offset: CGFloat = 0
@@ -72,7 +75,7 @@ struct NewItemView: View {
                                 InputFormTitle(title: "■アイテム名", isNeed: true)
                                     .padding(.bottom)
 
-                                TextField("1st Album「...」", text: $newItemName)
+                                TextField("1st Album「...」", text: $updateItemName)
                                     .focused($focusedField, equals: .name)
                                     .autocapitalization(.none)
                                     .onTapGesture { focusedField = .name }
@@ -87,7 +90,7 @@ struct NewItemView: View {
                                 InputFormTitle(title: "■在庫数", isNeed: false)
                                     .padding(.bottom)
 
-                                TextField("100", text: $newItemInventry)
+                                TextField("100", text: $updateItemInventry)
                                     .keyboardType(.numberPad)
                                     .focused($focusedField, equals: .stock)
                                     .onTapGesture { focusedField = .stock }
@@ -102,11 +105,11 @@ struct NewItemView: View {
                                 InputFormTitle(title: "■価格(税込)", isNeed: false)
                                     .padding(.bottom)
 
-                                TextField("2000", text: $newItemPrice)
+                                TextField("2000", text: $updateItemPrice)
                                     .keyboardType(.numberPad)
                                     .focused($focusedField, equals: .price)
                                     .onTapGesture { focusedField = .price }
-                                    .onSubmit { focusedField = .detail }
+                                    .onSubmit { focusedField = .sales }
 
                                 FocusedLineRow(select: focusedField == .price ? true : false)
 
@@ -114,10 +117,26 @@ struct NewItemView: View {
 
                             VStack(alignment: .leading) {
 
+                                InputFormTitle(title: "■総売上げ", isNeed: false)
+                                    .padding(.bottom)
+
+                                TextField("2000", text: $updateItemSales)
+                                    .keyboardType(.numberPad)
+                                    .focused($focusedField, equals: .price)
+                                    .onTapGesture { focusedField = .sales
+                                    }
+                                    .onSubmit { focusedField = .detail }
+
+                                FocusedLineRow(select: focusedField == .price ? true : false)
+
+                            } // ■総売上
+
+                            VStack(alignment: .leading) {
+
                                 InputFormTitle(title: "■アイテム詳細(メモ)", isNeed: false)
                                     .font(.title3)
 
-                                TextEditor(text: $newItemDetail)
+                                TextEditor(text: $updateItemDetail)
                                     .frame(width: UIScreen.main.bounds.width - 20, height: 200)
                                     .shadow(radius: 3, x: 0, y: 0)
                                     .autocapitalization(.none)
@@ -125,7 +144,7 @@ struct NewItemView: View {
                                     .onTapGesture { focusedField = .detail }
                                     .overlay(alignment: .topLeading) {
                                         if focusedField != .detail {
-                                            if newItemDetail.isEmpty {
+                                            if updateItemDetail.isEmpty {
                                                 Text("アイテムについてメモを残しましょう。")
                                                     .opacity(0.5)
                                                     .padding()
@@ -141,7 +160,7 @@ struct NewItemView: View {
 
                         // -------- 入力フォームここまで ---------- //
 
-                    } // VStack
+                    } // VStack(パーツ全体)
 
                     if isOpenSideMenu {
 
@@ -192,7 +211,7 @@ struct NewItemView: View {
                 }
             } // onChange (selectionTagName)
 
-            .onChange(of: newItemName) { newValue in
+            .onChange(of: updateItemName) { newValue in
 
                 withAnimation(.easeIn(duration: 0.2)) {
                     if newValue.isEmpty {
@@ -214,15 +233,21 @@ struct NewItemView: View {
                 }
             } // onChange(タグ設定内の選択タグ更新)
 
-            // NOTE: NewItemView生成時に、タグ配列のfirst要素をPickerが参照するselectionTagに初期値として代入します。
+            // NOTE: updateitemView呼び出し時に、親Viewから受け取ったアイテム情報を各入力欄に格納します。
             .onAppear {
-                if let firstTag = itemVM.tags.first {
-                    self.selectionTagName = firstTag.tagName
-                    print("onAppear時に格納したタグ: \(selectionTagName)")
-                }
+
+
+
+                self.selectionTagName = updateItem.tag
+                self.updateItemName = updateItem.name
+                self.updateItemInventry = String(updateItem.inventory)
+                self.updateItemPrice = String(updateItem.price)
+                self.updateItemSales = String(updateItem.sales)
+                self.updateItemDetail = updateItem.detail
+
             } // onAppear
 
-            .navigationTitle("新規アイテム")
+            .navigationTitle("アイテム編集")
             .navigationBarTitleDisplayMode(.inline)
 
             .toolbar {
@@ -230,34 +255,34 @@ struct NewItemView: View {
 
                     Button {
 
-                        print("追加ボタンタップ_selectionTagColor: \(selectionTagColor)")
+                        print("編集ボタンタップ_selectionTagColor: \(selectionTagColor)")
 
                         let castTagColorString = itemVM.castColorIntoString(color: selectionTagColor)
 
-                        print("追加ボタンタップ_castTagColorString: \(castTagColorString)")
+                        print("編集ボタンタップ_castTagColorString: \(castTagColorString)")
 
-                        // NOTE: テストデータに新規アイテムを保存
-                        itemVM.items.append(Item(tag: selectionTagName,
-                                                 tagColor: castTagColorString,
-                                                 name: newItemName,
-                                                 detail: newItemDetail != "" ? newItemDetail : "none.",
-                                                 photo: "", // Todo: 写真取り込み実装後、変更
-                                                 price: Int(newItemPrice) ?? 0,
-                                                 sales: 0,
-                                                 inventory: Int(newItemInventry) ?? 0,
-                                                 createTime: Date(), // Todo: Timestamp実装後、変更
-                                                 updateTime: Date()) // Todo: Timestamp実装後、変更
-                        )
+                        // NOTE: テストデータに情報の変更を保存
+//                        itemVM.items.append(Item(tag: selectionTagName,
+//                                                 tagColor: castTagColorString,
+//                                                 name: updateItemName,
+//                                                 detail: updateItemDetail != "" ? updateItemDetail : "none.",
+//                                                 photo: "", // Todo: 写真取り込み実装後、変更
+//                                                 price: Int(updateItemPrice) ?? 0,
+//                                                 sales: 0,
+//                                                 inventory: Int(updateItemInventry) ?? 0,
+//                                                 createTime: Date(), // Todo: Timestamp実装後、変更
+//                                                 updateTime: Date()) // Todo: Timestamp実装後、変更
+//                        )
 
                         if let itemsLast = itemVM.items.last {
                             print("新規追加されたアイテム: \(itemsLast)")
                         }
 
                         // シートを閉じる
-                        self.isPresentedNewItem.toggle()
+                        self.isPresentedUpdateItem.toggle()
 
                     } label: {
-                        Text("追加する")
+                        Text("更新する")
                     }
                     .disabled(disableButton)
                 }
@@ -273,8 +298,22 @@ private struct OffsetPreferenceKey: PreferenceKey {
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {}
 }
 
-struct NewItemView_Previews: PreviewProvider {
+struct UpdateItemView_Previews: PreviewProvider {
     static var previews: some View {
-        NewItemView(itemVM: ItemViewModel(), isPresentedNewItem: .constant(true))
+        UpdateItemView(itemVM: ItemViewModel(),
+                       itemIndex: 0,
+                       updateItem:
+                        Item(tag: "Album",
+                            tagColor: "赤",
+                            name: "Album1",
+                            detail: "Album1のアイテム紹介テキストです。",
+                            photo: "",
+                            price: 1800,
+                            sales: 88000,
+                            inventory: 200,
+                            createTime: Date(),
+                            updateTime: Date()),
+                       isPresentedUpdateItem: .constant(true)
+        )
     }
 }

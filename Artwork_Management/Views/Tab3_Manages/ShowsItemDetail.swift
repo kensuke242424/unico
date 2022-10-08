@@ -9,14 +9,19 @@ import SwiftUI
 
 struct ShowsItemDetail: View {
 
-    // NOTE: 親ViewからItem配列とインデックスを取得
-    let item: [Item]
-    @Binding var index: Int
+    @StateObject var itemVM: ItemViewModel
+
+    // NOTE: 親Viewから選択Itemとインデックスを取得
+    //       Itemはnilを許容し、nilだった場合「データが取得できませんでした」と表示
+    let item: Item?
+    let itemIndex: Int
     @Binding var isShowitemDetail: Bool
 
+    @State private var disabledButton = true
     @State private var opacity: Double = 0
     @State private var isShowAlert = false
-    @State private var isShowItemEdit = false
+    @State private var isPlesentedUpdateItem = false
+    @State private var isPlesentedErrorInfomation = false
 
     var body: some View {
 
@@ -33,12 +38,13 @@ struct ShowsItemDetail: View {
                     print("onTapGesture_isShowitemDetail: \(isShowitemDetail)")
                 } // onTapGesture
 
+            if let showItem = item {
+
             RoundedRectangle(cornerRadius: 20)
                 .foregroundColor(.black)
                 .frame(width: 300, height: 470)
                 .opacity(0.7)
 
-            if let showItem = item[index] {
                 VStack(spacing: 10) {
                     Text(showItem.name)
                         .fontWeight(.black)
@@ -66,8 +72,9 @@ struct ShowsItemDetail: View {
 
                         } label: {
                             Image(systemName: "highlighter")
-                                .foregroundColor(.yellow)
+                                .foregroundColor(disabledButton ? .gray : .yellow)
                         }
+                        .disabled(disabledButton)
                         .alert("編集", isPresented: $isShowAlert) {
 
                             Button {
@@ -78,8 +85,8 @@ struct ShowsItemDetail: View {
                             }
 
                             Button {
-                                isShowItemEdit.toggle()
-                                print("isShowItemEdit: \(isShowItemEdit)")
+                                isPlesentedUpdateItem.toggle()
+                                print("isShowItemEdit: \(isPlesentedUpdateItem)")
                             } label: {
                                 Text("はい")
                             }
@@ -102,36 +109,77 @@ struct ShowsItemDetail: View {
                     Text("ーーーーーーーーーーーーー")
                         .foregroundColor(.white)
 
-                } // VStack
+                } // VStack(item != nil の時)
 
             } else {
-                Text("アイテムデータが取得できませんでした")
-            } // if let item[index]
 
-        } // ZStack
-        // NOTE: opacityの設定によって遷移時のアニメーションを付与
+                VStack {
+
+                    RoundedRectangle(cornerRadius: 20)
+                        .foregroundColor(.black)
+                        .frame(width: 300, height: 470)
+                        .opacity(0.7)
+                        .overlay {
+                            Text("アイテムデータが取得できません")
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
+                        }
+                        .overlay(alignment: .bottomTrailing) {
+
+                            Button {
+                                // Todo: エラー報告インフォメーションへ遷移
+                                isPlesentedErrorInfomation.toggle()
+                            } label: {
+                                Text("エラーを報告する>>")
+                                    .padding()
+                            } // Button
+                        } // overlay
+                } // VStack(item == nil の時)
+
+            } // if let item
+
+        } // ZStack(全体)
         .opacity(self.opacity)
+
+        .sheet(isPresented: $isPlesentedUpdateItem) {
+
+            // NOTE: itemがnilでない場合のみボタンを有効にしているため、ボタンアクション時には値を強制アンラップしています。
+            UpdateItemView(itemVM: itemVM,
+                           itemIndex: itemIndex,
+                           updateItem: item!,
+                           isPresentedUpdateItem: $isPlesentedUpdateItem)
+        } // sheet(アイテム更新シート)
+
         .onAppear {
+
+            // NOTE: itemに値が存在した場合、アイテム編集ボタンを有効化
+            if item != nil {
+                self.disabledButton.toggle()
+            }
+
+            // NOTE: opacityの動的な値の変化を使ったフェードアニメーション
             withAnimation(.linear(duration: 0.2)) {
                 self.opacity = 1.0
             }
+
         } // .onAppear
+
     } // body
 } // View
 
 struct SalesItemDetailView_Previews: PreviewProvider {
     static var previews: some View {
-        ShowsItemDetail(item: [Item(tag: "Album",
-                                    tagColor: "赤",
-                                    name: "Album1",
-                                    detail: "Album1のアイテム紹介テキストです。",
-                                    photo: "",
-                                    price: 1800,
-                                    sales: 88000,
-                                    inventory: 200,
-                                    createTime: Date(),
-                                    updateTime: Date())],
-                        index: .constant(0),
+        ShowsItemDetail(itemVM: ItemViewModel(),
+                        item: Item(tag: "Album",
+                                   tagColor: "赤",
+                                   name: "Album1",
+                                   detail: "Album1のアイテム紹介テキストです。",
+                                   photo: "",
+                                   price: 1800, sales: 88000,
+                                   inventory: 200,
+                                   createTime: Date(),
+                                   updateTime: Date()),
+                        itemIndex: 0,
                         isShowitemDetail: .constant(false)
         )
     }
