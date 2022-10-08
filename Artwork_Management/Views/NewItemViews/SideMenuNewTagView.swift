@@ -31,6 +31,7 @@ struct SideMenuNewTagView: View {
     @State private var disableButton = true
     @State private var opacity = 0.0
     @State private var selectionSideMenuTagColor = Color.red
+    @State private var isShowAlert = false
     // NOTE: 初期値として画面横幅分をoffset(x)軸に渡すことで、呼び出されるまでの間、画面外へ除いておく
     @State private var defaultOffsetX: CGFloat = UIScreen.main.bounds.width
     @FocusState var focusedField: Field?
@@ -146,51 +147,79 @@ struct SideMenuNewTagView: View {
 
                     Button {
 
-                        switch tagSideMenuStatus {
 
-                        case .create:
 
-                            print("タグ追加ボタンタップ...")
+                            switch tagSideMenuStatus {
 
-                            // 新規タグデータを追加、配列の１番目に保存(at: 0)
-                            itemVM.tags.insert(Tag(tagName: newTagName,
-                                                   tagColor: selectionSideMenuTagColor),
-                                               at: 0)
+                            case .create:
 
-                            self.selectionTagName = newTagName
+                                print("タグ追加ボタンタップ...")
 
-                        case .update:
+                                // NOTE: アイテム内にタグが重複していないかを確認します。重複していればアラート表示
+                                if itemVM.tags.contains(where: { $0.tagName == newTagName }) {
 
-                            print("タグ編集ボタンタップ...")
+                                    print("タグが重複しました。")
+                                    self.isShowAlert.toggle()
 
-                            self.selectionTagName = newTagName
-                            self.selectionTagColor = selectionSideMenuTagColor
+                                } else {
 
-                            // メソッド: 更新内容を受け取って、itemVM.tagsの対象タグデータを更新するメソッドです。
-                            itemVM.updateTagsData(itemVM: itemVM,
-                                           itemTagName: itemTagName,
-                                           selectTagName: newTagName,
-                                           selectTagColor: selectionSideMenuTagColor)
+                                // 新規タグデータを追加、配列の１番目に保存(at: 0)
+                                itemVM.tags.insert(Tag(tagName: newTagName,
+                                                       tagColor: selectionSideMenuTagColor),
+                                                   at: 0)
 
-                            // メソッド: 更新内容を受け取って、itemVM.itemsの対象タグデータを更新するメソッドです。
-                            itemVM.updateItemsTagData(itemVM: itemVM,
-                                               itemTagName: itemTagName,
-                                               newTagName: newTagName,
-                                               newTagColorString: itemVM.castColorIntoString(color: selectionTagColor))
+                                self.selectionTagName = newTagName
 
-                        } // switch
+                            } // if contains
 
-                        withAnimation(.easeIn(duration: 0.25)) {
-                            self.defaultOffsetX = screenSize.width
-                            self.opacity = 0.0
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            self.isOpenSideMenu = false
-                        }
+                            case .update:
+
+                                print("タグ編集ボタンタップ...")
+
+                                self.selectionTagName = newTagName
+                                self.selectionTagColor = selectionSideMenuTagColor
+
+                                // メソッド: 更新内容を受け取って、itemVM.tagsの対象タグデータを更新するメソッドです。
+                                itemVM.updateTagsData(itemVM: itemVM,
+                                                      itemTagName: itemTagName,
+                                                      selectTagName: newTagName,
+                                                      selectTagColor: selectionSideMenuTagColor)
+
+                                // メソッド: 更新内容を受け取って、itemVM.itemsの対象タグデータを更新するメソッドです。
+                                itemVM.updateItemsTagData(itemVM: itemVM,
+                                                          itemTagName: itemTagName,
+                                                          newTagName: newTagName,
+                                                          newTagColorString: itemVM.castColorIntoString(color: selectionTagColor))
+
+                            } // switch
+
+                        if !isShowAlert {
+
+                            withAnimation(.easeIn(duration: 0.25)) {
+                                self.defaultOffsetX = screenSize.width
+                                self.opacity = 0.0
+                            }
+
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                self.isOpenSideMenu = false
+
+                            }
+                        } // if !isShowAlert
 
                     } label: {
                         Text(tagSideMenuStatus == .create ? "追加" : "更新")
                     } // Button(追加 or 更新)
+                    .alert("タグの重複", isPresented: $isShowAlert) {
+
+                        Button {
+                            isShowAlert.toggle()
+                            print("isShowAlert: \(isShowAlert)")
+                        } label: {
+                            Text("OK")
+                        }
+                    } message: {
+                        Text("入力したタグネームは既に存在します。")
+                    } // alert
                     .frame(width: 70, height: 30)
                     .buttonStyle(.borderedProminent)
                     .disabled(disableButton)
