@@ -159,6 +159,7 @@ struct NewItemView: View {
                                            isOpenSideMenu: $isOpenSideMenu,
                                            geometryMinY: $geometryMinY,
                                            selectionTagName: $selectionTagName,
+                                           selectionTagColor: $selectionTagColor,
                                            itemTagName: "",
                                            itemTagColor: Color.red,
                                            itemStatus: .create,

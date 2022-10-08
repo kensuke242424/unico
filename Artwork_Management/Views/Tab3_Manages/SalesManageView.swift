@@ -224,6 +224,8 @@ struct SalesManageView: View {
                         IndicatorRow(salesValue: item.sales, tagColor: .blue)
                     case "黄":
                         IndicatorRow(salesValue: item.sales, tagColor: .yellow)
+                    case "緑":
+                        IndicatorRow(salesValue: item.sales, tagColor: .green)
                     default:
                         IndicatorRow(salesValue: item.sales, tagColor: .gray)
                     }

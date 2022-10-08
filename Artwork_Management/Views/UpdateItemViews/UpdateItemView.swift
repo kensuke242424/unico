@@ -182,6 +182,7 @@ struct UpdateItemView: View {
                             isOpenSideMenu: $isOpenSideMenu,
                             geometryMinY: $geometryMinY,
                             selectionTagName: $selectionTagName,
+                            selectionTagColor: $selectionTagColor,
                             itemTagName: selectionTagName,
                             itemTagColor: selectionTagColor,
                             itemStatus: .update,

@@ -11,9 +11,9 @@ import SwiftUI
 // Firestore内で管理されるItemオブジェクト
 struct Item: Identifiable {
 
-    let id = UUID()
-    let tag: String
-    let tagColor: String
+    var id = UUID()
+    var tag: String
+    var tagColor: String
     let name: String
     let detail: String
     let photo: String

@@ -18,6 +18,7 @@ struct SideMenuNewTagView: View {
     @Binding var isOpenSideMenu: Bool
     @Binding var geometryMinY: CGFloat
     @Binding var selectionTagName: String
+    @Binding var selectionTagColor: Color
 
     let screenSize = UIScreen.main.bounds
     let itemTagName: String
@@ -29,7 +30,7 @@ struct SideMenuNewTagView: View {
     @State private var newTagName = ""
     @State private var disableButton = true
     @State private var opacity = 0.0
-    @State private var selectionTagColor = Color.red
+    @State private var selectionSideMenuTagColor = Color.red
     // NOTE: 初期値として画面横幅分をoffset(x)軸に渡すことで、呼び出されるまでの間、画面外へ除いておく
     @State private var defaultOffsetX: CGFloat = UIScreen.main.bounds.width
     @FocusState var focusedField: Field?
@@ -124,7 +125,7 @@ struct SideMenuNewTagView: View {
                         .opacity(0.5)
                         .padding(.top)
 
-                        Picker("色を選択", selection: $selectionTagColor) {
+                        Picker("色を選択", selection: $selectionSideMenuTagColor) {
 
                             Text("赤").tag(Color.red)
                             Text("青").tag(Color.blue)
@@ -141,7 +142,7 @@ struct SideMenuNewTagView: View {
                         .foregroundColor(.white)
                         .shadow(radius: 4, x: 4, y: 6)
 
-                    IndicatorRow(salesValue: 170000, tagColor: selectionTagColor)
+                    IndicatorRow(salesValue: 170000, tagColor: selectionSideMenuTagColor)
 
                     Button {
 
@@ -152,7 +153,7 @@ struct SideMenuNewTagView: View {
 
                             // 新規タグデータを追加、配列の１番目に保存(at: 0)
                             itemVM.tags.insert(Tag(tagName: newTagName,
-                                                   tagColor: selectionTagColor),
+                                                   tagColor: selectionSideMenuTagColor),
                                                at: 0)
 
                             self.selectionTagName = newTagName
@@ -160,18 +161,43 @@ struct SideMenuNewTagView: View {
                         case .update:
                             print("タグ編集ボタンタップ_更新処理実行")
 
+                            // 更新内容が格納されたタグデータ
+                            var updateTagData: Tag
+
+                            // ーーーーーーーーーーーー　タグデータ更新メソッドここから　ーーーーーーーーーーーーーーー //
+
                             // NOTE: for文で各要素のデータとインデックスを両方取得し、タグネームを参照して更新対象のデータを選出しています。
                             for (index, tagData) in itemVM.tags.enumerated() {
-                                print("取り込まれたタグデータ: \(tagData), \(index)")
+
+                                print("ループ文で取り込まれたタグデータ: \(tagData), \(index)")
 
                                 if tagData.tagName == itemTagName {
 
-                                    itemVM.tags[index] = Tag(tagName: newTagName,
-                                                             tagColor: selectionTagColor)
+                                    updateTagData = Tag(tagName: newTagName,
+                                                        tagColor: selectionSideMenuTagColor)
 
+                                    itemVM.tags[index] = updateTagData
                                     self.selectionTagName = newTagName
+                                    self.selectionTagColor = selectionSideMenuTagColor
 
-                                    print("　更新されたタグデータ: \(itemVM.tags[index])")
+                                    print("　更新されたitemVM.tagsデータ: \(itemVM.tags[index])")
+
+                                    // ーーーーーーーーーーーー　タグデータ更新ここまで　ーーーーーーーーーーーーーーー //
+
+                                    // ーーーーーーーーーーーー　アイテムデータのタグ更新メソッドここから　ーーーーーーーーーーーーーーー //
+
+                                    // NOTE: アイテムデータ内の更新対象タグを取り出して、同じタググループアイテムをまとめて更新します。
+                                    for (index, itemData) in itemVM.items.enumerated()
+                                    where itemData.tag == itemTagName {
+
+                                            itemVM.items[index].tag = newTagName
+                                            itemVM.items[index].tagColor = itemVM.castColorIntoString(color:
+                                                                                                        selectionSideMenuTagColor)
+
+                                        print("ループ内でタグのデータが更新されたitemVM.items: \(itemVM.items[index])")
+                                    } // for where
+
+                                    // ーーーーーーーーーーーー　アイテムデータのタグ更新メソッドここまで　ーーーーーーーーーーーーーーー //
 
                                 } // if
                             } // for in
@@ -222,7 +248,7 @@ struct SideMenuNewTagView: View {
             // // タグ編集の場合は、親Viewから受け取ったアイテムの値を渡す
             if tagSideMenuStatus == .update {
                 self.newTagName = itemTagName
-                self.selectionTagColor = itemTagColor
+                self.selectionSideMenuTagColor = itemTagColor
             }
 
             withAnimation(.easeIn(duration: 0.3)) {
@@ -238,14 +264,15 @@ struct SideMenuNewTagView: View {
 struct SideMenuNewTagView_Previews: PreviewProvider {
     static var previews: some View {
         SideMenuNewTagView(
-                           itemVM: ItemViewModel(),
-                           isOpenSideMenu: .constant(true),
-                           geometryMinY: .constant(-200),
-                           selectionTagName: .constant("＋タグを追加"),
-                           itemTagName: "Album",
-                           itemTagColor: Color.red,
-                           itemStatus: .create,
-                           tagSideMenuStatus: .create
+            itemVM: ItemViewModel(),
+            isOpenSideMenu: .constant(true),
+            geometryMinY: .constant(-200),
+            selectionTagName: .constant("＋タグを追加"),
+            selectionTagColor: .constant(Color.red),
+            itemTagName: "Album",
+            itemTagColor: Color.red,
+            itemStatus: .create,
+            tagSideMenuStatus: .create
         )
     }
 }
