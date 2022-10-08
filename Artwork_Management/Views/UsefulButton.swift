@@ -43,18 +43,14 @@ struct UsefulButton: View {
             switch newIndex {
             case 0:
                 buttonStyle = .library
-                print("ホーム画面でボタンがタップされました。")
             case 1:
                 buttonStyle = .stock
-                print("ストック画面でボタンがタップされました。")
             case 2:
                 buttonStyle = .manege
-                print("マネージ画面でボタンがタップされました。")
             case 3:
                 buttonStyle = .account
-                print("システム画面でボタンがタップされました。")
             default:
-                print("default")
+                print("tabIndex_error")
             }
         } // onChange(tabIndex)
     } // body
@@ -109,8 +105,8 @@ struct ButtonStyleView: View {
                             .offset(x: 10, y: -10)
                     } // overlay
             } // overlay
-    }
-}
+    } // body
+} // View
 
 struct UsefulButton_Previews: PreviewProvider {
     static var previews: some View {
