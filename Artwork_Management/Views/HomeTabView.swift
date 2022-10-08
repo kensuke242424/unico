@@ -9,43 +9,52 @@ import SwiftUI
 
 struct HomeTabView: View {
 
+    @StateObject var rootItemVM = ItemViewModel()
+
     @State private var tabIndex = 0
     @State private var isShowItemDetail = false
+    @State private var isPresentedNewItem = false
 
     var body: some View {
 
-        TabView(selection: $tabIndex) {
+        ZStack {
+            TabView(selection: $tabIndex) {
 
-            LibraryView(isShowItemDetail: $isShowItemDetail)
-                .tabItem {
-                    Image(systemName: "house")
-                    Text("Home")
-                }
-                .tag(0)
+                LibraryView(itemVM: rootItemVM, isShowItemDetail: $isShowItemDetail)
+                    .tabItem {
+                        Image(systemName: "house")
+                        Text("Home")
+                    }
+                    .tag(0)
 
-            ItemStockView()
-                .tabItem {
-                    Image(systemName: "shippingbox.fill")
-                    Text("inventory")
-                }
-                .tag(1)
+                ItemStockView(itemVM: rootItemVM)
+                    .tabItem {
+                        Image(systemName: "shippingbox.fill")
+                        Text("inventory")
+                    }
+                    .tag(1)
 
-            SalesManageView()
-                .tabItem {
-                    Image(systemName: "chart.xyaxis.line")
-                    Text("Manage")
-                }
-                .tag(2)
+                SalesManageView(itemVM: rootItemVM, isPresentedNewItem: $isPresentedNewItem)
+                    .tabItem {
+                        Image(systemName: "chart.xyaxis.line")
+                        Text("Manage")
+                    }
+                    .tag(2)
 
-            SystemView()
-                .tabItem {
-                    Image(systemName: "person.fill")
-                    Text("System")
-                }
-                .badge("!")
-                .tag(3)
+                SystemView(itemVM: rootItemVM)
+                    .tabItem {
+                        Image(systemName: "person.fill")
+                        Text("System")
+                    }
+                    .badge("!")
+                    .tag(3)
 
-        } // TabViewここまで
+            } // TabViewここまで
+
+            // Todo: 各タブごとにオプションが変わるボタン
+            UsefulButton(tabIndex: $tabIndex, isPresentedNewItem: $isPresentedNewItem)
+
+        } // ZStack
         .navigationBarBackButtonHidden()
     } // body
 } // View

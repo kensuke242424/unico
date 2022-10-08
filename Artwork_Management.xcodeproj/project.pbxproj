@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E042AA9128EAD1980054D8E8 /* NewItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E042AA9028EAD1980054D8E8 /* NewItemView.swift */; };
 		E04ACF4128E6DD600054A6C4 /* ShowsItemDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04ACF4028E6DD600054A6C4 /* ShowsItemDetail.swift */; };
 		E04ACF4328E73C660054A6C4 /* IndicatorRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04ACF4228E73C660054A6C4 /* IndicatorRow.swift */; };
 		E08F272528DDA08E00329C5E /* Artwork_ManagementApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E08F272428DDA08E00329C5E /* Artwork_ManagementApp.swift */; };
@@ -19,6 +20,12 @@
 		E08F273E28DDB65F00329C5E /* HomeTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E08F273D28DDB65F00329C5E /* HomeTabView.swift */; };
 		E094F10028E20F1000D3C845 /* LogInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E094F0FF28E20F1000D3C845 /* LogInView.swift */; };
 		E094F10228E21EBA00D3C845 /* FirstSignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E094F10128E21EBA00D3C845 /* FirstSignInView.swift */; };
+		E09F09BC28EAF33500D07669 /* FocusedLineRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09F09BB28EAF33500D07669 /* FocusedLineRow.swift */; };
+		E09F09C128EC4A1800D07669 /* ResizableSheet in Frameworks */ = {isa = PBXBuildFile; productRef = E09F09C028EC4A1800D07669 /* ResizableSheet */; };
+		E09F09C528ED5DEA00D07669 /* SideMenuNewTagView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09F09C428ED5DEA00D07669 /* SideMenuNewTagView.swift */; };
+		E09F09C728EE266600D07669 /* InputFormTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09F09C628EE266500D07669 /* InputFormTitle.swift */; };
+		E09F09C928EE3B4900D07669 /* UsefulButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09F09C828EE3B4900D07669 /* UsefulButton.swift */; };
+		E09F09CB28EFEA8700D07669 /* SelectItemPhotoArea.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09F09CA28EFEA8600D07669 /* SelectItemPhotoArea.swift */; };
 		E0CC79B628E761EA00CE0B19 /* UserModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0CC79B528E761EA00CE0B19 /* UserModel.swift */; };
 		E0CC79B828E7811500CE0B19 /* ItemDetailContents.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0CC79B728E7811500CE0B19 /* ItemDetailContents.swift */; };
 		E0CF7EEC28DEEED700735142 /* LibraryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0CF7EEB28DEEED700735142 /* LibraryListView.swift */; };
@@ -32,6 +39,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		E042AA9028EAD1980054D8E8 /* NewItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewItemView.swift; sourceTree = "<group>"; };
 		E04ACF4028E6DD600054A6C4 /* ShowsItemDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowsItemDetail.swift; sourceTree = "<group>"; };
 		E04ACF4228E73C660054A6C4 /* IndicatorRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndicatorRow.swift; sourceTree = "<group>"; };
 		E08F272128DDA08E00329C5E /* Artwork_Management.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Artwork_Management.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -45,6 +53,11 @@
 		E08F273D28DDB65F00329C5E /* HomeTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTabView.swift; sourceTree = "<group>"; };
 		E094F0FF28E20F1000D3C845 /* LogInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogInView.swift; sourceTree = "<group>"; };
 		E094F10128E21EBA00D3C845 /* FirstSignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstSignInView.swift; sourceTree = "<group>"; };
+		E09F09BB28EAF33500D07669 /* FocusedLineRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusedLineRow.swift; sourceTree = "<group>"; };
+		E09F09C428ED5DEA00D07669 /* SideMenuNewTagView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideMenuNewTagView.swift; sourceTree = "<group>"; };
+		E09F09C628EE266500D07669 /* InputFormTitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputFormTitle.swift; sourceTree = "<group>"; };
+		E09F09C828EE3B4900D07669 /* UsefulButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsefulButton.swift; sourceTree = "<group>"; };
+		E09F09CA28EFEA8600D07669 /* SelectItemPhotoArea.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectItemPhotoArea.swift; sourceTree = "<group>"; };
 		E0CC79B528E761EA00CE0B19 /* UserModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserModel.swift; sourceTree = "<group>"; };
 		E0CC79B728E7811500CE0B19 /* ItemDetailContents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemDetailContents.swift; sourceTree = "<group>"; };
 		E0CF7EEB28DEEED700735142 /* LibraryListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryListView.swift; sourceTree = "<group>"; };
@@ -63,6 +76,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E09F09C128EC4A1800D07669 /* ResizableSheet in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -109,8 +123,10 @@
 		E08F273228DDB3B200329C5E /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				E094F0FE28E20BB800D3C845 /* LogIn */,
 				E08F273D28DDB65F00329C5E /* HomeTabView.swift */,
+				E09F09C828EE3B4900D07669 /* UsefulButton.swift */,
+				E09F09BA28EAF2DD00D07669 /* NewItemViews */,
+				E094F0FE28E20BB800D3C845 /* LogIn */,
 				E08F273F28DEAD1100329C5E /* Tab1_Librarys */,
 				E08F274028DEAD3B00329C5E /* Tab2_Inventrys */,
 				E08F274128DEAD4D00329C5E /* Tab3_Manages */,
@@ -187,6 +203,18 @@
 			path = LogIn;
 			sourceTree = "<group>";
 		};
+		E09F09BA28EAF2DD00D07669 /* NewItemViews */ = {
+			isa = PBXGroup;
+			children = (
+				E042AA9028EAD1980054D8E8 /* NewItemView.swift */,
+				E09F09CA28EFEA8600D07669 /* SelectItemPhotoArea.swift */,
+				E09F09C428ED5DEA00D07669 /* SideMenuNewTagView.swift */,
+				E09F09C628EE266500D07669 /* InputFormTitle.swift */,
+				E09F09BB28EAF33500D07669 /* FocusedLineRow.swift */,
+			);
+			path = NewItemViews;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -204,6 +232,9 @@
 			dependencies = (
 			);
 			name = Artwork_Management;
+			packageProductDependencies = (
+				E09F09C028EC4A1800D07669 /* ResizableSheet */,
+			);
 			productName = Artwork_Management;
 			productReference = E08F272128DDA08E00329C5E /* Artwork_Management.app */;
 			productType = "com.apple.product-type.application";
@@ -232,6 +263,9 @@
 				Base,
 			);
 			mainGroup = E08F271828DDA08E00329C5E;
+			packageReferences = (
+				E09F09BF28EC4A1800D07669 /* XCRemoteSwiftPackageReference "ResizableSheet" */,
+			);
 			productRefGroup = E08F272228DDA08E00329C5E /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -279,17 +313,22 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E09F09C728EE266600D07669 /* InputFormTitle.swift in Sources */,
 				E0CF7EF828DF7BFA00735142 /* SystemListView.swift in Sources */,
 				E04ACF4128E6DD600054A6C4 /* ShowsItemDetail.swift in Sources */,
+				E042AA9128EAD1980054D8E8 /* NewItemView.swift in Sources */,
 				E08F273C28DDB61A00329C5E /* LibraryView.swift in Sources */,
 				E08F273828DDB51600329C5E /* SalesManageView.swift in Sources */,
 				E04ACF4328E73C660054A6C4 /* IndicatorRow.swift in Sources */,
+				E09F09BC28EAF33500D07669 /* FocusedLineRow.swift in Sources */,
+				E09F09CB28EFEA8700D07669 /* SelectItemPhotoArea.swift in Sources */,
 				E08F273628DDB48100329C5E /* ItemStockView.swift in Sources */,
 				E094F10228E21EBA00D3C845 /* FirstSignInView.swift in Sources */,
 				E0CF7EF228DF166700735142 /* ItemViewModel.swift in Sources */,
 				E0CF7EF028DF152D00735142 /* ItemModel.swift in Sources */,
 				E08F273E28DDB65F00329C5E /* HomeTabView.swift in Sources */,
 				E08F272528DDA08E00329C5E /* Artwork_ManagementApp.swift in Sources */,
+				E09F09C528ED5DEA00D07669 /* SideMenuNewTagView.swift in Sources */,
 				E094F10028E20F1000D3C845 /* LogInView.swift in Sources */,
 				E0CF7EF428DF385800735142 /* ItemShowBlock.swift in Sources */,
 				E0CF7EEE28DEFFEE00735142 /* LibraryDetailShow.swift in Sources */,
@@ -299,6 +338,7 @@
 				E0CF7EEC28DEEED700735142 /* LibraryListView.swift in Sources */,
 				E0DE98D828E2DBB800471AB4 /* LogInViewModel.swift in Sources */,
 				E0CC79B828E7811500CE0B19 /* ItemDetailContents.swift in Sources */,
+				E09F09C928EE3B4900D07669 /* UsefulButton.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -499,6 +539,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		E09F09BF28EC4A1800D07669 /* XCRemoteSwiftPackageReference "ResizableSheet" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/mtj0928/ResizableSheet.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		E09F09C028EC4A1800D07669 /* ResizableSheet */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E09F09BF28EC4A1800D07669 /* XCRemoteSwiftPackageReference "ResizableSheet" */;
+			productName = ResizableSheet;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E08F271928DDA08E00329C5E /* Project object */;
 }

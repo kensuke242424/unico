@@ -9,9 +9,11 @@ import SwiftUI
 
 struct LibraryView: View {
 
+    @StateObject var itemVM: ItemViewModel
     @Binding var isShowItemDetail: Bool
 
-    @State var itemName = ""
+    @State private var itemName = ""
+    @State private var isPresentedNewItem = false
 
     var body: some View {
 
@@ -38,17 +40,30 @@ struct LibraryView: View {
                     } // VStack
                 } // ScrollView
             } // ZStack
+            .navigationTitle("Home")
 
-            .overlay(
-                LibraryDetailShow(itemName: "a")
-                    .opacity(isShowItemDetail ? 0.6 : 0)
-            )
+//            .toolbar {
+//                ToolbarItem(placement: .navigationBarTrailing) {
+//
+//                    Button {
+//                        isPresentedNewItem.toggle()
+//                    } label: {
+//                        Image(systemName: "rectangle.stack.fill.badge.plus")
+//                    }
+//                }
+//            } // toolbar
+//
+//            .sheet(isPresented: $isPresentedNewItem) {
+//                NewItemView(itemVM: itemVM)
+//            } // sheet
+
         } // NavigationView
     } // body
 } // View
 
 struct ItemLibraryView_Previews: PreviewProvider {
     static var previews: some View {
-        LibraryView(isShowItemDetail: .constant(false))
+        LibraryView(itemVM: ItemViewModel(),
+                    isShowItemDetail: .constant(false))
     }
 }
