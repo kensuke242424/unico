@@ -35,9 +35,9 @@ class ItemViewModel: ObservableObject {
 
     @Published var tags: [Tag] =
     [
-        Tag(tagName: "Album", tagColor: .red),
-        Tag(tagName: "Single", tagColor: .blue),
-        Tag(tagName: "Goods", tagColor: .yellow)
+//        Tag(tagName: "Album", tagColor: .red),
+//        Tag(tagName: "Single", tagColor: .blue),
+//        Tag(tagName: "Goods", tagColor: .yellow)
     ]
 
     // ✅ NOTE: アイテム配列を各項目に沿ってソートするメソッド

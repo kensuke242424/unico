@@ -73,12 +73,14 @@ struct EditItemView: View {
                                         .foregroundColor(selectionTagColor)
 
                                     Picker("", selection: $selectionTagName) {
+
                                         ForEach(0 ..< itemVM.tags.count, id: \.self) { index in
 
                                             if let tagsRow = itemVM.tags[index] {
                                                 Text(tagsRow.tagName).tag(tagsRow.tagName)
                                             }
                                         }
+                                        if itemVM.tags.isEmpty { Text("タグ無し").tag("タグ無し") }
                                         Text("＋タグを追加").tag("＋タグを追加")
                                     } // Picker
 
@@ -297,14 +299,19 @@ struct EditItemView: View {
                 print("アイテム編集ステータス: \(editItemStatus)")
 
                 // NOTE: 新規アイテム登録遷移の場合、passItemDataにはnilが代入されているためreturn
-                guard let passItemData = passItemData else { return }
+                if let passItemData = passItemData {
 
-                self.selectionTagName = passItemData.tag
-                self.editItemName = passItemData.name
-                self.editItemInventry = String(passItemData.inventory)
-                self.editItemPrice = String(passItemData.price)
-                self.editItemSales = String(passItemData.sales)
-                self.editItemDetail = passItemData.detail
+                    self.selectionTagName = passItemData.tag
+                    self.editItemName = passItemData.name
+                    self.editItemInventry = String(passItemData.inventory)
+                    self.editItemPrice = String(passItemData.price)
+                    self.editItemSales = String(passItemData.sales)
+                    self.editItemDetail = passItemData.detail
+
+                } else {
+                    guard let defaultTag = itemVM.tags.first else { return }
+                    self.selectionTagName = defaultTag.tagName
+                }
 
             } // onAppear
 
@@ -378,7 +385,7 @@ private struct OffsetPreferenceKey: PreferenceKey {
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {}
 }
 
-struct UpdateItemView_Previews: PreviewProvider {
+struct EditItemView_Previews: PreviewProvider {
     static var previews: some View {
         EditItemView(itemVM: ItemViewModel(),
                      isPresentedEditItem: .constant(true),
