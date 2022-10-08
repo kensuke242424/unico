@@ -65,6 +65,17 @@ struct UpdateItemView: View {
                                         }
                                         Text("＋タグを追加").tag("＋タグを追加")
                                     } // Picker
+
+                                    Spacer()
+
+                                    Button {
+                                        isOpenSideMenu.toggle()
+
+                                    } label: {
+                                        Text("タグ編集>>")
+                                    }
+                                    .padding(.trailing)
+
                                 } // HStack(Pickerタグ要素)
 
                                 // NOTE: フォーカスの有無によって、入力欄の下線の色をスイッチします。(カスタムView)
@@ -172,7 +183,8 @@ struct UpdateItemView: View {
                             geometryMinY: $geometryMinY,
                             selectionTagName: $selectionTagName,
                             itemTag: updateItem.tag,
-                            status: .create
+                            itemStatus: .update,
+                            tagSideMenuStatus: selectionTagName == "＋タグを追加" ? .create : .update
                         )
 
                     } // if isOpenSideMenu

@@ -21,7 +21,9 @@ struct SideMenuNewTagView: View {
 
     let screenSize = UIScreen.main.bounds
     let itemTag: String
-    let status: Status
+
+    let itemStatus: Status
+    let tagSideMenuStatus: Status
 
     @State private var newTagName = ""
     @State private var disableButton = true
@@ -63,7 +65,7 @@ struct SideMenuNewTagView: View {
                 VStack(alignment: .leading, spacing: 20) {
 
                     VStack(alignment: .leading) {
-                        Text(status == .create ? "新規タグ" : "タグ編集")
+                        Text(tagSideMenuStatus == .create ? "新規タグ" : "タグ編集")
                             .font(.title2)
                             .foregroundColor(.white)
                             .opacity(0.5)
@@ -142,9 +144,10 @@ struct SideMenuNewTagView: View {
 
                     Button {
 
-                        switch status {
+                        switch tagSideMenuStatus {
+
                         case .create:
-                            // 新規タグをオブジェクトに詰め、配列の１番目に保存
+                            // 新規タグデータを追加、配列の１番目に保存(at: 0)
                             itemVM.tags.insert(Tag(tagName: newTagName,
                                                    tagColor: selectionTagColor),
                                                at: 0)
@@ -171,7 +174,7 @@ struct SideMenuNewTagView: View {
                         }
 
                     } label: {
-                        Text(status == .create ? "追加" : "更新")
+                        Text(tagSideMenuStatus == .create ? "追加" : "更新")
                     }
                     .frame(width: 70, height: 30)
                     .buttonStyle(.borderedProminent)
@@ -196,6 +199,7 @@ struct SideMenuNewTagView: View {
             } // .onChange
 
         } // ZStack(全体)
+        .offset(y: itemStatus == .create ? 0 : -80)
         .offset(y: focusedField == .tag ? -self.geometryMinY - 330 : -self.geometryMinY - 200)
         .animation(.easeOut(duration: 0.3), value: focusedField)
         .opacity(self.opacity)
@@ -203,7 +207,9 @@ struct SideMenuNewTagView: View {
 
         .onAppear {
 
-            self.newTagName = itemTag
+            if selectionTagName != "＋タグを追加" {
+                self.newTagName = itemTag
+            }
 
             withAnimation(.easeIn(duration: 0.3)) {
                 self.opacity = 1.0
@@ -221,9 +227,10 @@ struct SideMenuNewTagView_Previews: PreviewProvider {
                            itemVM: ItemViewModel(),
                            isOpenSideMenu: .constant(true),
                            geometryMinY: .constant(-200),
-                           selectionTagName: .constant("+タグを追加"),
+                           selectionTagName: .constant("＋タグを追加"),
                            itemTag: "Album",
-                           status: .update
+                           itemStatus: .create,
+                           tagSideMenuStatus: .create
         )
     }
 }
