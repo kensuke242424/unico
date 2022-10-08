@@ -80,7 +80,6 @@ struct EditItemView: View {
                                                 Text(tagsRow.tagName).tag(tagsRow.tagName)
                                             }
                                         }
-                                        if itemVM.tags.isEmpty { Text("タグ無し").tag("タグ無し") }
                                         Text("＋タグを追加").tag("＋タグを追加")
                                     } // Picker
 
