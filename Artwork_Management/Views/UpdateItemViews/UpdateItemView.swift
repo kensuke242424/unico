@@ -182,7 +182,7 @@ struct UpdateItemView: View {
                             isOpenSideMenu: $isOpenSideMenu,
                             geometryMinY: $geometryMinY,
                             selectionTagName: $selectionTagName,
-                            itemTagName: updateItem.tag,
+                            itemTagName: selectionTagName,
                             itemTagColor: selectionTagColor,
                             itemStatus: .update,
                             // Warning_TextSimbol: "＋タグを追加"
@@ -205,7 +205,7 @@ struct UpdateItemView: View {
                             .onChange(of: geometry.frame(in: .named("scrollFrame_Space")).minY) { newValue in
 
                                 withAnimation(.easeIn(duration: 0.1)) {
-                                    print(newValue)
+//                                    print(newValue)
                                     self.geometryMinY = newValue
                                 }
                             } // onChange
@@ -219,7 +219,7 @@ struct UpdateItemView: View {
 
             .onChange(of: selectionTagName) { selection in
 
-                // NOTE: 選択されたタグネームと紐づいたタグカラーを取り出し、selectionTagColorに格納します。
+//                // NOTE: 選択されたタグネームと紐づいたタグカラーを取り出し、selectionTagColorに格納します。
                 let searchedTagColor = itemVM.searchSelectTagColor(selectTagName: selection,
                                                                    tags: itemVM.tags)
                 withAnimation(.easeIn(duration: 0.25)) {
@@ -259,6 +259,8 @@ struct UpdateItemView: View {
 
             // NOTE: updateitemView呼び出し時に、親Viewから受け取ったアイテム情報を各入力欄に格納します。
             .onAppear {
+
+                print("onAppear_実行")
 
                 self.selectionTagName = updateItem.tag
                 self.updateItemName = updateItem.name

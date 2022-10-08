@@ -148,6 +148,8 @@ struct SideMenuNewTagView: View {
                         switch tagSideMenuStatus {
 
                         case .create:
+                            print("タグ追加ボタンタップ_追加処理実行")
+
                             // 新規タグデータを追加、配列の１番目に保存(at: 0)
                             itemVM.tags.insert(Tag(tagName: newTagName,
                                                    tagColor: selectionTagColor),
@@ -156,14 +158,24 @@ struct SideMenuNewTagView: View {
                             self.selectionTagName = newTagName
 
                         case .update:
-                            // Todo: 編集時の更新アクション
-                            print("タグ編集で更新実行_未実装")
+                            print("タグ編集ボタンタップ_更新処理実行")
 
-                            for (tagData, index) in itemVM.tags.enumerated() {
-                                print("タグ編集時にfilterで絞り込まれたタグデータ: \(tagData), \(index)")
-                            }
+                            // NOTE: for文で各要素のデータとインデックスを両方取得し、タグネームを参照して更新対象のデータを選出しています。
+                            for (index, tagData) in itemVM.tags.enumerated() {
+                                print("取り込まれたタグデータ: \(tagData), \(index)")
 
-                        }
+                                if tagData.tagName == itemTagName {
+
+                                    itemVM.tags[index] = Tag(tagName: newTagName,
+                                                             tagColor: selectionTagColor)
+
+                                    self.selectionTagName = newTagName
+
+                                    print("　更新されたタグデータ: \(itemVM.tags[index])")
+
+                                } // if
+                            } // for in
+                        } // switch
 
                         withAnimation(.easeIn(duration: 0.25)) {
                             self.defaultOffsetX = screenSize.width
@@ -175,7 +187,7 @@ struct SideMenuNewTagView: View {
 
                     } label: {
                         Text(tagSideMenuStatus == .create ? "追加" : "更新")
-                    }
+                    } // Button(追加 or 更新)
                     .frame(width: 70, height: 30)
                     .buttonStyle(.borderedProminent)
                     .disabled(disableButton)
