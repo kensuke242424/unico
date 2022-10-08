@@ -182,8 +182,10 @@ struct UpdateItemView: View {
                             isOpenSideMenu: $isOpenSideMenu,
                             geometryMinY: $geometryMinY,
                             selectionTagName: $selectionTagName,
-                            itemTag: updateItem.tag,
+                            itemTagName: updateItem.tag,
+                            itemTagColor: selectionTagColor,
                             itemStatus: .update,
+                            // Warning_TextSimbol: "＋タグを追加"
                             tagSideMenuStatus: selectionTagName == "＋タグを追加" ? .create : .update
                         )
 
@@ -225,6 +227,7 @@ struct UpdateItemView: View {
                 }
 
                 // NOTE: タグ選択で「+タグを追加」が選択された時、新規タグ追加Viewを表示します。
+                // Warning_TextSimbol: "＋タグを追加"
                 if selection == "＋タグを追加" {
                     self.isOpenSideMenu.toggle()
                     print("サイドメニュー: \(isOpenSideMenu)")
@@ -242,14 +245,17 @@ struct UpdateItemView: View {
                 }
             } // onChange(ボタンdisable分岐)
 
-            // NOTE: 新規タグ追加サイドViewが閉じられた時、タグ配列の一番目を再代入します。
-            //       新規作成されたタグは配列の１番目に格納するよう処理されています。
+            // NOTE: タグ追加サイドメニュー表示後、新規タグが追加されず、サイドメニューが閉じられた時(タグ選択が「＋タグ選択」のままの状態)
+            //       タグピッカーの選択をアイテムが保有するタグに戻します。
             .onChange(of: isOpenSideMenu) { isOpen in
 
                 if isOpen == false {
+                    // Warning_TextSimbol: "＋タグを追加"
+                    if selectionTagName == "＋タグを追加" {
                         selectionTagName = updateItem.tag
+                    }
                 }
-            } // onChange(タグ設定内の選択タグ更新)
+            } // onChange(サイドメニューが綴じられた後の選択タグ監視)
 
             // NOTE: updateitemView呼び出し時に、親Viewから受け取ったアイテム情報を各入力欄に格納します。
             .onAppear {

@@ -159,7 +159,8 @@ struct NewItemView: View {
                                            isOpenSideMenu: $isOpenSideMenu,
                                            geometryMinY: $geometryMinY,
                                            selectionTagName: $selectionTagName,
-                                           itemTag: "",
+                                           itemTagName: "",
+                                           itemTagColor: Color.red,
                                            itemStatus: .create,
                                            tagSideMenuStatus: selectionTagName == "＋タグを追加" ? .create : .update
                         )

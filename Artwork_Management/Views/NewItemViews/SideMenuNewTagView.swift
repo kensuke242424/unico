@@ -20,7 +20,8 @@ struct SideMenuNewTagView: View {
     @Binding var selectionTagName: String
 
     let screenSize = UIScreen.main.bounds
-    let itemTag: String
+    let itemTagName: String
+    let itemTagColor: Color
 
     let itemStatus: Status
     let tagSideMenuStatus: Status
@@ -152,6 +153,8 @@ struct SideMenuNewTagView: View {
                                                    tagColor: selectionTagColor),
                                                at: 0)
 
+                            self.selectionTagName = newTagName
+
                         case .update:
                             // Todo: 編集時の更新アクション
                             print("タグ編集で更新実行_未実装")
@@ -207,8 +210,10 @@ struct SideMenuNewTagView: View {
 
         .onAppear {
 
-            if selectionTagName != "＋タグを追加" {
-                self.newTagName = itemTag
+            // // タグ編集の場合は、親Viewから受け取ったアイテムの値を渡す
+            if tagSideMenuStatus == .update {
+                self.newTagName = itemTagName
+                self.selectionTagColor = itemTagColor
             }
 
             withAnimation(.easeIn(duration: 0.3)) {
@@ -228,7 +233,8 @@ struct SideMenuNewTagView_Previews: PreviewProvider {
                            isOpenSideMenu: .constant(true),
                            geometryMinY: .constant(-200),
                            selectionTagName: .constant("＋タグを追加"),
-                           itemTag: "Album",
+                           itemTagName: "Album",
+                           itemTagColor: Color.red,
                            itemStatus: .create,
                            tagSideMenuStatus: .create
         )
