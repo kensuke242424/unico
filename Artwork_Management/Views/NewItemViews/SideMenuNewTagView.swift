@@ -159,13 +159,10 @@ struct SideMenuNewTagView: View {
                             // Todo: 編集時の更新アクション
                             print("タグ編集で更新実行_未実装")
 
-//                            let filterTag = itemVM.tags.filter { $0.tagName == itemTag }
-//                            print("タグ編集時にfilterで絞り込まれたタグデータ: \(filterTag)")
-//
-//                            if var unwrappedFilterTag = filterTag.first {
-//
-//                                unwrappedFilterTag.tagName = newTagName
-//                            }
+                            for (tagData, index) in itemVM.tags.enumerated() {
+                                print("タグ編集時にfilterで絞り込まれたタグデータ: \(tagData), \(index)")
+                            }
+
                         }
 
                         withAnimation(.easeIn(duration: 0.25)) {
