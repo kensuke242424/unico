@@ -11,9 +11,11 @@ struct UpdateItemView: View {
 
     @StateObject var itemVM: ItemViewModel
 
+    @Binding var isPresentedUpdateItem: Bool
+
     let itemIndex: Int
     let updateItem: Item
-    @Binding var isPresentedUpdateItem: Bool
+
     @State private var photoURL = ""  // Todo: 写真取り込み機能追加後使用
     @State private var selectionTagName = ""
     @State private var selectionTagColor = Color.red
@@ -125,9 +127,9 @@ struct UpdateItemView: View {
                                     .focused($focusedField, equals: .price)
                                     .onTapGesture { focusedField = .sales
                                     }
-                                    .onSubmit { focusedField = .detail }
+                                    .onSubmit { focusedField = .sales }
 
-                                FocusedLineRow(select: focusedField == .price ? true : false)
+                                FocusedLineRow(select: focusedField == .sales ? true : false)
 
                             } // ■総売上
 
@@ -164,9 +166,13 @@ struct UpdateItemView: View {
 
                     if isOpenSideMenu {
 
-                        SideMenuNewTagView(itemVM: itemVM,
-                                           isOpenSideMenu: $isOpenSideMenu,
-                                           geometryMinY: $geometryMinY
+                        SideMenuNewTagView(
+                            itemVM: itemVM,
+                            isOpenSideMenu: $isOpenSideMenu,
+                            geometryMinY: $geometryMinY,
+                            selectionTagName: $selectionTagName,
+                            itemTag: updateItem.tag,
+                            status: .create
                         )
 
                     } // if isOpenSideMenu
@@ -175,6 +181,8 @@ struct UpdateItemView: View {
                 // アイテム詳細
                 .offset(y: focusedField == .detail && -500.0 <= geometryMinY ? offset - 300 : 0)
                 .animation(.easeIn(duration: 0.3), value: offset)
+
+                // NOTE: スクロールView全体を.backgroundからgeometry取得します。
                 .background(
                     GeometryReader { geometry in
                         Color.clear
@@ -227,16 +235,12 @@ struct UpdateItemView: View {
             .onChange(of: isOpenSideMenu) { isOpen in
 
                 if isOpen == false {
-                    if let firstTag = itemVM.tags.first {
-                        selectionTagName = firstTag.tagName
-                    }
+                        selectionTagName = updateItem.tag
                 }
             } // onChange(タグ設定内の選択タグ更新)
 
             // NOTE: updateitemView呼び出し時に、親Viewから受け取ったアイテム情報を各入力欄に格納します。
             .onAppear {
-
-
 
                 self.selectionTagName = updateItem.tag
                 self.updateItemName = updateItem.name
@@ -301,19 +305,19 @@ private struct OffsetPreferenceKey: PreferenceKey {
 struct UpdateItemView_Previews: PreviewProvider {
     static var previews: some View {
         UpdateItemView(itemVM: ItemViewModel(),
+                       isPresentedUpdateItem: .constant(true),
                        itemIndex: 0,
                        updateItem:
                         Item(tag: "Album",
-                            tagColor: "赤",
-                            name: "Album1",
-                            detail: "Album1のアイテム紹介テキストです。",
-                            photo: "",
-                            price: 1800,
-                            sales: 88000,
-                            inventory: 200,
-                            createTime: Date(),
-                            updateTime: Date()),
-                       isPresentedUpdateItem: .constant(true)
+                             tagColor: "赤",
+                             name: "Album1",
+                             detail: "Album1のアイテム紹介テキストです。",
+                             photo: "",
+                             price: 1800,
+                             sales: 88000,
+                             inventory: 200,
+                             createTime: Date(),
+                             updateTime: Date())
         )
     }
 }

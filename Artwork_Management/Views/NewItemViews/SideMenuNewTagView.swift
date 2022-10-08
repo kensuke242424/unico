@@ -7,13 +7,21 @@
 
 import SwiftUI
 
+enum Status {
+    case create
+    case update
+}
+
 struct SideMenuNewTagView: View {
 
     @StateObject var itemVM: ItemViewModel
     @Binding var isOpenSideMenu: Bool
     @Binding var geometryMinY: CGFloat
+    @Binding var selectionTagName: String
 
     let screenSize = UIScreen.main.bounds
+    let itemTag: String
+    let status: Status
 
     @State private var newTagName = ""
     @State private var disableButton = true
@@ -55,7 +63,7 @@ struct SideMenuNewTagView: View {
                 VStack(alignment: .leading, spacing: 20) {
 
                     VStack(alignment: .leading) {
-                        Text("新規タグ")
+                        Text(status == .create ? "新規タグ" : "タグ編集")
                             .font(.title2)
                             .foregroundColor(.white)
                             .opacity(0.5)
@@ -133,10 +141,26 @@ struct SideMenuNewTagView: View {
                     IndicatorRow(salesValue: 170000, tagColor: selectionTagColor)
 
                     Button {
-                        // 新規タグをオブジェクトに詰め、配列の１番目に保存
-                        itemVM.tags.insert(Tag(tagName: newTagName,
-                                               tagColor: selectionTagColor),
-                                           at: 0)
+
+                        switch status {
+                        case .create:
+                            // 新規タグをオブジェクトに詰め、配列の１番目に保存
+                            itemVM.tags.insert(Tag(tagName: newTagName,
+                                                   tagColor: selectionTagColor),
+                                               at: 0)
+
+                        case .update:
+                            // Todo: 編集時の更新アクション
+                            print("タグ編集で更新実行_未実装")
+
+//                            let filterTag = itemVM.tags.filter { $0.tagName == itemTag }
+//                            print("タグ編集時にfilterで絞り込まれたタグデータ: \(filterTag)")
+//
+//                            if var unwrappedFilterTag = filterTag.first {
+//
+//                                unwrappedFilterTag.tagName = newTagName
+//                            }
+                        }
 
                         withAnimation(.easeIn(duration: 0.25)) {
                             self.defaultOffsetX = screenSize.width
@@ -147,7 +171,7 @@ struct SideMenuNewTagView: View {
                         }
 
                     } label: {
-                        Text("追加")
+                        Text(status == .create ? "追加" : "更新")
                     }
                     .frame(width: 70, height: 30)
                     .buttonStyle(.borderedProminent)
@@ -178,6 +202,9 @@ struct SideMenuNewTagView: View {
         // View表示時
 
         .onAppear {
+
+            self.newTagName = itemTag
+
             withAnimation(.easeIn(duration: 0.3)) {
                 self.opacity = 1.0
                 // NOTE: View呼び出し時に「画面横幅 / 2 - (微調整)」で横から入力ブロックを出現
@@ -190,9 +217,13 @@ struct SideMenuNewTagView: View {
 
 struct SideMenuNewTagView_Previews: PreviewProvider {
     static var previews: some View {
-        SideMenuNewTagView(itemVM: ItemViewModel(),
+        SideMenuNewTagView(
+                           itemVM: ItemViewModel(),
                            isOpenSideMenu: .constant(true),
-                           geometryMinY: .constant(-200)
+                           geometryMinY: .constant(-200),
+                           selectionTagName: .constant("+タグを追加"),
+                           itemTag: "Album",
+                           status: .update
         )
     }
 }

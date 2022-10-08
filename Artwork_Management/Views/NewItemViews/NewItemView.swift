@@ -22,7 +22,7 @@ struct NewItemView: View {
 
     @Binding var isPresentedNewItem: Bool
 
-    @State private var photoURL = ""  // TODO: 写真取り込み機能追加後使用
+    @State private var photoURL = ""  // Todo: 写真取り込み機能追加後使用
     @State private var selectionTagName = ""
     @State private var selectionTagColor = Color.red
     @State private var newItemName = ""
@@ -157,7 +157,10 @@ struct NewItemView: View {
 
                         SideMenuNewTagView(itemVM: itemVM,
                                            isOpenSideMenu: $isOpenSideMenu,
-                                           geometryMinY: $geometryMinY
+                                           geometryMinY: $geometryMinY,
+                                           selectionTagName: $selectionTagName,
+                                           itemTag: "",
+                                           status: .create
                         )
 
                     } // if isOpenSideMenu

@@ -25,7 +25,7 @@ struct Item: Identifiable {
 }
 
 // iPhone側で扱われるオブジェクト
-struct Tag: Identifiable {
+struct Tag: Identifiable, Equatable {
     var id = UUID()
     var tagName: String
     var tagColor: Color

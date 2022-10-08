@@ -145,9 +145,9 @@ struct ShowsItemDetail: View {
 
             // NOTE: itemがnilでない場合のみボタンを有効にしているため、ボタンアクション時には値を強制アンラップしています。
             UpdateItemView(itemVM: itemVM,
+                           isPresentedUpdateItem: $isPlesentedUpdateItem,
                            itemIndex: itemIndex,
-                           updateItem: item!,
-                           isPresentedUpdateItem: $isPlesentedUpdateItem)
+                           updateItem: item!)
         } // sheet(アイテム更新シート)
 
         .onAppear {
