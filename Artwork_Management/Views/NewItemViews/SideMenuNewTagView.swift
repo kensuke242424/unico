@@ -161,46 +161,27 @@ struct SideMenuNewTagView: View {
                         case .update:
                             print("タグ編集ボタンタップ_更新処理実行")
 
-                            // 更新内容が格納されたタグデータ
-                            var updateTagData: Tag
+                            // NOTE: 更新内容を受け取って、itemVM.tagsの対象タグデータを更新するメソッドです。
+                            updateTagsData(tags: itemVM.tags,
+                                           itemTagName: itemTagName,
+                                           selectTagName: newTagName,
+                                           selectTagColor: selectionSideMenuTagColor)
 
-                            // ーーーーーーーーーーーー　タグデータ更新メソッドここから　ーーーーーーーーーーーーーーー //
+                            // ーーーーーーーーーーーー　アイテムデータのタグ更新メソッドここから　ーーーーーーーーーーーーーーー //
 
-                            // NOTE: for文で各要素のデータとインデックスを両方取得し、タグネームを参照して更新対象のデータを選出しています。
-                            for (index, tagData) in itemVM.tags.enumerated() {
+                            // NOTE: アイテムデータ内の更新対象タグを取り出して、同じタググループアイテムをまとめて更新します。
+                            for (index, itemData) in itemVM.items.enumerated()
+                            where itemData.tag == itemTagName {
 
-                                print("ループ文で取り込まれたタグデータ: \(tagData), \(index)")
+                                itemVM.items[index].tag = newTagName
+                                itemVM.items[index].tagColor = itemVM.castColorIntoString(color:
+                                                                                            selectionSideMenuTagColor)
 
-                                if tagData.tagName == itemTagName {
+                                print("ループ内でタグのデータが更新されたitemVM.items: \(itemVM.items[index])")
+                            } // for where
 
-                                    updateTagData = Tag(tagName: newTagName,
-                                                        tagColor: selectionSideMenuTagColor)
+                            // ーーーーーーーーーーーー　アイテムデータのタグ更新メソッドここまで　ーーーーーーーーーーーーーーー //
 
-                                    itemVM.tags[index] = updateTagData
-                                    self.selectionTagName = newTagName
-                                    self.selectionTagColor = selectionSideMenuTagColor
-
-                                    print("　更新されたitemVM.tagsデータ: \(itemVM.tags[index])")
-
-                                    // ーーーーーーーーーーーー　タグデータ更新ここまで　ーーーーーーーーーーーーーーー //
-
-                                    // ーーーーーーーーーーーー　アイテムデータのタグ更新メソッドここから　ーーーーーーーーーーーーーーー //
-
-                                    // NOTE: アイテムデータ内の更新対象タグを取り出して、同じタググループアイテムをまとめて更新します。
-                                    for (index, itemData) in itemVM.items.enumerated()
-                                    where itemData.tag == itemTagName {
-
-                                            itemVM.items[index].tag = newTagName
-                                            itemVM.items[index].tagColor = itemVM.castColorIntoString(color:
-                                                                                                        selectionSideMenuTagColor)
-
-                                        print("ループ内でタグのデータが更新されたitemVM.items: \(itemVM.items[index])")
-                                    } // for where
-
-                                    // ーーーーーーーーーーーー　アイテムデータのタグ更新メソッドここまで　ーーーーーーーーーーーーーーー //
-
-                                } // if
-                            } // for in
                         } // switch
 
                         withAnimation(.easeIn(duration: 0.25)) {
@@ -259,6 +240,25 @@ struct SideMenuNewTagView: View {
         } // onAppear
 
     } // body
+
+    func updateTagsData(tags: [Tag], itemTagName: String, selectTagName: String, selectTagColor: Color) {
+
+        // 更新内容が格納されるタグデータ
+        var updateTagData: Tag
+
+        // NOTE: for文で各要素のデータとインデックスを両方取得し、タグネームを参照して更新対象のデータを選出しています。
+        for (index, tagData) in itemVM.tags.enumerated() {
+
+            print("ループ文で取り込まれたタグデータ: \(tagData), \(index)")
+
+            if tagData.tagName == itemTagName {
+
+                updateTagData = Tag(tagName: selectTagName,
+                                    tagColor: selectTagColor)
+                itemVM.tags[index] = updateTagData
+            } // if
+        } // for
+    } // func updateTagsData
 } // View
 
 struct SideMenuNewTagView_Previews: PreviewProvider {
