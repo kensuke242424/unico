@@ -13,7 +13,7 @@ struct HomeTabView: View {
 
     @State private var tabIndex = 0
     @State private var isShowItemDetail = false
-    @State private var isPresentedNewItem = false
+    @State private var isPresentedEditItem = false
 
     var body: some View {
 
@@ -34,7 +34,7 @@ struct HomeTabView: View {
                     }
                     .tag(1)
 
-                SalesManageView(itemVM: rootItemVM, isPresentedNewItem: $isPresentedNewItem)
+                SalesManageView(itemVM: rootItemVM, isPresentedEditItem: $isPresentedEditItem)
                     .tabItem {
                         Image(systemName: "chart.xyaxis.line")
                         Text("Manage")
@@ -52,7 +52,7 @@ struct HomeTabView: View {
             } // TabViewここまで
 
             // Todo: 各タブごとにオプションが変わるボタン
-            UsefulButton(tabIndex: $tabIndex, isPresentedNewItem: $isPresentedNewItem)
+            UsefulButton(tabIndex: $tabIndex, isPresentedEditItem: $isPresentedEditItem)
 
         } // ZStack
         .navigationBarBackButtonHidden()

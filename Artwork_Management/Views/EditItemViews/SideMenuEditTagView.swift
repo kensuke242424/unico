@@ -7,12 +7,7 @@
 
 import SwiftUI
 
-enum Status {
-    case create
-    case update
-}
-
-struct SideMenuNewTagView: View {
+struct SideMenuEditTagView: View {
 
     @StateObject var itemVM: ItemViewModel
     @Binding var isOpenSideMenu: Bool
@@ -24,7 +19,7 @@ struct SideMenuNewTagView: View {
     let itemTagName: String
     let itemTagColor: Color
 
-    let itemStatus: Status
+    let editItemStatus: Status
     let tagSideMenuStatus: Status
 
     @State private var newTagName = ""
@@ -147,21 +142,19 @@ struct SideMenuNewTagView: View {
 
                     Button {
 
+                        switch tagSideMenuStatus {
 
+                        case .create:
 
-                            switch tagSideMenuStatus {
+                            print("タグ追加ボタンタップ...")
 
-                            case .create:
+                            // NOTE: アイテム内にタグが重複していないかを確認します。重複していればアラート表示
+                            if itemVM.tags.contains(where: { $0.tagName == newTagName }) {
 
-                                print("タグ追加ボタンタップ...")
+                                print("タグが重複しました。")
+                                self.isShowAlert.toggle()
 
-                                // NOTE: アイテム内にタグが重複していないかを確認します。重複していればアラート表示
-                                if itemVM.tags.contains(where: { $0.tagName == newTagName }) {
-
-                                    print("タグが重複しました。")
-                                    self.isShowAlert.toggle()
-
-                                } else {
+                            } else {
 
                                 // 新規タグデータを追加、配列の１番目に保存(at: 0)
                                 itemVM.tags.insert(Tag(tagName: newTagName,
@@ -172,26 +165,26 @@ struct SideMenuNewTagView: View {
 
                             } // if contains
 
-                            case .update:
+                        case .update:
 
-                                print("タグ編集ボタンタップ...")
+                            print("タグ編集ボタンタップ...")
 
-                                self.selectionTagName = newTagName
-                                self.selectionTagColor = selectionSideMenuTagColor
+                            self.selectionTagName = newTagName
+                            self.selectionTagColor = selectionSideMenuTagColor
 
-                                // メソッド: 更新内容を受け取って、itemVM.tagsの対象タグデータを更新するメソッドです。
-                                itemVM.updateTagsData(itemVM: itemVM,
+                            // メソッド: 更新内容を受け取って、itemVM.tagsの対象タグデータを更新するメソッドです。
+                            itemVM.updateTagsData(itemVM: itemVM,
+                                                  itemTagName: itemTagName,
+                                                  selectTagName: newTagName,
+                                                  selectTagColor: selectionSideMenuTagColor)
+
+                            // メソッド: 更新内容を受け取って、itemVM.itemsの対象タグデータを更新するメソッドです。
+                            itemVM.updateItemsTagData(itemVM: itemVM,
                                                       itemTagName: itemTagName,
-                                                      selectTagName: newTagName,
-                                                      selectTagColor: selectionSideMenuTagColor)
+                                                      newTagName: newTagName,
+                                                      newTagColorString: itemVM.castColorIntoString(color: selectionTagColor))
 
-                                // メソッド: 更新内容を受け取って、itemVM.itemsの対象タグデータを更新するメソッドです。
-                                itemVM.updateItemsTagData(itemVM: itemVM,
-                                                          itemTagName: itemTagName,
-                                                          newTagName: newTagName,
-                                                          newTagColorString: itemVM.castColorIntoString(color: selectionTagColor))
-
-                            } // switch
+                        } // switch
 
                         if !isShowAlert {
 
@@ -243,13 +236,18 @@ struct SideMenuNewTagView: View {
             } // .onChange
 
         } // ZStack(全体)
-        .offset(y: itemStatus == .create ? 0 : -80)
+        .offset(y: editItemStatus == .update ? -80 : 0)
         .offset(y: focusedField == .tag ? -self.geometryMinY - 330 : -self.geometryMinY - 200)
         .animation(.easeOut(duration: 0.3), value: focusedField)
         .opacity(self.opacity)
         // View表示時
 
         .onAppear {
+
+            print("SideMenuTagView_onAppear_実行")
+
+            print("アイテム編集ステータス: \(editItemStatus)")
+            print("サイドメニュータグ編集ステータス: \(tagSideMenuStatus)")
 
             // // タグ編集の場合は、親Viewから受け取ったアイテムの値を渡す
             if tagSideMenuStatus == .update {
@@ -269,7 +267,7 @@ struct SideMenuNewTagView: View {
 
 struct SideMenuNewTagView_Previews: PreviewProvider {
     static var previews: some View {
-        SideMenuNewTagView(
+        SideMenuEditTagView(
             itemVM: ItemViewModel(),
             isOpenSideMenu: .constant(true),
             geometryMinY: .constant(-200),
@@ -277,7 +275,7 @@ struct SideMenuNewTagView_Previews: PreviewProvider {
             selectionTagColor: .constant(Color.red),
             itemTagName: "Album",
             itemTagColor: Color.red,
-            itemStatus: .create,
+            editItemStatus: .create,
             tagSideMenuStatus: .create
         )
     }

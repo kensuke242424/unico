@@ -143,11 +143,12 @@ struct ShowsItemDetail: View {
 
         .sheet(isPresented: $isPlesentedUpdateItem) {
 
-            // NOTE: itemがnilでない場合のみボタンを有効にしているため、ボタンアクション時には値を強制アンラップしています。
-            UpdateItemView(itemVM: itemVM,
-                           isPresentedUpdateItem: $isPlesentedUpdateItem,
+            // NOTE: itemがnilでない場合のみボタンを有効にしているため、ボタンアクション時には値を強制アンラップします。
+            EditItemView(itemVM: itemVM,
+                            isPresentedEditItem: $isPlesentedUpdateItem,
                            itemIndex: itemIndex,
-                           updateItem: item!)
+                           editItemData: item!,
+                           editItemStatus: .update)
         } // sheet(アイテム更新シート)
 
         .onAppear {

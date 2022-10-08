@@ -7,14 +7,31 @@
 
 import SwiftUI
 
-struct UpdateItemView: View {
+enum Status {
+    case create
+    case update
+}
+
+enum Field {
+    case tag
+    case name
+    case stock
+    case price
+    case sales
+    case detail
+}
+
+struct EditItemView: View {
 
     @StateObject var itemVM: ItemViewModel
 
-    @Binding var isPresentedUpdateItem: Bool
+    @Binding var isPresentedEditItem: Bool
 
     let itemIndex: Int
-    let updateItem: Item
+    let editItemData: Item?
+
+    // NOTE: enum「Status」を用いて、新規登録と編集とでViewレイアウトを分岐します。
+    let editItemStatus: Status
 
     @State private var photoURL = ""  // Todo: 写真取り込み機能追加後使用
     @State private var selectionTagName = ""
@@ -69,6 +86,7 @@ struct UpdateItemView: View {
                                     Spacer()
 
                                     Button {
+
                                         isOpenSideMenu.toggle()
 
                                     } label: {
@@ -128,21 +146,24 @@ struct UpdateItemView: View {
 
                             } // ■価格
 
-                            VStack(alignment: .leading) {
+                            if editItemStatus == .update {
 
-                                InputFormTitle(title: "■総売上げ", isNeed: false)
-                                    .padding(.bottom)
+                                VStack(alignment: .leading) {
 
-                                TextField("2000", text: $updateItemSales)
-                                    .keyboardType(.numberPad)
-                                    .focused($focusedField, equals: .sales)
-                                    .onTapGesture { focusedField = .sales
-                                    }
-                                    .onSubmit { focusedField = .sales }
+                                    InputFormTitle(title: "■総売上げ", isNeed: false)
+                                        .padding(.bottom)
 
-                                FocusedLineRow(select: focusedField == .sales ? true : false)
+                                    TextField("2000", text: $updateItemSales)
+                                        .keyboardType(.numberPad)
+                                        .focused($focusedField, equals: .sales)
+                                        .onTapGesture { focusedField = .sales
+                                        }
+                                        .onSubmit { focusedField = .sales }
 
-                            } // ■総売上
+                                    FocusedLineRow(select: focusedField == .sales ? true : false)
+
+                                } // ■総売上
+                            } // if .update「総売上」
 
                             VStack(alignment: .leading) {
 
@@ -177,7 +198,7 @@ struct UpdateItemView: View {
 
                     if isOpenSideMenu {
 
-                        SideMenuNewTagView(
+                        SideMenuEditTagView(
                             itemVM: itemVM,
                             isOpenSideMenu: $isOpenSideMenu,
                             geometryMinY: $geometryMinY,
@@ -185,7 +206,7 @@ struct UpdateItemView: View {
                             selectionTagColor: $selectionTagColor,
                             itemTagName: selectionTagName,
                             itemTagColor: selectionTagColor,
-                            itemStatus: .update,
+                            editItemStatus: editItemStatus,
                             // Warning_TextSimbol: "＋タグを追加"
                             tagSideMenuStatus: selectionTagName == "＋タグを追加" ? .create : .update
                         )
@@ -206,7 +227,7 @@ struct UpdateItemView: View {
                             .onChange(of: geometry.frame(in: .named("scrollFrame_Space")).minY) { newValue in
 
                                 withAnimation(.easeIn(duration: 0.1)) {
-//                                    print(newValue)
+                                    //                                    print(newValue)
                                     self.geometryMinY = newValue
                                 }
                             } // onChange
@@ -220,7 +241,7 @@ struct UpdateItemView: View {
 
             .onChange(of: selectionTagName) { selection in
 
-//                // NOTE: 選択されたタグネームと紐づいたタグカラーを取り出し、selectionTagColorに格納します。
+                //                // NOTE: 選択されたタグネームと紐づいたタグカラーを取り出し、selectionTagColorに格納します。
                 let searchedTagColor = itemVM.searchSelectTagColor(selectTagName: selection,
                                                                    tags: itemVM.tags)
                 withAnimation(.easeIn(duration: 0.25)) {
@@ -253,26 +274,45 @@ struct UpdateItemView: View {
                 if isOpen == false {
                     // Warning_TextSimbol: "＋タグを追加"
                     if selectionTagName == "＋タグを追加" {
-                        selectionTagName = updateItem.tag
-                    }
-                }
+
+                        switch editItemStatus {
+
+                        case .create:
+
+                            if let defaultTag = itemVM.tags.first {
+                                self.selectionTagName = defaultTag.tagName
+                            }
+
+                        case .update:
+
+                            if let editItemData = editItemData {
+                                selectionTagName = editItemData.tag
+                            }
+                        } // switch
+
+                    } // if selectionTagName == "＋タグを追加"
+                } // if isOpen == false
             } // onChange(サイドメニューが綴じられた後の選択タグ監視)
 
             // NOTE: updateitemView呼び出し時に、親Viewから受け取ったアイテム情報を各入力欄に格納します。
             .onAppear {
 
-                print("onAppear_実行")
+                print("EditItemView_onAppear_実行")
 
-                self.selectionTagName = updateItem.tag
-                self.updateItemName = updateItem.name
-                self.updateItemInventry = String(updateItem.inventory)
-                self.updateItemPrice = String(updateItem.price)
-                self.updateItemSales = String(updateItem.sales)
-                self.updateItemDetail = updateItem.detail
+                print("アイテム編集ステータス: \(editItemStatus)")
 
+                if let editItemData = editItemData {
+
+                    self.selectionTagName = editItemData.tag
+                    self.updateItemName = editItemData.name
+                    self.updateItemInventry = String(editItemData.inventory)
+                    self.updateItemPrice = String(editItemData.price)
+                    self.updateItemSales = String(editItemData.sales)
+                    self.updateItemDetail = editItemData.detail
+                }
             } // onAppear
 
-            .navigationTitle("アイテム編集")
+            .navigationTitle(editItemStatus == .create ? "新規アイテム" : "アイテム編集")
             .navigationBarTitleDisplayMode(.inline)
 
             .toolbar {
@@ -280,34 +320,54 @@ struct UpdateItemView: View {
 
                     Button {
 
-                        print("編集ボタンタップ_selectionTagColor: \(selectionTagColor)")
-
+                        // NOTE: Firestoreへのデータ保存を見越して、Color型はString型に変換しておきます。
                         let castTagColorString = itemVM.castColorIntoString(color: selectionTagColor)
 
-                        print("編集ボタンタップ_castTagColorString: \(castTagColorString)")
+                        switch editItemStatus {
 
-                        // NOTE: テストデータに情報の変更を保存
-                        let updateItem = Item(tag: selectionTagName,
-                                              tagColor: castTagColorString,
-                                              name: updateItemName,
-                                              detail: updateItemDetail != "" ? updateItemDetail : "none.",
-                                              photo: "", // Todo: 写真取り込み実装後、変更
-                                              price: Int(updateItemPrice) ?? 0,
-                                              sales: Int(updateItemSales) ?? 0,
-                                              inventory: Int(updateItemInventry) ?? 0,
-                                              createTime: Date(), // Todo: Timestamp実装後、変更
-                                              updateTime: Date()) // Todo: Timestamp実装後、変更
+                        case .create:
 
-                        // NOTE: アイテムを更新
-                        itemVM.items[itemIndex] = updateItem
+                            // NOTE: テストデータに新規アイテムを保存
+                            itemVM.items.append(Item(tag: selectionTagName,
+                                                     tagColor: castTagColorString,
+                                                     name: updateItemName,
+                                                     detail: updateItemDetail != "" ? updateItemDetail : "none.",
+                                                     photo: "", // Todo: 写真取り込み実装後、変更
+                                                     price: Int(updateItemPrice) ?? 0,
+                                                     sales: 0,
+                                                     inventory: Int(updateItemInventry) ?? 0,
+                                                     createTime: Date(), // Todo: Timestamp実装後、変更
+                                                     updateTime: Date())) // Todo: Timestamp実装後、変更
+
+                            if let appendNewItem = itemVM.items.last {
+                                print("新規追加されたアイテム: \(appendNewItem)")
+                            }
+
+                        case .update:
+                            // NOTE: テストデータに情報の変更を保存
+                            let updateItemSource = Item(tag: selectionTagName,
+                                                        tagColor: castTagColorString,
+                                                        name: updateItemName,
+                                                        detail: updateItemDetail != "" ? updateItemDetail : "none.",
+                                                        photo: "", // Todo: 写真取り込み実装後、変更
+                                                        price: Int(updateItemPrice) ?? 0,
+                                                        sales: Int(updateItemSales) ?? 0,
+                                                        inventory: Int(updateItemInventry) ?? 0,
+                                                        createTime: Date(), // Todo: Timestamp実装後、変更
+                                                        updateTime: Date()) // Todo: Timestamp実装後、変更
+
+                            // NOTE: アイテムを更新
+                            itemVM.items[itemIndex] = updateItemSource
 
                             print("更新されたアイテム: \(itemVM.items[itemIndex])")
 
+                        } // switch itemStatus
+
                         // シートを閉じる
-                        self.isPresentedUpdateItem.toggle()
+                        self.isPresentedEditItem.toggle()
 
                     } label: {
-                        Text("更新する")
+                        Text(editItemStatus == .create ? "追加する" : "更新する")
                     }
                     .disabled(disableButton)
                 }
@@ -325,10 +385,10 @@ private struct OffsetPreferenceKey: PreferenceKey {
 
 struct UpdateItemView_Previews: PreviewProvider {
     static var previews: some View {
-        UpdateItemView(itemVM: ItemViewModel(),
-                       isPresentedUpdateItem: .constant(true),
+        EditItemView(itemVM: ItemViewModel(),
+                        isPresentedEditItem: .constant(true),
                        itemIndex: 0,
-                       updateItem:
+                       editItemData:
                         Item(tag: "Album",
                              tagColor: "赤",
                              name: "Album1",
@@ -338,7 +398,8 @@ struct UpdateItemView_Previews: PreviewProvider {
                              sales: 88000,
                              inventory: 200,
                              createTime: Date(),
-                             updateTime: Date())
+                             updateTime: Date()),
+                       editItemStatus: .update
         )
     }
 }

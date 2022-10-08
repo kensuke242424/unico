@@ -17,14 +17,14 @@ enum ButtonStyle {
 struct UsefulButton: View {
 
     @Binding var tabIndex: Int
-    @Binding var isPresentedNewItem: Bool
+    @Binding var isPresentedEditItem: Bool
     @State private var buttonStyle: ButtonStyle = .library
 
     var body: some View {
         Button {
 
             if buttonStyle == .manege {
-                self.isPresentedNewItem.toggle()
+                self.isPresentedEditItem.toggle()
             } else {
                 print("マネージ画面でのみ、新規アイテムシートが表示されます。")
             }
@@ -110,6 +110,6 @@ struct ButtonStyleView: View {
 
 struct UsefulButton_Previews: PreviewProvider {
     static var previews: some View {
-        UsefulButton(tabIndex: .constant(2), isPresentedNewItem: .constant(false))
+        UsefulButton(tabIndex: .constant(2), isPresentedEditItem: .constant(false))
     }
 }
