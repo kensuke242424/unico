@@ -175,7 +175,7 @@ struct SalesManageView: View {
                 EditItemView(itemVM: itemVM,
                                 isPresentedEditItem: $isPresentedEditItem,
                                 itemIndex: 0,
-                                editItemData: nil,
+                                passItemData: nil,
                                 editItemStatus: .create)
             } // sheet(新規アイテム)
 

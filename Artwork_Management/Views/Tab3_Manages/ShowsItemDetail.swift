@@ -147,7 +147,7 @@ struct ShowsItemDetail: View {
             EditItemView(itemVM: itemVM,
                             isPresentedEditItem: $isPlesentedUpdateItem,
                            itemIndex: itemIndex,
-                           editItemData: item!,
+                           passItemData: item!,
                            editItemStatus: .update)
         } // sheet(アイテム更新シート)
 

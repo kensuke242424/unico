@@ -28,7 +28,7 @@ struct EditItemView: View {
     @Binding var isPresentedEditItem: Bool
 
     let itemIndex: Int
-    let editItemData: Item?
+    let passItemData: Item?
 
     // NOTE: enum「Status」を用いて、新規登録と編集とでViewレイアウトを分岐します。
     let editItemStatus: Status
@@ -36,11 +36,11 @@ struct EditItemView: View {
     @State private var photoURL = ""  // Todo: 写真取り込み機能追加後使用
     @State private var selectionTagName = ""
     @State private var selectionTagColor = Color.red
-    @State private var updateItemName = ""
-    @State private var updateItemInventry = ""
-    @State private var updateItemPrice = ""
-    @State private var updateItemSales = ""
-    @State private var updateItemDetail = ""
+    @State private var editItemName = ""
+    @State private var editItemInventry = ""
+    @State private var editItemPrice = ""
+    @State private var editItemSales = ""
+    @State private var editItemDetail = ""
     @State private var disableButton = true
     @State private var isOpenSideMenu = false
     @State private var offset: CGFloat = 0
@@ -56,7 +56,6 @@ struct EditItemView: View {
 
                 ZStack {
                     VStack {
-
                         // ✅カスタムView 写真ゾーン
                         SelectItemPhotoArea(selectTagColor: selectionTagColor)
 
@@ -106,7 +105,7 @@ struct EditItemView: View {
                                 InputFormTitle(title: "■アイテム名", isNeed: true)
                                     .padding(.bottom)
 
-                                TextField("1st Album「...」", text: $updateItemName)
+                                TextField("1st Album「...」", text: $editItemName)
                                     .focused($focusedField, equals: .name)
                                     .autocapitalization(.none)
                                     .onTapGesture { focusedField = .name }
@@ -121,7 +120,7 @@ struct EditItemView: View {
                                 InputFormTitle(title: "■在庫数", isNeed: false)
                                     .padding(.bottom)
 
-                                TextField("100", text: $updateItemInventry)
+                                TextField("100", text: $editItemInventry)
                                     .keyboardType(.numberPad)
                                     .focused($focusedField, equals: .stock)
                                     .onTapGesture { focusedField = .stock }
@@ -136,7 +135,7 @@ struct EditItemView: View {
                                 InputFormTitle(title: "■価格(税込)", isNeed: false)
                                     .padding(.bottom)
 
-                                TextField("2000", text: $updateItemPrice)
+                                TextField("2000", text: $editItemPrice)
                                     .keyboardType(.numberPad)
                                     .focused($focusedField, equals: .price)
                                     .onTapGesture { focusedField = .price }
@@ -153,7 +152,7 @@ struct EditItemView: View {
                                     InputFormTitle(title: "■総売上げ", isNeed: false)
                                         .padding(.bottom)
 
-                                    TextField("2000", text: $updateItemSales)
+                                    TextField("2000", text: $editItemSales)
                                         .keyboardType(.numberPad)
                                         .focused($focusedField, equals: .sales)
                                         .onTapGesture { focusedField = .sales
@@ -161,7 +160,6 @@ struct EditItemView: View {
                                         .onSubmit { focusedField = .sales }
 
                                     FocusedLineRow(select: focusedField == .sales ? true : false)
-
                                 } // ■総売上
                             } // if .update「総売上」
 
@@ -170,7 +168,7 @@ struct EditItemView: View {
                                 InputFormTitle(title: "■アイテム詳細(メモ)", isNeed: false)
                                     .font(.title3)
 
-                                TextEditor(text: $updateItemDetail)
+                                TextEditor(text: $editItemDetail)
                                     .frame(width: UIScreen.main.bounds.width - 20, height: 200)
                                     .shadow(radius: 3, x: 0, y: 0)
                                     .autocapitalization(.none)
@@ -178,7 +176,7 @@ struct EditItemView: View {
                                     .onTapGesture { focusedField = .detail }
                                     .overlay(alignment: .topLeading) {
                                         if focusedField != .detail {
-                                            if updateItemDetail.isEmpty {
+                                            if editItemDetail.isEmpty {
                                                 Text("アイテムについてメモを残しましょう。")
                                                     .opacity(0.5)
                                                     .padding()
@@ -208,8 +206,7 @@ struct EditItemView: View {
                             itemTagColor: selectionTagColor,
                             editItemStatus: editItemStatus,
                             // Warning_TextSimbol: "＋タグを追加"
-                            tagSideMenuStatus: selectionTagName == "＋タグを追加" ? .create : .update
-                        )
+                            tagSideMenuStatus: selectionTagName == "＋タグを追加" ? .create : .update)
 
                     } // if isOpenSideMenu
 
@@ -256,7 +253,7 @@ struct EditItemView: View {
                 }
             } // onChange (selectionTagName)
 
-            .onChange(of: updateItemName) { newValue in
+            .onChange(of: editItemName) { newValue in
 
                 withAnimation(.easeIn(duration: 0.2)) {
                     if newValue.isEmpty {
@@ -278,14 +275,12 @@ struct EditItemView: View {
                         switch editItemStatus {
 
                         case .create:
-
                             if let defaultTag = itemVM.tags.first {
                                 self.selectionTagName = defaultTag.tagName
                             }
 
                         case .update:
-
-                            if let editItemData = editItemData {
+                            if let editItemData = passItemData {
                                 selectionTagName = editItemData.tag
                             }
                         } // switch
@@ -301,15 +296,16 @@ struct EditItemView: View {
 
                 print("アイテム編集ステータス: \(editItemStatus)")
 
-                if let editItemData = editItemData {
+                // NOTE: 新規アイテム登録遷移の場合、passItemDataにはnilが代入されているためreturn
+                guard let passItemData = passItemData else { return }
 
-                    self.selectionTagName = editItemData.tag
-                    self.updateItemName = editItemData.name
-                    self.updateItemInventry = String(editItemData.inventory)
-                    self.updateItemPrice = String(editItemData.price)
-                    self.updateItemSales = String(editItemData.sales)
-                    self.updateItemDetail = editItemData.detail
-                }
+                self.selectionTagName = passItemData.tag
+                self.editItemName = passItemData.name
+                self.editItemInventry = String(passItemData.inventory)
+                self.editItemPrice = String(passItemData.price)
+                self.editItemSales = String(passItemData.sales)
+                self.editItemDetail = passItemData.detail
+
             } // onAppear
 
             .navigationTitle(editItemStatus == .create ? "新規アイテム" : "アイテム編集")
@@ -330,12 +326,12 @@ struct EditItemView: View {
                             // NOTE: テストデータに新規アイテムを保存
                             itemVM.items.append(Item(tag: selectionTagName,
                                                      tagColor: castTagColorString,
-                                                     name: updateItemName,
-                                                     detail: updateItemDetail != "" ? updateItemDetail : "none.",
+                                                     name: editItemName,
+                                                     detail: editItemDetail != "" ? editItemDetail : "none.",
                                                      photo: "", // Todo: 写真取り込み実装後、変更
-                                                     price: Int(updateItemPrice) ?? 0,
+                                                     price: Int(editItemPrice) ?? 0,
                                                      sales: 0,
-                                                     inventory: Int(updateItemInventry) ?? 0,
+                                                     inventory: Int(editItemInventry) ?? 0,
                                                      createTime: Date(), // Todo: Timestamp実装後、変更
                                                      updateTime: Date())) // Todo: Timestamp実装後、変更
 
@@ -347,21 +343,20 @@ struct EditItemView: View {
                             // NOTE: テストデータに情報の変更を保存
                             let updateItemSource = Item(tag: selectionTagName,
                                                         tagColor: castTagColorString,
-                                                        name: updateItemName,
-                                                        detail: updateItemDetail != "" ? updateItemDetail : "none.",
+                                                        name: editItemName,
+                                                        detail: editItemDetail != "" ? editItemDetail : "none.",
                                                         photo: "", // Todo: 写真取り込み実装後、変更
-                                                        price: Int(updateItemPrice) ?? 0,
-                                                        sales: Int(updateItemSales) ?? 0,
-                                                        inventory: Int(updateItemInventry) ?? 0,
+                                                        price: Int(editItemPrice) ?? 0,
+                                                        sales: Int(editItemSales) ?? 0,
+                                                        inventory: Int(editItemInventry) ?? 0,
                                                         createTime: Date(), // Todo: Timestamp実装後、変更
                                                         updateTime: Date()) // Todo: Timestamp実装後、変更
 
                             // NOTE: アイテムを更新
                             itemVM.items[itemIndex] = updateItemSource
-
                             print("更新されたアイテム: \(itemVM.items[itemIndex])")
 
-                        } // switch itemStatus
+                        } // switch editItemStatus
 
                         // シートを閉じる
                         self.isPresentedEditItem.toggle()
@@ -386,9 +381,9 @@ private struct OffsetPreferenceKey: PreferenceKey {
 struct UpdateItemView_Previews: PreviewProvider {
     static var previews: some View {
         EditItemView(itemVM: ItemViewModel(),
-                        isPresentedEditItem: .constant(true),
-                       itemIndex: 0,
-                       editItemData:
+                     isPresentedEditItem: .constant(true),
+                     itemIndex: 0,
+                     passItemData:
                         Item(tag: "Album",
                              tagColor: "赤",
                              name: "Album1",
@@ -399,7 +394,7 @@ struct UpdateItemView_Previews: PreviewProvider {
                              inventory: 200,
                              createTime: Date(),
                              updateTime: Date()),
-                       editItemStatus: .update
+                     editItemStatus: .update
         )
     }
 }

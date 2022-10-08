@@ -261,7 +261,6 @@ struct SideMenuEditTagView: View {
                 self.defaultOffsetX = defaultOffsetX / 2 - 30
             }
         } // onAppear
-
     } // body
 } // View
 
