@@ -124,7 +124,7 @@ struct UpdateItemView: View {
 
                                 TextField("2000", text: $updateItemSales)
                                     .keyboardType(.numberPad)
-                                    .focused($focusedField, equals: .price)
+                                    .focused($focusedField, equals: .sales)
                                     .onTapGesture { focusedField = .sales
                                     }
                                     .onSubmit { focusedField = .sales }
@@ -266,21 +266,21 @@ struct UpdateItemView: View {
                         print("編集ボタンタップ_castTagColorString: \(castTagColorString)")
 
                         // NOTE: テストデータに情報の変更を保存
-//                        itemVM.items.append(Item(tag: selectionTagName,
-//                                                 tagColor: castTagColorString,
-//                                                 name: updateItemName,
-//                                                 detail: updateItemDetail != "" ? updateItemDetail : "none.",
-//                                                 photo: "", // Todo: 写真取り込み実装後、変更
-//                                                 price: Int(updateItemPrice) ?? 0,
-//                                                 sales: 0,
-//                                                 inventory: Int(updateItemInventry) ?? 0,
-//                                                 createTime: Date(), // Todo: Timestamp実装後、変更
-//                                                 updateTime: Date()) // Todo: Timestamp実装後、変更
-//                        )
+                        let updateItem = Item(tag: selectionTagName,
+                                              tagColor: castTagColorString,
+                                              name: updateItemName,
+                                              detail: updateItemDetail != "" ? updateItemDetail : "none.",
+                                              photo: "", // Todo: 写真取り込み実装後、変更
+                                              price: Int(updateItemPrice) ?? 0,
+                                              sales: Int(updateItemSales) ?? 0,
+                                              inventory: Int(updateItemInventry) ?? 0,
+                                              createTime: Date(), // Todo: Timestamp実装後、変更
+                                              updateTime: Date()) // Todo: Timestamp実装後、変更
 
-                        if let itemsLast = itemVM.items.last {
-                            print("新規追加されたアイテム: \(itemsLast)")
-                        }
+                        // NOTE: アイテムを更新
+                        itemVM.items[itemIndex] = updateItem
+
+                            print("更新されたアイテム: \(itemVM.items[itemIndex])")
 
                         // シートを閉じる
                         self.isPresentedUpdateItem.toggle()
