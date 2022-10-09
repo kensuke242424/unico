@@ -213,7 +213,7 @@ struct EditItemView: View {
 
                 } // ZStack(View全体)
                 // アイテム詳細
-                .offset(y: focusedField == .detail && -500.0 <= geometryMinY ? offset - 300 : 0)
+                .offset(y: focusedField == .detail && -550.0 <= geometryMinY ? offset - 300 : 0)
                 .animation(.easeIn(duration: 0.3), value: offset)
 
                 // NOTE: スクロールView全体を.backgroundからgeometry取得します。
@@ -297,7 +297,7 @@ struct EditItemView: View {
 
                 print("アイテム編集ステータス: \(editItemStatus)")
 
-                // NOTE: 新規アイテム登録遷移の場合、passItemDataにはnilが代入されているためreturn
+                // NOTE: 新規アイテム登録遷移の場合、passItemDataにはnilが代入されている
                 if let passItemData = passItemData {
 
                     self.selectionTagName = passItemData.tag
