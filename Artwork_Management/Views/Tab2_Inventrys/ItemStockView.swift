@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import ResizableSheet
 
 struct ItemStockView: View {
 
@@ -15,6 +16,7 @@ struct ItemStockView: View {
     @State private var isPresentedNewItem = false
     @State private var currentIndex = 0
     @State private var sideTagOpacity = 0.7
+    @State var state: ResizableSheetState = .hidden
 
     let itemPadding: CGFloat = 80
 
@@ -31,6 +33,7 @@ struct ItemStockView: View {
 
                     Button {
                         // Todo: 検索アクション
+                        self.state = .medium
                     } label: {
                         Image(systemName: "magnifyingglass")
                             .resizable()
@@ -64,8 +67,14 @@ struct ItemStockView: View {
                         DragGesture()
                             .updating(self.$dragOffset, body: { (value, state, _) in
 
-                                // 移動幅（width）のみ更新する
-                                state = value.translation.width
+                                // 先頭・末尾ではスクロールする必要がないので、画面幅の1/5までドラッグで制御する
+                                if self.currentIndex == 0, value.translation.width > 0 {
+                                    state = value.translation.width / 5
+                                } else if self.currentIndex == (itemVM.tags.count - 1), value.translation.width < 0 {
+                                    state = value.translation.width / 5
+                                } else {
+                                    state = value.translation.width
+                                }
                             })
                             .onEnded({ value in
                                 var newIndex = self.currentIndex
@@ -109,8 +118,10 @@ struct ItemStockView: View {
                                         Text("\(itemVM.tags[currentIndex - 1].tagName)")
                                             .frame(width: 50)
                                             .lineLimit(1)
-                                    }
+                                    } // HStack
+                                    .onTapGesture { self.currentIndex -= 1 }
                                 }
+
                                 Spacer()
 
                                 if currentIndex + 1 < itemVM.tags.count {
@@ -119,11 +130,13 @@ struct ItemStockView: View {
                                             .frame(width: 50)
                                             .lineLimit(1)
                                         Text(">")
-                                    }
+                                    } // HStack
+                                    .onTapGesture { self.currentIndex += 1 }
                                 }
                             } // HStack
                             .padding(.horizontal, 20)
                             .opacity(sideTagOpacity)
+                            .animation(.easeIn(duration: 0.2), value: currentIndex)
 
                         } // overlay(サイドタグ情報)
                         .animation(.easeIn(duration: 0.2), value: sideTagOpacity)
@@ -140,7 +153,9 @@ struct ItemStockView: View {
                     }
                 } // onChange
 
-                Divider()
+                .onChange(of: currentIndex) { newValue in
+                        print(newValue)
+                }
 
                 ItemShowBlock(itemWidth: 180,
                               itemHeight: 200,
@@ -151,12 +166,38 @@ struct ItemStockView: View {
             .navigationTitle("ItemStock")
             .padding(.top)
             .navigationBarTitleDisplayMode(.inline)
+
+            .resizableSheet($state) {builder in
+                builder.content { context in
+                    Text("ハーフモーダル")
+                        .padding()
+                        .frame(height: 200)
+                }
+                .sheetBackground { context in
+                    Color.pink
+                }
+                .background { context in
+
+                    EmptyView()
+                }
+            } // .resizableSheet(ハーフモーダル)
+
         } // NavigationView
     } // body
 } // View
 
 struct ItemStockControlView_Previews: PreviewProvider {
     static var previews: some View {
-        ItemStockView(itemVM: ItemViewModel())
+        var windowScene: UIWindowScene? {
+                    let scenes = UIApplication.shared.connectedScenes
+                    let windowScene = scenes.first as? UIWindowScene
+                    return windowScene
+                }
+        var resizableSheetCenter: ResizableSheetCenter? {
+                   windowScene.flatMap(ResizableSheetCenter.resolve(for:))
+               }
+
+        return ItemStockView(itemVM: ItemViewModel())
+            .environment(\.resizableSheetCenter, resizableSheetCenter)
     }
 }
