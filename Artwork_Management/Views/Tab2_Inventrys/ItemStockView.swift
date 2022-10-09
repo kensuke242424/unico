@@ -11,6 +11,9 @@ struct ItemStockView: View {
 
     @StateObject var itemVM: ItemViewModel
 
+    var columnsH: [GridItem] = Array(repeating: .init(.flexible(),
+                                                      spacing: 0), count: 1)
+
     @State private var searchItemText = ""
     @State private var isPresentedNewItem = false
 
@@ -34,7 +37,31 @@ struct ItemStockView: View {
 
                     } // Button
                 } // HStack(検索ボタン)
-                .padding()
+                .padding(.horizontal)
+
+                // Todo: タグを横並べにスクロールし、中央に来たタグを検知してフィルタリング
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(lineWidth: 1)
+                        .opacity(0.2)
+                        .frame(width: UIScreen.main.bounds.width - 20, height: 40)
+                        .shadow(color: .black, radius: 4, x: 3, y: 3)
+                        .overlay {
+                            ScrollView(.horizontal, showsIndicators: false) {
+
+                                LazyHGrid(rows: columnsH, spacing: 130) {
+
+                                    Text("全て")
+
+                                    ForEach(itemVM.tags) {tag in
+
+                                        Text(tag.tagName)
+
+                                    } // ForEachここまで
+                                } // LazyHGridここまで
+                                .padding()
+                            } // ScrollViewここまで
+                        } // overlay
+
                 ItemShowBlock(itemWidth: 180,
                               itemHeight: 200,
                               itemSpase: 20,
@@ -44,20 +71,6 @@ struct ItemStockView: View {
             .navigationTitle("ItemStock")
             .padding(.top)
             .navigationBarTitleDisplayMode(.inline)
-//            .toolbar {
-//                ToolbarItem(placement: .navigationBarTrailing) {
-//
-//                    Button {
-//                        isPresentedNewItem.toggle()
-//                    } label: {
-//                        Image(systemName: "rectangle.stack.fill.badge.plus")
-//                    }
-//                }
-//            } // toolbar
-//
-//            .sheet(isPresented: $isPresentedNewItem) {
-//                NewItemView(itemVM: itemVM)
-//            } // sheet
         } // NavigationView
     } // body
 } // View
