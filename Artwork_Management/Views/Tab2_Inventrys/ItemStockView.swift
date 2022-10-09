@@ -14,9 +14,7 @@ struct ItemStockView: View {
     @State private var searchItemText = ""
     @State private var isPresentedNewItem = false
     @State private var currentIndex = 0
-    @State private var leftTagIndex = 0
-    @State private var rightTagIndex = 0
-    @State private var sideTagOpacity = 0.0
+    @State private var sideTagOpacity = 0.7
 
     let itemPadding: CGFloat = 80
 
@@ -61,11 +59,7 @@ struct ItemStockView: View {
                     .padding()
                     .offset(x: self.dragOffset)
                     .offset(x: -CGFloat(self.currentIndex) * (bodyView.size.width * 0.7 + itemPadding))
-                    .onChange(of: currentIndex) { newValue in
-                        print(newValue)
-                        self.leftTagIndex = newValue - 1
-                        self.rightTagIndex = newValue + 1
-                    }
+
                     .gesture(
                         DragGesture()
                             .updating(self.$dragOffset, body: { (value, state, _) in
@@ -98,30 +92,44 @@ struct ItemStockView: View {
                 } // Geometry
                 .frame(height: 60) // Geometry範囲のflame
 
-                // NOTE: タグサイドバー内で、現在選択しているタグの前後の値をインフォメーションします。
+                // NOTE: サイドタグバーの枠フレームを表示します。
                 .overlay {
-                    RoundedRectangle(cornerRadius: 10)
+                    RoundedRectangle(cornerRadius: 0)
                         .stroke(lineWidth: 1)
-                        .opacity(0.2)
-                        .frame(width: UIScreen.main.bounds.width - 20, height: 40)
+                        .opacity(0.4)
+                        .frame(width: UIScreen.main.bounds.width + 10, height: 40)
                         .shadow(color: .black, radius: 4, x: 3, y: 3)
+
+                    // NOTE: タグサイドバー枠内で、現在選択しているタグの前後の値をインフォメーションします。
                         .overlay {
                             HStack {
-
-                                Text("aaaa")
-
+                                if currentIndex - 1 >= 0 {
+                                    HStack {
+                                        Text("<")
+                                        Text("\(itemVM.tags[currentIndex - 1].tagName)")
+                                            .frame(width: 50)
+                                            .lineLimit(1)
+                                    }
+                                }
                                 Spacer()
 
-                                Text("aaaa")
-                            }
-                            .padding(.horizontal)
+                                if currentIndex + 1 < itemVM.tags.count {
+                                    HStack {
+                                        Text("\(itemVM.tags[currentIndex + 1].tagName)")
+                                            .frame(width: 50)
+                                            .lineLimit(1)
+                                        Text(">")
+                                    }
+                                }
+                            } // HStack
+                            .padding(.horizontal, 20)
+                            .opacity(sideTagOpacity)
 
                         } // overlay(サイドタグ情報)
-                        .opacity(sideTagOpacity)
                         .animation(.easeIn(duration: 0.2), value: sideTagOpacity)
                 } // overlay サイドタグバーのフレーム
 
-                // NOTE: サイドタグバー両端のタグインフォメーションのopacityを管理しています
+                // NOTE: サイドタグバー両端のタグインフォメーションopacityを、ドラッグ位置を監視して管理しています。
                 .onChange(of: dragOffset) { newValue in
                     if newValue == 0 {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
