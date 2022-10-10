@@ -15,8 +15,8 @@ struct HomeTabView: View {
         var tabIndex: Int = 0
         var isShowItemDetail: Bool = false
         var isPresentedEditItem: Bool = false
-
     }
+
     @State private var input: InputHomeTab = InputHomeTab()
 
     var body: some View {
