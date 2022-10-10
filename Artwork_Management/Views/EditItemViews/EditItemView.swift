@@ -33,18 +33,22 @@ struct EditItemView: View {
     // NOTE: enum「Status」を用いて、新規登録と編集とでViewレイアウトを分岐します。
     let editItemStatus: Status
 
-    @State private var photoURL = ""  // Todo: 写真取り込み機能追加後使用
-    @State private var selectionTagName = ""
-    @State private var selectionTagColor = Color.red
-    @State private var editItemName = ""
-    @State private var editItemInventry = ""
-    @State private var editItemPrice = ""
-    @State private var editItemSales = ""
-    @State private var editItemDetail = ""
-    @State private var disableButton = true
-    @State private var isOpenSideMenu = false
-    @State private var offset: CGFloat = 0
-    @State private var geometryMinY: CGFloat = 0
+    struct Input {
+        var photoURL: String = ""  // Todo: 写真取り込み機能追加後使用
+        var selectionTagName: String = ""
+        var selectionTagColor: Color = Color.red
+        var editItemName: String = ""
+        var editItemInventry: String = ""
+        var editItemPrice: String = ""
+        var editItemSales: String = ""
+        var editItemDetail: String = ""
+        var disableButton: Bool = true
+        var isOpenSideMenu: Bool = false
+        var offset: CGFloat = 0
+        var geometryMinY: CGFloat = 0
+    }
+
+    @State private var input: Input = Input()
 
     @FocusState private var focusedField: Field?
 
@@ -57,7 +61,7 @@ struct EditItemView: View {
                 ZStack {
                     VStack {
                         // ✅カスタムView 写真ゾーン
-                        SelectItemPhotoArea(selectTagColor: selectionTagColor)
+                        SelectItemPhotoArea(selectTagColor: input.selectionTagColor)
 
                         // -------- 入力フォームここから ---------- //
 
@@ -70,9 +74,9 @@ struct EditItemView: View {
                                 HStack {
                                     Image(systemName: "tag.fill")
                                     // NOTE: メソッドで選択タグと紐づいたカラーを取り出す
-                                        .foregroundColor(selectionTagColor)
+                                        .foregroundColor(input.selectionTagColor)
 
-                                    Picker("", selection: $selectionTagName) {
+                                    Picker("", selection: $input.selectionTagName) {
 
                                         ForEach(0 ..< itemVM.tags.count, id: \.self) { index in
 
@@ -87,7 +91,7 @@ struct EditItemView: View {
 
                                     Button {
 
-                                        isOpenSideMenu.toggle()
+                                        input.isOpenSideMenu.toggle()
 
                                     } label: {
                                         Text("タグ編集>>")
@@ -106,7 +110,7 @@ struct EditItemView: View {
                                 InputFormTitle(title: "■アイテム名", isNeed: true)
                                     .padding(.bottom)
 
-                                TextField("1st Album「...」", text: $editItemName)
+                                TextField("1st Album「...」", text: $input.editItemName)
                                     .focused($focusedField, equals: .name)
                                     .autocapitalization(.none)
                                     .onTapGesture { focusedField = .name }
@@ -121,7 +125,7 @@ struct EditItemView: View {
                                 InputFormTitle(title: "■在庫数", isNeed: false)
                                     .padding(.bottom)
 
-                                TextField("100", text: $editItemInventry)
+                                TextField("100", text: $input.editItemInventry)
                                     .keyboardType(.numberPad)
                                     .focused($focusedField, equals: .stock)
                                     .onTapGesture { focusedField = .stock }
@@ -136,7 +140,7 @@ struct EditItemView: View {
                                 InputFormTitle(title: "■価格(税込)", isNeed: false)
                                     .padding(.bottom)
 
-                                TextField("2000", text: $editItemPrice)
+                                TextField("2000", text: $input.editItemPrice)
                                     .keyboardType(.numberPad)
                                     .focused($focusedField, equals: .price)
                                     .onTapGesture { focusedField = .price }
@@ -153,7 +157,7 @@ struct EditItemView: View {
                                     InputFormTitle(title: "■総売上げ", isNeed: false)
                                         .padding(.bottom)
 
-                                    TextField("2000", text: $editItemSales)
+                                    TextField("2000", text: $input.editItemSales)
                                         .keyboardType(.numberPad)
                                         .focused($focusedField, equals: .sales)
                                         .onTapGesture { focusedField = .sales
@@ -169,15 +173,15 @@ struct EditItemView: View {
                                 InputFormTitle(title: "■アイテム詳細(メモ)", isNeed: false)
                                     .font(.title3)
 
-                                TextEditor(text: $editItemDetail)
-                                    .frame(width: UIScreen.main.bounds.width - 20, height: 200)
+                                TextEditor(text: $input.editItemDetail)
+//                                    .frame(width: UIScreen.main.bounds.width - 20, height: 200)
                                     .shadow(radius: 3, x: 0, y: 0)
                                     .autocapitalization(.none)
                                     .focused($focusedField, equals: .detail)
                                     .onTapGesture { focusedField = .detail }
                                     .overlay(alignment: .topLeading) {
                                         if focusedField != .detail {
-                                            if editItemDetail.isEmpty {
+                                            if input.editItemDetail.isEmpty {
                                                 Text("アイテムについてメモを残しましょう。")
                                                     .opacity(0.5)
                                                     .padding()
@@ -195,26 +199,26 @@ struct EditItemView: View {
 
                     } // VStack(パーツ全体)
 
-                    if isOpenSideMenu {
+                    if input.isOpenSideMenu {
 
                         SideMenuEditTagView(
                             itemVM: itemVM,
-                            isOpenSideMenu: $isOpenSideMenu,
-                            geometryMinY: $geometryMinY,
-                            selectionTagName: $selectionTagName,
-                            selectionTagColor: $selectionTagColor,
-                            itemTagName: selectionTagName,
-                            itemTagColor: selectionTagColor,
+                            isOpenSideMenu: $input.isOpenSideMenu,
+                            geometryMinY: $input.geometryMinY,
+                            selectionTagName: $input.selectionTagName,
+                            selectionTagColor: $input.selectionTagColor,
+                            itemTagName: input.selectionTagName,
+                            itemTagColor: input.selectionTagColor,
                             editItemStatus: editItemStatus,
                             // Warning_TextSimbol: "＋タグを追加"
-                            tagSideMenuStatus: selectionTagName == "＋タグを追加" ? .create : .update)
+                            tagSideMenuStatus: input.selectionTagName == "＋タグを追加" ? .create : .update)
 
                     } // if isOpenSideMenu
 
                 } // ZStack(View全体)
                 // アイテム詳細
-                .offset(y: focusedField == .detail && -550.0 <= geometryMinY ? offset - 300 : 0)
-                .animation(.easeIn(duration: 0.3), value: offset)
+                .offset(y: focusedField == .detail && -550.0 <= input.geometryMinY ? input.offset - 300 : 0)
+                .animation(.easeIn(duration: 0.3), value: input.offset)
 
                 // NOTE: スクロールView全体を.backgroundからgeometry取得します。
                 .background(
@@ -225,8 +229,7 @@ struct EditItemView: View {
                             .onChange(of: geometry.frame(in: .named("scrollFrame_Space")).minY) { newValue in
 
                                 withAnimation(.easeIn(duration: 0.1)) {
-                                    //                                    print(newValue)
-                                    self.geometryMinY = newValue
+                                    self.input.geometryMinY = newValue
                                 }
                             } // onChange
                     } // Geometry
@@ -237,52 +240,52 @@ struct EditItemView: View {
 
             .onTapGesture { focusedField = nil }
 
-            .onChange(of: selectionTagName) { selection in
+            .onChange(of: input.selectionTagName) { selection in
 
                 //                // NOTE: 選択されたタグネームと紐づいたタグカラーを取り出し、selectionTagColorに格納します。
                 let searchedTagColor = itemVM.searchSelectTagColor(selectTagName: selection,
                                                                    tags: itemVM.tags)
                 withAnimation(.easeIn(duration: 0.25)) {
-                    selectionTagColor = searchedTagColor
+                    input.selectionTagColor = searchedTagColor
                 }
 
                 // NOTE: タグ選択で「+タグを追加」が選択された時、新規タグ追加Viewを表示します。
                 // Warning_TextSimbol: "＋タグを追加"
                 if selection == "＋タグを追加" {
-                    self.isOpenSideMenu.toggle()
-                    print("サイドメニュー: \(isOpenSideMenu)")
+                    self.input.isOpenSideMenu.toggle()
+                    print("サイドメニュー: \(input.isOpenSideMenu)")
                 }
             } // onChange (selectionTagName)
 
-            .onChange(of: editItemName) { newValue in
+            .onChange(of: input.editItemName) { newValue in
 
                 withAnimation(.easeIn(duration: 0.2)) {
                     if newValue.isEmpty {
-                        self.disableButton = true
+                        self.input.disableButton = true
                     } else {
-                        self.disableButton = false
+                        self.input.disableButton = false
                     }
                 }
             } // onChange(ボタンdisable分岐)
 
             // NOTE: タグ追加サイドメニュー表示後、新規タグが追加されず、サイドメニューが閉じられた時(タグ選択が「＋タグ選択」のままの状態)
             //       タグピッカーの選択をアイテムが保有するタグに戻します。
-            .onChange(of: isOpenSideMenu) { isOpen in
+            .onChange(of: input.isOpenSideMenu) { isOpen in
 
                 if isOpen == false {
                     // Warning_TextSimbol: "＋タグを追加"
-                    if selectionTagName == "＋タグを追加" {
+                    if input.selectionTagName == "＋タグを追加" {
 
                         switch editItemStatus {
 
                         case .create:
                             if let defaultTag = itemVM.tags.first {
-                                self.selectionTagName = defaultTag.tagName
+                                self.input.selectionTagName = defaultTag.tagName
                             }
 
                         case .update:
                             if let editItemData = passItemData {
-                                selectionTagName = editItemData.tag
+                                input.selectionTagName = editItemData.tag
                             }
                         } // switch
 
@@ -300,16 +303,16 @@ struct EditItemView: View {
                 // NOTE: 新規アイテム登録遷移の場合、passItemDataにはnilが代入されている
                 if let passItemData = passItemData {
 
-                    self.selectionTagName = passItemData.tag
-                    self.editItemName = passItemData.name
-                    self.editItemInventry = String(passItemData.inventory)
-                    self.editItemPrice = String(passItemData.price)
-                    self.editItemSales = String(passItemData.sales)
-                    self.editItemDetail = passItemData.detail
+                    self.input.selectionTagName = passItemData.tag
+                    self.input.editItemName = passItemData.name
+                    self.input.editItemInventry = String(passItemData.inventory)
+                    self.input.editItemPrice = String(passItemData.price)
+                    self.input.editItemSales = String(passItemData.sales)
+                    self.input.editItemDetail = passItemData.detail
 
                 } else {
                     guard let defaultTag = itemVM.tags.first else { return }
-                    self.selectionTagName = defaultTag.tagName
+                    self.input.selectionTagName = defaultTag.tagName
                 }
 
             } // onAppear
@@ -323,21 +326,21 @@ struct EditItemView: View {
                     Button {
 
                         // NOTE: Firestoreへのデータ保存を見越して、Color型はString型に変換しておきます。
-                        let castTagColorString = itemVM.castColorIntoString(color: selectionTagColor)
+                        let castTagColorString = itemVM.castColorIntoString(color: input.selectionTagColor)
 
                         switch editItemStatus {
 
                         case .create:
 
                             // NOTE: テストデータに新規アイテムを保存
-                            itemVM.items.append(Item(tag: selectionTagName,
+                            itemVM.items.append(Item(tag: input.selectionTagName,
                                                      tagColor: castTagColorString,
-                                                     name: editItemName,
-                                                     detail: editItemDetail != "" ? editItemDetail : "none.",
+                                                     name: input.editItemName,
+                                                     detail: input.editItemDetail != "" ? input.editItemDetail : "none.",
                                                      photo: "", // Todo: 写真取り込み実装後、変更
-                                                     price: Int(editItemPrice) ?? 0,
+                                                     price: Int(input.editItemPrice) ?? 0,
                                                      sales: 0,
-                                                     inventory: Int(editItemInventry) ?? 0,
+                                                     inventory: Int(input.editItemInventry) ?? 0,
                                                      createTime: Date(), // Todo: Timestamp実装後、変更
                                                      updateTime: Date())) // Todo: Timestamp実装後、変更
 
@@ -347,14 +350,14 @@ struct EditItemView: View {
 
                         case .update:
                             // NOTE: テストデータに情報の変更を保存
-                            let updateItemSource = Item(tag: selectionTagName,
+                            let updateItemSource = Item(tag: input.selectionTagName,
                                                         tagColor: castTagColorString,
-                                                        name: editItemName,
-                                                        detail: editItemDetail != "" ? editItemDetail : "none.",
+                                                        name: input.editItemName,
+                                                        detail: input.editItemDetail != "" ? input.editItemDetail : "none.",
                                                         photo: "", // Todo: 写真取り込み実装後、変更
-                                                        price: Int(editItemPrice) ?? 0,
-                                                        sales: Int(editItemSales) ?? 0,
-                                                        inventory: Int(editItemInventry) ?? 0,
+                                                        price: Int(input.editItemPrice) ?? 0,
+                                                        sales: Int(input.editItemSales) ?? 0,
+                                                        inventory: Int(input.editItemInventry) ?? 0,
                                                         createTime: Date(), // Todo: Timestamp実装後、変更
                                                         updateTime: Date()) // Todo: Timestamp実装後、変更
 
@@ -370,7 +373,7 @@ struct EditItemView: View {
                     } label: {
                         Text(editItemStatus == .create ? "追加する" : "更新する")
                     }
-                    .disabled(disableButton)
+                    .disabled(input.disableButton)
                 }
             } // toolbar(アイテム追加ボタン)
 
@@ -379,7 +382,7 @@ struct EditItemView: View {
 } // View
 
 // NOTE: スクロールView全体に対しての画面の現在位置座標をgeometry内で検知し、値を渡すために用いる
-private struct OffsetPreferenceKey: PreferenceKey {
+private struct OffsetPreferenceKey: PreferenceKey, Equatable {
     static var defaultValue: CGFloat = .zero
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {}
 }
