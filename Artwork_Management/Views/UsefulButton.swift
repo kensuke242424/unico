@@ -18,7 +18,7 @@ struct UsefulButton: View {
 
     @Binding var tabIndex: Int
     @Binding var isPresentedEditItem: Bool
-    
+
     @State private var buttonStyle: ButtonStyle = .library
 
     var body: some View {
@@ -89,7 +89,7 @@ struct ButtonStyleView: View {
             .blur(radius: 1)
             .shadow(color: .gray, radius: 10, x: 4, y: 11)
 
-            // ボタンのアイコン
+        // ボタンのアイコン
             .overlay {
                 Image(systemName: "shippingbox.fill")
                     .resizable()
@@ -97,7 +97,7 @@ struct ButtonStyleView: View {
                     .frame(width: 38, height: 38)
                     .shadow(radius: 10, x: 3, y: 5)
 
-                    // アイコン右上に付くバッジ
+                // アイコン右上に付くバッジ
                     .overlay(alignment: .topTrailing) {
                         Image(systemName: "plus.circle.fill")
                             .resizable()
