@@ -11,8 +11,8 @@ struct ItemStockView: View {
 
     @StateObject var itemVM: ItemViewModel
 
-    @State private var searchItemText = ""
-    @State private var isPresentedNewItem = false
+    @State private var searchItemText: String = ""
+    @State private var isPresentedNewItem: Bool = false
 
     var body: some View {
 

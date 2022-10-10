@@ -12,8 +12,8 @@ struct LibraryView: View {
     @StateObject var itemVM: ItemViewModel
     @Binding var isShowItemDetail: Bool
 
-    @State private var itemName = ""
-    @State private var isPresentedNewItem = false
+    @State private var itemName: String = ""
+    @State private var isPresentedNewItem: Bool = false
 
     var body: some View {
 
