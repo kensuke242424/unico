@@ -23,11 +23,11 @@ struct SideMenuEditTagView: View {
 
     // NOTE: サイドタグメニューの入力値を構造体化
     struct InputSideMenuTag {
-        var newTagName = ""
-        var disableButton = true
-        var opacity = 0.0
-        var selectionSideMenuTagColor = Color.red
-        var isShowAlert = false
+        var newTagName: String = ""
+        var disableButton: Bool = true
+        var opacity: CGFloat = 0.0
+        var selectionSideMenuTagColor: Color = Color.red
+        var isShowAlert: Bool = false
         // NOTE: 初期値として画面横幅分をoffset(x)軸に渡すことで、呼び出されるまでの間、画面外へ除いておく
         var defaultOffsetX: CGFloat = UIScreen.main.bounds.width
     }
