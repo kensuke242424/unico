@@ -11,16 +11,20 @@ struct HomeTabView: View {
 
     @StateObject var rootItemVM = ItemViewModel()
 
-    @State private var tabIndex = 0
-    @State private var isShowItemDetail = false
-    @State private var isPresentedEditItem = false
+    struct InputHomeTab {
+        var tabIndex: Int = 0
+        var isShowItemDetail: Bool = false
+        var isPresentedEditItem: Bool = false
+
+    }
+    @State private var input: InputHomeTab = InputHomeTab()
 
     var body: some View {
 
         ZStack {
-            TabView(selection: $tabIndex) {
+            TabView(selection: $input.tabIndex) {
 
-                LibraryView(itemVM: rootItemVM, isShowItemDetail: $isShowItemDetail)
+                LibraryView(itemVM: rootItemVM, isShowItemDetail: $input.isShowItemDetail)
                     .tabItem {
                         Image(systemName: "house")
                         Text("Home")
@@ -34,7 +38,7 @@ struct HomeTabView: View {
                     }
                     .tag(1)
 
-                ManageView(itemVM: rootItemVM, isPresentedEditItem: $isPresentedEditItem)
+                ManageView(itemVM: rootItemVM, isPresentedEditItem: $input.isPresentedEditItem)
                     .tabItem {
                         Image(systemName: "chart.xyaxis.line")
                         Text("Manage")
@@ -52,7 +56,8 @@ struct HomeTabView: View {
             } // TabViewここまで
 
             // Todo: 各タブごとにオプションが変わるボタン
-            UsefulButton(tabIndex: $tabIndex, isPresentedEditItem: $isPresentedEditItem)
+            UsefulButton(tabIndex: $input.tabIndex,
+                         isPresentedEditItem: $input.isPresentedEditItem)
 
         } // ZStack
         .navigationBarBackButtonHidden()

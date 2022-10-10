@@ -18,6 +18,7 @@ struct UsefulButton: View {
 
     @Binding var tabIndex: Int
     @Binding var isPresentedEditItem: Bool
+    
     @State private var buttonStyle: ButtonStyle = .library
 
     var body: some View {
