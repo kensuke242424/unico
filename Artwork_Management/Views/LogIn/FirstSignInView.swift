@@ -40,13 +40,17 @@ struct FirstLogInInfomation: View {
 
     let user: User
 
-    @State private var address = ""
-    @State private var password = ""
-    @State private var password2 = ""
-    @State private var passHidden = true
-    @State private var passHidden2 = true
-    @State private var resultPassword = true
-    @State private var isActive = false
+    struct InputFirstLogin {
+        var address: String = ""
+        var password: String = ""
+        var password2: String = ""
+        var passHidden: Bool = true
+        var passHidden2: Bool = true
+        var resultPassword: Bool = true
+        var isActive: Bool = false
+    }
+
+    @State private var input: InputFirstLogin = InputFirstLogin()
 
     var body: some View {
 
@@ -55,23 +59,23 @@ struct FirstLogInInfomation: View {
 
                 Text("メールアドレス")
 
-                TextField("artwork/@gmail.com", text: $address)
+                TextField("artwork/@gmail.com", text: $input.address)
 
                 Text("パスワード")
 
                 ZStack {
-                    if passHidden {
-                        SecureField("●●●●", text: $password)
+                    if input.passHidden {
+                        SecureField("●●●●", text: $input.password)
                     } else {
-                        TextField("●●●●", text: $password)
+                        TextField("●●●●", text: $input.password)
                     } // if passHidden
 
                     HStack {
                         Spacer()
 
                         Button {
-                            passHidden.toggle()
-                            print("passHidden: \(passHidden)")
+                            input.passHidden.toggle()
+                            print("passHidden: \(input.passHidden)")
                         } label: {
                             Image(systemName: "eye.fill")
                                 .foregroundColor(.gray)
@@ -84,7 +88,7 @@ struct FirstLogInInfomation: View {
                     Text("再度入力してください")
                         .foregroundColor(.gray)
 
-                    if resultPassword == false {
+                    if input.resultPassword == false {
                         Text("※パスワードが一致しません")
                             .font(.caption2)
                             .foregroundColor(.red)
@@ -94,18 +98,18 @@ struct FirstLogInInfomation: View {
 
                 ZStack {
 
-                    if passHidden2 {
-                        SecureField("●●●●", text: $password2)
+                    if input.passHidden2 {
+                        SecureField("●●●●", text: $input.password2)
                     } else {
-                        TextField("●●●●", text: $password2)
+                        TextField("●●●●", text: $input.password2)
                     } // if passHidden
 
                     HStack {
                         Spacer()
 
                         Button {
-                            passHidden2.toggle()
-                            print("passHidden: \(passHidden2)")
+                            input.passHidden2.toggle()
+                            print("passHidden: \(input.passHidden2)")
                         } label: {
                             Image(systemName: "eye.fill")
                                 .foregroundColor(.gray)
@@ -125,18 +129,18 @@ struct FirstLogInInfomation: View {
         .padding()
 
         NavigationLink(destination: HomeTabView(),
-                       isActive: $isActive,
+                       isActive: $input.isActive,
                        label: {
             Button {
 
-                if password != password2 {
-                    resultPassword = false
+                if input.password != input.password2 {
+                    input.resultPassword = false
                 } else {
-                    resultPassword = true
+                    input.resultPassword = true
                 }
 
-                if resultPassword {
-                    isActive.toggle()
+                if input.resultPassword {
+                    input.isActive.toggle()
                 }
 
             } label: {

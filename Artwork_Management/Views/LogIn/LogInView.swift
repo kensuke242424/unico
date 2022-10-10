@@ -65,12 +65,16 @@ struct LogInInfomation: View {
 
     let user: User
 
-    @State private var address = ""
-    @State private var password = ""
-    @State private var passHidden = true
-    @State private var isActive = false
-    @State private var resultAddress = true
-    @State private var resultPassword = true
+    struct InputLogIn {
+        var address: String = ""
+        var password: String = ""
+        var passHidden: Bool = true
+        var isActive: Bool = false
+        var resultAddress: Bool = true
+        var resultPassword: Bool = true
+    }
+
+    @State private var input: InputLogIn = InputLogIn()
 
     var body: some View {
 
@@ -82,19 +86,19 @@ struct LogInInfomation: View {
                 HStack {
                     Text("メールアドレス")
 
-                    if resultAddress == false {
+                    if input.resultAddress == false {
                         Text("※該当するアドレスがありません。")
                             .font(.caption2)
                             .foregroundColor(.red)
                     }
                 } // HStack‚
 
-                TextField("artwork/@gmail.com", text: $address)
+                TextField("artwork/@gmail.com", text: $input.address)
 
                 HStack {
                     Text("パスワード")
 
-                    if resultPassword == false {
+                    if input.resultPassword == false {
                         Text("※パスワードが間違っています。")
                             .font(.caption2)
                             .foregroundColor(.red)
@@ -102,17 +106,17 @@ struct LogInInfomation: View {
                 } // HStack
 
                 ZStack {
-                    if passHidden {
-                        SecureField("●●●●", text: $password)
+                    if input.passHidden {
+                        SecureField("●●●●", text: $input.password)
                     } else {
-                        TextField("●●●●", text: $password)
+                        TextField("●●●●", text: $input.password)
                     } // if passHidden
 
                     HStack {
                         Spacer()
 
                         Button {
-                            passHidden.toggle()
+                            input.passHidden.toggle()
                         } label: {
                             Image(systemName: "eye.fill")
                                 .foregroundColor(.gray)
@@ -134,29 +138,29 @@ struct LogInInfomation: View {
         VStack {
 
             NavigationLink(destination: HomeTabView(),
-                           isActive: $isActive,
+                           isActive: $input.isActive,
                            label: {
                 Button {
 
                     // アドレスが存在するかチェック
-                    if user.address != address {
-                        resultAddress = false
+                    if user.address != input.address {
+                        input.resultAddress = false
                     } else {
-                        resultAddress = true
+                        input.resultAddress = true
                     }
 
                     // メールアドレスが存在したら、パスワードが合っているかチェック
-                    if resultAddress {
-                        if user.password != password {
-                            resultPassword = false
+                    if input.resultAddress {
+                        if user.password != input.password {
+                            input.resultPassword = false
                         } else {
-                            resultPassword = true
+                            input.resultPassword = true
                         }
                     }
 
                     // アドレス、パスワードが一致したらログイン、遷移
-                    if resultAddress, resultPassword {
-                        isActive.toggle()
+                    if input.resultAddress, input.resultPassword {
+                        input.isActive.toggle()
                     }
 
                 } label: {
