@@ -33,7 +33,8 @@ struct EditItemView: View {
     // NOTE: enum「Status」を用いて、新規登録と編集とでViewレイアウトを分岐します。
     let editItemStatus: Status
 
-    struct Input {
+    // NOTE: ＠Stateの入力プロパティを構造体化
+    struct InputEditItem {
         var photoURL: String = ""  // Todo: 写真取り込み機能追加後使用
         var selectionTagName: String = ""
         var selectionTagColor: Color = Color.red
@@ -48,7 +49,7 @@ struct EditItemView: View {
         var geometryMinY: CGFloat = 0
     }
 
-    @State private var input: Input = Input()
+    @State private var input: InputEditItem = InputEditItem()
 
     @FocusState private var focusedField: Field?
 
