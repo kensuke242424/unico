@@ -11,8 +11,12 @@ struct ItemStockView: View {
 
     @StateObject var itemVM: ItemViewModel
 
-    @State private var searchItemText: String = ""
-    @State private var isPresentedNewItem: Bool = false
+    struct InputStock {
+        var searchItemText: String = ""
+        var isPresentedNewItem: Bool = false
+    }
+
+    @State private var input: InputStock = InputStock()
 
     var body: some View {
 
@@ -20,7 +24,7 @@ struct ItemStockView: View {
 
             VStack {
                 HStack {
-                    TextField("　　　　　キーワード検索", text: $searchItemText)
+                    TextField("　　　　　キーワード検索", text: $input.searchItemText)
                         .textFieldStyle(.roundedBorder)
 
                     Button {
@@ -44,20 +48,6 @@ struct ItemStockView: View {
             .navigationTitle("ItemStock")
             .padding(.top)
             .navigationBarTitleDisplayMode(.inline)
-//            .toolbar {
-//                ToolbarItem(placement: .navigationBarTrailing) {
-//
-//                    Button {
-//                        isPresentedNewItem.toggle()
-//                    } label: {
-//                        Image(systemName: "rectangle.stack.fill.badge.plus")
-//                    }
-//                }
-//            } // toolbar
-//
-//            .sheet(isPresented: $isPresentedNewItem) {
-//                NewItemView(itemVM: itemVM)
-//            } // sheet
         } // NavigationView
     } // body
 } // View
