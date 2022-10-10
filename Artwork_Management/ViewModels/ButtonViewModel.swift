@@ -25,7 +25,7 @@ class ButtonViewModel: ObservableObject {
     ]
 
     // ✅メソッド: ボタンアイコンのレイアウトを切り替えるメソッドです。
-    func buttonIconViewChenged(style: ButtonStyle, change: Bool) -> ButtonIcon {
+    func iconChenge(style: ButtonStyle, change: Bool) -> ButtonIcon {
 
         switch style {
 
@@ -41,8 +41,8 @@ class ButtonViewModel: ObservableObject {
 
         case .manege:
             print("マネージ画面時のアイコンに変更")
-            return ButtonIcon(icon: change ? "shippingbox.fill" : "",
-                              badge: change ? "plus.circle.fill" : "")
+            return ButtonIcon(icon: change ? "shippingbox.fill" : "shippingbox.fill",
+                              badge: change ? "plus.circle.fill" : "plus.circle.fill")
 
         case .account:
             print("システム画面時のアイコンに変更")

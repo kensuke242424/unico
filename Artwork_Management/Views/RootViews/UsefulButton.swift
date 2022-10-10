@@ -16,32 +16,48 @@ struct UsefulButton: View {
     @Binding var isPresentedNewItem: Bool
     @Binding var state: ResizableSheetState
 
+    @State private var change: Bool = false
     @State private var buttonStyle: ButtonStyle = .library
+    @State private var buttonIcon: ButtonIcon = ButtonIcon(icon: "shippingbox.fill",
+                                              badge: "plus.circle.fill")
 
     var body: some View {
         Button {
 
-            if buttonStyle == .manege {
+            self.buttonStyle = buttonVM.buttonStyleChenged(tabIndex: tabIndex)
+            self.buttonIcon = buttonVM.iconChenge(style: buttonStyle, change: change)
+
+            switch buttonStyle {
+
+            case .library:
+                print("library画面ボタンアクション実行")
+
+            case .stock:
+                print("stock画面ボタンアクション実行")
+
+            case .manege:
+                print("manege画面ボタンアクション実行")
                 self.isPresentedNewItem.toggle()
-            } else {
-                print("マネージ画面でのみ、新規アイテムシートが表示されます。")
-            }
+
+            case .account:
+                print("account画面ボタンアクション実行")
+            } // switch
 
         } label: {
 
             // ✅カスタムView
             ButtonStyleView(buttonStyle: $buttonStyle,
-                            tabIndex: $tabIndex)
+                            tabIndex: $tabIndex,
+                            buttonIcon: $buttonIcon)
 
         } // Button
         .offset(x: UIScreen.main.bounds.width / 3 - 5,
                 y: UIScreen.main.bounds.height / 3 - 20)
 
-        .onChange(of: tabIndex) {newIndex in
-
-            self.buttonStyle = buttonVM.buttonStyleChenged(tabIndex: newIndex)
-
-        } // onChange(tabIndex)
+        // NOTE: ボタンアイコンが条件で変化する発火場所です。
+//        .onChange(of: tabIndex) {newIndex in
+//            //
+//        } // onChange(tabIndex)
     } // body
 } // View
 
@@ -49,6 +65,7 @@ struct ButtonStyleView: View {
 
     @Binding var buttonStyle: ButtonStyle
     @Binding var tabIndex: Int
+    @Binding var buttonIcon: ButtonIcon
 
     var body: some View {
 
@@ -62,7 +79,7 @@ struct ButtonStyleView: View {
 
             // ボタンのアイコン
             .overlay {
-                Image(systemName: "shippingbox.fill")
+                Image(systemName: buttonIcon.icon)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 38, height: 38)
@@ -70,7 +87,7 @@ struct ButtonStyleView: View {
 
                     // アイコン右上に付くバッジ
                     .overlay(alignment: .topTrailing) {
-                        Image(systemName: "plus.circle.fill")
+                        Image(systemName: buttonIcon.badge)
                             .resizable()
                             .scaledToFit()
                             .frame(width: 18, height: 18)
