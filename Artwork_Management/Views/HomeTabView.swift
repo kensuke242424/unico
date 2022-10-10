@@ -34,7 +34,7 @@ struct HomeTabView: View {
                     }
                     .tag(1)
 
-                SalesManageView(itemVM: rootItemVM, isPresentedEditItem: $isPresentedEditItem)
+                ManageView(itemVM: rootItemVM, isPresentedEditItem: $isPresentedEditItem)
                     .tabItem {
                         Image(systemName: "chart.xyaxis.line")
                         Text("Manage")

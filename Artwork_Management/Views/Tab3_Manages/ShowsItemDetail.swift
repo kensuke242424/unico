@@ -17,11 +17,15 @@ struct ShowsItemDetail: View {
     let itemIndex: Int
     @Binding var isShowitemDetail: Bool
 
-    @State private var disabledButton = true
-    @State private var opacity: Double = 0
-    @State private var isShowAlert = false
-    @State private var isPlesentedUpdateItem = false
-    @State private var isPlesentedErrorInfomation = false
+    struct InputItemDetail {
+        var opacity: Double = 0
+        var isShowAlert: Bool = false
+        var disabledButton: Bool = true
+        var isPlesentedUpdateItem: Bool = false
+        var isPlesentedErrorInfomation: Bool = false
+    }
+
+    @State private var input: InputItemDetail = InputItemDetail()
 
     var body: some View {
 
@@ -40,10 +44,10 @@ struct ShowsItemDetail: View {
 
             if let showItem = item {
 
-            RoundedRectangle(cornerRadius: 20)
-                .foregroundColor(.black)
-                .frame(width: 300, height: 470)
-                .opacity(0.7)
+                RoundedRectangle(cornerRadius: 20)
+                    .foregroundColor(.black)
+                    .frame(width: 300, height: 470)
+                    .opacity(0.7)
 
                 VStack(spacing: 10) {
                     Text(showItem.name)
@@ -67,26 +71,26 @@ struct ShowsItemDetail: View {
 
                         Button {
                             // NOTE: アイテム編集画面へ遷移するかをアラートで選択
-                            isShowAlert.toggle()
-                            print("isShowAlert: \(isShowAlert)")
+                            input.isShowAlert.toggle()
+                            print("isShowAlert: \(input.isShowAlert)")
 
                         } label: {
                             Image(systemName: "highlighter")
-                                .foregroundColor(disabledButton ? .gray : .yellow)
+                                .foregroundColor(input.disabledButton ? .gray : .yellow)
                         }
-                        .disabled(disabledButton)
-                        .alert("編集", isPresented: $isShowAlert) {
+                        .disabled(input.disabledButton)
+                        .alert("編集", isPresented: $input.isShowAlert) {
 
                             Button {
-                                isShowAlert.toggle()
-                                print("isShowAlert: \(isShowAlert)")
+                                input.isShowAlert.toggle()
+                                print("isShowAlert: \(input.isShowAlert)")
                             } label: {
                                 Text("戻る")
                             }
 
                             Button {
-                                isPlesentedUpdateItem.toggle()
-                                print("isShowItemEdit: \(isPlesentedUpdateItem)")
+                                input.isPlesentedUpdateItem.toggle()
+                                print("isShowItemEdit: \(input.isPlesentedUpdateItem)")
                             } label: {
                                 Text("はい")
                             }
@@ -128,7 +132,7 @@ struct ShowsItemDetail: View {
 
                             Button {
                                 // Todo: エラー報告インフォメーションへ遷移
-                                isPlesentedErrorInfomation.toggle()
+                                input.isPlesentedErrorInfomation.toggle()
                             } label: {
                                 Text("エラーを報告する>>")
                                     .padding()
@@ -139,28 +143,28 @@ struct ShowsItemDetail: View {
             } // if let item
 
         } // ZStack(全体)
-        .opacity(self.opacity)
+        .opacity(self.input.opacity)
 
-        .sheet(isPresented: $isPlesentedUpdateItem) {
+        .sheet(isPresented: $input.isPlesentedUpdateItem) {
 
             // NOTE: itemがnilでない場合のみボタンを有効にしているため、ボタンアクション時には値を強制アンラップします。
             EditItemView(itemVM: itemVM,
-                            isPresentedEditItem: $isPlesentedUpdateItem,
-                           itemIndex: itemIndex,
-                           passItemData: item!,
-                           editItemStatus: .update)
+                         isPresentedEditItem: $input.isPlesentedUpdateItem,
+                         itemIndex: itemIndex,
+                         passItemData: item!,
+                         editItemStatus: .update)
         } // sheet(アイテム更新シート)
 
         .onAppear {
 
             // NOTE: itemに値が存在した場合、アイテム編集ボタンを有効化
             if item != nil {
-                self.disabledButton.toggle()
+                self.input.disabledButton.toggle()
             }
 
             // NOTE: opacityの動的な値の変化を使ったフェードアニメーション
             withAnimation(.linear(duration: 0.2)) {
-                self.opacity = 1.0
+                self.input.opacity = 1.0
             }
 
         } // .onAppear
