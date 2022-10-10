@@ -549,7 +549,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/mtj0928/ResizableSheet.git";
 			requirement = {
-				branch = main;
+				branch = 0.0.5;
 				kind = branch;
 			};
 		};

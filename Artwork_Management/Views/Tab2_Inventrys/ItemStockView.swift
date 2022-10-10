@@ -168,18 +168,32 @@ struct ItemStockView: View {
             .navigationBarTitleDisplayMode(.inline)
 
             .resizableSheet($state) {builder in
-                builder.content { context in
-                    Text("ハーフモーダル")
+                builder.content { _ in
+                    VStack {
+                        HStack {
+                            Spacer(minLength: 0)
+                            Button(
+                                action: { state = .hidden },
+                                label: {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .resizable()
+                                        .foregroundColor(.gray)
+                                }
+                            )
+                            .frame(width: 40, height: 40)
+                        }
                         .padding()
-                        .frame(height: 200)
+                        Spacer(minLength: 0).frame(height: 300)
+                    }
                 }
-                .sheetBackground { context in
-                    Color.pink
+                .sheetBackground { _ in
+                    Color.white
                 }
-                .background { context in
+                .background { _ in
 
                     EmptyView()
                 }
+//                .supportedState([.medium, .hidden])
             } // .resizableSheet(ハーフモーダル)
 
         } // NavigationView
