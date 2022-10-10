@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import ResizableSheet
 
 struct HomeTabView: View {
 
@@ -14,6 +15,7 @@ struct HomeTabView: View {
     @State private var tabIndex = 0
     @State private var isShowItemDetail = false
     @State private var isPresentedNewItem = false
+    @State var state: ResizableSheetState = .hidden
 
     var body: some View {
 
@@ -52,7 +54,9 @@ struct HomeTabView: View {
             } // TabViewここまで
 
             // Todo: 各タブごとにオプションが変わるボタン
-            UsefulButton(tabIndex: $tabIndex, isPresentedNewItem: $isPresentedNewItem)
+            UsefulButton(tabIndex: $tabIndex,
+                         isPresentedNewItem: $isPresentedNewItem,
+                         state: $state)
 
         } // ZStack
         .navigationBarBackButtonHidden()
@@ -60,8 +64,20 @@ struct HomeTabView: View {
 } // View
 
 struct HomeTabView_Previews: PreviewProvider {
+
     static var previews: some View {
-            HomeTabView()
+
+        var windowScene: UIWindowScene? {
+                    let scenes = UIApplication.shared.connectedScenes
+                    let windowScene = scenes.first as? UIWindowScene
+                    return windowScene
+                }
+        var resizableSheetCenter: ResizableSheetCenter? {
+                   windowScene.flatMap(ResizableSheetCenter.resolve(for:))
+               }
+
+            return HomeTabView()
+            .environment(\.resizableSheetCenter, resizableSheetCenter)
 
     }
 }

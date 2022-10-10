@@ -8,6 +8,11 @@
 import Foundation
 import SwiftUI
 
+enum Mode {
+    case dark
+    case light
+}
+
 class ItemViewModel: ObservableObject {
 
     // NOTE: アイテム、タグのテストデータです

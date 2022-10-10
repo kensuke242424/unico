@@ -12,6 +12,8 @@ struct ItemCardRow: View {
     // ダークモードの判定
     @Environment(\.colorScheme) var colorScheme
 
+    @Binding var isShowItemDetail: Bool
+
     let item: Item
     let itemWidth: CGFloat
     let itemHeight: CGFloat
@@ -25,6 +27,8 @@ struct ItemCardRow: View {
             .overlay(alignment: .topTrailing) {
                 Button {
                     // アイテム詳細表示
+                    self.isShowItemDetail.toggle()
+                    print("ItemStockView_アイテム詳細ボタンタップ: \(isShowItemDetail)")
                 } label: {
                     Image(systemName: "info.circle.fill")
                         .resizable()
@@ -54,17 +58,14 @@ struct ItemCardRow: View {
                         .foregroundColor(.gray)
                         .opacity(0.2)
                         .frame(width: itemWidth - 50, height: itemWidth - 50)
-                        .padding(.bottom)
 
-                    HStack {
                         Text(item.name)
                             .font(.headline)
                             .fontWeight(.heavy)
                             .padding(.horizontal, 5)
+                            .padding(.top, 5)
                             .frame(width: itemWidth * 0.9)
                             .lineLimit(1)
-                        Spacer()
-                    }
 
                     Spacer()
 
@@ -85,20 +86,20 @@ struct ItemCardRow: View {
 struct ItemCardRow_Previews: PreviewProvider {
     static var previews: some View {
 
-
-            ItemCardRow(item: Item(tag: "Album",
-                                   tagColor: "赤",
-                                   name: "Album1",
-                                   detail: "Album1のアイテム紹介テキストです。",
-                                   photo: "",
-                                   price: 1800,
-                                   sales: 88000,
-                                   inventory: 200,
-                                   createTime: Date(),
-                                   updateTime: Date()),
-                        itemWidth: UIScreen.main.bounds.width * 0.45,
-                        itemHeight: 240
-            )
-            .previewLayout(.sizeThatFits)
+        ItemCardRow(isShowItemDetail: .constant(false),
+                    item: Item(tag: "Album",
+                               tagColor: "赤",
+                               name: "Album1",
+                               detail: "Album1のアイテム紹介テキストです。",
+                               photo: "",
+                               price: 1800,
+                               sales: 88000,
+                               inventory: 200,
+                               createTime: Date(),
+                               updateTime: Date()),
+                    itemWidth: UIScreen.main.bounds.width * 0.45,
+                    itemHeight: 240
+        )
+        .previewLayout(.sizeThatFits)
     }
 }

@@ -12,14 +12,10 @@ enum SearchFocus {
     case check
 }
 
-enum Mode {
-    case dark
-    case light
-}
-
 struct ItemStockView: View {
 
     @Environment(\.colorScheme) var colorScheme
+
     @StateObject var itemVM: ItemViewModel
 
     let sideBarTagItemPadding: CGFloat = 80
@@ -29,6 +25,7 @@ struct ItemStockView: View {
     @State private var sideTagOpacity: CGFloat = 0.7
     @State private var isPresentedNewItem = false
     @State private var isShowSearchField = false
+    @State private var isShowItemDetail: Bool = false
     @State var state: ResizableSheetState = .hidden
     @State private var mode: Mode = .dark
 
@@ -139,11 +136,12 @@ struct ItemStockView: View {
                         .background(.gray)
                         .padding()
                      // ✅カスタムView: 最近更新したアイテムをHStack表示します。(横スクロール)
-                         UpdateTimeCards(itemWidth: UIScreen.main.bounds.width * 0.45,
-                                             itemHeight: 250,
-                                             itemSpase: 20,
-                                             itemNameTag: "アイテム",
-                                             items: itemVM.items)
+                    UpdateTimeCards(isShowItemDetail: $isShowItemDetail,
+                                    itemWidth: UIScreen.main.bounds.width * 0.45,
+                                    itemHeight: 230,
+                                    itemSpase: 20,
+                                    itemNameTag: "アイテム",
+                                    items: itemVM.items)
 
                      Divider()
                          .background(.gray)
@@ -152,11 +150,12 @@ struct ItemStockView: View {
                     TagTitle(title: itemVM.tags[currentIndex].tagName, font: .title)
                         .padding()
                      // ✅カスタムView: アイテムを表示します。(縦スクロール)
-                     TagCards(itemWidth: UIScreen.main.bounds.width * 0.45,
-                                   itemHeight: 250,
-                                   itemSpase: 20,
-                                   itemNameTag: "アイテム",
-                                   items: itemVM.items)
+                     TagCards(isShowItemDetail: $isShowItemDetail,
+                              itemWidth: UIScreen.main.bounds.width * 0.45,
+                              itemHeight: 230,
+                              itemSpase: 20,
+                              itemNameTag: "アイテム",
+                              items: itemVM.items)
                 } // ScrollView (アイテムロケーション)
 
             } // VStack

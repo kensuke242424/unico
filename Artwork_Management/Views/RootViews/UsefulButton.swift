@@ -6,18 +6,16 @@
 //
 
 import SwiftUI
-
-enum ButtonStyle {
-    case library
-    case stock
-    case manege
-    case account
-}
+import ResizableSheet
 
 struct UsefulButton: View {
 
+    @StateObject var buttonVM: ButtonViewModel = ButtonViewModel()
+
     @Binding var tabIndex: Int
     @Binding var isPresentedNewItem: Bool
+    @Binding var state: ResizableSheetState
+
     @State private var buttonStyle: ButtonStyle = .library
 
     var body: some View {
@@ -32,7 +30,8 @@ struct UsefulButton: View {
         } label: {
 
             // ✅カスタムView
-            ButtonStyleView()
+            ButtonStyleView(buttonStyle: $buttonStyle,
+                            tabIndex: $tabIndex)
 
         } // Button
         .offset(x: UIScreen.main.bounds.width / 3 - 5,
@@ -40,48 +39,17 @@ struct UsefulButton: View {
 
         .onChange(of: tabIndex) {newIndex in
 
-            switch newIndex {
-            case 0:
-                buttonStyle = .library
-                print("ホーム画面でボタンがタップされました。")
-            case 1:
-                buttonStyle = .stock
-                print("ストック画面でボタンがタップされました。")
-            case 2:
-                buttonStyle = .manege
-                print("マネージ画面でボタンがタップされました。")
-            case 3:
-                buttonStyle = .account
-                print("システム画面でボタンがタップされました。")
-            default:
-                print("default")
-            }
+            self.buttonStyle = buttonVM.buttonStyleChenged(tabIndex: newIndex)
+
         } // onChange(tabIndex)
     } // body
-
-    func buttonIconStyleSelect(style: ButtonStyle) -> [String: String] {
-
-        switch style {
-        case .library:
-            print("ライブラリ画面時のアイコン")
-            return ["icon": "", "badge": ""]
-
-        case .stock:
-            print("ストック画面時のアイコン")
-            return ["icon": "", "badge": ""]
-        case .manege:
-            print("マネージ画面時のアイコン")
-            return ["icon": "shippingbox.fill", "badge": "plus.circle.fill"]
-
-        case .account:
-            print("システム画面時のアイコン")
-            return ["icon": "", "badge": ""]
-        }
-    } // func buttonStyleIcon
-
 } // View
 
 struct ButtonStyleView: View {
+
+    @Binding var buttonStyle: ButtonStyle
+    @Binding var tabIndex: Int
+
     var body: some View {
 
         // 円形のボタン土台
@@ -109,11 +77,25 @@ struct ButtonStyleView: View {
                             .offset(x: 10, y: -10)
                     } // overlay
             } // overlay
-    }
-}
+    } // body
+} // View
 
 struct UsefulButton_Previews: PreviewProvider {
     static var previews: some View {
-        UsefulButton(tabIndex: .constant(2), isPresentedNewItem: .constant(false))
+
+        var windowScene: UIWindowScene? {
+                    let scenes = UIApplication.shared.connectedScenes
+                    let windowScene = scenes.first as? UIWindowScene
+                    return windowScene
+                }
+        var resizableSheetCenter: ResizableSheetCenter? {
+                   windowScene.flatMap(ResizableSheetCenter.resolve(for:))
+               }
+
+        return UsefulButton(tabIndex: .constant(2),
+                            isPresentedNewItem: .constant(false),
+                            state: .constant(.medium)
+        )
+        .environment(\.resizableSheetCenter, resizableSheetCenter)
     }
 }
