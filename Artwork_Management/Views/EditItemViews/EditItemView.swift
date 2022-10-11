@@ -100,7 +100,7 @@ struct EditItemView: View {
                 ZStack {
                     VStack {
                         // ✅カスタムView 写真ゾーン
-                        SelectItemPhotoArea(selectTagColor: input.passItemColor)
+                        SelectItemPhotoArea(selectTagColor: input.selectionTagColor)
 
                         // -------- 入力フォームここから ---------- //
 
@@ -113,7 +113,7 @@ struct EditItemView: View {
                                 HStack {
                                     Image(systemName: "tag.fill")
                                     // NOTE: メソッドで選択タグと紐づいたカラーを取り出す
-                                        .foregroundColor(input.passItemColor)
+                                        .foregroundColor(input.selectionTagColor.color)
 
                                     Picker("", selection: $input.selectionTagName) {
 
@@ -285,7 +285,7 @@ struct EditItemView: View {
                 let searchedTagColor = itemVM.searchSelectTagColor(selectTagName: selection,
                                                                    tags: itemVM.tags)
                 withAnimation(.easeIn(duration: 0.25)) {
-                    input.passItemColor = searchedTagColor
+                    input.selectionTagColor = searchedTagColor
                 }
 
                 // NOTE: タグ選択で「+タグを追加」が選択された時、新規タグ追加Viewを表示します。

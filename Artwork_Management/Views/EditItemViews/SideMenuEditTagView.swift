@@ -132,11 +132,6 @@ struct SideMenuEditTagView: View {
 
                                 Text(value.text).tag(value.color)
                             }
-//
-//                            Text("赤").tag(Color.red)
-//                            Text("青").tag(Color.blue)
-//                            Text("黄").tag(Color.yellow)
-//                            Text("緑").tag(Color.green)
                         }
                         .pickerStyle(.segmented)
                         .padding(.bottom)
@@ -193,7 +188,7 @@ struct SideMenuEditTagView: View {
                             itemVM.updateItemsTagData(itemVM: itemVM,
                                                       itemTagName: itemTagName,
                                                       newTagName: input.newTagName,
-                                                      newTagColorString: selectionTagColor.text)
+                                                      newTagColorString: input.selectionSideMenuTagColor.text)
 
                         } // switch
 
