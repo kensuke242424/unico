@@ -164,7 +164,7 @@ struct SideMenuEditTagView: View {
 
                                 // 新規タグデータを追加、配列の１番目に保存(at: 0)
                                 itemVM.tags.insert(Tag(tagName: input.newTagName,
-                                                       tagColor: input.selectionSideMenuTagColor.color),
+                                                       tagColor: input.selectionSideMenuTagColor),
                                                    at: 0)
 
                                 self.selectionTagName = input.newTagName
@@ -257,8 +257,8 @@ struct SideMenuEditTagView: View {
 
             // // タグ編集の場合は、親Viewから受け取ったアイテムの値を渡す
             if tagSideMenuStatus == .update {
-                self.input.newTagName = itemTagName
-                self.input.selectionSideMenuTagColor = itemTagColor
+                self.input.newTagName = selectionTagName
+                self.input.selectionSideMenuTagColor = selectionTagColor
             }
 
             withAnimation(.easeIn(duration: 0.3)) {

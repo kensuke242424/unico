@@ -37,8 +37,7 @@ class ItemViewModel: ObservableObject {
     [
         Tag(tagName: "Album", tagColor: .red),
         Tag(tagName: "Single", tagColor: .blue),
-        Tag(tagName: "Goods", tagColor: .yellow),
-//        Tag(tagName: "タグ無し", tagColor: .gray)
+        Tag(tagName: "Goods", tagColor: .yellow)
     ]
 
     // ✅ NOTE: アイテム配列を各項目に沿ってソートするメソッド
@@ -67,7 +66,7 @@ class ItemViewModel: ObservableObject {
     } // func itemsSortr
 
     // ✅ NOTE: 新規アイテム作成時に選択したタグの登録カラーを取り出します。
-    func searchSelectTagColor(selectTagName: String, tags: [Tag]) -> Color {
+    func searchSelectTagColor(selectTagName: String, tags: [Tag]) -> UsedColor {
 
         print("＝＝＝＝＝＝＝searchSelectTagColor_実行＝＝＝＝＝＝＝＝＝")
 
@@ -87,62 +86,6 @@ class ItemViewModel: ObservableObject {
         }
     } // func castStringIntoColor
 
-    // ✅ NOTE: String型の色データをもとに、当てはまるColorデータを返します
-    func castStringIntoColor(color: String) -> Color {
-
-        print("===========castStringIntoColor実行=============")
-        print("　引数で受け取ったstring値: 「\(color)」")
-
-        switch color {
-        case "赤":
-            print("　赤と判定されました。「.red」が返り値です。")
-            return .red
-        case "青":
-            print("　青と判定されました。「.blue」が返り値です。")
-            return .blue
-        case "黄":
-            print("　黄と判定されました。「.yellow」が返り値です。")
-            return .yellow
-        case "緑":
-            print("　緑と判定されました。「.green」が返り値です。")
-            return .green
-        default:
-            print("　どれにも判定されませんでした。「.gray」が返り値です。")
-            return .gray
-
-        }
-    } // func castStringIntoColor
-
-    // ✅ NOTE: Color型の色データをもとに、当てはまるStringデータを返します
-    func castColorIntoString(color: Color) -> String {
-
-        print("===========castColorIntoString実行=============")
-        print("　引数で受け取ったColor値: 「\(color)」")
-
-        switch color {
-        case .red:
-            print("　.redと判定されました。返り値は「赤」です。")
-            return "赤"
-
-        case .blue:
-            print("　.blueと判定されました。返り値は「青」です。")
-            return "青"
-
-        case .yellow:
-            print("　.yellowと判定されました。返り値は「黄」です。")
-            return "黄"
-
-        case .green:
-            print("　.greenと判定されました。返り値は「緑」です。")
-            return "緑"
-
-        default:
-            print("　どれも判定されませんでした。返り値は「灰」です。")
-            return "灰"
-
-        }
-    } // func castColorIntoString
-
     // ✅ メソッド: 変更内容をもとに、tags内の対象データのタグネーム、タグカラーを更新します。
     func updateTagsData(itemVM: ItemViewModel,
                         itemTagName: String,
@@ -156,7 +99,7 @@ class ItemViewModel: ObservableObject {
         where tagData.tagName == itemTagName {
 
             itemVM.tags[index] = Tag(tagName: selectTagName,
-                                     tagColor: selectTagColor.color)
+                                     tagColor: selectTagColor)
 
             print("更新されたitemVM.tags: \(itemVM.tags[index])")
 

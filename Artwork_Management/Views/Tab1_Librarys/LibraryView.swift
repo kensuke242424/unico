@@ -41,22 +41,6 @@ struct LibraryView: View {
                 } // ScrollView
             } // ZStack
             .navigationTitle("Home")
-
-//            .toolbar {
-//                ToolbarItem(placement: .navigationBarTrailing) {
-//
-//                    Button {
-//                        isPresentedNewItem.toggle()
-//                    } label: {
-//                        Image(systemName: "rectangle.stack.fill.badge.plus")
-//                    }
-//                }
-//            } // toolbar
-//
-//            .sheet(isPresented: $isPresentedNewItem) {
-//                NewItemView(itemVM: itemVM)
-//            } // sheet
-
         } // NavigationView
     } // body
 } // View

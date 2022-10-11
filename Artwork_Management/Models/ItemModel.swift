@@ -28,5 +28,5 @@ struct Item: Identifiable {
 struct Tag: Identifiable, Equatable {
     var id = UUID()
     var tagName: String
-    var tagColor: Color
+    var tagColor: UsedColor
 }

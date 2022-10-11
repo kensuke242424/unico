@@ -7,58 +7,6 @@
 
 import SwiftUI
 
-enum Status {
-    case create
-    case update
-}
-
-enum Field {
-    case tag
-    case name
-    case stock
-    case price
-    case sales
-    case detail
-}
-
-enum UsedColor: CaseIterable {
-
-    case red
-    case blue
-    case yellow
-    case green
-    case gray
-
-    var text: String {
-        switch self {
-        case .red:
-            return "赤"
-        case .blue:
-            return "青"
-        case .yellow:
-            return "黄"
-        case .green:
-            return "緑"
-        default:
-            return "灰"
-        }
-    }
-    var color: Color {
-        switch self {
-        case .red:
-            return .red
-        case .blue:
-            return .blue
-        case .yellow:
-            return .yellow
-        case .green:
-            return .green
-        default:
-            return .gray
-        }
-    }
-}
-
 struct EditItemView: View {
 
     @StateObject var itemVM: ItemViewModel
@@ -73,7 +21,7 @@ struct EditItemView: View {
 
     // NOTE: ＠Stateの入力プロパティを構造体化
     struct InputEditItem {
-        var passItemColor: Color = .red
+
         var selectionTagName: String = ""
         var selectionTagColor: UsedColor = .red
         var photoURL: String = ""  // Todo: 写真取り込み機能追加後使用
@@ -342,8 +290,8 @@ struct EditItemView: View {
                 // NOTE: 新規アイテム登録遷移の場合、passItemDataにはnilが代入されている
                 if let passItemData = passItemData {
 
-                    self.input.passItemColor = itemVM.searchSelectTagColor(
-                        selectTagName: passItemData.tag, tags: itemVM.tags)
+//                    self.input.passItemColor = itemVM.searchSelectTagColor(
+//                        selectTagName: passItemData.tag, tags: itemVM.tags)
 
                     self.input.selectionTagName = passItemData.tag
                     self.input.editItemName = passItemData.name
@@ -355,7 +303,7 @@ struct EditItemView: View {
                 } else {
                     guard let defaultTag = itemVM.tags.first else { return }
                     self.input.selectionTagName = defaultTag.tagName
-                    self.input.passItemColor = defaultTag.tagColor
+//                    self.input.passItemColor = defaultTag.tagColor
                 }
 
             } // onAppear
@@ -367,9 +315,6 @@ struct EditItemView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
 
                     Button {
-
-                        //                        // NOTE: Firestoreへのデータ保存を見越して、Color型はString型に変換しておきます。
-                        //                        let castTagColorString = itemVM.castColorIntoString(color: input.selectionTagColor)
 
                         switch editItemStatus {
 
@@ -408,7 +353,7 @@ struct EditItemView: View {
                             itemVM.items[itemIndex] = updateItemSource
                             print("更新されたアイテム: \(itemVM.items[itemIndex])")
 
-                        } // switch editItemStatus
+                        } // switch editItemStatus(データ追加、更新)
 
                         // シートを閉じる
                         self.isPresentedEditItem.toggle()

@@ -7,21 +7,6 @@
 
 import SwiftUI
 
-// NOTE: アイテムのソートタイプを管理します
-enum SortType {
-    case salesUp
-    case salesDown
-    case updateAtUp
-    case createAtUp
-    case start
-}
-
-// NOTE: アイテムのタググループ有無を管理します
-enum TagGroup {
-    case on // swiftlint:disable:this identifier_name
-    case off
-}
-
 struct ManageView: View {
 
     @StateObject var itemVM: ItemViewModel

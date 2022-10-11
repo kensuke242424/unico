@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		E04ACF4128E6DD600054A6C4 /* ShowsItemDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04ACF4028E6DD600054A6C4 /* ShowsItemDetail.swift */; };
 		E04ACF4328E73C660054A6C4 /* IndicatorRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04ACF4228E73C660054A6C4 /* IndicatorRow.swift */; };
+		E0796ADA28F5625F0094E50C /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0796AD928F5625F0094E50C /* Enums.swift */; };
 		E08F272528DDA08E00329C5E /* Artwork_ManagementApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E08F272428DDA08E00329C5E /* Artwork_ManagementApp.swift */; };
 		E08F272928DDA09000329C5E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E08F272828DDA09000329C5E /* Assets.xcassets */; };
 		E08F272C28DDA09000329C5E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E08F272B28DDA09000329C5E /* Preview Assets.xcassets */; };
@@ -41,6 +42,7 @@
 /* Begin PBXFileReference section */
 		E04ACF4028E6DD600054A6C4 /* ShowsItemDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowsItemDetail.swift; sourceTree = "<group>"; };
 		E04ACF4228E73C660054A6C4 /* IndicatorRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndicatorRow.swift; sourceTree = "<group>"; };
+		E0796AD928F5625F0094E50C /* Enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
 		E08F272128DDA08E00329C5E /* Artwork_Management.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Artwork_Management.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E08F272428DDA08E00329C5E /* Artwork_ManagementApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Artwork_ManagementApp.swift; sourceTree = "<group>"; };
 		E08F272828DDA09000329C5E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -83,6 +85,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E0796ADB28F5626C0094E50C /* Enums */ = {
+			isa = PBXGroup;
+			children = (
+				E0796AD928F5625F0094E50C /* Enums.swift */,
+			);
+			path = Enums;
+			sourceTree = "<group>";
+		};
 		E08F271828DDA08E00329C5E = {
 			isa = PBXGroup;
 			children = (
@@ -125,6 +135,7 @@
 			children = (
 				E08F273D28DDB65F00329C5E /* HomeTabView.swift */,
 				E09F09C828EE3B4900D07669 /* UsefulButton.swift */,
+				E0796ADB28F5626C0094E50C /* Enums */,
 				E094F0FE28E20BB800D3C845 /* LogIn */,
 				E09F09BA28EAF2DD00D07669 /* EditItemViews */,
 				E08F273F28DEAD1100329C5E /* Tab1_Librarys */,
@@ -329,6 +340,7 @@
 				E08F272528DDA08E00329C5E /* Artwork_ManagementApp.swift in Sources */,
 				E09F09C528ED5DEA00D07669 /* SideMenuEditTagView.swift in Sources */,
 				E094F10028E20F1000D3C845 /* LogInView.swift in Sources */,
+				E0796ADA28F5625F0094E50C /* Enums.swift in Sources */,
 				E0CF7EF428DF385800735142 /* ItemShowBlock.swift in Sources */,
 				E0CF7EEE28DEFFEE00735142 /* LibraryDetailShow.swift in Sources */,
 				E08F273A28DDB53700329C5E /* SystemView.swift in Sources */,
