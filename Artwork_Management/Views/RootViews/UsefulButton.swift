@@ -20,12 +20,10 @@ struct UsefulButton: View {
     @State private var buttonStyle: ButtonStyle = .library
     @State private var buttonIcon: ButtonIcon = ButtonIcon(icon: "shippingbox.fill",
                                               badge: "plus.circle.fill")
+    @State private var angle: CGFloat = 0.0
 
     var body: some View {
         Button {
-
-            self.buttonStyle = buttonVM.buttonStyleChenged(tabIndex: tabIndex)
-            self.buttonIcon = buttonVM.iconChenge(style: buttonStyle, change: change)
 
             switch buttonStyle {
 
@@ -46,26 +44,27 @@ struct UsefulButton: View {
         } label: {
 
             // ✅カスタムView
-            ButtonStyleView(buttonStyle: $buttonStyle,
-                            tabIndex: $tabIndex,
-                            buttonIcon: $buttonIcon)
+            ButtonStyleView(buttonIcon: $buttonIcon, angle: $angle)
+                .rotationEffect(Angle(degrees: angle))
 
         } // Button
         .offset(x: UIScreen.main.bounds.width / 3 - 5,
                 y: UIScreen.main.bounds.height / 3 - 20)
 
         // NOTE: ボタンアイコンが条件で変化する発火場所です。
-//        .onChange(of: tabIndex) {newIndex in
-//            //
-//        } // onChange(tabIndex)
+        .onChange(of: tabIndex) { newIndex in
+            self.buttonStyle = buttonVM.buttonStyleChenged(tabIndex: newIndex)
+            self.buttonIcon = buttonVM.iconChenge(style: buttonStyle, change: change)
+        } // onChange(tabIndex)
+
+
     } // body
 } // View
 
 struct ButtonStyleView: View {
 
-    @Binding var buttonStyle: ButtonStyle
-    @Binding var tabIndex: Int
     @Binding var buttonIcon: ButtonIcon
+    @Binding var angle: CGFloat
 
     var body: some View {
 
@@ -94,6 +93,21 @@ struct ButtonStyleView: View {
                             .offset(x: 10, y: -10)
                     } // overlay
             } // overlay
+            .animation(.easeIn(duration: 0.2), value: buttonIcon)
+            .animation(.easeIn(duration: 0.3), value: angle)
+
+            .onChange(of: buttonIcon) { _ in
+                    self.angle = 50.0
+                print(angle)
+            } // .onChange(buttonIcon)
+
+            .onChange(of: angle) { newAngle in
+                if newAngle == 50.0 {
+                    self.angle = 0.0
+                    print(angle)
+                }
+            }
+
     } // body
 } // View
 

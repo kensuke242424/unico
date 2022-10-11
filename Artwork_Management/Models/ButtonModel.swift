@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct ButtonIcon {
+struct ButtonIcon: Equatable {
     let icon: String
     let badge: String
 }

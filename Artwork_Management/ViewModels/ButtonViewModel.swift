@@ -32,7 +32,7 @@ class ButtonViewModel: ObservableObject {
         case .library:
             print("ライブラリ画面時のアイコンに変更")
             return ButtonIcon(icon: change ?  "" : "",
-                              badge:  change ?  "" : "")
+                              badge: change ?  "" : "")
 
         case .stock:
             print("ストック画面時のアイコンに変更")
