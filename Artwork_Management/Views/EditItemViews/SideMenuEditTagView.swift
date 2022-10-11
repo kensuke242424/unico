@@ -151,29 +151,20 @@ struct SideMenuEditTagView: View {
                         switch tagSideMenuStatus {
 
                         case .create:
-
-                            print("タグ追加ボタンタップ...")
-
                             // NOTE: 既存のタグと重複していないかを確認します。重複していればアラート表示
                             if itemVM.tags.contains(where: { $0.tagName == input.newTagName }) {
-
                                 print("タグが重複しました。")
                                 self.input.isShowAlert.toggle()
-
                             } else {
-
                                 // 新規タグデータを追加、配列の１番目に保存(at: 0)
                                 itemVM.tags.insert(Tag(tagName: input.newTagName,
                                                        tagColor: input.selectionSideMenuTagColor),
                                                    at: 0)
 
                                 self.selectionTagName = input.newTagName
-
                             } // if contains
 
                         case .update:
-
-                            print("タグ編集ボタンタップ...")
 
                             self.selectionTagName = input.newTagName
                             self.selectionTagColor = input.selectionSideMenuTagColor
@@ -189,7 +180,6 @@ struct SideMenuEditTagView: View {
                                                       itemTagName: itemTagName,
                                                       newTagName: input.newTagName,
                                                       newTagColorString: input.selectionSideMenuTagColor.text)
-
                         } // switch
 
                         if !input.isShowAlert {
@@ -198,16 +188,18 @@ struct SideMenuEditTagView: View {
                                 self.input.defaultOffsetX = screenSize.width
                                 self.input.opacity = 0.0
                             }
-
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                                 self.isOpenSideMenu = false
-
                             }
                         } // if !isShowAlert
 
                     } label: {
                         Text(tagSideMenuStatus == .create ? "追加" : "更新")
                     } // Button(追加 or 更新)
+                    .frame(width: 70, height: 30)
+                    .buttonStyle(.borderedProminent)
+                    .disabled(input.disableButton)
+                    .padding(.top)
                     .alert("タグの重複", isPresented: $input.isShowAlert) {
 
                         Button {
@@ -219,28 +211,24 @@ struct SideMenuEditTagView: View {
                     } message: {
                         Text("入力したタグネームは既に存在します。")
                     } // alert
-                    .frame(width: 70, height: 30)
-                    .buttonStyle(.borderedProminent)
-                    .disabled(input.disableButton)
-                    .padding(.top)
+                    // NOTE: タグネームの入力値がisEmptyの場合、追加ボタンを無効化します
+                    .onChange(of: input.newTagName) {newValue in
+                        withAnimation(.easeIn(duration: 0.15)) {
+                            if newValue.isEmpty {
+                                input.disableButton = true
+                            } else {
+                                input.disableButton = false
+                            }
+                        }
+                    } // .onChange
 
                 } // VStack
                 .padding(.leading, 30)
-            } // ZStack (新規タグブロック)
+            } // ZStack (タグサイドメニューブロック)
             .offset(x: input.defaultOffsetX)
             .offset(y: editItemStatus == .update ? -80 : 0)
             .onTapGesture { self.focusedField = nil }
 
-            // NOTE: タグネームの入力値がisEmptyの場合、追加ボタンを無効化します
-            .onChange(of: input.newTagName) {newValue in
-                withAnimation(.easeIn(duration: 0.15)) {
-                    if newValue.isEmpty {
-                        input.disableButton = true
-                    } else {
-                        input.disableButton = false
-                    }
-                }
-            } // .onChange
 
         } // ZStack(全体)
         .offset(y: focusedField == .tag ? -self.geometryMinY - 330 : -self.geometryMinY - 200)

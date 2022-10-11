@@ -10,7 +10,6 @@ import SwiftUI
 struct EditItemView: View {
 
     @StateObject var itemVM: ItemViewModel
-
     @Binding var isPresentedEditItem: Bool
 
     let itemIndex: Int
@@ -34,10 +33,11 @@ struct EditItemView: View {
         var isOpenSideMenu: Bool = false
         var offset: CGFloat = 0
         var geometryMinY: CGFloat = 0
+        var isCheckedFocuseDetail: Bool = false
     }
     @State private var input: InputEditItem = InputEditItem()
 
-    @FocusState private var focusedField: Field?
+//    @FocusState private var focusedField: Field?
 
     var body: some View {
 
@@ -50,139 +50,18 @@ struct EditItemView: View {
                         // ✅カスタムView 写真ゾーン
                         SelectItemPhotoArea(selectTagColor: input.selectionTagColor)
 
-                        // -------- 入力フォームここから ---------- //
-
-                        VStack(spacing: 30) {
-
-                            VStack(alignment: .leading) {
-                                InputFormTitle(title: "■タグ設定", isNeed: true)
-                                    .padding(.bottom)
-
-                                HStack {
-                                    Image(systemName: "tag.fill")
-                                    // NOTE: メソッドで選択タグと紐づいたカラーを取り出す
-                                        .foregroundColor(input.selectionTagColor.color)
-
-                                    Picker("", selection: $input.selectionTagName) {
-
-                                        ForEach(0 ..< itemVM.tags.count, id: \.self) { index in
-
-                                            if let tagsRow = itemVM.tags[index] {
-                                                Text(tagsRow.tagName).tag(tagsRow.tagName)
-                                            }
-                                        }
-                                        Text("＋タグを追加").tag("＋タグを追加")
-                                    } // Picker
-
-                                    Spacer()
-
-                                    Button {
-
-                                        input.isOpenSideMenu.toggle()
-
-                                    } label: {
-                                        Text("タグ編集>>")
-                                    }
-                                    .padding(.trailing)
-
-                                } // HStack(Pickerタグ要素)
-
-                                // NOTE: フォーカスの有無によって、入力欄の下線の色をスイッチします。(カスタムView)
-                                FocusedLineRow(select: focusedField == .tag ? true : false)
-
-                            } // ■タグ設定
-
-                            VStack(alignment: .leading) {
-
-                                InputFormTitle(title: "■アイテム名", isNeed: true)
-                                    .padding(.bottom)
-
-                                TextField("1st Album「...」", text: $input.editItemName)
-                                    .focused($focusedField, equals: .name)
-                                    .autocapitalization(.none)
-                                    .onTapGesture { focusedField = .name }
-                                    .onSubmit { focusedField = .stock }
-
-                                FocusedLineRow(select: focusedField == .name ? true : false)
-
-                            } // ■アイテム名
-
-                            VStack(alignment: .leading) {
-
-                                InputFormTitle(title: "■在庫数", isNeed: false)
-                                    .padding(.bottom)
-
-                                TextField("100", text: $input.editItemInventry)
-                                    .keyboardType(.numberPad)
-                                    .focused($focusedField, equals: .stock)
-                                    .onTapGesture { focusedField = .stock }
-                                    .onSubmit { focusedField = .price }
-
-                                FocusedLineRow(select: focusedField == .stock ? true : false)
-
-                            } // ■在庫数
-
-                            VStack(alignment: .leading) {
-
-                                InputFormTitle(title: "■価格(税込)", isNeed: false)
-                                    .padding(.bottom)
-
-                                TextField("2000", text: $input.editItemPrice)
-                                    .keyboardType(.numberPad)
-                                    .focused($focusedField, equals: .price)
-                                    .onTapGesture { focusedField = .price }
-                                    .onSubmit { focusedField = .sales }
-
-                                FocusedLineRow(select: focusedField == .price ? true : false)
-
-                            } // ■価格
-
-                            if editItemStatus == .update {
-
-                                VStack(alignment: .leading) {
-
-                                    InputFormTitle(title: "■総売上げ", isNeed: false)
-                                        .padding(.bottom)
-
-                                    TextField("2000", text: $input.editItemSales)
-                                        .keyboardType(.numberPad)
-                                        .focused($focusedField, equals: .sales)
-                                        .onTapGesture { focusedField = .sales
-                                        }
-                                        .onSubmit { focusedField = .sales }
-
-                                    FocusedLineRow(select: focusedField == .sales ? true : false)
-                                } // ■総売上
-                            } // if .update「総売上」
-
-                            VStack(alignment: .leading) {
-
-                                InputFormTitle(title: "■アイテム詳細(メモ)", isNeed: false)
-                                    .font(.title3)
-
-                                TextEditor(text: $input.editItemDetail)
-                                    .frame(width: UIScreen.main.bounds.width - 20, height: 200)
-                                    .shadow(radius: 3, x: 0, y: 0)
-                                    .autocapitalization(.none)
-                                    .focused($focusedField, equals: .detail)
-                                    .onTapGesture { focusedField = .detail }
-                                    .overlay(alignment: .topLeading) {
-                                        if focusedField != .detail {
-                                            if input.editItemDetail.isEmpty {
-                                                Text("アイテムについてメモを残しましょう。")
-                                                    .opacity(0.5)
-                                                    .padding()
-                                            }
-                                        }
-                                    } // overlay
-                            } // ■アイテム詳細
-                            .padding(.top)
-
-                        } // VStack(入力フォーム全体)
-                        .padding(.vertical, 20)
-                        .padding(.horizontal, 30)
-
-                        // -------- 入力フォームここまで ---------- //
+                        InputForms(itemVM: itemVM,
+                                   selectionTagName: $input.selectionTagName,
+                                   isOpenSideMenu: $input.isOpenSideMenu,
+                                   editItemName: $input.editItemName,
+                                   editItemInventry: $input.editItemInventry,
+                                   editItemPrice: $input.editItemPrice,
+                                   editItemSales: $input.editItemSales,
+                                   editItemDetail: $input.editItemDetail,
+                                   geometryMinY: $input.geometryMinY,
+                                   offset: $input.offset,
+                                   editItemStatus: editItemStatus,
+                                   tagColor: input.selectionTagColor)
 
                     } // VStack(パーツ全体)
 
@@ -199,12 +78,9 @@ struct EditItemView: View {
                             editItemStatus: editItemStatus,
                             // Warning_TextSimbol: "＋タグを追加"
                             tagSideMenuStatus: input.selectionTagName == "＋タグを追加" ? .create : .update)
-
                     } // if isOpenSideMenu
 
                 } // ZStack(View全体)
-                // アイテム詳細
-                .offset(y: focusedField == .detail && -550.0 <= input.geometryMinY ? input.offset - 300 : 0)
                 .animation(.easeIn(duration: 0.3), value: input.offset)
 
                 // NOTE: スクロールView全体を.backgroundからgeometry取得します。
@@ -224,8 +100,6 @@ struct EditItemView: View {
 
             } // ScrollView
             .coordinateSpace(name: "scrollFrame_Space")
-
-            .onTapGesture { focusedField = nil }
 
             .onChange(of: input.selectionTagName) { selection in
 
@@ -364,6 +238,152 @@ struct EditItemView: View {
         } // NavigationView
     } // body
 } // View
+
+struct InputForms: View {
+
+    @StateObject var itemVM: ItemViewModel
+    @Binding var selectionTagName: String
+    @Binding var isOpenSideMenu: Bool
+    @Binding var editItemName: String
+    @Binding var editItemInventry: String
+    @Binding var editItemPrice: String
+    @Binding var editItemSales: String
+    @Binding var editItemDetail: String
+    @Binding var geometryMinY: CGFloat
+    @Binding var offset: CGFloat
+
+    // NOTE: enum「Status」を用いて、「.create」と「.update」とでViewレイアウトを分岐します。
+    let editItemStatus: Status
+    let tagColor: UsedColor
+
+    @FocusState private var focusedField: Field?
+
+    var body: some View {
+
+        VStack(spacing: 30) {
+
+            VStack(alignment: .leading) {
+                InputFormTitle(title: "■タグ設定", isNeed: true)
+                    .padding(.bottom)
+
+                HStack {
+                    Image(systemName: "tag.fill")
+                        .foregroundColor(tagColor.color)
+                    Picker("", selection: $selectionTagName) {
+                        ForEach(0 ..< itemVM.tags.count, id: \.self) { index in
+
+                            if let tagsRow = itemVM.tags[index] {
+                                Text(tagsRow.tagName).tag(tagsRow.tagName)
+                            }
+                        } // ForEach
+                        Text("＋タグを追加").tag("＋タグを追加")
+                    } // Picker
+
+                    Spacer()
+
+                    Button {
+                        self.isOpenSideMenu.toggle()
+                    } label: { Text("タグ編集>>") }
+                    .padding(.trailing)
+                } // HStack(Pickerタグ要素)
+
+                // NOTE: フォーカスの有無によって、入力欄の下線の色をスイッチします。(カスタムView)
+                FocusedLineRow(select: focusedField == .tag ? true : false)
+
+            } // ■タグ設定
+
+            VStack(alignment: .leading) {
+
+                InputFormTitle(title: "■アイテム名", isNeed: true)
+                    .padding(.bottom)
+
+                TextField("1st Album「...」", text: $editItemName)
+                    .focused($focusedField, equals: .name)
+                    .autocapitalization(.none)
+                    .onTapGesture { focusedField = .name }
+                    .onSubmit { focusedField = .stock }
+
+                FocusedLineRow(select: focusedField == .name ? true : false)
+
+            } // ■アイテム名
+
+            VStack(alignment: .leading) {
+
+                InputFormTitle(title: "■在庫数", isNeed: false)
+                    .padding(.bottom)
+
+                TextField("100", text: $editItemInventry)
+                    .keyboardType(.numberPad)
+                    .focused($focusedField, equals: .stock)
+                    .onTapGesture { focusedField = .stock }
+                    .onSubmit { focusedField = .price }
+
+                FocusedLineRow(select: focusedField == .stock ? true : false)
+
+            } // ■在庫数
+
+            VStack(alignment: .leading) {
+
+                InputFormTitle(title: "■価格(税込)", isNeed: false)
+                    .padding(.bottom)
+
+                TextField("2000", text: $editItemPrice)
+                    .keyboardType(.numberPad)
+                    .focused($focusedField, equals: .price)
+                    .onTapGesture { focusedField = .price }
+                    .onSubmit { focusedField = .sales }
+
+                FocusedLineRow(select: focusedField == .price ? true : false)
+
+            } // ■価格
+
+            if editItemStatus == .update {
+
+                VStack(alignment: .leading) {
+
+                    InputFormTitle(title: "■総売上げ", isNeed: false)
+                        .padding(.bottom)
+
+                    TextField("2000", text: $editItemSales)
+                        .keyboardType(.numberPad)
+                        .focused($focusedField, equals: .sales)
+                        .onTapGesture { focusedField = .sales
+                        }
+                        .onSubmit { focusedField = .sales }
+
+                    FocusedLineRow(select: focusedField == .sales ? true : false)
+                } // ■総売上
+            } // if .update「総売上」
+
+            VStack(alignment: .leading) {
+
+                InputFormTitle(title: "■アイテム詳細(メモ)", isNeed: false)
+                    .font(.title3)
+
+                TextEditor(text: $editItemDetail)
+                    .frame(width: UIScreen.main.bounds.width - 20, height: 200)
+                    .shadow(radius: 3, x: 0, y: 0)
+                    .autocapitalization(.none)
+                    .focused($focusedField, equals: .detail)
+                    .onTapGesture { focusedField = .detail }
+                    .overlay(alignment: .topLeading) {
+                        if focusedField != .detail {
+                            if self.editItemDetail.isEmpty {
+                                Text("アイテムについてメモを残しましょう。")
+                                    .opacity(0.5)
+                                    .padding()
+                            }
+                        }
+                    } // overlay
+            } // ■アイテム詳細
+            .padding(.top)
+
+        } // VStack(入力フォーム全体)
+        .padding(.vertical, 20)
+        .padding(.horizontal, 30)
+        .onTapGesture { focusedField = nil }
+    }
+}
 
 // NOTE: スクロールView全体に対しての画面の現在位置座標をgeometry内で検知し、値を渡すために用いる
 private struct OffsetPreferenceKey: PreferenceKey, Equatable {
