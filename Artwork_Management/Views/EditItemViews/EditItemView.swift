@@ -290,9 +290,6 @@ struct EditItemView: View {
                 // NOTE: 新規アイテム登録遷移の場合、passItemDataにはnilが代入されている
                 if let passItemData = passItemData {
 
-//                    self.input.passItemColor = itemVM.searchSelectTagColor(
-//                        selectTagName: passItemData.tag, tags: itemVM.tags)
-
                     self.input.selectionTagName = passItemData.tag
                     self.input.editItemName = passItemData.name
                     self.input.editItemInventry = String(passItemData.inventory)
@@ -303,7 +300,6 @@ struct EditItemView: View {
                 } else {
                     guard let defaultTag = itemVM.tags.first else { return }
                     self.input.selectionTagName = defaultTag.tagName
-//                    self.input.passItemColor = defaultTag.tagColor
                 }
 
             } // onAppear
