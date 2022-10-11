@@ -117,7 +117,7 @@ struct ItemStockView: View {
                     .onChange(of: dragOffset) { newValue in
                         if newValue == 0 {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                self.sideTagOpacity = 0.7
+                                self.sideTagOpacity = 0.3
                             }
                         } else {
                             self.sideTagOpacity = 0.0

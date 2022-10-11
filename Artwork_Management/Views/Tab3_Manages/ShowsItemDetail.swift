@@ -27,9 +27,7 @@ struct ShowsItemDetail: View {
                 .opacity(0.3)
             // NOTE: アイテム詳細の外側をタップすると、詳細画面を閉じます
                 .onTapGesture {
-                    withAnimation(.linear(duration: 0.2)) {
-                        isShowitemDetail = false
-                    }
+                    isShowitemDetail = false
                     print("onTapGesture_isShowitemDetail: \(isShowitemDetail)")
                 } // onTapGesture
 
@@ -112,7 +110,7 @@ struct ShowsItemDetail: View {
         // NOTE: opacityの設定によって遷移時のアニメーションを付与
         .opacity(self.opacity)
         .onAppear {
-            withAnimation(.linear(duration: 0.2)) {
+            withAnimation(.linear(duration: 0.1)) {
                 self.opacity = 1.0
             }
         } // .onAppear

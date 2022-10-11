@@ -194,7 +194,7 @@ struct SalesManageView: View {
                     }
 
                 VStack(alignment: .leading, spacing: 10) {
-                    HStack(spacing: 20) {
+                    HStack(spacing: 40) {
                         Text("\(item.sales)円")
                             .font(.subheadline.bold())
 
@@ -206,8 +206,9 @@ struct SalesManageView: View {
                             print("isShowItemDetail: \(isShowItemDetail)")
 
                         } label: {
-                            Image(systemName: "list.bullet")
+                            Image(systemName: "info.circle.fill")
                                 .foregroundColor(.gray)
+                                .opacity(0.7)
 
                         } // Button
                     } // HStack
