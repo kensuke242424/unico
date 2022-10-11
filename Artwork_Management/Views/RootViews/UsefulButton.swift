@@ -21,7 +21,6 @@ struct UsefulButton: View {
     @State private var buttonIcon: ButtonIcon = ButtonIcon(icon: "shippingbox.fill",
                                               badge: "plus.circle.fill")
 
-
     var body: some View {
         Button {
 
@@ -47,7 +46,6 @@ struct UsefulButton: View {
             // ✅カスタムView
             ButtonStyleView(buttonIcon: $buttonIcon)
 
-
         } // Button
         .offset(x: UIScreen.main.bounds.width / 3 - 5,
                 y: UIScreen.main.bounds.height / 3 - 20)
@@ -57,10 +55,6 @@ struct UsefulButton: View {
             self.buttonStyle = buttonVM.buttonStyleChenged(tabIndex: newIndex)
             self.buttonIcon = buttonVM.iconChenge(style: buttonStyle, change: change)
         } // onChange(tabIndex)
-
-        .onChange(of: buttonIcon) {newIcon in
-
-        }
     } // body
 } // View
 

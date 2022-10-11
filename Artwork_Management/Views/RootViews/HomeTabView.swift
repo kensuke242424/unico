@@ -15,7 +15,8 @@ struct HomeTabView: View {
     @State private var tabIndex = 0
     @State private var isShowItemDetail = false
     @State private var isPresentedNewItem = false
-    @State var state: ResizableSheetState = .hidden
+    @State var basketState: ResizableSheetState = .hidden
+    @State var commerceState: ResizableSheetState = .hidden
 
     var body: some View {
 
@@ -56,18 +57,61 @@ struct HomeTabView: View {
             // Todo: 各タブごとにオプションが変わるボタン
             UsefulButton(tabIndex: $tabIndex,
                          isPresentedNewItem: $isPresentedNewItem,
-                         state: $state)
+                         state: $basketState)
 
         } // ZStack
         .navigationBarBackButtonHidden()
-        // NOTE: パッケージResizable_Sheetを用いたハーフモーダル
-        .resizableSheet($state) {builder in
+
+        // Todo: 買い物かごシート
+        .resizableSheet($basketState, id: "A") {builder in
+            builder.content { _ in
+                VStack {
+                    GrabBar().opacity(0.7)
+                    HStack {
+                        Text("カート内のアイテム")
+                            .font(.headline)
+                            .fontWeight(.black)
+                        Spacer()
+                        Button(
+                            action: { commerceState = .medium },
+                            label: {
+                                HStack {
+                                    Image(systemName: "trash.fill")
+                                    Text("全て削除")
+                                        .font(.callout)
+                                }
+                            }
+                        ) // Button
+                    } // HStack
+                    .foregroundColor(.gray)
+                    .padding(.horizontal, 20)
+
+                    Divider()
+                        .background(.black)
+                        .padding(.bottom, 20)
+                        .padding(.horizontal, 20)
+
+                    BasketItems(basketItems: $rootItemVM.items)
+
+                    Spacer(minLength: 0).frame(height: 110)
+                } // VStack
+            } // builder.content
+            .sheetBackground { _ in
+                Color.white
+            }
+            .background { _ in
+                EmptyView()
+            }
+        } // .resizableSheet
+
+        // Todo: 決済シート
+        .resizableSheet($commerceState, id: "B") {builder in
             builder.content { _ in
                 VStack {
                     HStack {
                         Spacer(minLength: 0)
                         Button(
-                            action: { state = .hidden },
+                            action: { commerceState = .hidden },
                             label: {
                                 Image(systemName: "xmark.circle.fill")
                                     .resizable()
@@ -77,17 +121,16 @@ struct HomeTabView: View {
                         .frame(width: 40, height: 40)
                     }
                     .padding()
-                    Spacer(minLength: 0).frame(height: 300)
+                    Spacer(minLength: 0).frame(height: 30)
                 }
             }
+            .supportedState([.hidden, .medium])
             .sheetBackground { _ in
                 Color.white
             }
             .background { _ in
-
                 EmptyView()
             }
-//                .supportedState([.medium, .hidden])
         } // .resizableSheet
 
     } // body

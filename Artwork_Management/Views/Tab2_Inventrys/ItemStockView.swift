@@ -140,8 +140,8 @@ struct ItemStockView: View {
                          // ✅カスタムView: 最近更新したアイテムをHStack表示します。(横スクロール)
                         UpdateTimeCards(isShowItemDetail: $isShowItemDetail,
                                         listIndex: $listIndex,
-                                        itemWidth: UIScreen.main.bounds.width * 0.45,
-                                        itemHeight: 230,
+                                        itemWidth: UIScreen.main.bounds.width * 0.41,
+                                        itemHeight: 210,
                                         itemSpase: 20,
                                         itemNameTag: "アイテム",
                                         items: itemVM.items)
@@ -155,8 +155,8 @@ struct ItemStockView: View {
                          // ✅カスタムView: アイテムを表示します。(縦スクロール)
                          TagCards(isShowItemDetail: $isShowItemDetail,
                                   listIndex: $listIndex,
-                                  itemWidth: UIScreen.main.bounds.width * 0.45,
-                                  itemHeight: 230,
+                                  itemWidth: UIScreen.main.bounds.width * 0.43,
+                                  itemHeight: 220,
                                   itemSpase: 20,
                                   itemNameTag: "アイテム",
                                   items: itemVM.items)

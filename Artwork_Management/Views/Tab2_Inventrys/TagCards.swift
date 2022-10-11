@@ -90,8 +90,8 @@ struct TagCards_Previews: PreviewProvider {
              ScrollView(.horizontal) {
                  UpdateTimeCards(isShowItemDetail: .constant(false),
                                  listIndex: .constant(0),
-                                 itemWidth: 180,
-                                 itemHeight: 260,
+                                 itemWidth: 160,
+                                 itemHeight: 220,
                                  itemSpase: 20,
                                  itemNameTag: "アイテム",
                                  items: [
@@ -105,7 +105,7 @@ struct TagCards_Previews: PreviewProvider {
                                          price: 1100, sales: 182000, inventory: 199, createTime: Date(), updateTime: Date())
                                  ])
              } // ScrollView
-             .frame(height: 260)
+             .frame(height: 220)
 
             Divider()
                 .background(.gray)
@@ -115,8 +115,8 @@ struct TagCards_Previews: PreviewProvider {
             // ✅カスタムView: アイテムを表示します。(縦スクロール)
             TagCards(isShowItemDetail: .constant(false),
                      listIndex: .constant(0),
-                     itemWidth: UIScreen.main.bounds.width * 0.45,
-                     itemHeight: 260,
+                     itemWidth: UIScreen.main.bounds.width * 0.43,
+                     itemHeight: 220,
                      itemSpase: 20,
                      itemNameTag: "アイテム",
                      items: [
