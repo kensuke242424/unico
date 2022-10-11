@@ -21,6 +21,44 @@ enum Field {
     case detail
 }
 
+enum UsedColor: CaseIterable {
+
+    case red
+    case blue
+    case yellow
+    case green
+    case gray
+
+    var text: String {
+        switch self {
+        case .red:
+            return "赤"
+        case .blue:
+            return "青"
+        case .yellow:
+            return "黄"
+        case .green:
+            return "緑"
+        default:
+            return "灰"
+        }
+    }
+    var color: Color {
+        switch self {
+        case .red:
+            return .red
+        case .blue:
+            return .blue
+        case .yellow:
+            return .yellow
+        case .green:
+            return .green
+        default:
+            return .gray
+        }
+    }
+}
+
 struct EditItemView: View {
 
     @StateObject var itemVM: ItemViewModel
@@ -30,14 +68,15 @@ struct EditItemView: View {
     let itemIndex: Int
     let passItemData: Item?
 
-    // NOTE: enum「Status」を用いて、新規登録と編集とでViewレイアウトを分岐します。
+    // NOTE: enum「Status」を用いて、「.create」と「.update」とでViewレイアウトを分岐します。
     let editItemStatus: Status
 
     // NOTE: ＠Stateの入力プロパティを構造体化
     struct InputEditItem {
-        var photoURL: String = ""  // Todo: 写真取り込み機能追加後使用
+        var passItemColor: Color = .red
         var selectionTagName: String = ""
-        var selectionTagColor: Color = Color.red
+        var selectionTagColor: UsedColor = .red
+        var photoURL: String = ""  // Todo: 写真取り込み機能追加後使用
         var editItemName: String = ""
         var editItemInventry: String = ""
         var editItemPrice: String = ""
@@ -48,7 +87,6 @@ struct EditItemView: View {
         var offset: CGFloat = 0
         var geometryMinY: CGFloat = 0
     }
-
     @State private var input: InputEditItem = InputEditItem()
 
     @FocusState private var focusedField: Field?
@@ -62,7 +100,7 @@ struct EditItemView: View {
                 ZStack {
                     VStack {
                         // ✅カスタムView 写真ゾーン
-                        SelectItemPhotoArea(selectTagColor: input.selectionTagColor)
+                        SelectItemPhotoArea(selectTagColor: input.passItemColor)
 
                         // -------- 入力フォームここから ---------- //
 
@@ -75,7 +113,7 @@ struct EditItemView: View {
                                 HStack {
                                     Image(systemName: "tag.fill")
                                     // NOTE: メソッドで選択タグと紐づいたカラーを取り出す
-                                        .foregroundColor(input.selectionTagColor)
+                                        .foregroundColor(input.passItemColor)
 
                                     Picker("", selection: $input.selectionTagName) {
 
@@ -243,11 +281,11 @@ struct EditItemView: View {
 
             .onChange(of: input.selectionTagName) { selection in
 
-                //                // NOTE: 選択されたタグネームと紐づいたタグカラーを取り出し、selectionTagColorに格納します。
+                // NOTE: 選択されたタグネームと紐づいたタグカラーを取り出し、selectionTagColorに格納します。
                 let searchedTagColor = itemVM.searchSelectTagColor(selectTagName: selection,
                                                                    tags: itemVM.tags)
                 withAnimation(.easeIn(duration: 0.25)) {
-                    input.selectionTagColor = searchedTagColor
+                    input.passItemColor = searchedTagColor
                 }
 
                 // NOTE: タグ選択で「+タグを追加」が選択された時、新規タグ追加Viewを表示します。
@@ -304,6 +342,9 @@ struct EditItemView: View {
                 // NOTE: 新規アイテム登録遷移の場合、passItemDataにはnilが代入されている
                 if let passItemData = passItemData {
 
+                    self.input.passItemColor = itemVM.searchSelectTagColor(selectTagName:passItemData.tag,
+                                                                           tags: itemVM.tags)
+
                     self.input.selectionTagName = passItemData.tag
                     self.input.editItemName = passItemData.name
                     self.input.editItemInventry = String(passItemData.inventory)
@@ -314,6 +355,7 @@ struct EditItemView: View {
                 } else {
                     guard let defaultTag = itemVM.tags.first else { return }
                     self.input.selectionTagName = defaultTag.tagName
+                    self.input.passItemColor = defaultTag.tagColor
                 }
 
             } // onAppear
@@ -326,8 +368,8 @@ struct EditItemView: View {
 
                     Button {
 
-                        // NOTE: Firestoreへのデータ保存を見越して、Color型はString型に変換しておきます。
-                        let castTagColorString = itemVM.castColorIntoString(color: input.selectionTagColor)
+//                        // NOTE: Firestoreへのデータ保存を見越して、Color型はString型に変換しておきます。
+//                        let castTagColorString = itemVM.castColorIntoString(color: input.selectionTagColor)
 
                         switch editItemStatus {
 
@@ -335,7 +377,7 @@ struct EditItemView: View {
 
                             // NOTE: テストデータに新規アイテムを保存
                             itemVM.items.append(Item(tag: input.selectionTagName,
-                                                     tagColor: castTagColorString,
+                                                     tagColor: input.selectionTagColor.text,
                                                      name: input.editItemName,
                                                      detail: input.editItemDetail != "" ? input.editItemDetail : "none.",
                                                      photo: "", // Todo: 写真取り込み実装後、変更
@@ -352,7 +394,7 @@ struct EditItemView: View {
                         case .update:
                             // NOTE: テストデータに情報の変更を保存
                             let updateItemSource = Item(tag: input.selectionTagName,
-                                                        tagColor: castTagColorString,
+                                                        tagColor: input.selectionTagColor.text,
                                                         name: input.editItemName,
                                                         detail: input.editItemDetail != "" ? input.editItemDetail : "none.",
                                                         photo: "", // Todo: 写真取り込み実装後、変更

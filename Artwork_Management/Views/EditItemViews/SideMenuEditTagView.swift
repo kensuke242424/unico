@@ -13,10 +13,10 @@ struct SideMenuEditTagView: View {
     @Binding var isOpenSideMenu: Bool
     @Binding var geometryMinY: CGFloat
     @Binding var selectionTagName: String
-    @Binding var selectionTagColor: Color
+    @Binding var selectionTagColor: UsedColor
     let screenSize = UIScreen.main.bounds
     let itemTagName: String
-    let itemTagColor: Color
+    let itemTagColor: UsedColor
 
     let editItemStatus: Status
     let tagSideMenuStatus: Status
@@ -26,7 +26,7 @@ struct SideMenuEditTagView: View {
         var newTagName: String = ""
         var disableButton: Bool = true
         var opacity: CGFloat = 0.0
-        var selectionSideMenuTagColor: Color = Color.red
+        var selectionSideMenuTagColor: UsedColor = .red
         var isShowAlert: Bool = false
         // NOTE: 初期値として画面横幅分をoffset(x)軸に渡すことで、呼び出されるまでの間、画面外へ除いておく
         var defaultOffsetX: CGFloat = UIScreen.main.bounds.width
@@ -128,10 +128,15 @@ struct SideMenuEditTagView: View {
 
                         Picker("色を選択", selection: $input.selectionSideMenuTagColor) {
 
-                            Text("赤").tag(Color.red)
-                            Text("青").tag(Color.blue)
-                            Text("黄").tag(Color.yellow)
-                            Text("緑").tag(Color.green)
+                            ForEach(UsedColor.allCases, id: \.self) { value in
+
+                                Text(value.text).tag(value.color)
+                            }
+//
+//                            Text("赤").tag(Color.red)
+//                            Text("青").tag(Color.blue)
+//                            Text("黄").tag(Color.yellow)
+//                            Text("緑").tag(Color.green)
                         }
                         .pickerStyle(.segmented)
                         .padding(.bottom)
@@ -143,7 +148,8 @@ struct SideMenuEditTagView: View {
                         .foregroundColor(.white)
                         .shadow(radius: 4, x: 4, y: 6)
 
-                    IndicatorRow(salesValue: 170000, tagColor: input.selectionSideMenuTagColor)
+                    IndicatorRow(salesValue: 170000,
+                                 tagColor: input.selectionSideMenuTagColor)
 
                     Button {
 
@@ -153,7 +159,7 @@ struct SideMenuEditTagView: View {
 
                             print("タグ追加ボタンタップ...")
 
-                            // NOTE: アイテム内にタグが重複していないかを確認します。重複していればアラート表示
+                            // NOTE: 既存のタグと重複していないかを確認します。重複していればアラート表示
                             if itemVM.tags.contains(where: { $0.tagName == input.newTagName }) {
 
                                 print("タグが重複しました。")
@@ -163,7 +169,7 @@ struct SideMenuEditTagView: View {
 
                                 // 新規タグデータを追加、配列の１番目に保存(at: 0)
                                 itemVM.tags.insert(Tag(tagName: input.newTagName,
-                                                       tagColor: input.selectionSideMenuTagColor),
+                                                       tagColor: input.selectionSideMenuTagColor.color),
                                                    at: 0)
 
                                 self.selectionTagName = input.newTagName
@@ -187,7 +193,7 @@ struct SideMenuEditTagView: View {
                             itemVM.updateItemsTagData(itemVM: itemVM,
                                                       itemTagName: itemTagName,
                                                       newTagName: input.newTagName,
-                                                      newTagColorString: itemVM.castColorIntoString(color: selectionTagColor))
+                                                      newTagColorString: selectionTagColor.text)
 
                         } // switch
 
@@ -276,9 +282,9 @@ struct SideMenuNewTagView_Previews: PreviewProvider {
             isOpenSideMenu: .constant(true),
             geometryMinY: .constant(-200),
             selectionTagName: .constant("＋タグを追加"),
-            selectionTagColor: .constant(Color.red),
+            selectionTagColor: .constant(.red),
             itemTagName: "Album",
-            itemTagColor: Color.red,
+            itemTagColor: .red,
             editItemStatus: .create,
             tagSideMenuStatus: .create
         )

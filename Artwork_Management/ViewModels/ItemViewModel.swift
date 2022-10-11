@@ -38,7 +38,7 @@ class ItemViewModel: ObservableObject {
         Tag(tagName: "Album", tagColor: .red),
         Tag(tagName: "Single", tagColor: .blue),
         Tag(tagName: "Goods", tagColor: .yellow),
-        Tag(tagName: "タグ無し", tagColor: .gray)
+//        Tag(tagName: "タグ無し", tagColor: .gray)
     ]
 
     // ✅ NOTE: アイテム配列を各項目に沿ってソートするメソッド
@@ -144,7 +144,10 @@ class ItemViewModel: ObservableObject {
     } // func castColorIntoString
 
     // ✅ メソッド: 変更内容をもとに、tags内の対象データのタグネーム、タグカラーを更新します。
-    func updateTagsData(itemVM: ItemViewModel, itemTagName: String, selectTagName: String, selectTagColor: Color) {
+    func updateTagsData(itemVM: ItemViewModel,
+                        itemTagName: String,
+                        selectTagName: String,
+                        selectTagColor: UsedColor) {
 
         print("ーーーーーーー　updateTagsDataメソッド_実行　ーーーーーーーーー")
 
@@ -153,7 +156,7 @@ class ItemViewModel: ObservableObject {
         where tagData.tagName == itemTagName {
 
             itemVM.tags[index] = Tag(tagName: selectTagName,
-                                     tagColor: selectTagColor)
+                                     tagColor: selectTagColor.color)
 
             print("更新されたitemVM.tags: \(itemVM.tags[index])")
 
@@ -161,8 +164,10 @@ class ItemViewModel: ObservableObject {
     } // func updateTagsData
 
     // ✅ メソッド: 変更内容をもとに、items内の対象データのタグネーム、タグカラーを更新します。
-    func updateItemsTagData(itemVM: ItemViewModel, itemTagName: String,
-                            newTagName: String, newTagColorString: String) {
+    func updateItemsTagData(itemVM: ItemViewModel,
+                            itemTagName: String,
+                            newTagName: String,
+                            newTagColorString: String) {
 
         print("ーーーーーーー　updateItemsTagDataメソッド_実行　ーーーーーーーーー")
 
