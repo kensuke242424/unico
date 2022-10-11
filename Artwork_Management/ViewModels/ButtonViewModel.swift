@@ -36,7 +36,7 @@ class ButtonViewModel: ObservableObject {
 
         case .stock:
             print("ストック画面時のアイコンに変更")
-            return ButtonIcon(icon: change ?  "" : "",
+            return ButtonIcon(icon: change ?  "cart.fill" : "cart.fill",
                               badge: change ?  "" : "")
 
         case .manege:

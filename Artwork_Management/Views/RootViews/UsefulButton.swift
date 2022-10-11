@@ -20,7 +20,7 @@ struct UsefulButton: View {
     @State private var buttonStyle: ButtonStyle = .library
     @State private var buttonIcon: ButtonIcon = ButtonIcon(icon: "shippingbox.fill",
                                               badge: "plus.circle.fill")
-    @State private var angle: CGFloat = 0.0
+
 
     var body: some View {
         Button {
@@ -32,6 +32,7 @@ struct UsefulButton: View {
 
             case .stock:
                 print("stock画面ボタンアクション実行")
+                self.state = .medium
 
             case .manege:
                 print("manege画面ボタンアクション実行")
@@ -44,8 +45,8 @@ struct UsefulButton: View {
         } label: {
 
             // ✅カスタムView
-            ButtonStyleView(buttonIcon: $buttonIcon, angle: $angle)
-                .rotationEffect(Angle(degrees: angle))
+            ButtonStyleView(buttonIcon: $buttonIcon)
+
 
         } // Button
         .offset(x: UIScreen.main.bounds.width / 3 - 5,
@@ -57,14 +58,17 @@ struct UsefulButton: View {
             self.buttonIcon = buttonVM.iconChenge(style: buttonStyle, change: change)
         } // onChange(tabIndex)
 
+        .onChange(of: buttonIcon) {newIcon in
 
+        }
     } // body
 } // View
 
 struct ButtonStyleView: View {
 
     @Binding var buttonIcon: ButtonIcon
-    @Binding var angle: CGFloat
+
+    @State private var angle: CGFloat = 0.0
 
     var body: some View {
 
@@ -78,33 +82,40 @@ struct ButtonStyleView: View {
 
             // ボタンのアイコン
             .overlay {
-                Image(systemName: buttonIcon.icon)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 38, height: 38)
-                    .shadow(radius: 10, x: 3, y: 5)
+
+                Group {
+                    Image(systemName: buttonIcon.icon)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 38, height: 38)
+                        .shadow(radius: 10, x: 3, y: 5)
 
                     // アイコン右上に付くバッジ
-                    .overlay(alignment: .topTrailing) {
-                        Image(systemName: buttonIcon.badge)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 18, height: 18)
-                            .offset(x: 10, y: -10)
-                    } // overlay
+                        .overlay(alignment: .topTrailing) {
+                            Image(systemName: buttonIcon.badge)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 18, height: 18)
+                                .offset(x: 10, y: -10)
+                        } // overlay
+                }
+                .animation(.easeIn(duration: 0.2), value: buttonIcon)
+                .rotationEffect(Angle(degrees: angle), anchor: UnitPoint(x: 2.0, y: 2.0))
             } // overlay
-            .animation(.easeIn(duration: 0.2), value: buttonIcon)
-            .animation(.easeIn(duration: 0.3), value: angle)
 
             .onChange(of: buttonIcon) { _ in
+                withAnimation(.easeIn(duration: 0.2)) {
                     self.angle = 50.0
-                print(angle)
+                    print(angle)
+                }
             } // .onChange(buttonIcon)
 
             .onChange(of: angle) { newAngle in
                 if newAngle == 50.0 {
-                    self.angle = 0.0
-                    print(angle)
+                    withAnimation(.easeIn(duration: 0.2)) {
+                        self.angle = 0.0
+                        print(angle)
+                    }
                 }
             }
 

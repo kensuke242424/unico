@@ -60,6 +60,36 @@ struct HomeTabView: View {
 
         } // ZStack
         .navigationBarBackButtonHidden()
+        // NOTE: パッケージResizable_Sheetを用いたハーフモーダル
+        .resizableSheet($state) {builder in
+            builder.content { _ in
+                VStack {
+                    HStack {
+                        Spacer(minLength: 0)
+                        Button(
+                            action: { state = .hidden },
+                            label: {
+                                Image(systemName: "xmark.circle.fill")
+                                    .resizable()
+                                    .foregroundColor(.gray)
+                            }
+                        )
+                        .frame(width: 40, height: 40)
+                    }
+                    .padding()
+                    Spacer(minLength: 0).frame(height: 300)
+                }
+            }
+            .sheetBackground { _ in
+                Color.white
+            }
+            .background { _ in
+
+                EmptyView()
+            }
+//                .supportedState([.medium, .hidden])
+        } // .resizableSheet
+
     } // body
 } // View
 
