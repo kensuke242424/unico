@@ -130,7 +130,7 @@ struct SideMenuEditTagView: View {
 
                             ForEach(UsedColor.allCases, id: \.self) { value in
 
-                                Text(value.text).tag(value.color)
+                                Text(value.text)
                             }
                         }
                         .pickerStyle(.segmented)
