@@ -233,6 +233,7 @@ struct SideMenuEditTagView: View {
                 .padding(.leading, 30)
             } // ZStack (新規タグブロック)
             .offset(x: input.defaultOffsetX)
+            .offset(y: editItemStatus == .update ? -80 : 0)
             .onTapGesture { self.focusedField = nil }
 
             // NOTE: タグネームの入力値がisEmptyの場合、追加ボタンを無効化します
@@ -247,7 +248,6 @@ struct SideMenuEditTagView: View {
             } // .onChange
 
         } // ZStack(全体)
-        .offset(y: editItemStatus == .update ? -80 : 0)
         .offset(y: focusedField == .tag ? -self.geometryMinY - 330 : -self.geometryMinY - 200)
         .animation(.easeOut(duration: 0.3), value: focusedField)
         .opacity(self.input.opacity)

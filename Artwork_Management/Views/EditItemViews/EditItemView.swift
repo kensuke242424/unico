@@ -213,7 +213,7 @@ struct EditItemView: View {
                                     .font(.title3)
 
                                 TextEditor(text: $input.editItemDetail)
-//                                    .frame(width: UIScreen.main.bounds.width - 20, height: 200)
+                                    .frame(width: UIScreen.main.bounds.width - 20, height: 200)
                                     .shadow(radius: 3, x: 0, y: 0)
                                     .autocapitalization(.none)
                                     .focused($focusedField, equals: .detail)
@@ -342,8 +342,8 @@ struct EditItemView: View {
                 // NOTE: 新規アイテム登録遷移の場合、passItemDataにはnilが代入されている
                 if let passItemData = passItemData {
 
-                    self.input.passItemColor = itemVM.searchSelectTagColor(selectTagName:passItemData.tag,
-                                                                           tags: itemVM.tags)
+                    self.input.passItemColor = itemVM.searchSelectTagColor(
+                        selectTagName: passItemData.tag, tags: itemVM.tags)
 
                     self.input.selectionTagName = passItemData.tag
                     self.input.editItemName = passItemData.name
@@ -368,8 +368,8 @@ struct EditItemView: View {
 
                     Button {
 
-//                        // NOTE: Firestoreへのデータ保存を見越して、Color型はString型に変換しておきます。
-//                        let castTagColorString = itemVM.castColorIntoString(color: input.selectionTagColor)
+                        //                        // NOTE: Firestoreへのデータ保存を見越して、Color型はString型に変換しておきます。
+                        //                        let castTagColorString = itemVM.castColorIntoString(color: input.selectionTagColor)
 
                         switch editItemStatus {
 
