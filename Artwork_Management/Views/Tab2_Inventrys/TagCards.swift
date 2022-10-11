@@ -16,6 +16,7 @@ enum ShowItemSize {
 struct TagCards: View {
 
     @Binding var isShowItemDetail: Bool
+    @Binding var listIndex: Int
 
     // アイテムのディテールを指定します。
     let itemWidth: CGFloat
@@ -29,9 +30,11 @@ struct TagCards: View {
     var body: some View {
 
         LazyVGrid(columns: columnsV, spacing: itemSpase) {
-            ForEach(items) { item in
+            ForEach(Array(items.enumerated()), id: \.offset) { offset, item in
 
                 ItemCardRow(isShowItemDetail: $isShowItemDetail,
+                            listIndex: $listIndex,
+                            rowIndex: offset,
                             item: item,
                             itemWidth: itemWidth,
                             itemHeight: itemHeight)
@@ -46,6 +49,7 @@ struct TagCards: View {
 struct UpdateTimeCards: View {
 
     @Binding var isShowItemDetail: Bool
+    @Binding var listIndex: Int
 
     // アイテムのディテールを指定します。
     let columnsH: [GridItem] = Array(repeating: .init(.flexible()), count: 1)
@@ -59,9 +63,11 @@ struct UpdateTimeCards: View {
 
         ScrollView(.horizontal) {
             LazyHGrid(rows: columnsH, spacing: itemSpase) {
-                ForEach(items) { item in
+                ForEach(Array(items.enumerated()), id: \.offset) { offset, item in
 
                     ItemCardRow(isShowItemDetail: $isShowItemDetail,
+                                listIndex: $listIndex,
+                                rowIndex: offset,
                                 item: item,
                                 itemWidth: itemWidth,
                                 itemHeight: itemHeight)
@@ -83,6 +89,7 @@ struct TagCards_Previews: PreviewProvider {
              // ✅カスタムView: 最近更新したアイテムをHStack表示します。(横スクロール)
              ScrollView(.horizontal) {
                  UpdateTimeCards(isShowItemDetail: .constant(false),
+                                 listIndex: .constant(0),
                                  itemWidth: 180,
                                  itemHeight: 260,
                                  itemSpase: 20,
@@ -107,6 +114,7 @@ struct TagCards_Previews: PreviewProvider {
             TagTitle(title: "アイテム", font: .title)
             // ✅カスタムView: アイテムを表示します。(縦スクロール)
             TagCards(isShowItemDetail: .constant(false),
+                     listIndex: .constant(0),
                      itemWidth: UIScreen.main.bounds.width * 0.45,
                      itemHeight: 260,
                      itemSpase: 20,

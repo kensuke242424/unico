@@ -13,6 +13,8 @@ struct ItemCardRow: View {
     @Environment(\.colorScheme) var colorScheme
 
     @Binding var isShowItemDetail: Bool
+    @Binding var listIndex: Int
+    let rowIndex: Int
 
     let item: Item
     let itemWidth: CGFloat
@@ -26,6 +28,8 @@ struct ItemCardRow: View {
             .opacity(colorScheme == .dark ? 0.2 : 1.0)
             .overlay(alignment: .topTrailing) {
                 Button {
+                    print("rowIndex: \(rowIndex)")
+                    self.listIndex = rowIndex
                     // アイテム詳細表示
                     self.isShowItemDetail.toggle()
                     print("ItemStockView_アイテム詳細ボタンタップ: \(isShowItemDetail)")
@@ -87,6 +91,8 @@ struct ItemCardRow_Previews: PreviewProvider {
     static var previews: some View {
 
         ItemCardRow(isShowItemDetail: .constant(false),
+                    listIndex: .constant(0),
+                    rowIndex: 0,
                     item: Item(tag: "Album",
                                tagColor: "赤",
                                name: "Album1",
