@@ -35,6 +35,8 @@ struct BasketItems: View {
                                     .resizable()
                                     .frame(width: 22, height: 22)
                             }
+                            Text("1")
+                                .fontWeight(.black)
                             Button {
                                 // マイナスボタン
                             } label: {
