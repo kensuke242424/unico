@@ -12,7 +12,7 @@ enum HalfSheetScroll {
     case additional
 }
 
-struct BasketItems: View {
+struct BasketItemsSheet: View {
 
     let basketItems: [Item]?
     let halfSheetScroll: HalfSheetScroll
@@ -35,12 +35,9 @@ struct BasketItems: View {
                 .frame(width: UIScreen.main.bounds.width, height: 120)
 
             } else {
-                VStack {
-                    Text("かごの中にアイテムはありません")
-//                        .font(.title3)
-                        .foregroundColor(.gray)
-                        .frame(height: 100)
-                }
+                Text("かごの中にアイテムはありません")
+                    .foregroundColor(.gray)
+                    .frame(height: 100)
             }
 
         case .additional:
@@ -53,11 +50,9 @@ struct BasketItems: View {
                 .frame(width: UIScreen.main.bounds.width, height: 120)
 
             } else {
-                VStack {
-                    Spacer()
-                        .frame(width: UIScreen.main.bounds.width,
-                               height: 10)
-                }
+                Spacer()
+                    .frame(width: UIScreen.main.bounds.width,
+                           height: 10)
             }
 
         } // switch
@@ -123,7 +118,7 @@ struct BasketItemRow: View {
 
 struct BasketItems_Previews: PreviewProvider {
     static var previews: some View {
-        BasketItems(basketItems:
+        BasketItemsSheet(basketItems:
             [
                 Item(tag: "Album", tagColor: "赤", name: "Album1", detail: "Album1のアイテム紹介テキストです。", photo: "",
                      price: 1800, sales: 88000, inventory: 200, createTime: Date(), updateTime: Date()),

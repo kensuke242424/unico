@@ -219,7 +219,6 @@ struct TagTitle: View {
 
             Spacer()
          }
-
     } // body
 } // カスタムView
 

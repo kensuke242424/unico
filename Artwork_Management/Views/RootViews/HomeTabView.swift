@@ -93,12 +93,12 @@ struct HomeTabView: View {
                     ResizableScrollView(
                         context: context,
                         main: {
-                            BasketItems(
-                                basketItems: nil,
+                            BasketItemsSheet(
+                                basketItems: rootItemVM.items,
                                 halfSheetScroll: .main)
                         },
                         additional: {
-                            BasketItems(
+                            BasketItemsSheet(
                                 basketItems: rootItemVM.items,
                                 halfSheetScroll: .additional)
 
@@ -134,33 +134,8 @@ struct HomeTabView: View {
                 EmptyView()
             }
         } // .resizableSheet
-
     } // body
 } // View
-
-struct CommerceSheet: View {
-
-    @Binding var commerceState: ResizableSheetState
-
-    var body: some View {
-        VStack {
-            HStack {
-                Spacer(minLength: 0)
-                Button(
-                    action: { commerceState = .hidden },
-                    label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .resizable()
-                            .foregroundColor(.gray)
-                    }
-                )
-                .frame(width: 40, height: 40)
-            }
-            .padding()
-            Spacer(minLength: 0).frame(height: 30)
-        } // VStack 決済シートレイアウト
-    }
-}
 
 struct HomeTabView_Previews: PreviewProvider {
 

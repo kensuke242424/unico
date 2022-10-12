@@ -39,9 +39,9 @@ struct ItemCardRow: View {
                         .scaledToFit()
                         .frame(width: 23, height: 23)
                         .foregroundColor(.brown)
-
+                        .opacity(0.5)
                 } // Button
-            }
+            } // .overlay
 
             // NOTE: アイテムカードのフレーム
             .overlay {
@@ -53,9 +53,9 @@ struct ItemCardRow: View {
                     .shadow(radius: 4)
                     .shadow(radius: 4)
                     .frame(width: itemWidth, height: itemHeight)
-            }
+            } // overlay
 
-        // NOTE: アイテムカードの内容
+            // NOTE: アイテムカードの内容
             .overlay {
                 VStack {
                     RoundedRectangle(cornerRadius: 5)
@@ -79,11 +79,21 @@ struct ItemCardRow: View {
                             .font(.title3)
                             .fontWeight(.heavy)
                         Spacer()
-                    }
 
+                        Button {
+                            //
+                        } label: {
+                            Image(systemName: "checkmark.seal.fill")
+                                .resizable()
+                                .frame(width: 28, height: 28)
+                                .foregroundColor(.brown)
+                        } // Button
+                        .offset(x: 5, y: 5)
+                    } // HStack
                 } // VStack
                 .padding()
             } // overlay
+
     } // body
 } // View
 
