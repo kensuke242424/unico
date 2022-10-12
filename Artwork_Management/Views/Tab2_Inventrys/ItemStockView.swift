@@ -166,6 +166,8 @@ struct ItemStockView: View {
                                     isShowitemDetail: $isShowItemDetail)
                 } // if isShowItemDetail
             } // ZStack
+            .background(LinearGradient(gradient: Gradient(colors: [.customBackgroundLight2, .customBackgroundDark2]),
+                                       startPoint: .top, endPoint: .bottom))
             .navigationTitle("ItemStock")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

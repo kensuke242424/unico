@@ -84,6 +84,8 @@ struct ManageView: View {
                 } // if isShowItemDetail
 
             } // ZStack
+            .background(LinearGradient(gradient: Gradient(colors: [.customBackgroundLight2, .customBackgroundDark2]),
+                                       startPoint: .top, endPoint: .bottom))
             .navigationTitle("Sales")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -237,7 +239,7 @@ struct ManageView: View {
     } // リストレイアウト
 } // View
 
-struct SalesView_Previews: PreviewProvider {
+struct ManageView_Previews: PreviewProvider {
     static var previews: some View {
         ManageView(itemVM: ItemViewModel(), isPresentedEditItem: .constant(false))
     }

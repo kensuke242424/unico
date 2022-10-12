@@ -21,6 +21,7 @@ struct HomeTabView: View {
     var body: some View {
 
         ZStack {
+
             TabView(selection: $tabIndex) {
 
                 LibraryView(itemVM: rootItemVM, isShowItemDetail: $isShowItemDetail)

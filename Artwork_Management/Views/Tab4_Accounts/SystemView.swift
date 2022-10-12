@@ -18,6 +18,9 @@ struct SystemView: View {
             SystemListView()
 
         } // VStack
+        .background(LinearGradient(gradient: Gradient(colors: [.customBackgroundLight2, .customBackgroundDark2]),
+                                   startPoint: .top, endPoint: .bottom))
+        
     } // body
 } // View
 

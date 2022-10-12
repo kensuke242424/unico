@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct SystemListView: View {
+    
     var body: some View {
 
         List {
@@ -40,6 +41,11 @@ struct SystemListView: View {
             }
 
         } // List
+        .background(LinearGradient(gradient: Gradient(colors: [.customBackgroundLight2, .customBackgroundDark2]),
+                                   startPoint: .top, endPoint: .bottom))
+        .onAppear {
+            UITableView.appearance().backgroundColor = .clear
+        }
     } // body
 } // View
 

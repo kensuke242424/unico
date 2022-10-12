@@ -39,6 +39,8 @@ struct LibraryView: View {
 
                     } // VStack
                 } // ScrollView
+                .background(LinearGradient(gradient: Gradient(colors: [.customBackgroundLight2, .customBackgroundDark2]),
+                                           startPoint: .top, endPoint: .bottom))
             } // ZStack
             .navigationTitle("Home")
         } // NavigationView
