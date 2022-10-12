@@ -9,15 +9,11 @@
 /* Begin PBXBuildFile section */
 		E04ACF4128E6DD600054A6C4 /* ShowsItemDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04ACF4028E6DD600054A6C4 /* ShowsItemDetail.swift */; };
 		E04ACF4328E73C660054A6C4 /* IndicatorRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04ACF4228E73C660054A6C4 /* IndicatorRow.swift */; };
-<<<<<<< HEAD
 		E05130E228F341620092FE46 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E05130E128F341610092FE46 /* RootView.swift */; };
 		E0796AD328F46CC90094E50C /* ItemCardRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0796AD228F46CC90094E50C /* ItemCardRow.swift */; };
 		E0796AD528F4850D0094E50C /* ButtonModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0796AD428F4850D0094E50C /* ButtonModel.swift */; };
 		E0796AD728F485850094E50C /* ButtonViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0796AD628F485850094E50C /* ButtonViewModel.swift */; };
 		E0796ADD28F5F2830094E50C /* BasketItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0796ADC28F5F2830094E50C /* BasketItems.swift */; };
-=======
-		E0796ADA28F5625F0094E50C /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0796AD928F5625F0094E50C /* Enums.swift */; };
->>>>>>> main
 		E08F272528DDA08E00329C5E /* Artwork_ManagementApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E08F272428DDA08E00329C5E /* Artwork_ManagementApp.swift */; };
 		E08F272928DDA09000329C5E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E08F272828DDA09000329C5E /* Assets.xcassets */; };
 		E08F272C28DDA09000329C5E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E08F272B28DDA09000329C5E /* Preview Assets.xcassets */; };
@@ -50,15 +46,11 @@
 /* Begin PBXFileReference section */
 		E04ACF4028E6DD600054A6C4 /* ShowsItemDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowsItemDetail.swift; sourceTree = "<group>"; };
 		E04ACF4228E73C660054A6C4 /* IndicatorRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndicatorRow.swift; sourceTree = "<group>"; };
-<<<<<<< HEAD
 		E05130E128F341610092FE46 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		E0796AD228F46CC90094E50C /* ItemCardRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemCardRow.swift; sourceTree = "<group>"; };
 		E0796AD428F4850D0094E50C /* ButtonModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonModel.swift; sourceTree = "<group>"; };
 		E0796AD628F485850094E50C /* ButtonViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonViewModel.swift; sourceTree = "<group>"; };
 		E0796ADC28F5F2830094E50C /* BasketItems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasketItems.swift; sourceTree = "<group>"; };
-=======
-		E0796AD928F5625F0094E50C /* Enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
->>>>>>> main
 		E08F272128DDA08E00329C5E /* Artwork_Management.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Artwork_Management.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E08F272428DDA08E00329C5E /* Artwork_ManagementApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Artwork_ManagementApp.swift; sourceTree = "<group>"; };
 		E08F272828DDA09000329C5E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -101,7 +93,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-<<<<<<< HEAD
 		E0796AD828F48D530094E50C /* RootViews */ = {
 			isa = PBXGroup;
 			children = (
@@ -110,14 +101,6 @@
 				E09F09C828EE3B4900D07669 /* UsefulButton.swift */,
 			);
 			path = RootViews;
-=======
-		E0796ADB28F5626C0094E50C /* Enums */ = {
-			isa = PBXGroup;
-			children = (
-				E0796AD928F5625F0094E50C /* Enums.swift */,
-			);
-			path = Enums;
->>>>>>> main
 			sourceTree = "<group>";
 		};
 		E08F271828DDA08E00329C5E = {
@@ -160,17 +143,9 @@
 		E08F273228DDB3B200329C5E /* Views */ = {
 			isa = PBXGroup;
 			children = (
-<<<<<<< HEAD
 				E0796AD828F48D530094E50C /* RootViews */,
 				E094F0FE28E20BB800D3C845 /* LogIn */,
 				E09F09BA28EAF2DD00D07669 /* NewItemViews */,
-=======
-				E08F273D28DDB65F00329C5E /* HomeTabView.swift */,
-				E09F09C828EE3B4900D07669 /* UsefulButton.swift */,
-				E0796ADB28F5626C0094E50C /* Enums */,
-				E094F0FE28E20BB800D3C845 /* LogIn */,
-				E09F09BA28EAF2DD00D07669 /* EditItemViews */,
->>>>>>> main
 				E08F273F28DEAD1100329C5E /* Tab1_Librarys */,
 				E08F274028DEAD3B00329C5E /* Tab2_Inventrys */,
 				E08F274128DEAD4D00329C5E /* Tab3_Manages */,
@@ -365,12 +340,8 @@
 				E0CF7EF828DF7BFA00735142 /* SystemListView.swift in Sources */,
 				E04ACF4128E6DD600054A6C4 /* ShowsItemDetail.swift in Sources */,
 				E08F273C28DDB61A00329C5E /* LibraryView.swift in Sources */,
-<<<<<<< HEAD
 				E08F273828DDB51600329C5E /* SalesManageView.swift in Sources */,
 				E0796AD728F485850094E50C /* ButtonViewModel.swift in Sources */,
-=======
-				E08F273828DDB51600329C5E /* ManageView.swift in Sources */,
->>>>>>> main
 				E04ACF4328E73C660054A6C4 /* IndicatorRow.swift in Sources */,
 				E09F09BC28EAF33500D07669 /* FocusedLineRow.swift in Sources */,
 				E09F09CB28EFEA8700D07669 /* SelectItemPhotoArea.swift in Sources */,
@@ -382,18 +353,11 @@
 				E08F273E28DDB65F00329C5E /* HomeTabView.swift in Sources */,
 				E05130E228F341620092FE46 /* RootView.swift in Sources */,
 				E08F272528DDA08E00329C5E /* Artwork_ManagementApp.swift in Sources */,
-<<<<<<< HEAD
 				E09F09C528ED5DEA00D07669 /* SideMenuNewTagView.swift in Sources */,
 				E0796ADD28F5F2830094E50C /* BasketItems.swift in Sources */,
 				E094F10028E20F1000D3C845 /* LogInView.swift in Sources */,
 				E0CF7EF428DF385800735142 /* TagCards.swift in Sources */,
 				E0796AD528F4850D0094E50C /* ButtonModel.swift in Sources */,
-=======
-				E09F09C528ED5DEA00D07669 /* SideMenuEditTagView.swift in Sources */,
-				E094F10028E20F1000D3C845 /* LogInView.swift in Sources */,
-				E0796ADA28F5625F0094E50C /* Enums.swift in Sources */,
-				E0CF7EF428DF385800735142 /* ItemShowBlock.swift in Sources */,
->>>>>>> main
 				E0CF7EEE28DEFFEE00735142 /* LibraryDetailShow.swift in Sources */,
 				E08F273A28DDB53700329C5E /* SystemView.swift in Sources */,
 				E0CC79B628E761EA00CE0B19 /* UserModel.swift in Sources */,
