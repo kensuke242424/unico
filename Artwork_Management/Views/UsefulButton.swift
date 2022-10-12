@@ -25,7 +25,7 @@ struct UsefulButton: View {
         Button {
 
             if buttonStyle == .manege {
-                self.isPresentedEditItem.toggle()
+                isPresentedEditItem.toggle()
             } else {
                 print("マネージ画面でのみ、新規アイテムシートが表示されます。")
             }

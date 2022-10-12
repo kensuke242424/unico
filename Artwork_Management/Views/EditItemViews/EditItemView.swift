@@ -92,7 +92,7 @@ struct EditItemView: View {
                             .onChange(of: geometry.frame(in: .named("scrollFrame_Space")).minY) { newValue in
 
                                 withAnimation(.easeIn(duration: 0.1)) {
-                                    self.input.geometryMinY = newValue
+                                    input.geometryMinY = newValue
                                 }
                             } // onChange
                     } // Geometry
@@ -113,7 +113,7 @@ struct EditItemView: View {
                 // NOTE: タグ選択で「+タグを追加」が選択された時、新規タグ追加Viewを表示します。
                 // Warning_TextSimbol: "＋タグを追加"
                 if selection == "＋タグを追加" {
-                    self.input.isOpenSideMenu.toggle()
+                    input.isOpenSideMenu.toggle()
                     print("サイドメニュー: \(input.isOpenSideMenu)")
                 }
             } // onChange (selectionTagName)
@@ -122,9 +122,9 @@ struct EditItemView: View {
 
                 withAnimation(.easeIn(duration: 0.2)) {
                     if newValue.isEmpty {
-                        self.input.disableButton = true
+                        input.disableButton = true
                     } else {
-                        self.input.disableButton = false
+                        input.disableButton = false
                     }
                 }
             } // onChange(ボタンdisable分岐)
@@ -141,7 +141,7 @@ struct EditItemView: View {
 
                         case .create:
                             if let defaultTag = itemVM.tags.first {
-                                self.input.selectionTagName = defaultTag.tagName
+                                input.selectionTagName = defaultTag.tagName
                             }
 
                         case .update:
@@ -164,16 +164,16 @@ struct EditItemView: View {
                 // NOTE: 新規アイテム登録遷移の場合、passItemDataにはnilが代入されている
                 if let passItemData = passItemData {
 
-                    self.input.selectionTagName = passItemData.tag
-                    self.input.editItemName = passItemData.name
-                    self.input.editItemInventry = String(passItemData.inventory)
-                    self.input.editItemPrice = String(passItemData.price)
-                    self.input.editItemSales = String(passItemData.sales)
-                    self.input.editItemDetail = passItemData.detail
+                    input.selectionTagName = passItemData.tag
+                    input.editItemName = passItemData.name
+                    input.editItemInventry = String(passItemData.inventory)
+                    input.editItemPrice = String(passItemData.price)
+                    input.editItemSales = String(passItemData.sales)
+                    input.editItemDetail = passItemData.detail
 
                 } else {
                     guard let defaultTag = itemVM.tags.first else { return }
-                    self.input.selectionTagName = defaultTag.tagName
+                    input.selectionTagName = defaultTag.tagName
                 }
 
             } // onAppear
@@ -226,7 +226,7 @@ struct EditItemView: View {
                         } // switch editItemStatus(データ追加、更新)
 
                         // シートを閉じる
-                        self.isPresentedEditItem.toggle()
+                        isPresentedEditItem.toggle()
 
                     } label: {
                         Text(editItemStatus == .create ? "追加する" : "更新する")
@@ -282,7 +282,7 @@ struct InputForms: View {
                     Spacer()
 
                     Button {
-                        self.isOpenSideMenu.toggle()
+                        isOpenSideMenu.toggle()
                     } label: { Text("タグ編集>>") }
                     .padding(.trailing)
                 } // HStack(Pickerタグ要素)
@@ -368,7 +368,7 @@ struct InputForms: View {
                     .onTapGesture { focusedField = .detail }
                     .overlay(alignment: .topLeading) {
                         if focusedField != .detail {
-                            if self.editItemDetail.isEmpty {
+                            if editItemDetail.isEmpty {
                                 Text("アイテムについてメモを残しましょう。")
                                     .opacity(0.5)
                                     .padding()

@@ -143,7 +143,7 @@ struct ShowsItemDetail: View {
             } // if let item
 
         } // ZStack(全体)
-        .opacity(self.input.opacity)
+        .opacity(input.opacity)
 
         .sheet(isPresented: $input.isPlesentedUpdateItem) {
 
@@ -159,12 +159,12 @@ struct ShowsItemDetail: View {
 
             // NOTE: itemに値が存在した場合、アイテム編集ボタンを有効化
             if item != nil {
-                self.input.disabledButton.toggle()
+                input.disabledButton.toggle()
             }
 
             // NOTE: opacityの動的な値の変化を使ったフェードアニメーション
             withAnimation(.linear(duration: 0.2)) {
-                self.input.opacity = 1.0
+                input.opacity = 1.0
             }
 
         } // .onAppear

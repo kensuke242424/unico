@@ -30,12 +30,12 @@ struct IndicatorRow: View {
 //                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                     withAnimation(.linear(duration: 0.8)) {
 
-                        self.animationValue = salesValue
+                        animationValue = salesValue
                     } // withAnimation
 //                } // DispatchQueue
             }
             .onDisappear {
-                self.animationValue = 0
+                animationValue = 0
             }
     }
 }

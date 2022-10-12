@@ -113,7 +113,7 @@ struct ManageView: View {
 
                         Menu("並び替え") {
                             Button {
-                                self.input.sortType = .salesUp
+                                input.sortType = .salesUp
                                 itemVM.items = itemVM.itemsSort(sort: input.sortType, items: itemVM.items)
                             } label: {
                                 if input.sortType == .salesUp {
@@ -123,7 +123,7 @@ struct ManageView: View {
                                 }
                             }
                             Button {
-                                self.input.sortType = .salesDown
+                                input.sortType = .salesDown
                                 itemVM.items = itemVM.itemsSort(sort: input.sortType, items: itemVM.items)
                             } label: {
                                 if input.sortType == .salesDown {
@@ -133,7 +133,7 @@ struct ManageView: View {
                                 }
                             }
                             Button {
-                                self.input.sortType = .updateAtUp
+                                input.sortType = .updateAtUp
                                 itemVM.items = itemVM.itemsSort(sort: input.sortType, items: itemVM.items)
                             } label: {
                                 if input.sortType == .updateAtUp {
@@ -143,7 +143,7 @@ struct ManageView: View {
                                 }
                             }
                             Button {
-                                self.input.sortType = .createAtUp
+                                input.sortType = .createAtUp
                                 itemVM.items = itemVM.itemsSort(sort: input.sortType, items: itemVM.items)
                             } label: {
                                 if input.sortType == .createAtUp {
@@ -196,7 +196,7 @@ struct ManageView: View {
                             .font(.subheadline.bold())
 
                         Button {
-                            self.input.listIndex = listIndex
+                            input.listIndex = listIndex
                             print("listIndex: \(listIndex)")
 
                             input.isShowItemDetail.toggle()

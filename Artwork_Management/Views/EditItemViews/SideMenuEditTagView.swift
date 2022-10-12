@@ -21,6 +21,8 @@ struct SideMenuEditTagView: View {
     let editItemStatus: Status
     let tagSideMenuStatus: Status
 
+    @FocusState var focusedField: Field?
+
     // NOTE: サイドタグメニューの入力値を構造体化
     struct InputSideMenuTag {
         var newTagName: String = ""
@@ -31,10 +33,7 @@ struct SideMenuEditTagView: View {
         // NOTE: 初期値として画面横幅分をoffset(x)軸に渡すことで、呼び出されるまでの間、画面外へ除いておく
         var defaultOffsetX: CGFloat = UIScreen.main.bounds.width
     }
-
     @State private var input: InputSideMenuTag = InputSideMenuTag()
-
-    @FocusState var focusedField: Field?
 
     var body: some View {
 
@@ -42,16 +41,16 @@ struct SideMenuEditTagView: View {
 
             // 背景
             Color(.gray).opacity(0.5)
-                .opacity(self.input.opacity)
+                .opacity(input.opacity)
                 .onTapGesture {
                     withAnimation(.easeIn(duration: 0.25)) {
-                        self.input.defaultOffsetX = screenSize.width
-                        self.input.opacity = 0.0
+                        input.defaultOffsetX = screenSize.width
+                        input.opacity = 0.0
                     }
                     // NOTE: 表示管理Bool値をずらさないとView非表示時のアニメーションが不自然になるため、
                     //       DispatchQueueを用いてtoggle処理をずらしています。
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        self.isOpenSideMenu = false
+                        isOpenSideMenu = false
                     }
                 } // .onTapGesture
 
@@ -154,20 +153,20 @@ struct SideMenuEditTagView: View {
                             // NOTE: 既存のタグと重複していないかを確認します。重複していればアラート表示
                             if itemVM.tags.contains(where: { $0.tagName == input.newTagName }) {
                                 print("タグが重複しました。")
-                                self.input.isShowAlert.toggle()
+                                input.isShowAlert.toggle()
                             } else {
                                 // 新規タグデータを追加、配列の１番目に保存(at: 0)
                                 itemVM.tags.insert(Tag(tagName: input.newTagName,
                                                        tagColor: input.selectionSideMenuTagColor),
                                                    at: 0)
 
-                                self.selectionTagName = input.newTagName
+                                selectionTagName = input.newTagName
                             } // if contains
 
                         case .update:
 
-                            self.selectionTagName = input.newTagName
-                            self.selectionTagColor = input.selectionSideMenuTagColor
+                            selectionTagName = input.newTagName
+                            selectionTagColor = input.selectionSideMenuTagColor
 
                             // メソッド: 更新内容を受け取って、itemVM.tagsの対象タグデータを更新するメソッドです。
                             itemVM.updateTagsData(itemVM: itemVM,
@@ -185,11 +184,11 @@ struct SideMenuEditTagView: View {
                         if !input.isShowAlert {
 
                             withAnimation(.easeIn(duration: 0.25)) {
-                                self.input.defaultOffsetX = screenSize.width
-                                self.input.opacity = 0.0
+                                input.defaultOffsetX = screenSize.width
+                                input.opacity = 0.0
                             }
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                self.isOpenSideMenu = false
+                                isOpenSideMenu = false
                             }
                         } // if !isShowAlert
 
@@ -227,13 +226,12 @@ struct SideMenuEditTagView: View {
             } // ZStack (タグサイドメニューブロック)
             .offset(x: input.defaultOffsetX)
             .offset(y: editItemStatus == .update ? -80 : 0)
-            .onTapGesture { self.focusedField = nil }
-
+            .onTapGesture { focusedField = nil }
 
         } // ZStack(全体)
-        .offset(y: focusedField == .tag ? -self.geometryMinY - 330 : -self.geometryMinY - 200)
+        .offset(y: focusedField == .tag ? -geometryMinY - 330 : -geometryMinY - 200)
         .animation(.easeOut(duration: 0.3), value: focusedField)
-        .opacity(self.input.opacity)
+        .opacity(input.opacity)
         // View表示時
 
         .onAppear {
@@ -245,14 +243,14 @@ struct SideMenuEditTagView: View {
 
             // // タグ編集の場合は、親Viewから受け取ったアイテムの値を渡す
             if tagSideMenuStatus == .update {
-                self.input.newTagName = selectionTagName
-                self.input.selectionSideMenuTagColor = selectionTagColor
+                input.newTagName = selectionTagName
+                input.selectionSideMenuTagColor = selectionTagColor
             }
 
             withAnimation(.easeIn(duration: 0.3)) {
-                self.input.opacity = 1.0
+                input.opacity = 1.0
                 // NOTE: View呼び出し時に「画面横幅 / 2 - (微調整)」で横から入力ブロックを出現
-                self.input.defaultOffsetX = input.defaultOffsetX / 2 - 30
+                input.defaultOffsetX = input.defaultOffsetX / 2 - 30
             }
         } // onAppear
     } // body
