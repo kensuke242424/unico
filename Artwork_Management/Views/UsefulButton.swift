@@ -17,14 +17,15 @@ enum ButtonStyle {
 struct UsefulButton: View {
 
     @Binding var tabIndex: Int
-    @Binding var isPresentedNewItem: Bool
+    @Binding var isPresentedEditItem: Bool
+
     @State private var buttonStyle: ButtonStyle = .library
 
     var body: some View {
         Button {
 
             if buttonStyle == .manege {
-                self.isPresentedNewItem.toggle()
+                isPresentedEditItem.toggle()
             } else {
                 print("マネージ画面でのみ、新規アイテムシートが表示されます。")
             }
@@ -43,18 +44,14 @@ struct UsefulButton: View {
             switch newIndex {
             case 0:
                 buttonStyle = .library
-                print("ホーム画面でボタンがタップされました。")
             case 1:
                 buttonStyle = .stock
-                print("ストック画面でボタンがタップされました。")
             case 2:
                 buttonStyle = .manege
-                print("マネージ画面でボタンがタップされました。")
             case 3:
                 buttonStyle = .account
-                print("システム画面でボタンがタップされました。")
             default:
-                print("default")
+                print("tabIndex_error")
             }
         } // onChange(tabIndex)
     } // body
@@ -92,7 +89,7 @@ struct ButtonStyleView: View {
             .blur(radius: 1)
             .shadow(color: .gray, radius: 10, x: 4, y: 11)
 
-            // ボタンのアイコン
+        // ボタンのアイコン
             .overlay {
                 Image(systemName: "shippingbox.fill")
                     .resizable()
@@ -100,7 +97,7 @@ struct ButtonStyleView: View {
                     .frame(width: 38, height: 38)
                     .shadow(radius: 10, x: 3, y: 5)
 
-                    // アイコン右上に付くバッジ
+                // アイコン右上に付くバッジ
                     .overlay(alignment: .topTrailing) {
                         Image(systemName: "plus.circle.fill")
                             .resizable()
@@ -109,11 +106,11 @@ struct ButtonStyleView: View {
                             .offset(x: 10, y: -10)
                     } // overlay
             } // overlay
-    }
-}
+    } // body
+} // View
 
 struct UsefulButton_Previews: PreviewProvider {
     static var previews: some View {
-        UsefulButton(tabIndex: .constant(2), isPresentedNewItem: .constant(false))
+        UsefulButton(tabIndex: .constant(2), isPresentedEditItem: .constant(false))
     }
 }

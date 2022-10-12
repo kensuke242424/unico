@@ -42,8 +42,8 @@ struct ItemShowBlock: View {
 struct ItemStockList_Previews: PreviewProvider {
     static var previews: some View {
         ItemShowBlock(itemWidth: 180,
-                      itemHeight: 100,
+                      itemHeight: 200,
                       itemSpase: 20,
-                      itemNameTag: "Album")
+                      itemNameTag: "アイテム")
     }
 }

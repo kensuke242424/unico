@@ -10,7 +10,7 @@ import SwiftUI
 struct IndicatorRow: View {
 
     let salesValue: Int
-    let tagColor: Color
+    let tagColor: UsedColor
 
     private let size = UIScreen.main.bounds
     @State private var animationValue: Int = 0
@@ -22,7 +22,7 @@ struct IndicatorRow: View {
             .overlay(alignment: .leading) {
                 Rectangle()
                     .frame(width: CGFloat(animationValue) / 1000, height: 13)
-                    .foregroundColor(tagColor)
+                    .foregroundColor(tagColor.color)
                     .opacity(0.6)
                     .shadow(radius: 2, x: 7, y: 4)
             } // case 黄
@@ -30,12 +30,12 @@ struct IndicatorRow: View {
 //                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                     withAnimation(.linear(duration: 0.8)) {
 
-                        self.animationValue = salesValue
+                        animationValue = salesValue
                     } // withAnimation
 //                } // DispatchQueue
             }
             .onDisappear {
-                self.animationValue = 0
+                animationValue = 0
             }
     }
 }

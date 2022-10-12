@@ -7,6 +7,17 @@
 
 import SwiftUI
 
+struct LogInChecksView: View {
+    var body: some View {
+
+        VStack {
+            LogInCheckView()
+            SuccsessView()
+            ErrorView()
+        }
+    }
+}
+
 struct LogInCheckView: View {
 
     var body: some View {
@@ -43,13 +54,8 @@ struct ErrorView: View {
     }
 }
 
-struct LodingView_Previews: PreviewProvider {
+struct LogInChecksView_Previews: PreviewProvider {
     static var previews: some View {
-        Group {
-            LogInCheckView()
-            SuccsessView()
-            ErrorView()
-        }
-
+        LogInChecksView()
     }
 }
