@@ -63,13 +63,13 @@ struct ItemCardRow: View {
                         .opacity(0.2)
                         .frame(width: itemWidth - 50, height: itemWidth - 50)
 
-                        Text(item.name)
-                            .font(.headline)
-                            .fontWeight(.heavy)
-                            .padding(.horizontal, 5)
-                            .padding(.top, 5)
-                            .frame(width: itemWidth * 0.9)
-                            .lineLimit(1)
+                    Text(item.name)
+                        .font(.callout)
+                        .fontWeight(.heavy)
+                        .padding(.horizontal, 5)
+                        .padding(.top, 5)
+                        .frame(width: itemWidth * 0.9)
+                        .lineLimit(1)
 
                     Spacer()
 

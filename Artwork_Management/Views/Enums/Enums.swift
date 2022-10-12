@@ -4,7 +4,6 @@
 //
 //  Created by 中川賢亮 on 2022/10/11.
 //
-
 import SwiftUI
 
 // NOTE: アイテムのソートタイプを管理します
@@ -26,6 +25,10 @@ enum TagGroup {
 enum Status {
     case create
     case update
+}
+
+enum SearchFocus {
+    case check
 }
 
 enum Field {

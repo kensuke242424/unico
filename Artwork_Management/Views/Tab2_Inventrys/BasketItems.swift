@@ -7,66 +7,128 @@
 
 import SwiftUI
 
+enum HalfSheetScroll {
+    case main
+    case additional
+}
+
 struct BasketItems: View {
 
-    @Binding var basketItems: [Item]
+    let basketItems: [Item]?
+    let halfSheetScroll: HalfSheetScroll
+
+    private let listLimit: Int = 3
+
+    var body: some View {
+
+        switch halfSheetScroll {
+
+        case .main:
+
+            if let basketItems = basketItems {
+                ForEach(0 ..< basketItems.count, id: \.self) { index in
+                    if listLimit > index {
+                        BasketItemRow(item: basketItems[index])
+                    } // if
+                } // ForEach
+                .padding()
+                .frame(width: UIScreen.main.bounds.width, height: 120)
+
+            } else {
+                VStack {
+                    Text("かごの中にアイテムはありません")
+                        .frame(height: 200)
+                }
+            }
+
+        case .additional:
+
+            if let basketItems = basketItems {
+                ForEach(listLimit ..< basketItems.count, id: \.self) { index in
+                    BasketItemRow(item: basketItems[index])
+                } // ForEach
+                .padding()
+                .frame(width: UIScreen.main.bounds.width, height: 120)
+
+            } else {
+                VStack {
+                    Spacer()
+                        .frame(width: UIScreen.main.bounds.width,height: 10)
+                }
+            }
+
+        } // switch
+    } // body
+} // View
+
+struct BasketItemRow: View {
+
+    let item: Item
 
     var body: some View {
 
         VStack {
-            ForEach(basketItems) { item in
-                HStack {
-                    RoundedRectangle(cornerRadius: 10)
-                        .frame(width: 100, height: 100)
-                        .foregroundColor(.gray)
+            Divider()
+                .background(.gray)
 
-                    Spacer()
+            HStack {
+                RoundedRectangle(cornerRadius: 10)
+                    .frame(width: 100, height: 100)
+                    .foregroundColor(.gray)
 
-                    VStack(alignment: .trailing, spacing: 30) {
-                        Text("\(item.name)")
-                            .font(.title3.bold())
-                            .lineLimit(1)
+                Spacer()
 
-                        HStack(spacing: 60) {
-                            Button {
-                                // マイナスボタン
-                            } label: {
-                                Image(systemName: "minus.circle.fill")
-                                    .resizable()
-                                    .frame(width: 22, height: 22)
-                            }
-                            Text("1")
-                                .fontWeight(.black)
-                            Button {
-                                // マイナスボタン
-                            } label: {
-                                Image(systemName: "plus.circle.fill")
-                                    .resizable()
-                                    .frame(width: 22, height: 22)
-                            }
+                VStack(alignment: .trailing, spacing: 30) {
+                    Text("\(item.name)")
+                        .font(.title3.bold())
+                        .lineLimit(1)
+
+                    HStack(alignment: .bottom, spacing: 30) {
+
+                        HStack(alignment: .bottom) {
+                            Text("¥")
+                            Text(String(item.price))
+                                .font(.title3)
+                                .fontWeight(.heavy)
+                            Spacer()
                         }
 
 
-                    } // VStack
-                } // HStack
-            } // VStack
-            .padding()
-            .frame(width: UIScreen.main.bounds.width, height: 120)
-            .border(.gray)
-        }
-    }
-}
+                        Button {
+                            // マイナスボタン
+                        } label: {
+                            Image(systemName: "minus.circle.fill")
+                                .resizable()
+                                .frame(width: 22, height: 22)
+                        }
+                        Text("1")
+                            .fontWeight(.black)
+                        Button {
+                            // マイナスボタン
+                        } label: {
+                            Image(systemName: "plus.circle.fill")
+                                .resizable()
+                                .frame(width: 22, height: 22)
+                        }
+                    }
+                    .offset(y: 8)
+                } // VStack
+            } // HStack
+        } // VStack(全体)
+    } // body
+} // view
 
 struct BasketItems_Previews: PreviewProvider {
     static var previews: some View {
-        BasketItems(basketItems: .constant(
+        BasketItems(basketItems:
             [
                 Item(tag: "Album", tagColor: "赤", name: "Album1", detail: "Album1のアイテム紹介テキストです。", photo: "",
                      price: 1800, sales: 88000, inventory: 200, createTime: Date(), updateTime: Date()),
                 Item(tag: "Album", tagColor: "赤", name: "Album2", detail: "Album2のアイテム紹介テキストです。", photo: "",
                      price: 2800, sales: 230000, inventory: 420, createTime: Date(), updateTime: Date()),
                 Item(tag: "Album", tagColor: "赤", name: "Album3", detail: "Album3のアイテム紹介テキストです。", photo: "", price: 2800, sales: 230000, inventory: 420, createTime: Date(), updateTime: Date())
-            ])
+            ],
+                    halfSheetScroll: .main
         )
     }
 }

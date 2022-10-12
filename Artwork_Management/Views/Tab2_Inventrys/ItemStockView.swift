@@ -8,10 +8,6 @@
 import SwiftUI
 import ResizableSheet
 
-enum SearchFocus {
-    case check
-}
-
 struct ItemStockView: View {
 
     @Environment(\.colorScheme) var colorScheme
@@ -38,6 +34,7 @@ struct ItemStockView: View {
         NavigationView {
             ZStack {
                 VStack {
+
                     // NOTE: 検索ボックスの表示管理
                     if isShowSearchField {
 
@@ -101,7 +98,7 @@ struct ItemStockView: View {
                                                         initialVelocity: 0.1),
                                    value: dragOffset)
                     } // Geometry
-                    .frame(height: 60) // Geometry範囲のflame
+                    .frame(height: 40) // Geometry範囲のflame
 
                     // NOTE: サイドタグバーの枠フレームおよび、前後のタグインフォメーションを表示します。
                     .overlay {
@@ -163,12 +160,13 @@ struct ItemStockView: View {
 
                 // NOTE: アイテム詳細ボタンをタップすると、詳細画面が発火します。
                 if isShowItemDetail {
-                    ShowsItemDetail(item: itemVM.items, index: $listIndex,
+                    ShowsItemDetail(itemVM: itemVM,
+                                    item: itemVM.items[listIndex],
+                                    itemIndex: listIndex,
                                     isShowitemDetail: $isShowItemDetail)
                 } // if isShowItemDetail
-            }
+            } // ZStack
             .navigationTitle("ItemStock")
-            .padding(.top)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -187,9 +185,7 @@ struct ItemStockView: View {
                 }
             } // .toolbar
             .animation(.easeIn(duration: 0.2), value: isShowSearchField)
-            } // VStack
             .navigationTitle("ItemStock")
-            .padding(.top)
             .navigationBarTitleDisplayMode(.inline)
         } // NavigationView
         .onTapGesture { searchFocused = nil }
@@ -197,14 +193,13 @@ struct ItemStockView: View {
         // NOTE: ディスプレイのカラーモードを検知し、enumを切り替えます。
         .onChange(of: colorScheme) { _ in
             switch colorScheme {
-            case .light: self.mode = .light
-            case .dark: self.mode = .dark
+            case .light: mode = .light
+            case .dark: mode = .dark
             default:
                 fatalError()
             } // switch
             print("ディスプレイモード: \(mode)")
         } // .onChange
-
     } // body
 } // View
 

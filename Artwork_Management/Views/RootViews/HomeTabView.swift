@@ -37,7 +37,7 @@ struct HomeTabView: View {
                     }
                     .tag(1)
 
-                SalesManageView(itemVM: rootItemVM, isPresentedNewItem: $isPresentedNewItem)
+                ManageView(itemVM: rootItemVM, isPresentedEditItem: $isPresentedNewItem)
                     .tabItem {
                         Image(systemName: "chart.xyaxis.line")
                         Text("Manage")
@@ -64,10 +64,10 @@ struct HomeTabView: View {
 
         // Todo: 買い物かごシート
         .resizableSheet($basketState, id: "A") {builder in
-            builder.content { _ in
+            builder.content { context in
+
                 VStack {
-                    GrabBar().opacity(0.7)
-                    HStack {
+                    HStack(alignment: .bottom) {
                         Text("カート内のアイテム")
                             .font(.headline)
                             .fontWeight(.black)
@@ -85,19 +85,33 @@ struct HomeTabView: View {
                     } // HStack
                     .foregroundColor(.gray)
                     .padding(.horizontal, 20)
+                    .padding(.top, 20)
+                    .frame(height: 50)
 
-                    Divider()
-                        .background(.black)
-                        .padding(.bottom, 20)
-                        .padding(.horizontal, 20)
+                    ResizableScrollView(
+                        context: context,
+                        main: {
+                            BasketItems(
+                                basketItems: rootItemVM.items,
+                                halfSheetScroll: .main)
+                        },
+                        additional: {
+                            BasketItems(
+                                basketItems: nil,
+                                halfSheetScroll: .additional)
 
-                    BasketItems(basketItems: $rootItemVM.items)
-
-                    Spacer(minLength: 0).frame(height: 110)
-                } // VStack
+                            Spacer()
+                                .frame(height: 100)
+                        }
+                    )
+                    Spacer()
+                        .frame(height: 120)
+                } // VStack バスケットシートレイアウト
             } // builder.content
             .sheetBackground { _ in
                 Color.white
+                    .opacity(0.9)
+                
             }
             .background { _ in
                 EmptyView()
@@ -107,23 +121,10 @@ struct HomeTabView: View {
         // Todo: 決済シート
         .resizableSheet($commerceState, id: "B") {builder in
             builder.content { _ in
-                VStack {
-                    HStack {
-                        Spacer(minLength: 0)
-                        Button(
-                            action: { commerceState = .hidden },
-                            label: {
-                                Image(systemName: "xmark.circle.fill")
-                                    .resizable()
-                                    .foregroundColor(.gray)
-                            }
-                        )
-                        .frame(width: 40, height: 40)
-                    }
-                    .padding()
-                    Spacer(minLength: 0).frame(height: 30)
-                }
-            }
+
+                CommerceSheet(commerceState: $commerceState)
+
+            } // builder.content
             .supportedState([.hidden, .medium])
             .sheetBackground { _ in
                 Color.white
@@ -135,6 +136,30 @@ struct HomeTabView: View {
 
     } // body
 } // View
+
+struct CommerceSheet: View {
+
+    @Binding var commerceState: ResizableSheetState
+
+    var body: some View {
+        VStack {
+            HStack {
+                Spacer(minLength: 0)
+                Button(
+                    action: { commerceState = .hidden },
+                    label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .resizable()
+                            .foregroundColor(.gray)
+                    }
+                )
+                .frame(width: 40, height: 40)
+            }
+            .padding()
+            Spacer(minLength: 0).frame(height: 30)
+        } // VStack 決済シートレイアウト
+    }
+}
 
 struct HomeTabView_Previews: PreviewProvider {
 
