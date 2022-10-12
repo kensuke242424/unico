@@ -14,7 +14,8 @@ struct UsefulButton: View {
 
     @Binding var tabIndex: Int
     @Binding var isPresentedNewItem: Bool
-    @Binding var state: ResizableSheetState
+    @Binding var basketState: ResizableSheetState
+    @Binding var commerceState: ResizableSheetState
 
     @State private var change: Bool = false
     @State private var buttonStyle: ButtonStyle = .library
@@ -31,7 +32,10 @@ struct UsefulButton: View {
 
             case .stock:
                 print("stock画面ボタンアクション実行")
-                self.state = .medium
+                commerceState = .medium
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    basketState = .medium
+                }
 
             case .manege:
                 print("manege画面ボタンアクション実行")
@@ -130,7 +134,8 @@ struct UsefulButton_Previews: PreviewProvider {
 
         return UsefulButton(tabIndex: .constant(2),
                             isPresentedNewItem: .constant(false),
-                            state: .constant(.medium)
+                            basketState: .constant(.medium),
+                            commerceState: .constant(.medium)
         )
         .environment(\.resizableSheetCenter, resizableSheetCenter)
     }

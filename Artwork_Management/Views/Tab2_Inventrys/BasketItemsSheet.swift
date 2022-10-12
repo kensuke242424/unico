@@ -90,8 +90,6 @@ struct BasketItemRow: View {
                                 .fontWeight(.heavy)
                             Spacer()
                         }
-
-
                         Button {
                             // マイナスボタン
                         } label: {

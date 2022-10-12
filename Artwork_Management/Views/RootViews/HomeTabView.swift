@@ -57,7 +57,8 @@ struct HomeTabView: View {
             // Todo: 各タブごとにオプションが変わるボタン
             UsefulButton(tabIndex: $tabIndex,
                          isPresentedNewItem: $isPresentedNewItem,
-                         state: $basketState)
+                         basketState: $basketState,
+                         commerceState: $commerceState)
 
         } // ZStack
         .navigationBarBackButtonHidden()
@@ -71,21 +72,24 @@ struct HomeTabView: View {
                         Text("カート内のアイテム")
                             .font(.headline)
                             .fontWeight(.black)
+                            .opacity(0.6)
                         Spacer()
                         Button(
                             action: {
-                                commerceState = .medium
+                                basketState = .hidden
+                                commerceState = .hidden
                             },
                             label: {
                                 HStack {
                                     Image(systemName: "trash.fill")
                                     Text("全て削除")
                                         .font(.callout)
+
                                 }
+                                .foregroundColor(.red)
                             }
                         ) // Button
                     } // HStack
-                    .foregroundColor(.gray)
                     .padding(.horizontal, 20)
                     .padding(.top, 20)
                     .frame(height: 50)
@@ -113,6 +117,7 @@ struct HomeTabView: View {
             .sheetBackground { _ in
                 Color.white
                     .opacity(0.9)
+                    .blur(radius: 1)
             }
             .background { _ in
                 EmptyView()
