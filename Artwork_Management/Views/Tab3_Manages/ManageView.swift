@@ -7,34 +7,25 @@
 
 import SwiftUI
 
-// NOTE: アイテムのソートタイプを管理します
-enum SortType {
-    case salesUp
-    case salesDown
-    case updateAtUp
-    case createAtUp
-    case start
-}
-
-// NOTE: アイテムのタググループ有無を管理します
-enum TagGroup {
-    case on // swiftlint:disable:this identifier_name
-    case off
-}
-
-struct SalesManageView: View {
+struct ManageView: View {
 
     @StateObject var itemVM: ItemViewModel
-    // NOTE: リスト内のアイテム詳細を表示するトリガーです
-    @State private var isShowItemDetail = false
+
     // NOTE: 新規アイテム追加Viewの発現を管理します
-    @Binding var isPresentedNewItem: Bool
-    // NOTE: リストの一要素Indexを、アイテム詳細画面表示時に渡します
-    @State private var listIndex = 0
-    // NOTE: タググループ表示の切り替えに用います
-    @State private var tagGroup: TagGroup = .on
-    // NOTE: アイテムのソート処理の切り替えに用います
-    @State private var sortType: SortType = .start
+    @Binding var isPresentedEditItem: Bool
+
+    struct InputManage {
+        // NOTE: リスト内のアイテム詳細を表示するトリガーです
+        var isShowItemDetail = false
+        // NOTE: リストの一要素Indexを、アイテム詳細画面表示時に渡します
+        var listIndex = 0
+        // NOTE: タググループ表示の切り替えに用います
+        var tagGroup: TagGroup = .on
+        // NOTE: アイテムのソート処理の切り替えに用います
+        var sortType: SortType = .start
+    }
+
+    @State private var input: InputManage = InputManage()
 
     var body: some View {
 
@@ -45,7 +36,7 @@ struct SalesManageView: View {
                     VStack(alignment: .leading) {
 
                         // NOTE: タグ表示の「ON」「OFF」で表示を切り替えます
-                        switch tagGroup {
+                        switch input.tagGroup {
 
                         case .on:
                             // タグの要素数の分リストを作成
@@ -84,9 +75,11 @@ struct SalesManageView: View {
 
                 } // ScrollView
 
-                if isShowItemDetail {
-                    ShowsItemDetail(item: itemVM.items, index: $listIndex,
-                                    isShowitemDetail: $isShowItemDetail
+                if input.isShowItemDetail {
+                    ShowsItemDetail(itemVM: itemVM,
+                                    item: itemVM.items[input.listIndex],
+                                    itemIndex: input.listIndex,
+                                    isShowitemDetail: $input.isShowItemDetail
                     )
                 } // if isShowItemDetail
 
@@ -98,9 +91,9 @@ struct SalesManageView: View {
                         Menu("タググループ") {
 
                             Button {
-                                tagGroup = .on
+                                input.tagGroup = .on
                             } label: {
-                                if tagGroup == .on {
+                                if input.tagGroup == .on {
                                     Text("ON   　　　　　 ✔︎")
                                 } else {
                                     Text("ON")
@@ -108,9 +101,9 @@ struct SalesManageView: View {
                             } // ON
 
                             Button {
-                                tagGroup = .off
+                                input.tagGroup = .off
                             } label: {
-                                if tagGroup == .off {
+                                if input.tagGroup == .off {
                                     Text("OFF   　　　　　 ✔︎")
                                 } else {
                                     Text("OFF")
@@ -120,40 +113,40 @@ struct SalesManageView: View {
 
                         Menu("並び替え") {
                             Button {
-                                self.sortType = .salesUp
-                                itemVM.items = itemVM.itemsSort(sort: sortType, items: itemVM.items)
+                                input.sortType = .salesUp
+                                itemVM.items = itemVM.itemsSort(sort: input.sortType, items: itemVM.items)
                             } label: {
-                                if sortType == .salesUp {
+                                if input.sortType == .salesUp {
                                     Text("売り上げ(↑)　　 ✔︎")
                                 } else {
                                     Text("売り上げ(↑)")
                                 }
                             }
                             Button {
-                                self.sortType = .salesDown
-                                itemVM.items = itemVM.itemsSort(sort: sortType, items: itemVM.items)
+                                input.sortType = .salesDown
+                                itemVM.items = itemVM.itemsSort(sort: input.sortType, items: itemVM.items)
                             } label: {
-                                if sortType == .salesDown {
+                                if input.sortType == .salesDown {
                                     Text("売り上げ(↓)　　 ✔︎")
                                 } else {
                                     Text("売り上げ(↓)")
                                 }
                             }
                             Button {
-                                self.sortType = .updateAtUp
-                                itemVM.items = itemVM.itemsSort(sort: sortType, items: itemVM.items)
+                                input.sortType = .updateAtUp
+                                itemVM.items = itemVM.itemsSort(sort: input.sortType, items: itemVM.items)
                             } label: {
-                                if sortType == .updateAtUp {
+                                if input.sortType == .updateAtUp {
                                     Text("最終更新日　　　✔︎")
                                 } else {
                                     Text("最終更新日")
                                 }
                             }
                             Button {
-                                self.sortType = .createAtUp
-                                itemVM.items = itemVM.itemsSort(sort: sortType, items: itemVM.items)
+                                input.sortType = .createAtUp
+                                itemVM.items = itemVM.itemsSort(sort: input.sortType, items: itemVM.items)
                             } label: {
-                                if sortType == .createAtUp {
+                                if input.sortType == .createAtUp {
                                     Text("追加日　　　✔︎")
                                 } else {
                                     Text("追加日")
@@ -169,9 +162,13 @@ struct SalesManageView: View {
                     }
                 }
             } // .toolbar
-            .sheet(isPresented: $isPresentedNewItem) {
-                NewItemView(itemVM: itemVM, isPresentedNewItem: $isPresentedNewItem)
-            } // sheet
+            .sheet(isPresented: $isPresentedEditItem) {
+                EditItemView(itemVM: itemVM,
+                                isPresentedEditItem: $isPresentedEditItem,
+                                itemIndex: 0,
+                                passItemData: nil,
+                                editItemStatus: .create)
+            } // sheet(新規アイテム)
 
             .navigationBarTitleDisplayMode(.inline)
         } // NavigationView
@@ -199,11 +196,11 @@ struct SalesManageView: View {
                             .font(.subheadline.bold())
 
                         Button {
-                            self.listIndex = listIndex
+                            input.listIndex = listIndex
                             print("listIndex: \(listIndex)")
 
-                            isShowItemDetail.toggle()
-                            print("isShowItemDetail: \(isShowItemDetail)")
+                            input.isShowItemDetail.toggle()
+                            print("isShowItemDetail: \(input.isShowItemDetail)")
 
                         } label: {
                             Image(systemName: "info.circle.fill")
@@ -222,6 +219,8 @@ struct SalesManageView: View {
                         IndicatorRow(salesValue: item.sales, tagColor: .blue)
                     case "黄":
                         IndicatorRow(salesValue: item.sales, tagColor: .yellow)
+                    case "緑":
+                        IndicatorRow(salesValue: item.sales, tagColor: .green)
                     default:
                         IndicatorRow(salesValue: item.sales, tagColor: .gray)
                     }
@@ -240,6 +239,6 @@ struct SalesManageView: View {
 
 struct SalesView_Previews: PreviewProvider {
     static var previews: some View {
-        SalesManageView(itemVM: ItemViewModel(), isPresentedNewItem: .constant(false))
+        ManageView(itemVM: ItemViewModel(), isPresentedEditItem: .constant(false))
     }
 }

@@ -9,11 +9,11 @@ import SwiftUI
 
 struct SelectItemPhotoArea: View {
 
-    let selectTagColor: Color
+    let selectTagColor: UsedColor
 
     var body: some View {
 
-        selectTagColor
+        selectTagColor.color
             .frame(width: UIScreen.main.bounds.width, height: 350)
             .blur(radius: 2.0, opaque: false)
 

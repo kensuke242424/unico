@@ -71,7 +71,7 @@ class ItemViewModel: ObservableObject {
     } // func itemsSortr
 
     // ✅ NOTE: 新規アイテム作成時に選択したタグの登録カラーを取り出します。
-    func searchSelectTagColor(selectTagName: String, tags: [Tag]) -> Color {
+    func searchSelectTagColor(selectTagName: String, tags: [Tag]) -> UsedColor {
 
         print("＝＝＝＝＝＝＝searchSelectTagColor_実行＝＝＝＝＝＝＝＝＝")
 
@@ -91,60 +91,44 @@ class ItemViewModel: ObservableObject {
         }
     } // func castStringIntoColor
 
-    // ✅ NOTE: String型の色データをもとに、当てはまるColorデータを返します
-    func castStringIntoColor(color: String) -> Color {
+    // ✅ メソッド: 変更内容をもとに、tags内の対象データのタグネーム、タグカラーを更新します。
+    func updateTagsData(itemVM: ItemViewModel,
+                        itemTagName: String,
+                        selectTagName: String,
+                        selectTagColor: UsedColor) {
 
-        print("===========castStringIntoColor実行=============")
-        print("　引数で受け取ったstring値: 「\(color)」")
+        print("ーーーーーーー　updateTagsDataメソッド_実行　ーーーーーーーーー")
 
-        switch color {
-        case "赤":
-            print("　赤と判定されました。「.red」が返り値です。")
-            return .red
-        case "青":
-            print("　青と判定されました。「.blue」が返り値です。")
-            return .blue
-        case "黄":
-            print("　黄と判定されました。「.yellow」が返り値です。")
-            return .yellow
-        case "緑":
-            print("　緑と判定されました。「.green」が返り値です。")
-            return .green
-        default:
-            print("　どれにも判定されませんでした。「.gray」が返り値です。")
-            return .gray
+        // NOTE: for where文で更新対象要素を選出し、enumurated()でデータとインデックスを両方取得します。
+        for (index, tagData) in itemVM.tags.enumerated()
+        where tagData.tagName == itemTagName {
 
-        }
-    } // func castStringIntoColor
+            itemVM.tags[index] = Tag(tagName: selectTagName,
+                                     tagColor: selectTagColor)
 
-    // ✅ NOTE: Color型の色データをもとに、当てはまるStringデータを返します
-    func castColorIntoString(color: Color) -> String {
+            print("更新されたitemVM.tags: \(itemVM.tags[index])")
 
-        print("===========castColorIntoString実行=============")
-        print("　引数で受け取ったColor値: 「\(color)」")
+        } // for where
+    } // func updateTagsData
 
-        switch color {
-        case .red:
-            print("　.redと判定されました。返り値は「赤」です。")
-            return "赤"
+    // ✅ メソッド: 変更内容をもとに、items内の対象データのタグネーム、タグカラーを更新します。
+    func updateItemsTagData(itemVM: ItemViewModel,
+                            itemTagName: String,
+                            newTagName: String,
+                            newTagColorString: String) {
 
-        case .blue:
-            print("　.blueと判定されました。返り値は「青」です。")
-            return "青"
+        print("ーーーーーーー　updateItemsTagDataメソッド_実行　ーーーーーーーーー")
 
-        case .yellow:
-            print("　.yellowと判定されました。返り値は「黄」です。")
-            return "黄"
+        // NOTE: アイテムデータ内の更新対象タグを取り出して、同じタググループアイテムをまとめて更新します。
+        for (index, itemData) in itemVM.items.enumerated()
+        where itemData.tag == itemTagName {
 
-        case .green:
-            print("　.greenと判定されました。返り値は「緑」です。")
-            return "緑"
+            itemVM.items[index].tag = newTagName
+            itemVM.items[index].tagColor = newTagColorString
 
-        default:
-            print("　どれも判定されませんでした。返り値は「灰」です。")
-            return "灰"
+            print("更新されたitemVM.items: \(itemVM.items[index])")
 
-        }
-    } // func castColorIntoString
+        } // for where
+    } // func updateItemsTagData
 
 } // class

@@ -35,12 +35,9 @@ struct ItemStockView: View {
     @GestureState private var dragOffset: CGFloat = 0
 
     var body: some View {
-
         NavigationView {
-
             ZStack {
                 VStack {
-
                     // NOTE: 検索ボックスの表示管理
                     if isShowSearchField {
 
@@ -190,7 +187,10 @@ struct ItemStockView: View {
                 }
             } // .toolbar
             .animation(.easeIn(duration: 0.2), value: isShowSearchField)
-
+            } // VStack
+            .navigationTitle("ItemStock")
+            .padding(.top)
+            .navigationBarTitleDisplayMode(.inline)
         } // NavigationView
         .onTapGesture { searchFocused = nil }
 
