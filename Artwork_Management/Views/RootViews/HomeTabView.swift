@@ -73,7 +73,9 @@ struct HomeTabView: View {
                             .fontWeight(.black)
                         Spacer()
                         Button(
-                            action: { commerceState = .medium },
+                            action: {
+                                commerceState = .medium
+                            },
                             label: {
                                 HStack {
                                     Image(systemName: "trash.fill")
@@ -92,12 +94,12 @@ struct HomeTabView: View {
                         context: context,
                         main: {
                             BasketItems(
-                                basketItems: rootItemVM.items,
+                                basketItems: nil,
                                 halfSheetScroll: .main)
                         },
                         additional: {
                             BasketItems(
-                                basketItems: nil,
+                                basketItems: rootItemVM.items,
                                 halfSheetScroll: .additional)
 
                             Spacer()
@@ -111,7 +113,6 @@ struct HomeTabView: View {
             .sheetBackground { _ in
                 Color.white
                     .opacity(0.9)
-                
             }
             .background { _ in
                 EmptyView()

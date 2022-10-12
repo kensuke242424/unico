@@ -37,7 +37,9 @@ struct BasketItems: View {
             } else {
                 VStack {
                     Text("かごの中にアイテムはありません")
-                        .frame(height: 200)
+//                        .font(.title3)
+                        .foregroundColor(.gray)
+                        .frame(height: 100)
                 }
             }
 
@@ -53,7 +55,8 @@ struct BasketItems: View {
             } else {
                 VStack {
                     Spacer()
-                        .frame(width: UIScreen.main.bounds.width,height: 10)
+                        .frame(width: UIScreen.main.bounds.width,
+                               height: 10)
                 }
             }
 
