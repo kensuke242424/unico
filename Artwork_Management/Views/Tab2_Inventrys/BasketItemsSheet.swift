@@ -21,10 +21,15 @@ struct BasketItemsSheet: View {
 
     var body: some View {
 
+        // NOTE: 親View、ScrollResizableSheetの設定「.main」「.additional」
+        //       .main ⇨ シート呼び出し時に表示される要素を設定します。
+        //       .additional ⇨ シート内のスクロール全体に表示するアイテムを設定します。
         switch halfSheetScroll {
 
         case .main:
 
+            // NOTE: アイテム取引かごシート表示時のアイテム表示数をプロパティ「listLimit」の値分で制限します。
+            //       現在、シート呼び出し時の初期アイテム表示は3つまでとしています。以降の要素はスクロールにより表示します。
             if let basketItems = basketItems {
                 ForEach(0 ..< basketItems.count, id: \.self) { index in
                     if listLimit > index {
@@ -59,6 +64,7 @@ struct BasketItemsSheet: View {
     } // body
 } // View
 
+// ✅ カスタムView: かご内の一要素分のレイアウト
 struct BasketItemRow: View {
 
     let item: Item
@@ -66,6 +72,7 @@ struct BasketItemRow: View {
     var body: some View {
 
         VStack {
+            
             Divider()
                 .background(.gray)
 
@@ -73,12 +80,14 @@ struct BasketItemRow: View {
                 RoundedRectangle(cornerRadius: 10)
                     .frame(width: 100, height: 100)
                     .foregroundColor(.customLightGray1)
-                    .opacity(0.5)
+                    .opacity(0.3)
 
                 Spacer()
 
                 VStack(alignment: .trailing, spacing: 30) {
                     Text("\(item.name)")
+                        .foregroundColor(.black)
+                        .opacity(0.8)
                         .font(.title3.bold())
                         .lineLimit(1)
 
@@ -86,7 +95,9 @@ struct BasketItemRow: View {
 
                         HStack(alignment: .bottom) {
                             Text("¥")
+                                .foregroundColor(.black)
                             Text(String(item.price))
+                                .foregroundColor(.black)
                                 .font(.title3)
                                 .fontWeight(.heavy)
                             Spacer()
@@ -97,9 +108,10 @@ struct BasketItemRow: View {
                             Image(systemName: "minus.circle.fill")
                                 .resizable()
                                 .frame(width: 22, height: 22)
-                                .foregroundColor(.customlMiddlePurple1)
+                                .foregroundColor(.customlDarkPurple1)
                         }
                         Text("1")
+                            .foregroundColor(.black)
                             .fontWeight(.black)
                         Button {
                             // マイナスボタン
@@ -107,7 +119,7 @@ struct BasketItemRow: View {
                             Image(systemName: "plus.circle.fill")
                                 .resizable()
                                 .frame(width: 22, height: 22)
-                                .foregroundColor(.customlMiddlePurple1)
+                                .foregroundColor(.customlDarkPurple1)
                         }
                     }
                     .offset(y: 8)

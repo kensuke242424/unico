@@ -8,7 +8,9 @@
 import SwiftUI
 
 struct SystemView: View {
+
     @StateObject var itemVM: ItemViewModel
+
     var body: some View {
 
         VStack {
@@ -20,9 +22,6 @@ struct SystemView: View {
         } // VStack
         .background(LinearGradient(gradient: Gradient(colors: [.customDarkGray1, .customLightGray1]),
                                    startPoint: .top, endPoint: .bottom))
-        .onAppear {
-            UITableView.appearance().backgroundColor = UIColor.clear
-        }
     } // body
 } // View
 

@@ -8,35 +8,50 @@
 import SwiftUI
 import ResizableSheet
 
+// NOTE: 取引対象のアイテムの決済を完了するシートです。
 struct CommerceSheet: View {
 
-        @Binding var commerceState: ResizableSheetState
+    @Binding var commerceState: ResizableSheetState
+    @Binding var basketSheet: ResizableSheetState
 
     var body: some View {
         VStack {
             HStack {
-                Text("合計")
-                    .font(.title2.bold())
-                    .opacity(0.6)
-                    .offset(y: 3)
-                    .padding(.trailing, 2)
-                Text("10 個")
-                    .font(.title.bold())
+
+                Image(systemName: "shippingbox.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 30)
+                    .foregroundColor(.black)
+                    .padding(.horizontal)
+
+                HStack(alignment: .bottom) {
+                    Text("¥")
+                        .foregroundColor(.black)
+                        .font(.title2.bold())
+                    Text("1800")
+                        .foregroundColor(.black)
+                        .font(.title.bold())
+                    Spacer()
+                }
 
                 Spacer()
 
                 Button(
-                    action: { commerceState = .hidden },
+                    action: {
+                        commerceState = .hidden
+                        basketSheet = .hidden
+                    },
                     label: {
                         RoundedRectangle(cornerRadius: 20)
                             .foregroundColor(.customlMiddlePurple1)
                             .frame(width: 80, height: 50)
-                            .shadow(color: .gray, radius: 2)
+                            .shadow(radius: 2, x: 3, y: 3)
                             .overlay {
-                                Image(systemName: "arrowshape.turn.up.right.fill")
+                                Image(systemName: "checkmark")
                                     .resizable()
                                     .scaledToFit()
-                                    .frame(width: 30)
+                                    .frame(width: 20)
                                     .foregroundColor(.white)
                             }
                     }
@@ -45,5 +60,5 @@ struct CommerceSheet: View {
             .frame(height: 100)
             .padding(.horizontal, 20)
         } // VStack 決済シートレイアウト
-    }
-}
+    } // body
+} // View

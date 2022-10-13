@@ -15,6 +15,9 @@ extension Color {
     static let customlDarkPurple1 = Color("customlDarkPurple1")
     static let customlMiddlePurple1 = Color("customlMiddlePurple1")
 
-    static let customBackgroundDark2 = Color("backgroundDarkGray2")
-    static let backgroundDarkPurple2 = Color("backgroundDarkPurple2")
+    static let customDarkGray2 = Color("customDarkGray2")
+    static let customMediumGray2 = Color("customMediumGray2")
+    static let customLightGray2 = Color("customLightGray2")
+    static let customDarkBlue2 = Color("customDarkBlue2")
+    static let customLightBlue2 = Color("customLightBlue2")
 }

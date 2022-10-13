@@ -21,6 +21,8 @@ struct LibraryView: View {
 
             ZStack {
 
+
+
                 ScrollView(.vertical) {
 
                     VStack(spacing: 20) {

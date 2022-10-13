@@ -97,7 +97,7 @@ struct ButtonStyleView: View {
                                 .offset(x: 10, y: -10)
                         } // overlay
                 }
-                .foregroundColor(.customlMiddlePurple1)
+                .foregroundColor(.customDarkGray1)
                 .animation(.easeIn(duration: 0.2), value: buttonIcon)
                 .rotationEffect(Angle(degrees: angle), anchor: UnitPoint(x: 2.0, y: 2.0))
             } // overlay

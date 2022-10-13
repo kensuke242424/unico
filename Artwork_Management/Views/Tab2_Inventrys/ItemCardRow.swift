@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ItemCardRow: View {
 
-    // ダークモードの判定
+    // ダークモードの判定に用いる
     @Environment(\.colorScheme) var colorScheme
 
     @Binding var isShowItemDetail: Bool
@@ -25,7 +25,7 @@ struct ItemCardRow: View {
         RoundedRectangle(cornerRadius: 10)
             .foregroundColor(.white)
             .frame(width: itemWidth, height: itemHeight)
-            .opacity(colorScheme == .dark ? 0.2 : 1.0)
+            .opacity(colorScheme == .dark ? 0.3 : 0.3)
             .overlay(alignment: .topTrailing) {
                 Button {
                     print("rowIndex: \(rowIndex)")
@@ -38,8 +38,8 @@ struct ItemCardRow: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 23, height: 23)
-                        .foregroundColor(.customlMiddlePurple1)
-                        .opacity(0.5)
+                        .foregroundColor(.customDarkGray1)
+                        .opacity(0.6)
                 } // Button
             } // .overlay
 
@@ -47,11 +47,15 @@ struct ItemCardRow: View {
             .overlay {
                 RoundedRectangle(cornerRadius: 10)
                     .stroke(lineWidth: 0.2)
-                    .foregroundColor(.brown)
-                    .shadow(radius: 1)
+                    .shadow(radius: 3, x: 4, y: 4)
+                    .shadow(radius: 3, x: 4, y: 4)
+                    .shadow(radius: 3, x: 4, y: 4)
+                    .shadow(radius: 3, x: 4, y: 4)
+                    .shadow(radius: 3, x: 1, y: 1)
+                    .shadow(radius: 3, x: 1, y: 1)
                     .shadow(radius: 4)
                     .shadow(radius: 4)
-                    .shadow(radius: 4)
+                    .foregroundColor(.customDarkGray1)
                     .frame(width: itemWidth, height: itemHeight)
             } // overlay
 
@@ -59,11 +63,12 @@ struct ItemCardRow: View {
             .overlay {
                 VStack {
                     RoundedRectangle(cornerRadius: 5)
-                        .foregroundColor(.gray)
-                        .opacity(0.2)
+                        .foregroundColor(.white)
+                        .opacity(0.5)
                         .frame(width: itemWidth - 50, height: itemWidth - 50)
 
                     Text(item.name)
+                        .foregroundColor(.black)
                         .font(.callout)
                         .fontWeight(.heavy)
                         .padding(.horizontal, 5)
@@ -75,15 +80,17 @@ struct ItemCardRow: View {
 
                     HStack(alignment: .bottom) {
                         Text("¥")
+                            .foregroundColor(.black)
                         Text(String(item.price))
                             .font(.title3)
                             .fontWeight(.heavy)
+                            .foregroundColor(.black)
                         Spacer()
 
                         Button {
                             //
                         } label: {
-                            Image(systemName: "checkmark.seal.fill")
+                            Image(systemName: "plus.circle.fill")
                                 .resizable()
                                 .frame(width: 28, height: 28)
                                 .foregroundColor(.customDarkGray1)

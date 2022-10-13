@@ -9,10 +9,6 @@ import SwiftUI
 
 struct SystemListView: View {
 
-    init() {
-            UITableView.appearance().backgroundColor = UIColor.black
-        }
-
     var body: some View {
 
         List {
@@ -45,11 +41,8 @@ struct SystemListView: View {
             }
 
         } // List
-        .background(LinearGradient(gradient: Gradient(colors: [.backgroundDarkPurple2, .customBackgroundDark2]),
+        .background(LinearGradient(gradient: Gradient(colors: [.customDarkGray1, .customLightGray1]),
                                    startPoint: .top, endPoint: .bottom))
-        .onAppear {
-            UITableView.appearance().backgroundColor = .clear
-        }
     } // body
 } // View
 

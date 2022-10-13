@@ -43,6 +43,7 @@ struct ManageView: View {
                             ForEach(itemVM.tags) { tag in
 
                                 Text("- \(tag.tagName) -")
+                                    .foregroundColor(.white)
                                     .font(.largeTitle.bold())
                                     .shadow(radius: 2, x: 4, y: 6)
                                     .padding(.vertical)
@@ -195,6 +196,8 @@ struct ManageView: View {
                 VStack(alignment: .leading, spacing: 10) {
                     HStack(spacing: 40) {
                         Text("\(item.sales)円")
+                            .foregroundColor(.white)
+                            .opacity(0.8)
                             .font(.subheadline.bold())
 
                         Button {

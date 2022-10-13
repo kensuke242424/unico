@@ -53,7 +53,7 @@ struct EditItemView: View {
                                                                 [.clear, .customLightGray1]),
                                                        startPoint: .top, endPoint: .bottom)
                         }
-                        .offset(y: 150)
+                        .offset(y: 340)
                     VStack {
                         // ✅カスタムView 写真ゾーン
                         SelectItemPhotoArea(selectTagColor: input.selectionTagColor)
@@ -244,7 +244,6 @@ struct EditItemView: View {
             } // toolbar(アイテム追加ボタン)
 
         } // NavigationView
-        
     } // body
 } // View
 

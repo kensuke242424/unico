@@ -13,33 +13,36 @@ struct ItemStockView: View {
     @Environment(\.colorScheme) var colorScheme
 
     @StateObject var itemVM: ItemViewModel
+    @Binding var basketState: ResizableSheetState
+    @Binding var commerceState: ResizableSheetState
 
     let sideBarTagItemPadding: CGFloat = 80
 
-    @State private var searchItemText = ""
-    @State private var currentIndex = 0
-    @State private var listIndex = 0
-    @State private var sideTagOpacity: CGFloat = 0.7
-    @State private var isPresentedNewItem = false
-    @State private var isShowSearchField = false
-    @State private var isShowItemDetail: Bool = false
-    @State var state: ResizableSheetState = .hidden
-    @State private var mode: Mode = .dark
-
     @FocusState var searchFocused: SearchFocus?
-
     @GestureState private var dragOffset: CGFloat = 0
+
+    struct InputStock {
+
+        var searchItemNameText = ""
+        var currentIndex = 0
+        var listIndex = 0
+        var sideTagOpacity: CGFloat = 0.4
+        var isPresentedNewItem = false
+        var isShowSearchField = false
+        var isShowItemDetail: Bool = false
+        var state: ResizableSheetState = .hidden
+        var mode: Mode = .dark
+    }
+    @State private var input: InputStock = InputStock()
 
     var body: some View {
         NavigationView {
+
             ZStack {
                 VStack {
-
                     // NOTE: 検索ボックスの表示管理
-                    if isShowSearchField {
-
-                        TextField("キーワード検索", text: $searchItemText)
-                            .textFieldStyle(.roundedBorder)
+                    if input.isShowSearchField {
+                        TextField("キーワード検索", text: $input.searchItemNameText)
                             .focused($searchFocused, equals: .check)
                             .padding(.horizontal)
                     }
@@ -52,6 +55,7 @@ struct ItemStockView: View {
                             ForEach(itemVM.tags.indices, id: \.self) {index in
 
                                 Text(itemVM.tags[index].tagName)
+                                    .foregroundColor(.white)
                                     .font(.system(size: 20, weight: .bold))
                                     .frame(width: bodyView.size.width * 0.7, height: 40)
                                     .padding(.leading, index == 0 ? bodyView.size.width * 0.1 : 0)
@@ -60,35 +64,35 @@ struct ItemStockView: View {
                         } // LazyHStack
                         .padding()
                         .offset(x: self.dragOffset)
-                        .offset(x: -CGFloat(self.currentIndex) * (bodyView.size.width * 0.7 + sideBarTagItemPadding))
+                        .offset(x: -CGFloat(input.currentIndex) * (bodyView.size.width * 0.7 + sideBarTagItemPadding))
 
                         .gesture(
                             DragGesture()
                                 .updating(self.$dragOffset, body: { (value, state, _) in
 
                                     // 先頭・末尾ではスクロールする必要がないので、画面幅の1/5までドラッグで制御する
-                                    if self.currentIndex == 0, value.translation.width > 0 {
+                                    if input.currentIndex == 0, value.translation.width > 0 {
                                         state = value.translation.width / 5
-                                    } else if self.currentIndex == (itemVM.tags.count - 1), value.translation.width < 0 {
+                                    } else if input.currentIndex == (itemVM.tags.count - 1), value.translation.width < 0 {
                                         state = value.translation.width / 5
                                     } else {
                                         state = value.translation.width
                                     }
                                 })
                                 .onEnded({ value in
-                                    var newIndex = self.currentIndex
+                                    var newIndex = input.currentIndex
 
                                     // ドラッグ幅からページングを判定
                                     // 今回は画面幅x0.3としているが、操作感に応じてカスタマイズする必要がある
                                     if abs(value.translation.width) > bodyView.size.width * 0.2 {
-                                        newIndex = value.translation.width > 0 ? self.currentIndex - 1 : self.currentIndex + 1
+                                        newIndex = value.translation.width > 0 ? input.currentIndex - 1 : input.currentIndex + 1
                                     }
                                     if newIndex < 0 {
                                         newIndex = 0
                                     } else if newIndex > (itemVM.tags.count - 1) {
                                         newIndex = itemVM.tags.count - 1
                                     }
-                                    self.currentIndex = newIndex
+                                    input.currentIndex = newIndex
                                 }) // .onEnded
                         ) // .gesture
                         // 減衰ばねモデル、それぞれの値は操作感に応じて変更する
@@ -102,80 +106,165 @@ struct ItemStockView: View {
 
                     // NOTE: サイドタグバーの枠フレームおよび、前後のタグインフォメーションを表示します。
                     .overlay {
-                        SideTagBarOverlay(currentIndex: $currentIndex,
-                                          sideTagOpacity: $sideTagOpacity,
+                        SideTagBarOverlay(currentIndex: $input.currentIndex,
+                                          sideTagOpacity: $input.sideTagOpacity,
                                           tags: $itemVM.tags)
                     } // overlay
+                    .padding(.top)
 
                     // NOTE: サイドタグバー両端のタグインフォメーションopacityを、ドラッグ位置を監視して管理しています。
                     .onChange(of: dragOffset) { newValue in
                         if newValue == 0 {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                self.sideTagOpacity = 0.3
+                                input.sideTagOpacity = 0.4
                             }
                         } else {
-                            self.sideTagOpacity = 0.0
+                            input.sideTagOpacity = 0.0
                         }
                     } // onChange
 
                     // Check: タグセレクトバーの選択タグindex値
-                    .onChange(of: currentIndex) { newValue in
-                            print(newValue)
+                    .onChange(of: input.currentIndex) { newValue in
+                        print(newValue)
                     }
 
                     // NOTE: アイテム要素全体のロケーション
                     ScrollView {
                         TagTitle(title: "最近更新したアイテム", font: .title3)
+                            .foregroundColor(.white)
+                            .opacity(0.8)
                             .padding(.top)
 
                         Divider()
                             .background(.gray)
                             .padding()
-                         // ✅カスタムView: 最近更新したアイテムをHStack表示します。(横スクロール)
-                        UpdateTimeCards(isShowItemDetail: $isShowItemDetail,
-                                        listIndex: $listIndex,
+                        // ✅カスタムView: 最近更新したアイテムをHStack表示します。(横スクロール)
+                        UpdateTimeCards(isShowItemDetail: $input.isShowItemDetail,
+                                        listIndex: $input.listIndex,
                                         itemWidth: UIScreen.main.bounds.width * 0.41,
                                         itemHeight: 210,
                                         itemSpase: 20,
                                         itemNameTag: "アイテム",
                                         items: itemVM.items)
 
-                         Divider()
-                             .background(.gray)
-                             .padding()
-
-                        TagTitle(title: itemVM.tags[currentIndex].tagName, font: .title)
+                        Divider()
+                            .background(.gray)
                             .padding()
-                         // ✅カスタムView: アイテムを表示します。(縦スクロール)
-                         TagCards(isShowItemDetail: $isShowItemDetail,
-                                  listIndex: $listIndex,
-                                  itemWidth: UIScreen.main.bounds.width * 0.43,
-                                  itemHeight: 220,
-                                  itemSpase: 20,
-                                  itemNameTag: "アイテム",
-                                  items: itemVM.items)
+
+                        TagTitle(title: itemVM.tags[input.currentIndex].tagName, font: .title)
+                            .foregroundColor(.white)
+                            .opacity(0.8)
+                            .padding()
+                        // ✅カスタムView: アイテムを表示します。(縦スクロール)
+                        TagCards(isShowItemDetail: $input.isShowItemDetail,
+                                 listIndex: $input.listIndex,
+                                 itemWidth: UIScreen.main.bounds.width * 0.43,
+                                 itemHeight: 220,
+                                 itemSpase: 20,
+                                 itemNameTag: "アイテム",
+                                 items: itemVM.items)
                     } // ScrollView (アイテムロケーション)
 
                 } // VStack
-
                 // NOTE: アイテム詳細ボタンをタップすると、詳細画面が発火します。
-                if isShowItemDetail {
+                if input.isShowItemDetail {
                     ShowsItemDetail(itemVM: itemVM,
-                                    item: itemVM.items[listIndex],
-                                    itemIndex: listIndex,
-                                    isShowitemDetail: $isShowItemDetail)
+                                    item: itemVM.items[input.listIndex],
+                                    itemIndex: input.listIndex,
+                                    isShowitemDetail: $input.isShowItemDetail)
                 } // if isShowItemDetail
             } // ZStack
-            .background(LinearGradient(gradient: Gradient(colors: [.customDarkGray1, .customLightGray1]),
+            .background(LinearGradient(gradient: Gradient(colors: [.customDarkGray1,
+                                                                   .customLightGray1]),
                                        startPoint: .top, endPoint: .bottom))
-            .navigationTitle("ItemStock")
-            .navigationBarTitleDisplayMode(.inline)
+            // アイテム取引かごのシート画面
+            .resizableSheet($basketState, id: "A") {builder in
+                builder.content { context in
+
+                    VStack {
+                        HStack(alignment: .bottom) {
+                            Text("カート内のアイテム")
+                                .foregroundColor(.black)
+                                .font(.headline)
+                                .fontWeight(.black)
+                                .opacity(0.6)
+                            Spacer()
+                            Button(
+                                action: {
+                                    basketState = .hidden
+                                    commerceState = .hidden
+                                },
+                                label: {
+                                    HStack {
+                                        Image(systemName: "trash.fill")
+                                        Text("全て削除")
+                                            .font(.callout)
+                                    }
+                                    .foregroundColor(.red)
+                                    .opacity(0.7)
+                                }
+                            ) // Button
+                        } // HStack
+                        .padding(.horizontal, 20)
+                        .padding(.top, 20)
+                        .frame(height: 50)
+
+                        ResizableScrollView(
+                            context: context,
+                            main: {
+                                BasketItemsSheet(
+                                    basketItems: itemVM.items,
+                                    halfSheetScroll: .main)
+                            },
+                            additional: {
+                                BasketItemsSheet(
+                                    basketItems: itemVM.items,
+                                    halfSheetScroll: .additional)
+
+                                Spacer()
+                                    .frame(height: 100)
+                            }
+                        )
+                        Spacer()
+                            .frame(height: 120)
+                    } // VStack
+                } // builder.content
+                .sheetBackground { _ in
+                    LinearGradient(gradient: Gradient(colors: [.white, .customLightGray1]),
+                                   startPoint: .leading, endPoint: .trailing)
+                    .opacity(0.95)
+                    .blur(radius: 1)
+                }
+                .background { _ in
+                    EmptyView()
+                }
+            } // .resizableSheet
+
+            // 決済リザルトのシート画面
+            .resizableSheet($commerceState, id: "B") {builder in
+                builder.content { _ in
+
+                    CommerceSheet(commerceState: $commerceState,
+                                  basketSheet: $basketState)
+
+                } // builder.content
+                .supportedState([.hidden, .medium])
+                .sheetBackground { _ in
+                    LinearGradient(gradient: Gradient(colors: [.white, .customLightGray1]),
+                                   startPoint: .leading, endPoint: .trailing)
+                    .opacity(0.95)
+                }
+                .background { _ in
+                    EmptyView()
+                }
+            } // .resizableSheet
+
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
-                        self.isShowSearchField.toggle()
+                        input.isShowSearchField.toggle()
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                            self.searchFocused = isShowSearchField ? .check : nil
+                            searchFocused = input.isShowSearchField ? .check : nil
                         }
                     } label: {
                         Image(systemName: "magnifyingglass")
@@ -186,7 +275,7 @@ struct ItemStockView: View {
                     } // Button
                 }
             } // .toolbar
-            .animation(.easeIn(duration: 0.2), value: isShowSearchField)
+            .animation(.easeIn(duration: 0.2), value: input.isShowSearchField)
             .navigationTitle("ItemStock")
             .navigationBarTitleDisplayMode(.inline)
         } // NavigationView
@@ -195,12 +284,12 @@ struct ItemStockView: View {
         // NOTE: ディスプレイのカラーモードを検知し、enumを切り替えます。
         .onChange(of: colorScheme) { _ in
             switch colorScheme {
-            case .light: mode = .light
-            case .dark: mode = .dark
+            case .light: input.mode = .light
+            case .dark: input.mode = .dark
             default:
                 fatalError()
             } // switch
-            print("ディスプレイモード: \(mode)")
+            print("ディスプレイモード: \(input.mode)")
         } // .onChange
     } // body
 } // View
@@ -214,13 +303,13 @@ struct TagTitle: View {
     var body: some View {
 
         HStack {
-             Text("- \(title) -")
-                 .font(font.bold())
-                 .shadow(radius: 3, x: 4, y: 6)
-                 .padding(.horizontal)
+            Text("- \(title) -")
+                .font(font.bold())
+                .shadow(radius: 3, x: 4, y: 6)
+                .padding(.horizontal)
 
             Spacer()
-         }
+        }
     } // body
 } // カスタムView
 
@@ -234,7 +323,7 @@ struct SideTagBarOverlay: View {
     var body: some View {
         RoundedRectangle(cornerRadius: 0)
             .stroke(lineWidth: 0.2)
-//            .opacity(0.3)
+            .opacity(0.5)
             .frame(width: UIScreen.main.bounds.width + 10, height: 40)
             .shadow(color: .black, radius: 3, x: 0, y: 0)
             .shadow(color: .black, radius: 3, x: 0, y: 0)
@@ -261,9 +350,10 @@ struct SideTagBarOverlay: View {
                                 .lineLimit(1)
                             Text(">")
                         } // HStack
-                        .onTapGesture { self.currentIndex += 1 }
+                        .onTapGesture { currentIndex += 1 }
                     }
                 } // HStack
+                .foregroundColor(.white)
                 .padding(.horizontal, 20)
                 .opacity(sideTagOpacity)
                 .animation(.easeIn(duration: 0.1), value: currentIndex)
@@ -276,15 +366,17 @@ struct SideTagBarOverlay: View {
 struct ItemStockControlView_Previews: PreviewProvider {
     static var previews: some View {
         var windowScene: UIWindowScene? {
-                    let scenes = UIApplication.shared.connectedScenes
-                    let windowScene = scenes.first as? UIWindowScene
-                    return windowScene
-                }
+            let scenes = UIApplication.shared.connectedScenes
+            let windowScene = scenes.first as? UIWindowScene
+            return windowScene
+        }
         var resizableSheetCenter: ResizableSheetCenter? {
-                   windowScene.flatMap(ResizableSheetCenter.resolve(for:))
-               }
+            windowScene.flatMap(ResizableSheetCenter.resolve(for:))
+        }
 
-        return ItemStockView(itemVM: ItemViewModel())
-            .environment(\.resizableSheetCenter, resizableSheetCenter)
+        return ItemStockView(itemVM: ItemViewModel(),
+                             basketState: .constant(.hidden),
+                             commerceState: .constant(.hidden))
+        .environment(\.resizableSheetCenter, resizableSheetCenter)
     }
 } // View_Previews

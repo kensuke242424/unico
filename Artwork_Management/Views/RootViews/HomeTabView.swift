@@ -31,7 +31,9 @@ struct HomeTabView: View {
                     }
                     .tag(0)
 
-                ItemStockView(itemVM: rootItemVM)
+                ItemStockView(itemVM: rootItemVM,
+                              basketState: $basketState,
+                              commerceState: $commerceState)
                     .tabItem {
                         Image(systemName: "shippingbox.fill")
                         Text("inventory")
@@ -63,83 +65,6 @@ struct HomeTabView: View {
 
         } // ZStack
         .navigationBarBackButtonHidden()
-
-        // Todo: 買い物かごシート
-        .resizableSheet($basketState, id: "A") {builder in
-            builder.content { context in
-
-                VStack {
-                    HStack(alignment: .bottom) {
-                        Text("カート内のアイテム")
-                            .font(.headline)
-                            .fontWeight(.black)
-                            .opacity(0.6)
-                        Spacer()
-                        Button(
-                            action: {
-                                basketState = .hidden
-                                commerceState = .hidden
-                            },
-                            label: {
-                                HStack {
-                                    Image(systemName: "trash.fill")
-                                    Text("全て削除")
-                                        .font(.callout)
-
-                                }
-                                .foregroundColor(.red)
-                            }
-                        ) // Button
-                    } // HStack
-                    .padding(.horizontal, 20)
-                    .padding(.top, 20)
-                    .frame(height: 50)
-
-                    ResizableScrollView(
-                        context: context,
-                        main: {
-                            BasketItemsSheet(
-                                basketItems: rootItemVM.items,
-                                halfSheetScroll: .main)
-                        },
-                        additional: {
-                            BasketItemsSheet(
-                                basketItems: rootItemVM.items,
-                                halfSheetScroll: .additional)
-
-                            Spacer()
-                                .frame(height: 100)
-                        }
-                    )
-                    Spacer()
-                        .frame(height: 120)
-                } // VStack バスケットシートレイアウト
-            } // builder.content
-            .sheetBackground { _ in
-                Color.white
-                    .opacity(0.9)
-                    .blur(radius: 1)
-            }
-            .background { _ in
-                EmptyView()
-            }
-        } // .resizableSheet
-
-        // Todo: 決済シート
-        .resizableSheet($commerceState, id: "B") {builder in
-            builder.content { _ in
-
-                CommerceSheet(commerceState: $commerceState)
-
-            } // builder.content
-            .supportedState([.hidden, .medium])
-            .sheetBackground { _ in
-                Color.white
-            }
-            .background { _ in
-                EmptyView()
-            }
-        } // .resizableSheet
     } // body
 } // View
 

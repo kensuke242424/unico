@@ -95,6 +95,8 @@ struct TagCards_Previews: PreviewProvider {
                                  itemSpase: 20,
                                  itemNameTag: "アイテム",
                                  items: [
+
+                                    // NOTE: テストデータ
                                     Item(tag: "Album", tagColor: "赤", name: "Album1", detail: "Album1のアイテム紹介テキストです。", photo: "",
                                          price: 1800, sales: 88000, inventory: 200, createTime: Date(), updateTime: Date()),
                                     Item(tag: "Album", tagColor: "赤", name: "Album2", detail: "Album2のアイテム紹介テキストです。", photo: "",
@@ -120,6 +122,7 @@ struct TagCards_Previews: PreviewProvider {
                      itemSpase: 20,
                      itemNameTag: "アイテム",
                      items: [
+                        // NOTE: テストデータ
                         Item(tag: "Album", tagColor: "赤", name: "Album1ddddddddddd", detail: "Album1のアイテム紹介テキストです。", photo: "",
                              price: 1800, sales: 88000, inventory: 200, createTime: Date(), updateTime: Date()),
                         Item(tag: "Album", tagColor: "赤", name: "Album2", detail: "Album2のアイテム紹介テキストです。", photo: "",

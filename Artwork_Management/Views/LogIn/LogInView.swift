@@ -97,6 +97,7 @@ struct LogInInfomation: View {
 
                 TextField("artwork/@gmail.com", text: $input.address)
 
+
                 HStack {
                     Text("パスワード")
 
