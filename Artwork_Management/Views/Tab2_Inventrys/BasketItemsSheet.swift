@@ -14,7 +14,7 @@ enum HalfSheetScroll {
 
 struct BasketItemsSheet: View {
 
-    let basketItems: [Item]?
+    @Binding var basketItems: [Item]?
     let halfSheetScroll: HalfSheetScroll
 
     private let listLimit: Int = 3
@@ -48,18 +48,22 @@ struct BasketItemsSheet: View {
         case .additional:
 
             if let basketItems = basketItems {
-                ForEach(listLimit ..< basketItems.count, id: \.self) { index in
-                    BasketItemRow(item: basketItems[index])
-                } // ForEach
-                .padding()
-                .frame(width: UIScreen.main.bounds.width, height: 120)
-
+                if basketItems.count > listLimit {
+                    ForEach(listLimit ..< basketItems.count, id: \.self) { index in
+                        BasketItemRow(item: basketItems[index])
+                    } // ForEach
+                    .padding()
+                    .frame(width: UIScreen.main.bounds.width, height: 120)
+                } else {
+                    Spacer()
+                        .frame(width: UIScreen.main.bounds.width,
+                               height: 10)
+                }
             } else {
                 Spacer()
                     .frame(width: UIScreen.main.bounds.width,
                            height: 10)
-            }
-
+            } // if let
         } // switch
     } // body
 } // View
@@ -132,13 +136,13 @@ struct BasketItemRow: View {
 struct BasketItems_Previews: PreviewProvider {
     static var previews: some View {
         BasketItemsSheet(basketItems:
-            [
+                .constant([
                 Item(tag: "Album", tagColor: "赤", name: "Album1", detail: "Album1のアイテム紹介テキストです。", photo: "",
                      price: 1800, sales: 88000, inventory: 200, createTime: Date(), updateTime: Date()),
                 Item(tag: "Album", tagColor: "赤", name: "Album2", detail: "Album2のアイテム紹介テキストです。", photo: "",
                      price: 2800, sales: 230000, inventory: 420, createTime: Date(), updateTime: Date()),
                 Item(tag: "Album", tagColor: "赤", name: "Album3", detail: "Album3のアイテム紹介テキストです。", photo: "", price: 2800, sales: 230000, inventory: 420, createTime: Date(), updateTime: Date())
-            ],
+            ]),
                     halfSheetScroll: .main
         )
     }

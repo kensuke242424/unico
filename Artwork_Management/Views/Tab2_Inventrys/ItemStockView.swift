@@ -132,6 +132,13 @@ struct ItemStockView: View {
                             print(newValue)
                         }
 
+                        .onChange(of: input.resultBasketItems) { _ in
+
+                            guard input.resultBasketItems != nil else { return }
+
+                            commerceState = .medium
+                        }
+
                         // NOTE: アイテム要素全体のロケーション
                         ScrollView {
                             TagTitle(title: "最近更新したアイテム", font: .title3)
@@ -227,10 +234,14 @@ struct ItemStockView: View {
                             Spacer()
                             Button(
                                 action: {
+                                    input.resultBasketItems = []
                                     basketState = .hidden
-                                    commerceState = .hidden
-                                    input.resultPrice = 0
-                                    input.resultItemAmount = 0
+                                    // NOTE: .hiddenと値のリセット処理が重なるとうまくシートが閉じなかったので、ずらしています。
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                        commerceState = .hidden
+                                        input.resultPrice = 0
+                                        input.resultItemAmount = 0
+                                    }
                                 },
                                 label: {
                                     HStack {
@@ -249,12 +260,12 @@ struct ItemStockView: View {
                             context: context,
                             main: {
                                 BasketItemsSheet(
-                                    basketItems: itemVM.items,
+                                    basketItems: $input.resultBasketItems,
                                     halfSheetScroll: .main)
                             },
                             additional: {
                                 BasketItemsSheet(
-                                    basketItems: itemVM.items,
+                                    basketItems: $input.resultBasketItems,
                                     halfSheetScroll: .additional)
 
                                 Spacer()
@@ -281,9 +292,10 @@ struct ItemStockView: View {
                 builder.content { _ in
 
                     CommerceSheet(commerceState: $commerceState,
-                                  basketSheet: $basketState,
+                                  basketState: $basketState,
                                   resultPrice: $input.resultPrice,
-                                  resultItemAmount: $input.resultItemAmount)
+                                  resultItemAmount: $input.resultItemAmount,
+                                  resultBasketItems: $input.resultBasketItems)
 
                 } // builder.content
                 .supportedState([.hidden, .medium])
@@ -385,7 +397,7 @@ struct SideTagBarOverlay: View {
     }
 } // カスタムView
 
-struct ItemStockControlView_Previews: PreviewProvider {
+struct ItemStockView_Previews: PreviewProvider {
     static var previews: some View {
         var windowScene: UIWindowScene? {
             let scenes = UIApplication.shared.connectedScenes

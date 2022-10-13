@@ -12,35 +12,41 @@ import ResizableSheet
 struct CommerceSheet: View {
 
     @Binding var commerceState: ResizableSheetState
-    @Binding var basketSheet: ResizableSheetState
+    @Binding var basketState: ResizableSheetState
     @Binding var resultPrice: Int
     @Binding var resultItemAmount: Int
+    @Binding var resultBasketItems: [Item]?
 
     var body: some View {
         VStack {
             HStack {
 
-                Image(systemName: "shippingbox.fill")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 30)
-                    .foregroundColor(.black)
-                    .padding(.horizontal)
-                    .overlay(alignment: .topTrailing) {
-                        if resultItemAmount <= 50 {
-                            Image(systemName: "\(resultItemAmount).circle")
-                                .offset(y: -8)
-                        } else {
-                            Image(systemName: "50.circle").offset(y: -8)
-                                .overlay(alignment: .topTrailing) {
-                                    Text("＋")
-                                        .font(.caption)
-                                        .offset(x: 7, y: -12)
-                                }
-                        }
+                Button {
+                    basketState = .medium
+                } label: {
+                    Image(systemName: "shippingbox.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 30)
+                        .foregroundColor(.black)
+                        .padding(.horizontal)
+                        .overlay(alignment: .topTrailing) {
+                            if resultItemAmount <= 50 {
+                                Image(systemName: "\(resultItemAmount).circle")
+                                    .foregroundColor(.black)
+                                    .offset(y: -8)
+                            } else {
+                                Image(systemName: "50.circle").offset(y: -8)
+                                    .foregroundColor(.black)
+                                    .overlay(alignment: .topTrailing) {
+                                        Text("＋")
+                                            .font(.caption)
+                                            .offset(x: 7, y: -12)
+                                    }
 
-                    }
-
+                            }
+                        } // overlay
+                } // Button
                 HStack(alignment: .bottom) {
                     Text("¥")
                         .foregroundColor(.black)
@@ -55,10 +61,15 @@ struct CommerceSheet: View {
 
                 Button(
                     action: {
-                        commerceState = .hidden
-                        basketSheet = .hidden
-                        resultPrice = 0
-                        resultItemAmount = 0
+
+                        resultBasketItems?.removeAll()
+                        basketState = .hidden
+                        // NOTE: .hiddenと値のリセット処理が重なるとうまくシートが閉じなかったので、ずらしています。
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            commerceState = .hidden
+                            resultPrice = 0
+                            resultItemAmount = 0
+                        }
                     },
                     label: {
                         RoundedRectangle(cornerRadius: 20)
@@ -77,6 +88,8 @@ struct CommerceSheet: View {
             } // HStack
             .frame(height: 100)
             .padding(.horizontal, 20)
+            .animation(nil, value: resultPrice)
+            .animation(.easeIn(duration: 1.0), value: resultPrice)
         } // VStack 決済シートレイアウト
     } // body
 } // View

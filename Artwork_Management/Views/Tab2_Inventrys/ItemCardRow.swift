@@ -93,9 +93,11 @@ struct ItemCardRow: View {
 
                         Button {
                             // 取引かごに追加するボタン
-                            // タップするたびに、値段合計、個数にプラスする
+                            // タップするたびに、値段合計、個数、カート内アイテム要素にプラスする
                             resultPrice += item.price
                             resultItemAmount += 1
+                            resultBasketItems?.append(item)
+
                             print("resultPrice: \(resultPrice)円")
                             print("resultItemAmount: \(resultItemAmount)個")
 
