@@ -14,6 +14,10 @@ struct ItemCardRow: View {
 
     @Binding var isShowItemDetail: Bool
     @Binding var listIndex: Int
+    @Binding var resultPrice: Int
+    @Binding var resultItemAmount: Int
+    @Binding var resultBasketItems: [Item]?
+
     let rowIndex: Int
 
     let item: Item
@@ -88,7 +92,13 @@ struct ItemCardRow: View {
                         Spacer()
 
                         Button {
-                            //
+                            // 取引かごに追加するボタン
+                            // タップするたびに、値段合計、個数にプラスする
+                            resultPrice += item.price
+                            resultItemAmount += 1
+                            print("resultPrice: \(resultPrice)円")
+                            print("resultItemAmount: \(resultItemAmount)個")
+
                         } label: {
                             Image(systemName: "plus.circle.fill")
                                 .resizable()
@@ -109,6 +119,9 @@ struct ItemCardRow_Previews: PreviewProvider {
 
         ItemCardRow(isShowItemDetail: .constant(false),
                     listIndex: .constant(0),
+                    resultPrice: .constant(12000),
+                    resultItemAmount: .constant(3),
+                    resultBasketItems: .constant([]),
                     rowIndex: 0,
                     item: Item(tag: "Album",
                                tagColor: "赤",

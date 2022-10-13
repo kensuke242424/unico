@@ -13,22 +13,23 @@ struct ItemStockView: View {
     @Environment(\.colorScheme) var colorScheme
 
     @StateObject var itemVM: ItemViewModel
+    @Binding var isShowSearchField: Bool
     @Binding var basketState: ResizableSheetState
     @Binding var commerceState: ResizableSheetState
-
-    let sideBarTagItemPadding: CGFloat = 80
 
     @FocusState var searchFocused: SearchFocus?
     @GestureState private var dragOffset: CGFloat = 0
 
     struct InputStock {
 
-        var searchItemNameText = ""
-        var currentIndex = 0
-        var listIndex = 0
+        var searchItemNameText: String = ""
+        var currentIndex: Int = 0
+        var listIndex: Int = 0
+        var resultPrice: Int = 0
+        var resultItemAmount: Int = 0
+        var resultBasketItems: [Item]? = []
         var sideTagOpacity: CGFloat = 0.4
         var isPresentedNewItem = false
-        var isShowSearchField = false
         var isShowItemDetail: Bool = false
         var state: ResizableSheetState = .hidden
         var mode: Mode = .dark
@@ -38,10 +39,13 @@ struct ItemStockView: View {
     var body: some View {
         NavigationView {
 
+//            ScrollViewReader { scrollProxy in
+//
+//            }
             ZStack {
                 VStack {
                     // NOTE: 検索ボックスの表示管理
-                    if input.isShowSearchField {
+                    if isShowSearchField {
                         TextField("キーワード検索", text: $input.searchItemNameText)
                             .focused($searchFocused, equals: .check)
                             .padding(.horizontal)
@@ -49,6 +53,8 @@ struct ItemStockView: View {
 
                     // NOTE: Geometryを用いたサイドタグセレクトバー
                     GeometryReader { bodyView in
+
+                        let sideBarTagItemPadding: CGFloat = 80
 
                         LazyHStack(spacing: sideBarTagItemPadding) {
 
@@ -139,13 +145,16 @@ struct ItemStockView: View {
                             .background(.gray)
                             .padding()
                         // ✅カスタムView: 最近更新したアイテムをHStack表示します。(横スクロール)
-                        UpdateTimeCards(isShowItemDetail: $input.isShowItemDetail,
-                                        listIndex: $input.listIndex,
-                                        itemWidth: UIScreen.main.bounds.width * 0.41,
-                                        itemHeight: 210,
-                                        itemSpase: 20,
-                                        itemNameTag: "アイテム",
-                                        items: itemVM.items)
+                        UpdateTimeSortCards(isShowItemDetail: $input.isShowItemDetail,
+                                            listIndex: $input.listIndex,
+                                            resultPrice: $input.resultPrice,
+                                            resultItemAmount: $input.resultItemAmount,
+                                            resultBasketItems: $input.resultBasketItems,
+                                            itemWidth: UIScreen.main.bounds.width * 0.41,
+                                            itemHeight: 210,
+                                            itemSpase: 20,
+                                            itemNameTag: "アイテム",
+                                            items: itemVM.items)
 
                         Divider()
                             .background(.gray)
@@ -156,13 +165,16 @@ struct ItemStockView: View {
                             .opacity(0.8)
                             .padding()
                         // ✅カスタムView: アイテムを表示します。(縦スクロール)
-                        TagCards(isShowItemDetail: $input.isShowItemDetail,
-                                 listIndex: $input.listIndex,
-                                 itemWidth: UIScreen.main.bounds.width * 0.43,
-                                 itemHeight: 220,
-                                 itemSpase: 20,
-                                 itemNameTag: "アイテム",
-                                 items: itemVM.items)
+                        TagSortCards(isShowItemDetail: $input.isShowItemDetail,
+                                     listIndex: $input.listIndex,
+                                     resultPrice: $input.resultPrice,
+                                     resultItemAmount: $input.resultItemAmount,
+                                     resultBasketItems: $input.resultBasketItems,
+                                     itemWidth: UIScreen.main.bounds.width * 0.43,
+                                     itemHeight: 220,
+                                     itemSpase: 20,
+                                     itemNameTag: "アイテム",
+                                     items: itemVM.items)
                     } // ScrollView (アイテムロケーション)
 
                 } // VStack
@@ -182,6 +194,9 @@ struct ItemStockView: View {
                 builder.content { context in
 
                     VStack {
+
+                        GrabBar()
+
                         HStack(alignment: .bottom) {
                             Text("カート内のアイテム")
                                 .foregroundColor(.black)
@@ -193,6 +208,8 @@ struct ItemStockView: View {
                                 action: {
                                     basketState = .hidden
                                     commerceState = .hidden
+                                    input.resultPrice = 0
+                                    input.resultItemAmount = 0
                                 },
                                 label: {
                                     HStack {
@@ -206,8 +223,6 @@ struct ItemStockView: View {
                             ) // Button
                         } // HStack
                         .padding(.horizontal, 20)
-                        .padding(.top, 20)
-                        .frame(height: 50)
 
                         ResizableScrollView(
                             context: context,
@@ -245,7 +260,9 @@ struct ItemStockView: View {
                 builder.content { _ in
 
                     CommerceSheet(commerceState: $commerceState,
-                                  basketSheet: $basketState)
+                                  basketSheet: $basketState,
+                                  resultPrice: $input.resultPrice,
+                                  resultItemAmount: $input.resultItemAmount)
 
                 } // builder.content
                 .supportedState([.hidden, .medium])
@@ -259,23 +276,7 @@ struct ItemStockView: View {
                 }
             } // .resizableSheet
 
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        input.isShowSearchField.toggle()
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                            searchFocused = input.isShowSearchField ? .check : nil
-                        }
-                    } label: {
-                        Image(systemName: "magnifyingglass")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 40, height: 20)
-                            .shadow(radius: 3, x: 1, y: 1)
-                    } // Button
-                }
-            } // .toolbar
-            .animation(.easeIn(duration: 0.2), value: input.isShowSearchField)
+            .animation(.easeIn(duration: 0.2), value: isShowSearchField)
             .navigationTitle("ItemStock")
             .navigationBarTitleDisplayMode(.inline)
         } // NavigationView
@@ -290,6 +291,17 @@ struct ItemStockView: View {
                 fatalError()
             } // switch
             print("ディスプレイモード: \(input.mode)")
+        } // .onChange
+
+        .onChange(of: isShowSearchField) { newValue in
+            searchFocused = newValue ? .check : nil
+            print(newValue)
+        }
+
+        .onChange(of: searchFocused) { newFocus in
+            if newFocus == nil {
+                isShowSearchField = false
+            }
         } // .onChange
     } // body
 } // View
@@ -375,6 +387,7 @@ struct ItemStockControlView_Previews: PreviewProvider {
         }
 
         return ItemStockView(itemVM: ItemViewModel(),
+                             isShowSearchField: .constant(false),
                              basketState: .constant(.hidden),
                              commerceState: .constant(.hidden))
         .environment(\.resizableSheetCenter, resizableSheetCenter)

@@ -13,8 +13,9 @@ struct HomeTabView: View {
     @StateObject var rootItemVM = ItemViewModel()
 
     @State private var tabIndex = 0
-    @State private var isShowItemDetail = false
-    @State private var isPresentedNewItem = false
+    @State private var isShowItemDetail: Bool = false
+    @State private var isPresentedNewItem: Bool = false
+    @State private var isShowSearchField: Bool = false
     @State var basketState: ResizableSheetState = .hidden
     @State var commerceState: ResizableSheetState = .hidden
 
@@ -32,6 +33,7 @@ struct HomeTabView: View {
                     .tag(0)
 
                 ItemStockView(itemVM: rootItemVM,
+                              isShowSearchField: $isShowSearchField,
                               basketState: $basketState,
                               commerceState: $commerceState)
                     .tabItem {
@@ -60,6 +62,7 @@ struct HomeTabView: View {
             // Todo: 各タブごとにオプションが変わるボタン
             UsefulButton(tabIndex: $tabIndex,
                          isPresentedNewItem: $isPresentedNewItem,
+                         isShowSearchField: $isShowSearchField,
                          basketState: $basketState,
                          commerceState: $commerceState)
 

@@ -14,11 +14,12 @@ struct UsefulButton: View {
 
     @Binding var tabIndex: Int
     @Binding var isPresentedNewItem: Bool
+    @Binding var isShowSearchField: Bool
     @Binding var basketState: ResizableSheetState
     @Binding var commerceState: ResizableSheetState
 
     @State private var change: Bool = false
-    @State private var buttonStyle: ButtonStyle = .library
+    @State private var buttonStyle: ButtonStyle = .stock
     @State private var buttonIcon: ButtonIcon = ButtonIcon(icon: "shippingbox.fill",
                                               badge: "plus.circle.fill")
 
@@ -32,10 +33,9 @@ struct UsefulButton: View {
 
             case .stock:
                 print("stock画面ボタンアクション実行")
-                commerceState = .medium
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                    basketState = .medium
-                }
+                // NOTE: フォーカスを用いた入力フィールド開閉の都合上、ボタンによるfalseはしたくないため、
+                //       toggle()は使用していません。
+                isShowSearchField.toggle()
 
             case .manege:
                 print("manege画面ボタンアクション実行")
@@ -48,7 +48,7 @@ struct UsefulButton: View {
         } label: {
 
             // ✅カスタムView
-            ButtonStyleView(buttonIcon: $buttonIcon)
+            ButtonStyleView(buttonIcon: $buttonIcon, buttonStyle: $buttonStyle)
 
         } // Button
         .offset(x: UIScreen.main.bounds.width / 3 - 5,
@@ -65,6 +65,7 @@ struct UsefulButton: View {
 struct ButtonStyleView: View {
 
     @Binding var buttonIcon: ButtonIcon
+    @Binding var buttonStyle: ButtonStyle
 
     @State private var angle: CGFloat = 0.0
 
@@ -73,7 +74,7 @@ struct ButtonStyleView: View {
         // 円形のボタン土台
         Circle()
             .foregroundColor(.white)
-            .frame(width: 70)
+            .frame(width: 65)
             .padding()
             .blur(radius: 1)
             .shadow(color: .gray, radius: 10, x: 4, y: 11)
@@ -85,7 +86,7 @@ struct ButtonStyleView: View {
                     Image(systemName: buttonIcon.icon)
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 38, height: 38)
+                        .frame(width: 35, height: 35)
                         .shadow(radius: 10, x: 3, y: 5)
 
                     // アイコン右上に付くバッジ
@@ -96,6 +97,16 @@ struct ButtonStyleView: View {
                                 .frame(width: 18, height: 18)
                                 .offset(x: 10, y: -10)
                         } // overlay
+
+                        .overlay {
+                            if buttonStyle == .stock {
+                                Image(systemName: "questionmark")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 7)
+                                    .offset(x: -3, y: -4)
+                            }
+                        }
                 }
                 .foregroundColor(.customDarkGray1)
                 .animation(.easeIn(duration: 0.2), value: buttonIcon)
@@ -135,6 +146,7 @@ struct UsefulButton_Previews: PreviewProvider {
 
         return UsefulButton(tabIndex: .constant(2),
                             isPresentedNewItem: .constant(false),
+                            isShowSearchField: .constant(false),
                             basketState: .constant(.medium),
                             commerceState: .constant(.medium)
         )

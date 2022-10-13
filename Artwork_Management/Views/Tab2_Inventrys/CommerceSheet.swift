@@ -13,6 +13,8 @@ struct CommerceSheet: View {
 
     @Binding var commerceState: ResizableSheetState
     @Binding var basketSheet: ResizableSheetState
+    @Binding var resultPrice: Int
+    @Binding var resultItemAmount: Int
 
     var body: some View {
         VStack {
@@ -24,12 +26,26 @@ struct CommerceSheet: View {
                     .frame(width: 30)
                     .foregroundColor(.black)
                     .padding(.horizontal)
+                    .overlay(alignment: .topTrailing) {
+                        if resultItemAmount <= 50 {
+                            Image(systemName: "\(resultItemAmount).circle")
+                                .offset(y: -8)
+                        } else {
+                            Image(systemName: "50.circle").offset(y: -8)
+                                .overlay(alignment: .topTrailing) {
+                                    Text("＋")
+                                        .font(.caption)
+                                        .offset(x: 7, y: -12)
+                                }
+                        }
+
+                    }
 
                 HStack(alignment: .bottom) {
                     Text("¥")
                         .foregroundColor(.black)
                         .font(.title2.bold())
-                    Text("1800")
+                    Text(String(resultPrice))
                         .foregroundColor(.black)
                         .font(.title.bold())
                     Spacer()
@@ -41,6 +57,8 @@ struct CommerceSheet: View {
                     action: {
                         commerceState = .hidden
                         basketSheet = .hidden
+                        resultPrice = 0
+                        resultItemAmount = 0
                     },
                     label: {
                         RoundedRectangle(cornerRadius: 20)

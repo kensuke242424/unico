@@ -13,10 +13,13 @@ enum ShowItemSize {
 }
 
 // ✅カスタムView: StockViewのタグからピックアップされたカードのレイアウトです。
-struct TagCards: View {
+struct TagSortCards: View {
 
     @Binding var isShowItemDetail: Bool
     @Binding var listIndex: Int
+    @Binding var resultPrice: Int
+    @Binding var resultItemAmount: Int
+    @Binding var resultBasketItems: [Item]?
 
     // アイテムのディテールを指定します。
     let itemWidth: CGFloat
@@ -34,6 +37,9 @@ struct TagCards: View {
 
                 ItemCardRow(isShowItemDetail: $isShowItemDetail,
                             listIndex: $listIndex,
+                            resultPrice: $resultPrice,
+                            resultItemAmount: $resultItemAmount,
+                            resultBasketItems: $resultBasketItems,
                             rowIndex: offset,
                             item: item,
                             itemWidth: itemWidth,
@@ -46,10 +52,13 @@ struct TagCards: View {
 } // View
 
 // ✅カスタムView: StockViewのアイテム表示要素から、最近更新したアイテムをピックアップするレイアウトです。
-struct UpdateTimeCards: View {
+struct UpdateTimeSortCards: View {
 
     @Binding var isShowItemDetail: Bool
     @Binding var listIndex: Int
+    @Binding var resultPrice: Int
+    @Binding var resultItemAmount: Int
+    @Binding var resultBasketItems: [Item]?
 
     // アイテムのディテールを指定します。
     let columnsH: [GridItem] = Array(repeating: .init(.flexible()), count: 1)
@@ -67,6 +76,9 @@ struct UpdateTimeCards: View {
 
                     ItemCardRow(isShowItemDetail: $isShowItemDetail,
                                 listIndex: $listIndex,
+                                resultPrice: $resultPrice,
+                                resultItemAmount: $resultItemAmount,
+                                resultBasketItems: $resultBasketItems,
                                 rowIndex: offset,
                                 item: item,
                                 itemWidth: itemWidth,
@@ -88,13 +100,16 @@ struct TagCards_Previews: PreviewProvider {
                 .padding(.vertical)
              // ✅カスタムView: 最近更新したアイテムをHStack表示します。(横スクロール)
              ScrollView(.horizontal) {
-                 UpdateTimeCards(isShowItemDetail: .constant(false),
-                                 listIndex: .constant(0),
-                                 itemWidth: 160,
-                                 itemHeight: 220,
-                                 itemSpase: 20,
-                                 itemNameTag: "アイテム",
-                                 items: [
+                 UpdateTimeSortCards(isShowItemDetail: .constant(false),
+                                     listIndex: .constant(0),
+                                     resultPrice: .constant(12000),
+                                     resultItemAmount: .constant(5),
+                                     resultBasketItems: .constant([]),
+                                     itemWidth: 160,
+                                     itemHeight: 220,
+                                     itemSpase: 20,
+                                     itemNameTag: "アイテム",
+                                     items: [
 
                                     // NOTE: テストデータ
                                     Item(tag: "Album", tagColor: "赤", name: "Album1", detail: "Album1のアイテム紹介テキストです。", photo: "",
@@ -115,33 +130,36 @@ struct TagCards_Previews: PreviewProvider {
 
             TagTitle(title: "アイテム", font: .title)
             // ✅カスタムView: アイテムを表示します。(縦スクロール)
-            TagCards(isShowItemDetail: .constant(false),
-                     listIndex: .constant(0),
-                     itemWidth: UIScreen.main.bounds.width * 0.43,
-                     itemHeight: 220,
-                     itemSpase: 20,
-                     itemNameTag: "アイテム",
-                     items: [
-                        // NOTE: テストデータ
-                        Item(tag: "Album", tagColor: "赤", name: "Album1ddddddddddd", detail: "Album1のアイテム紹介テキストです。", photo: "",
-                             price: 1800, sales: 88000, inventory: 200, createTime: Date(), updateTime: Date()),
-                        Item(tag: "Album", tagColor: "赤", name: "Album2", detail: "Album2のアイテム紹介テキストです。", photo: "",
-                             price: 2800, sales: 230000, inventory: 420, createTime: Date(), updateTime: Date()),
-                        Item(tag: "Album", tagColor: "赤", name: "Album3", detail: "Album3のアイテム紹介テキストです。", photo: "",
-                             price: 3200, sales: 367000, inventory: 402, createTime: Date(), updateTime: Date()),
-                        Item(tag: "Single", tagColor: "青", name: "Single1", detail: "Single1のアイテム紹介テキストです。", photo: "",
-                             price: 1100, sales: 182000, inventory: 199, createTime: Date(), updateTime: Date()),
-                        Item(tag: "Single", tagColor: "青", name: "Single2", detail: "Single2のアイテム紹介テキストです。", photo: "",
-                             price: 1310, sales: 105000, inventory: 43, createTime: Date(), updateTime: Date()),
-                        Item(tag: "Single", tagColor: "青", name: "Single3", detail: "Single3のアイテム紹介テキストです。", photo: "",
-                             price: 1470, sales: 185000, inventory: 97, createTime: Date(), updateTime: Date()),
-                        Item(tag: "Goods", tagColor: "黄", name: "グッズ1", detail: "グッズ1のアイテム紹介テキストです。", photo: "",
-                             price: 2300, sales: 329000, inventory: 88, createTime: Date(), updateTime: Date()),
-                        Item(tag: "Goods", tagColor: "黄", name: "グッズ2", detail: "グッズ2のアイテム紹介テキストです。", photo: "",
-                             price: 3300, sales: 199000, inventory: 105, createTime: Date(), updateTime: Date()),
-                        Item(tag: "Goods", tagColor: "黄", name: "グッズ3", detail: "グッズ3のアイテム紹介テキストです。", photo: "",
-                             price: 4000, sales: 520000, inventory: 97, createTime: Date(), updateTime: Date())
-                     ])
+            TagSortCards(isShowItemDetail: .constant(false),
+                         listIndex: .constant(0),
+                         resultPrice: .constant(12000),
+                         resultItemAmount: .constant(5),
+                         resultBasketItems: .constant([]),
+                         itemWidth: UIScreen.main.bounds.width * 0.43,
+                         itemHeight: 220,
+                         itemSpase: 20,
+                         itemNameTag: "アイテム",
+                         items: [
+                            // NOTE: テストデータ
+                            Item(tag: "Album", tagColor: "赤", name: "Album1ddddddddddd", detail: "Album1のアイテム紹介テキストです。", photo: "",
+                                 price: 1800, sales: 88000, inventory: 200, createTime: Date(), updateTime: Date()),
+                            Item(tag: "Album", tagColor: "赤", name: "Album2", detail: "Album2のアイテム紹介テキストです。", photo: "",
+                                 price: 2800, sales: 230000, inventory: 420, createTime: Date(), updateTime: Date()),
+                            Item(tag: "Album", tagColor: "赤", name: "Album3", detail: "Album3のアイテム紹介テキストです。", photo: "",
+                                 price: 3200, sales: 367000, inventory: 402, createTime: Date(), updateTime: Date()),
+                            Item(tag: "Single", tagColor: "青", name: "Single1", detail: "Single1のアイテム紹介テキストです。", photo: "",
+                                 price: 1100, sales: 182000, inventory: 199, createTime: Date(), updateTime: Date()),
+                            Item(tag: "Single", tagColor: "青", name: "Single2", detail: "Single2のアイテム紹介テキストです。", photo: "",
+                                 price: 1310, sales: 105000, inventory: 43, createTime: Date(), updateTime: Date()),
+                            Item(tag: "Single", tagColor: "青", name: "Single3", detail: "Single3のアイテム紹介テキストです。", photo: "",
+                                 price: 1470, sales: 185000, inventory: 97, createTime: Date(), updateTime: Date()),
+                            Item(tag: "Goods", tagColor: "黄", name: "グッズ1", detail: "グッズ1のアイテム紹介テキストです。", photo: "",
+                                 price: 2300, sales: 329000, inventory: 88, createTime: Date(), updateTime: Date()),
+                            Item(tag: "Goods", tagColor: "黄", name: "グッズ2", detail: "グッズ2のアイテム紹介テキストです。", photo: "",
+                                 price: 3300, sales: 199000, inventory: 105, createTime: Date(), updateTime: Date()),
+                            Item(tag: "Goods", tagColor: "黄", name: "グッズ3", detail: "グッズ3のアイテム紹介テキストです。", photo: "",
+                                 price: 4000, sales: 520000, inventory: 97, createTime: Date(), updateTime: Date())
+                         ])
         } // ScrollView (アイテムロケーション)
     }
 } // TagCards_Previews
