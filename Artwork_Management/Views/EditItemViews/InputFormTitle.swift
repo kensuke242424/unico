@@ -17,8 +17,8 @@ struct InputFormTitle: View {
         HStack(spacing: 20) {
             Text(title)
                 .fontWeight(.bold)
-                .foregroundColor(.gray)
-                .opacity(0.8)
+                .foregroundColor(.white)
+                .opacity(0.6)
 
             if isNeed {
                 RoundedRectangle(cornerRadius: 5)
@@ -27,6 +27,7 @@ struct InputFormTitle: View {
                     .overlay {
                         Text("必須")
                             .font(.caption)
+                            .foregroundColor(.black)
                     } // overlay
                     .opacity(0.6)
             } // if isNeed

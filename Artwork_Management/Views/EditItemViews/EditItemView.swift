@@ -37,8 +37,6 @@ struct EditItemView: View {
     }
     @State private var input: InputEditItem = InputEditItem()
 
-//    @FocusState private var focusedField: Field?
-
     var body: some View {
 
         NavigationView {
@@ -306,6 +304,7 @@ struct InputForms: View {
                     .padding(.bottom)
 
                 TextField("1st Album「...」", text: $editItemName)
+                    .foregroundColor(.white)
                     .focused($focusedField, equals: .name)
                     .autocapitalization(.none)
                     .onTapGesture { focusedField = .name }
@@ -321,6 +320,7 @@ struct InputForms: View {
                     .padding(.bottom)
 
                 TextField("100", text: $editItemInventry)
+                    .foregroundColor(.white)
                     .keyboardType(.numberPad)
                     .focused($focusedField, equals: .stock)
                     .onTapGesture { focusedField = .stock }
@@ -336,6 +336,7 @@ struct InputForms: View {
                     .padding(.bottom)
 
                 TextField("2000", text: $editItemPrice)
+                    .foregroundColor(.white)
                     .keyboardType(.numberPad)
                     .focused($focusedField, equals: .price)
                     .onTapGesture { focusedField = .price }
@@ -353,6 +354,7 @@ struct InputForms: View {
                         .padding(.bottom)
 
                     TextField("2000", text: $editItemSales)
+                        .foregroundColor(.white)
                         .keyboardType(.numberPad)
                         .focused($focusedField, equals: .sales)
                         .onTapGesture { focusedField = .sales
