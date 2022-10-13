@@ -9,9 +9,12 @@ import Foundation
 import SwiftUI
 
 extension Color {
-    static let customBackgroundDark1 = Color("backgroundColorDark1")
-    static let customBackgroundLight1 = Color("backgroundColorlight1")
+    static let customDarkGray1 = Color("customDarkGray1")
+    static let customMiddleGray1 = Color("customMiddleGray1")
+    static let customLightGray1 = Color("customLightGray1")
+    static let customlDarkPurple1 = Color("customlDarkPurple1")
+    static let customlMiddlePurple1 = Color("customlMiddlePurple1")
 
-    static let customBackgroundDark2 = Color("backgroundColorDark2")
-    static let customBackgroundLight2 = Color("backgroundColorlight2")
+    static let customBackgroundDark2 = Color("backgroundDarkGray2")
+    static let backgroundDarkPurple2 = Color("backgroundDarkPurple2")
 }

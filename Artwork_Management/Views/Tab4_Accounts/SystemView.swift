@@ -18,9 +18,11 @@ struct SystemView: View {
             SystemListView()
 
         } // VStack
-        .background(LinearGradient(gradient: Gradient(colors: [.customBackgroundLight2, .customBackgroundDark2]),
+        .background(LinearGradient(gradient: Gradient(colors: [.customDarkGray1, .customLightGray1]),
                                    startPoint: .top, endPoint: .bottom))
-        
+        .onAppear {
+            UITableView.appearance().backgroundColor = UIColor.clear
+        }
     } // body
 } // View
 

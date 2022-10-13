@@ -23,16 +23,15 @@ struct IndicatorRow: View {
                 Rectangle()
                     .frame(width: CGFloat(animationValue) / 1000, height: 13)
                     .foregroundColor(tagColor.color)
-                    .opacity(0.6)
+                    .opacity(0.5)
+                    .shadow(radius: 1)
                     .shadow(radius: 2, x: 7, y: 4)
             } // case 黄
             .onAppear {
-//                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                     withAnimation(.linear(duration: 0.8)) {
 
                         animationValue = salesValue
                     } // withAnimation
-//                } // DispatchQueue
             }
             .onDisappear {
                 animationValue = 0

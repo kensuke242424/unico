@@ -38,7 +38,7 @@ struct ItemCardRow: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 23, height: 23)
-                        .foregroundColor(.brown)
+                        .foregroundColor(.customlMiddlePurple1)
                         .opacity(0.5)
                 } // Button
             } // .overlay
@@ -86,7 +86,7 @@ struct ItemCardRow: View {
                             Image(systemName: "checkmark.seal.fill")
                                 .resizable()
                                 .frame(width: 28, height: 28)
-                                .foregroundColor(.brown)
+                                .foregroundColor(.customDarkGray1)
                         } // Button
                         .offset(x: 5, y: 5)
                     } // HStack

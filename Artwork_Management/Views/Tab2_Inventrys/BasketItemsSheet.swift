@@ -72,7 +72,8 @@ struct BasketItemRow: View {
             HStack {
                 RoundedRectangle(cornerRadius: 10)
                     .frame(width: 100, height: 100)
-                    .foregroundColor(.gray)
+                    .foregroundColor(.customLightGray1)
+                    .opacity(0.5)
 
                 Spacer()
 
@@ -96,6 +97,7 @@ struct BasketItemRow: View {
                             Image(systemName: "minus.circle.fill")
                                 .resizable()
                                 .frame(width: 22, height: 22)
+                                .foregroundColor(.customlMiddlePurple1)
                         }
                         Text("1")
                             .fontWeight(.black)
@@ -105,6 +107,7 @@ struct BasketItemRow: View {
                             Image(systemName: "plus.circle.fill")
                                 .resizable()
                                 .frame(width: 22, height: 22)
+                                .foregroundColor(.customlMiddlePurple1)
                         }
                     }
                     .offset(y: 8)

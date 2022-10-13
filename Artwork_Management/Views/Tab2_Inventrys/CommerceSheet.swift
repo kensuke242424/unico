@@ -29,7 +29,7 @@ struct CommerceSheet: View {
                     action: { commerceState = .hidden },
                     label: {
                         RoundedRectangle(cornerRadius: 20)
-                            .foregroundColor(.yellow)
+                            .foregroundColor(.customlMiddlePurple1)
                             .frame(width: 80, height: 50)
                             .shadow(color: .gray, radius: 2)
                             .overlay {

@@ -46,6 +46,14 @@ struct EditItemView: View {
             ScrollView(showsIndicators: false) {
 
                 ZStack {
+                    Color.customDarkGray1
+                        .ignoresSafeArea()
+                        .overlay {
+                            LinearGradient(gradient: Gradient(colors:
+                                                                [.clear, .customLightGray1]),
+                                                       startPoint: .top, endPoint: .bottom)
+                        }
+                        .offset(y: 150)
                     VStack {
                         // ✅カスタムView 写真ゾーン
                         SelectItemPhotoArea(selectTagColor: input.selectionTagColor)
@@ -236,6 +244,7 @@ struct EditItemView: View {
             } // toolbar(アイテム追加ボタン)
 
         } // NavigationView
+        
     } // body
 } // View
 
@@ -375,10 +384,12 @@ struct InputForms: View {
                             }
                         }
                     } // overlay
+                    .opacity(0.6)
             } // ■アイテム詳細
             .padding(.top)
 
         } // VStack(入力フォーム全体)
+
         .padding(.vertical, 20)
         .padding(.horizontal, 30)
         .onTapGesture { focusedField = nil }
