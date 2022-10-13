@@ -39,153 +39,174 @@ struct ItemStockView: View {
     var body: some View {
         NavigationView {
 
-//            ScrollViewReader { scrollProxy in
-//
-//            }
-            ZStack {
-                VStack {
-                    // NOTE: 検索ボックスの表示管理
-                    if isShowSearchField {
-                        TextField("キーワード検索", text: $input.searchItemNameText)
-                            .focused($searchFocused, equals: .check)
-                            .padding(.horizontal)
-                    }
-
-                    // NOTE: Geometryを用いたサイドタグセレクトバー
-                    GeometryReader { bodyView in
-
-                        let sideBarTagItemPadding: CGFloat = 80
-
-                        LazyHStack(spacing: sideBarTagItemPadding) {
-
-                            ForEach(itemVM.tags.indices, id: \.self) {index in
-
-                                Text(itemVM.tags[index].tagName)
-                                    .foregroundColor(.white)
-                                    .font(.system(size: 20, weight: .bold))
-                                    .frame(width: bodyView.size.width * 0.7, height: 40)
-                                    .padding(.leading, index == 0 ? bodyView.size.width * 0.1 : 0)
-
-                            } // ForEach
-                        } // LazyHStack
-                        .padding()
-                        .offset(x: self.dragOffset)
-                        .offset(x: -CGFloat(input.currentIndex) * (bodyView.size.width * 0.7 + sideBarTagItemPadding))
-
-                        .gesture(
-                            DragGesture()
-                                .updating(self.$dragOffset, body: { (value, state, _) in
-
-                                    // 先頭・末尾ではスクロールする必要がないので、画面幅の1/5までドラッグで制御する
-                                    if input.currentIndex == 0, value.translation.width > 0 {
-                                        state = value.translation.width / 5
-                                    } else if input.currentIndex == (itemVM.tags.count - 1), value.translation.width < 0 {
-                                        state = value.translation.width / 5
-                                    } else {
-                                        state = value.translation.width
-                                    }
-                                })
-                                .onEnded({ value in
-                                    var newIndex = input.currentIndex
-
-                                    // ドラッグ幅からページングを判定
-                                    // 今回は画面幅x0.3としているが、操作感に応じてカスタマイズする必要がある
-                                    if abs(value.translation.width) > bodyView.size.width * 0.2 {
-                                        newIndex = value.translation.width > 0 ? input.currentIndex - 1 : input.currentIndex + 1
-                                    }
-                                    if newIndex < 0 {
-                                        newIndex = 0
-                                    } else if newIndex > (itemVM.tags.count - 1) {
-                                        newIndex = itemVM.tags.count - 1
-                                    }
-                                    input.currentIndex = newIndex
-                                }) // .onEnded
-                        ) // .gesture
-                        // 減衰ばねモデル、それぞれの値は操作感に応じて変更する
-                        .animation(.interpolatingSpring(mass: 0.4,
-                                                        stiffness: 100,
-                                                        damping: 80,
-                                                        initialVelocity: 0.1),
-                                   value: dragOffset)
-                    } // Geometry
-                    .frame(height: 40) // Geometry範囲のflame
-
-                    // NOTE: サイドタグバーの枠フレームおよび、前後のタグインフォメーションを表示します。
-                    .overlay {
-                        SideTagBarOverlay(currentIndex: $input.currentIndex,
-                                          sideTagOpacity: $input.sideTagOpacity,
-                                          tags: $itemVM.tags)
-                    } // overlay
-                    .padding(.top)
-
-                    // NOTE: サイドタグバー両端のタグインフォメーションopacityを、ドラッグ位置を監視して管理しています。
-                    .onChange(of: dragOffset) { newValue in
-                        if newValue == 0 {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                input.sideTagOpacity = 0.4
-                            }
-                        } else {
-                            input.sideTagOpacity = 0.0
+            ScrollViewReader { scrollProxy in
+                ZStack {
+                    VStack {
+                        // NOTE: 検索ボックスの表示管理
+                        if isShowSearchField {
+                            TextField("キーワード検索", text: $input.searchItemNameText)
+                                .focused($searchFocused, equals: .check)
+                                .padding(.horizontal)
                         }
-                    } // onChange
 
-                    // Check: タグセレクトバーの選択タグindex値
-                    .onChange(of: input.currentIndex) { newValue in
-                        print(newValue)
+                        // NOTE: Geometryを用いたサイドタグセレクトバー
+                        GeometryReader { bodyView in
+
+                            let sideBarTagItemPadding: CGFloat = 80
+
+                            LazyHStack(spacing: sideBarTagItemPadding) {
+
+                                ForEach(itemVM.tags.indices, id: \.self) {index in
+
+                                    Text(itemVM.tags[index].tagName)
+                                        .foregroundColor(.white)
+                                        .font(.system(size: 20, weight: .bold))
+                                        .frame(width: bodyView.size.width * 0.7, height: 40)
+                                        .padding(.leading, index == 0 ? bodyView.size.width * 0.1 : 0)
+
+                                } // ForEach
+                            } // LazyHStack
+                            .padding()
+                            .offset(x: self.dragOffset)
+                            .offset(x: -CGFloat(input.currentIndex) * (bodyView.size.width * 0.7 + sideBarTagItemPadding))
+
+                            .gesture(
+                                DragGesture()
+                                    .updating(self.$dragOffset, body: { (value, state, _) in
+
+                                        // 先頭・末尾ではスクロールする必要がないので、画面幅の1/5までドラッグで制御する
+                                        if input.currentIndex == 0, value.translation.width > 0 {
+                                            state = value.translation.width / 5
+                                        } else if input.currentIndex == (itemVM.tags.count - 1), value.translation.width < 0 {
+                                            state = value.translation.width / 5
+                                        } else {
+                                            state = value.translation.width
+                                        }
+                                    })
+                                    .onEnded({ value in
+                                        var newIndex = input.currentIndex
+
+                                        // ドラッグ幅からページングを判定
+                                        // 今回は画面幅x0.3としているが、操作感に応じてカスタマイズする必要がある
+                                        if abs(value.translation.width) > bodyView.size.width * 0.2 {
+                                            newIndex = value.translation.width > 0 ? input.currentIndex - 1 : input.currentIndex + 1
+                                        }
+                                        if newIndex < 0 {
+                                            newIndex = 0
+                                        } else if newIndex > (itemVM.tags.count - 1) {
+                                            newIndex = itemVM.tags.count - 1
+                                        }
+                                        input.currentIndex = newIndex
+                                    }) // .onEnded
+                            ) // .gesture
+                            // 減衰ばねモデル、それぞれの値は操作感に応じて変更する
+                            .animation(.interpolatingSpring(mass: 0.4,
+                                                            stiffness: 100,
+                                                            damping: 80,
+                                                            initialVelocity: 0.1),
+                                       value: dragOffset)
+                        } // Geometry
+                        .frame(height: 40) // Geometry範囲のflame
+
+                        // NOTE: サイドタグバーの枠フレームおよび、前後のタグインフォメーションを表示します。
+                        .overlay {
+                            SideTagBarOverlay(currentIndex: $input.currentIndex,
+                                              sideTagOpacity: $input.sideTagOpacity,
+                                              tags: $itemVM.tags)
+                        } // overlay
+                        .padding(.top)
+
+                        // NOTE: サイドタグバー両端のタグインフォメーションopacityを、ドラッグ位置を監視して管理しています。
+                        .onChange(of: dragOffset) { newValue in
+                            if newValue == 0 {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                    input.sideTagOpacity = 0.4
+                                }
+                            } else {
+                                input.sideTagOpacity = 0.0
+                            }
+                        } // onChange
+
+                        // Check: タグセレクトバーの選択タグindex値
+                        .onChange(of: input.currentIndex) { newValue in
+                            print(newValue)
+                        }
+
+                        // NOTE: アイテム要素全体のロケーション
+                        ScrollView {
+                            TagTitle(title: "最近更新したアイテム", font: .title3)
+                                .foregroundColor(.white)
+                                .opacity(0.8)
+                                .padding(.top)
+
+                            Divider()
+                                .background(.gray)
+                                .padding()
+                            // ✅カスタムView: 最近更新したアイテムをHStack表示します。(横スクロール)
+                            UpdateTimeSortCards(isShowItemDetail: $input.isShowItemDetail,
+                                                listIndex: $input.listIndex,
+                                                resultPrice: $input.resultPrice,
+                                                resultItemAmount: $input.resultItemAmount,
+                                                resultBasketItems: $input.resultBasketItems,
+                                                itemWidth: UIScreen.main.bounds.width * 0.41,
+                                                itemHeight: 210,
+                                                itemSpase: 20,
+                                                itemNameTag: "アイテム",
+                                                items: itemVM.items)
+
+                            Divider()
+                                .background(.gray)
+                                .padding()
+
+                            TagTitle(title: itemVM.tags[input.currentIndex].tagName, font: .title)
+                                .id("search")
+                                .foregroundColor(.white)
+                                .opacity(0.8)
+                                .padding()
+                            // ✅カスタムView: アイテムを表示します。(縦スクロール)
+                            TagSortCards(isShowItemDetail: $input.isShowItemDetail,
+                                         listIndex: $input.listIndex,
+                                         resultPrice: $input.resultPrice,
+                                         resultItemAmount: $input.resultItemAmount,
+                                         resultBasketItems: $input.resultBasketItems,
+                                         itemWidth: UIScreen.main.bounds.width * 0.43,
+                                         itemHeight: 220,
+                                         itemSpase: 20,
+                                         itemNameTag: "アイテム",
+                                         items: itemVM.items)
+                        } // ScrollView (アイテムロケーション)
+
+                    } // VStack
+                    // NOTE: アイテム詳細ボタンをタップすると、詳細画面が発火します。
+                    if input.isShowItemDetail {
+                        ShowsItemDetail(itemVM: itemVM,
+                                        item: itemVM.items[input.listIndex],
+                                        itemIndex: input.listIndex,
+                                        isShowitemDetail: $input.isShowItemDetail)
+                    } // if isShowItemDetail
+                } // ZStack
+
+                // NOTE: 入力フィールドの表示に合わせて、フォーカスを切り替えます。
+                // NOTE: 入力フィールド表示時に、指定の位置まで自動フォーカスします。
+                .onChange(of: isShowSearchField) { newValue in
+                    print(newValue)
+
+                    searchFocused = newValue ? .check : nil
+
+                    if newValue {
+                        withAnimation(.easeOut(duration: 2.0)) {
+                                scrollProxy.scrollTo("search", anchor: .top)
+                            }
+                    } // if
+                } // .onChange
+
+                .onChange(of: searchFocused) { newFocus in
+                    if newFocus == nil {
+                        isShowSearchField = false
                     }
+                } // .onChange
+            } // ScrollViewReader
 
-                    // NOTE: アイテム要素全体のロケーション
-                    ScrollView {
-                        TagTitle(title: "最近更新したアイテム", font: .title3)
-                            .foregroundColor(.white)
-                            .opacity(0.8)
-                            .padding(.top)
-
-                        Divider()
-                            .background(.gray)
-                            .padding()
-                        // ✅カスタムView: 最近更新したアイテムをHStack表示します。(横スクロール)
-                        UpdateTimeSortCards(isShowItemDetail: $input.isShowItemDetail,
-                                            listIndex: $input.listIndex,
-                                            resultPrice: $input.resultPrice,
-                                            resultItemAmount: $input.resultItemAmount,
-                                            resultBasketItems: $input.resultBasketItems,
-                                            itemWidth: UIScreen.main.bounds.width * 0.41,
-                                            itemHeight: 210,
-                                            itemSpase: 20,
-                                            itemNameTag: "アイテム",
-                                            items: itemVM.items)
-
-                        Divider()
-                            .background(.gray)
-                            .padding()
-
-                        TagTitle(title: itemVM.tags[input.currentIndex].tagName, font: .title)
-                            .foregroundColor(.white)
-                            .opacity(0.8)
-                            .padding()
-                        // ✅カスタムView: アイテムを表示します。(縦スクロール)
-                        TagSortCards(isShowItemDetail: $input.isShowItemDetail,
-                                     listIndex: $input.listIndex,
-                                     resultPrice: $input.resultPrice,
-                                     resultItemAmount: $input.resultItemAmount,
-                                     resultBasketItems: $input.resultBasketItems,
-                                     itemWidth: UIScreen.main.bounds.width * 0.43,
-                                     itemHeight: 220,
-                                     itemSpase: 20,
-                                     itemNameTag: "アイテム",
-                                     items: itemVM.items)
-                    } // ScrollView (アイテムロケーション)
-
-                } // VStack
-                // NOTE: アイテム詳細ボタンをタップすると、詳細画面が発火します。
-                if input.isShowItemDetail {
-                    ShowsItemDetail(itemVM: itemVM,
-                                    item: itemVM.items[input.listIndex],
-                                    itemIndex: input.listIndex,
-                                    isShowitemDetail: $input.isShowItemDetail)
-                } // if isShowItemDetail
-            } // ZStack
             .background(LinearGradient(gradient: Gradient(colors: [.customDarkGray1,
                                                                    .customLightGray1]),
                                        startPoint: .top, endPoint: .bottom))
@@ -291,17 +312,6 @@ struct ItemStockView: View {
                 fatalError()
             } // switch
             print("ディスプレイモード: \(input.mode)")
-        } // .onChange
-
-        .onChange(of: isShowSearchField) { newValue in
-            searchFocused = newValue ? .check : nil
-            print(newValue)
-        }
-
-        .onChange(of: searchFocused) { newFocus in
-            if newFocus == nil {
-                isShowSearchField = false
-            }
         } // .onChange
     } // body
 } // View
