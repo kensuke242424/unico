@@ -194,7 +194,7 @@ struct ItemStockView: View {
                     searchFocused = newValue ? .check : nil
 
                     if newValue {
-                        withAnimation(.easeOut(duration: 2.0)) {
+                        withAnimation(.easeIn(duration: 2.0)) {
                                 scrollProxy.scrollTo("search", anchor: .top)
                             }
                     } // if
