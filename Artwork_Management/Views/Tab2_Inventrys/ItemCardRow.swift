@@ -13,7 +13,7 @@ struct ItemCardRow: View {
     @Environment(\.colorScheme) var colorScheme
 
     @Binding var isShowItemDetail: Bool
-    @Binding var listIndex: Int
+    @Binding var actionRowIndex: Int
     @Binding var resultPrice: Int
     @Binding var resultItemAmount: Int
     @Binding var resultBasketItems: [Item]?
@@ -33,7 +33,7 @@ struct ItemCardRow: View {
             .overlay(alignment: .topTrailing) {
                 Button {
                     print("rowIndex: \(rowIndex)")
-                    self.listIndex = rowIndex
+                    actionRowIndex = rowIndex
                     // アイテム詳細表示
                     self.isShowItemDetail.toggle()
                     print("ItemStockView_アイテム詳細ボタンタップ: \(isShowItemDetail)")
@@ -96,6 +96,9 @@ struct ItemCardRow: View {
                             // タップするたびに、値段合計、個数、カート内アイテム要素にプラスする
                             resultPrice += item.price
                             resultItemAmount += 1
+                            actionRowIndex = rowIndex
+                            print("ItemCardRow_+ボタンタップ rowIndex(\(rowIndex))")
+                            print("ItemCardRow_+ボタンタップ actionRowIndex(\(actionRowIndex))")
                             resultBasketItems?.append(item)
 
                             print("resultPrice: \(resultPrice)円")
@@ -120,7 +123,7 @@ struct ItemCardRow_Previews: PreviewProvider {
     static var previews: some View {
 
         ItemCardRow(isShowItemDetail: .constant(false),
-                    listIndex: .constant(0),
+                    actionRowIndex: .constant(0),
                     resultPrice: .constant(12000),
                     resultItemAmount: .constant(3),
                     resultBasketItems: .constant([]),

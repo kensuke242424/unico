@@ -24,7 +24,7 @@ struct ItemStockView: View {
 
         var searchItemNameText: String = ""
         var currentIndex: Int = 0
-        var listIndex: Int = 0
+        var actionRowIndex: Int = 0
         var resultPrice: Int = 0
         var resultItemAmount: Int = 0
         var resultBasketItems: [Item]? = []
@@ -132,11 +132,15 @@ struct ItemStockView: View {
                             print(newValue)
                         }
 
+                        // NOTE: バスケット内にアイテムが追加された時点で、ハーフモーダルを表示します。
                         .onChange(of: input.resultBasketItems) { _ in
 
                             guard input.resultBasketItems != nil else { return }
 
                             commerceState = .medium
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                basketState = .medium
+                            }
                         }
 
                         // NOTE: アイテム要素全体のロケーション
@@ -151,7 +155,7 @@ struct ItemStockView: View {
                                 .padding()
                             // ✅カスタムView: 最近更新したアイテムをHStack表示します。(横スクロール)
                             UpdateTimeSortCards(isShowItemDetail: $input.isShowItemDetail,
-                                                listIndex: $input.listIndex,
+                                                actionRowIndex: $input.actionRowIndex,
                                                 resultPrice: $input.resultPrice,
                                                 resultItemAmount: $input.resultItemAmount,
                                                 resultBasketItems: $input.resultBasketItems,
@@ -172,7 +176,7 @@ struct ItemStockView: View {
                                 .padding()
                             // ✅カスタムView: アイテムを表示します。(縦スクロール)
                             TagSortCards(isShowItemDetail: $input.isShowItemDetail,
-                                         listIndex: $input.listIndex,
+                                         actionRowIndex: $input.actionRowIndex,
                                          resultPrice: $input.resultPrice,
                                          resultItemAmount: $input.resultItemAmount,
                                          resultBasketItems: $input.resultBasketItems,
@@ -187,8 +191,8 @@ struct ItemStockView: View {
                     // NOTE: アイテム詳細ボタンをタップすると、詳細画面が発火します。
                     if input.isShowItemDetail {
                         ShowsItemDetail(itemVM: itemVM,
-                                        item: itemVM.items[input.listIndex],
-                                        itemIndex: input.listIndex,
+                                        item: itemVM.items[input.actionRowIndex],
+                                        itemIndex: input.actionRowIndex,
                                         isShowitemDetail: $input.isShowItemDetail)
                     } // if isShowItemDetail
                 } // ZStack
@@ -260,14 +264,18 @@ struct ItemStockView: View {
                             context: context,
                             main: {
                                 BasketItemsSheet(
+                                    itemVM: itemVM,
                                     basketItems: $input.resultBasketItems,
                                     resultItemAmount: $input.resultItemAmount,
+                                    actionRowIndex: $input.actionRowIndex,
                                     halfSheetScroll: .main)
                             },
                             additional: {
                                 BasketItemsSheet(
+                                    itemVM: itemVM,
                                     basketItems: $input.resultBasketItems,
                                     resultItemAmount: $input.resultItemAmount,
+                                    actionRowIndex: $input.actionRowIndex,
                                     halfSheetScroll: .additional)
 
                                 Spacer()

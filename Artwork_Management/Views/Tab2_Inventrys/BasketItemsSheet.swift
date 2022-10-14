@@ -14,11 +14,13 @@ enum HalfSheetScroll {
 
 struct BasketItemsSheet: View {
 
+    @StateObject var itemVM: ItemViewModel
     @Binding var basketItems: [Item]?
     @Binding var resultItemAmount: Int
+    @Binding var actionRowIndex: Int
     let halfSheetScroll: HalfSheetScroll
 
-    private let listLimit: Int = 3
+    private let listLimit: Int = 0
 
     var body: some View {
 
@@ -34,7 +36,9 @@ struct BasketItemsSheet: View {
             if let basketItems = basketItems {
                 ForEach(0 ..< basketItems.count, id: \.self) { index in
                     if listLimit > index {
-                        BasketItemRow(resultItemAmount: $resultItemAmount,
+                        BasketItemRow(itemVM: itemVM,
+                                      resultItemAmount: $resultItemAmount,
+                                      actionRowIndex: $actionRowIndex,
                                       item: basketItems[index])
                     } // if
                 } // ForEach
@@ -52,7 +56,9 @@ struct BasketItemsSheet: View {
             if let basketItems = basketItems {
                 if basketItems.count > listLimit {
                     ForEach(listLimit ..< basketItems.count, id: \.self) { index in
-                        BasketItemRow(resultItemAmount: $resultItemAmount,
+                        BasketItemRow(itemVM: itemVM,
+                                      resultItemAmount: $resultItemAmount,
+                                      actionRowIndex: $actionRowIndex,
                                       item: basketItems[index])
                     } // ForEach
                     .padding()
@@ -67,6 +73,7 @@ struct BasketItemsSheet: View {
                     .frame(width: UIScreen.main.bounds.width,
                            height: 10)
             } // if let
+            
         } // switch
     } // body
 } // View
@@ -74,7 +81,10 @@ struct BasketItemsSheet: View {
 // ✅ カスタムView: かご内の一要素分のレイアウト
 struct BasketItemRow: View {
 
+    @StateObject var itemVM: ItemViewModel
+
     @Binding var resultItemAmount: Int
+    @Binding var actionRowIndex: Int
     let item: Item
 
     @State var count: Int = 0
@@ -140,21 +150,40 @@ struct BasketItemRow: View {
                 } // VStack
             } // HStack
         } // VStack(全体)
+
+        .onChange(of: resultItemAmount) { _ in
+            print("BasketItemRow_onChange_resultItemAmount  アイテムの追加処理を検知")
+            print("actionRowIndex: \(actionRowIndex)")
+
+            guard let itemIndex = itemVM.items.firstIndex(of: item) else { return }
+            print("itemIndex: \(itemIndex)")
+
+            if actionRowIndex == itemIndex {
+                count += 1
+                print("\(itemVM.items[itemIndex].name)がバスケットに追加されました。")
+
+            }
+        } // .onChange
+        .onAppear {
+            print("BasketItemRow_onAppear")
+        }
+
     } // body
 } // view
 
-struct BasketItems_Previews: PreviewProvider {
+struct BasketItemsSheet_Previews: PreviewProvider {
     static var previews: some View {
-        BasketItemsSheet(basketItems:
-                .constant([
-                    Item(tag: "Album", tagColor: "赤", name: "Album1", detail: "Album1のアイテム紹介テキストです。", photo: "",
-                         price: 1800, sales: 88000, inventory: 200, createTime: Date(), updateTime: Date()),
-                    Item(tag: "Album", tagColor: "赤", name: "Album2", detail: "Album2のアイテム紹介テキストです。", photo: "",
-                         price: 2800, sales: 230000, inventory: 420, createTime: Date(), updateTime: Date()),
-                    Item(tag: "Album", tagColor: "赤", name: "Album3", detail: "Album3のアイテム紹介テキストです。", photo: "", price: 2800, sales: 230000, inventory: 420, createTime: Date(), updateTime: Date())
-                ]),
+        BasketItemsSheet(itemVM: ItemViewModel(),
+                         basketItems: .constant(
+                            [
+                                Item(tag: "Album", tagColor: "赤", name: "Album1", detail: "Album1のアイテム紹介テキストです。", photo: "",
+                                     price: 1800, sales: 88000, inventory: 200, createTime: Date(), updateTime: Date()),
+                                Item(tag: "Album", tagColor: "赤", name: "Album2", detail: "Album2のアイテム紹介テキストです。", photo: "",
+                                     price: 2800, sales: 230000, inventory: 420, createTime: Date(), updateTime: Date()),
+                                Item(tag: "Album", tagColor: "赤", name: "Album3", detail: "Album3のアイテム紹介テキストです。", photo: "", price: 2800, sales: 230000, inventory: 420, createTime: Date(), updateTime: Date())
+                            ]),
                          resultItemAmount: .constant(0),
-                         halfSheetScroll: .main
-        )
+                         actionRowIndex: .constant(0),
+                         halfSheetScroll: .main)
     }
 }

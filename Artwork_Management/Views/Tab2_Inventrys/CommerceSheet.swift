@@ -91,5 +91,8 @@ struct CommerceSheet: View {
             .animation(nil, value: resultPrice)
             .animation(.easeIn(duration: 1.0), value: resultPrice)
         } // VStack 決済シートレイアウト
+        .onAppear {
+            print("CommerceSheet_onAppear")
+        }
     } // body
 } // View

@@ -16,7 +16,7 @@ enum ShowItemSize {
 struct TagSortCards: View {
 
     @Binding var isShowItemDetail: Bool
-    @Binding var listIndex: Int
+    @Binding var actionRowIndex: Int
     @Binding var resultPrice: Int
     @Binding var resultItemAmount: Int
     @Binding var resultBasketItems: [Item]?
@@ -36,7 +36,7 @@ struct TagSortCards: View {
             ForEach(Array(items.enumerated()), id: \.offset) { offset, item in
 
                 ItemCardRow(isShowItemDetail: $isShowItemDetail,
-                            listIndex: $listIndex,
+                            actionRowIndex: $actionRowIndex,
                             resultPrice: $resultPrice,
                             resultItemAmount: $resultItemAmount,
                             resultBasketItems: $resultBasketItems,
@@ -55,7 +55,7 @@ struct TagSortCards: View {
 struct UpdateTimeSortCards: View {
 
     @Binding var isShowItemDetail: Bool
-    @Binding var listIndex: Int
+    @Binding var actionRowIndex: Int
     @Binding var resultPrice: Int
     @Binding var resultItemAmount: Int
     @Binding var resultBasketItems: [Item]?
@@ -75,7 +75,7 @@ struct UpdateTimeSortCards: View {
                 ForEach(Array(items.enumerated()), id: \.offset) { offset, item in
 
                     ItemCardRow(isShowItemDetail: $isShowItemDetail,
-                                listIndex: $listIndex,
+                                actionRowIndex: $actionRowIndex,
                                 resultPrice: $resultPrice,
                                 resultItemAmount: $resultItemAmount,
                                 resultBasketItems: $resultBasketItems,
@@ -101,7 +101,7 @@ struct TagCards_Previews: PreviewProvider {
              // ✅カスタムView: 最近更新したアイテムをHStack表示します。(横スクロール)
              ScrollView(.horizontal) {
                  UpdateTimeSortCards(isShowItemDetail: .constant(false),
-                                     listIndex: .constant(0),
+                                     actionRowIndex: .constant(0),
                                      resultPrice: .constant(12000),
                                      resultItemAmount: .constant(5),
                                      resultBasketItems: .constant([]),
@@ -131,7 +131,7 @@ struct TagCards_Previews: PreviewProvider {
             TagTitle(title: "アイテム", font: .title)
             // ✅カスタムView: アイテムを表示します。(縦スクロール)
             TagSortCards(isShowItemDetail: .constant(false),
-                         listIndex: .constant(0),
+                         actionRowIndex: .constant(0),
                          resultPrice: .constant(12000),
                          resultItemAmount: .constant(5),
                          resultBasketItems: .constant([]),
