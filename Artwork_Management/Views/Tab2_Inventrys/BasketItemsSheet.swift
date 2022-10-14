@@ -15,6 +15,7 @@ enum HalfSheetScroll {
 struct BasketItemsSheet: View {
 
     @Binding var basketItems: [Item]?
+    @Binding var resultItemAmount: Int
     let halfSheetScroll: HalfSheetScroll
 
     private let listLimit: Int = 3
@@ -33,7 +34,8 @@ struct BasketItemsSheet: View {
             if let basketItems = basketItems {
                 ForEach(0 ..< basketItems.count, id: \.self) { index in
                     if listLimit > index {
-                        BasketItemRow(item: basketItems[index])
+                        BasketItemRow(resultItemAmount: $resultItemAmount,
+                                      item: basketItems[index])
                     } // if
                 } // ForEach
                 .padding()
@@ -50,7 +52,8 @@ struct BasketItemsSheet: View {
             if let basketItems = basketItems {
                 if basketItems.count > listLimit {
                     ForEach(listLimit ..< basketItems.count, id: \.self) { index in
-                        BasketItemRow(item: basketItems[index])
+                        BasketItemRow(resultItemAmount: $resultItemAmount,
+                                      item: basketItems[index])
                     } // ForEach
                     .padding()
                     .frame(width: UIScreen.main.bounds.width, height: 120)
@@ -71,12 +74,15 @@ struct BasketItemsSheet: View {
 // ✅ カスタムView: かご内の一要素分のレイアウト
 struct BasketItemRow: View {
 
+    @Binding var resultItemAmount: Int
     let item: Item
+
+    @State var count: Int = 0
 
     var body: some View {
 
         VStack {
-            
+
             Divider()
                 .background(.gray)
 
@@ -108,17 +114,21 @@ struct BasketItemRow: View {
                         }
                         Button {
                             // マイナスボタン
+                            count -= 1
+                            print(count)
                         } label: {
                             Image(systemName: "minus.circle.fill")
                                 .resizable()
                                 .frame(width: 22, height: 22)
                                 .foregroundColor(.customlDarkPurple1)
                         }
-                        Text("1")
+                        Text(String(count))
                             .foregroundColor(.black)
                             .fontWeight(.black)
                         Button {
-                            // マイナスボタン
+                            // プラスボタン
+                            count += 1
+                            print(count)
                         } label: {
                             Image(systemName: "plus.circle.fill")
                                 .resizable()
@@ -137,13 +147,14 @@ struct BasketItems_Previews: PreviewProvider {
     static var previews: some View {
         BasketItemsSheet(basketItems:
                 .constant([
-                Item(tag: "Album", tagColor: "赤", name: "Album1", detail: "Album1のアイテム紹介テキストです。", photo: "",
-                     price: 1800, sales: 88000, inventory: 200, createTime: Date(), updateTime: Date()),
-                Item(tag: "Album", tagColor: "赤", name: "Album2", detail: "Album2のアイテム紹介テキストです。", photo: "",
-                     price: 2800, sales: 230000, inventory: 420, createTime: Date(), updateTime: Date()),
-                Item(tag: "Album", tagColor: "赤", name: "Album3", detail: "Album3のアイテム紹介テキストです。", photo: "", price: 2800, sales: 230000, inventory: 420, createTime: Date(), updateTime: Date())
-            ]),
-                    halfSheetScroll: .main
+                    Item(tag: "Album", tagColor: "赤", name: "Album1", detail: "Album1のアイテム紹介テキストです。", photo: "",
+                         price: 1800, sales: 88000, inventory: 200, createTime: Date(), updateTime: Date()),
+                    Item(tag: "Album", tagColor: "赤", name: "Album2", detail: "Album2のアイテム紹介テキストです。", photo: "",
+                         price: 2800, sales: 230000, inventory: 420, createTime: Date(), updateTime: Date()),
+                    Item(tag: "Album", tagColor: "赤", name: "Album3", detail: "Album3のアイテム紹介テキストです。", photo: "", price: 2800, sales: 230000, inventory: 420, createTime: Date(), updateTime: Date())
+                ]),
+                         resultItemAmount: .constant(0),
+                         halfSheetScroll: .main
         )
     }
 }

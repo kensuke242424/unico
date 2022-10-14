@@ -261,11 +261,13 @@ struct ItemStockView: View {
                             main: {
                                 BasketItemsSheet(
                                     basketItems: $input.resultBasketItems,
+                                    resultItemAmount: $input.resultItemAmount,
                                     halfSheetScroll: .main)
                             },
                             additional: {
                                 BasketItemsSheet(
                                     basketItems: $input.resultBasketItems,
+                                    resultItemAmount: $input.resultItemAmount,
                                     halfSheetScroll: .additional)
 
                                 Spacer()
