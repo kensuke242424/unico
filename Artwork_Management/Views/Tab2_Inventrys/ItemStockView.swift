@@ -126,6 +126,10 @@ struct ItemStockView: View {
                             }
                         } // onChange
 
+                        .onChange(of: input.actionRowIndex) { newActionIndex in
+                            print("StockView内でアクションされたアイテムの更新。index: \(newActionIndex)")
+                        }
+
                         // NOTE: バスケット内にアイテムが追加された時点で、ハーフモーダルを表示します。
                         .onChange(of: input.resultBasketItems) { newBasket in
 
@@ -134,6 +138,7 @@ struct ItemStockView: View {
                                 basketState = .hidden
                             } else {
                                 commerceState = .medium
+                                if basketState == .large { return }
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                     basketState = .medium
                                 }

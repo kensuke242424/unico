@@ -18,8 +18,8 @@ struct BasketItemsSheet: View {
     @Binding var basketItems: [Item]
     @Binding var resultItemAmount: Int
     @Binding var resultPrice: Int
-
     @Binding var actionRowIndex: Int
+
     let halfSheetScroll: HalfSheetScroll
 
     private let listLimit: Int = 0
@@ -34,9 +34,10 @@ struct BasketItemsSheet: View {
         case .main:
 
             // NOTE: アイテム取引かごシート表示時のアイテム表示数をプロパティ「listLimit」の値分で制限します。
-            //       現在、シート呼び出し時の初期アイテム表示は3つまでとしています。以降の要素はスクロールにより表示します。
+            //       リミット数以降の要素はスクロールにより表示します。
             if basketItems != [] {
                 ForEach(0 ..< basketItems.count, id: \.self) { index in
+
                     if listLimit > index {
                         BasketItemRow(itemVM: itemVM,
                                       resultItemAmount: $resultItemAmount,
@@ -54,28 +55,18 @@ struct BasketItemsSheet: View {
 
         case .additional:
 
-            if basketItems != [] {
-                if basketItems.count > listLimit {
-                    ForEach(listLimit ..< basketItems.count, id: \.self) { index in
-                        BasketItemRow(itemVM: itemVM,
-                                      resultItemAmount: $resultItemAmount,
-                                      resultPrice: $resultPrice,
-                                      actionRowIndex: $actionRowIndex,
-                                      basketItems: $basketItems,
-                                      item: basketItems[index])
-                    } // ForEach
-                    .padding()
-                    .frame(width: UIScreen.main.bounds.width, height: 120)
-                } else {
-                    Spacer()
-                        .frame(width: UIScreen.main.bounds.width,
-                               height: 10)
-                }
-            } else {
-                Spacer()
-                    .frame(width: UIScreen.main.bounds.width,
-                           height: 10)
-            } // if let
+            if basketItems.count > listLimit {
+                ForEach(listLimit ..< basketItems.count, id: \.self) { index in
+                    BasketItemRow(itemVM: itemVM,
+                                  resultItemAmount: $resultItemAmount,
+                                  resultPrice: $resultPrice,
+                                  actionRowIndex: $actionRowIndex,
+                                  basketItems: $basketItems,
+                                  item: basketItems[index])
+                } // ForEach
+                .padding()
+                .frame(width: UIScreen.main.bounds.width, height: 120)
+            }
         } // switch
     } // body
 } // View
@@ -129,13 +120,18 @@ struct BasketItemRow: View {
                             Spacer()
                         }
                         Button {
-                            // マイナスボタン
+
+                            // カート内アイテム数カウントが１だった時、アイテムを削除するかをユーザに確認します。
                             if count == 1 {
                                 isShowAlert.toggle()
-                            } else {
-                                resultItemAmount -= 1
-                                resultPrice -= item.price
+                                return
                             }
+
+                            // マイナスボタン
+                            if let newActionIndex = itemVM.items.firstIndex(of: item) {
+                                actionRowIndex = newActionIndex
+                                resultItemAmount -= 1
+                            } // if let
 
                         } label: {
                             Image(systemName: "minus.circle.fill")
@@ -148,9 +144,11 @@ struct BasketItemRow: View {
                             .fontWeight(.black)
                         Button {
                             // プラスボタン
-                            resultItemAmount += 1
-                            resultPrice += item.price
-                            print(count)
+                            if let newActionIndex = itemVM.items.firstIndex(of: item) {
+                                actionRowIndex = newActionIndex
+                                resultItemAmount += 1
+                            } // if let
+
                         } label: {
                             Image(systemName: "plus.circle.fill")
                                 .resizable()
@@ -162,6 +160,7 @@ struct BasketItemRow: View {
                     .alert("確認", isPresented: $isShowAlert) {
                         Button("削除", role: .destructive) {
                             // データ削除処理
+//                            resultItemAmount -= 1
                             basketItems.removeAll(where: { $0 == item })
                         }
                     } message: {
@@ -172,20 +171,20 @@ struct BasketItemRow: View {
         } // VStack(全体)
 
         // NOTE: かごのアイテム総数の変化を受け取り、どのアイテムが更新されたかを判定し、カウントを増減します。
+        //       メインのカードView側からのアイテム追加とカウントを同期させるために必要です。
         .onChange(of: resultItemAmount) { [resultItemAmount] newItemAmount in
-
+//
             if item == itemVM.items[actionRowIndex] {
                 count = resultItemAmount < newItemAmount ? count + 1 : count - 1
+                resultPrice = resultItemAmount < newItemAmount ? resultPrice + item.price : resultPrice - item.price
             }
         } // .onChange
 
-        // NOTE: 新規アイテム追加onAppear時は(-)判定は発生しないので、判定分岐はせず、アイテムカウントに+1
+        // NOTE: 新規アイテム追加時、roeViewのonAppearが発火します。
+        //       アイテム要素追加時は(-)判定は発生しないので、判定分岐はせず、アイテムカウントに+1
         .onAppear {
             print("BasketItemRow_onAppear")
-//            if item == itemVM.items[actionRowIndex] {
-//                print("\(item.name)がバスケットに追加されました。")
-                count += 1
-//            }
+            count += 1
         } // .onAppear
 
     } // body
