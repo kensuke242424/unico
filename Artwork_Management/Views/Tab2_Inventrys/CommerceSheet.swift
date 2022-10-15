@@ -41,7 +41,7 @@ struct CommerceSheet: View {
                         .padding(.horizontal)
                         .overlay(alignment: .topTrailing) {
                             if resultItemAmount <= 50 {
-                                Image(systemName: "\(resultItemAmount).circle")
+                                Image(systemName: "\(resultItemAmount).circle.fill")
                                     .foregroundColor(.black)
                                     .offset(y: -8)
                             } else {

@@ -127,25 +127,6 @@ struct ItemStockView: View {
                             }
                         } // onChange
 
-                        .onChange(of: input.actionRowIndex) { newActionIndex in
-                            print("StockView内でアクションされたアイテムの更新。index: \(newActionIndex)")
-                        }
-
-                        // NOTE: バスケット内にアイテムが追加された時点で、ハーフモーダルを表示します。
-                        .onChange(of: input.resultBasketItems) { [defaultBasket = input.resultBasketItems] newBasket in
-
-                            if defaultBasket.count == 0 {
-                                commerceState = .medium
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                    basketState = .medium
-                                }
-                            }
-                            if newBasket == [] {
-                                commerceState = .hidden
-                                basketState = .hidden
-                            }
-                        }
-
                         // NOTE: アイテム要素全体のロケーション
                         ScrollView {
                             TagTitle(title: "最近更新したアイテム", font: .title3)
@@ -167,7 +148,6 @@ struct ItemStockView: View {
                                                 itemSpase: 20,
                                                 itemNameTag: "アイテム",
                                                 items: itemVM.items)
-
                             Divider()
                                 .background(.gray)
                                 .padding()
@@ -200,6 +180,25 @@ struct ItemStockView: View {
                     } // if isShowItemDetail
                 } // ZStack
 
+                .onChange(of: input.actionRowIndex) { newActionIndex in
+                    print("StockView内でアクションされたアイテムの更新。index: \(newActionIndex)")
+                }
+
+                // NOTE: バスケット内にアイテムが追加された時点で、ハーフモーダルを表示します。
+                .onChange(of: input.resultBasketItems) { [defaultBasket = input.resultBasketItems] newBasket in
+
+                    if defaultBasket.count == 0 {
+                        commerceState = .medium
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                            basketState = .medium
+                        }
+                    }
+                    if newBasket == [] {
+                        commerceState = .hidden
+                        basketState = .hidden
+                    }
+                }
+
                 // NOTE: 入力フィールドの表示に合わせて、フォーカスを切り替えます。
                 // NOTE: 入力フィールド表示時に、指定の位置まで自動フォーカスします。
                 .onChange(of: isShowSearchField) { newValue in
@@ -219,6 +218,7 @@ struct ItemStockView: View {
                         isShowSearchField = false
                     }
                 } // .onChange
+
             } // ScrollViewReader
 
             .background(LinearGradient(gradient: Gradient(colors: [.customDarkGray1,
@@ -244,13 +244,8 @@ struct ItemStockView: View {
                             Button(
                                 action: {
                                     input.resultBasketItems = []
-                                    basketState = .hidden
-                                    // NOTE: .hiddenと値のリセット処理が重なるとうまくシートが閉じなかったので、ずらしています。
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                        commerceState = .hidden
-                                        input.resultPrice = 0
-                                        input.resultItemAmount = 0
-                                    }
+                                    input.resultPrice = 0
+                                    input.resultItemAmount = 0
                                 },
                                 label: {
                                     HStack {

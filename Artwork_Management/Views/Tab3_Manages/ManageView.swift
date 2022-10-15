@@ -87,7 +87,7 @@ struct ManageView: View {
             } // ZStack
             .background(LinearGradient(gradient: Gradient(colors: [.customDarkGray1, .customLightGray1]),
                                        startPoint: .top, endPoint: .bottom))
-            .navigationTitle("Sales")
+            .navigationTitle("Manage")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
