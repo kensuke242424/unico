@@ -15,8 +15,10 @@ enum HalfSheetScroll {
 struct BasketItemsSheet: View {
 
     @StateObject var itemVM: ItemViewModel
-    @Binding var basketItems: [Item]?
+    @Binding var basketItems: [Item]
     @Binding var resultItemAmount: Int
+    @Binding var resultPrice: Int
+
     @Binding var actionRowIndex: Int
     let halfSheetScroll: HalfSheetScroll
 
@@ -33,18 +35,17 @@ struct BasketItemsSheet: View {
 
             // NOTE: アイテム取引かごシート表示時のアイテム表示数をプロパティ「listLimit」の値分で制限します。
             //       現在、シート呼び出し時の初期アイテム表示は3つまでとしています。以降の要素はスクロールにより表示します。
-            if let basketItems = basketItems {
+            if basketItems != [] {
                 ForEach(0 ..< basketItems.count, id: \.self) { index in
                     if listLimit > index {
                         BasketItemRow(itemVM: itemVM,
                                       resultItemAmount: $resultItemAmount,
+                                      resultPrice: $resultPrice,
                                       actionRowIndex: $actionRowIndex,
+                                      basketItems: $basketItems,
                                       item: basketItems[index])
                     } // if
                 } // ForEach
-                .padding()
-                .frame(width: UIScreen.main.bounds.width, height: 120)
-
             } else {
                 Text("かごの中にアイテムはありません")
                     .foregroundColor(.gray)
@@ -53,12 +54,14 @@ struct BasketItemsSheet: View {
 
         case .additional:
 
-            if let basketItems = basketItems {
+            if basketItems != [] {
                 if basketItems.count > listLimit {
                     ForEach(listLimit ..< basketItems.count, id: \.self) { index in
                         BasketItemRow(itemVM: itemVM,
                                       resultItemAmount: $resultItemAmount,
+                                      resultPrice: $resultPrice,
                                       actionRowIndex: $actionRowIndex,
+                                      basketItems: $basketItems,
                                       item: basketItems[index])
                     } // ForEach
                     .padding()
@@ -73,7 +76,6 @@ struct BasketItemsSheet: View {
                     .frame(width: UIScreen.main.bounds.width,
                            height: 10)
             } // if let
-            
         } // switch
     } // body
 } // View
@@ -84,10 +86,14 @@ struct BasketItemRow: View {
     @StateObject var itemVM: ItemViewModel
 
     @Binding var resultItemAmount: Int
+    @Binding var resultPrice: Int
     @Binding var actionRowIndex: Int
+
+    @Binding var basketItems: [Item]
     let item: Item
 
-    @State var count: Int = 0
+    @State private var count: Int = 0
+    @State private var isShowAlert: Bool = false
 
     var body: some View {
 
@@ -124,8 +130,13 @@ struct BasketItemRow: View {
                         }
                         Button {
                             // マイナスボタン
-                            count -= 1
-                            print(count)
+                            if count == 1 {
+                                isShowAlert.toggle()
+                            } else {
+                                resultItemAmount -= 1
+                                resultPrice -= item.price
+                            }
+
                         } label: {
                             Image(systemName: "minus.circle.fill")
                                 .resizable()
@@ -137,7 +148,8 @@ struct BasketItemRow: View {
                             .fontWeight(.black)
                         Button {
                             // プラスボタン
-                            count += 1
+                            resultItemAmount += 1
+                            resultPrice += item.price
                             print(count)
                         } label: {
                             Image(systemName: "plus.circle.fill")
@@ -147,26 +159,34 @@ struct BasketItemRow: View {
                         }
                     }
                     .offset(y: 8)
+                    .alert("確認", isPresented: $isShowAlert) {
+                        Button("削除", role: .destructive) {
+                            // データ削除処理
+                            basketItems.removeAll(where: { $0 == item })
+                        }
+                    } message: {
+                        Text("かごからアイテムを削除しますか？")
+                    }
                 } // VStack
             } // HStack
         } // VStack(全体)
 
-        .onChange(of: resultItemAmount) { _ in
-            print("BasketItemRow_onChange_resultItemAmount  アイテムの追加処理を検知")
-            print("actionRowIndex: \(actionRowIndex)")
+        // NOTE: かごのアイテム総数の変化を受け取り、どのアイテムが更新されたかを判定し、カウントを増減します。
+        .onChange(of: resultItemAmount) { [resultItemAmount] newItemAmount in
 
-            guard let itemIndex = itemVM.items.firstIndex(of: item) else { return }
-            print("itemIndex: \(itemIndex)")
-
-            if actionRowIndex == itemIndex {
-                count += 1
-                print("\(itemVM.items[itemIndex].name)がバスケットに追加されました。")
-
+            if item == itemVM.items[actionRowIndex] {
+                count = resultItemAmount < newItemAmount ? count + 1 : count - 1
             }
         } // .onChange
+
+        // NOTE: 新規アイテム追加onAppear時は(-)判定は発生しないので、判定分岐はせず、アイテムカウントに+1
         .onAppear {
             print("BasketItemRow_onAppear")
-        }
+//            if item == itemVM.items[actionRowIndex] {
+//                print("\(item.name)がバスケットに追加されました。")
+                count += 1
+//            }
+        } // .onAppear
 
     } // body
 } // view
@@ -183,6 +203,7 @@ struct BasketItemsSheet_Previews: PreviewProvider {
                                 Item(tag: "Album", tagColor: "赤", name: "Album3", detail: "Album3のアイテム紹介テキストです。", photo: "", price: 2800, sales: 230000, inventory: 420, createTime: Date(), updateTime: Date())
                             ]),
                          resultItemAmount: .constant(0),
+                         resultPrice: .constant(20000),
                          actionRowIndex: .constant(0),
                          halfSheetScroll: .main)
     }

@@ -16,7 +16,7 @@ struct ItemCardRow: View {
     @Binding var actionRowIndex: Int
     @Binding var resultPrice: Int
     @Binding var resultItemAmount: Int
-    @Binding var resultBasketItems: [Item]?
+    @Binding var resultBasketItems: [Item]
 
     let rowIndex: Int
 
@@ -95,11 +95,15 @@ struct ItemCardRow: View {
                             // 取引かごに追加するボタン
                             // タップするたびに、値段合計、個数、カート内アイテム要素にプラスする
                             resultPrice += item.price
-                            resultItemAmount += 1
                             actionRowIndex = rowIndex
                             print("ItemCardRow_+ボタンタップ rowIndex(\(rowIndex))")
                             print("ItemCardRow_+ボタンタップ actionRowIndex(\(actionRowIndex))")
-                            resultBasketItems?.append(item)
+
+                            // カート内に対象アイテムがなければ、カートに要素を新規追加
+                            if resultBasketItems.filter({ $0 == item }) == [] {
+                                resultBasketItems.append(item)
+                            }
+                            resultItemAmount += 1
 
                             print("resultPrice: \(resultPrice)円")
                             print("resultItemAmount: \(resultItemAmount)個")

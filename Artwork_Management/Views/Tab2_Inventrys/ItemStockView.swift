@@ -27,11 +27,10 @@ struct ItemStockView: View {
         var actionRowIndex: Int = 0
         var resultPrice: Int = 0
         var resultItemAmount: Int = 0
-        var resultBasketItems: [Item]? = []
+        var resultBasketItems: [Item] = []
         var sideTagOpacity: CGFloat = 0.4
         var isPresentedNewItem = false
         var isShowItemDetail: Bool = false
-        var state: ResizableSheetState = .hidden
         var mode: Mode = .dark
     }
     @State private var input: InputStock = InputStock()
@@ -127,19 +126,17 @@ struct ItemStockView: View {
                             }
                         } // onChange
 
-                        // Check: タグセレクトバーの選択タグindex値
-                        .onChange(of: input.currentIndex) { newValue in
-                            print(newValue)
-                        }
-
                         // NOTE: バスケット内にアイテムが追加された時点で、ハーフモーダルを表示します。
-                        .onChange(of: input.resultBasketItems) { _ in
+                        .onChange(of: input.resultBasketItems) { newBasket in
 
-                            guard input.resultBasketItems != nil else { return }
-
-                            commerceState = .medium
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                basketState = .medium
+                            if newBasket == [] {
+                                commerceState = .hidden
+                                basketState = .hidden
+                            } else {
+                                commerceState = .medium
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                    basketState = .medium
+                                }
                             }
                         }
 
@@ -228,6 +225,7 @@ struct ItemStockView: View {
                     VStack {
 
                         GrabBar()
+                            .foregroundColor(.black)
 
                         HStack(alignment: .bottom) {
                             Text("カート内のアイテム")
@@ -254,7 +252,6 @@ struct ItemStockView: View {
                                             .font(.callout)
                                     }
                                     .foregroundColor(.red)
-                                    .opacity(0.7)
                                 }
                             ) // Button
                         } // HStack
@@ -267,6 +264,7 @@ struct ItemStockView: View {
                                     itemVM: itemVM,
                                     basketItems: $input.resultBasketItems,
                                     resultItemAmount: $input.resultItemAmount,
+                                    resultPrice: $input.resultPrice,
                                     actionRowIndex: $input.actionRowIndex,
                                     halfSheetScroll: .main)
                             },
@@ -275,6 +273,7 @@ struct ItemStockView: View {
                                     itemVM: itemVM,
                                     basketItems: $input.resultBasketItems,
                                     resultItemAmount: $input.resultItemAmount,
+                                    resultPrice: $input.resultPrice,
                                     actionRowIndex: $input.actionRowIndex,
                                     halfSheetScroll: .additional)
 

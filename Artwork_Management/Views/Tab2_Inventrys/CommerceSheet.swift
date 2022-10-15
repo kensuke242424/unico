@@ -15,7 +15,7 @@ struct CommerceSheet: View {
     @Binding var basketState: ResizableSheetState
     @Binding var resultPrice: Int
     @Binding var resultItemAmount: Int
-    @Binding var resultBasketItems: [Item]?
+    @Binding var resultBasketItems: [Item]
 
     var body: some View {
         VStack {
@@ -62,7 +62,7 @@ struct CommerceSheet: View {
                 Button(
                     action: {
 
-                        resultBasketItems?.removeAll()
+                        resultBasketItems.removeAll()
                         basketState = .hidden
                         // NOTE: .hiddenと値のリセット処理が重なるとうまくシートが閉じなかったので、ずらしています。
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {

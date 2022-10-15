@@ -19,7 +19,7 @@ struct TagSortCards: View {
     @Binding var actionRowIndex: Int
     @Binding var resultPrice: Int
     @Binding var resultItemAmount: Int
-    @Binding var resultBasketItems: [Item]?
+    @Binding var resultBasketItems: [Item]
 
     // アイテムのディテールを指定します。
     let itemWidth: CGFloat
@@ -58,7 +58,7 @@ struct UpdateTimeSortCards: View {
     @Binding var actionRowIndex: Int
     @Binding var resultPrice: Int
     @Binding var resultItemAmount: Int
-    @Binding var resultBasketItems: [Item]?
+    @Binding var resultBasketItems: [Item]
 
     // アイテムのディテールを指定します。
     let columnsH: [GridItem] = Array(repeating: .init(.flexible()), count: 1)
