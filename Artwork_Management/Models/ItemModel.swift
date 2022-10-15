@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 // Firestore内で管理されるItemオブジェクト
-struct Item: Identifiable, Equatable {
+struct Item: Identifiable, Equatable, Hashable {
 
     var id = UUID()
     var tag: String

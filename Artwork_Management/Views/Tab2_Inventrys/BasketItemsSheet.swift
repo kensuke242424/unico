@@ -22,6 +22,7 @@ struct BasketItemsSheet: View {
 
     let halfSheetScroll: HalfSheetScroll
 
+    // .medium表示時の要素表示数
     private let listLimit: Int = 0
 
     var body: some View {
@@ -36,33 +37,36 @@ struct BasketItemsSheet: View {
             // NOTE: アイテム取引かごシート表示時のアイテム表示数をプロパティ「listLimit」の値分で制限します。
             //       リミット数以降の要素はスクロールにより表示します。
             if basketItems != [] {
-                ForEach(0 ..< basketItems.count, id: \.self) { index in
+                ForEach(Array(basketItems.enumerated()), id: \.element) { offset, element in
 
-                    if listLimit > index {
+                    if listLimit > offset {
                         BasketItemRow(itemVM: itemVM,
                                       resultItemAmount: $resultItemAmount,
                                       resultPrice: $resultPrice,
                                       actionRowIndex: $actionRowIndex,
                                       basketItems: $basketItems,
-                                      item: basketItems[index])
+                                      item: element)
                     } // if
                 } // ForEach
             } else {
                 Text("かごの中にアイテムはありません")
                     .foregroundColor(.gray)
                     .frame(height: 100)
-            }
+            } // if listLimit
 
         case .additional:
 
             if basketItems.count > listLimit {
-                ForEach(listLimit ..< basketItems.count, id: \.self) { index in
-                    BasketItemRow(itemVM: itemVM,
-                                  resultItemAmount: $resultItemAmount,
-                                  resultPrice: $resultPrice,
-                                  actionRowIndex: $actionRowIndex,
-                                  basketItems: $basketItems,
-                                  item: basketItems[index])
+                ForEach(Array(basketItems.enumerated()), id: \.element) { offset, element in
+
+                    if listLimit <= offset {
+                        BasketItemRow(itemVM: itemVM,
+                                      resultItemAmount: $resultItemAmount,
+                                      resultPrice: $resultPrice,
+                                      actionRowIndex: $actionRowIndex,
+                                      basketItems: $basketItems,
+                                      item: element)
+                    } // if listLimit
                 } // ForEach
                 .padding()
                 .frame(width: UIScreen.main.bounds.width, height: 120)
@@ -160,7 +164,8 @@ struct BasketItemRow: View {
                     .alert("確認", isPresented: $isShowAlert) {
                         Button("削除", role: .destructive) {
                             // データ削除処理
-//                            resultItemAmount -= 1
+                            resultItemAmount -= 1
+                            resultPrice -= item.price
                             basketItems.removeAll(where: { $0 == item })
                         }
                     } message: {
@@ -173,11 +178,10 @@ struct BasketItemRow: View {
         // NOTE: かごのアイテム総数の変化を受け取り、どのアイテムが更新されたかを判定し、カウントを増減します。
         //       メインのカードView側からのアイテム追加とカウントを同期させるために必要です。
         .onChange(of: resultItemAmount) { [resultItemAmount] newItemAmount in
-//
             if item == itemVM.items[actionRowIndex] {
                 count = resultItemAmount < newItemAmount ? count + 1 : count - 1
                 resultPrice = resultItemAmount < newItemAmount ? resultPrice + item.price : resultPrice - item.price
-            }
+            } // if
         } // .onChange
 
         // NOTE: 新規アイテム追加時、roeViewのonAppearが発火します。
@@ -185,6 +189,7 @@ struct BasketItemRow: View {
         .onAppear {
             print("BasketItemRow_onAppear")
             count += 1
+            resultPrice += item.price
         } // .onAppear
 
     } // body
