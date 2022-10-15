@@ -15,17 +15,17 @@ enum ShowItemSize {
 // ✅カスタムView: StockViewのタグからピックアップされたカードのレイアウトです。
 struct TagSortCards: View {
 
-    @Binding var isShowItemDetail: Bool
     @Binding var actionRowIndex: Int
     @Binding var resultPrice: Int
     @Binding var resultItemAmount: Int
+    @Binding var isShowItemDetail: Bool
     @Binding var resultBasketItems: [Item]
 
     // アイテムのディテールを指定します。
     let itemWidth: CGFloat
     let itemHeight: CGFloat
     let itemSpase: CGFloat
-    let itemNameTag: String
+    let selectTag: String
     let items: [Item]
 
     let columnsV: [GridItem] = Array(repeating: .init(.flexible()), count: 2)
@@ -35,15 +35,28 @@ struct TagSortCards: View {
         LazyVGrid(columns: columnsV, spacing: itemSpase) {
             ForEach(Array(items.enumerated()), id: \.offset) { offset, item in
 
-                ItemCardRow(isShowItemDetail: $isShowItemDetail,
-                            actionRowIndex: $actionRowIndex,
-                            resultPrice: $resultPrice,
-                            resultItemAmount: $resultItemAmount,
-                            resultBasketItems: $resultBasketItems,
-                            rowIndex: offset,
-                            item: item,
-                            itemWidth: itemWidth,
-                            itemHeight: itemHeight)
+                if selectTag == "ALL" {
+                    ItemCardRow(isShowItemDetail: $isShowItemDetail,
+                                actionRowIndex: $actionRowIndex,
+                                resultPrice: $resultPrice,
+                                resultItemAmount: $resultItemAmount,
+                                resultBasketItems: $resultBasketItems,
+                                rowIndex: offset,
+                                item: item,
+                                itemWidth: itemWidth,
+                                itemHeight: itemHeight)
+
+                } else if item.tag == selectTag {
+                    ItemCardRow(isShowItemDetail: $isShowItemDetail,
+                                actionRowIndex: $actionRowIndex,
+                                resultPrice: $resultPrice,
+                                resultItemAmount: $resultItemAmount,
+                                resultBasketItems: $resultBasketItems,
+                                rowIndex: offset,
+                                item: item,
+                                itemWidth: itemWidth,
+                                itemHeight: itemHeight)
+                }
             } // ForEach
         } // LazyVGrid
         .padding(.horizontal, 10)
@@ -130,15 +143,15 @@ struct TagCards_Previews: PreviewProvider {
 
             TagTitle(title: "アイテム", font: .title)
             // ✅カスタムView: アイテムを表示します。(縦スクロール)
-            TagSortCards(isShowItemDetail: .constant(false),
-                         actionRowIndex: .constant(0),
+            TagSortCards(actionRowIndex: .constant(0),
                          resultPrice: .constant(12000),
                          resultItemAmount: .constant(5),
+                         isShowItemDetail: .constant(false),
                          resultBasketItems: .constant([]),
                          itemWidth: UIScreen.main.bounds.width * 0.43,
                          itemHeight: 220,
                          itemSpase: 20,
-                         itemNameTag: "アイテム",
+                         selectTag: "Album",
                          items: [
                             // NOTE: テストデータ
                             Item(tag: "Album", tagColor: "赤", name: "Album1ddddddddddd", detail: "Album1のアイテム紹介テキストです。", photo: "",

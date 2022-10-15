@@ -167,6 +167,7 @@ struct BasketItemRow: View {
                             resultItemAmount -= 1
                             resultPrice -= item.price
                             basketItems.removeAll(where: { $0 == item })
+
                         }
                     } message: {
                         Text("かごからアイテムを削除しますか？")

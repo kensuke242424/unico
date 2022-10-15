@@ -158,15 +158,15 @@ struct ItemStockView: View {
                                 .opacity(0.8)
                                 .padding()
                             // ✅カスタムView: アイテムを表示します。(縦スクロール)
-                            TagSortCards(isShowItemDetail: $input.isShowItemDetail,
-                                         actionRowIndex: $input.actionRowIndex,
+                            TagSortCards(actionRowIndex: $input.actionRowIndex,
                                          resultPrice: $input.resultPrice,
                                          resultItemAmount: $input.resultItemAmount,
+                                         isShowItemDetail: $input.isShowItemDetail,
                                          resultBasketItems: $input.resultBasketItems,
                                          itemWidth: UIScreen.main.bounds.width * 0.43,
                                          itemHeight: 220,
                                          itemSpase: 20,
-                                         itemNameTag: "アイテム",
+                                         selectTag: itemVM.tags[input.currentIndex].tagName,
                                          items: itemVM.items)
                         } // ScrollView (アイテムロケーション)
 
@@ -208,8 +208,11 @@ struct ItemStockView: View {
 
                     if newValue {
                         withAnimation(.easeIn(duration: 2.0)) {
-                                scrollProxy.scrollTo("search", anchor: .top)
+                            scrollProxy.scrollTo("search", anchor: .top)
                             }
+                        withAnimation(.easeIn(duration: 0.3)) {
+                            input.currentIndex = 0 // タグを「All」に更新
+                        }
                     } // if
                 } // .onChange
 
