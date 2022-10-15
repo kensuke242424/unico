@@ -16,13 +16,22 @@ struct CommerceSheet: View {
     @Binding var resultPrice: Int
     @Binding var resultItemAmount: Int
     @Binding var resultBasketItems: [Item]
+    @Binding var doCommerce: Bool
 
     var body: some View {
         VStack {
             HStack {
 
                 Button {
-                    basketState = .medium
+                    switch basketState {
+                    case .medium:
+                        basketState = .large
+                    case .large:
+                        basketState = .medium
+                    case .hidden:
+                        basketState = .medium
+                    }
+
                 } label: {
                     Image(systemName: "shippingbox.fill")
                         .resizable()
@@ -61,15 +70,11 @@ struct CommerceSheet: View {
 
                 Button(
                     action: {
-
                         resultBasketItems.removeAll()
                         basketState = .hidden
-                        // NOTE: .hiddenと値のリセット処理が重なるとうまくシートが閉じなかったので、ずらしています。
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            commerceState = .hidden
-                            resultPrice = 0
-                            resultItemAmount = 0
-                        }
+                        commerceState = .hidden
+                        resultPrice = 0
+                        resultItemAmount = 0
                     },
                     label: {
                         RoundedRectangle(cornerRadius: 20)
@@ -86,10 +91,10 @@ struct CommerceSheet: View {
                     }
                 ) // Button
             } // HStack
-            .frame(height: 100)
+            .frame(height: 80)
             .padding(.horizontal, 20)
             .animation(nil, value: resultPrice)
-            .animation(.easeIn(duration: 1.0), value: resultPrice)
+            .animation(nil, value: resultItemAmount)
         } // VStack 決済シートレイアウト
         .onAppear {
             print("CommerceSheet_onAppear")

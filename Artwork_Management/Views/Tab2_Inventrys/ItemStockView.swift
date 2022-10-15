@@ -31,6 +31,7 @@ struct ItemStockView: View {
         var sideTagOpacity: CGFloat = 0.4
         var isPresentedNewItem = false
         var isShowItemDetail: Bool = false
+        var doCommerce: Bool = false
         var mode: Mode = .dark
     }
     @State private var input: InputStock = InputStock()
@@ -131,17 +132,17 @@ struct ItemStockView: View {
                         }
 
                         // NOTE: バスケット内にアイテムが追加された時点で、ハーフモーダルを表示します。
-                        .onChange(of: input.resultBasketItems) { newBasket in
+                        .onChange(of: input.resultBasketItems) { [defaultBasket = input.resultBasketItems] newBasket in
 
-                            if newBasket == [] {
-                                commerceState = .hidden
-                                basketState = .hidden
-                            } else {
+                            if defaultBasket.count == 0 {
                                 commerceState = .medium
-                                if basketState == .large { return }
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                     basketState = .medium
                                 }
+                            }
+                            if newBasket == [] {
+                                commerceState = .hidden
+                                basketState = .hidden
                             }
                         }
 
@@ -228,9 +229,10 @@ struct ItemStockView: View {
                 builder.content { context in
 
                     VStack {
-
+                        Spacer(minLength: 0)
                         GrabBar()
                             .foregroundColor(.black)
+                        Spacer(minLength: 0)
 
                         HStack(alignment: .bottom) {
                             Text("カート内のアイテム")
@@ -262,6 +264,8 @@ struct ItemStockView: View {
                         } // HStack
                         .padding(.horizontal, 20)
 
+                        Spacer(minLength: 8)
+
                         ResizableScrollView(
                             context: context,
                             main: {
@@ -287,7 +291,7 @@ struct ItemStockView: View {
                             }
                         )
                         Spacer()
-                            .frame(height: 120)
+                            .frame(height: 80)
                     } // VStack
                 } // builder.content
                 .sheetBackground { _ in
@@ -309,10 +313,11 @@ struct ItemStockView: View {
                                   basketState: $basketState,
                                   resultPrice: $input.resultPrice,
                                   resultItemAmount: $input.resultItemAmount,
-                                  resultBasketItems: $input.resultBasketItems)
+                                  resultBasketItems: $input.resultBasketItems,
+                                  doCommerce: $input.doCommerce)
 
                 } // builder.content
-                .supportedState([.hidden, .medium])
+                .supportedState([.medium])
                 .sheetBackground { _ in
                     LinearGradient(gradient: Gradient(colors: [.white, .customLightGray1]),
                                    startPoint: .leading, endPoint: .trailing)
@@ -324,7 +329,7 @@ struct ItemStockView: View {
             } // .resizableSheet
 
             .animation(.easeIn(duration: 0.2), value: isShowSearchField)
-            .navigationTitle("ItemStock")
+            .navigationTitle("Stock")
             .navigationBarTitleDisplayMode(.inline)
         } // NavigationView
         .onTapGesture { searchFocused = nil }

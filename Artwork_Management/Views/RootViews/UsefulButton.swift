@@ -18,6 +18,7 @@ struct UsefulButton: View {
     @Binding var basketState: ResizableSheetState
     @Binding var commerceState: ResizableSheetState
 
+    @State private var offsetY: CGFloat = 0.0
     @State private var change: Bool = false
     @State private var buttonStyle: ButtonStyle = .stock
     @State private var buttonIcon: ButtonIcon = ButtonIcon(icon: "shippingbox.fill",
@@ -52,9 +53,19 @@ struct UsefulButton: View {
 
         } // Button
         .offset(x: UIScreen.main.bounds.width / 3 - 5,
-                y: UIScreen.main.bounds.height / 3 - 20)
+                y: UIScreen.main.bounds.height / 3 - 10)
+        .offset(y: offsetY)
 
-        // NOTE: ボタンアイコンが条件で変化する発火場所です。
+        .onChange(of: basketState) { _ in
+            withAnimation(.easeOut(duration: 0.3)) {
+                switch basketState {
+                case .hidden: offsetY = 0.0
+                case .medium: offsetY = -60.0
+                case .large: offsetY = -60.0
+                }
+            }
+        } // .onChange(basketState)
+
         .onChange(of: tabIndex) { newIndex in
             self.buttonStyle = buttonVM.buttonStyleChenged(tabIndex: newIndex)
             self.buttonIcon = buttonVM.iconChenge(style: buttonStyle, change: change)
@@ -124,10 +135,9 @@ struct ButtonStyleView: View {
                 if newAngle == 50.0 {
                     withAnimation(.easeIn(duration: 0.2)) {
                         self.angle = 0.0
-                        print(angle)
                     }
                 }
-            }
+            } // .onChange(angle)
 
     } // body
 } // View
