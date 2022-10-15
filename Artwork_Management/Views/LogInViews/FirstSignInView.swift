@@ -122,7 +122,6 @@ struct FirstLogInInfomation: View {
             } // Group(入力欄全体)
             .font(.subheadline)
             .autocapitalization(.none)
-            .textFieldStyle(.roundedBorder)
             .keyboardType(.emailAddress)
             .padding(.bottom, 10)
 
@@ -145,7 +144,7 @@ struct FirstLogInInfomation: View {
                 }
 
             } label: {
-                Text("サインイン")
+                Text("サインアップ")
             }
             .buttonStyle(.borderedProminent)
 
