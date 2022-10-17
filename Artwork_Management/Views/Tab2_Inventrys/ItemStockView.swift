@@ -168,7 +168,8 @@ struct ItemStockView: View {
                                 if !input.searchItemNameText.isEmpty,
                                    input.searchItemNameText != "ALL" {
                                     Button {
-                                        input.searchItemNameText = ""
+                                        input.searchItemNameText = "ALL"
+                                        itemVM.tags[0].tagName = "ALL"
                                     } label: {
                                         RoundedRectangle(cornerRadius: 10)
                                             .foregroundColor(.gray)
