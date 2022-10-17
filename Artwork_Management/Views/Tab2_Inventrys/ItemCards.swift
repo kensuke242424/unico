@@ -35,10 +35,11 @@ struct TagSortCards: View {
     var body: some View {
 
         LazyVGrid(columns: columnsV, spacing: itemSpase) {
-            ForEach(Array(searchItemNameText == "" ? items.enumerated() : searchItems.enumerated()),
+            ForEach(Array(searchItemNameText == "ALL" || searchItemNameText == "" ?
+                          items.enumerated() : searchItems.enumerated()),
                     id: \.offset) { offset, item in
 
-                if selectTag == "ALL" {
+                if selectTag == "ALL" || selectTag == "検索" {
                     ItemCardRow(isShowItemDetail: $isShowItemDetail,
                                 actionRowIndex: $actionRowIndex,
                                 resultPrice: $resultPrice,

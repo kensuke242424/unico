@@ -22,7 +22,7 @@ struct ItemStockView: View {
 
     struct InputStock {
 
-        var searchItemNameText: String = ""
+        var searchItemNameText: String = "ALL"
         var currentIndex: Int = 0
         var actionRowIndex: Int = 0
         var resultPrice: Int = 0
@@ -45,6 +45,8 @@ struct ItemStockView: View {
                         // NOTE: 検索ボックスの表示管理
                         if isShowSearchField {
                             TextField("キーワード検索", text: $input.searchItemNameText)
+                                .foregroundColor(.white)
+                                .autocapitalization(.none)
                                 .focused($searchFocused, equals: .check)
                                 .padding(.horizontal)
                         }
@@ -152,7 +154,9 @@ struct ItemStockView: View {
                                 .background(.gray)
                                 .padding()
 
-                            TagTitle(title: itemVM.tags[input.currentIndex].tagName, font: .title)
+                            TagTitle(title: input.currentIndex == 0 ?
+                                     input.searchItemNameText : itemVM.tags[input.currentIndex].tagName,
+                                     font: .title)
                                 .id("search")
                                 .foregroundColor(.white)
                                 .opacity(0.8)
@@ -206,6 +210,18 @@ struct ItemStockView: View {
                     print(newValue)
 
                     searchFocused = newValue ? .check : nil
+                    if newValue == true {
+                        if input.searchItemNameText == "ALL" {
+                            input.searchItemNameText = ""
+                            itemVM.tags[0].tagName = "検索"
+                        }
+                    }
+                    if newValue == false {
+                        if input.searchItemNameText == "" {
+                            input.searchItemNameText = "ALL"
+                            itemVM.tags[0].tagName = "ALL"
+                        }
+                    }
 
                     if newValue {
                         withAnimation(.easeIn(duration: 2.0)) {
