@@ -11,14 +11,13 @@ struct ItemCardRow: View {
 
     // ダークモードの判定に用いる
     @Environment(\.colorScheme) var colorScheme
+    @StateObject var itemVM: ItemViewModel
 
     @Binding var isShowItemDetail: Bool
     @Binding var actionRowIndex: Int
     @Binding var resultPrice: Int
     @Binding var resultItemAmount: Int
     @Binding var resultBasketItems: [Item]
-
-    let rowIndex: Int
 
     let item: Item
     let itemWidth: CGFloat
@@ -32,8 +31,9 @@ struct ItemCardRow: View {
             .opacity(colorScheme == .dark ? 0.3 : 0.3)
             .overlay(alignment: .topTrailing) {
                 Button {
-                    print("rowIndex: \(rowIndex)")
-                    actionRowIndex = rowIndex
+
+                    actionRowIndex = itemVM.items.firstIndex(where: { $0 == item }) ?? 0
+                    print("actionRowIndex: \(actionRowIndex)")
                     // アイテム詳細表示
                     self.isShowItemDetail.toggle()
                     print("ItemStockView_アイテム詳細ボタンタップ: \(isShowItemDetail)")
@@ -94,7 +94,7 @@ struct ItemCardRow: View {
                         Button {
                             // 取引かごに追加するボタン
                             // タップするたびに、値段合計、個数、カート内アイテム要素にプラスする
-                            actionRowIndex = rowIndex
+                            actionRowIndex = itemVM.items.firstIndex(where: { $0 == item }) ?? 0
                             resultItemAmount += 1
 
                             // カート内に対象アイテムがなければ、カートに要素を新規追加
@@ -123,12 +123,12 @@ struct ItemCardRow: View {
 struct ItemCardRow_Previews: PreviewProvider {
     static var previews: some View {
 
-        ItemCardRow(isShowItemDetail: .constant(false),
+        ItemCardRow(itemVM: ItemViewModel(),
+                    isShowItemDetail: .constant(false),
                     actionRowIndex: .constant(0),
                     resultPrice: .constant(12000),
                     resultItemAmount: .constant(3),
                     resultBasketItems: .constant([]),
-                    rowIndex: 0,
                     item: Item(tag: "Album",
                                tagColor: "赤",
                                name: "Album1",

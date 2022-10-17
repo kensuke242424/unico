@@ -140,7 +140,8 @@ struct ItemStockView: View {
                                 .background(.gray)
                                 .padding()
                             // ✅カスタムView: 最近更新したアイテムをHStack表示します。(横スクロール)
-                            UpdateTimeSortCards(isShowItemDetail: $input.isShowItemDetail,
+                            UpdateTimeSortCards(itemVM: itemVM,
+                                                isShowItemDetail: $input.isShowItemDetail,
                                                 actionRowIndex: $input.actionRowIndex,
                                                 resultPrice: $input.resultPrice,
                                                 resultItemAmount: $input.resultItemAmount,
@@ -185,7 +186,8 @@ struct ItemStockView: View {
                             .padding()
 
                             // ✅カスタムView: アイテムを表示します。(縦スクロール)
-                            TagSortCards(searchItemNameText: $input.searchItemNameText,
+                            TagSortCards(itemVM: itemVM,
+                                         searchItemNameText: $input.searchItemNameText,
                                          actionRowIndex: $input.actionRowIndex,
                                          resultPrice: $input.resultPrice,
                                          resultItemAmount: $input.resultItemAmount,

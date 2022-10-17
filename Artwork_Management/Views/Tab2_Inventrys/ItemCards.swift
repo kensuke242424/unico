@@ -15,6 +15,8 @@ enum ShowItemSize {
 // ✅カスタムView: StockViewのタグからピックアップされたカードのレイアウトです。
 struct TagSortCards: View {
 
+    @StateObject var itemVM: ItemViewModel
+
     @Binding var searchItemNameText: String
     @Binding var actionRowIndex: Int
     @Binding var resultPrice: Int
@@ -35,28 +37,27 @@ struct TagSortCards: View {
     var body: some View {
 
         LazyVGrid(columns: columnsV, spacing: itemSpase) {
-            ForEach(Array(searchItemNameText == "ALL" || searchItemNameText == "" ?
-                          items.enumerated() : searchItems.enumerated()),
-                    id: \.offset) { offset, item in
+            ForEach(searchItemNameText == "ALL" || searchItemNameText == "" ?
+                          items : searchItems) { item in
 
                 if selectTag == "ALL" || selectTag == "検索" {
-                    ItemCardRow(isShowItemDetail: $isShowItemDetail,
+                    ItemCardRow(itemVM: itemVM,
+                                isShowItemDetail: $isShowItemDetail,
                                 actionRowIndex: $actionRowIndex,
                                 resultPrice: $resultPrice,
                                 resultItemAmount: $resultItemAmount,
                                 resultBasketItems: $resultBasketItems,
-                                rowIndex: offset,
                                 item: item,
                                 itemWidth: itemWidth,
                                 itemHeight: itemHeight)
 
                 } else if item.tag == selectTag {
-                    ItemCardRow(isShowItemDetail: $isShowItemDetail,
+                    ItemCardRow(itemVM: itemVM,
+                                isShowItemDetail: $isShowItemDetail,
                                 actionRowIndex: $actionRowIndex,
                                 resultPrice: $resultPrice,
                                 resultItemAmount: $resultItemAmount,
                                 resultBasketItems: $resultBasketItems,
-                                rowIndex: offset,
                                 item: item,
                                 itemWidth: itemWidth,
                                 itemHeight: itemHeight)
@@ -76,6 +77,8 @@ struct TagSortCards: View {
 // ✅カスタムView: StockViewのアイテム表示要素から、最近更新したアイテムをピックアップするレイアウトです。
 struct UpdateTimeSortCards: View {
 
+    @StateObject var itemVM: ItemViewModel
+
     @Binding var isShowItemDetail: Bool
     @Binding var actionRowIndex: Int
     @Binding var resultPrice: Int
@@ -94,14 +97,14 @@ struct UpdateTimeSortCards: View {
 
         ScrollView(.horizontal) {
             LazyHGrid(rows: columnsH, spacing: itemSpase) {
-                ForEach(Array(items.enumerated()), id: \.offset) { offset, item in
+                ForEach(items) { item in
 
-                    ItemCardRow(isShowItemDetail: $isShowItemDetail,
+                    ItemCardRow(itemVM: itemVM,
+                                isShowItemDetail: $isShowItemDetail,
                                 actionRowIndex: $actionRowIndex,
                                 resultPrice: $resultPrice,
                                 resultItemAmount: $resultItemAmount,
                                 resultBasketItems: $resultBasketItems,
-                                rowIndex: offset,
                                 item: item,
                                 itemWidth: itemWidth,
                                 itemHeight: itemHeight)
@@ -121,7 +124,8 @@ struct TagCards_Previews: PreviewProvider {
                 .padding(.vertical)
              // ✅カスタムView: 最近更新したアイテムをHStack表示します。(横スクロール)
              ScrollView(.horizontal) {
-                 UpdateTimeSortCards(isShowItemDetail: .constant(false),
+                 UpdateTimeSortCards(itemVM: ItemViewModel(),
+                                     isShowItemDetail: .constant(false),
                                      actionRowIndex: .constant(0),
                                      resultPrice: .constant(12000),
                                      resultItemAmount: .constant(5),
@@ -151,7 +155,8 @@ struct TagCards_Previews: PreviewProvider {
 
             TagTitle(title: "アイテム", font: .title)
             // ✅カスタムView: アイテムを表示します。(縦スクロール)
-            TagSortCards(searchItemNameText: .constant(""),
+            TagSortCards(itemVM: ItemViewModel(),
+                         searchItemNameText: .constant(""),
                          actionRowIndex: .constant(0),
                          resultPrice: .constant(12000),
                          resultItemAmount: .constant(5),
