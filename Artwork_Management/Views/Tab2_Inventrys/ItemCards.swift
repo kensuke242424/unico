@@ -15,6 +15,7 @@ enum ShowItemSize {
 // ✅カスタムView: StockViewのタグからピックアップされたカードのレイアウトです。
 struct TagSortCards: View {
 
+    @Binding var searchItemNameText: String
     @Binding var actionRowIndex: Int
     @Binding var resultPrice: Int
     @Binding var resultItemAmount: Int
@@ -27,13 +28,15 @@ struct TagSortCards: View {
     let itemSpase: CGFloat
     let selectTag: String
     let items: [Item]
+    @State var searchItems: [Item] = []
 
     let columnsV: [GridItem] = Array(repeating: .init(.flexible()), count: 2)
 
     var body: some View {
 
         LazyVGrid(columns: columnsV, spacing: itemSpase) {
-            ForEach(Array(items.enumerated()), id: \.offset) { offset, item in
+            ForEach(Array(searchItemNameText == "" ? items.enumerated() : searchItems.enumerated()),
+                    id: \.offset) { offset, item in
 
                 if selectTag == "ALL" {
                     ItemCardRow(isShowItemDetail: $isShowItemDetail,
@@ -61,6 +64,11 @@ struct TagSortCards: View {
         } // LazyVGrid
         .padding(.horizontal, 10)
         Spacer().frame(height: 200)
+            .onChange(of: searchItemNameText) { newSearchText in
+                if !searchItemNameText.isEmpty {
+                    searchItems = items.filter({ $0.name.contains(newSearchText) })
+                }
+            }
     } // body
 } // View
 
@@ -102,7 +110,6 @@ struct UpdateTimeSortCards: View {
             .padding()
         }
         .frame(height: itemHeight)
-
     } // body
 } // View
 
@@ -143,7 +150,8 @@ struct TagCards_Previews: PreviewProvider {
 
             TagTitle(title: "アイテム", font: .title)
             // ✅カスタムView: アイテムを表示します。(縦スクロール)
-            TagSortCards(actionRowIndex: .constant(0),
+            TagSortCards(searchItemNameText: .constant(""),
+                         actionRowIndex: .constant(0),
                          resultPrice: .constant(12000),
                          resultItemAmount: .constant(5),
                          isShowItemDetail: .constant(false),
@@ -172,7 +180,8 @@ struct TagCards_Previews: PreviewProvider {
                                  price: 3300, sales: 199000, inventory: 105, createTime: Date(), updateTime: Date()),
                             Item(tag: "Goods", tagColor: "黄", name: "グッズ3", detail: "グッズ3のアイテム紹介テキストです。", photo: "",
                                  price: 4000, sales: 520000, inventory: 97, createTime: Date(), updateTime: Date())
-                         ])
+                         ],
+            searchItems: [])
         } // ScrollView (アイテムロケーション)
     }
 } // TagCards_Previews

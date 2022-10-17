@@ -158,7 +158,8 @@ struct ItemStockView: View {
                                 .opacity(0.8)
                                 .padding()
                             // ✅カスタムView: アイテムを表示します。(縦スクロール)
-                            TagSortCards(actionRowIndex: $input.actionRowIndex,
+                            TagSortCards(searchItemNameText: $input.searchItemNameText,
+                                         actionRowIndex: $input.actionRowIndex,
                                          resultPrice: $input.resultPrice,
                                          resultItemAmount: $input.resultItemAmount,
                                          isShowItemDetail: $input.isShowItemDetail,
@@ -228,7 +229,7 @@ struct ItemStockView: View {
                                                                    .customLightGray1]),
                                        startPoint: .top, endPoint: .bottom))
             // アイテム取引かごのシート画面
-            .resizableSheet($basketState, id: "A") {builder in
+            .resizableSheet($basketState, id: "A") { builder in
                 builder.content { context in
 
                     VStack {
