@@ -154,13 +154,36 @@ struct ItemStockView: View {
                                 .background(.gray)
                                 .padding()
 
-                            TagTitle(title: input.currentIndex == 0 ?
-                                     input.searchItemNameText : itemVM.tags[input.currentIndex].tagName,
-                                     font: .title)
-                                .id("search")
+                            HStack(spacing: 50) {
+                                Text(input.currentIndex == 0 ?
+                                         "- \(input.searchItemNameText) -" :
+                                        "-  \(itemVM.tags[input.currentIndex].tagName) -")
+                                .font(.title.bold())
                                 .foregroundColor(.white)
+                                .shadow(radius: 3, x: 4, y: 6)
+                                .lineLimit(1)
                                 .opacity(0.8)
-                                .padding()
+
+                                if !input.searchItemNameText.isEmpty,
+                                   input.searchItemNameText != "ALL" {
+                                    Button {
+                                        input.searchItemNameText = ""
+                                    } label: {
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .foregroundColor(.gray)
+                                            .frame(width: 40)
+                                            .overlay {
+                                                Image(systemName: "trash.fill")
+                                                    .foregroundColor(.white)
+                                            }
+                                    } // Button
+                                    .opacity(0.3)
+                                }
+                                Spacer()
+                            } // HStack
+                            .id("search")
+                            .padding()
+
                             // ✅カスタムView: アイテムを表示します。(縦スクロール)
                             TagSortCards(searchItemNameText: $input.searchItemNameText,
                                          actionRowIndex: $input.actionRowIndex,
@@ -361,25 +384,6 @@ struct ItemStockView: View {
         } // .onChange
     } // body
 } // View
-
-// ✅カスタムView: アイテムのタグタイトル
-struct TagTitle: View {
-
-    let title: String
-    let font: Font
-
-    var body: some View {
-
-        HStack {
-            Text("- \(title) -")
-                .font(font.bold())
-                .shadow(radius: 3, x: 4, y: 6)
-                .padding(.horizontal)
-
-            Spacer()
-        }
-    } // body
-} // カスタムView
 
 // ✅カスタムView: サイドタグバーのフレーム、選択タグの前後要素のインフォメーションを表示するオーバーレイviewです。
 struct SideTagBarOverlay: View {
