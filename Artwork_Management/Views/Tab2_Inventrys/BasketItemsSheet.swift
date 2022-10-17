@@ -182,10 +182,13 @@ struct BasketItemRow: View {
             if item == itemVM.items[actionRowIndex] {
                 if resultItemAmount < newItemAmount {
                     count += 1
+                    resultPrice += item.price
+
                 } else if resultItemAmount > newItemAmount {
                     // NOTE: カート内のアイテムが削除された際、onchange内のカウント減処理が他のアイテムに適用されてしまうため、
                     //       アイテム削除が発火するcount1の時は、マイナス処理を飛ばしています。
                     if count == 1 { return }
+                    resultPrice -= item.price
                     count -= 1
                 }
             } // if
