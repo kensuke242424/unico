@@ -164,10 +164,11 @@ struct BasketItemRow: View {
                     .alert("確認", isPresented: $isShowAlert) {
                         Button("削除", role: .destructive) {
                             // データ削除処理
-                            resultItemAmount -= 1
+//                            resultItemAmount -= 1
                             resultPrice -= item.price
-                            basketItems.removeAll(where: { $0 == item })
-
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                basketItems.removeAll(where: { $0 == item })
+                            }
                         }
                     } message: {
                         Text("かごからアイテムを削除しますか？")
