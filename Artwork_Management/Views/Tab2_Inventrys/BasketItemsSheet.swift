@@ -164,11 +164,9 @@ struct BasketItemRow: View {
                     .alert("確認", isPresented: $isShowAlert) {
                         Button("削除", role: .destructive) {
                             // データ削除処理
-//                            resultItemAmount -= 1
+                            resultItemAmount -= 1
                             resultPrice -= item.price
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                basketItems.removeAll(where: { $0 == item })
-                            }
+                            basketItems.removeAll(where: { $0 == item })
                         }
                     } message: {
                         Text("かごからアイテムを削除しますか？")
@@ -180,9 +178,16 @@ struct BasketItemRow: View {
         // NOTE: かごのアイテム総数の変化を受け取り、どのアイテムが更新されたかを判定し、カウントを増減します。
         //       メインのカードView側からのアイテム追加とカウントを同期させるために必要です。
         .onChange(of: resultItemAmount) { [resultItemAmount] newItemAmount in
+
             if item == itemVM.items[actionRowIndex] {
-                count = resultItemAmount < newItemAmount ? count + 1 : count - 1
-                resultPrice = resultItemAmount < newItemAmount ? resultPrice + item.price : resultPrice - item.price
+                if resultItemAmount < newItemAmount {
+                    count += 1
+                } else if resultItemAmount > newItemAmount {
+                    // NOTE: カート内のアイテムが削除された際、onchange内のカウント減処理が他のアイテムに適用されてしまうため、
+                    //       アイテム削除が発火するcount1の時は、マイナス処理を飛ばしています。
+                    if count == 1 { return }
+                    count -= 1
+                }
             } // if
         } // .onChange
 
