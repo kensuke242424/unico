@@ -40,7 +40,7 @@ class ItemViewModel: ObservableObject {
 
     @Published var tags: [Tag] =
     [
-        Tag(tagName: "ALL", tagColor: .gray),
+//        Tag(tagName: "ALL", tagColor: .gray),
         Tag(tagName: "Album", tagColor: .red),
         Tag(tagName: "Single", tagColor: .blue),
         Tag(tagName: "Goods", tagColor: .yellow)

@@ -68,6 +68,17 @@ struct HomeTabView: View {
 
         } // ZStack
         .navigationBarBackButtonHidden()
+        .onChange(of: tabIndex) { newTabIndex in
+
+            // ストック画面でのみ、"ALL"タグを追加
+            if newTabIndex == 1 {
+                rootItemVM.tags.insert(Tag(tagName: "ALL", tagColor: .gray), at: 0)
+                print(rootItemVM.tags)
+            } else {
+                rootItemVM.tags.removeAll(where: {$0.tagName == "ALL"})
+                print(rootItemVM.tags)
+            }
+        }
     } // body
 } // View
 
