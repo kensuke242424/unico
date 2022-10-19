@@ -32,11 +32,16 @@ struct ItemCardRow: View {
             .overlay(alignment: .topTrailing) {
                 Button {
 
-                    actionRowIndex = itemVM.items.firstIndex(where: { $0 == item }) ?? 0
-                    print("actionRowIndex: \(actionRowIndex)")
-                    // アイテム詳細表示
-                    self.isShowItemDetail.toggle()
-                    print("ItemStockView_アイテム詳細ボタンタップ: \(isShowItemDetail)")
+                    guard let newActionIndex = itemVM.items.firstIndex(where: { $0 == item }) else {
+                        print("アクションIndexの取得に失敗しました")
+                        return
+                    }
+                        actionRowIndex = newActionIndex
+                        print("actionRowIndex: \(actionRowIndex)")
+                        // アイテム詳細表示
+                        self.isShowItemDetail.toggle()
+                        print("ItemStockView_アイテム詳細ボタンタップ: \(isShowItemDetail)")
+
                 } label: {
                     Image(systemName: "info.circle.fill")
                         .resizable()
@@ -94,7 +99,11 @@ struct ItemCardRow: View {
                         Button {
                             // 取引かごに追加するボタン
                             // タップするたびに、値段合計、個数、カート内アイテム要素にプラスする
-                            actionRowIndex = itemVM.items.firstIndex(where: { $0 == item }) ?? 0
+                            guard let newActionIndex = itemVM.items.firstIndex(where: { $0 == item }) else {
+                                print("アクションIndexの取得に失敗しました")
+                                return
+                            }
+                            actionRowIndex = newActionIndex
                             resultItemAmount += 1
 
                             // カート内に対象アイテムがなければ、カートに要素を新規追加

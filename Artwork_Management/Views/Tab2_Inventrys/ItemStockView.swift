@@ -230,6 +230,15 @@ struct ItemStockView: View {
                     }
                 }
 
+                .onChange(of: itemVM.items[input.actionRowIndex])
+                { [beforeItem = itemVM.items[input.actionRowIndex]] afterItem in
+
+                    guard let basketActionIndex = input.resultBasketItems.firstIndex(where: { $0 == beforeItem })
+                    else { return }
+
+                    input.resultBasketItems[basketActionIndex] = afterItem
+                }
+
                 // NOTE: 入力フィールドの表示に合わせて、フォーカスを切り替えます。
                 // NOTE: 入力フィールド表示時に、指定の位置まで自動フォーカスします。
                 .onChange(of: isShowSearchField) { newValue in

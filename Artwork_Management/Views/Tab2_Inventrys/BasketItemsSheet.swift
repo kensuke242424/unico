@@ -112,7 +112,7 @@ struct BasketItemRow: View {
                         .font(.title3.bold())
                         .lineLimit(1)
 
-                    HStack(alignment: .bottom, spacing: 30) {
+                    HStack(alignment: .bottom, spacing: 20) {
 
                         HStack(alignment: .bottom) {
                             Text("¥")
@@ -135,6 +135,8 @@ struct BasketItemRow: View {
                             if let newActionIndex = itemVM.items.firstIndex(of: item) {
                                 actionRowIndex = newActionIndex
                                 resultItemAmount -= 1
+                            } else {
+                                print("アクションIndexの取得に失敗しました")
                             } // if let
 
                         } label: {
@@ -151,6 +153,8 @@ struct BasketItemRow: View {
                             if let newActionIndex = itemVM.items.firstIndex(of: item) {
                                 actionRowIndex = newActionIndex
                                 resultItemAmount += 1
+                            } else {
+                                print("アクションIndexの取得に失敗しました")
                             } // if let
 
                         } label: {
@@ -193,7 +197,6 @@ struct BasketItemRow: View {
                 }
             } // if
         } // .onChange
-
         // NOTE: 新規アイテム追加時、roeViewのonAppearが発火します。
         //       アイテム要素追加時は(-)判定は発生しないので、判定分岐はせず、アイテムカウントに+1
         .onAppear {
