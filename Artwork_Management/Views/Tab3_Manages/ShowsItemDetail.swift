@@ -20,6 +20,7 @@ struct ShowsItemDetail: View {
     struct InputItemDetail {
         var opacity: Double = 0
         var isShowAlert: Bool = false
+        var isShowResetBasketAlert: Bool = false
         var disabledButton: Bool = true
         var isPlesentedUpdateItem: Bool = false
         var isPlesentedErrorInfomation: Bool = false
@@ -94,6 +95,20 @@ struct ShowsItemDetail: View {
                             }
                         } message: {
                             Text("アイテムデータを編集しますか？")
+//                            Text("")
+                        } // alert
+
+                        .alert("編集", isPresented: $input.isShowResetBasketAlert) {
+
+                            Button {
+                                input.isPlesentedUpdateItem.toggle()
+                                print("isShowItemEdit: \(input.isPlesentedUpdateItem)")
+                            } label: {
+                                Text("はい")
+                            }
+                        } message: {
+                            Text("アイテム情報が更新されました。カート内のアイテムがリセットされました。")
+//                            Text("")
                         } // alert
                     } // HStack
 

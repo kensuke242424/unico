@@ -197,6 +197,14 @@ struct BasketItemRow: View {
                 }
             } // if
         } // .onChange
+
+        .onChange(of: itemVM.items) { _ in
+
+//            if basketItems.contains(where: {$0.id == itemVM.items[actionRowIndex].id} ) {
+//
+//            }
+        }
+
         // NOTE: 新規アイテム追加時、roeViewのonAppearが発火します。
         //       アイテム要素追加時は(-)判定は発生しないので、判定分岐はせず、アイテムカウントに+1
         .onAppear {
