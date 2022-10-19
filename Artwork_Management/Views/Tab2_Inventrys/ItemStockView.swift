@@ -31,6 +31,7 @@ struct ItemStockView: View {
         var sideTagOpacity: CGFloat = 0.4
         var isPresentedNewItem = false
         var isShowItemDetail: Bool = false
+        var isShowBasketResetInfomation: Bool = false
         var doCommerce: Bool = false
         var mode: Mode = .dark
     }
@@ -210,6 +211,22 @@ struct ItemStockView: View {
                                         itemIndex: input.actionRowIndex,
                                         isShowitemDetail: $input.isShowItemDetail)
                     } // if isShowItemDetail
+
+                    if input.isShowBasketResetInfomation {
+                        VStack {
+                            RoundedRectangle(cornerRadius: 10)
+                                .foregroundColor(.white)
+                                .frame(width: 300, height: 30)
+                                .overlay {
+                                    Text("カート内がリセットされました。")
+                                        .foregroundColor(.black)
+                                        .fontWeight(.bold)
+                                }
+                                .opacity(0.5)
+                            Spacer()
+                        }
+                    } // if isShowBasketResetInfomation
+
                 } // ZStack
 
                 .onChange(of: input.actionRowIndex) { newActionIndex in
@@ -231,12 +248,23 @@ struct ItemStockView: View {
                     }
                 }
 
+                // NOTE: アイテム情報の更新が入った時、カート内にアイテムがあればリセットします。
                 .onChange(of: itemVM.items) { _ in
-                    input.resultBasketItems = []
-                    input.resultItemAmount = 0
-                    input.resultPrice = 0
-                    print("アイテム情報更新を検知しました。バスケット内のアイテムがリセットされました。")
-                }
+                    if input.resultBasketItems != [] {
+                        input.resultBasketItems = []
+                        input.resultItemAmount = 0
+                        input.resultPrice = 0
+                        withAnimation(.easeIn(duration: 0.3)) {
+                            input.isShowBasketResetInfomation.toggle()
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                withAnimation(.easeIn(duration: 0.2)) {
+                                    input.isShowBasketResetInfomation.toggle()
+                                }
+                            }
+                        }
+                        print("アイテム情報更新を検知しました。バスケット内のアイテムがリセットされました。")
+                    }
+                } // .onChange
 
                 // NOTE: 入力フィールドの表示に合わせて、フォーカスを切り替えます。
                 // NOTE: 入力フィールド表示時に、指定の位置まで自動フォーカスします。
