@@ -83,8 +83,8 @@ struct BasketItemRow: View {
     @Binding var resultItemAmount: Int
     @Binding var resultPrice: Int
     @Binding var actionRowIndex: Int
-
     @Binding var basketItems: [Item]
+
     let item: Item
 
     @State private var count: Int = 0
@@ -197,13 +197,6 @@ struct BasketItemRow: View {
                 }
             } // if
         } // .onChange
-
-        .onChange(of: itemVM.items) { _ in
-
-//            if basketItems.contains(where: {$0.id == itemVM.items[actionRowIndex].id} ) {
-//
-//            }
-        }
 
         // NOTE: 新規アイテム追加時、roeViewのonAppearが発火します。
         //       アイテム要素追加時は(-)判定は発生しないので、判定分岐はせず、アイテムカウントに+1

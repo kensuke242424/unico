@@ -12,20 +12,24 @@ struct HomeTabView: View {
 
     @StateObject var rootItemVM = ItemViewModel()
 
-    @State private var tabIndex = 0
-    @State private var isShowItemDetail: Bool = false
-    @State private var isPresentedNewItem: Bool = false
-    @State private var isShowSearchField: Bool = false
-    @State var basketState: ResizableSheetState = .hidden
-    @State var commerceState: ResizableSheetState = .hidden
+    struct InputHomeTab {
+        var tabIndex = 0
+        var isShowItemDetail: Bool = false
+        var isPresentedNewItem: Bool = false
+        var isShowSearchField: Bool = false
+        var basketState: ResizableSheetState = .hidden
+        var commerceState: ResizableSheetState = .hidden
+    }
+    @State private var input: InputHomeTab = InputHomeTab()
+
 
     var body: some View {
 
         ZStack {
 
-            TabView(selection: $tabIndex) {
+            TabView(selection: $input.tabIndex) {
 
-                LibraryView(itemVM: rootItemVM, isShowItemDetail: $isShowItemDetail)
+                LibraryView(itemVM: rootItemVM, isShowItemDetail: $input.isShowItemDetail)
                     .tabItem {
                         Image(systemName: "house")
                         Text("Home")
@@ -33,16 +37,16 @@ struct HomeTabView: View {
                     .tag(0)
 
                 ItemStockView(itemVM: rootItemVM,
-                              isShowSearchField: $isShowSearchField,
-                              basketState: $basketState,
-                              commerceState: $commerceState)
+                              isShowSearchField: $input.isShowSearchField,
+                              basketState: $input.basketState,
+                              commerceState: $input.commerceState)
                     .tabItem {
                         Image(systemName: "shippingbox.fill")
                         Text("inventory")
                     }
                     .tag(1)
 
-                ManageView(itemVM: rootItemVM, isPresentedEditItem: $isPresentedNewItem)
+                ManageView(itemVM: rootItemVM, isPresentedEditItem: $input.isPresentedNewItem)
                     .tabItem {
                         Image(systemName: "chart.xyaxis.line")
                         Text("Manage")
@@ -60,15 +64,15 @@ struct HomeTabView: View {
             } // TabViewここまで
 
             // Todo: 各タブごとにオプションが変わるボタン
-            UsefulButton(tabIndex: $tabIndex,
-                         isPresentedNewItem: $isPresentedNewItem,
-                         isShowSearchField: $isShowSearchField,
-                         basketState: $basketState,
-                         commerceState: $commerceState)
+            UsefulButton(tabIndex: $input.tabIndex,
+                         isPresentedNewItem: $input.isPresentedNewItem,
+                         isShowSearchField: $input.isShowSearchField,
+                         basketState: $input.basketState,
+                         commerceState: $input.commerceState)
 
         } // ZStack
         .navigationBarBackButtonHidden()
-        .onChange(of: tabIndex) { newTabIndex in
+        .onChange(of: input.tabIndex) { newTabIndex in
 
             // ストック画面でのみ、"ALL"タグを追加
             if newTabIndex == 1 {
