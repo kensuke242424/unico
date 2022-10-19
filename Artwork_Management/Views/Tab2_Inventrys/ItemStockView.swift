@@ -230,8 +230,7 @@ struct ItemStockView: View {
                     }
                 }
 
-                .onChange(of: itemVM.items[input.actionRowIndex])
-                { [beforeItem = itemVM.items[input.actionRowIndex]] afterItem in
+                .onChange(of: itemVM.items[input.actionRowIndex]) { [beforeItem = itemVM.items[input.actionRowIndex]] afterItem in
 
                     guard let basketActionIndex = input.resultBasketItems.firstIndex(where: { $0 == beforeItem })
                     else { return }
