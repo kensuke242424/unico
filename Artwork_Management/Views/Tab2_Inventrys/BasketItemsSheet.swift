@@ -19,6 +19,7 @@ struct BasketItemsSheet: View {
     @Binding var resultItemAmount: Int
     @Binding var resultPrice: Int
     @Binding var actionRowIndex: Int
+    @Binding var doCommerce: Bool
 
     let halfSheetScroll: HalfSheetScroll
 
@@ -45,6 +46,7 @@ struct BasketItemsSheet: View {
                                       resultPrice: $resultPrice,
                                       actionRowIndex: $actionRowIndex,
                                       basketItems: $basketItems,
+                                      doCommerce: $doCommerce,
                                       item: element)
                     } // if
                 } // ForEach
@@ -65,6 +67,7 @@ struct BasketItemsSheet: View {
                                       resultPrice: $resultPrice,
                                       actionRowIndex: $actionRowIndex,
                                       basketItems: $basketItems,
+                                      doCommerce: $doCommerce,
                                       item: element)
                     } // if listLimit
                 } // ForEach
@@ -84,6 +87,7 @@ struct BasketItemRow: View {
     @Binding var resultPrice: Int
     @Binding var actionRowIndex: Int
     @Binding var basketItems: [Item]
+    @Binding var doCommerce: Bool
 
     let item: Item
 
@@ -177,6 +181,19 @@ struct BasketItemRow: View {
                     }
                 } // VStack
             } // HStack
+
+            // 決済確定ボタンタップを検知して、対象のアイテム情報を更新します。
+            .onChange(of: doCommerce) { commerce in
+                if commerce {
+                    for item in basketItems {
+
+                        guard let updateItemIndex = itemVM.items.firstIndex(of: item) else { return }
+                        itemVM.items[updateItemIndex].sales += item.price * count
+                        itemVM.items[updateItemIndex].inventory -= count
+                    }
+                    doCommerce.toggle()
+                }
+            }
         } // VStack(全体)
 
         // NOTE: かごのアイテム総数の変化を受け取り、どのアイテムが更新されたかを判定し、カウントを増減します。
@@ -223,6 +240,7 @@ struct BasketItemsSheet_Previews: PreviewProvider {
                          resultItemAmount: .constant(0),
                          resultPrice: .constant(20000),
                          actionRowIndex: .constant(0),
+                         doCommerce: .constant(false),
                          halfSheetScroll: .main)
     }
 }

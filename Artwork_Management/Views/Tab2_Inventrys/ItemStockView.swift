@@ -323,6 +323,7 @@ struct ItemStockView: View {
                                     resultItemAmount: $input.resultItemAmount,
                                     resultPrice: $input.resultPrice,
                                     actionRowIndex: $input.actionRowIndex,
+                                    doCommerce: $input.doCommerce,
                                     halfSheetScroll: .main)
                             },
                             additional: {
@@ -332,6 +333,7 @@ struct ItemStockView: View {
                                     resultItemAmount: $input.resultItemAmount,
                                     resultPrice: $input.resultPrice,
                                     actionRowIndex: $input.actionRowIndex,
+                                    doCommerce: $input.doCommerce,
                                     halfSheetScroll: .additional)
 
                                 Spacer()

@@ -70,11 +70,13 @@ struct CommerceSheet: View {
 
                 Button(
                     action: {
-                        resultBasketItems.removeAll()
+//                        resultBasketItems.removeAll()
+                        doCommerce.toggle()
+                        print(doCommerce)
                         basketState = .hidden
                         commerceState = .hidden
-                        resultPrice = 0
-                        resultItemAmount = 0
+//                        resultPrice = 0
+//                        resultItemAmount = 0
                     },
                     label: {
                         RoundedRectangle(cornerRadius: 20)
