@@ -199,11 +199,9 @@ struct ManageView: View {
                             .foregroundColor(.white)
                             .opacity(0.8)
                             .font(.subheadline.bold())
-
                         Button {
                             input.listIndex = listIndex
                             print("listIndex: \(listIndex)")
-
                             input.isShowItemDetail.toggle()
                             print("isShowItemDetail: \(input.isShowItemDetail)")
 
@@ -218,22 +216,16 @@ struct ManageView: View {
                     // NOTE: ラインの外枠を透明フレームで置いておくことで、
                     // ラインが端まで行ってもレイアウトが崩れない
                     switch item.tagColor {
-                    case "赤":
-                        IndicatorRow(salesValue: item.sales, tagColor: .red)
-                    case "青":
-                        IndicatorRow(salesValue: item.sales, tagColor: .blue)
-                    case "黄":
-                        IndicatorRow(salesValue: item.sales, tagColor: .yellow)
-                    case "緑":
-                        IndicatorRow(salesValue: item.sales, tagColor: .green)
-                    default:
-                        IndicatorRow(salesValue: item.sales, tagColor: .gray)
+                    case "赤": IndicatorRow(salesValue: item.sales, tagColor: .red)
+                    case "青": IndicatorRow(salesValue: item.sales, tagColor: .blue)
+                    case "黄": IndicatorRow(salesValue: item.sales, tagColor: .yellow)
+                    case "緑": IndicatorRow(salesValue: item.sales, tagColor: .green)
+                    default: IndicatorRow(salesValue: item.sales, tagColor: .gray)
                     }
 
                     Text(item.name)
                         .font(.caption.bold())
                         .foregroundColor(.gray)
-
                 } // VStack
                 Spacer()
             } // HStack

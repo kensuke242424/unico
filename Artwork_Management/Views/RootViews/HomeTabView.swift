@@ -22,7 +22,6 @@ struct HomeTabView: View {
     }
     @State private var input: InputHomeTab = InputHomeTab()
 
-
     var body: some View {
 
         ZStack {
