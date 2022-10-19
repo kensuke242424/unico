@@ -186,7 +186,6 @@ struct BasketItemRow: View {
             .onChange(of: doCommerce) { commerce in
                 if commerce {
                     for item in basketItems {
-
                         guard let updateItemIndex = itemVM.items.firstIndex(of: item) else { return }
                         itemVM.items[updateItemIndex].sales += item.price * count
                         itemVM.items[updateItemIndex].inventory -= count
@@ -194,6 +193,7 @@ struct BasketItemRow: View {
                     doCommerce.toggle()
                 }
             }
+
         } // VStack(全体)
 
         // NOTE: かごのアイテム総数の変化を受け取り、どのアイテムが更新されたかを判定し、カウントを増減します。
@@ -206,8 +206,8 @@ struct BasketItemRow: View {
                     resultPrice += item.price
 
                 } else if resultItemAmount > newItemAmount {
-                    // NOTE: カート内のアイテムが削除された際、onchange内のカウント減処理が他のアイテムに適用されてしまうため、
-                    //       アイテム削除が発火するcount1の時は、マイナス処理を飛ばしています。
+                    // NOTE: カート内のアイテム削除処理が発生した際、onchange内のカウント減処理が他のアイテムに適用されてしまうため、
+                    //       アイテム削除処理が発火する条件である「count1」の時は、マイナス処理をスキップしています。
                     if count == 1 { return }
                     resultPrice -= item.price
                     count -= 1

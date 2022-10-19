@@ -99,6 +99,7 @@ struct ItemStockView: View {
                                             newIndex = itemVM.tags.count - 1
                                         }
                                         input.currentIndex = newIndex
+                                        if input.currentIndex != 0 { isShowSearchField = false }
                                     }) // .onEnded
                             ) // .gesture
                             // 減衰ばねモデル、それぞれの値は操作感に応じて変更する
