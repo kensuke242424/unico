@@ -19,9 +19,9 @@ class ItemViewModel: ObservableObject {
      @Published var items: [Item] =
     [
         Item(tag: "Album", tagColor: "赤", name: "Album1", detail: "Album1のアイテム紹介テキストです。", photo: "",
-             price: 1800, sales: 88000, inventory: 200, createTime: Date(), updateTime: Date()),
+             price: 1800, sales: 88000, inventory: 2, createTime: Date(), updateTime: Date()),
         Item(tag: "Album", tagColor: "赤", name: "Album2", detail: "Album2のアイテム紹介テキストです。", photo: "",
-             price: 2800, sales: 230000, inventory: 420, createTime: Date(), updateTime: Date()),
+             price: 2800, sales: 230000, inventory: 4, createTime: Date(), updateTime: Date()),
         Item(tag: "Album", tagColor: "赤", name: "Album3", detail: "Album3のアイテム紹介テキストです。", photo: "",
              price: 3200, sales: 367000, inventory: 402, createTime: Date(), updateTime: Date()),
         Item(tag: "Single", tagColor: "青", name: "Single1", detail: "Single1のアイテム紹介テキストです。", photo: "",

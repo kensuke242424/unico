@@ -91,8 +91,9 @@ struct BasketItemRow: View {
 
     let item: Item
 
-    @State private var count: Int = 0
+    @State private var basketItemCount: Int = 0
     @State private var isShowAlert: Bool = false
+    @State private var countUpDisable: Bool = false
 
     var body: some View {
 
@@ -130,7 +131,7 @@ struct BasketItemRow: View {
                         Button {
 
                             // カート内アイテム数カウントが１だった時、アイテムを削除するかをユーザに確認します。
-                            if count == 1 {
+                            if basketItemCount == 1 {
                                 isShowAlert.toggle()
                                 return
                             }
@@ -149,7 +150,7 @@ struct BasketItemRow: View {
                                 .frame(width: 22, height: 22)
                                 .foregroundColor(.customlDarkPurple1)
                         }
-                        Text(String(count))
+                        Text(String(basketItemCount))
                             .foregroundColor(.black)
                             .fontWeight(.black)
                         Button {
@@ -166,7 +167,9 @@ struct BasketItemRow: View {
                                 .resizable()
                                 .frame(width: 22, height: 22)
                                 .foregroundColor(.customlDarkPurple1)
+                                .opacity(countUpDisable ? 0.3 : 1.0)
                         }
+                        .disabled(countUpDisable)
                     }
                     .offset(y: 8)
                     .alert("確認", isPresented: $isShowAlert) {
@@ -187,8 +190,8 @@ struct BasketItemRow: View {
                 if commerce {
                     for item in basketItems {
                         guard let updateItemIndex = itemVM.items.firstIndex(of: item) else { return }
-                        itemVM.items[updateItemIndex].sales += item.price * count
-                        itemVM.items[updateItemIndex].inventory -= count
+                        itemVM.items[updateItemIndex].sales += item.price * basketItemCount
+                        itemVM.items[updateItemIndex].inventory -= basketItemCount
                     }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                         doCommerce.toggle()
@@ -204,23 +207,35 @@ struct BasketItemRow: View {
 
             if item == itemVM.items[actionRowIndex] {
                 if resultItemAmount < newItemAmount {
-                    count += 1
+                    basketItemCount += 1
                     resultPrice += item.price
 
                 } else if resultItemAmount > newItemAmount {
                     // NOTE: カート内のアイテム削除処理が発生した際、onchange内のカウント減処理が他のアイテムに適用されてしまうため、
                     //       アイテム削除処理が発火する条件である「count1」の時は、マイナス処理をスキップしています。
-                    if count == 1 { return }
+                    if basketItemCount == 1 { return }
                     resultPrice -= item.price
-                    count -= 1
+                    basketItemCount -= 1
                 }
             } // if
         } // .onChange
 
+        .onChange(of: basketItemCount) { newCount in
+            if newCount == item.inventory {
+                if item == itemVM.items[actionRowIndex] {
+                    countUpDisable = true
+                }
+            } else {
+                if item == itemVM.items[actionRowIndex] {
+                    countUpDisable = false
+                }
+            }
+        }
+
         // NOTE: 新規アイテム追加時、roeViewのonAppearが発火します。
         //       アイテム要素追加時は(-)判定は発生しないので、判定分岐はせず、アイテムカウントに+1
         .onAppear {
-            count += 1
+            basketItemCount += 1
             resultPrice += item.price
         } // .onAppear
 

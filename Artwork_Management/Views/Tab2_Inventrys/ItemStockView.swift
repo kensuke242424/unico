@@ -34,6 +34,7 @@ struct ItemStockView: View {
         var resultBasketItems: [Item] = []
         var sideTagOpacity: CGFloat = 0.4
         var isShowItemDetail: Bool = false
+        var countUpDisable: Bool = false
         var isShowUpdateDataInfomation: Bool = false
         var isShowUpdateBasketInfomation: Bool = false
         var mode: Mode = .dark

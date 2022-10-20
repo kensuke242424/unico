@@ -12,7 +12,6 @@ struct ItemCardRow: View {
     // ダークモードの判定に用いる
     @Environment(\.colorScheme) var colorScheme
     @StateObject var itemVM: ItemViewModel
-
     @Binding var isShowItemDetail: Bool
     @Binding var actionRowIndex: Int
     @Binding var resultPrice: Int
@@ -24,6 +23,7 @@ struct ItemCardRow: View {
     let itemHeight: CGFloat
 
     @State private var cardCount: Int =  0
+    @State private var countUpDisable: Bool = false
 
     var body: some View {
 
@@ -123,8 +123,10 @@ struct ItemCardRow: View {
                                     .resizable()
                                     .frame(width: 28, height: 28)
                                     .foregroundColor(.customDarkGray1)
+                                    .opacity(countUpDisable ? 0.2 : 1.0)
                             } // Button
                             .offset(x: 5, y: 5)
+                            .disabled(countUpDisable)
                         } // HStack
                     } // VStack
                     .padding()
@@ -156,6 +158,18 @@ struct ItemCardRow: View {
 
         .onChange(of: resultBasketItems) { _ in
             if resultBasketItems == [] { cardCount = 0 }
+        }
+
+        .onChange(of: cardCount) { newCardCount in
+            if newCardCount == item.inventory {
+                if item == itemVM.items[actionRowIndex] {
+                    countUpDisable = true
+                }
+            } else {
+                if item == itemVM.items[actionRowIndex] {
+                    countUpDisable = false
+                }
+            }
         }
 
     } // body
