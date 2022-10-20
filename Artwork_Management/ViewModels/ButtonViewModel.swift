@@ -30,22 +30,18 @@ class ButtonViewModel: ObservableObject {
         switch style {
 
         case .library:
-            print("ライブラリ画面時のアイコンに変更")
             return ButtonIcon(icon: change ?  "" : "",
                               badge: change ?  "" : "")
 
         case .stock:
-            print("ストック画面時のアイコンに変更")
             return ButtonIcon(icon: change ?  "magnifyingglass" : "magnifyingglass",
                               badge: change ?  "" : "")
 
         case .manege:
-            print("マネージ画面時のアイコンに変更")
             return ButtonIcon(icon: change ? "shippingbox.fill" : "shippingbox.fill",
                               badge: change ? "plus.circle.fill" : "plus.circle.fill")
 
         case .account:
-            print("システム画面時のアイコンに変更")
             return ButtonIcon(icon: change ?  "" : "",
                               badge: change ?  "" : "")
         } // switch
@@ -59,22 +55,17 @@ class ButtonViewModel: ObservableObject {
         switch tabIndex {
         case 0:
             buttonStyle = .library
-            print("ボタンスタイルが.libraryに変更されました。")
             return buttonStyle
         case 1:
             buttonStyle = .stock
-            print("ボタンスタイルが.stockに変更されました。")
             return buttonStyle
         case 2:
             buttonStyle = .manege
-            print("ボタンスタイルが.manegeに変更されました。")
             return buttonStyle
         case 3:
             buttonStyle = .account
-            print("ボタンスタイルが.accountに変更されました。")
             return buttonStyle
         default:
-            print("buttonStyleChenged_メソッド：error")
             return buttonStyle
         }
     } // func buttonStyleChenged

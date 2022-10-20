@@ -70,8 +70,8 @@ struct CommerceSheet: View {
 
                 Button(
                     action: {
+                        print("取引確定ボタンタップ")
                         doCommerce.toggle()
-                        print("取引確定ボタンタップ_doCommerce: \(doCommerce)")
                         basketState = .hidden
                         commerceState = .hidden
                     },

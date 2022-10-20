@@ -120,7 +120,6 @@ struct EditItemView: View {
                 // Warning_TextSimbol: "＋タグを追加"
                 if selection == "＋タグを追加" {
                     input.isOpenSideMenu.toggle()
-                    print("サイドメニュー: \(input.isOpenSideMenu)")
                 }
             } // onChange (selectionTagName)
 
@@ -163,7 +162,7 @@ struct EditItemView: View {
             // NOTE: updateitemView呼び出し時に、親Viewから受け取ったアイテム情報を各入力欄に格納します。
             .onAppear {
 
-                print("EditItemView_onAppear_実行")
+                print("EditItemView_onAppear")
 
                 print("アイテム編集ステータス: \(editItemStatus)")
 

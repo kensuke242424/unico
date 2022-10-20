@@ -220,7 +220,6 @@ struct BasketItemRow: View {
         // NOTE: 新規アイテム追加時、roeViewのonAppearが発火します。
         //       アイテム要素追加時は(-)判定は発生しないので、判定分岐はせず、アイテムカウントに+1
         .onAppear {
-            print("BasketItemRow_onAppear")
             count += 1
             resultPrice += item.price
         } // .onAppear

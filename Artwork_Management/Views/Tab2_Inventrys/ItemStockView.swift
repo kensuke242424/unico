@@ -216,10 +216,6 @@ struct ItemStockView: View {
                     } // if isShowItemDetail
                 } // ZStack
 
-                .onChange(of: input.actionRowIndex) { newActionIndex in
-                    print("StockView内でアクションされたアイテムの更新。index: \(newActionIndex)")
-                }
-
                 // NOTE: バスケット内にアイテムが追加された時点で、ハーフモーダルを表示します。
                 .onChange(of: input.resultBasketItems) { [before = input.resultBasketItems] after in
 
@@ -232,8 +228,6 @@ struct ItemStockView: View {
                     if after == [] {
                         commerceState = .hidden
                         basketState = .hidden
-
-                        print("doCommerce: \(doCommerce)")
                         basketInfomationOpacity = 0.7
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.9) {
                             basketInfomationOpacity = 0.0
@@ -257,7 +251,6 @@ struct ItemStockView: View {
                 // NOTE: 入力フィールドの表示に合わせて、フォーカスを切り替えます。
                 // NOTE: 入力フィールド表示時に、指定の位置まで自動フォーカスします。
                 .onChange(of: isShowSearchField) { newValue in
-                    print(newValue)
 
                     searchFocused = newValue ? .check : nil
                     if newValue == true {

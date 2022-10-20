@@ -201,7 +201,6 @@ struct ManageView: View {
                             .font(.subheadline.bold())
                         Button {
                             input.listIndex = listIndex
-                            print("listIndex: \(listIndex)")
                             input.isShowItemDetail.toggle()
                             print("isShowItemDetail: \(input.isShowItemDetail)")
 
