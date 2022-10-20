@@ -133,6 +133,7 @@ struct ItemCardRow: View {
                 .overlay(alignment: .topLeading) {
                     if cardCount > 0 {
                         Text("\(cardCount)").font(.title.bold())
+                            .foregroundColor(.black)
                         .shadow(color: .white, radius: 1)
                         .shadow(color: .white, radius: 1)
                         .shadow(color: .white, radius: 1)

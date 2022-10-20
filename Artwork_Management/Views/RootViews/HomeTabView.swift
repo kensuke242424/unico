@@ -14,9 +14,12 @@ struct HomeTabView: View {
 
     struct InputHomeTab {
         var tabIndex = 0
+        var itemsInfomationOpacity: CGFloat = 0.0
+        var basketInfomationOpacity: CGFloat = 0.0
         var isShowItemDetail: Bool = false
         var isPresentedNewItem: Bool = false
         var isShowSearchField: Bool = false
+        var doCommerce: Bool = false
         var basketState: ResizableSheetState = .hidden
         var commerceState: ResizableSheetState = .hidden
     }
@@ -36,7 +39,10 @@ struct HomeTabView: View {
                     .tag(0)
 
                 ItemStockView(itemVM: rootItemVM,
+                              itemsInfomationOpacity: $input.itemsInfomationOpacity,
+                              basketInfomationOpacity: $input.basketInfomationOpacity,
                               isShowSearchField: $input.isShowSearchField,
+                              doCommerce: $input.doCommerce,
                               basketState: $input.basketState,
                               commerceState: $input.commerceState)
                     .tabItem {
@@ -61,6 +67,31 @@ struct HomeTabView: View {
                     .tag(3)
 
             } // TabViewここまで
+
+            VStack {
+                RoundedRectangle(cornerRadius: 10)
+                    .foregroundColor(.white)
+                    .frame(width: 300, height: 30)
+                    .overlay {
+                        Text("アイテム情報が更新されました。")
+                            .foregroundColor(.black)
+                            .fontWeight(.bold)
+                    }
+                    .opacity(input.itemsInfomationOpacity)
+                RoundedRectangle(cornerRadius: 10)
+                    .foregroundColor(.white)
+                    .frame(width: 300, height: 30)
+                    .overlay {
+                        Text(input.doCommerce ? "カート内の処理が確定しました。" : "カート内がリセットされました。")
+                            .foregroundColor(.black)
+                            .fontWeight(.bold)
+                    }
+                    .opacity(input.basketInfomationOpacity)
+                Spacer()
+            }
+            .offset(y: 80)
+            .animation(.easeIn(duration: 0.2), value: input.itemsInfomationOpacity)
+            .animation(.easeIn(duration: 0.2), value: input.basketInfomationOpacity)
 
             // Todo: 各タブごとにオプションが変わるボタン
             UsefulButton(tabIndex: $input.tabIndex,

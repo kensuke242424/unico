@@ -113,7 +113,7 @@ struct UpdateTimeSortCards: View {
             } // LazyHGrid
             .padding()
         }
-        .frame(height: itemHeight)
+        .frame(height: 235)
     } // body
 } // View
 
@@ -147,7 +147,6 @@ struct TagCards_Previews: PreviewProvider {
                                          price: 1100, sales: 182000, inventory: 199, createTime: Date(), updateTime: Date())
                                  ])
              } // ScrollView
-             .frame(height: 220)
 
             Divider()
                 .background(.gray)

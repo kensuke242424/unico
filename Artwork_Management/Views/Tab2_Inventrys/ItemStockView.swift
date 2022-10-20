@@ -13,7 +13,10 @@ struct ItemStockView: View {
     @Environment(\.colorScheme) var colorScheme
 
     @StateObject var itemVM: ItemViewModel
+    @Binding var itemsInfomationOpacity: CGFloat
+    @Binding var basketInfomationOpacity: CGFloat
     @Binding var isShowSearchField: Bool
+    @Binding var doCommerce: Bool
     @Binding var basketState: ResizableSheetState
     @Binding var commerceState: ResizableSheetState
 
@@ -32,7 +35,7 @@ struct ItemStockView: View {
         var isPresentedNewItem = false
         var isShowItemDetail: Bool = false
         var isShowUpdateDataInfomation: Bool = false
-        var doCommerce: Bool = false
+        var isShowUpdateBasketInfomation: Bool = false
         var mode: Mode = .dark
     }
     @State private var input: InputStock = InputStock()
@@ -149,7 +152,7 @@ struct ItemStockView: View {
                                                 resultItemAmount: $input.resultItemAmount,
                                                 resultBasketItems: $input.resultBasketItems,
                                                 itemWidth: UIScreen.main.bounds.width * 0.41,
-                                                itemHeight: 230,
+                                                itemHeight: 205,
                                                 itemSpase: 20,
                                                 itemNameTag: "アイテム",
                                                 items: itemVM.items)
@@ -197,7 +200,7 @@ struct ItemStockView: View {
                                          isShowItemDetail: $input.isShowItemDetail,
                                          resultBasketItems: $input.resultBasketItems,
                                          itemWidth: UIScreen.main.bounds.width * 0.43,
-                                         itemHeight: 240,
+                                         itemHeight: 210,
                                          itemSpase: 20,
                                          selectTag: itemVM.tags[input.currentIndex].tagName,
                                          items: itemVM.items)
@@ -211,24 +214,6 @@ struct ItemStockView: View {
                                         itemIndex: input.actionRowIndex,
                                         isShowitemDetail: $input.isShowItemDetail)
                     } // if isShowItemDetail
-
-                    if input.isShowUpdateDataInfomation {
-                        VStack {
-                            RoundedRectangle(cornerRadius: 10)
-                                .foregroundColor(.white)
-                                .frame(width: 300, height: 30)
-                                .overlay {
-                                    Text("アイテムの情報が更新されました。")
-                                        .foregroundColor(.black)
-                                        .fontWeight(.bold)
-                                }
-
-                            Spacer()
-                        } // VStack
-                        .opacity(0.7)
-                        .offset(y: 50)
-                    } // if isShowBasketResetInfomation
-
                 } // ZStack
 
                 .onChange(of: input.actionRowIndex) { newActionIndex in
@@ -247,26 +232,26 @@ struct ItemStockView: View {
                     if newBasket == [] {
                         commerceState = .hidden
                         basketState = .hidden
+
+                        print("doCommerce: \(doCommerce)")
+                        basketInfomationOpacity = 0.7
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.9) {
+                            basketInfomationOpacity = 0.0
+                        }
                     }
                 }
 
                 // NOTE: アイテム情報の更新が入った時、カート内にアイテムがあればリセットします。
                 .onChange(of: itemVM.items) { _ in
-//                    commerceState = .hidden
-//                    basketState = .hidden
+
                     input.resultBasketItems = []
                     input.resultItemAmount = 0
                     input.resultPrice = 0
-                    withAnimation(.easeIn(duration: 0.2)) {
-                        input.isShowUpdateDataInfomation.toggle()
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                            withAnimation(.easeIn(duration: 0.25)) {
-                                input.isShowUpdateDataInfomation.toggle()
 
-                            }
-                        }
+                    itemsInfomationOpacity = 0.7
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.7) {
+                        itemsInfomationOpacity = 0.0
                     }
-                    print(input.doCommerce)
                 } // .onChange
 
                 // NOTE: 入力フィールドの表示に合わせて、フォーカスを切り替えます。
@@ -355,7 +340,7 @@ struct ItemStockView: View {
                                     resultItemAmount: $input.resultItemAmount,
                                     resultPrice: $input.resultPrice,
                                     actionRowIndex: $input.actionRowIndex,
-                                    doCommerce: $input.doCommerce,
+                                    doCommerce: $doCommerce,
                                     halfSheetScroll: .main)
                             },
                             additional: {
@@ -365,7 +350,7 @@ struct ItemStockView: View {
                                     resultItemAmount: $input.resultItemAmount,
                                     resultPrice: $input.resultPrice,
                                     actionRowIndex: $input.actionRowIndex,
-                                    doCommerce: $input.doCommerce,
+                                    doCommerce: $doCommerce,
                                     halfSheetScroll: .additional)
 
                                 Spacer()
@@ -396,7 +381,7 @@ struct ItemStockView: View {
                                   resultPrice: $input.resultPrice,
                                   resultItemAmount: $input.resultItemAmount,
                                   resultBasketItems: $input.resultBasketItems,
-                                  doCommerce: $input.doCommerce)
+                                  doCommerce: $doCommerce)
 
                 } // builder.content
                 .supportedState([.medium])
@@ -491,7 +476,10 @@ struct ItemStockView_Previews: PreviewProvider {
         }
 
         return ItemStockView(itemVM: ItemViewModel(),
+                             itemsInfomationOpacity: .constant(0.0),
+                             basketInfomationOpacity: .constant(0.0),
                              isShowSearchField: .constant(false),
+                             doCommerce: .constant(false),
                              basketState: .constant(.hidden),
                              commerceState: .constant(.hidden))
         .environment(\.resizableSheetCenter, resizableSheetCenter)
