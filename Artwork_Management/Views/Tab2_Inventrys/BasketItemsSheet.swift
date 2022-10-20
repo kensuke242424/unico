@@ -188,13 +188,18 @@ struct BasketItemRow: View {
             // 決済確定ボタンタップを検知して、対象のアイテム情報を更新します。
             .onChange(of: doCommerce) { commerce in
                 if commerce {
-                    for item in basketItems {
-                        guard let updateItemIndex = itemVM.items.firstIndex(of: item) else { return }
+                    print(doCommerce)
+                    guard let updateItemIndex = itemVM.items.firstIndex(of: item) else { return }
+                    print("updateItemIndex: \(updateItemIndex)")
+                    print("basketItemCount: \(basketItemCount)")
+                    if item == itemVM.items[updateItemIndex] {
                         itemVM.items[updateItemIndex].sales += item.price * basketItemCount
                         itemVM.items[updateItemIndex].inventory -= basketItemCount
                     }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                        doCommerce.toggle()
+
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.3) {
+                        doCommerce = false
+                        print(doCommerce)
                     }
                 }
             }

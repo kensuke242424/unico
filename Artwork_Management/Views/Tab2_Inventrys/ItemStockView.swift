@@ -374,7 +374,6 @@ struct ItemStockView: View {
                                   basketState: $basketState,
                                   resultPrice: $input.resultPrice,
                                   resultItemAmount: $input.resultItemAmount,
-                                  resultBasketItems: $input.resultBasketItems,
                                   doCommerce: $doCommerce)
 
                 } // builder.content

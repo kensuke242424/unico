@@ -15,8 +15,10 @@ struct CommerceSheet: View {
     @Binding var basketState: ResizableSheetState
     @Binding var resultPrice: Int
     @Binding var resultItemAmount: Int
-    @Binding var resultBasketItems: [Item]
     @Binding var doCommerce: Bool
+
+    @State private var commerceButtonDisable: Bool = false
+    @State private var commerceButtonOpacity: CGFloat =  1.0
 
     var body: some View {
         VStack {
@@ -42,13 +44,14 @@ struct CommerceSheet: View {
                         .overlay(alignment: .topTrailing) {
                             if resultItemAmount <= 50 {
                                 Image(systemName: "\(resultItemAmount).circle.fill")
-                                    .foregroundColor(.black)
+                                    .foregroundColor(.customLightBlue2)
                                     .offset(y: -8)
                             } else {
-                                Image(systemName: "50.circle").offset(y: -8)
-                                    .foregroundColor(.black)
+                                Image(systemName: "50.circle.fill").offset(y: -8)
+                                    .foregroundColor(.customLightBlue2)
                                     .overlay(alignment: .topTrailing) {
                                         Text("＋")
+                                            .foregroundColor(.customLightBlue2)
                                             .font(.caption)
                                             .offset(x: 7, y: -12)
                                     }
@@ -71,7 +74,7 @@ struct CommerceSheet: View {
                 Button(
                     action: {
                         print("取引確定ボタンタップ")
-                        doCommerce.toggle()
+                        doCommerce = true
                         basketState = .hidden
                         commerceState = .hidden
                     },
@@ -89,12 +92,20 @@ struct CommerceSheet: View {
                             }
                     }
                 ) // Button
+                .disabled(commerceButtonDisable)
+                .opacity(commerceButtonOpacity)
             } // HStack
             .frame(height: 80)
             .padding(.horizontal, 20)
             .animation(nil, value: resultPrice)
             .animation(nil, value: resultItemAmount)
         } // VStack 決済シートレイアウト
+
+        .onChange(of: doCommerce) { _ in
+            commerceButtonDisable = doCommerce ? true : false
+            commerceButtonOpacity = doCommerce ? 0.3 : 1.0
+        }
+
         .onAppear {
             print("CommerceSheet_onAppear")
         }
