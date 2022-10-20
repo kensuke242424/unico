@@ -130,19 +130,21 @@ struct BasketItemRow: View {
                         }
                         Button {
 
+                            if let newActionIndex = itemVM.items.firstIndex(of: item) {
+                                actionRowIndex = newActionIndex
+                                print("newActionIndex: \(newActionIndex)")
+                            } else {
+                                print("アクションIndexの取得に失敗しました")
+                                return
+                            } // if let
                             // カート内アイテム数カウントが１だった時、アイテムを削除するかをユーザに確認します。
                             if basketItemCount == 1 {
                                 isShowAlert.toggle()
                                 return
                             }
-
                             // マイナスボタン
-                            if let newActionIndex = itemVM.items.firstIndex(of: item) {
-                                actionRowIndex = newActionIndex
-                                resultItemAmount -= 1
-                            } else {
-                                print("アクションIndexの取得に失敗しました")
-                            } // if let
+
+                            resultItemAmount -= 1
 
                         } label: {
                             Image(systemName: "minus.circle.fill")
@@ -219,8 +221,11 @@ struct BasketItemRow: View {
                     // NOTE: カート内のアイテム削除処理が発生した際、onchange内のカウント減処理が他のアイテムに適用されてしまうため、
                     //       アイテム削除処理が発火する条件である「count1」の時は、マイナス処理をスキップしています。
                     if basketItemCount == 1 { return }
-                    resultPrice -= item.price
-                    basketItemCount -= 1
+                    if item == itemVM.items[actionRowIndex] {
+                        print("カウント減実行")
+                        resultPrice -= item.price
+                        basketItemCount -= 1
+                    }
                 }
             } // if
         } // .onChange

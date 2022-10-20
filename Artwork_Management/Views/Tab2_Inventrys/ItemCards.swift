@@ -113,7 +113,7 @@ struct UpdateTimeSortCards: View {
             } // LazyHGrid
             .padding()
         }
-        .frame(height: 235)
+        .frame(height: 246)
     } // body
 } // View
 

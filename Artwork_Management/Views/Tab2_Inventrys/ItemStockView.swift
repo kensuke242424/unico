@@ -152,8 +152,8 @@ struct ItemStockView: View {
                                                 resultPrice: $input.resultPrice,
                                                 resultItemAmount: $input.resultItemAmount,
                                                 resultBasketItems: $input.resultBasketItems,
-                                                itemWidth: UIScreen.main.bounds.width * 0.41,
-                                                itemHeight: 205,
+                                                itemWidth: 165,
+                                                itemHeight: 210,
                                                 itemSpase: 20,
                                                 itemNameTag: "アイテム",
                                                 items: itemVM.items)
@@ -200,9 +200,9 @@ struct ItemStockView: View {
                                          resultItemAmount: $input.resultItemAmount,
                                          isShowItemDetail: $input.isShowItemDetail,
                                          resultBasketItems: $input.resultBasketItems,
-                                         itemWidth: UIScreen.main.bounds.width * 0.43,
+                                         itemWidth: 165,
                                          itemHeight: 210,
-                                         itemSpase: 20,
+                                         itemSpase: 25,
                                          selectTag: itemVM.tags[input.currentIndex].tagName,
                                          items: itemVM.items)
                         } // ScrollView (アイテムロケーション)
