@@ -220,22 +220,16 @@ struct ItemStockView: View {
                     print("StockView内でアクションされたアイテムの更新。index: \(newActionIndex)")
                 }
 
-//                .onChange(of: isPresentedEditItem) { presented in
-//                    if presented {
-//                        itemVM.tags.removeAll(where: { $0.tagName == "ALL" })
-//                    }
-//                }
-
                 // NOTE: バスケット内にアイテムが追加された時点で、ハーフモーダルを表示します。
-                .onChange(of: input.resultBasketItems) { [defaultBasket = input.resultBasketItems] newBasket in
+                .onChange(of: input.resultBasketItems) { [before = input.resultBasketItems] after in
 
-                    if defaultBasket.count == 0 {
+                    if before.count == 0 {
                         commerceState = .medium
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                             basketState = .medium
                         }
                     }
-                    if newBasket == [] {
+                    if after == [] {
                         commerceState = .hidden
                         basketState = .hidden
 
