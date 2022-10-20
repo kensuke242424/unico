@@ -23,7 +23,9 @@ struct ItemCardRow: View {
     let itemHeight: CGFloat
 
     @State private var cardCount: Int =  0
+    @State private var soldOpacity: CGFloat = 0.0
     @State private var countUpDisable: Bool = false
+    @State private var itemSold: Bool = false
 
     var body: some View {
 
@@ -142,6 +144,26 @@ struct ItemCardRow: View {
                         .offset(y: -15)
                     }
                 }
+
+                .overlay(alignment: .topLeading) {
+//                    if itemSold {
+                        Group {
+                            RoundedRectangle(cornerRadius: 0)
+                                .stroke(lineWidth: 6)
+                                .frame(width: 80, height: 30)
+                            Text("SOLD OUT")
+                                .font(.footnote)
+                                .fontWeight(.black)
+                        }
+                        .foregroundColor(.customSoldOutTagColor)
+                        .offset(x: -12, y: -3)
+                        .opacity(soldOpacity)
+                        .rotationEffect(Angle(degrees: -30.0))
+                        .scaleEffect(itemSold ? 1.0 : 1.9)
+                        .animation(Animation.default, value: itemSold)
+//                    } // if
+                } // .overlay
+
         } // VStack
         .onChange(of: resultItemAmount) { [before = resultItemAmount] after in
             if before < after {
@@ -170,6 +192,12 @@ struct ItemCardRow: View {
                     countUpDisable = false
                 }
             }
+        }
+
+        .onChange(of: item.inventory) {newInventory in
+            itemSold = newInventory == 0 ? true : false
+            soldOpacity = newInventory == 0 ? 1.0 : 0.0
+            print("itemSold: \(itemSold)")
         }
 
     } // body

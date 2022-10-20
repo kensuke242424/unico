@@ -20,4 +20,7 @@ extension Color {
     static let customLightGray2 = Color("customLightGray2")
     static let customDarkBlue2 = Color("customDarkBlue2")
     static let customLightBlue2 = Color("customLightBlue2")
+
+    static let customSoldOutTagColor = Color("customSoldOutTagColor")
+
 }
