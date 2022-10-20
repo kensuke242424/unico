@@ -70,13 +70,10 @@ struct CommerceSheet: View {
 
                 Button(
                     action: {
-//                        resultBasketItems.removeAll()
                         doCommerce.toggle()
-                        print(doCommerce)
+                        print("取引確定ボタンタップ_doCommerce: \(doCommerce)")
                         basketState = .hidden
                         commerceState = .hidden
-//                        resultPrice = 0
-//                        resultItemAmount = 0
                     },
                     label: {
                         RoundedRectangle(cornerRadius: 20)

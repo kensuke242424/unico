@@ -190,7 +190,9 @@ struct BasketItemRow: View {
                         itemVM.items[updateItemIndex].sales += item.price * count
                         itemVM.items[updateItemIndex].inventory -= count
                     }
-                    doCommerce.toggle()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                        doCommerce.toggle()
+                    }
                 }
             }
 

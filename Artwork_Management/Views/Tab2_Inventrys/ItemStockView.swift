@@ -31,7 +31,7 @@ struct ItemStockView: View {
         var sideTagOpacity: CGFloat = 0.4
         var isPresentedNewItem = false
         var isShowItemDetail: Bool = false
-        var isShowBasketResetInfomation: Bool = false
+        var isShowUpdateDataInfomation: Bool = false
         var doCommerce: Bool = false
         var mode: Mode = .dark
     }
@@ -149,7 +149,7 @@ struct ItemStockView: View {
                                                 resultItemAmount: $input.resultItemAmount,
                                                 resultBasketItems: $input.resultBasketItems,
                                                 itemWidth: UIScreen.main.bounds.width * 0.41,
-                                                itemHeight: 210,
+                                                itemHeight: 230,
                                                 itemSpase: 20,
                                                 itemNameTag: "アイテム",
                                                 items: itemVM.items)
@@ -197,7 +197,7 @@ struct ItemStockView: View {
                                          isShowItemDetail: $input.isShowItemDetail,
                                          resultBasketItems: $input.resultBasketItems,
                                          itemWidth: UIScreen.main.bounds.width * 0.43,
-                                         itemHeight: 220,
+                                         itemHeight: 240,
                                          itemSpase: 20,
                                          selectTag: itemVM.tags[input.currentIndex].tagName,
                                          items: itemVM.items)
@@ -212,19 +212,21 @@ struct ItemStockView: View {
                                         isShowitemDetail: $input.isShowItemDetail)
                     } // if isShowItemDetail
 
-                    if input.isShowBasketResetInfomation {
+                    if input.isShowUpdateDataInfomation {
                         VStack {
                             RoundedRectangle(cornerRadius: 10)
                                 .foregroundColor(.white)
                                 .frame(width: 300, height: 30)
                                 .overlay {
-                                    Text("カート内がリセットされました。")
+                                    Text("アイテムの情報が更新されました。")
                                         .foregroundColor(.black)
                                         .fontWeight(.bold)
                                 }
-                                .opacity(0.5)
+
                             Spacer()
-                        }
+                        } // VStack
+                        .opacity(0.7)
+                        .offset(y: 50)
                     } // if isShowBasketResetInfomation
 
                 } // ZStack
@@ -250,20 +252,21 @@ struct ItemStockView: View {
 
                 // NOTE: アイテム情報の更新が入った時、カート内にアイテムがあればリセットします。
                 .onChange(of: itemVM.items) { _ in
-                    if input.resultBasketItems != [] {
-                        input.resultBasketItems = []
-                        input.resultItemAmount = 0
-                        input.resultPrice = 0
-                        withAnimation(.easeIn(duration: 0.3)) {
-                            input.isShowBasketResetInfomation.toggle()
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                withAnimation(.easeIn(duration: 0.2)) {
-                                    input.isShowBasketResetInfomation.toggle()
-                                }
+//                    commerceState = .hidden
+//                    basketState = .hidden
+                    input.resultBasketItems = []
+                    input.resultItemAmount = 0
+                    input.resultPrice = 0
+                    withAnimation(.easeIn(duration: 0.2)) {
+                        input.isShowUpdateDataInfomation.toggle()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                            withAnimation(.easeIn(duration: 0.25)) {
+                                input.isShowUpdateDataInfomation.toggle()
+
                             }
                         }
-                        print("アイテム情報更新を検知しました。バスケット内のアイテムがリセットされました。")
                     }
+                    print(input.doCommerce)
                 } // .onChange
 
                 // NOTE: 入力フィールドの表示に合わせて、フォーカスを切り替えます。

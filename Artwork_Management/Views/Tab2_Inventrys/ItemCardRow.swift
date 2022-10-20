@@ -23,108 +23,139 @@ struct ItemCardRow: View {
     let itemWidth: CGFloat
     let itemHeight: CGFloat
 
+    @State private var cardCount: Int =  0
+
     var body: some View {
-        // NOTE: アイテムカードの色(ダークモードを判定してopacityをスイッチ)
-        RoundedRectangle(cornerRadius: 10)
-            .foregroundColor(.white)
-            .frame(width: itemWidth, height: itemHeight)
-            .opacity(colorScheme == .dark ? 0.3 : 0.3)
-            .overlay(alignment: .topTrailing) {
-                Button {
 
-                    guard let newActionIndex = itemVM.items.firstIndex(where: { $0 == item }) else {
-                        print("アクションIndexの取得に失敗しました")
-                        return
-                    }
-                        actionRowIndex = newActionIndex
-                        print("actionRowIndex: \(actionRowIndex)")
-                        // アイテム詳細表示
-                        self.isShowItemDetail.toggle()
-                        print("ItemStockView_アイテム詳細ボタンタップ: \(isShowItemDetail)")
+        VStack {
+            // NOTE: アイテムカードの色(ダークモードを判定してopacityをスイッチ)
+            RoundedRectangle(cornerRadius: 10)
+                .foregroundColor(.white)
+                .frame(width: itemWidth, height: itemHeight)
+                .opacity(colorScheme == .dark ? 0.3 : 0.3)
+                .overlay(alignment: .topTrailing) {
+                    Button {
 
-                } label: {
-                    Image(systemName: "info.circle.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 23, height: 23)
+                        guard let newActionIndex = itemVM.items.firstIndex(where: { $0 == item }) else {
+                            print("アクションIndexの取得に失敗しました")
+                            return
+                        }
+                            actionRowIndex = newActionIndex
+                            print("actionRowIndex: \(actionRowIndex)")
+                            // アイテム詳細表示
+                            self.isShowItemDetail.toggle()
+                            print("ItemStockView_アイテム詳細ボタンタップ: \(isShowItemDetail)")
+
+                    } label: {
+                        Image(systemName: "info.circle.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 23, height: 23)
+                            .foregroundColor(.customDarkGray1)
+                            .opacity(0.6)
+                    } // Button
+                } // .overlay
+
+                // NOTE: アイテムカードのフレーム
+                .overlay {
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(lineWidth: 0.2)
+                        .shadow(radius: 3, x: 4, y: 4)
+                        .shadow(radius: 3, x: 4, y: 4)
+                        .shadow(radius: 3, x: 4, y: 4)
+                        .shadow(radius: 3, x: 4, y: 4)
+                        .shadow(radius: 3, x: 1, y: 1)
+                        .shadow(radius: 3, x: 1, y: 1)
+                        .shadow(radius: 4)
+                        .shadow(radius: 4)
                         .foregroundColor(.customDarkGray1)
-                        .opacity(0.6)
-                } // Button
-            } // .overlay
+                        .frame(width: itemWidth, height: itemHeight)
+                } // overlay
 
-            // NOTE: アイテムカードのフレーム
-            .overlay {
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(lineWidth: 0.2)
-                    .shadow(radius: 3, x: 4, y: 4)
-                    .shadow(radius: 3, x: 4, y: 4)
-                    .shadow(radius: 3, x: 4, y: 4)
-                    .shadow(radius: 3, x: 4, y: 4)
-                    .shadow(radius: 3, x: 1, y: 1)
-                    .shadow(radius: 3, x: 1, y: 1)
-                    .shadow(radius: 4)
-                    .shadow(radius: 4)
-                    .foregroundColor(.customDarkGray1)
-                    .frame(width: itemWidth, height: itemHeight)
-            } // overlay
+                // NOTE: アイテムカードの内容
+                .overlay {
+                    VStack {
+                        RoundedRectangle(cornerRadius: 5)
+                            .foregroundColor(.white)
+                            .opacity(0.5)
+                            .frame(width: itemWidth - 50, height: itemWidth - 50)
 
-            // NOTE: アイテムカードの内容
-            .overlay {
-                VStack {
-                    RoundedRectangle(cornerRadius: 5)
-                        .foregroundColor(.white)
-                        .opacity(0.5)
-                        .frame(width: itemWidth - 50, height: itemWidth - 50)
-
-                    Text(item.name)
-                        .foregroundColor(.black)
-                        .font(.callout)
-                        .fontWeight(.heavy)
-                        .padding(.horizontal, 5)
-                        .padding(.top, 5)
-                        .frame(width: itemWidth * 0.9)
-                        .lineLimit(1)
-
-                    Spacer()
-
-                    HStack(alignment: .bottom) {
-                        Text("¥")
+                        Text(item.name)
                             .foregroundColor(.black)
-                        Text(String(item.price))
-                            .font(.title3)
+                            .font(.callout)
                             .fontWeight(.heavy)
-                            .foregroundColor(.black)
+                            .padding(.horizontal, 5)
+                            .padding(.top, 5)
+                            .frame(width: itemWidth * 0.9)
+                            .lineLimit(1)
+
                         Spacer()
 
-                        Button {
-                            // 取引かごに追加するボタン
-                            // タップするたびに、値段合計、個数、カート内アイテム要素にプラスする
-                            guard let newActionIndex = itemVM.items.firstIndex(where: { $0 == item }) else {
-                                print("アクションIndexの取得に失敗しました")
-                                return
-                            }
-                            actionRowIndex = newActionIndex
-                            resultItemAmount += 1
+                        HStack(alignment: .bottom) {
+                            Text("¥")
+                                .foregroundColor(.black)
+                            Text(String(item.price))
+                                .font(.title3)
+                                .fontWeight(.heavy)
+                                .foregroundColor(.black)
+                            Spacer()
 
-                            // カート内に対象アイテムがなければ、カートに要素を新規追加
-                            if resultBasketItems.filter({ $0 == item }) == [] {
-                                resultBasketItems.append(item)
-                            }
+                            Button {
+                                // 取引かごに追加するボタン
+                                // タップするたびに、値段合計、個数、カート内アイテム要素にプラスする
+                                guard let newActionIndex = itemVM.items.firstIndex(where: { $0 == item }) else {
+                                    print("アクションIndexの取得に失敗しました")
+                                    return
+                                }
+                                actionRowIndex = newActionIndex
+                                resultItemAmount += 1
 
-                            print("resultPrice: \(resultPrice)円")
-                            print("resultItemAmount: \(resultItemAmount)個")
+                                // カート内に対象アイテムがなければ、カートに要素を新規追加
+                                if resultBasketItems.filter({ $0 == item }) == [] {
+                                    resultBasketItems.append(item)
+                                }
 
-                        } label: {
-                            Image(systemName: "plus.circle.fill")
-                                .resizable()
-                                .frame(width: 28, height: 28)
-                                .foregroundColor(.customDarkGray1)
-                        } // Button
-                        .offset(x: 5, y: 5)
-                    } // HStack
-                } // VStack
-                .padding()
-            } // overlay
+                                print("resultPrice: \(resultPrice)円")
+                                print("resultItemAmount: \(resultItemAmount)個")
+
+                            } label: {
+                                Image(systemName: "plus.circle.fill")
+                                    .resizable()
+                                    .frame(width: 28, height: 28)
+                                    .foregroundColor(.customDarkGray1)
+                            } // Button
+                            .offset(x: 5, y: 5)
+                        } // HStack
+                    } // VStack
+                    .padding()
+                } // overlay
+
+                .overlay(alignment: .topLeading) {
+                    if cardCount > 0 {
+                        Text("\(cardCount)").font(.title.bold())
+                        .shadow(color: .white, radius: 1)
+                        .shadow(color: .white, radius: 1)
+                        .shadow(color: .white, radius: 1)
+                        .offset(y: -15)
+                    }
+                }
+        } // VStack
+        .onChange(of: resultItemAmount) { [before = resultItemAmount] after in
+            if before < after {
+                if item == itemVM.items[actionRowIndex] {
+                    cardCount += 1
+                }
+            }
+            if before > after {
+                if item == itemVM.items[actionRowIndex] {
+                    cardCount -= 1
+                }
+            }
+        } // .onChange
+
+        .onChange(of: resultBasketItems) { _ in
+            if resultBasketItems == [] { cardCount = 0 }
+        }
 
     } // body
 } // View
