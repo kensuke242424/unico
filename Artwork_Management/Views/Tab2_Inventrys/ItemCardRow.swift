@@ -157,6 +157,7 @@ struct ItemCardRow: View {
                         }
                         .foregroundColor(.customSoldOutTagColor)
                         .offset(x: -12, y: -3)
+                        .shadow(radius: 3, x: 5, y: 5)
                         .opacity(soldOpacity)
                         .rotationEffect(Angle(degrees: -30.0))
                         .scaleEffect(itemSold ? 1.0 : 1.9)
