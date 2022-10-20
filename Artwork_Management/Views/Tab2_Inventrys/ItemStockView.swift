@@ -16,6 +16,7 @@ struct ItemStockView: View {
     @Binding var itemsInfomationOpacity: CGFloat
     @Binding var basketInfomationOpacity: CGFloat
     @Binding var isShowSearchField: Bool
+    @Binding var isPresentedEditItem: Bool
     @Binding var doCommerce: Bool
     @Binding var basketState: ResizableSheetState
     @Binding var commerceState: ResizableSheetState
@@ -32,7 +33,6 @@ struct ItemStockView: View {
         var resultItemAmount: Int = 0
         var resultBasketItems: [Item] = []
         var sideTagOpacity: CGFloat = 0.4
-        var isPresentedNewItem = false
         var isShowItemDetail: Bool = false
         var isShowUpdateDataInfomation: Bool = false
         var isShowUpdateBasketInfomation: Bool = false
@@ -219,6 +219,12 @@ struct ItemStockView: View {
                 .onChange(of: input.actionRowIndex) { newActionIndex in
                     print("StockView内でアクションされたアイテムの更新。index: \(newActionIndex)")
                 }
+
+//                .onChange(of: isPresentedEditItem) { presented in
+//                    if presented {
+//                        itemVM.tags.removeAll(where: { $0.tagName == "ALL" })
+//                    }
+//                }
 
                 // NOTE: バスケット内にアイテムが追加された時点で、ハーフモーダルを表示します。
                 .onChange(of: input.resultBasketItems) { [defaultBasket = input.resultBasketItems] newBasket in
@@ -479,6 +485,7 @@ struct ItemStockView_Previews: PreviewProvider {
                              itemsInfomationOpacity: .constant(0.0),
                              basketInfomationOpacity: .constant(0.0),
                              isShowSearchField: .constant(false),
+                             isPresentedEditItem: .constant(false),
                              doCommerce: .constant(false),
                              basketState: .constant(.hidden),
                              commerceState: .constant(.hidden))

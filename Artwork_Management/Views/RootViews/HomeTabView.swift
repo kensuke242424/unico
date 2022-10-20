@@ -17,7 +17,7 @@ struct HomeTabView: View {
         var itemsInfomationOpacity: CGFloat = 0.0
         var basketInfomationOpacity: CGFloat = 0.0
         var isShowItemDetail: Bool = false
-        var isPresentedNewItem: Bool = false
+        var isPresentedEditItem: Bool = false
         var isShowSearchField: Bool = false
         var doCommerce: Bool = false
         var basketState: ResizableSheetState = .hidden
@@ -42,6 +42,7 @@ struct HomeTabView: View {
                               itemsInfomationOpacity: $input.itemsInfomationOpacity,
                               basketInfomationOpacity: $input.basketInfomationOpacity,
                               isShowSearchField: $input.isShowSearchField,
+                              isPresentedEditItem: $input.isPresentedEditItem,
                               doCommerce: $input.doCommerce,
                               basketState: $input.basketState,
                               commerceState: $input.commerceState)
@@ -51,7 +52,7 @@ struct HomeTabView: View {
                     }
                     .tag(1)
 
-                ManageView(itemVM: rootItemVM, isPresentedEditItem: $input.isPresentedNewItem)
+                ManageView(itemVM: rootItemVM, isPresentedEditItem: $input.isPresentedEditItem)
                     .tabItem {
                         Image(systemName: "chart.xyaxis.line")
                         Text("Manage")
@@ -95,7 +96,7 @@ struct HomeTabView: View {
 
             // Todo: 各タブごとにオプションが変わるボタン
             UsefulButton(tabIndex: $input.tabIndex,
-                         isPresentedNewItem: $input.isPresentedNewItem,
+                         isPresentedNewItem: $input.isPresentedEditItem,
                          isShowSearchField: $input.isShowSearchField,
                          basketState: $input.basketState,
                          commerceState: $input.commerceState)
@@ -105,7 +106,7 @@ struct HomeTabView: View {
         .onChange(of: input.tabIndex) { newTabIndex in
 
             // ストック画面でのみ、"ALL"タグを追加
-            if newTabIndex == 1 {
+            if newTabIndex == 1 || input.isPresentedEditItem {
                 rootItemVM.tags.insert(Tag(tagName: "ALL", tagColor: .gray), at: 0)
             } else {
                 rootItemVM.tags.removeAll(where: {$0.tagName == "ALL"})
