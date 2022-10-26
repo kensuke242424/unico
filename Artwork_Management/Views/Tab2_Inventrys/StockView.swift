@@ -23,7 +23,7 @@ struct CartResults {
     var resultCartItems: [Item] = []
 }
 
-struct ItemStockView: View {
+struct StockView: View {
 
     @Environment(\.colorScheme) var colorScheme
     @StateObject var itemVM: ItemViewModel
@@ -428,7 +428,7 @@ struct SideTagBarOverlay: View {
     }
 } // カスタムView
 
-struct ItemStockView_Previews: PreviewProvider {
+struct StockView_Previews: PreviewProvider {
     static var previews: some View {
         var windowScene: UIWindowScene? {
             let scenes = UIApplication.shared.connectedScenes
@@ -439,7 +439,7 @@ struct ItemStockView_Previews: PreviewProvider {
             windowScene.flatMap(ResizableSheetCenter.resolve(for:))
         }
 
-        return ItemStockView(itemVM: ItemViewModel(),
+        return StockView(itemVM: ItemViewModel(),
                              inputHome: .constant(InputHome())
         )
         .environment(\.resizableSheetCenter, resizableSheetCenter)

@@ -21,7 +21,7 @@
 		E08F272528DDA08E00329C5E /* Artwork_ManagementApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E08F272428DDA08E00329C5E /* Artwork_ManagementApp.swift */; };
 		E08F272928DDA09000329C5E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E08F272828DDA09000329C5E /* Assets.xcassets */; };
 		E08F272C28DDA09000329C5E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E08F272B28DDA09000329C5E /* Preview Assets.xcassets */; };
-		E08F273628DDB48100329C5E /* ItemStockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E08F273528DDB48100329C5E /* ItemStockView.swift */; };
+		E08F273628DDB48100329C5E /* StockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E08F273528DDB48100329C5E /* StockView.swift */; };
 		E08F273828DDB51600329C5E /* ManageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E08F273728DDB51600329C5E /* ManageView.swift */; };
 		E08F273A28DDB53700329C5E /* SystemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E08F273928DDB53700329C5E /* SystemView.swift */; };
 		E08F273C28DDB61A00329C5E /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E08F273B28DDB61A00329C5E /* LibraryView.swift */; };
@@ -63,7 +63,7 @@
 		E08F272428DDA08E00329C5E /* Artwork_ManagementApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Artwork_ManagementApp.swift; sourceTree = "<group>"; };
 		E08F272828DDA09000329C5E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E08F272B28DDA09000329C5E /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		E08F273528DDB48100329C5E /* ItemStockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemStockView.swift; sourceTree = "<group>"; };
+		E08F273528DDB48100329C5E /* StockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StockView.swift; sourceTree = "<group>"; };
 		E08F273728DDB51600329C5E /* ManageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageView.swift; sourceTree = "<group>"; };
 		E08F273928DDB53700329C5E /* SystemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemView.swift; sourceTree = "<group>"; };
 		E08F273B28DDB61A00329C5E /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
@@ -213,7 +213,7 @@
 		E08F274028DEAD3B00329C5E /* Tab2_Inventrys */ = {
 			isa = PBXGroup;
 			children = (
-				E08F273528DDB48100329C5E /* ItemStockView.swift */,
+				E08F273528DDB48100329C5E /* StockView.swift */,
 				E0CF7EF328DF385800735142 /* ItemCards.swift */,
 				E0796AD228F46CC90094E50C /* ItemCardRow.swift */,
 				E0796ADC28F5F2830094E50C /* CartItemsSheet.swift */,
@@ -374,7 +374,7 @@
 				E09F09BC28EAF33500D07669 /* FocusedLineRow.swift in Sources */,
 				E09F09CB28EFEA8700D07669 /* SelectItemPhotoArea.swift in Sources */,
 				E0796AD328F46CC90094E50C /* ItemCardRow.swift in Sources */,
-				E08F273628DDB48100329C5E /* ItemStockView.swift in Sources */,
+				E08F273628DDB48100329C5E /* StockView.swift in Sources */,
 				E094F10228E21EBA00D3C845 /* FirstSignInView.swift in Sources */,
 				E0CF7EF228DF166700735142 /* ItemViewModel.swift in Sources */,
 				E0CF7EF028DF152D00735142 /* ItemModel.swift in Sources */,

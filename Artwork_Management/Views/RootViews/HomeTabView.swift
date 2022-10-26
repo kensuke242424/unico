@@ -39,7 +39,7 @@ struct HomeTabView: View {
                     }
                     .tag(0)
 
-                ItemStockView(itemVM: rootItemVM, inputHome: $inputHome)
+                StockView(itemVM: rootItemVM, inputHome: $inputHome)
                     .tabItem {
                         Image(systemName: "shippingbox.fill")
                         Text("inventory")
