@@ -12,7 +12,7 @@ struct ItemCardRow: View {
     @Environment(\.colorScheme) var colorScheme
     @StateObject var itemVM: ItemViewModel
     @Binding var inputStock: InputStock
-    @Binding var commerceResults: CommerceResults
+    @Binding var commerceResults: CartResults
     let item: Item
 
     let itemWidth: CGFloat = 165
@@ -109,8 +109,8 @@ struct ItemCardRow: View {
                                 commerceResults.resultItemAmount += 1
 
                                 // カート内に対象アイテムがなければ、カートに要素を新規追加
-                                if commerceResults.resultBasketItems.filter({ $0 == item }) == [] {
-                                    commerceResults.resultBasketItems.append(item)
+                                if commerceResults.resultCartItems.filter({ $0 == item }) == [] {
+                                    commerceResults.resultCartItems.append(item)
                                 }
 
                                 print("resultPrice: \(commerceResults.resultPrice)円")
@@ -175,8 +175,8 @@ struct ItemCardRow: View {
             }
         } // .onChange
 
-        .onChange(of: commerceResults.resultBasketItems) { _ in
-            if commerceResults.resultBasketItems == [] { cardCount = 0 }
+        .onChange(of: commerceResults.resultCartItems) { _ in
+            if commerceResults.resultCartItems == [] { cardCount = 0 }
         }
 
         .onChange(of: cardCount) { newCardCount in

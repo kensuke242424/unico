@@ -16,7 +16,7 @@ struct InputHome {
     var isPresentedEditItem: Bool = false
     var isShowSearchField: Bool = false
     var doCommerce: Bool = false
-    var basketState: ResizableSheetState = .hidden
+    var cartState: ResizableSheetState = .hidden
     var commerceState: ResizableSheetState = .hidden
 }
 

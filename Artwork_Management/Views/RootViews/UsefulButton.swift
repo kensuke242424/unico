@@ -52,15 +52,15 @@ struct UsefulButton: View {
                 y: UIScreen.main.bounds.height / 3 - 10)
         .offset(y: offsetY)
 
-        .onChange(of: inputHome.basketState) { _ in
+        .onChange(of: inputHome.cartState) { _ in
             withAnimation(.easeOut(duration: 0.3)) {
-                switch inputHome.basketState {
+                switch inputHome.cartState {
                 case .hidden: offsetY = 0.0
                 case .medium: offsetY = -60.0
                 case .large: offsetY = -60.0
                 }
             }
-        } // .onChange(basketState)
+        } // .onChange(cartState)
 
         .onChange(of: inputHome.tabIndex) { newIndex in
             self.buttonStyle = buttonVM.buttonStyleChenged(tabIndex: newIndex)

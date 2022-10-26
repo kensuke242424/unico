@@ -13,7 +13,7 @@ struct TagSortCards: View {
     @StateObject var itemVM: ItemViewModel
 
     @Binding var inputStock: InputStock
-    @Binding var commerceResults: CommerceResults
+    @Binding var commerceResults: CartResults
     let selectFilterTag: String
 
     @State var searchItems: [Item] = []
@@ -56,7 +56,7 @@ struct UpdateTimeSortCards: View {
     @StateObject var itemVM: ItemViewModel
 
     @Binding var inputStock: InputStock
-    @Binding var commerceResults: CommerceResults
+    @Binding var commerceResults: CartResults
 
     // アイテムのディテールを指定します。
     let columnsH: [GridItem] = Array(repeating: .init(.flexible()), count: 1)

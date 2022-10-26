@@ -12,12 +12,12 @@ enum HalfSheetScroll {
     case additional
 }
 
-struct BasketItemsSheet: View {
+struct CartItemsSheet: View {
 
     @StateObject var itemVM: ItemViewModel
-    @Binding var commerceResults: CommerceResults
-    @Binding var actionRowIndex: Int
-    @Binding var doCommerce: Bool
+    @Binding var commerceResults: CartResults
+    @Binding var inputStock: InputStock
+    @Binding var inputHome: InputHome
 
     let halfSheetScroll: HalfSheetScroll
 
@@ -35,14 +35,14 @@ struct BasketItemsSheet: View {
 
             // NOTE: アイテム取引かごシート表示時のアイテム表示数をプロパティ「listLimit」の値分で制限します。
             //       リミット数以降の要素はスクロールにより表示します。
-            if commerceResults.resultBasketItems != [] {
-                ForEach(Array(commerceResults.resultBasketItems.enumerated()), id: \.element) { offset, element in
+            if commerceResults.resultCartItems != [] {
+                ForEach(Array(commerceResults.resultCartItems.enumerated()), id: \.element) { offset, element in
 
                     if listLimit > offset {
                         BasketItemRow(itemVM: itemVM,
                                       commerceResults: $commerceResults,
-                                      actionRowIndex: $actionRowIndex,
-                                      doCommerce: $doCommerce,
+                                      inputStock: $inputStock,
+                                      inputHome: $inputHome,
                                       item: element)
                     } // if
                 } // ForEach
@@ -54,14 +54,14 @@ struct BasketItemsSheet: View {
 
         case .additional:
 
-            if commerceResults.resultBasketItems.count > listLimit {
-                ForEach(Array(commerceResults.resultBasketItems.enumerated()), id: \.element) { offset, element in
+            if commerceResults.resultCartItems.count > listLimit {
+                ForEach(Array(commerceResults.resultCartItems.enumerated()), id: \.element) { offset, element in
 
                     if listLimit <= offset {
                         BasketItemRow(itemVM: itemVM,
                                       commerceResults: $commerceResults,
-                                      actionRowIndex: $actionRowIndex,
-                                      doCommerce: $doCommerce,
+                                      inputStock: $inputStock,
+                                      inputHome: $inputHome,
                                       item: element)
                     } // if listLimit
                 } // ForEach
@@ -77,9 +77,9 @@ struct BasketItemRow: View {
 
     @StateObject var itemVM: ItemViewModel
 
-    @Binding var commerceResults: CommerceResults
-    @Binding var actionRowIndex: Int
-    @Binding var doCommerce: Bool
+    @Binding var commerceResults: CartResults
+    @Binding var inputStock: InputStock
+    @Binding var inputHome: InputHome
 
     let item: Item
 
@@ -123,7 +123,7 @@ struct BasketItemRow: View {
                         Button {
 
                             if let newActionIndex = itemVM.items.firstIndex(of: item) {
-                                actionRowIndex = newActionIndex
+                                inputStock.actionRowIndex = newActionIndex
                                 print("newActionIndex: \(newActionIndex)")
                             } else {
                                 print("アクションIndexの取得に失敗しました")
@@ -150,7 +150,7 @@ struct BasketItemRow: View {
                         Button {
                             // プラスボタン
                             if let newActionIndex = itemVM.items.firstIndex(of: item) {
-                                actionRowIndex = newActionIndex
+                                inputStock.actionRowIndex = newActionIndex
                                 commerceResults.resultItemAmount += 1
                             } else {
                                 print("アクションIndexの取得に失敗しました")
@@ -171,7 +171,7 @@ struct BasketItemRow: View {
                             // データ削除処理
                             commerceResults.resultItemAmount -= 1
                             commerceResults.resultPrice -= item.price
-                            commerceResults.resultBasketItems.removeAll(where: { $0 == item })
+                            commerceResults.resultCartItems.removeAll(where: { $0 == item })
                         }
                     } message: {
                         Text("かごからアイテムを削除しますか？")
@@ -180,9 +180,9 @@ struct BasketItemRow: View {
             } // HStack
 
             // 決済確定ボタンタップを検知して、対象のアイテム情報を更新します。
-            .onChange(of: doCommerce) { commerce in
+            .onChange(of: inputHome.doCommerce) { commerce in
                 if commerce {
-                    print(doCommerce)
+                    print(inputHome.doCommerce)
                     guard let updateItemIndex = itemVM.items.firstIndex(of: item) else { return }
                     print("updateItemIndex: \(updateItemIndex)")
                     print("basketItemCount: \(basketItemCount)")
@@ -192,8 +192,8 @@ struct BasketItemRow: View {
                     }
 
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2.3) {
-                        doCommerce = false
-                        print(doCommerce)
+                        inputHome.doCommerce = false
+                        print(inputHome.doCommerce)
                     }
                 }
             }
@@ -204,7 +204,7 @@ struct BasketItemRow: View {
         //       メインのカードView側からのアイテム追加とカウントを同期させるために必要です。
         .onChange(of: commerceResults.resultItemAmount) { [beforeAmount = commerceResults.resultItemAmount] afterAmount in
 
-            if item == itemVM.items[actionRowIndex] {
+            if item == itemVM.items[inputStock.actionRowIndex] {
                 if beforeAmount < afterAmount {
                     basketItemCount += 1
                     commerceResults.resultPrice += item.price
@@ -213,7 +213,7 @@ struct BasketItemRow: View {
                     // NOTE: カート内のアイテム削除処理が発生した際、onchange内のカウント減処理が他のアイテムに適用されてしまうため、
                     //       アイテム削除処理が発火する条件である「count1」の時は、マイナス処理をスキップしています。
                     if basketItemCount == 1 { return }
-                    if item == itemVM.items[actionRowIndex] {
+                    if item == itemVM.items[inputStock.actionRowIndex] {
                         print("カウント減実行")
                         commerceResults.resultPrice -= item.price
                         basketItemCount -= 1
@@ -224,11 +224,11 @@ struct BasketItemRow: View {
 
         .onChange(of: basketItemCount) { newCount in
             if newCount == item.inventory {
-                if item == itemVM.items[actionRowIndex] {
+                if item == itemVM.items[inputStock.actionRowIndex] {
                     countUpDisable = true
                 }
             } else {
-                if item == itemVM.items[actionRowIndex] {
+                if item == itemVM.items[inputStock.actionRowIndex] {
                     countUpDisable = false
                 }
             }

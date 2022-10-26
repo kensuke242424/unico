@@ -17,10 +17,10 @@ struct InputStock {
     var mode: Mode = .dark
 }
 
-struct CommerceResults {
+struct CartResults {
     var resultItemAmount: Int = 0
     var resultPrice: Int = 0
-    var resultBasketItems: [Item] = []
+    var resultCartItems: [Item] = []
 }
 
 struct ItemStockView: View {
@@ -33,7 +33,7 @@ struct ItemStockView: View {
     @GestureState private var dragOffset: CGFloat = 0
 
     @State private var inputStock: InputStock = InputStock()
-    @State private var commerceResults: CommerceResults = CommerceResults()
+    @State private var cartResults: CartResults = CartResults()
 
     var body: some View {
         NavigationView {
@@ -143,7 +143,7 @@ struct ItemStockView: View {
                             // ✅カスタムView: 最近更新したアイテムをHStack表示します。(横スクロール)
                             UpdateTimeSortCards(itemVM: itemVM,
                                                 inputStock: $inputStock,
-                                                commerceResults: $commerceResults)
+                                                commerceResults: $cartResults)
                             Divider()
                                 .background(.gray)
                                 .padding()
@@ -182,7 +182,7 @@ struct ItemStockView: View {
                             // ✅カスタムView: アイテムを表示します。(縦スクロール)
                             TagSortCards(itemVM: itemVM,
                                          inputStock: $inputStock,
-                                         commerceResults: $commerceResults,
+                                         commerceResults: $cartResults,
                                          selectFilterTag: itemVM.tags[inputStock.currentIndex].tagName)
                         } // ScrollView (アイテムロケーション)
 
@@ -197,17 +197,17 @@ struct ItemStockView: View {
                 } // ZStack
 
                 // NOTE: バスケット内にアイテムが追加された時点で、ハーフモーダルを表示します。
-                .onChange(of: commerceResults.resultBasketItems) { [before = commerceResults.resultBasketItems] after in
+                .onChange(of: cartResults.resultCartItems) { [before = cartResults.resultCartItems] after in
 
                     if before.count == 0 {
                         inputHome.commerceState = .medium
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                            inputHome.basketState = .medium
+                            inputHome.cartState = .medium
                         }
                     }
                     if after == [] {
                         inputHome.commerceState = .hidden
-                        inputHome.basketState = .hidden
+                        inputHome.cartState = .hidden
                         inputHome.basketInfomationOpacity = 0.7
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.9) {
                             inputHome.basketInfomationOpacity = 0.0
@@ -218,9 +218,9 @@ struct ItemStockView: View {
                 // NOTE: アイテム情報の更新が入った時、カート内にアイテムがあればリセットします。
                 .onChange(of: itemVM.items) { _ in
 
-                    commerceResults.resultBasketItems = []
-                    commerceResults.resultItemAmount = 0
-                    commerceResults.resultPrice = 0
+                    cartResults.resultCartItems = []
+                    cartResults.resultItemAmount = 0
+                    cartResults.resultPrice = 0
 
                     inputHome.itemsInfomationOpacity = 0.7
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.7) {
@@ -268,7 +268,7 @@ struct ItemStockView: View {
                                                                    .customLightGray1]),
                                        startPoint: .top, endPoint: .bottom))
             // アイテム取引かごのシート画面
-            .resizableSheet($inputHome.basketState, id: "A") { builder in
+            .resizableSheet($inputHome.cartState, id: "A") { builder in
                 builder.content { context in
 
                     VStack {
@@ -286,9 +286,9 @@ struct ItemStockView: View {
                             Spacer()
                             Button(
                                 action: {
-                                    commerceResults.resultBasketItems = []
-                                    commerceResults.resultPrice = 0
-                                    commerceResults.resultItemAmount = 0
+                                    cartResults.resultCartItems = []
+                                    cartResults.resultPrice = 0
+                                    cartResults.resultItemAmount = 0
                                 },
                                 label: {
                                     HStack {
@@ -307,19 +307,19 @@ struct ItemStockView: View {
                         ResizableScrollView(
                             context: context,
                             main: {
-                                BasketItemsSheet(
+                                CartItemsSheet(
                                     itemVM: itemVM,
-                                    commerceResults: $commerceResults,
-                                    actionRowIndex: $inputStock.actionRowIndex,
-                                    doCommerce: $inputHome.doCommerce,
+                                    commerceResults: $cartResults,
+                                    inputStock: $inputStock,
+                                    inputHome: $inputHome,
                                     halfSheetScroll: .main)
                             },
                             additional: {
-                                BasketItemsSheet(
+                                CartItemsSheet(
                                     itemVM: itemVM,
-                                    commerceResults: $commerceResults,
-                                    actionRowIndex: $inputStock.actionRowIndex,
-                                    doCommerce: $inputHome.doCommerce,
+                                    commerceResults: $cartResults,
+                                    inputStock: $inputStock,
+                                    inputHome: $inputHome,
                                     halfSheetScroll: .additional)
 
                                 Spacer()
@@ -345,11 +345,8 @@ struct ItemStockView: View {
             .resizableSheet($inputHome.commerceState, id: "B") {builder in
                 builder.content { _ in
 
-                    CommerceSheet(commerceState: $inputHome.commerceState,
-                                  basketState: $inputHome.basketState,
-                                  resultPrice: $commerceResults.resultPrice,
-                                  resultItemAmount: $commerceResults.resultItemAmount,
-                                  doCommerce: $inputHome.doCommerce)
+                    CommerceSheet(inputHome: $inputHome,
+                                  commerceResults: $cartResults)
 
                 } // builder.content
                 .supportedState([.medium])
