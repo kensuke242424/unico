@@ -335,8 +335,7 @@ struct ItemStockView: View {
                                 BasketItemsSheet(
                                     itemVM: itemVM,
                                     basketItems: $input.resultBasketItems,
-                                    resultItemAmount: $commerceResults.resultItemAmount,
-                                    resultPrice: $commerceResults.resultPrice,
+                                    commerceResults: $commerceResults,
                                     actionRowIndex: $input.actionRowIndex,
                                     doCommerce: $doCommerce,
                                     halfSheetScroll: .main)
@@ -345,8 +344,7 @@ struct ItemStockView: View {
                                 BasketItemsSheet(
                                     itemVM: itemVM,
                                     basketItems: $input.resultBasketItems,
-                                    resultItemAmount: $commerceResults.resultItemAmount,
-                                    resultPrice: $commerceResults.resultPrice,
+                                    commerceResults: $commerceResults,
                                     actionRowIndex: $input.actionRowIndex,
                                     doCommerce: $doCommerce,
                                     halfSheetScroll: .additional)
