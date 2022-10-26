@@ -13,7 +13,7 @@ struct ItemCardRow: View {
     @StateObject var itemVM: ItemViewModel
     @Binding var inputStock: InputStock
     @Binding var cartResults: CartResults
-    let item: Item
+    let itemRow: Item
 
     let itemWidth: CGFloat = 165
     let itemHeight: CGFloat = 210
@@ -34,7 +34,7 @@ struct ItemCardRow: View {
                 .overlay(alignment: .topTrailing) {
                     Button {
 
-                        guard let newActionIndex = itemVM.items.firstIndex(where: { $0 == item }) else {
+                        guard let newActionIndex = itemVM.items.firstIndex(where: { $0 == itemRow }) else {
                             print("アクションIndexの取得に失敗しました")
                             return
                         }
@@ -78,7 +78,7 @@ struct ItemCardRow: View {
                             .opacity(0.5)
                             .frame(width: itemWidth - 50, height: itemWidth - 50)
 
-                        Text(item.name)
+                        Text(itemRow.name)
                             .foregroundColor(.black)
                             .font(.callout)
                             .fontWeight(.heavy)
@@ -92,7 +92,7 @@ struct ItemCardRow: View {
                         HStack(alignment: .bottom) {
                             Text("¥")
                                 .foregroundColor(.black)
-                            Text(String(item.price))
+                            Text(String(itemRow.price))
                                 .font(.title3)
                                 .fontWeight(.heavy)
                                 .foregroundColor(.black)
@@ -101,7 +101,7 @@ struct ItemCardRow: View {
                             Button {
                                 // 取引かごに追加するボタン
                                 // タップするたびに、値段合計、個数、カート内アイテム要素にプラスする
-                                guard let newActionIndex = itemVM.items.firstIndex(where: { $0 == item }) else {
+                                guard let newActionIndex = itemVM.items.firstIndex(where: { $0 == itemRow }) else {
                                     print("アクションIndexの取得に失敗しました")
                                     return
                                 }
@@ -109,8 +109,8 @@ struct ItemCardRow: View {
                                 cartResults.resultItemAmount += 1
 
                                 // カート内に対象アイテムがなければ、カートに要素を新規追加
-                                if cartResults.resultCartItems.filter({ $0 == item }) == [] {
-                                    cartResults.resultCartItems.append(item)
+                                if cartResults.resultCartItems.filter({ $0 == itemRow }) == [] {
+                                    cartResults.resultCartItems.append(itemRow)
                                 }
 
                                 print("resultPrice: \(cartResults.resultPrice)円")
@@ -164,12 +164,12 @@ struct ItemCardRow: View {
         } // VStack
         .onChange(of: cartResults.resultItemAmount) { [before = cartResults.resultItemAmount] after in
             if before < after {
-                if item == itemVM.items[inputStock.actionRowIndex] {
+                if itemRow == itemVM.items[inputStock.actionRowIndex] {
                     cardCount += 1
                 }
             }
             if before > after {
-                if item == itemVM.items[inputStock.actionRowIndex] {
+                if itemRow == itemVM.items[inputStock.actionRowIndex] {
                     cardCount -= 1
                 }
             }
@@ -180,21 +180,27 @@ struct ItemCardRow: View {
         }
 
         .onChange(of: cardCount) { newCardCount in
-            if newCardCount == item.inventory {
-                if item == itemVM.items[inputStock.actionRowIndex] {
+            if newCardCount == itemRow.inventory {
+                if itemRow == itemVM.items[inputStock.actionRowIndex] {
                     countUpDisable = true
                 }
             } else {
-                if item == itemVM.items[inputStock.actionRowIndex] {
+                if itemRow == itemVM.items[inputStock.actionRowIndex] {
                     countUpDisable = false
                 }
             }
         }
 
-        .onChange(of: item.inventory) {newInventory in
+        .onChange(of: itemRow.inventory) {newInventory in
             itemSold = newInventory == 0 ? true : false
             soldOpacity = newInventory == 0 ? 1.0 : 0.0
-            print("itemSold: \(itemSold)")
+            print("onChange_itemSold: \(itemSold)")
+        }
+
+        .onAppear {
+            itemSold = itemRow.inventory == 0 ? true : false
+            soldOpacity = itemRow.inventory == 0 ? 1.0 : 0.0
+            print("onAppear_itemSold: \(itemSold)")
         }
 
     } // body
@@ -206,7 +212,7 @@ struct ItemCardRow_Previews: PreviewProvider {
         ItemCardRow(itemVM: ItemViewModel(),
                     inputStock: .constant(InputStock()),
                     cartResults: .constant(CartResults()),
-                    item: TestItem().testItem)
+                    itemRow: TestItem().testItem)
         .previewLayout(.sizeThatFits)
     }
 }

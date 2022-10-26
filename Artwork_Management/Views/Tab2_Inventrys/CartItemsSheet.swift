@@ -34,11 +34,11 @@ struct CartItemsSheet: View {
                 ForEach(Array(cartResults.resultCartItems.enumerated()), id: \.element) { offset, element in
 
                     if listLimit > offset {
-                        BasketItemRow(itemVM: itemVM,
+                        CartItemRow(itemVM: itemVM,
                                       commerceResults: $cartResults,
                                       inputStock: $inputStock,
                                       inputHome: $inputHome,
-                                      item: element)
+                                      itemRow: element)
                     } // if
                 } // ForEach
             } else {
@@ -53,11 +53,11 @@ struct CartItemsSheet: View {
                 ForEach(Array(cartResults.resultCartItems.enumerated()), id: \.element) { offset, element in
 
                     if listLimit <= offset {
-                        BasketItemRow(itemVM: itemVM,
+                        CartItemRow(itemVM: itemVM,
                                       commerceResults: $cartResults,
                                       inputStock: $inputStock,
                                       inputHome: $inputHome,
-                                      item: element)
+                                      itemRow: element)
                     } // if listLimit
                 } // ForEach
                 .padding()
@@ -68,7 +68,7 @@ struct CartItemsSheet: View {
 } // View
 
 // ✅ カスタムView: かご内の一要素分のレイアウト
-struct BasketItemRow: View {
+struct CartItemRow: View {
 
     @StateObject var itemVM: ItemViewModel
 
@@ -76,7 +76,7 @@ struct BasketItemRow: View {
     @Binding var inputStock: InputStock
     @Binding var inputHome: InputHome
 
-    let item: Item
+    let itemRow: Item
 
     @State private var basketItemCount: Int = 0
     @State private var isShowAlert: Bool = false
@@ -98,7 +98,7 @@ struct BasketItemRow: View {
                 Spacer()
 
                 VStack(alignment: .trailing, spacing: 30) {
-                    Text("\(item.name)")
+                    Text("\(itemRow.name)")
                         .foregroundColor(.black)
                         .opacity(0.8)
                         .font(.title3.bold())
@@ -109,7 +109,7 @@ struct BasketItemRow: View {
                         HStack(alignment: .bottom) {
                             Text("¥")
                                 .foregroundColor(.black)
-                            Text(String(item.price))
+                            Text(String(itemRow.price))
                                 .foregroundColor(.black)
                                 .font(.title3)
                                 .fontWeight(.heavy)
@@ -117,7 +117,7 @@ struct BasketItemRow: View {
                         }
                         Button {
 
-                            if let newActionIndex = itemVM.items.firstIndex(of: item) {
+                            if let newActionIndex = itemVM.items.firstIndex(of: itemRow) {
                                 inputStock.actionRowIndex = newActionIndex
                                 print("newActionIndex: \(newActionIndex)")
                             } else {
@@ -144,7 +144,7 @@ struct BasketItemRow: View {
                             .fontWeight(.black)
                         Button {
                             // プラスボタン
-                            if let newActionIndex = itemVM.items.firstIndex(of: item) {
+                            if let newActionIndex = itemVM.items.firstIndex(of: itemRow) {
                                 inputStock.actionRowIndex = newActionIndex
                                 commerceResults.resultItemAmount += 1
                             } else {
@@ -165,8 +165,8 @@ struct BasketItemRow: View {
                         Button("削除", role: .destructive) {
                             // データ削除処理
                             commerceResults.resultItemAmount -= 1
-                            commerceResults.resultPrice -= item.price
-                            commerceResults.resultCartItems.removeAll(where: { $0 == item })
+                            commerceResults.resultPrice -= itemRow.price
+                            commerceResults.resultCartItems.removeAll(where: { $0 == itemRow })
                         }
                     } message: {
                         Text("かごからアイテムを削除しますか？")
@@ -178,11 +178,11 @@ struct BasketItemRow: View {
             .onChange(of: inputHome.doCommerce) { commerce in
                 if commerce {
                     print(inputHome.doCommerce)
-                    guard let updateItemIndex = itemVM.items.firstIndex(of: item) else { return }
+                    guard let updateItemIndex = itemVM.items.firstIndex(of: itemRow) else { return }
                     print("updateItemIndex: \(updateItemIndex)")
                     print("basketItemCount: \(basketItemCount)")
-                    if item == itemVM.items[updateItemIndex] {
-                        itemVM.items[updateItemIndex].sales += item.price * basketItemCount
+                    if itemRow == itemVM.items[updateItemIndex] {
+                        itemVM.items[updateItemIndex].sales += itemRow.price * basketItemCount
                         itemVM.items[updateItemIndex].inventory -= basketItemCount
                     }
 
@@ -199,18 +199,18 @@ struct BasketItemRow: View {
         //       メインのカードView側からのアイテム追加とカウントを同期させるために必要です。
         .onChange(of: commerceResults.resultItemAmount) { [beforeAmount = commerceResults.resultItemAmount] afterAmount in
 
-            if item == itemVM.items[inputStock.actionRowIndex] {
+            if itemRow == itemVM.items[inputStock.actionRowIndex] {
                 if beforeAmount < afterAmount {
                     basketItemCount += 1
-                    commerceResults.resultPrice += item.price
+                    commerceResults.resultPrice += itemRow.price
 
                 } else if beforeAmount > afterAmount {
                     // NOTE: カート内のアイテム削除処理が発生した際、onchange内のカウント減処理が他のアイテムに適用されてしまうため、
                     //       アイテム削除処理が発火する条件である「count1」の時は、マイナス処理をスキップしています。
                     if basketItemCount == 1 { return }
-                    if item == itemVM.items[inputStock.actionRowIndex] {
+                    if itemRow == itemVM.items[inputStock.actionRowIndex] {
                         print("カウント減実行")
-                        commerceResults.resultPrice -= item.price
+                        commerceResults.resultPrice -= itemRow.price
                         basketItemCount -= 1
                     }
                 }
@@ -218,12 +218,12 @@ struct BasketItemRow: View {
         } // .onChange
 
         .onChange(of: basketItemCount) { newCount in
-            if newCount == item.inventory {
-                if item == itemVM.items[inputStock.actionRowIndex] {
+            if newCount == itemRow.inventory {
+                if itemRow == itemVM.items[inputStock.actionRowIndex] {
                     countUpDisable = true
                 }
             } else {
-                if item == itemVM.items[inputStock.actionRowIndex] {
+                if itemRow == itemVM.items[inputStock.actionRowIndex] {
                     countUpDisable = false
                 }
             }
@@ -233,7 +233,7 @@ struct BasketItemRow: View {
         //       アイテム要素追加時は(-)判定は発生しないので、判定分岐はせず、アイテムカウントに+1
         .onAppear {
             basketItemCount += 1
-            commerceResults.resultPrice += item.price
+            commerceResults.resultPrice += itemRow.price
         } // .onAppear
 
     } // body

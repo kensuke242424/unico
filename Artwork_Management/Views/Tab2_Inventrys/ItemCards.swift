@@ -16,37 +16,29 @@ struct TagSortCards: View {
     @Binding var cartResults: CartResults
     let selectFilterTag: String
 
-    @State var searchItems: [Item] = []
-
     private let columnsV: [GridItem] = Array(repeating: .init(.flexible()), count: 2)
 
     var body: some View {
 
         LazyVGrid(columns: columnsV, spacing: 20) {
-            ForEach(inputStock.searchItemNameText == "ALL" || inputStock.searchItemNameText == "" ?
-                    itemVM.items : searchItems) { item in
+            ForEach(itemVM.items) { item in
 
                 if selectFilterTag == "ALL" || selectFilterTag == "検索" {
                     ItemCardRow(itemVM: itemVM,
                                 inputStock: $inputStock,
                                 cartResults: $cartResults,
-                                item: item)
+                                itemRow: item)
 
                 } else if item.tag == selectFilterTag {
                     ItemCardRow(itemVM: itemVM,
                                 inputStock: $inputStock,
                                 cartResults: $cartResults,
-                                item: item)
+                                itemRow: item)
                 }
             } // ForEach
         } // LazyVGrid
         .padding(.horizontal, 10)
         Spacer().frame(height: 200)
-            .onChange(of: inputStock.searchItemNameText) { newSearchText in
-                if !inputStock.searchItemNameText.isEmpty {
-                    searchItems = itemVM.items.filter({ $0.name.contains(newSearchText) })
-                }
-            }
     } // body
 } // View
 
@@ -70,7 +62,7 @@ struct UpdateTimeSortCards: View {
                     ItemCardRow(itemVM: itemVM,
                                 inputStock: $inputStock,
                                 cartResults: $commerceResults,
-                                item: item)
+                                itemRow: item)
 
                 } // ForEach
             } // LazyHGrid
