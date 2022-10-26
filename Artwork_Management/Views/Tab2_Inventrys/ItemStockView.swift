@@ -8,6 +8,26 @@
 import SwiftUI
 import ResizableSheet
 
+struct CommerceResults {
+    var resultItemAmount: Int = 0
+}
+
+struct InputStock {
+
+    var searchItemNameText: String = "ALL"
+    var currentIndex: Int = 0
+    var actionRowIndex: Int = 0
+    var resultPrice: Int = 0
+
+    var resultBasketItems: [Item] = []
+    var sideTagOpacity: CGFloat = 0.4
+    var isShowItemDetail: Bool = false
+    var countUpDisable: Bool = false
+    var isShowUpdateDataInfomation: Bool = false
+    var isShowUpdateBasketInfomation: Bool = false
+    var mode: Mode = .dark
+}
+
 struct ItemStockView: View {
 
     @Environment(\.colorScheme) var colorScheme
@@ -24,22 +44,8 @@ struct ItemStockView: View {
     @FocusState var searchFocused: SearchFocus?
     @GestureState private var dragOffset: CGFloat = 0
 
-    struct InputStock {
-
-        var searchItemNameText: String = "ALL"
-        var currentIndex: Int = 0
-        var actionRowIndex: Int = 0
-        var resultPrice: Int = 0
-        var resultItemAmount: Int = 0
-        var resultBasketItems: [Item] = []
-        var sideTagOpacity: CGFloat = 0.4
-        var isShowItemDetail: Bool = false
-        var countUpDisable: Bool = false
-        var isShowUpdateDataInfomation: Bool = false
-        var isShowUpdateBasketInfomation: Bool = false
-        var mode: Mode = .dark
-    }
     @State private var input: InputStock = InputStock()
+    @State private var commerceResults: CommerceResults = CommerceResults()
 
     var body: some View {
         NavigationView {
@@ -150,7 +156,7 @@ struct ItemStockView: View {
                                                 isShowItemDetail: $input.isShowItemDetail,
                                                 actionRowIndex: $input.actionRowIndex,
                                                 resultPrice: $input.resultPrice,
-                                                resultItemAmount: $input.resultItemAmount,
+                                                commerceResults: $commerceResults,
                                                 resultBasketItems: $input.resultBasketItems,
                                                 itemWidth: 165,
                                                 itemHeight: 210,
@@ -197,7 +203,7 @@ struct ItemStockView: View {
                                          searchItemNameText: $input.searchItemNameText,
                                          actionRowIndex: $input.actionRowIndex,
                                          resultPrice: $input.resultPrice,
-                                         resultItemAmount: $input.resultItemAmount,
+                                         commerceResults: $commerceResults,
                                          isShowItemDetail: $input.isShowItemDetail,
                                          resultBasketItems: $input.resultBasketItems,
                                          itemWidth: 165,
@@ -240,7 +246,7 @@ struct ItemStockView: View {
                 .onChange(of: itemVM.items) { _ in
 
                     input.resultBasketItems = []
-                    input.resultItemAmount = 0
+                    commerceResults.resultItemAmount = 0
                     input.resultPrice = 0
 
                     itemsInfomationOpacity = 0.7
@@ -309,7 +315,7 @@ struct ItemStockView: View {
                                 action: {
                                     input.resultBasketItems = []
                                     input.resultPrice = 0
-                                    input.resultItemAmount = 0
+                                    commerceResults.resultItemAmount = 0
                                 },
                                 label: {
                                     HStack {
@@ -331,7 +337,7 @@ struct ItemStockView: View {
                                 BasketItemsSheet(
                                     itemVM: itemVM,
                                     basketItems: $input.resultBasketItems,
-                                    resultItemAmount: $input.resultItemAmount,
+                                    resultItemAmount: $commerceResults.resultItemAmount,
                                     resultPrice: $input.resultPrice,
                                     actionRowIndex: $input.actionRowIndex,
                                     doCommerce: $doCommerce,
@@ -341,7 +347,7 @@ struct ItemStockView: View {
                                 BasketItemsSheet(
                                     itemVM: itemVM,
                                     basketItems: $input.resultBasketItems,
-                                    resultItemAmount: $input.resultItemAmount,
+                                    resultItemAmount: $commerceResults.resultItemAmount,
                                     resultPrice: $input.resultPrice,
                                     actionRowIndex: $input.actionRowIndex,
                                     doCommerce: $doCommerce,
@@ -373,7 +379,7 @@ struct ItemStockView: View {
                     CommerceSheet(commerceState: $commerceState,
                                   basketState: $basketState,
                                   resultPrice: $input.resultPrice,
-                                  resultItemAmount: $input.resultItemAmount,
+                                  resultItemAmount: $commerceResults.resultItemAmount,
                                   doCommerce: $doCommerce)
 
                 } // builder.content
