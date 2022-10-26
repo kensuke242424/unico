@@ -21,16 +21,12 @@ struct InputStock {
     var actionRowIndex: Int = 0
     var sideTagOpacity: CGFloat = 0.4
     var isShowItemDetail: Bool = false
-    var countUpDisable: Bool = false
-    var isShowUpdateDataInfomation: Bool = false
-    var isShowUpdateBasketInfomation: Bool = false
     var mode: Mode = .dark
 }
 
 struct ItemStockView: View {
 
     @Environment(\.colorScheme) var colorScheme
-
     @StateObject var itemVM: ItemViewModel
     @Binding var itemsInfomationOpacity: CGFloat
     @Binding var basketInfomationOpacity: CGFloat
