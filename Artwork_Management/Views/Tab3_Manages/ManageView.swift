@@ -43,6 +43,7 @@ struct ManageView: View {
                             ForEach(itemVM.tags) { tag in
 
                                 Text("- \(tag.tagName) -")
+                                    .foregroundColor(.white)
                                     .font(.largeTitle.bold())
                                     .shadow(radius: 2, x: 4, y: 6)
                                     .padding(.vertical)
@@ -84,7 +85,9 @@ struct ManageView: View {
                 } // if isShowItemDetail
 
             } // ZStack
-            .navigationTitle("Sales")
+            .background(LinearGradient(gradient: Gradient(colors: [.customDarkGray1, .customLightGray1]),
+                                       startPoint: .top, endPoint: .bottom))
+            .navigationTitle("Manage")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
@@ -191,20 +194,20 @@ struct ManageView: View {
                     }
 
                 VStack(alignment: .leading, spacing: 10) {
-                    HStack(spacing: 20) {
+                    HStack(spacing: 40) {
                         Text("\(item.sales)円")
+                            .foregroundColor(.white)
+                            .opacity(0.8)
                             .font(.subheadline.bold())
-
                         Button {
                             input.listIndex = listIndex
-                            print("listIndex: \(listIndex)")
-
                             input.isShowItemDetail.toggle()
                             print("isShowItemDetail: \(input.isShowItemDetail)")
 
                         } label: {
-                            Image(systemName: "list.bullet")
+                            Image(systemName: "info.circle.fill")
                                 .foregroundColor(.gray)
+                                .opacity(0.7)
 
                         } // Button
                     } // HStack
@@ -212,22 +215,16 @@ struct ManageView: View {
                     // NOTE: ラインの外枠を透明フレームで置いておくことで、
                     // ラインが端まで行ってもレイアウトが崩れない
                     switch item.tagColor {
-                    case "赤":
-                        IndicatorRow(salesValue: item.sales, tagColor: .red)
-                    case "青":
-                        IndicatorRow(salesValue: item.sales, tagColor: .blue)
-                    case "黄":
-                        IndicatorRow(salesValue: item.sales, tagColor: .yellow)
-                    case "緑":
-                        IndicatorRow(salesValue: item.sales, tagColor: .green)
-                    default:
-                        IndicatorRow(salesValue: item.sales, tagColor: .gray)
+                    case "赤": IndicatorRow(salesValue: item.sales, tagColor: .red)
+                    case "青": IndicatorRow(salesValue: item.sales, tagColor: .blue)
+                    case "黄": IndicatorRow(salesValue: item.sales, tagColor: .yellow)
+                    case "緑": IndicatorRow(salesValue: item.sales, tagColor: .green)
+                    default: IndicatorRow(salesValue: item.sales, tagColor: .gray)
                     }
 
                     Text(item.name)
                         .font(.caption.bold())
                         .foregroundColor(.gray)
-
                 } // VStack
                 Spacer()
             } // HStack
@@ -236,7 +233,7 @@ struct ManageView: View {
     } // リストレイアウト
 } // View
 
-struct SalesView_Previews: PreviewProvider {
+struct ManageView_Previews: PreviewProvider {
     static var previews: some View {
         ManageView(itemVM: ItemViewModel(), isPresentedEditItem: .constant(false))
     }

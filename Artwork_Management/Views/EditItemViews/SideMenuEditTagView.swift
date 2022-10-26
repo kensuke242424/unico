@@ -203,7 +203,6 @@ struct SideMenuEditTagView: View {
 
                         Button {
                             input.isShowAlert.toggle()
-                            print("isShowAlert: \(input.isShowAlert)")
                         } label: {
                             Text("OK")
                         }
@@ -236,7 +235,7 @@ struct SideMenuEditTagView: View {
 
         .onAppear {
 
-            print("SideMenuTagView_onAppear_実行")
+            print("SideMenuTagView_onAppear")
 
             print("アイテム編集ステータス: \(editItemStatus)")
             print("サイドメニュータグ編集ステータス: \(tagSideMenuStatus)")

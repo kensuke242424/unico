@@ -9,19 +9,19 @@ import Foundation
 import SwiftUI
 
 // Firestore内で管理されるItemオブジェクト
-struct Item: Identifiable {
+struct Item: Identifiable, Equatable, Hashable {
 
     var id = UUID()
     var tag: String
     var tagColor: String
-    let name: String
-    let detail: String
-    let photo: String
-    let price: Int
-    let sales: Int
-    let inventory: Int
+    var name: String
+    var detail: String
+    var photo: String
+    var price: Int
+    var sales: Int
+    var inventory: Int
     let createTime: Date
-    let updateTime: Date
+    var updateTime: Date
 }
 
 // iPhone側で扱われるオブジェクト

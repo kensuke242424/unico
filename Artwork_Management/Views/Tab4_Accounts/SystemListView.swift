@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct SystemListView: View {
+
     var body: some View {
 
         List {
@@ -40,6 +41,8 @@ struct SystemListView: View {
             }
 
         } // List
+        .background(LinearGradient(gradient: Gradient(colors: [.customDarkGray1, .customLightGray1]),
+                                   startPoint: .top, endPoint: .bottom))
     } // body
 } // View
 

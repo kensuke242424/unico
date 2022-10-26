@@ -37,8 +37,6 @@ struct EditItemView: View {
     }
     @State private var input: InputEditItem = InputEditItem()
 
-//    @FocusState private var focusedField: Field?
-
     var body: some View {
 
         NavigationView {
@@ -46,6 +44,14 @@ struct EditItemView: View {
             ScrollView(showsIndicators: false) {
 
                 ZStack {
+                    Color.customDarkGray1
+                        .ignoresSafeArea()
+                        .overlay {
+                            LinearGradient(gradient: Gradient(colors:
+                                                                [.clear, .customLightGray1]),
+                                                       startPoint: .top, endPoint: .bottom)
+                        }
+                        .offset(y: 340)
                     VStack {
                         // ✅カスタムView 写真ゾーン
                         SelectItemPhotoArea(selectTagColor: input.selectionTagColor)
@@ -114,7 +120,6 @@ struct EditItemView: View {
                 // Warning_TextSimbol: "＋タグを追加"
                 if selection == "＋タグを追加" {
                     input.isOpenSideMenu.toggle()
-                    print("サイドメニュー: \(input.isOpenSideMenu)")
                 }
             } // onChange (selectionTagName)
 
@@ -157,7 +162,7 @@ struct EditItemView: View {
             // NOTE: updateitemView呼び出し時に、親Viewから受け取ったアイテム情報を各入力欄に格納します。
             .onAppear {
 
-                print("EditItemView_onAppear_実行")
+                print("EditItemView_onAppear")
 
                 print("アイテム編集ステータス: \(editItemStatus)")
 
@@ -298,6 +303,7 @@ struct InputForms: View {
                     .padding(.bottom)
 
                 TextField("1st Album「...」", text: $editItemName)
+                    .foregroundColor(.white)
                     .focused($focusedField, equals: .name)
                     .autocapitalization(.none)
                     .onTapGesture { focusedField = .name }
@@ -313,6 +319,7 @@ struct InputForms: View {
                     .padding(.bottom)
 
                 TextField("100", text: $editItemInventry)
+                    .foregroundColor(.white)
                     .keyboardType(.numberPad)
                     .focused($focusedField, equals: .stock)
                     .onTapGesture { focusedField = .stock }
@@ -328,6 +335,7 @@ struct InputForms: View {
                     .padding(.bottom)
 
                 TextField("2000", text: $editItemPrice)
+                    .foregroundColor(.white)
                     .keyboardType(.numberPad)
                     .focused($focusedField, equals: .price)
                     .onTapGesture { focusedField = .price }
@@ -345,6 +353,7 @@ struct InputForms: View {
                         .padding(.bottom)
 
                     TextField("2000", text: $editItemSales)
+                        .foregroundColor(.white)
                         .keyboardType(.numberPad)
                         .focused($focusedField, equals: .sales)
                         .onTapGesture { focusedField = .sales
@@ -375,10 +384,12 @@ struct InputForms: View {
                             }
                         }
                     } // overlay
+                    .opacity(0.6)
             } // ■アイテム詳細
             .padding(.top)
 
         } // VStack(入力フォーム全体)
+
         .padding(.vertical, 20)
         .padding(.horizontal, 30)
         .onTapGesture { focusedField = nil }
