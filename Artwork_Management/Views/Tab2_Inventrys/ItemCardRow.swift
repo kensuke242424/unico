@@ -15,7 +15,6 @@ struct ItemCardRow: View {
     @Binding var isShowItemDetail: Bool
     @Binding var actionRowIndex: Int
     @Binding var commerceResults: CommerceResults
-    @Binding var resultBasketItems: [Item]
 
     let item: Item
     let itemWidth: CGFloat
@@ -112,8 +111,8 @@ struct ItemCardRow: View {
                                 commerceResults.resultItemAmount += 1
 
                                 // カート内に対象アイテムがなければ、カートに要素を新規追加
-                                if resultBasketItems.filter({ $0 == item }) == [] {
-                                    resultBasketItems.append(item)
+                                if commerceResults.resultBasketItems.filter({ $0 == item }) == [] {
+                                    commerceResults.resultBasketItems.append(item)
                                 }
 
                                 print("resultPrice: \(commerceResults.resultPrice)円")
@@ -178,8 +177,8 @@ struct ItemCardRow: View {
             }
         } // .onChange
 
-        .onChange(of: resultBasketItems) { _ in
-            if resultBasketItems == [] { cardCount = 0 }
+        .onChange(of: commerceResults.resultBasketItems) { _ in
+            if commerceResults.resultBasketItems == [] { cardCount = 0 }
         }
 
         .onChange(of: cardCount) { newCardCount in

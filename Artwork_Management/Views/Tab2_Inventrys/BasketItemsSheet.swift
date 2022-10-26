@@ -15,7 +15,6 @@ enum HalfSheetScroll {
 struct BasketItemsSheet: View {
 
     @StateObject var itemVM: ItemViewModel
-    @Binding var basketItems: [Item]
     @Binding var commerceResults: CommerceResults
     @Binding var actionRowIndex: Int
     @Binding var doCommerce: Bool
@@ -36,14 +35,13 @@ struct BasketItemsSheet: View {
 
             // NOTE: アイテム取引かごシート表示時のアイテム表示数をプロパティ「listLimit」の値分で制限します。
             //       リミット数以降の要素はスクロールにより表示します。
-            if basketItems != [] {
-                ForEach(Array(basketItems.enumerated()), id: \.element) { offset, element in
+            if commerceResults.resultBasketItems != [] {
+                ForEach(Array(commerceResults.resultBasketItems.enumerated()), id: \.element) { offset, element in
 
                     if listLimit > offset {
                         BasketItemRow(itemVM: itemVM,
                                       commerceResults: $commerceResults,
                                       actionRowIndex: $actionRowIndex,
-                                      basketItems: $basketItems,
                                       doCommerce: $doCommerce,
                                       item: element)
                     } // if
@@ -56,14 +54,13 @@ struct BasketItemsSheet: View {
 
         case .additional:
 
-            if basketItems.count > listLimit {
-                ForEach(Array(basketItems.enumerated()), id: \.element) { offset, element in
+            if commerceResults.resultBasketItems.count > listLimit {
+                ForEach(Array(commerceResults.resultBasketItems.enumerated()), id: \.element) { offset, element in
 
                     if listLimit <= offset {
                         BasketItemRow(itemVM: itemVM,
                                       commerceResults: $commerceResults,
                                       actionRowIndex: $actionRowIndex,
-                                      basketItems: $basketItems,
                                       doCommerce: $doCommerce,
                                       item: element)
                     } // if listLimit
@@ -82,7 +79,6 @@ struct BasketItemRow: View {
 
     @Binding var commerceResults: CommerceResults
     @Binding var actionRowIndex: Int
-    @Binding var basketItems: [Item]
     @Binding var doCommerce: Bool
 
     let item: Item
@@ -175,7 +171,7 @@ struct BasketItemRow: View {
                             // データ削除処理
                             commerceResults.resultItemAmount -= 1
                             commerceResults.resultPrice -= item.price
-                            basketItems.removeAll(where: { $0 == item })
+                            commerceResults.resultBasketItems.removeAll(where: { $0 == item })
                         }
                     } message: {
                         Text("かごからアイテムを削除しますか？")

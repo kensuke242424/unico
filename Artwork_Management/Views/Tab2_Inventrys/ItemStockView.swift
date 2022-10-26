@@ -11,6 +11,7 @@ import ResizableSheet
 struct CommerceResults {
     var resultItemAmount: Int = 0
     var resultPrice: Int = 0
+    var resultBasketItems: [Item] = []
 }
 
 struct InputStock {
@@ -18,8 +19,6 @@ struct InputStock {
     var searchItemNameText: String = "ALL"
     var currentIndex: Int = 0
     var actionRowIndex: Int = 0
-
-    var resultBasketItems: [Item] = []
     var sideTagOpacity: CGFloat = 0.4
     var isShowItemDetail: Bool = false
     var countUpDisable: Bool = false
@@ -156,7 +155,6 @@ struct ItemStockView: View {
                                                 isShowItemDetail: $input.isShowItemDetail,
                                                 actionRowIndex: $input.actionRowIndex,
                                                 commerceResults: $commerceResults,
-                                                resultBasketItems: $input.resultBasketItems,
                                                 itemWidth: 165,
                                                 itemHeight: 210,
                                                 itemSpase: 20,
@@ -203,7 +201,6 @@ struct ItemStockView: View {
                                          actionRowIndex: $input.actionRowIndex,
                                          commerceResults: $commerceResults,
                                          isShowItemDetail: $input.isShowItemDetail,
-                                         resultBasketItems: $input.resultBasketItems,
                                          itemWidth: 165,
                                          itemHeight: 210,
                                          itemSpase: 25,
@@ -222,7 +219,7 @@ struct ItemStockView: View {
                 } // ZStack
 
                 // NOTE: バスケット内にアイテムが追加された時点で、ハーフモーダルを表示します。
-                .onChange(of: input.resultBasketItems) { [before = input.resultBasketItems] after in
+                .onChange(of: commerceResults.resultBasketItems) { [before = commerceResults.resultBasketItems] after in
 
                     if before.count == 0 {
                         commerceState = .medium
@@ -243,7 +240,7 @@ struct ItemStockView: View {
                 // NOTE: アイテム情報の更新が入った時、カート内にアイテムがあればリセットします。
                 .onChange(of: itemVM.items) { _ in
 
-                    input.resultBasketItems = []
+                    commerceResults.resultBasketItems = []
                     commerceResults.resultItemAmount = 0
                     commerceResults.resultPrice = 0
 
@@ -311,7 +308,7 @@ struct ItemStockView: View {
                             Spacer()
                             Button(
                                 action: {
-                                    input.resultBasketItems = []
+                                    commerceResults.resultBasketItems = []
                                     commerceResults.resultPrice = 0
                                     commerceResults.resultItemAmount = 0
                                 },
@@ -334,7 +331,6 @@ struct ItemStockView: View {
                             main: {
                                 BasketItemsSheet(
                                     itemVM: itemVM,
-                                    basketItems: $input.resultBasketItems,
                                     commerceResults: $commerceResults,
                                     actionRowIndex: $input.actionRowIndex,
                                     doCommerce: $doCommerce,
@@ -343,7 +339,6 @@ struct ItemStockView: View {
                             additional: {
                                 BasketItemsSheet(
                                     itemVM: itemVM,
-                                    basketItems: $input.resultBasketItems,
                                     commerceResults: $commerceResults,
                                     actionRowIndex: $input.actionRowIndex,
                                     doCommerce: $doCommerce,

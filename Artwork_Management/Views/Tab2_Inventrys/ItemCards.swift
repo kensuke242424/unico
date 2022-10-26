@@ -21,7 +21,6 @@ struct TagSortCards: View {
     @Binding var actionRowIndex: Int
     @Binding var commerceResults: CommerceResults
     @Binding var isShowItemDetail: Bool
-    @Binding var resultBasketItems: [Item]
 
     // アイテムのディテールを指定します。
     let itemWidth: CGFloat
@@ -44,7 +43,6 @@ struct TagSortCards: View {
                                 isShowItemDetail: $isShowItemDetail,
                                 actionRowIndex: $actionRowIndex,
                                 commerceResults: $commerceResults,
-                                resultBasketItems: $resultBasketItems,
                                 item: item,
                                 itemWidth: itemWidth,
                                 itemHeight: itemHeight)
@@ -54,7 +52,6 @@ struct TagSortCards: View {
                                 isShowItemDetail: $isShowItemDetail,
                                 actionRowIndex: $actionRowIndex,
                                 commerceResults: $commerceResults,
-                                resultBasketItems: $resultBasketItems,
                                 item: item,
                                 itemWidth: itemWidth,
                                 itemHeight: itemHeight)
@@ -79,7 +76,6 @@ struct UpdateTimeSortCards: View {
     @Binding var isShowItemDetail: Bool
     @Binding var actionRowIndex: Int
     @Binding var commerceResults: CommerceResults
-    @Binding var resultBasketItems: [Item]
 
     // アイテムのディテールを指定します。
     let columnsH: [GridItem] = Array(repeating: .init(.flexible()), count: 1)
@@ -99,7 +95,6 @@ struct UpdateTimeSortCards: View {
                                 isShowItemDetail: $isShowItemDetail,
                                 actionRowIndex: $actionRowIndex,
                                 commerceResults: $commerceResults,
-                                resultBasketItems: $resultBasketItems,
                                 item: item,
                                 itemWidth: itemWidth,
                                 itemHeight: itemHeight)
