@@ -8,20 +8,19 @@
 import SwiftUI
 import ResizableSheet
 
-struct CommerceResults {
-    var resultItemAmount: Int = 0
-    var resultPrice: Int = 0
-    var resultBasketItems: [Item] = []
-}
-
 struct InputStock {
-
     var searchItemNameText: String = "ALL"
     var currentIndex: Int = 0
     var actionRowIndex: Int = 0
     var sideTagOpacity: CGFloat = 0.4
     var isShowItemDetail: Bool = false
     var mode: Mode = .dark
+}
+
+struct CommerceResults {
+    var resultItemAmount: Int = 0
+    var resultPrice: Int = 0
+    var resultBasketItems: [Item] = []
 }
 
 struct ItemStockView: View {
@@ -39,7 +38,7 @@ struct ItemStockView: View {
     @FocusState var searchFocused: SearchFocus?
     @GestureState private var dragOffset: CGFloat = 0
 
-    @State private var input: InputStock = InputStock()
+    @State private var inputStock: InputStock = InputStock()
     @State private var commerceResults: CommerceResults = CommerceResults()
 
     var body: some View {
@@ -50,7 +49,7 @@ struct ItemStockView: View {
                     VStack {
                         // NOTE: 検索ボックスの表示管理
                         if isShowSearchField {
-                            TextField("キーワード検索", text: $input.searchItemNameText)
+                            TextField("キーワード検索", text: $inputStock.searchItemNameText)
                                 .foregroundColor(.white)
                                 .autocapitalization(.none)
                                 .focused($searchFocused, equals: .check)
@@ -76,36 +75,36 @@ struct ItemStockView: View {
                             } // LazyHStack
                             .padding()
                             .offset(x: self.dragOffset)
-                            .offset(x: -CGFloat(input.currentIndex) * (bodyView.size.width * 0.7 + sideBarTagItemPadding))
+                            .offset(x: -CGFloat(inputStock.currentIndex) * (bodyView.size.width * 0.7 + sideBarTagItemPadding))
 
                             .gesture(
                                 DragGesture()
                                     .updating(self.$dragOffset, body: { (value, state, _) in
 
                                         // 先頭・末尾ではスクロールする必要がないので、画面幅の1/5までドラッグで制御する
-                                        if input.currentIndex == 0, value.translation.width > 0 {
+                                        if inputStock.currentIndex == 0, value.translation.width > 0 {
                                             state = value.translation.width / 5
-                                        } else if input.currentIndex == (itemVM.tags.count - 1), value.translation.width < 0 {
+                                        } else if inputStock.currentIndex == (itemVM.tags.count - 1), value.translation.width < 0 {
                                             state = value.translation.width / 5
                                         } else {
                                             state = value.translation.width
                                         }
                                     })
                                     .onEnded({ value in
-                                        var newIndex = input.currentIndex
+                                        var newIndex = inputStock.currentIndex
 
                                         // ドラッグ幅からページングを判定
                                         // 今回は画面幅x0.3としているが、操作感に応じてカスタマイズする必要がある
                                         if abs(value.translation.width) > bodyView.size.width * 0.2 {
-                                            newIndex = value.translation.width > 0 ? input.currentIndex - 1 : input.currentIndex + 1
+                                            newIndex = value.translation.width > 0 ? inputStock.currentIndex - 1 : inputStock.currentIndex + 1
                                         }
                                         if newIndex < 0 {
                                             newIndex = 0
                                         } else if newIndex > (itemVM.tags.count - 1) {
                                             newIndex = itemVM.tags.count - 1
                                         }
-                                        input.currentIndex = newIndex
-                                        if input.currentIndex != 0 { isShowSearchField = false }
+                                        inputStock.currentIndex = newIndex
+                                        if inputStock.currentIndex != 0 { isShowSearchField = false }
                                     }) // .onEnded
                             ) // .gesture
                             // 減衰ばねモデル、それぞれの値は操作感に応じて変更する
@@ -119,8 +118,8 @@ struct ItemStockView: View {
 
                         // NOTE: サイドタグバーの枠フレームおよび、前後のタグインフォメーションを表示します。
                         .overlay {
-                            SideTagBarOverlay(currentIndex: $input.currentIndex,
-                                              sideTagOpacity: $input.sideTagOpacity,
+                            SideTagBarOverlay(currentIndex: $inputStock.currentIndex,
+                                              sideTagOpacity: $inputStock.sideTagOpacity,
                                               tags: $itemVM.tags)
                         } // overlay
                         .padding(.top)
@@ -129,10 +128,10 @@ struct ItemStockView: View {
                         .onChange(of: dragOffset) { newValue in
                             if newValue == 0 {
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                    input.sideTagOpacity = 0.4
+                                    inputStock.sideTagOpacity = 0.4
                                 }
                             } else {
-                                input.sideTagOpacity = 0.0
+                                inputStock.sideTagOpacity = 0.0
                             }
                         } // onChange
 
@@ -148,8 +147,8 @@ struct ItemStockView: View {
                                 .padding()
                             // ✅カスタムView: 最近更新したアイテムをHStack表示します。(横スクロール)
                             UpdateTimeSortCards(itemVM: itemVM,
-                                                isShowItemDetail: $input.isShowItemDetail,
-                                                actionRowIndex: $input.actionRowIndex,
+                                                isShowItemDetail: $inputStock.isShowItemDetail,
+                                                actionRowIndex: $inputStock.actionRowIndex,
                                                 commerceResults: $commerceResults,
                                                 itemNameTag: "アイテム",
                                                 items: itemVM.items)
@@ -158,19 +157,19 @@ struct ItemStockView: View {
                                 .padding()
 
                             HStack(spacing: 50) {
-                                Text(input.currentIndex == 0 ?
-                                         "- \(input.searchItemNameText) -" :
-                                        "-  \(itemVM.tags[input.currentIndex].tagName) -")
+                                Text(inputStock.currentIndex == 0 ?
+                                         "- \(inputStock.searchItemNameText) -" :
+                                        "-  \(itemVM.tags[inputStock.currentIndex].tagName) -")
                                 .font(.title.bold())
                                 .foregroundColor(.white)
                                 .shadow(radius: 3, x: 4, y: 6)
                                 .lineLimit(1)
                                 .opacity(0.8)
 
-                                if !input.searchItemNameText.isEmpty,
-                                   input.searchItemNameText != "ALL" {
+                                if !inputStock.searchItemNameText.isEmpty,
+                                   inputStock.searchItemNameText != "ALL" {
                                     Button {
-                                        input.searchItemNameText = "ALL"
+                                        inputStock.searchItemNameText = "ALL"
                                         itemVM.tags[0].tagName = "ALL"
                                     } label: {
                                         RoundedRectangle(cornerRadius: 10)
@@ -190,21 +189,21 @@ struct ItemStockView: View {
 
                             // ✅カスタムView: アイテムを表示します。(縦スクロール)
                             TagSortCards(itemVM: itemVM,
-                                         searchItemNameText: $input.searchItemNameText,
-                                         actionRowIndex: $input.actionRowIndex,
+                                         searchItemNameText: $inputStock.searchItemNameText,
+                                         actionRowIndex: $inputStock.actionRowIndex,
                                          commerceResults: $commerceResults,
-                                         isShowItemDetail: $input.isShowItemDetail,
-                                         selectTag: itemVM.tags[input.currentIndex].tagName,
+                                         isShowItemDetail: $inputStock.isShowItemDetail,
+                                         selectTag: itemVM.tags[inputStock.currentIndex].tagName,
                                          items: itemVM.items)
                         } // ScrollView (アイテムロケーション)
 
                     } // VStack
                     // NOTE: アイテム詳細ボタンをタップすると、詳細画面が発火します。
-                    if input.isShowItemDetail {
+                    if inputStock.isShowItemDetail {
                         ShowsItemDetail(itemVM: itemVM,
-                                        item: itemVM.items[input.actionRowIndex],
-                                        itemIndex: input.actionRowIndex,
-                                        isShowitemDetail: $input.isShowItemDetail)
+                                        item: itemVM.items[inputStock.actionRowIndex],
+                                        itemIndex: inputStock.actionRowIndex,
+                                        isShowitemDetail: $inputStock.isShowItemDetail)
                     } // if isShowItemDetail
                 } // ZStack
 
@@ -246,14 +245,14 @@ struct ItemStockView: View {
 
                     searchFocused = newValue ? .check : nil
                     if newValue == true {
-                        if input.searchItemNameText == "ALL" {
-                            input.searchItemNameText = ""
+                        if inputStock.searchItemNameText == "ALL" {
+                            inputStock.searchItemNameText = ""
                             itemVM.tags[0].tagName = "検索"
                         }
                     }
                     if newValue == false {
-                        if input.searchItemNameText == "" {
-                            input.searchItemNameText = "ALL"
+                        if inputStock.searchItemNameText == "" {
+                            inputStock.searchItemNameText = "ALL"
                             itemVM.tags[0].tagName = "ALL"
                         }
                     }
@@ -263,7 +262,7 @@ struct ItemStockView: View {
                             scrollProxy.scrollTo("search", anchor: .top)
                             }
                         withAnimation(.easeIn(duration: 0.3)) {
-                            input.currentIndex = 0 // タグを「All」に更新
+                            inputStock.currentIndex = 0 // タグを「All」に更新
                         }
                     } // if
                 } // .onChange
@@ -322,7 +321,7 @@ struct ItemStockView: View {
                                 BasketItemsSheet(
                                     itemVM: itemVM,
                                     commerceResults: $commerceResults,
-                                    actionRowIndex: $input.actionRowIndex,
+                                    actionRowIndex: $inputStock.actionRowIndex,
                                     doCommerce: $doCommerce,
                                     halfSheetScroll: .main)
                             },
@@ -330,7 +329,7 @@ struct ItemStockView: View {
                                 BasketItemsSheet(
                                     itemVM: itemVM,
                                     commerceResults: $commerceResults,
-                                    actionRowIndex: $input.actionRowIndex,
+                                    actionRowIndex: $inputStock.actionRowIndex,
                                     doCommerce: $doCommerce,
                                     halfSheetScroll: .additional)
 
@@ -384,12 +383,12 @@ struct ItemStockView: View {
         // NOTE: ディスプレイのカラーモードを検知し、enumを切り替えます。
         .onChange(of: colorScheme) { _ in
             switch colorScheme {
-            case .light: input.mode = .light
-            case .dark: input.mode = .dark
+            case .light: inputStock.mode = .light
+            case .dark: inputStock.mode = .dark
             default:
                 fatalError()
             } // switch
-            print("ディスプレイモード: \(input.mode)")
+            print("ディスプレイモード: \(inputStock.mode)")
         } // .onChange
     } // body
 } // View
