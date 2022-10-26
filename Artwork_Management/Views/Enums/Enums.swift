@@ -6,6 +6,12 @@
 //
 import SwiftUI
 
+// Stock画面のアイテムカードの大きさを変更？
+enum StockCardSize {
+    case mini
+    case medium
+}
+
 // NOTE: アイテムのソートタイプを管理します
 enum SortType {
     case salesUp

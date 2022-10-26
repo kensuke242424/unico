@@ -9,14 +9,12 @@ import SwiftUI
 
 struct ItemCardRow: View {
 
-    // ダークモードの判定に用いる
     @Environment(\.colorScheme) var colorScheme
     @StateObject var itemVM: ItemViewModel
-    @Binding var isShowItemDetail: Bool
-    @Binding var actionRowIndex: Int
+    @Binding var inputStock: InputStock
     @Binding var commerceResults: CommerceResults
-
     let item: Item
+
     let itemWidth: CGFloat = 165
     let itemHeight: CGFloat = 210
 
@@ -40,11 +38,11 @@ struct ItemCardRow: View {
                             print("アクションIndexの取得に失敗しました")
                             return
                         }
-                            actionRowIndex = newActionIndex
-                            print("actionRowIndex: \(actionRowIndex)")
+                        inputStock.actionRowIndex = newActionIndex
+                        print("actionRowIndex: \(inputStock.actionRowIndex)")
                             // アイテム詳細表示
-                            self.isShowItemDetail.toggle()
-                            print("ItemStockView_アイテム詳細ボタンタップ: \(isShowItemDetail)")
+                        inputStock.isShowItemDetail.toggle()
+                        print("ItemStockView_アイテム詳細ボタンタップ: \(inputStock.isShowItemDetail)")
 
                     } label: {
                         Image(systemName: "info.circle.fill")
@@ -107,7 +105,7 @@ struct ItemCardRow: View {
                                     print("アクションIndexの取得に失敗しました")
                                     return
                                 }
-                                actionRowIndex = newActionIndex
+                                inputStock.actionRowIndex = newActionIndex
                                 commerceResults.resultItemAmount += 1
 
                                 // カート内に対象アイテムがなければ、カートに要素を新規追加
@@ -166,12 +164,12 @@ struct ItemCardRow: View {
         } // VStack
         .onChange(of: commerceResults.resultItemAmount) { [before = commerceResults.resultItemAmount] after in
             if before < after {
-                if item == itemVM.items[actionRowIndex] {
+                if item == itemVM.items[inputStock.actionRowIndex] {
                     cardCount += 1
                 }
             }
             if before > after {
-                if item == itemVM.items[actionRowIndex] {
+                if item == itemVM.items[inputStock.actionRowIndex] {
                     cardCount -= 1
                 }
             }
@@ -183,11 +181,11 @@ struct ItemCardRow: View {
 
         .onChange(of: cardCount) { newCardCount in
             if newCardCount == item.inventory {
-                if item == itemVM.items[actionRowIndex] {
+                if item == itemVM.items[inputStock.actionRowIndex] {
                     countUpDisable = true
                 }
             } else {
-                if item == itemVM.items[actionRowIndex] {
+                if item == itemVM.items[inputStock.actionRowIndex] {
                     countUpDisable = false
                 }
             }

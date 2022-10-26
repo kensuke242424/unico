@@ -7,45 +7,34 @@
 
 import SwiftUI
 
-enum ShowItemSize {
-    case mini
-    case medium
-}
-
 // ✅カスタムView: StockViewのタグからピックアップされたカードのレイアウトです。
 struct TagSortCards: View {
 
     @StateObject var itemVM: ItemViewModel
 
-    @Binding var searchItemNameText: String
-    @Binding var actionRowIndex: Int
+    @Binding var inputStock: InputStock
     @Binding var commerceResults: CommerceResults
-    @Binding var isShowItemDetail: Bool
+    let selectFilterTag: String
 
-    // アイテムのディテールを指定します。
-    let selectTag: String
-    let items: [Item]
     @State var searchItems: [Item] = []
 
-    let columnsV: [GridItem] = Array(repeating: .init(.flexible()), count: 2)
+    private let columnsV: [GridItem] = Array(repeating: .init(.flexible()), count: 2)
 
     var body: some View {
 
         LazyVGrid(columns: columnsV, spacing: 20) {
-            ForEach(searchItemNameText == "ALL" || searchItemNameText == "" ?
-                          items : searchItems) { item in
+            ForEach(inputStock.searchItemNameText == "ALL" || inputStock.searchItemNameText == "" ?
+                    itemVM.items : searchItems) { item in
 
-                if selectTag == "ALL" || selectTag == "検索" {
+                if selectFilterTag == "ALL" || selectFilterTag == "検索" {
                     ItemCardRow(itemVM: itemVM,
-                                isShowItemDetail: $isShowItemDetail,
-                                actionRowIndex: $actionRowIndex,
+                                inputStock: $inputStock,
                                 commerceResults: $commerceResults,
                                 item: item)
 
-                } else if item.tag == selectTag {
+                } else if item.tag == selectFilterTag {
                     ItemCardRow(itemVM: itemVM,
-                                isShowItemDetail: $isShowItemDetail,
-                                actionRowIndex: $actionRowIndex,
+                                inputStock: $inputStock,
                                 commerceResults: $commerceResults,
                                 item: item)
                 }
@@ -53,9 +42,9 @@ struct TagSortCards: View {
         } // LazyVGrid
         .padding(.horizontal, 10)
         Spacer().frame(height: 200)
-            .onChange(of: searchItemNameText) { newSearchText in
-                if !searchItemNameText.isEmpty {
-                    searchItems = items.filter({ $0.name.contains(newSearchText) })
+            .onChange(of: inputStock.searchItemNameText) { newSearchText in
+                if !inputStock.searchItemNameText.isEmpty {
+                    searchItems = itemVM.items.filter({ $0.name.contains(newSearchText) })
                 }
             }
     } // body
@@ -66,24 +55,20 @@ struct UpdateTimeSortCards: View {
 
     @StateObject var itemVM: ItemViewModel
 
-    @Binding var isShowItemDetail: Bool
-    @Binding var actionRowIndex: Int
+    @Binding var inputStock: InputStock
     @Binding var commerceResults: CommerceResults
 
     // アイテムのディテールを指定します。
     let columnsH: [GridItem] = Array(repeating: .init(.flexible()), count: 1)
-    let itemNameTag: String
-    let items: [Item]
 
     var body: some View {
 
         ScrollView(.horizontal) {
             LazyHGrid(rows: columnsH, spacing: 20) {
-                ForEach(items) { item in
+                ForEach(itemVM.items) { item in
 
                     ItemCardRow(itemVM: itemVM,
-                                isShowItemDetail: $isShowItemDetail,
-                                actionRowIndex: $actionRowIndex,
+                                inputStock: $inputStock,
                                 commerceResults: $commerceResults,
                                 item: item)
 
