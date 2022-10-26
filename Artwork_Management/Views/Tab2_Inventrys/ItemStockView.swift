@@ -27,13 +27,7 @@ struct ItemStockView: View {
 
     @Environment(\.colorScheme) var colorScheme
     @StateObject var itemVM: ItemViewModel
-    @Binding var itemsInfomationOpacity: CGFloat
-    @Binding var basketInfomationOpacity: CGFloat
-    @Binding var isShowSearchField: Bool
-    @Binding var isPresentedEditItem: Bool
-    @Binding var doCommerce: Bool
-    @Binding var basketState: ResizableSheetState
-    @Binding var commerceState: ResizableSheetState
+    @Binding var inputHome: InputHome
 
     @FocusState var searchFocused: SearchFocus?
     @GestureState private var dragOffset: CGFloat = 0
@@ -48,7 +42,7 @@ struct ItemStockView: View {
                 ZStack {
                     VStack {
                         // NOTE: 検索ボックスの表示管理
-                        if isShowSearchField {
+                        if inputHome.isShowSearchField {
                             TextField("キーワード検索", text: $inputStock.searchItemNameText)
                                 .foregroundColor(.white)
                                 .autocapitalization(.none)
@@ -104,7 +98,9 @@ struct ItemStockView: View {
                                             newIndex = itemVM.tags.count - 1
                                         }
                                         inputStock.currentIndex = newIndex
-                                        if inputStock.currentIndex != 0 { isShowSearchField = false }
+                                        if inputStock.currentIndex != 0 {
+                                            inputHome.isShowSearchField = false
+                                        }
                                     }) // .onEnded
                             ) // .gesture
                             // 減衰ばねモデル、それぞれの値は操作感に応じて変更する
@@ -211,17 +207,17 @@ struct ItemStockView: View {
                 .onChange(of: commerceResults.resultBasketItems) { [before = commerceResults.resultBasketItems] after in
 
                     if before.count == 0 {
-                        commerceState = .medium
+                        inputHome.commerceState = .medium
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                            basketState = .medium
+                            inputHome.basketState = .medium
                         }
                     }
                     if after == [] {
-                        commerceState = .hidden
-                        basketState = .hidden
-                        basketInfomationOpacity = 0.7
+                        inputHome.commerceState = .hidden
+                        inputHome.basketState = .hidden
+                        inputHome.basketInfomationOpacity = 0.7
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.9) {
-                            basketInfomationOpacity = 0.0
+                            inputHome.basketInfomationOpacity = 0.0
                         }
                     }
                 }
@@ -233,15 +229,15 @@ struct ItemStockView: View {
                     commerceResults.resultItemAmount = 0
                     commerceResults.resultPrice = 0
 
-                    itemsInfomationOpacity = 0.7
+                    inputHome.itemsInfomationOpacity = 0.7
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.7) {
-                        itemsInfomationOpacity = 0.0
+                        inputHome.itemsInfomationOpacity = 0.0
                     }
                 } // .onChange
 
                 // NOTE: 入力フィールドの表示に合わせて、フォーカスを切り替えます。
                 // NOTE: 入力フィールド表示時に、指定の位置まで自動フォーカスします。
-                .onChange(of: isShowSearchField) { newValue in
+                .onChange(of: inputHome.isShowSearchField) { newValue in
 
                     searchFocused = newValue ? .check : nil
                     if newValue == true {
@@ -269,7 +265,7 @@ struct ItemStockView: View {
 
                 .onChange(of: searchFocused) { newFocus in
                     if newFocus == nil {
-                        isShowSearchField = false
+                        inputHome.isShowSearchField = false
                     }
                 } // .onChange
 
@@ -279,7 +275,7 @@ struct ItemStockView: View {
                                                                    .customLightGray1]),
                                        startPoint: .top, endPoint: .bottom))
             // アイテム取引かごのシート画面
-            .resizableSheet($basketState, id: "A") { builder in
+            .resizableSheet($inputHome.basketState, id: "A") { builder in
                 builder.content { context in
 
                     VStack {
@@ -322,7 +318,7 @@ struct ItemStockView: View {
                                     itemVM: itemVM,
                                     commerceResults: $commerceResults,
                                     actionRowIndex: $inputStock.actionRowIndex,
-                                    doCommerce: $doCommerce,
+                                    doCommerce: $inputHome.doCommerce,
                                     halfSheetScroll: .main)
                             },
                             additional: {
@@ -330,7 +326,7 @@ struct ItemStockView: View {
                                     itemVM: itemVM,
                                     commerceResults: $commerceResults,
                                     actionRowIndex: $inputStock.actionRowIndex,
-                                    doCommerce: $doCommerce,
+                                    doCommerce: $inputHome.doCommerce,
                                     halfSheetScroll: .additional)
 
                                 Spacer()
@@ -353,14 +349,14 @@ struct ItemStockView: View {
             } // .resizableSheet
 
             // 決済リザルトのシート画面
-            .resizableSheet($commerceState, id: "B") {builder in
+            .resizableSheet($inputHome.commerceState, id: "B") {builder in
                 builder.content { _ in
 
-                    CommerceSheet(commerceState: $commerceState,
-                                  basketState: $basketState,
+                    CommerceSheet(commerceState: $inputHome.commerceState,
+                                  basketState: $inputHome.basketState,
                                   resultPrice: $commerceResults.resultPrice,
                                   resultItemAmount: $commerceResults.resultItemAmount,
-                                  doCommerce: $doCommerce)
+                                  doCommerce: $inputHome.doCommerce)
 
                 } // builder.content
                 .supportedState([.medium])
@@ -374,7 +370,7 @@ struct ItemStockView: View {
                 }
             } // .resizableSheet
 
-            .animation(.easeIn(duration: 0.2), value: isShowSearchField)
+            .animation(.easeIn(duration: 0.2), value: inputHome.isShowSearchField)
             .navigationTitle("Stock")
             .navigationBarTitleDisplayMode(.inline)
         } // NavigationView
@@ -455,13 +451,8 @@ struct ItemStockView_Previews: PreviewProvider {
         }
 
         return ItemStockView(itemVM: ItemViewModel(),
-                             itemsInfomationOpacity: .constant(0.0),
-                             basketInfomationOpacity: .constant(0.0),
-                             isShowSearchField: .constant(false),
-                             isPresentedEditItem: .constant(false),
-                             doCommerce: .constant(false),
-                             basketState: .constant(.hidden),
-                             commerceState: .constant(.hidden))
+                             inputHome: .constant(InputHome())
+        )
         .environment(\.resizableSheetCenter, resizableSheetCenter)
     }
 } // View_Previews

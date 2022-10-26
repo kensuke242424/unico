@@ -8,21 +8,22 @@
 import SwiftUI
 import ResizableSheet
 
+struct InputHome {
+    var tabIndex = 0
+    var itemsInfomationOpacity: CGFloat = 0.0
+    var basketInfomationOpacity: CGFloat = 0.0
+    var isShowItemDetail: Bool = false
+    var isPresentedEditItem: Bool = false
+    var isShowSearchField: Bool = false
+    var doCommerce: Bool = false
+    var basketState: ResizableSheetState = .hidden
+    var commerceState: ResizableSheetState = .hidden
+}
+
 struct HomeTabView: View {
 
     @StateObject var rootItemVM = ItemViewModel()
 
-    struct InputHome {
-        var tabIndex = 0
-        var itemsInfomationOpacity: CGFloat = 0.0
-        var basketInfomationOpacity: CGFloat = 0.0
-        var isShowItemDetail: Bool = false
-        var isPresentedEditItem: Bool = false
-        var isShowSearchField: Bool = false
-        var doCommerce: Bool = false
-        var basketState: ResizableSheetState = .hidden
-        var commerceState: ResizableSheetState = .hidden
-    }
     @State private var inputHome: InputHome = InputHome()
 
     var body: some View {
@@ -38,14 +39,7 @@ struct HomeTabView: View {
                     }
                     .tag(0)
 
-                ItemStockView(itemVM: rootItemVM,
-                              itemsInfomationOpacity: $inputHome.itemsInfomationOpacity,
-                              basketInfomationOpacity: $inputHome.basketInfomationOpacity,
-                              isShowSearchField: $inputHome.isShowSearchField,
-                              isPresentedEditItem: $inputHome.isPresentedEditItem,
-                              doCommerce: $inputHome.doCommerce,
-                              basketState: $inputHome.basketState,
-                              commerceState: $inputHome.commerceState)
+                ItemStockView(itemVM: rootItemVM, inputHome: $inputHome)
                     .tabItem {
                         Image(systemName: "shippingbox.fill")
                         Text("inventory")
@@ -95,11 +89,7 @@ struct HomeTabView: View {
             .animation(.easeIn(duration: 0.2), value: inputHome.basketInfomationOpacity)
 
             // Todo: 各タブごとにオプションが変わるボタン
-            UsefulButton(tabIndex: $inputHome.tabIndex,
-                         isPresentedNewItem: $inputHome.isPresentedEditItem,
-                         isShowSearchField: $inputHome.isShowSearchField,
-                         basketState: $inputHome.basketState,
-                         commerceState: $inputHome.commerceState)
+            UsefulButton(inputHome: $inputHome)
 
         } // ZStack
         .navigationBarBackButtonHidden()
