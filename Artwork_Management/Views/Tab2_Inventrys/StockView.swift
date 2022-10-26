@@ -375,7 +375,7 @@ struct StockView: View {
                 fatalError()
             } // switch
             print("ディスプレイモード: \(inputStock.mode)")
-        } // .onChange
+        } // .onChangek
     } // body
 } // View
 
