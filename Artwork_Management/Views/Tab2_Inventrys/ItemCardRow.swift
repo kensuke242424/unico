@@ -14,7 +14,6 @@ struct ItemCardRow: View {
     @StateObject var itemVM: ItemViewModel
     @Binding var isShowItemDetail: Bool
     @Binding var actionRowIndex: Int
-    @Binding var resultPrice: Int
     @Binding var commerceResults: CommerceResults
     @Binding var resultBasketItems: [Item]
 
@@ -117,7 +116,7 @@ struct ItemCardRow: View {
                                     resultBasketItems.append(item)
                                 }
 
-                                print("resultPrice: \(resultPrice)円")
+                                print("resultPrice: \(commerceResults.resultPrice)円")
                                 print("resultItemAmount: \(commerceResults.resultItemAmount)個")
 
                             } label: {

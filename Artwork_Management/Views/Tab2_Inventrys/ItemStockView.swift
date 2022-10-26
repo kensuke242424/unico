@@ -10,6 +10,7 @@ import ResizableSheet
 
 struct CommerceResults {
     var resultItemAmount: Int = 0
+    var resultPrice: Int = 0
 }
 
 struct InputStock {
@@ -17,7 +18,6 @@ struct InputStock {
     var searchItemNameText: String = "ALL"
     var currentIndex: Int = 0
     var actionRowIndex: Int = 0
-    var resultPrice: Int = 0
 
     var resultBasketItems: [Item] = []
     var sideTagOpacity: CGFloat = 0.4
@@ -155,7 +155,6 @@ struct ItemStockView: View {
                             UpdateTimeSortCards(itemVM: itemVM,
                                                 isShowItemDetail: $input.isShowItemDetail,
                                                 actionRowIndex: $input.actionRowIndex,
-                                                resultPrice: $input.resultPrice,
                                                 commerceResults: $commerceResults,
                                                 resultBasketItems: $input.resultBasketItems,
                                                 itemWidth: 165,
@@ -202,7 +201,6 @@ struct ItemStockView: View {
                             TagSortCards(itemVM: itemVM,
                                          searchItemNameText: $input.searchItemNameText,
                                          actionRowIndex: $input.actionRowIndex,
-                                         resultPrice: $input.resultPrice,
                                          commerceResults: $commerceResults,
                                          isShowItemDetail: $input.isShowItemDetail,
                                          resultBasketItems: $input.resultBasketItems,
@@ -247,7 +245,7 @@ struct ItemStockView: View {
 
                     input.resultBasketItems = []
                     commerceResults.resultItemAmount = 0
-                    input.resultPrice = 0
+                    commerceResults.resultPrice = 0
 
                     itemsInfomationOpacity = 0.7
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.7) {
@@ -314,7 +312,7 @@ struct ItemStockView: View {
                             Button(
                                 action: {
                                     input.resultBasketItems = []
-                                    input.resultPrice = 0
+                                    commerceResults.resultPrice = 0
                                     commerceResults.resultItemAmount = 0
                                 },
                                 label: {
@@ -338,7 +336,7 @@ struct ItemStockView: View {
                                     itemVM: itemVM,
                                     basketItems: $input.resultBasketItems,
                                     resultItemAmount: $commerceResults.resultItemAmount,
-                                    resultPrice: $input.resultPrice,
+                                    resultPrice: $commerceResults.resultPrice,
                                     actionRowIndex: $input.actionRowIndex,
                                     doCommerce: $doCommerce,
                                     halfSheetScroll: .main)
@@ -348,7 +346,7 @@ struct ItemStockView: View {
                                     itemVM: itemVM,
                                     basketItems: $input.resultBasketItems,
                                     resultItemAmount: $commerceResults.resultItemAmount,
-                                    resultPrice: $input.resultPrice,
+                                    resultPrice: $commerceResults.resultPrice,
                                     actionRowIndex: $input.actionRowIndex,
                                     doCommerce: $doCommerce,
                                     halfSheetScroll: .additional)
@@ -378,7 +376,7 @@ struct ItemStockView: View {
 
                     CommerceSheet(commerceState: $commerceState,
                                   basketState: $basketState,
-                                  resultPrice: $input.resultPrice,
+                                  resultPrice: $commerceResults.resultPrice,
                                   resultItemAmount: $commerceResults.resultItemAmount,
                                   doCommerce: $doCommerce)
 

@@ -19,7 +19,6 @@ struct TagSortCards: View {
 
     @Binding var searchItemNameText: String
     @Binding var actionRowIndex: Int
-    @Binding var resultPrice: Int
     @Binding var commerceResults: CommerceResults
     @Binding var isShowItemDetail: Bool
     @Binding var resultBasketItems: [Item]
@@ -44,7 +43,6 @@ struct TagSortCards: View {
                     ItemCardRow(itemVM: itemVM,
                                 isShowItemDetail: $isShowItemDetail,
                                 actionRowIndex: $actionRowIndex,
-                                resultPrice: $resultPrice,
                                 commerceResults: $commerceResults,
                                 resultBasketItems: $resultBasketItems,
                                 item: item,
@@ -55,7 +53,6 @@ struct TagSortCards: View {
                     ItemCardRow(itemVM: itemVM,
                                 isShowItemDetail: $isShowItemDetail,
                                 actionRowIndex: $actionRowIndex,
-                                resultPrice: $resultPrice,
                                 commerceResults: $commerceResults,
                                 resultBasketItems: $resultBasketItems,
                                 item: item,
@@ -81,7 +78,6 @@ struct UpdateTimeSortCards: View {
 
     @Binding var isShowItemDetail: Bool
     @Binding var actionRowIndex: Int
-    @Binding var resultPrice: Int
     @Binding var commerceResults: CommerceResults
     @Binding var resultBasketItems: [Item]
 
@@ -102,7 +98,6 @@ struct UpdateTimeSortCards: View {
                     ItemCardRow(itemVM: itemVM,
                                 isShowItemDetail: $isShowItemDetail,
                                 actionRowIndex: $actionRowIndex,
-                                resultPrice: $resultPrice,
                                 commerceResults: $commerceResults,
                                 resultBasketItems: $resultBasketItems,
                                 item: item,
