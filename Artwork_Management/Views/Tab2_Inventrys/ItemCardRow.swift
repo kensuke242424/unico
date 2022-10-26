@@ -12,7 +12,7 @@ struct ItemCardRow: View {
     @Environment(\.colorScheme) var colorScheme
     @StateObject var itemVM: ItemViewModel
     @Binding var inputStock: InputStock
-    @Binding var commerceResults: CartResults
+    @Binding var cartResults: CartResults
     let item: Item
 
     let itemWidth: CGFloat = 165
@@ -106,15 +106,15 @@ struct ItemCardRow: View {
                                     return
                                 }
                                 inputStock.actionRowIndex = newActionIndex
-                                commerceResults.resultItemAmount += 1
+                                cartResults.resultItemAmount += 1
 
                                 // カート内に対象アイテムがなければ、カートに要素を新規追加
-                                if commerceResults.resultCartItems.filter({ $0 == item }) == [] {
-                                    commerceResults.resultCartItems.append(item)
+                                if cartResults.resultCartItems.filter({ $0 == item }) == [] {
+                                    cartResults.resultCartItems.append(item)
                                 }
 
-                                print("resultPrice: \(commerceResults.resultPrice)円")
-                                print("resultItemAmount: \(commerceResults.resultItemAmount)個")
+                                print("resultPrice: \(cartResults.resultPrice)円")
+                                print("resultItemAmount: \(cartResults.resultItemAmount)個")
 
                             } label: {
                                 Image(systemName: "plus.circle.fill")
@@ -162,7 +162,7 @@ struct ItemCardRow: View {
                 } // .overlay
 
         } // VStack
-        .onChange(of: commerceResults.resultItemAmount) { [before = commerceResults.resultItemAmount] after in
+        .onChange(of: cartResults.resultItemAmount) { [before = cartResults.resultItemAmount] after in
             if before < after {
                 if item == itemVM.items[inputStock.actionRowIndex] {
                     cardCount += 1
@@ -175,8 +175,8 @@ struct ItemCardRow: View {
             }
         } // .onChange
 
-        .onChange(of: commerceResults.resultCartItems) { _ in
-            if commerceResults.resultCartItems == [] { cardCount = 0 }
+        .onChange(of: cartResults.resultCartItems) { _ in
+            if cartResults.resultCartItems == [] { cardCount = 0 }
         }
 
         .onChange(of: cardCount) { newCardCount in
@@ -199,29 +199,14 @@ struct ItemCardRow: View {
 
     } // body
 } // View
-//
-//struct ItemCardRow_Previews: PreviewProvider {
-//    static var previews: some View {
-//
-//        ItemCardRow(itemVM: ItemViewModel(),
-//                    isShowItemDetail: .constant(false),
-//                    actionRowIndex: .constant(0),
-//                    resultPrice: .constant(12000),
-//                    resultItemAmount: .constant(3),
-//                    resultBasketItems: .constant([]),
-//                    item: Item(tag: "Album",
-//                               tagColor: "赤",
-//                               name: "Album1",
-//                               detail: "Album1のアイテム紹介テキストです。",
-//                               photo: "",
-//                               price: 1800,
-//                               sales: 88000,
-//                               inventory: 200,
-//                               createTime: Date(),
-//                               updateTime: Date()),
-//                    itemWidth: UIScreen.main.bounds.width * 0.45,
-//                    itemHeight: 240
-//        )
-//        .previewLayout(.sizeThatFits)
-//    }
-//}
+
+struct ItemCardRow_Previews: PreviewProvider {
+    static var previews: some View {
+
+        ItemCardRow(itemVM: ItemViewModel(),
+                    inputStock: .constant(InputStock()),
+                    cartResults: .constant(CartResults()),
+                    item: TestItem().testItem)
+        .previewLayout(.sizeThatFits)
+    }
+}

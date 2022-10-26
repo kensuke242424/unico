@@ -8,11 +8,6 @@
 import Foundation
 import SwiftUI
 
-enum Mode {
-    case dark
-    case light
-}
-
 class ItemViewModel: ObservableObject {
 
     // NOTE: アイテム、タグのテストデータです
@@ -40,7 +35,6 @@ class ItemViewModel: ObservableObject {
 
     @Published var tags: [Tag] =
     [
-//        Tag(tagName: "ALL", tagColor: .gray),
         Tag(tagName: "Album", tagColor: .red),
         Tag(tagName: "Single", tagColor: .blue),
         Tag(tagName: "Goods", tagColor: .yellow)
@@ -133,3 +127,17 @@ class ItemViewModel: ObservableObject {
     } // func updateItemsTagData
 
 } // class
+
+struct TestItem {
+
+    var testItem: Item = Item(tag: "Album",
+                              tagColor: "赤",
+                              name: "Album1",
+                              detail: "Album1のアイテム紹介テキストです。",
+                              photo: "",
+                              price: 1800,
+                              sales: 88000,
+                              inventory: 2,
+                              createTime: Date(),
+                              updateTime: Date())
+}

@@ -7,15 +7,10 @@
 
 import SwiftUI
 
-enum HalfSheetScroll {
-    case main
-    case additional
-}
-
 struct CartItemsSheet: View {
 
     @StateObject var itemVM: ItemViewModel
-    @Binding var commerceResults: CartResults
+    @Binding var cartResults: CartResults
     @Binding var inputStock: InputStock
     @Binding var inputHome: InputHome
 
@@ -26,7 +21,7 @@ struct CartItemsSheet: View {
 
     var body: some View {
 
-        // NOTE: 親View、ScrollResizableSheetの設定「.main」「.additional」
+        // NOTE: ライブラリ ScrollResizableSheetの設定「.main」「.additional」
         //       .main ⇨ シート呼び出し時に表示される要素を設定します。
         //       .additional ⇨ シート内のスクロール全体に表示するアイテムを設定します。
         switch halfSheetScroll {
@@ -35,12 +30,12 @@ struct CartItemsSheet: View {
 
             // NOTE: アイテム取引かごシート表示時のアイテム表示数をプロパティ「listLimit」の値分で制限します。
             //       リミット数以降の要素はスクロールにより表示します。
-            if commerceResults.resultCartItems != [] {
-                ForEach(Array(commerceResults.resultCartItems.enumerated()), id: \.element) { offset, element in
+            if cartResults.resultCartItems != [] {
+                ForEach(Array(cartResults.resultCartItems.enumerated()), id: \.element) { offset, element in
 
                     if listLimit > offset {
                         BasketItemRow(itemVM: itemVM,
-                                      commerceResults: $commerceResults,
+                                      commerceResults: $cartResults,
                                       inputStock: $inputStock,
                                       inputHome: $inputHome,
                                       item: element)
@@ -54,12 +49,12 @@ struct CartItemsSheet: View {
 
         case .additional:
 
-            if commerceResults.resultCartItems.count > listLimit {
-                ForEach(Array(commerceResults.resultCartItems.enumerated()), id: \.element) { offset, element in
+            if cartResults.resultCartItems.count > listLimit {
+                ForEach(Array(cartResults.resultCartItems.enumerated()), id: \.element) { offset, element in
 
                     if listLimit <= offset {
                         BasketItemRow(itemVM: itemVM,
-                                      commerceResults: $commerceResults,
+                                      commerceResults: $cartResults,
                                       inputStock: $inputStock,
                                       inputHome: $inputHome,
                                       item: element)
@@ -244,21 +239,12 @@ struct BasketItemRow: View {
     } // body
 } // view
 //
-//struct BasketItemsSheet_Previews: PreviewProvider {
-//    static var previews: some View {
-//        BasketItemsSheet(itemVM: ItemViewModel(),
-//                         basketItems: .constant(
-//                            [
-//                                Item(tag: "Album", tagColor: "赤", name: "Album1", detail: "Album1のアイテム紹介テキストです。", photo: "",
-//                                     price: 1800, sales: 88000, inventory: 200, createTime: Date(), updateTime: Date()),
-//                                Item(tag: "Album", tagColor: "赤", name: "Album2", detail: "Album2のアイテム紹介テキストです。", photo: "",
-//                                     price: 2800, sales: 230000, inventory: 420, createTime: Date(), updateTime: Date()),
-//                                Item(tag: "Album", tagColor: "赤", name: "Album3", detail: "Album3のアイテム紹介テキストです。", photo: "", price: 2800, sales: 230000, inventory: 420, createTime: Date(), updateTime: Date())
-//                            ]),
-//                         resultItemAmount: .constant(0),
-//                         resultPrice: .constant(20000),
-//                         actionRowIndex: .constant(0),
-//                         doCommerce: .constant(false),
-//                         halfSheetScroll: .main)
-//    }
-//}
+struct CartItemsSheet_Previews: PreviewProvider {
+    static var previews: some View {
+        CartItemsSheet(itemVM: ItemViewModel(),
+                       cartResults: .constant(CartResults()),
+                       inputStock: .constant(InputStock()),
+                       inputHome: .constant(InputHome()),
+                       halfSheetScroll: .additional)
+    }
+}

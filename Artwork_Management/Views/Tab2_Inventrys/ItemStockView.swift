@@ -182,7 +182,7 @@ struct ItemStockView: View {
                             // ✅カスタムView: アイテムを表示します。(縦スクロール)
                             TagSortCards(itemVM: itemVM,
                                          inputStock: $inputStock,
-                                         commerceResults: $cartResults,
+                                         cartResults: $cartResults,
                                          selectFilterTag: itemVM.tags[inputStock.currentIndex].tagName)
                         } // ScrollView (アイテムロケーション)
 
@@ -309,7 +309,7 @@ struct ItemStockView: View {
                             main: {
                                 CartItemsSheet(
                                     itemVM: itemVM,
-                                    commerceResults: $cartResults,
+                                    cartResults: $cartResults,
                                     inputStock: $inputStock,
                                     inputHome: $inputHome,
                                     halfSheetScroll: .main)
@@ -317,7 +317,7 @@ struct ItemStockView: View {
                             additional: {
                                 CartItemsSheet(
                                     itemVM: itemVM,
-                                    commerceResults: $cartResults,
+                                    cartResults: $cartResults,
                                     inputStock: $inputStock,
                                     inputHome: $inputHome,
                                     halfSheetScroll: .additional)
