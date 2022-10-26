@@ -155,9 +155,6 @@ struct ItemStockView: View {
                                                 isShowItemDetail: $input.isShowItemDetail,
                                                 actionRowIndex: $input.actionRowIndex,
                                                 commerceResults: $commerceResults,
-                                                itemWidth: 165,
-                                                itemHeight: 210,
-                                                itemSpase: 20,
                                                 itemNameTag: "アイテム",
                                                 items: itemVM.items)
                             Divider()
@@ -201,9 +198,6 @@ struct ItemStockView: View {
                                          actionRowIndex: $input.actionRowIndex,
                                          commerceResults: $commerceResults,
                                          isShowItemDetail: $input.isShowItemDetail,
-                                         itemWidth: 165,
-                                         itemHeight: 210,
-                                         itemSpase: 25,
                                          selectTag: itemVM.tags[input.currentIndex].tagName,
                                          items: itemVM.items)
                         } // ScrollView (アイテムロケーション)

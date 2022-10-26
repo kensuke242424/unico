@@ -23,9 +23,6 @@ struct TagSortCards: View {
     @Binding var isShowItemDetail: Bool
 
     // アイテムのディテールを指定します。
-    let itemWidth: CGFloat
-    let itemHeight: CGFloat
-    let itemSpase: CGFloat
     let selectTag: String
     let items: [Item]
     @State var searchItems: [Item] = []
@@ -34,7 +31,7 @@ struct TagSortCards: View {
 
     var body: some View {
 
-        LazyVGrid(columns: columnsV, spacing: itemSpase) {
+        LazyVGrid(columns: columnsV, spacing: 20) {
             ForEach(searchItemNameText == "ALL" || searchItemNameText == "" ?
                           items : searchItems) { item in
 
@@ -43,18 +40,14 @@ struct TagSortCards: View {
                                 isShowItemDetail: $isShowItemDetail,
                                 actionRowIndex: $actionRowIndex,
                                 commerceResults: $commerceResults,
-                                item: item,
-                                itemWidth: itemWidth,
-                                itemHeight: itemHeight)
+                                item: item)
 
                 } else if item.tag == selectTag {
                     ItemCardRow(itemVM: itemVM,
                                 isShowItemDetail: $isShowItemDetail,
                                 actionRowIndex: $actionRowIndex,
                                 commerceResults: $commerceResults,
-                                item: item,
-                                itemWidth: itemWidth,
-                                itemHeight: itemHeight)
+                                item: item)
                 }
             } // ForEach
         } // LazyVGrid
@@ -79,25 +72,20 @@ struct UpdateTimeSortCards: View {
 
     // アイテムのディテールを指定します。
     let columnsH: [GridItem] = Array(repeating: .init(.flexible()), count: 1)
-    let itemWidth: CGFloat
-    let itemHeight: CGFloat
-    let itemSpase: CGFloat
     let itemNameTag: String
     let items: [Item]
 
     var body: some View {
 
         ScrollView(.horizontal) {
-            LazyHGrid(rows: columnsH, spacing: itemSpase) {
+            LazyHGrid(rows: columnsH, spacing: 20) {
                 ForEach(items) { item in
 
                     ItemCardRow(itemVM: itemVM,
                                 isShowItemDetail: $isShowItemDetail,
                                 actionRowIndex: $actionRowIndex,
                                 commerceResults: $commerceResults,
-                                item: item,
-                                itemWidth: itemWidth,
-                                itemHeight: itemHeight)
+                                item: item)
 
                 } // ForEach
             } // LazyHGrid

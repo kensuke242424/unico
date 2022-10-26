@@ -17,8 +17,8 @@ struct ItemCardRow: View {
     @Binding var commerceResults: CommerceResults
 
     let item: Item
-    let itemWidth: CGFloat
-    let itemHeight: CGFloat
+    let itemWidth: CGFloat = 165
+    let itemHeight: CGFloat = 210
 
     @State private var cardCount: Int =  0
     @State private var soldOpacity: CGFloat = 0.0
