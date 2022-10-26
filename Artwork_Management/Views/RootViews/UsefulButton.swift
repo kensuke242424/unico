@@ -12,11 +12,7 @@ struct UsefulButton: View {
 
     @StateObject var buttonVM: ButtonViewModel = ButtonViewModel()
 
-    @Binding var tabIndex: Int
-    @Binding var isPresentedNewItem: Bool
-    @Binding var isShowSearchField: Bool
-    @Binding var basketState: ResizableSheetState
-    @Binding var commerceState: ResizableSheetState
+    @Binding var inputHome: InputHome
 
     @State private var offsetY: CGFloat = 0.0
     @State private var change: Bool = false
@@ -36,11 +32,11 @@ struct UsefulButton: View {
                 print("stock画面ボタンアクション実行")
                 // NOTE: フォーカスを用いた入力フィールド開閉の都合上、ボタンによるfalseはしたくないため、
                 //       toggle()は使用していません。
-                isShowSearchField.toggle()
+                inputHome.isShowSearchField.toggle()
 
             case .manege:
                 print("manege画面ボタンアクション実行")
-                self.isPresentedNewItem.toggle()
+                inputHome.isPresentedEditItem.toggle()
 
             case .account:
                 print("account画面ボタンアクション実行")
@@ -56,17 +52,17 @@ struct UsefulButton: View {
                 y: UIScreen.main.bounds.height / 3 - 10)
         .offset(y: offsetY)
 
-        .onChange(of: basketState) { _ in
+        .onChange(of: inputHome.cartState) { _ in
             withAnimation(.easeOut(duration: 0.3)) {
-                switch basketState {
+                switch inputHome.cartState {
                 case .hidden: offsetY = 0.0
                 case .medium: offsetY = -60.0
                 case .large: offsetY = -60.0
                 }
             }
-        } // .onChange(basketState)
+        } // .onChange(cartState)
 
-        .onChange(of: tabIndex) { newIndex in
+        .onChange(of: inputHome.tabIndex) { newIndex in
             self.buttonStyle = buttonVM.buttonStyleChenged(tabIndex: newIndex)
             self.buttonIcon = buttonVM.iconChenge(style: buttonStyle, change: change)
         } // onChange(tabIndex)
@@ -154,12 +150,7 @@ struct UsefulButton_Previews: PreviewProvider {
                    windowScene.flatMap(ResizableSheetCenter.resolve(for:))
                }
 
-        return UsefulButton(tabIndex: .constant(2),
-                            isPresentedNewItem: .constant(false),
-                            isShowSearchField: .constant(false),
-                            basketState: .constant(.medium),
-                            commerceState: .constant(.medium)
-        )
+        return UsefulButton(inputHome: .constant(InputHome()))
         .environment(\.resizableSheetCenter, resizableSheetCenter)
     }
 }

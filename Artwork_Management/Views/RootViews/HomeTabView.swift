@@ -8,51 +8,45 @@
 import SwiftUI
 import ResizableSheet
 
+struct InputHome {
+    var tabIndex = 0
+    var itemsInfomationOpacity: CGFloat = 0.0
+    var basketInfomationOpacity: CGFloat = 0.0
+    var isShowItemDetail: Bool = false
+    var isPresentedEditItem: Bool = false
+    var isShowSearchField: Bool = false
+    var doCommerce: Bool = false
+    var cartState: ResizableSheetState = .hidden
+    var commerceState: ResizableSheetState = .hidden
+}
+
 struct HomeTabView: View {
 
     @StateObject var rootItemVM = ItemViewModel()
 
-    struct InputHomeTab {
-        var tabIndex = 0
-        var itemsInfomationOpacity: CGFloat = 0.0
-        var basketInfomationOpacity: CGFloat = 0.0
-        var isShowItemDetail: Bool = false
-        var isPresentedEditItem: Bool = false
-        var isShowSearchField: Bool = false
-        var doCommerce: Bool = false
-        var basketState: ResizableSheetState = .hidden
-        var commerceState: ResizableSheetState = .hidden
-    }
-    @State private var input: InputHomeTab = InputHomeTab()
+    @State private var inputHome: InputHome = InputHome()
 
     var body: some View {
 
         ZStack {
 
-            TabView(selection: $input.tabIndex) {
+            TabView(selection: $inputHome.tabIndex) {
 
-                LibraryView(itemVM: rootItemVM, isShowItemDetail: $input.isShowItemDetail)
+                LibraryView(itemVM: rootItemVM, isShowItemDetail: $inputHome.isShowItemDetail)
                     .tabItem {
                         Image(systemName: "house")
                         Text("Home")
                     }
                     .tag(0)
 
-                ItemStockView(itemVM: rootItemVM,
-                              itemsInfomationOpacity: $input.itemsInfomationOpacity,
-                              basketInfomationOpacity: $input.basketInfomationOpacity,
-                              isShowSearchField: $input.isShowSearchField,
-                              isPresentedEditItem: $input.isPresentedEditItem,
-                              doCommerce: $input.doCommerce,
-                              basketState: $input.basketState,
-                              commerceState: $input.commerceState)
+                StockView(itemVM: rootItemVM, inputHome: $inputHome)
                     .tabItem {
                         Image(systemName: "shippingbox.fill")
                         Text("inventory")
                     }
                     .tag(1)
 
-                ManageView(itemVM: rootItemVM, isPresentedEditItem: $input.isPresentedEditItem)
+                ManageView(itemVM: rootItemVM, isPresentedEditItem: $inputHome.isPresentedEditItem)
                     .tabItem {
                         Image(systemName: "chart.xyaxis.line")
                         Text("Manage")
@@ -78,35 +72,31 @@ struct HomeTabView: View {
                             .foregroundColor(.black)
                             .fontWeight(.bold)
                     }
-                    .opacity(input.itemsInfomationOpacity)
+                    .opacity(inputHome.itemsInfomationOpacity)
                 RoundedRectangle(cornerRadius: 10)
                     .foregroundColor(.white)
                     .frame(width: 300, height: 30)
                     .overlay {
-                        Text(input.doCommerce ? "カート内の処理が確定しました。" : "カート内がリセットされました。")
+                        Text(inputHome.doCommerce ? "カート内の処理が確定しました。" : "カート内がリセットされました。")
                             .foregroundColor(.black)
                             .fontWeight(.bold)
                     }
-                    .opacity(input.basketInfomationOpacity)
+                    .opacity(inputHome.basketInfomationOpacity)
                 Spacer()
             }
             .offset(y: 80)
-            .animation(.easeIn(duration: 0.2), value: input.itemsInfomationOpacity)
-            .animation(.easeIn(duration: 0.2), value: input.basketInfomationOpacity)
+            .animation(.easeIn(duration: 0.2), value: inputHome.itemsInfomationOpacity)
+            .animation(.easeIn(duration: 0.2), value: inputHome.basketInfomationOpacity)
 
             // Todo: 各タブごとにオプションが変わるボタン
-            UsefulButton(tabIndex: $input.tabIndex,
-                         isPresentedNewItem: $input.isPresentedEditItem,
-                         isShowSearchField: $input.isShowSearchField,
-                         basketState: $input.basketState,
-                         commerceState: $input.commerceState)
+            UsefulButton(inputHome: $inputHome)
 
         } // ZStack
         .navigationBarBackButtonHidden()
-        .onChange(of: input.tabIndex) { newTabIndex in
+        .onChange(of: inputHome.tabIndex) { newTabIndex in
 
             // ストック画面でのみ、"ALL"タグを追加
-            if newTabIndex == 1 || input.isPresentedEditItem {
+            if newTabIndex == 1 || inputHome.isPresentedEditItem {
                 rootItemVM.tags.insert(Tag(tagName: "ALL", tagColor: .gray), at: 0)
             } else {
                 rootItemVM.tags.removeAll(where: {$0.tagName == "ALL"})

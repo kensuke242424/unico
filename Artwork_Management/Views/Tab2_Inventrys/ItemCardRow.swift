@@ -9,18 +9,14 @@ import SwiftUI
 
 struct ItemCardRow: View {
 
-    // ダークモードの判定に用いる
     @Environment(\.colorScheme) var colorScheme
     @StateObject var itemVM: ItemViewModel
-    @Binding var isShowItemDetail: Bool
-    @Binding var actionRowIndex: Int
-    @Binding var resultPrice: Int
-    @Binding var resultItemAmount: Int
-    @Binding var resultBasketItems: [Item]
-
+    @Binding var inputStock: InputStock
+    @Binding var cartResults: CartResults
     let item: Item
-    let itemWidth: CGFloat
-    let itemHeight: CGFloat
+
+    let itemWidth: CGFloat = 165
+    let itemHeight: CGFloat = 210
 
     @State private var cardCount: Int =  0
     @State private var soldOpacity: CGFloat = 0.0
@@ -42,11 +38,11 @@ struct ItemCardRow: View {
                             print("アクションIndexの取得に失敗しました")
                             return
                         }
-                            actionRowIndex = newActionIndex
-                            print("actionRowIndex: \(actionRowIndex)")
+                        inputStock.actionRowIndex = newActionIndex
+                        print("actionRowIndex: \(inputStock.actionRowIndex)")
                             // アイテム詳細表示
-                            self.isShowItemDetail.toggle()
-                            print("ItemStockView_アイテム詳細ボタンタップ: \(isShowItemDetail)")
+                        inputStock.isShowItemDetail.toggle()
+                        print("ItemStockView_アイテム詳細ボタンタップ: \(inputStock.isShowItemDetail)")
 
                     } label: {
                         Image(systemName: "info.circle.fill")
@@ -109,16 +105,16 @@ struct ItemCardRow: View {
                                     print("アクションIndexの取得に失敗しました")
                                     return
                                 }
-                                actionRowIndex = newActionIndex
-                                resultItemAmount += 1
+                                inputStock.actionRowIndex = newActionIndex
+                                cartResults.resultItemAmount += 1
 
                                 // カート内に対象アイテムがなければ、カートに要素を新規追加
-                                if resultBasketItems.filter({ $0 == item }) == [] {
-                                    resultBasketItems.append(item)
+                                if cartResults.resultCartItems.filter({ $0 == item }) == [] {
+                                    cartResults.resultCartItems.append(item)
                                 }
 
-                                print("resultPrice: \(resultPrice)円")
-                                print("resultItemAmount: \(resultItemAmount)個")
+                                print("resultPrice: \(cartResults.resultPrice)円")
+                                print("resultItemAmount: \(cartResults.resultItemAmount)個")
 
                             } label: {
                                 Image(systemName: "plus.circle.fill")
@@ -166,30 +162,30 @@ struct ItemCardRow: View {
                 } // .overlay
 
         } // VStack
-        .onChange(of: resultItemAmount) { [before = resultItemAmount] after in
+        .onChange(of: cartResults.resultItemAmount) { [before = cartResults.resultItemAmount] after in
             if before < after {
-                if item == itemVM.items[actionRowIndex] {
+                if item == itemVM.items[inputStock.actionRowIndex] {
                     cardCount += 1
                 }
             }
             if before > after {
-                if item == itemVM.items[actionRowIndex] {
+                if item == itemVM.items[inputStock.actionRowIndex] {
                     cardCount -= 1
                 }
             }
         } // .onChange
 
-        .onChange(of: resultBasketItems) { _ in
-            if resultBasketItems == [] { cardCount = 0 }
+        .onChange(of: cartResults.resultCartItems) { _ in
+            if cartResults.resultCartItems == [] { cardCount = 0 }
         }
 
         .onChange(of: cardCount) { newCardCount in
             if newCardCount == item.inventory {
-                if item == itemVM.items[actionRowIndex] {
+                if item == itemVM.items[inputStock.actionRowIndex] {
                     countUpDisable = true
                 }
             } else {
-                if item == itemVM.items[actionRowIndex] {
+                if item == itemVM.items[inputStock.actionRowIndex] {
                     countUpDisable = false
                 }
             }
@@ -208,24 +204,9 @@ struct ItemCardRow_Previews: PreviewProvider {
     static var previews: some View {
 
         ItemCardRow(itemVM: ItemViewModel(),
-                    isShowItemDetail: .constant(false),
-                    actionRowIndex: .constant(0),
-                    resultPrice: .constant(12000),
-                    resultItemAmount: .constant(3),
-                    resultBasketItems: .constant([]),
-                    item: Item(tag: "Album",
-                               tagColor: "赤",
-                               name: "Album1",
-                               detail: "Album1のアイテム紹介テキストです。",
-                               photo: "",
-                               price: 1800,
-                               sales: 88000,
-                               inventory: 200,
-                               createTime: Date(),
-                               updateTime: Date()),
-                    itemWidth: UIScreen.main.bounds.width * 0.45,
-                    itemHeight: 240
-        )
+                    inputStock: .constant(InputStock()),
+                    cartResults: .constant(CartResults()),
+                    item: TestItem().testItem)
         .previewLayout(.sizeThatFits)
     }
 }

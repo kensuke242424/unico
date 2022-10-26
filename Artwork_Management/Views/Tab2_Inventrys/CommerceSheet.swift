@@ -11,11 +11,8 @@ import ResizableSheet
 // NOTE: 取引対象のアイテムの決済を完了するシートです。
 struct CommerceSheet: View {
 
-    @Binding var commerceState: ResizableSheetState
-    @Binding var basketState: ResizableSheetState
-    @Binding var resultPrice: Int
-    @Binding var resultItemAmount: Int
-    @Binding var doCommerce: Bool
+    @Binding var inputHome: InputHome
+    @Binding var commerceResults: CartResults
 
     @State private var commerceButtonDisable: Bool = false
     @State private var commerceButtonOpacity: CGFloat =  1.0
@@ -25,13 +22,13 @@ struct CommerceSheet: View {
             HStack {
 
                 Button {
-                    switch basketState {
+                    switch inputHome.cartState {
                     case .medium:
-                        basketState = .large
+                        inputHome.cartState = .large
                     case .large:
-                        basketState = .medium
+                        inputHome.cartState = .medium
                     case .hidden:
-                        basketState = .medium
+                        inputHome.cartState = .medium
                     }
 
                 } label: {
@@ -42,8 +39,8 @@ struct CommerceSheet: View {
                         .foregroundColor(.black)
                         .padding(.horizontal)
                         .overlay(alignment: .topTrailing) {
-                            if resultItemAmount <= 50 {
-                                Image(systemName: "\(resultItemAmount).circle.fill")
+                            if commerceResults.resultItemAmount <= 50 {
+                                Image(systemName: "\(commerceResults.resultItemAmount).circle.fill")
                                     .foregroundColor(.customLightBlue2)
                                     .offset(y: -8)
                             } else {
@@ -63,7 +60,7 @@ struct CommerceSheet: View {
                     Text("¥")
                         .foregroundColor(.black)
                         .font(.title2.bold())
-                    Text(String(resultPrice))
+                    Text(String(commerceResults.resultPrice))
                         .foregroundColor(.black)
                         .font(.title.bold())
                     Spacer()
@@ -74,9 +71,9 @@ struct CommerceSheet: View {
                 Button(
                     action: {
                         print("取引確定ボタンタップ")
-                        doCommerce = true
-                        basketState = .hidden
-                        commerceState = .hidden
+                        inputHome.doCommerce = true
+                        inputHome.cartState = .hidden
+                        inputHome.commerceState = .hidden
                     },
                     label: {
                         RoundedRectangle(cornerRadius: 20)
@@ -97,13 +94,13 @@ struct CommerceSheet: View {
             } // HStack
             .frame(height: 80)
             .padding(.horizontal, 20)
-            .animation(nil, value: resultPrice)
-            .animation(nil, value: resultItemAmount)
+            .animation(nil, value: commerceResults.resultPrice)
+            .animation(nil, value: commerceResults.resultItemAmount)
         } // VStack 決済シートレイアウト
 
-        .onChange(of: doCommerce) { _ in
-            commerceButtonDisable = doCommerce ? true : false
-            commerceButtonOpacity = doCommerce ? 0.3 : 1.0
+        .onChange(of: inputHome.doCommerce) { _ in
+            commerceButtonDisable = inputHome.doCommerce ? true : false
+            commerceButtonOpacity = inputHome.doCommerce ? 0.3 : 1.0
         }
 
         .onAppear {
