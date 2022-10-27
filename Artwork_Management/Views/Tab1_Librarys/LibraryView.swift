@@ -48,27 +48,29 @@ struct LibraryView: View {
                 } // HStack
                 .padding(.top, 20)
                 .padding(.leading, 20)
+                .shadow(radius: 4, x: 3, y: 3)
 
                 // アカウント情報
                 HStack {
                     Spacer()
 
                     ZStack {
-                        VStack(alignment: .leading, spacing: 80) {
+                        VStack(alignment: .leading, spacing: 60) {
 
                             Group {
-                                Text("Useday.   ")
+                                Text("Useday.  ")
 
-                                Text("Items.   ")
-                                Text("Member.   ")
+                                Text("Items.  ")
+                                Text("Member.  ")
                             }
                             .font(.footnote)
                             .foregroundColor(.white)
                             .tracking(5)
-                            .opacity(0.6)
+                            .opacity(0.4)
+
                         } // VStack
 
-                        VStack(alignment: .trailing, spacing: 80) {
+                        VStack(alignment: .trailing, spacing: 60) {
                             Group {
                                 Text("55 day")
                                 Text("\(itemVM.items.count) item")
@@ -80,13 +82,13 @@ struct LibraryView: View {
                                 }
                             }
                         }
-                        .offset(x: 20, y: 40)
+                        .offset(x: 20, y: 35)
                         .tracking(5)
                         .foregroundColor(.white)
-                        .opacity(0.7)
+                        .opacity(0.5)
                     } // ZStack
                 } // HStack
-                .padding([.horizontal, .top])
+                .padding(.horizontal)
 
                 Spacer()
 
