@@ -98,10 +98,11 @@ struct HomeTabView: View {
             if newTabIndex == 0 || newTabIndex == 1 {
                 if rootItemVM.tags.contains(where: {$0.tagName == "ALL"}) { return }
                 rootItemVM.tags.insert(Tag(tagName: "ALL", tagColor: .gray), at: 0)
+                print("ALLタグを追加")
             }
             if newTabIndex == 2 || newTabIndex == 3 || inputHome.isPresentedEditItem {
                 rootItemVM.tags.removeAll(where: {$0.tagName == "ALL"})
-                print("ALLを削除")
+                print("ALLタグを削除")
             }
         } // .onChange
 
