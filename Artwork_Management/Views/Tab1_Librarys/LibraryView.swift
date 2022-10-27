@@ -109,6 +109,7 @@ struct LibraryView: View {
             CustomArcShape()
                 .ignoresSafeArea()
                 .foregroundColor(.white)
+                .blur(radius: 2)
                 .opacity(0.08)
 
             Menu {
