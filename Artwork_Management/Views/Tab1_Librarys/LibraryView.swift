@@ -153,9 +153,9 @@ struct LibraryView: View {
                                         .overlay(alignment: .bottomTrailing) {
                                             if inputLibrary.isShowCardInfomation {
                                                 Text(inputLibrary.tagFilterItemCards[index].name)
-                                                    .font(.callout.bold())
-                                                    .foregroundColor(.white)
-                                                    .opacity(0.7)
+                                                    .font(.footnote).foregroundColor(.white).opacity(0.7)
+                                                    .tracking(2)
+                                                    .lineLimit(1)
                                             }
                                         }
                                         .overlay(alignment: .topTrailing) {
@@ -256,6 +256,7 @@ struct LibraryView: View {
             inputLibrary.currentIndex =  0
             print("タグフィルターが更新されました")
         } // .onChange
+
         .onChange(of: inputLibrary.currentIndex) { new in
             print(new)
         }
