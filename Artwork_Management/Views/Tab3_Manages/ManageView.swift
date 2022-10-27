@@ -80,8 +80,9 @@ struct ManageView: View {
                     ShowsItemDetail(itemVM: itemVM,
                                     item: itemVM.items[input.listIndex],
                                     itemIndex: input.listIndex,
-                                    isShowitemDetail: $input.isShowItemDetail
-                    )
+                                    isShowItemDetail: $input.isShowItemDetail,
+                                    isPresentedEditItem: $isPresentedEditItem)
+
                 } // if isShowItemDetail
 
             } // ZStack

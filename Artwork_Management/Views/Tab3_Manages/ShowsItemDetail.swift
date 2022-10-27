@@ -15,14 +15,14 @@ struct ShowsItemDetail: View {
     //       Itemはnilを許容し、nilだった場合「データが取得できませんでした」と表示
     let item: Item?
     let itemIndex: Int
-    @Binding var isShowitemDetail: Bool
+    @Binding var isShowItemDetail: Bool
+    @Binding var isPresentedEditItem: Bool
 
     struct InputItemDetail {
         var opacity: Double = 0
         var isShowAlert: Bool = false
         var isShowResetBasketAlert: Bool = false
         var disabledButton: Bool = true
-        var isPlesentedUpdateItem: Bool = false
         var isPlesentedErrorInfomation: Bool = false
     }
 
@@ -37,8 +37,8 @@ struct ShowsItemDetail: View {
                 .opacity(0.3)
             // NOTE: アイテム詳細の外側をタップすると、詳細画面を閉じます
                 .onTapGesture {
-                    isShowitemDetail = false
-                    print("onTapGesture_isShowitemDetail: \(isShowitemDetail)")
+                    isShowItemDetail = false
+                    print("onTapGesture_isShowitemDetail: \(isShowItemDetail)")
                 } // onTapGesture
 
             if let showItem = item {
@@ -88,8 +88,7 @@ struct ShowsItemDetail: View {
                             }
 
                             Button {
-                                input.isPlesentedUpdateItem.toggle()
-                                print("isShowItemEdit: \(input.isPlesentedUpdateItem)")
+                                isPresentedEditItem.toggle()
                             } label: {
                                 Text("はい")
                             }
@@ -145,11 +144,11 @@ struct ShowsItemDetail: View {
         } // ZStack(全体)
         .opacity(input.opacity)
 
-        .sheet(isPresented: $input.isPlesentedUpdateItem) {
+        .sheet(isPresented: $isPresentedEditItem) {
 
             // NOTE: itemがnilでない場合のみボタンを有効にしているため、ボタンアクション時には値を強制アンラップします。
             EditItemView(itemVM: itemVM,
-                         isPresentedEditItem: $input.isPlesentedUpdateItem,
+                         isPresentedEditItem: $isPresentedEditItem,
                          itemIndex: itemIndex,
                          passItemData: item!,
                          editItemStatus: .update)
@@ -184,7 +183,8 @@ struct SalesItemDetailView_Previews: PreviewProvider {
                                    createTime: Date(),
                                    updateTime: Date()),
                         itemIndex: 0,
-                        isShowitemDetail: .constant(false)
+                        isShowItemDetail: .constant(false),
+                        isPresentedEditItem: .constant(false)
         )
     }
 }

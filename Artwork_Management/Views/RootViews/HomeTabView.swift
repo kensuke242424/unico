@@ -92,9 +92,8 @@ struct HomeTabView: View {
 
         } // ZStack
         .navigationBarBackButtonHidden()
-        .onChange(of: inputHome.tabIndex) { newTabIndex in
 
-            // ライブラリ画面、ストック画面でのみ、"ALL"タグを追加
+        .onChange(of: inputHome.tabIndex) { newTabIndex in
             if newTabIndex == 0 || newTabIndex == 1 {
                 if rootItemVM.tags.contains(where: {$0.tagName == "ALL"}) { return }
                 rootItemVM.tags.insert(Tag(tagName: "ALL", tagColor: .gray), at: 0)
@@ -106,10 +105,22 @@ struct HomeTabView: View {
             }
         } // .onChange
 
+        .onChange(of: inputHome.isPresentedEditItem) { present in
+            if present {
+                rootItemVM.tags.removeAll(where: { $0.tagName == "ALL" })
+                print("ALLタグを削除")
+            } else {
+                if rootItemVM.tags.contains(where: {$0.tagName == "ALL"}) { return }
+                rootItemVM.tags.insert(Tag(tagName: "ALL", tagColor: .gray), at: 0)
+                print("ALLタグを追加")
+            }
+        }
+
         .onAppear {
             if rootItemVM.tags.contains(where: {$0.tagName == "ALL"}) { return }
             rootItemVM.tags.insert(Tag(tagName: "ALL", tagColor: .gray), at: 0)
         }
+
     } // body
 } // View
 

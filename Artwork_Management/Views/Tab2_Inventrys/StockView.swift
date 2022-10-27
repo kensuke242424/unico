@@ -192,7 +192,8 @@ struct StockView: View {
                         ShowsItemDetail(itemVM: itemVM,
                                         item: itemVM.items[inputStock.actionRowIndex],
                                         itemIndex: inputStock.actionRowIndex,
-                                        isShowitemDetail: $inputStock.isShowItemDetail)
+                                        isShowItemDetail: $inputStock.isShowItemDetail,
+                                        isPresentedEditItem: $inputHome.isPresentedEditItem)
                     } // if isShowItemDetail
                 } // ZStack
 
