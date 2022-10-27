@@ -23,7 +23,6 @@ struct InputHome {
 struct HomeTabView: View {
 
     @StateObject var rootItemVM = ItemViewModel()
-
     @State private var inputHome: InputHome = InputHome()
 
     var body: some View {
@@ -95,12 +94,20 @@ struct HomeTabView: View {
         .navigationBarBackButtonHidden()
         .onChange(of: inputHome.tabIndex) { newTabIndex in
 
-            // ストック画面でのみ、"ALL"タグを追加
-            if newTabIndex == 1 || inputHome.isPresentedEditItem {
+            // ライブラリ画面、ストック画面でのみ、"ALL"タグを追加
+            if newTabIndex == 0 || newTabIndex == 1 {
+                if rootItemVM.tags.contains(where: {$0.tagName == "ALL"}) { return }
                 rootItemVM.tags.insert(Tag(tagName: "ALL", tagColor: .gray), at: 0)
-            } else {
-                rootItemVM.tags.removeAll(where: {$0.tagName == "ALL"})
             }
+            if newTabIndex == 2 || newTabIndex == 3 || inputHome.isPresentedEditItem {
+                rootItemVM.tags.removeAll(where: {$0.tagName == "ALL"})
+                print("ALLを削除")
+            }
+        } // .onChange
+
+        .onAppear {
+            if rootItemVM.tags.contains(where: {$0.tagName == "ALL"}) { return }
+            rootItemVM.tags.insert(Tag(tagName: "ALL", tagColor: .gray), at: 0)
         }
     } // body
 } // View

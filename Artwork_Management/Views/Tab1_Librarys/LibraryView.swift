@@ -10,6 +10,8 @@ import SwiftUI
 struct InputLibrary {
     var currentIndex: Int = 0
     var cardOpacity: CGFloat =  1.0
+    var selectFilterTag: String = "ALL"
+    var tagFilterItemCards: [Item] = []
 }
 
 struct LibraryView: View {
@@ -64,14 +66,13 @@ struct LibraryView: View {
 
                             Group {
                                 Text("Useday.  ")
-
                                 Text("Items.  ")
                                 Text("Member.  ")
                             }
                             .font(.footnote)
                             .foregroundColor(.white)
                             .tracking(5)
-                            .opacity(0.4)
+                            .opacity(0.3)
 
                         } // VStack
 
@@ -110,6 +111,25 @@ struct LibraryView: View {
                 .foregroundColor(.white)
                 .opacity(0.08)
 
+            Menu {
+                ForEach(itemVM.tags) { tag in
+                    Button {
+                        inputLibrary.selectFilterTag = tag.tagName
+                    } label: {
+                        if inputLibrary.selectFilterTag == tag.tagName {
+                            Text("\(tag.tagName)　　 ✔︎")
+                        } else {
+                            Text(tag.tagName)
+                        }
+                    }
+                } // ForEach
+            } label: {
+                Image(systemName: "list.bullet")
+                    .foregroundColor(.white)
+            } // Menu
+            .offset(x: -UIScreen.main.bounds.width / 2.5,
+                    y: UIScreen.main.bounds.height / 10)
+
                     GeometryReader { bodyView in
 
                         let libraryItemPadding: CGFloat = 200
@@ -118,17 +138,27 @@ struct LibraryView: View {
 
                             ForEach(itemVM.items.indices, id: \.self) {index in
 
-                                RoundedRectangle(cornerRadius: 5)
-                                    .foregroundColor(.gray)
-                                    .frame(width: 180, height: 180)
-                                    .opacity(inputLibrary.cardOpacity)
-                                    .shadow(radius: 4, x: 5, y: 5)
-                                    .frame(width: bodyView.size.width * 0.7, height: 40)
-                                    .padding(.leading, index == 0 ? bodyView.size.width * 0 : 0)
-                                    .overlay {
+                                if inputLibrary.selectFilterTag == "ALL" {
+                                    RoundedRectangle(cornerRadius: 5)
+                                        .foregroundColor(.gray)
+                                        .frame(width: 180, height: 180)
+                                        .opacity(inputLibrary.cardOpacity)
+                                        .shadow(radius: 4, x: 5, y: 5)
+                                        .frame(width: bodyView.size.width * 0.7, height: 40)
+                                        .overlay {
 
-                                    }
+                                        }
+                                } else if itemVM.items[index].tag == inputLibrary.selectFilterTag {
+                                    RoundedRectangle(cornerRadius: 5)
+                                        .foregroundColor(.gray)
+                                        .frame(width: 180, height: 180)
+                                        .opacity(inputLibrary.cardOpacity)
+                                        .shadow(radius: 4, x: 5, y: 5)
+                                        .frame(width: bodyView.size.width * 0.7, height: 40)
+                                        .overlay {
 
+                                        }
+                                }
                             } // ForEach
                         } // LazyHStack
                         .padding()
@@ -184,6 +214,18 @@ struct LibraryView: View {
                             y: UIScreen.main.bounds.height / 4)
 
         } // ZStack
+        .onChange(of: inputLibrary.selectFilterTag) { newValue in
+            inputLibrary.tagFilterItemCards = itemVM.items.filter({ $0.tag == newValue })
+        } // .onChange
+
+        .onAppear {
+            if inputLibrary.selectFilterTag == "ALL" {
+                inputLibrary.tagFilterItemCards = itemVM.items
+            } else {
+                inputLibrary.tagFilterItemCards = itemVM.items.filter({ $0.tag == inputLibrary.selectFilterTag })
+            }
+        } // .onAppear
+
     } // body
 } // View
 
