@@ -73,7 +73,7 @@ struct StockView: View {
 
                             .gesture(
                                 DragGesture()
-                                    .updating($dragOffset, body: { (value, state, _) in
+                                    .updating(self.$dragOffset, body: { (value, state, _) in
 
                                         // 先頭・末尾ではスクロールする必要がないので、画面幅の1/5までドラッグで制御する
                                         if inputStock.currentIndex == 0, value.translation.width > 0 {

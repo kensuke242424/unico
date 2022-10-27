@@ -9,6 +9,7 @@ import SwiftUI
 
 struct InputLibrary {
     var currentIndex: Int = 0
+    var cardOpacity: CGFloat =  1.0
 }
 
 struct LibraryView: View {
@@ -28,10 +29,7 @@ struct LibraryView: View {
                     .scaledToFill()
                     .ignoresSafeArea()
                     .frame(height: UIScreen.main.bounds.height * 0.3)
-                    .shadow(radius: 5, x: 0, y: 1)
-                    .shadow(radius: 5, x: 0, y: 1)
-                    .shadow(radius: 5, x: 0, y: 1)
-                    .shadow(radius: 5, x: 0, y: 1)
+                    .shadow(radius: 5, x: 0, y: 10)
 
                 // 時刻
                 HStack {
@@ -114,28 +112,27 @@ struct LibraryView: View {
 
                     GeometryReader { bodyView in
 
-                        let libraryItemPadding: CGFloat = 150
+                        let libraryItemPadding: CGFloat = 200
 
                         LazyHStack(spacing: libraryItemPadding) {
 
                             ForEach(itemVM.items.indices, id: \.self) {index in
 
-                                Text(itemVM.items[index].name)
-                                    .foregroundColor(.white)
-                                    .font(.system(size: 20, weight: .bold))
+                                RoundedRectangle(cornerRadius: 5)
+                                    .foregroundColor(.gray)
+                                    .frame(width: 180, height: 180)
+                                    .opacity(inputLibrary.cardOpacity)
+                                    .shadow(radius: 4, x: 5, y: 5)
                                     .frame(width: bodyView.size.width * 0.7, height: 40)
                                     .padding(.leading, index == 0 ? bodyView.size.width * 0 : 0)
                                     .overlay {
-                                        RoundedRectangle(cornerRadius: 5)
-                                            .foregroundColor(.gray)
-                                            .opacity(0.5)
-                                            .frame(width: 200, height: 200)
+
                                     }
 
                             } // ForEach
                         } // LazyHStack
                         .padding()
-                        .offset(x: self.dragOffset)
+                        .offset(x: dragOffset, y: dragOffset)
                         .offset(x: -CGFloat(inputLibrary.currentIndex) * (bodyView.size.width * 0.7 + libraryItemPadding))
 
                         .gesture(
@@ -150,9 +147,17 @@ struct LibraryView: View {
                                     } else {
                                         state = value.translation.width
                                     }
+
+                                    if value.translation.width > 0 {
+                                        inputLibrary.cardOpacity = 1.0 - value.translation.width / 100
+                                    } else if value.translation.width < 0 {
+                                        inputLibrary.cardOpacity = 1.0 + value.translation.width / 100
+                                    }
                                 })
                                 .onEnded({ value in
+
                                     var newIndex = inputLibrary.currentIndex
+                                    inputLibrary.cardOpacity = 1.0
 
                                     // ドラッグ幅からページングを判定
                                     // 今回は画面幅x0.3としているが、操作感に応じてカスタマイズする必要がある
@@ -169,7 +174,7 @@ struct LibraryView: View {
                                 }) // .onEnded
                         ) // .gesture
                         // 減衰ばねモデル、それぞれの値は操作感に応じて変更する
-                        .animation(.interpolatingSpring(mass: 0.4,
+                        .animation(.interpolatingSpring(mass: 0.8,
                                                         stiffness: 100,
                                                         damping: 80,
                                                         initialVelocity: 0.1),
