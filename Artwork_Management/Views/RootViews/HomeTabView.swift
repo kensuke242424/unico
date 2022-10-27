@@ -31,7 +31,7 @@ struct HomeTabView: View {
 
             TabView(selection: $inputHome.tabIndex) {
 
-                LibraryView(itemVM: rootItemVM, isShowItemDetail: $inputHome.isShowItemDetail)
+                LibraryView(itemVM: rootItemVM, inputHome: $inputHome)
                     .tabItem {
                         Image(systemName: "house")
                         Text("Home")

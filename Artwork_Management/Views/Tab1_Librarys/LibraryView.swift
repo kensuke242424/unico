@@ -8,16 +8,18 @@
 import SwiftUI
 
 struct InputLibrary {
-    var currentIndex: Int = 0
-    var cardOpacity: CGFloat =  1.0
     var selectFilterTag: String = "ALL"
+    var currentIndex: Int = 0
+    var libraryCardIndex: Int = 0
+    var cardOpacity: CGFloat =  1.0
     var tagFilterItemCards: [Item] = []
+    var isShowCardInfomation: Bool = false
 }
 
 struct LibraryView: View {
 
     @StateObject var itemVM: ItemViewModel
-    @Binding var isShowItemDetail: Bool
+    @Binding var inputHome: InputHome
 
     @GestureState private var dragOffset: CGFloat = 0
     @State private var inputLibrary: InputLibrary = InputLibrary()
@@ -137,29 +139,49 @@ struct LibraryView: View {
 
                         LazyHStack(spacing: libraryItemPadding) {
 
-                            ForEach(itemVM.items.indices, id: \.self) {index in
+                            ForEach(inputLibrary.tagFilterItemCards.indices, id: \.self) {index in
 
-                                if inputLibrary.selectFilterTag == "ALL" {
                                     RoundedRectangle(cornerRadius: 5)
                                         .foregroundColor(.gray)
                                         .frame(width: 180, height: 180)
+                                        .overlay {
+                                            if inputLibrary.isShowCardInfomation {
+                                                LinearGradient(gradient: Gradient(colors: [.clear, .black.opacity(0.4)]),
+                                                               startPoint: .top, endPoint: .bottom)
+                                            }
+                                        }
+                                        .overlay(alignment: .bottomTrailing) {
+                                            if inputLibrary.isShowCardInfomation {
+                                                Text(inputLibrary.tagFilterItemCards[index].name)
+                                                    .font(.callout.bold())
+                                                    .foregroundColor(.white)
+                                                    .opacity(0.7)
+                                            }
+                                        }
+                                        .overlay(alignment: .topTrailing) {
+                                            if inputLibrary.isShowCardInfomation {
+                                                Button {
+                                                    if let cardRowIndex =
+                                                        itemVM.items.firstIndex(of: inputLibrary.tagFilterItemCards[index]) {
+                                                        inputLibrary.libraryCardIndex = cardRowIndex
+                                                        inputHome.isShowItemDetail.toggle()
+                                                    } else {
+                                                        print("LibraryCardIndexの取得エラー")
+                                                    }
+                                                } label: {
+                                                    Image(systemName: "info.circle.fill")
+                                                        .resizable().scaledToFit().frame(width: 20)
+                                                        .foregroundColor(.white)
+                                                } // Button
+                                            } // if
+                                        } // overlay
                                         .opacity(inputLibrary.cardOpacity)
                                         .shadow(radius: 4, x: 5, y: 5)
                                         .frame(width: bodyView.size.width * 0.7, height: 40)
-                                        .overlay {
-
-                                        }
-                                } else if itemVM.items[index].tag == inputLibrary.selectFilterTag {
-                                    RoundedRectangle(cornerRadius: 5)
-                                        .foregroundColor(.gray)
-                                        .frame(width: 180, height: 180)
-                                        .opacity(inputLibrary.cardOpacity)
-                                        .shadow(radius: 4, x: 5, y: 5)
-                                        .frame(width: bodyView.size.width * 0.7, height: 40)
-                                        .overlay {
-
-                                        }
-                                }
+                                        .animation(.easeIn(duration: 0.2), value: inputLibrary.isShowCardInfomation)
+                                        .onTapGesture(perform: {
+                                            inputLibrary.isShowCardInfomation.toggle()
+                                        })
                             } // ForEach
                         } // LazyHStack
                         .padding()
@@ -170,10 +192,12 @@ struct LibraryView: View {
                             DragGesture()
                                 .updating(self.$dragOffset, body: { (value, state, _) in
 
+                                    print(value.translation.width)
+
                                     // 先頭・末尾ではスクロールする必要がないので、画面幅の1/5までドラッグで制御する
                                     if inputLibrary.currentIndex == 0, value.translation.width > 0 {
                                         state = value.translation.width / 5
-                                    } else if inputLibrary.currentIndex == (itemVM.items.count - 1), value.translation.width < 0 {
+                                    } else if inputLibrary.currentIndex == (inputLibrary.tagFilterItemCards.count - 1), value.translation.width < 0 {
                                         state = value.translation.width / 5
                                     } else {
                                         state = value.translation.width
@@ -191,14 +215,13 @@ struct LibraryView: View {
                                     inputLibrary.cardOpacity = 1.0
 
                                     // ドラッグ幅からページングを判定
-                                    // 今回は画面幅x0.3としているが、操作感に応じてカスタマイズする必要がある
-                                    if abs(value.translation.width) > bodyView.size.width * 0.1 {
+                                    if abs(value.translation.width) > bodyView.size.width * 0.2 {
                                         newIndex = value.translation.width > 0 ? inputLibrary.currentIndex - 1 : inputLibrary.currentIndex + 1
                                     }
                                     if newIndex < 0 {
                                         newIndex = 0
-                                    } else if newIndex > (itemVM.items.count - 1) {
-                                        newIndex = itemVM.items.count - 1
+                                    } else if newIndex > (inputLibrary.tagFilterItemCards.count - 1) {
+                                        newIndex = inputLibrary.tagFilterItemCards.count - 1
                                     }
                                     inputLibrary.currentIndex = newIndex
 
@@ -214,10 +237,28 @@ struct LibraryView: View {
                     .offset(x: -UIScreen.main.bounds.width / 10,
                             y: UIScreen.main.bounds.height / 4)
 
+            if inputHome.isShowItemDetail {
+                ShowsItemDetail(itemVM: itemVM,
+                                item: itemVM.items[inputLibrary.libraryCardIndex],
+                                itemIndex: inputLibrary.libraryCardIndex,
+                                isShowItemDetail: $inputHome.isShowItemDetail,
+                                isPresentedEditItem: $inputHome.isPresentedEditItem)
+            } // if isShowItemDetail
+
         } // ZStack
         .onChange(of: inputLibrary.selectFilterTag) { newValue in
+            if newValue == "ALL" {
+                inputLibrary.tagFilterItemCards = itemVM.items
+                inputLibrary.currentIndex =  0
+                return
+            }
             inputLibrary.tagFilterItemCards = itemVM.items.filter({ $0.tag == newValue })
+            inputLibrary.currentIndex =  0
+            print("タグフィルターが更新されました")
         } // .onChange
+        .onChange(of: inputLibrary.currentIndex) { new in
+            print(new)
+        }
 
         .onAppear {
             if inputLibrary.selectFilterTag == "ALL" {
@@ -233,6 +274,6 @@ struct LibraryView: View {
 struct LibraryView_Previews: PreviewProvider {
     static var previews: some View {
         LibraryView(itemVM: ItemViewModel(),
-                    isShowItemDetail: .constant(false))
+                    inputHome: .constant(InputHome()))
     }
 }
