@@ -68,12 +68,12 @@ struct StockView: View {
                                 } // ForEach
                             } // LazyHStack
                             .padding()
-                            .offset(x: self.dragOffset)
+                            .offset(x: dragOffset)
                             .offset(x: -CGFloat(inputStock.currentIndex) * (bodyView.size.width * 0.7 + sideBarTagItemPadding))
 
                             .gesture(
                                 DragGesture()
-                                    .updating(self.$dragOffset, body: { (value, state, _) in
+                                    .updating($dragOffset, body: { (value, state, _) in
 
                                         // 先頭・末尾ではスクロールする必要がないので、画面幅の1/5までドラッグで制御する
                                         if inputStock.currentIndex == 0, value.translation.width > 0 {
