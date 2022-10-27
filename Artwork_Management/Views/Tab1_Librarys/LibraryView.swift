@@ -12,42 +12,95 @@ struct LibraryView: View {
     @StateObject var itemVM: ItemViewModel
     @Binding var isShowItemDetail: Bool
 
-    @State private var itemName: String = ""
-    @State private var isPresentedNewItem: Bool = false
-
     var body: some View {
 
-        NavigationView {
+        ZStack {
+            VStack {
+                Image("homePhotoSample")
+                    .resizable()
+                    .scaledToFill()
+                    .ignoresSafeArea()
+                    .frame(height: UIScreen.main.bounds.height * 0.3)
+                    .shadow(radius: 5, x: 0, y: 1)
+                    .shadow(radius: 5, x: 0, y: 1)
+                    .shadow(radius: 5, x: 0, y: 1)
+                    .shadow(radius: 5, x: 0, y: 1)
 
-            ZStack {
+                // 時刻
+                HStack {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Group {
+                            Text("10:07:25")
+                                .font(.title3.bold())
+                                .frame(height: 40)
+                                .scaledToFit()
+                                .opacity(0.4)
 
-                ScrollView(.vertical) {
-
-                    VStack(spacing: 20) {
-
-                        LibraryListView(itemWidth: 250, itemHeight: 250, itemSpase: 60, itemNameTag: "Album",
-                                      itemColor: .gray, isShowItemDetail: $isShowItemDetail)
-
-                        LibraryListView(itemWidth: 180, itemHeight: 180, itemSpase: 40, itemNameTag: "Single",
-                                      itemColor: .yellow, isShowItemDetail: $isShowItemDetail)
-
-                        LibraryListView(itemWidth: 350, itemHeight: 300, itemSpase: 5, itemNameTag: "Picture",
-                                      itemColor: .red, isShowItemDetail: $isShowItemDetail)
-
-                        LibraryListView(itemWidth: 200, itemHeight: 150, itemSpase: 20, itemNameTag: "Goods",
-                                      itemColor: .blue, isShowItemDetail: $isShowItemDetail)
-
+                            Text("Jun Sun 23")
+                                .font(.title3.bold())
+                                .opacity(0.6)
+                        }
+                        .italic()
+                        .tracking(5)
+                        .foregroundColor(.white)
                     } // VStack
-                } // ScrollView
-                .background(LinearGradient(gradient: Gradient(colors: [.customDarkGray1, .customLightGray1]),
-                                           startPoint: .top, endPoint: .bottom))
-            } // ZStack
-            .navigationTitle("Home")
-        } // NavigationView
+                    Spacer()
+                } // HStack
+                .padding(.top, 20)
+                .padding(.leading, 20)
+
+                // アカウント情報
+                HStack {
+                    Spacer()
+
+                    ZStack {
+                        VStack(alignment: .leading, spacing: 80) {
+
+                            Group {
+                                Text("Useday.   ")
+
+                                Text("Items.   ")
+                                Text("Member.   ")
+                            }
+                            .font(.footnote)
+                            .foregroundColor(.white)
+                            .tracking(5)
+                            .opacity(0.6)
+                        } // VStack
+
+                        VStack(alignment: .trailing, spacing: 80) {
+                            Group {
+                                Text("55 day")
+                                Text("\(itemVM.items.count) item")
+                            }
+                            .font(.footnote)
+                            HStack {
+                                ForEach(0...2, id: \.self) { _ in
+                                    Image(systemName: "person.crop.circle.fill")
+                                }
+                            }
+                        }
+                        .offset(x: 20, y: 40)
+                        .tracking(5)
+                        .foregroundColor(.white)
+                        .opacity(0.7)
+                    } // ZStack
+                } // HStack
+                .padding([.horizontal, .top])
+
+                Spacer()
+
+            } // VStack
+            .background(
+
+                LinearGradient(gradient: Gradient(colors: [.customDarkGray1, .customLightGray1]),
+                               startPoint: .top, endPoint: .bottom)
+            )
+        } // ZStack
     } // body
 } // View
 
-struct ItemLibraryView_Previews: PreviewProvider {
+struct LibraryView_Previews: PreviewProvider {
     static var previews: some View {
         LibraryView(itemVM: ItemViewModel(),
                     isShowItemDetail: .constant(false))
