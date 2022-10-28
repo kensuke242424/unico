@@ -60,7 +60,7 @@ struct ManageView: View {
 
                         case .off:
 
-                            Text("- 全てのアイテム -")
+                            Text("- ALL -")
                                 .font(.largeTitle.bold())
                                 .shadow(radius: 2, x: 4, y: 6)
                                 .padding(.vertical)
