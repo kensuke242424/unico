@@ -175,11 +175,10 @@ struct LibraryView: View {
                                         } // overlay
                                         .opacity(inputLibrary.cardOpacity)
                                         .shadow(radius: 4, x: 5, y: 5)
+//                                        .contentShape(Rectangle())
                                         .frame(width: bodyView.size.width * 0.7, height: 40)
                                         .animation(.easeIn(duration: 0.2), value: inputLibrary.isShowCardInfomation)
-                                        .onTapGesture(perform: {
-                                            inputLibrary.isShowCardInfomation.toggle()
-                                        })
+                                        .onTapGesture { inputLibrary.isShowCardInfomation.toggle() }
                             } // ForEach
                         } // LazyHStack
                         .padding()
