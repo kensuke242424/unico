@@ -37,6 +37,7 @@
 		E09F09CE28F146DB00D07669 /* EditItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09F09CD28F146DB00D07669 /* EditItemView.swift */; };
 		E0A36452290A37A600B30A14 /* CustomArcShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0A36451290A37A600B30A14 /* CustomArcShape.swift */; };
 		E0A7DE4B290B9E0A008C3F3F /* ShowItemPhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0A7DE4A290B9E09008C3F3F /* ShowItemPhoto.swift */; };
+		E0A7DE4E290C289A008C3F3F /* CircleIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0A7DE4D290C289A008C3F3F /* CircleIcon.swift */; };
 		E0CC79B628E761EA00CE0B19 /* UserModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0CC79B528E761EA00CE0B19 /* UserModel.swift */; };
 		E0CC79B828E7811500CE0B19 /* ItemDetailData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0CC79B728E7811500CE0B19 /* ItemDetailData.swift */; };
 		E0CF7EEC28DEEED700735142 /* LibraryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0CF7EEB28DEEED700735142 /* LibraryListView.swift */; };
@@ -80,6 +81,7 @@
 		E09F09CD28F146DB00D07669 /* EditItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditItemView.swift; sourceTree = "<group>"; };
 		E0A36451290A37A600B30A14 /* CustomArcShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomArcShape.swift; sourceTree = "<group>"; };
 		E0A7DE4A290B9E09008C3F3F /* ShowItemPhoto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowItemPhoto.swift; sourceTree = "<group>"; };
+		E0A7DE4D290C289A008C3F3F /* CircleIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleIcon.swift; sourceTree = "<group>"; };
 		E0CC79B528E761EA00CE0B19 /* UserModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserModel.swift; sourceTree = "<group>"; };
 		E0CC79B728E7811500CE0B19 /* ItemDetailData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemDetailData.swift; sourceTree = "<group>"; };
 		E0CF7EEB28DEEED700735142 /* LibraryListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryListView.swift; sourceTree = "<group>"; };
@@ -127,6 +129,7 @@
 			isa = PBXGroup;
 			children = (
 				E0796AE028F67A6A0094E50C /* Enums.swift */,
+				E05FE94328F71BE400263F98 /* Extensions */,
 			);
 			path = Enums;
 			sourceTree = "<group>";
@@ -171,9 +174,9 @@
 		E08F273228DDB3B200329C5E /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				E05FE94328F71BE400263F98 /* Extensions */,
 				E0796ADF28F67A550094E50C /* Enums */,
 				E0796AD828F48D530094E50C /* RootViews */,
+				E0A7DE4C290C2811008C3F3F /* PhotoViews */,
 				E094F0FE28E20BB800D3C845 /* LogInViews */,
 				E09F09BA28EAF2DD00D07669 /* EditItemViews */,
 				E08F273F28DEAD1100329C5E /* Tab1_Librarys */,
@@ -224,7 +227,6 @@
 				E0796ADC28F5F2830094E50C /* CartItemsSheet.swift */,
 				E0796AE228F6D77A0094E50C /* CommerceSheet.swift */,
 				E0003D0228FD3BB0007308B0 /* TagTitle.swift */,
-				E0A7DE4A290B9E09008C3F3F /* ShowItemPhoto.swift */,
 			);
 			path = Tab2_Inventrys;
 			sourceTree = "<group>";
@@ -270,6 +272,15 @@
 				E09F09BB28EAF33500D07669 /* FocusedLineRow.swift */,
 			);
 			path = EditItemViews;
+			sourceTree = "<group>";
+		};
+		E0A7DE4C290C2811008C3F3F /* PhotoViews */ = {
+			isa = PBXGroup;
+			children = (
+				E0A7DE4A290B9E09008C3F3F /* ShowItemPhoto.swift */,
+				E0A7DE4D290C289A008C3F3F /* CircleIcon.swift */,
+			);
+			path = PhotoViews;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -384,6 +395,7 @@
 				E094F10228E21EBA00D3C845 /* FirstSignInView.swift in Sources */,
 				E0CF7EF228DF166700735142 /* ItemViewModel.swift in Sources */,
 				E0CF7EF028DF152D00735142 /* ItemModel.swift in Sources */,
+				E0A7DE4E290C289A008C3F3F /* CircleIcon.swift in Sources */,
 				E0796AE128F67A6A0094E50C /* Enums.swift in Sources */,
 				E0796AE328F6D77A0094E50C /* CommerceSheet.swift in Sources */,
 				E0A7DE4B290B9E0A008C3F3F /* ShowItemPhoto.swift in Sources */,
