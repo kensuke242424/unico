@@ -61,6 +61,11 @@ struct SideMenuEditTagView: View {
                     .foregroundColor(.black)
                     .frame(width: screenSize.width, height: 600)
                     .opacity(0.7)
+                    .overlay {
+                        Color.customDarkBlue2
+                            .opacity(0.5)
+                            .blur(radius: 20)
+                    }
                     .shadow(radius: 5, x: -5, y: 5)
                     .shadow(radius: 5, x: -5, y: 5)
 

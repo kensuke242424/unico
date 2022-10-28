@@ -43,88 +43,101 @@ struct ShowsItemDetail: View {
                 }
 
                 .overlay {
-                    ScrollView(showsIndicators: false) {
-                        VStack(spacing: 10) {
-                            Text(item.name)
-                                .fontWeight(.bold)
-                                .foregroundColor(.white)
-                                .tracking(1)
-                                .lineLimit(1)
+                    VStack {
+                        Text(item.name)
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+                            .tracking(1)
+                            .lineLimit(1)
 
-                            RoundedRectangle(cornerRadius: 4)
-                                .frame(width: 150, height: 150)
-                                .foregroundColor(.gray)
-                                .overlay {
-                                    Text("No Image.")
-                                        .font(.title2)
-                                        .fontWeight(.black)
+                        ScrollView(showsIndicators: false) {
+                            VStack(spacing: 10) {
+
+                                RoundedRectangle(cornerRadius: 4)
+                                    .frame(width: 150, height: 150)
+                                    .foregroundColor(.gray)
+                                    .overlay {
+                                        Text("No Image.")
+                                            .font(.title2)
+                                            .fontWeight(.black)
+                                            .foregroundColor(.white)
+                                    }
+
+                                HStack {
+                                    Text("　アイテム情報")
+                                        .fontWeight(.medium)
                                         .foregroundColor(.white)
-                                }
-
-                            HStack {
-                                Text("　アイテム情報")
-                                    .fontWeight(.medium)
-                                    .foregroundColor(.white)
-
-                                Button {
-                                    // NOTE: アイテム編集画面へ遷移するかをアラートで選択
-                                    inputDetail.isShowAlert.toggle()
-                                    print("isShowAlert: \(inputDetail.isShowAlert)")
-
-                                } label: {
-                                    Image(systemName: "highlighter")
-                                        .foregroundColor(.yellow)
-                                }
-                                .alert("編集", isPresented: $inputDetail.isShowAlert) {
 
                                     Button {
+                                        // NOTE: アイテム編集画面へ遷移するかをアラートで選択
                                         inputDetail.isShowAlert.toggle()
                                         print("isShowAlert: \(inputDetail.isShowAlert)")
+
                                     } label: {
-                                        Text("戻る")
+                                        Image(systemName: "highlighter")
+                                            .foregroundColor(.yellow)
                                     }
+                                    .alert("編集", isPresented: $inputDetail.isShowAlert) {
 
-                                    Button {
-                                        isPresentedEditItem.toggle()
-                                    } label: {
-                                        Text("はい")
-                                    }
-                                } message: {
-                                    Text("アイテムデータを編集しますか？")
-                                } // alert
+                                        Button {
+                                            inputDetail.isShowAlert.toggle()
+                                            print("isShowAlert: \(inputDetail.isShowAlert)")
+                                        } label: {
+                                            Text("戻る")
+                                        }
 
-                            } // HStack
+                                        Button {
+                                            isPresentedEditItem.toggle()
+                                        } label: {
+                                            Text("はい")
+                                        }
+                                    } message: {
+                                        Text("アイテムデータを編集しますか？")
+                                    } // alert
 
-                            Text("ーーーーーーーーーーーーー")
-                                .foregroundColor(.white)
+                                } // HStack
 
-                            // NOTE: アイテムの情報が格納羅列されたカスタムViewです
-                            ItemDetailContents(sales: item.sales,
-                                               price: item.price,
-                                               inventory: item.inventory,
-                                               createAt: item.createTime,
-                                               updateAt: item.updateTime
-                            )
+                                Divider()
+                                    .background(.white)
+                                    .opacity(0.5)
+                                    .padding()
 
-                            Text("ーーーーーーーーーーーーー")
-                                .foregroundColor(.white)
+                                // NOTE: アイテムの情報が格納羅列されたカスタムViewです
+                                ItemDetailData(sales: item.sales,
+                                                   price: item.price,
+                                                   inventory: item.inventory,
+                                                   createAt: item.createTime,
+                                                   updateAt: item.updateTime
+                                )
 
-                            RoundedRectangle(cornerRadius: 10)
-                                .foregroundColor(.gray)
-                                .frame(width: 250, height: 300)
-                                .opacity(0.2)
-                                .overlay(alignment: .top) {
-                                    Text(item.detail)
-                                        .font(.footnote)
+                                Divider()
+                                    .background(.white)
+                                    .opacity(0.5)
+                                    .padding()
+
+                                HStack {
+                                    Text("Memo.")
                                         .foregroundColor(.white)
-                                        .frame(width: 240)
-                                        .padding(.vertical)
+                                    Spacer()
                                 }
-                        } // VStack
-                    } // ScrollView
-                    .padding(.vertical, 30)
+                                .padding(.leading, 20)
 
-                }
+                                RoundedRectangle(cornerRadius: 10)
+                                    .foregroundColor(.gray)
+                                    .frame(width: 250, height: 300)
+                                    .opacity(0.2)
+                                    .overlay(alignment: .top) {
+                                        Text(item.detail)
+                                            .font(.footnote)
+                                            .foregroundColor(.white)
+                                            .frame(width: 240)
+                                            .padding(.vertical)
+                                    }
+                            } // VStack
+                        } // ScrollView
+                    } // VStack
+                    .padding(.vertical, 30)
+                }// overlay
         } // ZStack(全体)
         .opacity(inputDetail.opacity)
 
@@ -147,7 +160,7 @@ struct ShowsItemDetail: View {
     } // body
 } // View
 
-struct SalesItemDetailView_Previews: PreviewProvider {
+struct ShowsItemDetail_Previews: PreviewProvider {
     static var previews: some View {
         ShowsItemDetail(itemVM: ItemViewModel(),
                         item: Item(tag: "Album",
