@@ -30,9 +30,9 @@ struct LibraryView: View {
         ZStack {
             VStack {
 
-                homeHeaderPhoto(photo: "homePhoto_sample")
+                homeHeaderPhoto(photo: "homePhoto_sample", userIcon: "cloth_sample1")
 
-                // 時刻
+                // 時刻レイアウト
                 HStack {
                     VStack(alignment: .leading, spacing: 8) {
                         Group {
@@ -56,7 +56,7 @@ struct LibraryView: View {
                 .padding(.leading, 20)
                 .shadow(radius: 4, x: 3, y: 3)
 
-                // アカウント情報
+                // ユーザ情報一覧
                 HStack {
                     Spacer()
 
@@ -162,7 +162,8 @@ struct LibraryView: View {
     } // body
 
     @ViewBuilder
-    func homeHeaderPhoto(photo: String) -> some View {
+    func homeHeaderPhoto(photo: String, userIcon: String) -> some View {
+
         Image(photo)
             .resizable()
             .scaledToFill()
@@ -170,25 +171,33 @@ struct LibraryView: View {
             .frame(height: UIScreen.main.bounds.height * 0.3)
             .shadow(radius: 5, x: 0, y: 10)
             .overlay {
-                LinearGradient(gradient: Gradient(colors: [.clear, .black.opacity(0.8)]),
-                               startPoint: .top, endPoint: .bottom)
+                if inputLibrary.isShowHeaderPhotoInfomation {
+                    LinearGradient(gradient: Gradient(colors: [.clear, .black.opacity(0.6)]),
+                                   startPoint: .top, endPoint: .bottom)
+                }
             } // overlay
             .overlay(alignment: .topLeading) {
-                Button {
-                    inputLibrary.isShowHeaderPhotoInfomation.toggle()
-                } label: {
-                    CircleIcon(photo: "cloth_sample1", size: 35)
+                if inputLibrary.isShowHeaderPhotoInfomation {
+                    Button {
+                        inputLibrary.isShowHeaderPhotoInfomation.toggle()
+                    } label: {
+                        CircleIcon(photo: userIcon, size: 35)
+                    }
                 }
             } // overlay
             .overlay(alignment: .bottomTrailing) {
-                Button {
-                    // Todo: 画像変更処理
-                } label: {
-                    Image(systemName: "photo.on.rectangle.angled")
-                        .foregroundColor(.white)
-                        .padding()
+                if inputLibrary.isShowHeaderPhotoInfomation {
+                    Button {
+                        // Todo: 画像変更処理
+                    } label: {
+                        Image(systemName: "photo.on.rectangle.angled")
+                            .foregroundColor(.white)
+                            .padding()
+                    }
                 }
             } // overlay
+            .animation(.easeIn(duration: 0.2), value: inputLibrary.isShowHeaderPhotoInfomation)
+            .onTapGesture { inputLibrary.isShowHeaderPhotoInfomation.toggle() }
     } // homeHeaderPhoto
     func homeItemPhotoPanel() -> some View {
         GeometryReader { bodyView in

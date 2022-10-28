@@ -16,12 +16,12 @@ struct SelectItemPhotoArea: View {
 //        selectTagColor.color
         Color.customLightGray1
             .frame(width: UIScreen.main.bounds.width, height: 350)
-            .blur(radius: 2.0)
+            .blur(radius: 0)
 
             .overlay {
                 LinearGradient(colors:
                                 [Color.clear, Color.black], startPoint: .top, endPoint: .bottom)
-                .blur(radius: 10)
+                .blur(radius: 5)
             }
 
             .overlay {
@@ -32,11 +32,12 @@ struct SelectItemPhotoArea: View {
                             Button {
                                 // Todo: アイテム写真追加処理
                             } label: {
-                                Image(systemName: "plus.rectangle.fill.on.rectangle.fill")
+                                Image(systemName: "photo.on.rectangle.angled")
                                     .resizable()
                                     .scaledToFit()
+                                    .foregroundColor(.white)
                                     .frame(width: 40, height: 40)
-                                    .offset(x: 7, y: 7)
+                                    .offset(x: 10, y: 10)
                             } // Button
                         } // .overlay(ボタン)
                 } // VStack
