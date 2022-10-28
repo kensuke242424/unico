@@ -45,7 +45,7 @@ struct LibraryView: View {
                                 .scaledToFit()
                                 .opacity(0.4)
 
-                            Text("Jun Sun 23")
+                            Text("Oct. Sun 28")
                                 .font(.title3.bold())
                                 .opacity(0.6)
                         }
@@ -111,7 +111,7 @@ struct LibraryView: View {
             CustomArcShape()
                 .ignoresSafeArea()
                 .foregroundColor(.white)
-                .blur(radius: 2)
+                .blur(radius: 1)
                 .opacity(0.08)
 
             Menu {
@@ -191,8 +191,6 @@ struct LibraryView: View {
                         .gesture(
                             DragGesture()
                                 .updating(self.$dragOffset, body: { (value, state, _) in
-
-                                    print(value.translation.width)
 
                                     // 先頭・末尾ではスクロールする必要がないので、画面幅の1/5までドラッグで制御する
                                     if inputLibrary.currentIndex == 0, value.translation.width > 0 {

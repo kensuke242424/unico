@@ -123,6 +123,7 @@ struct ShowsItemDetail: View {
                         } // VStack
                     } // ScrollView
                     .padding(.vertical, 30)
+
                 }
         } // ZStack(全体)
         .opacity(inputDetail.opacity)
