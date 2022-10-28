@@ -28,7 +28,7 @@ struct LibraryView: View {
 
         ZStack {
             VStack {
-                Image("homePhotoSample")
+                Image("homePhoto_sample")
                     .resizable()
                     .scaledToFill()
                     .ignoresSafeArea()
@@ -141,9 +141,7 @@ struct LibraryView: View {
 
                             ForEach(inputLibrary.tagFilterItemCards.indices, id: \.self) {index in
 
-                                    RoundedRectangle(cornerRadius: 5)
-                                        .foregroundColor(.gray)
-                                        .frame(width: 180, height: 180)
+                                ShowItemPhoto(photo: inputLibrary.tagFilterItemCards[index].photo, size: 180)
                                         .overlay {
                                             if inputLibrary.isShowCardInfomation {
                                                 LinearGradient(gradient: Gradient(colors: [.clear, .black.opacity(0.4)]),

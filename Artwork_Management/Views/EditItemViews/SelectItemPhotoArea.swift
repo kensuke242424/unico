@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SelectItemPhotoArea: View {
 
-    let selectTagColor: UsedColor
+    let item: Item?
 
     var body: some View {
 
@@ -27,16 +27,7 @@ struct SelectItemPhotoArea: View {
             .overlay {
                 VStack {
 
-                    RoundedRectangle(cornerRadius: 10)
-                        .foregroundColor(.gray)
-                        .frame(width: 270, height: 270)
-                        .opacity(0.4)
-                        .overlay {
-                            Text("No Image...")
-                                .foregroundColor(.white)
-                                .font(.title2)
-                                .fontWeight(.black)
-                        }
+                    ShowItemPhoto(photo: item?.photo ?? "", size: 270)
                         .overlay(alignment: .bottomTrailing) {
                             Button {
                                 // Todo: アイテム写真追加処理
@@ -55,6 +46,6 @@ struct SelectItemPhotoArea: View {
 
 struct SelectItemPhotoArea_Previews: PreviewProvider {
     static var previews: some View {
-        SelectItemPhotoArea(selectTagColor: .red)
+        SelectItemPhotoArea(item: TestItem().testItem)
     }
 }

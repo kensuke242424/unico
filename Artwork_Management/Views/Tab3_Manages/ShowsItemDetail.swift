@@ -53,15 +53,7 @@ struct ShowsItemDetail: View {
                         ScrollView(showsIndicators: false) {
                             VStack(spacing: 10) {
 
-                                RoundedRectangle(cornerRadius: 4)
-                                    .frame(width: 150, height: 150)
-                                    .foregroundColor(.gray)
-                                    .overlay {
-                                        Text("No Image.")
-                                            .font(.title2)
-                                            .fontWeight(.black)
-                                            .foregroundColor(.white)
-                                    }
+                                ShowItemPhoto(photo: item.photo, size: 150)
 
                                 HStack {
                                     Text("　アイテム情報")
@@ -163,15 +155,7 @@ struct ShowsItemDetail: View {
 struct ShowsItemDetail_Previews: PreviewProvider {
     static var previews: some View {
         ShowsItemDetail(itemVM: ItemViewModel(),
-                        item: Item(tag: "Album",
-                                   tagColor: "赤",
-                                   name: "Album1",
-                                   detail: "Album1のアイテム紹介テキストです。",
-                                   photo: "",
-                                   price: 1800, sales: 88000,
-                                   inventory: 200,
-                                   createTime: Date(),
-                                   updateTime: Date()),
+                        item: TestItem().testItem,
                         itemIndex: 0,
                         isShowItemDetail: .constant(false),
                         isPresentedEditItem: .constant(false)

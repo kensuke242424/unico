@@ -184,15 +184,8 @@ struct ManageView: View {
         VStack(alignment: .leading, spacing: 20) {
 
             HStack(spacing: 20) {
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(Color.gray)
-                    .frame(width: 70, height: 70)
-                    .shadow(radius: 4, x: 5, y: 5)
-                    .overlay {
-                        Text("No Image.")
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
-                    }
+
+                ShowItemPhoto(photo: item.photo, size: 70)
 
                 VStack(alignment: .leading, spacing: 10) {
                     HStack(spacing: 40) {
