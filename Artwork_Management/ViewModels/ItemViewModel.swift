@@ -126,6 +126,60 @@ class ItemViewModel: ObservableObject {
         } // for where
     } // func updateItemsTagData
 
+    func nowDateTime(date: Date, type: String) -> String {
+        let month: String
+        let week: String
+        let day = Calendar.current.component(.day, from: date)
+        let hour = Calendar.current.component(.hour, from: date)
+        let minute = Calendar.current.component(.minute, from: date)
+        let second = Calendar.current.component(.second, from: date)
+
+        switch type {
+        case "date":
+
+            switch Calendar.current.component(.month, from: date) {
+            case 1: month = "Jan."
+            case 2: month = "Feb."
+            case 3: month = "Mar."
+            case 4: month = "Apr."
+            case 5: month = "May"
+            case 6: month = "Jun."
+            case 7: month = "Jul."
+            case 8: month = "Aug."
+            case 9: month = "Sept."
+            case 10: month = "Oct."
+            case 11: month = "Nov."
+            case 12: month = "Dec."
+            default: month =  "-"
+
+            }
+
+            switch Calendar.current.component(.weekday, from: date) {
+            case 1: week = "Sun"
+            case 2: week = "Mon"
+            case 3: week = "Thu"
+            case 4: week = "Wed"
+            case 5: week = "Thu"
+            case 6: week = "Fri"
+            case 7: week = "Sat"
+            default: week =  "-"
+            }
+
+            return "\(month) \(week) \(day)"
+
+        case "time":
+
+            let hour =  String(hour)
+            let minute = String(minute).count == 1 ? "0\(minute)" : String(minute)
+            let second = String(second).count == 1 ? "0\(second)" : String(second)
+
+            return "\(hour):\(minute):\(second)"
+
+        default:
+            return "Time_Error"
+        }
+    }
+
 } // class
 
 struct TestItem {

@@ -17,6 +17,11 @@ struct InputLibrary {
     var isShowHeaderPhotoInfomation: Bool = false
 }
 
+struct InputTime {
+    var nowDate =  Date()
+    let timer = Timer.publish(every: 1, on: .current, in: .common).autoconnect()
+}
+
 struct LibraryView: View {
 
     @StateObject var itemVM: ItemViewModel
@@ -24,6 +29,7 @@ struct LibraryView: View {
 
     @GestureState private var dragOffset: CGFloat = 0
     @State private var inputLibrary: InputLibrary = InputLibrary()
+    @State private var inputTime: InputTime = InputTime()
 
     var body: some View {
 
@@ -36,13 +42,12 @@ struct LibraryView: View {
                 HStack {
                     VStack(alignment: .leading, spacing: 8) {
                         Group {
-                            Text("10:07:25")
+                            Text(itemVM.nowDateTime(date: inputTime.nowDate, type: "time"))
                                 .font(.title3.bold())
                                 .frame(height: 40)
-                                .scaledToFit()
                                 .opacity(0.4)
 
-                            Text("Oct. Sun 28")
+                            Text(itemVM.nowDateTime(date: inputTime.nowDate, type: "date"))
                                 .font(.title3.bold())
                                 .opacity(0.6)
                         }
@@ -55,6 +60,9 @@ struct LibraryView: View {
                 .padding(.top, 20)
                 .padding(.leading, 20)
                 .shadow(radius: 4, x: 3, y: 3)
+                .onReceive(inputTime.timer) { _ in
+                    inputTime.nowDate = Date()
+                }
 
                 // ユーザ情報一覧
                 HStack {

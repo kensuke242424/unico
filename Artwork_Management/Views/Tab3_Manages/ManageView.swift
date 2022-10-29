@@ -189,7 +189,7 @@ struct ManageView: View {
 
                 VStack(alignment: .leading, spacing: 10) {
                     HStack(spacing: 40) {
-                        Text("\(item.sales)円")
+                        Text("¥ \(item.sales)")
                             .foregroundColor(.white)
                             .opacity(0.8)
                             .font(.subheadline.bold())
@@ -207,7 +207,7 @@ struct ManageView: View {
                     } // HStack
 
                     // NOTE: ラインの外枠を透明フレームで置いておくことで、
-                    // ラインが端まで行ってもレイアウトが崩れない
+                    // インジケーターが端まで行ってもレイアウトが崩れない
                     switch item.tagColor {
                     case "赤": IndicatorRow(salesValue: item.sales, tagColor: .red)
                     case "青": IndicatorRow(salesValue: item.sales, tagColor: .blue)
