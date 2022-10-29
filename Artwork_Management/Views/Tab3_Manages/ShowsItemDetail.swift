@@ -20,6 +20,7 @@ struct ShowsItemDetail: View {
     struct InputItemDetail {
         var opacity: Double = 0
         var isShowAlert: Bool = false
+        var isShowResetBasketAlert: Bool = false
         var disabledButton: Bool = true
         var isPlesentedUpdateItem: Bool = false
         var isPlesentedErrorInfomation: Bool = false
@@ -36,9 +37,7 @@ struct ShowsItemDetail: View {
                 .opacity(0.3)
             // NOTE: アイテム詳細の外側をタップすると、詳細画面を閉じます
                 .onTapGesture {
-                    withAnimation(.linear(duration: 0.2)) {
-                        isShowitemDetail = false
-                    }
+                    isShowitemDetail = false
                     print("onTapGesture_isShowitemDetail: \(isShowitemDetail)")
                 } // onTapGesture
 
@@ -97,6 +96,7 @@ struct ShowsItemDetail: View {
                         } message: {
                             Text("アイテムデータを編集しますか？")
                         } // alert
+
                     } // HStack
 
                     Text("ーーーーーーーーーーーーー")
@@ -156,7 +156,6 @@ struct ShowsItemDetail: View {
         } // sheet(アイテム更新シート)
 
         .onAppear {
-
             // NOTE: itemに値が存在した場合、アイテム編集ボタンを有効化
             if item != nil {
                 input.disabledButton.toggle()

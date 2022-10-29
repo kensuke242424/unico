@@ -4,8 +4,23 @@
 //
 //  Created by 中川賢亮 on 2022/10/11.
 //
-
 import SwiftUI
+
+enum Mode {
+    case dark
+    case light
+}
+
+// Stock画面のアイテムカードの大きさを変更？
+enum StockCardSize {
+    case mini
+    case medium
+}
+
+enum HalfSheetScroll {
+    case main
+    case additional
+}
 
 // NOTE: アイテムのソートタイプを管理します
 enum SortType {
@@ -26,6 +41,10 @@ enum TagGroup {
 enum Status {
     case create
     case update
+}
+
+enum SearchFocus {
+    case check
 }
 
 enum Field {

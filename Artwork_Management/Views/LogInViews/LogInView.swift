@@ -37,6 +37,8 @@ struct LogInView: View {
 
                 } // VStack
             } // ZStack
+            .background(LinearGradient(gradient: Gradient(colors: [.customDarkGray1, .customLightGray1]),
+                                       startPoint: .top, endPoint: .bottom))
         } // NavigationView
     } // body
 } // View
@@ -128,7 +130,6 @@ struct LogInInfomation: View {
             } // Group(入力欄全体)
             .font(.subheadline)
             .autocapitalization(.none)
-            .textFieldStyle(.roundedBorder)
             .keyboardType(.emailAddress)
             .padding(.bottom, 15)
 

@@ -13,12 +13,15 @@ struct SelectItemPhotoArea: View {
 
     var body: some View {
 
-        selectTagColor.color
+//        selectTagColor.color
+        Color.customLightGray1
             .frame(width: UIScreen.main.bounds.width, height: 350)
-            .blur(radius: 2.0, opaque: false)
+            .blur(radius: 2.0)
 
             .overlay {
-                LinearGradient(colors: [Color.clear, Color.black], startPoint: .top, endPoint: .bottom)
+                LinearGradient(colors:
+                                [Color.clear, Color.black], startPoint: .top, endPoint: .bottom)
+                .blur(radius: 10)
             }
 
             .overlay {
@@ -27,7 +30,7 @@ struct SelectItemPhotoArea: View {
                     RoundedRectangle(cornerRadius: 10)
                         .foregroundColor(.gray)
                         .frame(width: 270, height: 270)
-                        .opacity(0.6)
+                        .opacity(0.4)
                         .overlay {
                             Text("No Image...")
                                 .foregroundColor(.white)
