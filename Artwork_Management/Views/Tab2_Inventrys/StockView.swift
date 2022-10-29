@@ -58,68 +58,11 @@ struct StockView: View {
                                                 inputStock: $inputStock,
                                                 commerceResults: $cartResults)
 
-                            // NOTE: Geometryを用いたサイドタグセレクトバー
-                            GeometryReader { bodyView in
-
-                                let sideBarTagItemPadding: CGFloat = 0
-
-                                LazyHStack(spacing: sideBarTagItemPadding) {
-
-                                    ForEach(itemVM.tags.indices, id: \.self) {index in
-
-                                        Text(itemVM.tags[index].tagName)
+                            Text(itemVM.tags[inputStock.currentIndex].tagName)
                                             .foregroundColor(.white)
                                             .font(.system(size: 20, weight: .bold))
-                                            .frame(width: bodyView.size.width * 0.7, height: 40)
-                                            .padding(.leading, index == 0 ? bodyView.size.width * 0.1 : 0)
-
-                                    } // ForEach
-                                } // LazyHStack
-                                .padding()
-                                .offset(x: dragOffset)
-                                .offset(x: -CGFloat(inputStock.currentIndex) * (bodyView.size.width * 0.7 + sideBarTagItemPadding))
-
-//                                .gesture(
-//                                    DragGesture()
-//                                        .updating(self.$dragOffset, body: { (value, state, _) in
-//
-//                                            // 先頭・末尾ではスクロールする必要がないので、画面幅の1/5までドラッグで制御する
-//                                            if inputStock.currentIndex == 0, value.translation.width > 0 {
-//                                                state = value.translation.width / 5
-//                                            } else if inputStock.currentIndex == (itemVM.tags.count - 1), value.translation.width < 0 {
-//                                                state = value.translation.width / 5
-//                                            } else {
-//                                                state = value.translation.width
-//                                                print(state)
-//                                            }
-//                                        })
-//                                        .onEnded({ value in
-//                                            var newIndex = inputStock.currentIndex
-//
-//                                            // ドラッグ幅からページングを判定
-//                                            // 今回は画面幅x0.3としているが、操作感に応じてカスタマイズする必要がある
-//                                            if abs(value.translation.width) > bodyView.size.width * 0.2 {
-//                                                newIndex = value.translation.width > 0 ? inputStock.currentIndex - 1 : inputStock.currentIndex + 1
-//                                            }
-//                                            if newIndex < 0 {
-//                                                newIndex = 0
-//                                            } else if newIndex > (itemVM.tags.count - 1) {
-//                                                newIndex = itemVM.tags.count - 1
-//                                            }
-//                                            inputStock.currentIndex = newIndex
-//                                            if inputStock.currentIndex != 0 {
-//                                                inputHome.isShowSearchField = false
-//                                            }
-//                                        }) // .onEnded
-//                                ) // .gesture
-//                                // 減衰ばねモデル、それぞれの値は操作感に応じて変更する
-//                                .animation(.interpolatingSpring(mass: 0.4,
-//                                                                stiffness: 100,
-//                                                                damping: 80,
-//                                                                initialVelocity: 0.1),
-//                                           value: dragOffset)
-                            } // Geometry
-                            .frame(height: 40) // Geometry範囲のflame
+                                            .frame(width: 100, height: 40)
+                                            .padding()
 
                             // NOTE: サイドタグバーの枠フレームおよび、前後のタグインフォメーションを表示します。
                             .overlay {
@@ -127,7 +70,7 @@ struct StockView: View {
                                                   tags: $itemVM.tags)
                             } // overlay
                             .id("search")
-                            .padding()
+//                            .padding()
 
                             // NOTE: サイドタグバー両端のタグインフォメーションopacityを、ドラッグ位置を監視して管理しています。
                             .onChange(of: dragOffset) { newValue in

@@ -111,8 +111,11 @@ struct HomeTabView: View {
                 print("ALLタグを削除")
             } else {
                 if rootItemVM.tags.contains(where: {$0.tagName == "ALL"}) { return }
-                rootItemVM.tags.insert(Tag(tagName: "ALL", tagColor: .gray), at: 0)
-                print("ALLタグを追加")
+
+                if inputHome.tabIndex == 0 || inputHome.tabIndex == 1 {
+                    rootItemVM.tags.insert(Tag(tagName: "ALL", tagColor: .gray), at: 0)
+                    print("ALLタグを追加")
+                }
             }
         }
 
