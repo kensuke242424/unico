@@ -46,7 +46,7 @@ struct UsefulButton: View {
         } label: {
 
             // ✅カスタムView
-            ButtonStyleView(buttonIcon: $buttonIcon, buttonStyle: $buttonStyle)
+            ButtonStyleView(buttonIcon: buttonIcon, buttonStyle: buttonStyle)
 
         } // Button
         .offset(x: UIScreen.main.bounds.width / 3 - 5,
@@ -80,8 +80,8 @@ struct UsefulButton: View {
 
 struct ButtonStyleView: View {
 
-    @Binding var buttonIcon: ButtonIcon
-    @Binding var buttonStyle: ButtonStyle
+    let buttonIcon: ButtonIcon
+    let buttonStyle: ButtonStyle
 
     @State private var angle: CGFloat = 0.0
 
@@ -93,7 +93,6 @@ struct ButtonStyleView: View {
             .frame(width: 65)
             .padding()
             .blur(radius: 1)
-//            .shadow(color: .gray, radius: 10, x: 4, y: 11)
 
             // ボタンのアイコン
             .overlay {
