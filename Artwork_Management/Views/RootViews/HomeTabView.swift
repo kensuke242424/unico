@@ -293,7 +293,7 @@ struct SystemSideMenu: View {
 
                                     Spacer(minLength: 0)
 
-                                } // if tag...
+                                } // if inputSideMenu.tag...
                             } // VStack
                             SideMenuButton(open: $inputSideMenu.help,
                                            title: "ヘルプ", image: inputSideMenu.help
