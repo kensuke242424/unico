@@ -229,6 +229,16 @@ struct SystemSideMenu: View {
                                             inputHome.editItemStatus = .create
                                             inputHome.isPresentedEditItem.toggle()
 
+                                                    Image(systemName: inputSideMenu.editMode.isEditing ?
+                                                          "line.3.horizontal" : "highlighter")
+
+                                                    .foregroundColor(.yellow).opacity(colorScheme == .dark ? 0.0 : 0.6)
+                                                    .offset(x:inputSideMenu.editMode.isEditing ? 83 : 120)
+                                                    .onTapGesture {
+                                                        print(offset)
+                                                        print("タグ編集ボタンタップ")
+                                                    } // onTapGesture
+                                                } // overlay
                                         }
 
                                     } // VStack
@@ -282,6 +292,7 @@ struct SystemSideMenu: View {
                                 if inputSideMenu.tag {
 
                                     Spacer(minLength: 0)
+
                                 } // if tag...
                             } // VStack
                             SideMenuButton(open: $inputSideMenu.help,
@@ -498,7 +509,6 @@ struct SystemSideMenu: View {
                         }
                     }
                 }
-
         )
         .animation(.interpolatingSpring(mass: 0.8,
                                         stiffness: 100,
