@@ -178,6 +178,7 @@ struct ManageView: View {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button {
                         inputHome.isShowSystemSideMenu.toggle()
+                        inputHome.sideMenuBackGround.toggle()
                     } label: {
                         CircleIcon(photo: "cloth_sample1", size: 35)
                     }

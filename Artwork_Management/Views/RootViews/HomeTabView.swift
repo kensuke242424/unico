@@ -16,6 +16,7 @@ struct InputHome {
     var isPresentedEditItem: Bool = false
     var isShowSearchField: Bool = false
     var isShowSystemSideMenu: Bool = false
+    var sideMenuBackGround: Bool = false
     var doCommerce: Bool = false
     var cartState: ResizableSheetState = .hidden
     var commerceState: ResizableSheetState = .hidden
@@ -83,9 +84,17 @@ struct HomeTabView: View {
             // Todo: 各タブごとにオプションが変わるボタン
             UsefulButton(inputHome: $inputHome)
 
-            SistemSideMenu(itemVM: rootItemVM, inputHome: $inputHome)
+            // sideMenu_background...
+            Color.black
+                .opacity(inputHome.sideMenuBackGround ? 0.25 : 0)
+                .ignoresSafeArea()
+
+            SystemSideMenu(itemVM: rootItemVM, inputHome: $inputHome)
+                .offset(x: inputHome.isShowSystemSideMenu ? 0 : -UIScreen.main.bounds.width)
 
         } // ZStack
+        .animation(.easeIn(duration: 0.2), value: inputHome.sideMenuBackGround)
+        .animation(.spring(response: 0.2, blendDuration: 1.0), value: inputHome.isShowSystemSideMenu)
         .navigationBarBackButtonHidden()
 
         .onChange(of: inputHome.tabIndex) { newTabIndex in
@@ -118,7 +127,7 @@ struct HomeTabView: View {
     } // body
 } // View
 
-struct SistemSideMenu: View {
+struct SystemSideMenu: View {
 
     @Environment(\.colorScheme) var colorScheme: ColorScheme
     @Environment(\.editMode) var editMode
@@ -148,6 +157,7 @@ struct SistemSideMenu: View {
 
             Button {
                 inputHome.isShowSystemSideMenu.toggle()
+                inputHome.sideMenuBackGround.toggle()
             } label: {
                 Image(systemName: "delete.left")
                     .font(.title)
@@ -185,7 +195,7 @@ struct SistemSideMenu: View {
                                         }, label: {
                                             Text(inputSideMenu.editMode.isEditing ? "終了" : "編集")
                                         })
-                                        .padding(.leading, 40)
+                                        .padding(.leading, 30)
                                     }
                                 }
                                 if inputSideMenu.tag {
@@ -224,12 +234,11 @@ struct SistemSideMenu: View {
                                         .onMove(perform: rowReplace)
                                     } // List
                                     .environment(\.editMode, $inputSideMenu.editMode)
-                                    .frame(width: 200, height: 40 * CGFloat(itemVM.tags.count) + 100 )
+                                    .frame(width: 210, height: 40 * CGFloat(itemVM.tags.count) + 100 )
                                     .animation(.easeIn(duration: 0.2), value: inputSideMenu.editMode)
-                                    .transition(AnyTransition.opacity.combined(with: .offset(x: -100, y: 0)))
-
+                                    .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
                                     .scrollContentBackground(.hidden)
-//                                    .offset(y: -10)
+                                    .offset(x: -10)
                                     Spacer(minLength: 0)
                                 } // if tag...
                             } // VStack
@@ -282,7 +291,7 @@ struct SideMenuButton: View {
 
     var body: some View {
         Button {
-            withAnimation() {
+            withAnimation {
                 open.toggle()
             }
         } label: {
@@ -293,7 +302,7 @@ struct SideMenuButton: View {
                     .foregroundColor(.white)
                     .aspectRatio(contentMode: .fill)
                     .scaleEffect(open ? 1.1 : 1.0)
-                    .frame(width: 25, height: 25)
+                    .frame(width: 20, height: 20)
 
                 Text(title)
                     .font(.system(size: 20))
@@ -303,9 +312,9 @@ struct SideMenuButton: View {
                 Image(systemName: "chevron.down")
                     .foregroundColor(.white).opacity(0.5)
                     .rotationEffect(Angle(degrees: open ? -180 : 0))
-                    .padding(.leading)
+//                    .padding(.leading)
             }
-            .offset(x: open ? 10 : 0)
+            .offset(x: open ? 7 : 0)
         }
     }
 }
