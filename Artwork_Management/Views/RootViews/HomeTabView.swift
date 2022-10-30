@@ -91,7 +91,6 @@ struct HomeTabView: View {
             // Todo: 各タブごとにオプションが変わるボタン
             UsefulButton(inputHome: $inputHome)
 
-<<<<<<< HEAD
             ShowsItemDetail(itemVM: rootItemVM,
                             inputHome: $inputHome,
                             item: rootItemVM.items[inputHome.actionItemIndex])
@@ -133,9 +132,6 @@ struct HomeTabView: View {
             SideMenuEditTagView(itemVM: rootItemVM, inputHome: $inputHome, inputTag: $inputTag,
                                 defaultTag: inputTag.tagSideMenuStatus == .create ? nil : inputSideMenu.selectTag)
             .offset(x: inputHome.isOpenEditTagSideMenu ? UIScreen.main.bounds.width / 2 - 25 : UIScreen.main.bounds.width + 10)
-=======
-            SistemSideMenu(itemVM: rootItemVM, inputHome: $inputHome)
->>>>>>> 286bba6 (システムサイドメニュー 途中)
 
         } // ZStack
         .animation(.easeIn(duration: 0.2), value: inputHome.itemsInfomationOpacity)
