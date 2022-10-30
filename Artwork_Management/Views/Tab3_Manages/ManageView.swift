@@ -23,7 +23,7 @@ struct ManageView: View {
     @StateObject var itemVM: ItemViewModel
 
     // NOTE: 新規アイテム追加Viewの発現を管理します
-    @Binding var isPresentedEditItem: Bool
+    @Binding var inputHome: InputHome
 
     struct InputManage {
         var isShowItemDetail = false
@@ -88,7 +88,7 @@ struct ManageView: View {
                                     item: itemVM.items[inputManage.listIndex],
                                     itemIndex: inputManage.listIndex,
                                     isShowItemDetail: $inputManage.isShowItemDetail,
-                                    isPresentedEditItem: $isPresentedEditItem)
+                                    isPresentedEditItem: $inputHome.isPresentedEditItem)
 
                 } // if isShowItemDetail
 
@@ -184,9 +184,9 @@ struct ManageView: View {
                     }
                 }
             }
-            .sheet(isPresented: $isPresentedEditItem) {
+            .sheet(isPresented: $inputHome.isPresentedEditItem) {
                 EditItemView(itemVM: itemVM,
-                                isPresentedEditItem: $isPresentedEditItem,
+                             isPresentedEditItem: $inputHome.isPresentedEditItem,
                                 itemIndex: 0,
                                 passItemData: nil,
                                 editItemStatus: .create)
@@ -245,6 +245,6 @@ struct ManageView: View {
 
 struct ManageView_Previews: PreviewProvider {
     static var previews: some View {
-        ManageView(itemVM: ItemViewModel(), isPresentedEditItem: .constant(false))
+        ManageView(itemVM: ItemViewModel(), inputHome: .constant(InputHome()))
     }
 }

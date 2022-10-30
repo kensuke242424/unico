@@ -47,7 +47,7 @@ struct HomeTabView: View {
                     }
                     .tag(1)
 
-                ManageView(itemVM: rootItemVM, isPresentedEditItem: $inputHome.isPresentedEditItem)
+                ManageView(itemVM: rootItemVM, inputHome: $inputHome)
                     .tabItem {
                         Image(systemName: "chart.xyaxis.line")
                         Text("Manage")
@@ -119,6 +119,20 @@ struct HomeTabView: View {
             }
         }
 
+        .onChange(of: inputHome.isShowSystemSideMenu) { present in
+            if present {
+                rootItemVM.tags.removeAll(where: { $0.tagName == "ALL" })
+                print("ALLタグを削除")
+            } else {
+                if rootItemVM.tags.contains(where: {$0.tagName == "ALL"}) { return }
+
+                if inputHome.tabIndex == 0 || inputHome.tabIndex == 1 {
+                    rootItemVM.tags.insert(Tag(tagName: "ALL", tagColor: .gray), at: 0)
+                    print("ALLタグを追加")
+                }
+            }
+        }
+
         .onAppear {
             if rootItemVM.tags.contains(where: {$0.tagName == "ALL"}) { return }
             rootItemVM.tags.insert(Tag(tagName: "ALL", tagColor: .gray), at: 0)
@@ -144,6 +158,7 @@ struct SystemSideMenu: View {
     }
 
     @State private var inputSideMenu: InputSideMenu = InputSideMenu()
+    @GestureState var dragOffset: CGFloat = 0.0
 
     var body: some View {
 
@@ -159,8 +174,8 @@ struct SystemSideMenu: View {
                 inputHome.isShowSystemSideMenu.toggle()
                 inputHome.sideMenuBackGround.toggle()
             } label: {
-                Image(systemName: "delete.left")
-                    .font(.title)
+                Image(systemName: "chevron.left.2")
+                    .font(.title).opacity(0.5)
             }
             .foregroundColor(.white.opacity(0.6))
             .offset(x: UIScreen.main.bounds.width / 4,
@@ -194,52 +209,68 @@ struct SystemSideMenu: View {
                                             inputSideMenu.editMode = inputSideMenu.editMode.isEditing ? .inactive : .active
                                         }, label: {
                                             Text(inputSideMenu.editMode.isEditing ? "終了" : "編集")
+                                                .opacity(itemVM.tags.count == 0 ? 0.0 : 1.0)
                                         })
                                         .padding(.leading, 30)
                                     }
                                 }
+
                                 if inputSideMenu.tag {
+
                                     Spacer(minLength: 0)
+
                                     List {
-                                        Text("タグを追加      >>")
-                                            .foregroundColor(.white).opacity(0.5)
-                                            .listRowBackground(
-                                            colorScheme == .dark ?
-                                                Color.gray.opacity(0.3) : Color.white.opacity(0.2)
-                                            )
-                                            .onTapGesture {
-                                                print("タグ追加ボタンタップ")
-                                            }
+
                                         ForEach(Array(itemVM.tags.enumerated()),
                                                 id: \.offset) { offset, item in
 
-                                                Text(item.tagName)
-                                                    .foregroundColor(.white)
-                                                    .listRowBackground(
-                                                    colorScheme == .dark ?
-                                                        Color.gray.opacity(0.3) : Color.white.opacity(0.2)
-                                                    )
-                                                    .overlay(alignment: .leading) {
-                                                            Image(systemName: "highlighter")
-                                                            .foregroundColor(.yellow).opacity(0.6)
-                                                                .offset(x: 120)
-                                                                .onTapGesture {
-                                                                    print(offset)
-                                                                    print("タグ編集ボタンタップ")
-                                                                } // onTapGesture
-                                                    } // overlay
+                                            Text(item.tagName)
+                                                .foregroundColor(.white)
+                                                .listRowBackground(Color.clear)
+                                                .overlay(alignment: .leading) {
 
+                                                    Image(systemName: inputSideMenu.editMode.isEditing ?
+                                                          "line.3.horizontal" : "highlighter")
+
+                                                    .foregroundColor(.yellow).opacity(colorScheme == .dark ? 0.0 : 0.6)
+                                                    .offset(x:inputSideMenu.editMode.isEditing ? 83 : 120)
+                                                    .onTapGesture {
+                                                        print(offset)
+                                                        print("タグ編集ボタンタップ")
+                                                    } // onTapGesture
+                                                } // overlay
                                         }
-                                        .onDelete(perform: rowRemove)
-                                        .onMove(perform: rowReplace)
+                                                .onDelete(perform: rowRemove)
+                                                .onMove(perform: rowReplace)
                                     } // List
                                     .environment(\.editMode, $inputSideMenu.editMode)
-                                    .frame(width: 210, height: 40 * CGFloat(itemVM.tags.count) + 100 )
+                                    .frame(width: 210, height: 40 * CGFloat(itemVM.tags.count - 1) + 100 )
                                     .animation(.easeIn(duration: 0.2), value: inputSideMenu.editMode)
                                     .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
                                     .scrollContentBackground(.hidden)
                                     .offset(x: -10)
+                                    .overlay {
+
+                                        VStack(spacing: 30) {
+                                            Text("登録タグはありません")
+                                                .foregroundColor(.white)
+                                            Text("タグを追加 >>")
+                                                .foregroundColor(.blue)
+                                                .onTapGesture {
+                                                    inputHome.isShowSystemSideMenu.toggle()
+                                                    inputHome.sideMenuBackGround.toggle()
+                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                                                        inputHome.isPresentedEditItem.toggle()
+                                                        print("あああああ")
+                                                    }
+                                                }
+                                        }
+                                        .opacity(itemVM.tags.count == 0 ? 0.8 : 0.0)
+                                        .offset(y: 30)
+                                    } // overlay
+
                                     Spacer(minLength: 0)
+
                                 } // if tag...
                             } // VStack
                             SideMenuButton(open: $inputSideMenu.help,
@@ -253,7 +284,9 @@ struct SystemSideMenu: View {
             } // VStack
             .offset(y: UIScreen.main.bounds.height / 12)
         } // ZStack
+
         .clipShape(SideMenuShape())
+
         .background(
 
             SideMenuShape()
@@ -272,12 +305,32 @@ struct SystemSideMenu: View {
 
         )
         .ignoresSafeArea()
-    }
-    /// 行削除処理
+        .offset(x: dragOffset)
+        .gesture(
+            DragGesture()
+                .updating(self.$dragOffset, body: { (value, state, _) in
+
+                    if value.translation.width < 0 {
+                        state = value.translation.width
+                    }})
+                .onEnded { value in
+                    if value.translation.width < -100 {
+                        withAnimation(.easeIn(duration: 0.2)) {
+                            inputHome.isShowSystemSideMenu.toggle()
+                            inputHome.sideMenuBackGround.toggle()
+                        }
+                    }
+                }
+        )
+        .animation(.interpolatingSpring(mass: 0.8,
+                                        stiffness: 100,
+                                        damping: 80,
+                                        initialVelocity: 0.1),value: dragOffset)
+
+    } // body
         func rowRemove(offsets: IndexSet) {
             itemVM.tags.remove(atOffsets: offsets)
         }
-    /// 行入れ替え処理
         func rowReplace(_ from: IndexSet, _ to: Int) {
             itemVM.tags.move(fromOffsets: from, toOffset: to)
         }
@@ -291,9 +344,7 @@ struct SideMenuButton: View {
 
     var body: some View {
         Button {
-            withAnimation {
-                open.toggle()
-            }
+            withAnimation { open.toggle() }
         } label: {
             HStack(spacing: 12) {
 
