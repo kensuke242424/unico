@@ -15,11 +15,10 @@ struct CircleIcon: View {
     var body: some View {
 
         Image(photo)
-            .resizable().scaledToFit()
-            .frame(width: size)
+            .resizable().scaledToFill()
+            .frame(width: size, height: size)
             .clipShape(Circle())
             .shadow(radius: 2, x: 1, y: 2)
-            .padding(.leading)
     }
 }
 

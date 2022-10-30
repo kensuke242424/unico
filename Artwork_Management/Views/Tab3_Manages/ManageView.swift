@@ -26,13 +26,9 @@ struct ManageView: View {
     @Binding var isPresentedEditItem: Bool
 
     struct InputManage {
-        // NOTE: リスト内のアイテム詳細を表示するトリガーです
         var isShowItemDetail = false
-        // NOTE: リストの一要素Indexを、アイテム詳細画面表示時に渡します
         var listIndex = 0
-        // NOTE: タググループ表示の切り替えに用います
         var tagGroup: TagGroup = .on
-        // NOTE: アイテムのソート処理の切り替えに用います
         var sortType: SortType = .start
     }
 
@@ -100,6 +96,7 @@ struct ManageView: View {
             .background(LinearGradient(gradient: Gradient(colors: [.customDarkGray1, .customLightGray1]),
                                        startPoint: .top, endPoint: .bottom))
             .navigationTitle("Manage")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
@@ -177,6 +174,15 @@ struct ManageView: View {
                     }
                 }
             } // .toolbar
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        inputHome.isShowSystemSideMenu.toggle()
+                    } label: {
+                        CircleIcon(photo: "cloth_sample1", size: 35)
+                    }
+                }
+            }
             .sheet(isPresented: $isPresentedEditItem) {
                 EditItemView(itemVM: itemVM,
                                 isPresentedEditItem: $isPresentedEditItem,
@@ -184,8 +190,6 @@ struct ManageView: View {
                                 passItemData: nil,
                                 editItemStatus: .create)
             } // sheet(新規アイテム)
-
-            .navigationBarTitleDisplayMode(.inline)
         } // NavigationView
     } // body
 

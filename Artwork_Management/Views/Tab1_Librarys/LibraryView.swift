@@ -151,6 +151,7 @@ struct LibraryView: View {
                 LinearGradient(gradient: Gradient(colors: [.customDarkGray1, .customLightGray1]),
                                startPoint: .top, endPoint: .bottom)
             )
+            
             CustomArcShape()
                 .ignoresSafeArea()
                 .foregroundColor(.white)
@@ -227,7 +228,7 @@ struct LibraryView: View {
             .overlay(alignment: .topLeading) {
                 if inputLibrary.isShowHeaderPhotoInfomation {
                     Button {
-                        inputLibrary.isShowHeaderPhotoInfomation.toggle()
+                        inputHome.isShowSystemSideMenu.toggle()
                     } label: {
                         CircleIcon(photo: userIcon, size: 35)
                     }

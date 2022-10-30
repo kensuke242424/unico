@@ -15,6 +15,7 @@ struct InputHome {
     var isShowItemDetail: Bool = false
     var isPresentedEditItem: Bool = false
     var isShowSearchField: Bool = false
+    var isShowSystemSideMenu: Bool = false
     var doCommerce: Bool = false
     var cartState: ResizableSheetState = .hidden
     var commerceState: ResizableSheetState = .hidden
@@ -52,14 +53,6 @@ struct HomeTabView: View {
                     }
                     .tag(2)
 
-                SystemView(itemVM: rootItemVM)
-                    .tabItem {
-                        Image(systemName: "person.fill")
-                        Text("System")
-                    }
-                    .badge("!")
-                    .tag(3)
-
             } // TabViewここまで
 
             VStack {
@@ -89,6 +82,8 @@ struct HomeTabView: View {
 
             // Todo: 各タブごとにオプションが変わるボタン
             UsefulButton(inputHome: $inputHome)
+
+            SistemSideMenu(itemVM: rootItemVM, showMenu: $inputHome.isShowSystemSideMenu)
 
         } // ZStack
         .navigationBarBackButtonHidden()
@@ -122,6 +117,201 @@ struct HomeTabView: View {
 
     } // body
 } // View
+
+struct SistemSideMenu: View {
+
+    @Environment(\.colorScheme) var colorScheme: ColorScheme
+
+    @StateObject var itemVM: ItemViewModel
+    @Binding var showMenu: Bool
+
+    struct InputSideMenu {
+        var tag: Bool = false
+        var account: Bool = false
+        var editMode: EditMode = .inactive
+
+    }
+
+    @Environment(\.editMode) var editMode
+    @State private var inputSideMenu: InputSideMenu = InputSideMenu()
+
+    var body: some View {
+
+        ZStack {
+            // Blur View...
+            BlurView(style: .systemUltraThinMaterialDark)
+
+            Color.customDarkGray1
+                .opacity(0.7)
+                .blur(radius: 15)
+
+            Button {
+                showMenu.toggle()
+            } label: {
+                Image(systemName: "delete.left")
+                    .font(.title)
+            }
+            .foregroundColor(.white.opacity(0.6))
+            .offset(x: UIScreen.main.bounds.width / 4,
+                    y: -UIScreen.main.bounds.height / 3)
+
+            VStack {
+                VStack(alignment: .leading, spacing: 20) {
+
+                    CircleIcon(photo: "cloth_sample1", size: 120)
+
+                    Text("BUMP OF CHICKEN")
+                        .font(.title3.bold()).foregroundColor(.white)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding()
+
+                Spacer(minLength: 40)
+
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 60) {
+
+                            SideMenuButton(open: $inputSideMenu.account,
+                                           title: "アカウント", image: "person")
+
+                            VStack(alignment: .leading) {
+                                HStack {
+                                    SideMenuButton(open: $inputSideMenu.tag, title: "タグ", image: "tag")
+                                    if inputSideMenu.tag {
+                                        Button(action: {
+                                            inputSideMenu.editMode = inputSideMenu.editMode.isEditing ? .inactive : .active
+                                        }, label: {
+                                            Text(inputSideMenu.editMode.isEditing ? "終了" : "編集")
+                                        })
+                                        .padding(.leading)
+                                    }
+                                }
+                                if inputSideMenu.tag {
+                                    Spacer(minLength: 0)
+                                    List {
+                                        ForEach(Array(itemVM.tags.enumerated()),
+                                                id: \.offset) { offset, item in
+
+                                            Text(item.tagName)
+                                                .foregroundColor(.white)
+                                                .onTapGesture {
+                                                    print(offset)
+
+                                                } // HStack
+                                                .listRowBackground(
+                                                    colorScheme == .dark ?
+                                                    Color.gray.opacity(0.3) : Color.white.opacity(0.2)
+                                                )
+
+                                        }
+                                        .onDelete(perform: rowRemove)
+                                        .onMove(perform: rowReplace)
+                                    } // List
+                                    .environment(\.editMode, $inputSideMenu.editMode)
+                                    .frame(width: 200, height: 40 * CGFloat(itemVM.tags.count) + 60)
+                                    .animation(.easeIn(duration: 0.2), value: inputSideMenu.editMode)
+                                    .transition(AnyTransition.opacity.combined(with: .offset(x: -100, y: 0)))
+
+                                    .scrollContentBackground(.hidden)
+//                                    .offset(y: -10)
+                                    Spacer(minLength: 0)
+                                } // if tag...
+                            } // VStack
+                            SideMenuButton(open: $inputSideMenu.account,
+                                           title: "アカウント", image: "person")
+
+                        } // VStack(メニュー列全体)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.leading)
+                    } // ScrollView
+            } // VStack
+            .offset(y: UIScreen.main.bounds.height / 12)
+        } // ZStack
+        .clipShape(SideMenuShape())
+        .background(
+
+            SideMenuShape()
+                .stroke(
+                    .linearGradient(.init(colors: [
+
+                        Color.customLightGray1,
+                        Color.customLightGray1.opacity(0.7),
+                        Color.customLightGray1.opacity(0.5),
+                        Color.clear
+
+                    ]), startPoint: .top, endPoint: .bottom),
+                    lineWidth: 7
+                )
+                .padding(.leading, -50)
+
+        )
+        .ignoresSafeArea()
+    }
+    /// 行削除処理
+        func rowRemove(offsets: IndexSet) {
+            itemVM.tags.remove(atOffsets: offsets)
+        }
+    /// 行入れ替え処理
+        func rowReplace(_ from: IndexSet, _ to: Int) {
+            itemVM.tags.move(fromOffsets: from, toOffset: to)
+        }
+}
+
+struct SideMenuButton: View {
+
+    @Binding var open: Bool
+    let title: String
+    let image: String
+
+    var body: some View {
+        Button {
+            withAnimation() {
+                open.toggle()
+            }
+        } label: {
+            HStack(spacing: 12) {
+
+                Image(systemName: image)
+                    .resizable()
+                    .foregroundColor(.white)
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 25, height: 25)
+
+                Text(title)
+                    .font(.system(size: 20))
+                    .fontWeight(.medium)
+                    .foregroundColor(.white.opacity(0.6))
+
+                Image(systemName: "chevron.down")
+                    .foregroundColor(.white)
+                    .padding(.leading)
+            }
+        }
+    }
+}
+
+struct SideMenuShape: Shape {
+    func path(in rect: CGRect) -> Path {
+
+        return Path { path in
+            let width = rect.width - 100
+            let height = rect.height
+
+            path.move(to: CGPoint(x: width, y: height))
+            path.addLine(to: CGPoint(x: 0, y: height))
+            path.addLine(to: CGPoint(x: 0, y: 0))
+            path.addLine(to: CGPoint(x: width, y: 0))
+
+            // Curve Shape...
+            path.move(to: CGPoint(x: width, y: 0))
+
+            path.addCurve(to: CGPoint(x: width, y: height + 100),
+                          control1: CGPoint(x: width + 150, y: height / 3),
+                          control2: CGPoint(x: width - 150, y: height / 2))
+
+        }
+    }
+}
 
 struct HomeTabView_Previews: PreviewProvider {
 

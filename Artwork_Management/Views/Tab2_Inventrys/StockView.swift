@@ -74,7 +74,6 @@ struct StockView: View {
                                                   tags: $itemVM.tags)
                             } // overlay
                             .id("search")
-//                            .padding()
 
                             // NOTE: サイドタグバー両端のタグインフォメーションopacityを、ドラッグ位置を監視して管理しています。
                             .onChange(of: dragOffset) { newValue in
@@ -308,10 +307,18 @@ struct StockView: View {
                     EmptyView()
                 }
             } // .resizableSheet
-
             .animation(.easeIn(duration: 0.2), value: inputHome.isShowSearchField)
             .navigationTitle("Stock")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        inputHome.isShowSystemSideMenu.toggle()
+                    } label: {
+                        CircleIcon(photo: "cloth_sample1", size: 35)
+                    }
+                }
+            }
         } // NavigationView
         .onTapGesture { searchFocused = nil }
 
