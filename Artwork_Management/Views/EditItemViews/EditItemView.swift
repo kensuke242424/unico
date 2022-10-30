@@ -35,7 +35,7 @@ struct EditItemView: View {
         var geometryMinY: CGFloat = 0
         var isCheckedFocuseDetail: Bool = false
     }
-    @State private var input: InputEditItem = InputEditItem()
+    @State private var inputEdit: InputEditItem = InputEditItem()
 
     var body: some View {
 
@@ -57,37 +57,37 @@ struct EditItemView: View {
                         SelectItemPhotoArea(item: passItemData)
 
                         InputForms(itemVM: itemVM,
-                                   selectionTagName: $input.selectionTagName,
-                                   isOpenSideMenu: $input.isOpenSideMenu,
-                                   editItemName: $input.editItemName,
-                                   editItemInventry: $input.editItemInventry,
-                                   editItemPrice: $input.editItemPrice,
-                                   editItemSales: $input.editItemSales,
-                                   editItemDetail: $input.editItemDetail,
-                                   geometryMinY: $input.geometryMinY,
-                                   offset: $input.offset,
+                                   selectionTagName: $inputEdit.selectionTagName,
+                                   isOpenSideMenu: $inputEdit.isOpenSideMenu,
+                                   editItemName: $inputEdit.editItemName,
+                                   editItemInventry: $inputEdit.editItemInventry,
+                                   editItemPrice: $inputEdit.editItemPrice,
+                                   editItemSales: $inputEdit.editItemSales,
+                                   editItemDetail: $inputEdit.editItemDetail,
+                                   geometryMinY: $inputEdit.geometryMinY,
+                                   offset: $inputEdit.offset,
                                    editItemStatus: editItemStatus,
-                                   tagColor: input.selectionTagColor)
+                                   tagColor: inputEdit.selectionTagColor)
 
                     } // VStack(パーツ全体)
 
-                    if input.isOpenSideMenu {
+                    if inputEdit.isOpenSideMenu {
 
                         SideMenuEditTagView(
                             itemVM: itemVM,
-                            isOpenSideMenu: $input.isOpenSideMenu,
-                            geometryMinY: $input.geometryMinY,
-                            selectionTagName: $input.selectionTagName,
-                            selectionTagColor: $input.selectionTagColor,
-                            itemTagName: input.selectionTagName,
-                            itemTagColor: input.selectionTagColor,
+                            isOpenSideMenu: $inputEdit.isOpenSideMenu,
+                            geometryMinY: $inputEdit.geometryMinY,
+                            selectionTagName: $inputEdit.selectionTagName,
+                            selectionTagColor: $inputEdit.selectionTagColor,
+                            itemTagName: inputEdit.selectionTagName,
+                            itemTagColor: inputEdit.selectionTagColor,
                             editItemStatus: editItemStatus,
                             // Warning_TextSimbol: "＋タグを追加"
-                            tagSideMenuStatus: input.selectionTagName == "＋タグを追加" ? .create : .update)
+                            tagSideMenuStatus: inputEdit.selectionTagName == "＋タグを追加" ? .create : .update)
                     } // if isOpenSideMenu
 
                 } // ZStack(View全体)
-                .animation(.easeIn(duration: 0.3), value: input.offset)
+                .animation(.easeIn(duration: 0.3), value: inputEdit.offset)
 
                 // NOTE: スクロールView全体を.backgroundからgeometry取得します。
                 .background(
@@ -98,7 +98,7 @@ struct EditItemView: View {
                             .onChange(of: geometry.frame(in: .named("scrollFrame_Space")).minY) { newValue in
 
                                 withAnimation(.easeIn(duration: 0.1)) {
-                                    input.geometryMinY = newValue
+                                    inputEdit.geometryMinY = newValue
                                 }
                             } // onChange
                     } // Geometry
@@ -107,51 +107,51 @@ struct EditItemView: View {
             } // ScrollView
             .coordinateSpace(name: "scrollFrame_Space")
 
-            .onChange(of: input.selectionTagName) { selection in
+            .onChange(of: inputEdit.selectionTagName) { selection in
 
                 // NOTE: 選択されたタグネームと紐づいたタグカラーを取り出し、selectionTagColorに格納します。
                 let searchedTagColor = itemVM.searchSelectTagColor(selectTagName: selection,
                                                                    tags: itemVM.tags)
                 withAnimation(.easeIn(duration: 0.25)) {
-                    input.selectionTagColor = searchedTagColor
+                    inputEdit.selectionTagColor = searchedTagColor
                 }
 
                 // NOTE: タグ選択で「+タグを追加」が選択された時、新規タグ追加Viewを表示します。
                 // Warning_TextSimbol: "＋タグを追加"
                 if selection == "＋タグを追加" {
-                    input.isOpenSideMenu.toggle()
+                    inputEdit.isOpenSideMenu.toggle()
                 }
             } // onChange (selectionTagName)
 
-            .onChange(of: input.editItemName) { newValue in
+            .onChange(of: inputEdit.editItemName) { newValue in
 
                 withAnimation(.easeIn(duration: 0.2)) {
                     if newValue.isEmpty {
-                        input.disableButton = true
+                        inputEdit.disableButton = true
                     } else {
-                        input.disableButton = false
+                        inputEdit.disableButton = false
                     }
                 }
             } // onChange(ボタンdisable分岐)
 
             // NOTE: タグ追加サイドメニュー表示後、新規タグが追加されず、サイドメニューが閉じられた時(タグ選択が「＋タグ選択」のままの状態)
             //       タグピッカーの選択をアイテムが保有するタグに戻します。
-            .onChange(of: input.isOpenSideMenu) { isOpen in
+            .onChange(of: inputEdit.isOpenSideMenu) { isOpen in
 
                 if isOpen == false {
                     // Warning_TextSimbol: "＋タグを追加"
-                    if input.selectionTagName == "＋タグを追加" {
+                    if inputEdit.selectionTagName == "＋タグを追加" {
 
                         switch editItemStatus {
 
                         case .create:
                             if let defaultTag = itemVM.tags.first {
-                                input.selectionTagName = defaultTag.tagName
+                                inputEdit.selectionTagName = defaultTag.tagName
                             }
 
                         case .update:
                             if let editItemData = passItemData {
-                                input.selectionTagName = editItemData.tag
+                                inputEdit.selectionTagName = editItemData.tag
                             }
                         } // switch
 
@@ -169,16 +169,16 @@ struct EditItemView: View {
                 // NOTE: 新規アイテム登録遷移の場合、passItemDataにはnilが代入されている
                 if let passItemData = passItemData {
 
-                    input.selectionTagName = passItemData.tag
-                    input.editItemName = passItemData.name
-                    input.editItemInventry = String(passItemData.inventory)
-                    input.editItemPrice = String(passItemData.price)
-                    input.editItemSales = String(passItemData.sales)
-                    input.editItemDetail = passItemData.detail
+                    inputEdit.selectionTagName = passItemData.tag
+                    inputEdit.editItemName = passItemData.name
+                    inputEdit.editItemInventry = String(passItemData.inventory)
+                    inputEdit.editItemPrice = String(passItemData.price)
+                    inputEdit.editItemSales = String(passItemData.sales)
+                    inputEdit.editItemDetail = passItemData.detail
 
                 } else {
                     guard let defaultTag = itemVM.tags.first else { return }
-                    input.selectionTagName = defaultTag.tagName
+                    inputEdit.selectionTagName = defaultTag.tagName
                 }
 
             } // onAppear
@@ -196,10 +196,10 @@ struct EditItemView: View {
                         case .create:
 
                             // NOTE: テストデータに新規アイテムを保存
-                            itemVM.items.append(Item(tag: input.selectionTagName,
-                                                     tagColor: input.selectionTagColor.text,
-                                                     name: input.editItemName,
-                                                     detail: input.editItemDetail != "" ? input.editItemDetail : "none.",
+                            itemVM.items.append(Item(tag: inputEdit.selectionTagName,
+                                                     tagColor: inputEdit.selectionTagColor.text,
+                                                     name: inputEdit.editItemName,
+                                                     detail: inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "none.",
                                                      photo: "", // Todo: 写真取り込み実装後、変更
                                                      cost: 1000,
                                                      price: Int(input.editItemPrice) ?? 0,
@@ -235,7 +235,7 @@ struct EditItemView: View {
                     } label: {
                         Text(editItemStatus == .create ? "追加する" : "更新する")
                     }
-                    .disabled(input.disableButton)
+                    .disabled(inputEdit.disableButton)
                 }
             } // toolbar(アイテム追加ボタン)
 

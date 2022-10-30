@@ -219,59 +219,59 @@ struct SystemSideMenu: View {
 
                                     Spacer(minLength: 0)
 
-                                    List {
+                                    if itemVM.tags != [] {
+                                        List {
 
-                                        ForEach(Array(itemVM.tags.enumerated()),
-                                                id: \.offset) { offset, item in
+                                            ForEach(Array(itemVM.tags.enumerated()),
+                                                    id: \.offset) { offset, item in
 
-                                            Text(item.tagName)
-                                                .foregroundColor(.white)
-                                                .listRowBackground(Color.clear)
-                                                .overlay(alignment: .leading) {
+                                                Text(item.tagName)
+                                                    .foregroundColor(.white)
+                                                    .listRowBackground(Color.clear)
+                                                    .overlay(alignment: .leading) {
 
-                                                    Image(systemName: inputSideMenu.editMode.isEditing ?
-                                                          "line.3.horizontal" : "highlighter")
+                                                        Image(systemName: inputSideMenu.editMode.isEditing ?
+                                                              "line.3.horizontal" : "highlighter")
 
-                                                    .foregroundColor(.yellow).opacity(colorScheme == .dark ? 0.0 : 0.6)
-                                                    .offset(x:inputSideMenu.editMode.isEditing ? 83 : 120)
-                                                    .onTapGesture {
-                                                        print(offset)
-                                                        print("タグ編集ボタンタップ")
-                                                    } // onTapGesture
-                                                } // overlay
-                                        }
-                                                .onDelete(perform: rowRemove)
-                                                .onMove(perform: rowReplace)
-                                    } // List
-                                    .environment(\.editMode, $inputSideMenu.editMode)
-                                    .frame(width: 210, height: 40 * CGFloat(itemVM.tags.count - 1) + 100 )
-                                    .animation(.easeIn(duration: 0.2), value: inputSideMenu.editMode)
-                                    .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
-                                    .scrollContentBackground(.hidden)
-                                    .offset(x: -10)
-                                    .overlay {
-
+                                                        .foregroundColor(.yellow).opacity(colorScheme == .dark ? 0.6 : 0.6)
+                                                        .offset(x: inputSideMenu.editMode.isEditing ? 83 : 120)
+                                                        .onTapGesture {
+                                                            print(offset)
+                                                            print("タグ編集ボタンタップ")
+                                                        } // onTapGesture
+                                                    } // overlay
+                                            }
+                                                    .onDelete(perform: rowRemove)
+                                                    .onMove(perform: rowReplace)
+                                        } // List
+                                        .environment(\.editMode, $inputSideMenu.editMode)
+                                        .frame(width: 210, height: 40 * CGFloat(itemVM.tags.count - 1) + 100 )
+                                        .animation(.easeIn(duration: 0.2), value: inputSideMenu.editMode)
+                                        .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
+                                        .scrollContentBackground(.hidden)
+                                        .offset(x: -10)
+                                    } else {
                                         VStack(spacing: 30) {
                                             Text("登録タグはありません")
                                                 .foregroundColor(.white)
-                                            Text("タグを追加 >>")
+                                            Text("タグを登録 >>")
                                                 .foregroundColor(.blue)
                                                 .onTapGesture {
                                                     inputHome.isShowSystemSideMenu.toggle()
                                                     inputHome.sideMenuBackGround.toggle()
                                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                                                         inputHome.isPresentedEditItem.toggle()
-                                                        print("あああああ")
+                                                        print("タグ追加ボタンタップ")
                                                     }
                                                 }
                                         }
                                         .opacity(itemVM.tags.count == 0 ? 0.8 : 0.0)
                                         .offset(y: 30)
-                                    } // overlay
+                                    } // if itemVM.tags != []
 
                                     Spacer(minLength: 0)
 
-                                } // if tag...
+                                } // if inputSideMenu.tag...
                             } // VStack
                             SideMenuButton(open: $inputSideMenu.help,
                                            title: "ヘルプ", image: inputSideMenu.help
