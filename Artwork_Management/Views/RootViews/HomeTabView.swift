@@ -295,9 +295,6 @@ struct SystemSideMenu: View {
 
                                 } // if inputSideMenu.tag...
                             } // VStack
-                            SideMenuButton(open: $inputSideMenu.help,
-                                           title: "ヘルプ", image: inputSideMenu.help
-                                           ? "questionmark.circle.fill" : "questionmark.circle")
 
                                     if itemVM.tags.count > 2 {
                                         List {
@@ -488,6 +485,7 @@ struct SystemSideMenu: View {
 
         )
         .ignoresSafeArea()
+        .contentShape(SideMenuShape())
         .offset(x: dragOffset)
         .gesture(
             DragGesture()
