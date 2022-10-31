@@ -294,7 +294,7 @@ struct SystemSideMenu: View {
                                     Spacer(minLength: 0)
 
                                 } // if inputSideMenu.tag...
-                            } // VStack
+                            }
 
                                     if itemVM.tags.count > 2 {
                                         List {
@@ -485,7 +485,6 @@ struct SystemSideMenu: View {
 
         )
         .ignoresSafeArea()
-        .contentShape(SideMenuShape())
         .offset(x: dragOffset)
         .gesture(
             DragGesture()
