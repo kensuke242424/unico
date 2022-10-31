@@ -10,7 +10,7 @@ import ResizableSheet
 
 struct InputStock {
     var searchItemNameText: String = "ALL"
-    var currentIndex: Int = 0
+    var tagIndex: Int = 0
     var actionRowIndex: Int = 0
     var sideTagOpacity: CGFloat = 0.4
     var isShowItemDetail: Bool = false
@@ -62,7 +62,7 @@ struct StockView: View {
                                                 inputStock: $inputStock,
                                                 commerceResults: $cartResults)
 
-                            Text(itemVM.tags[inputStock.currentIndex].tagName)
+                            Text(itemVM.tags[inputStock.tagIndex].tagName)
                                             .foregroundColor(.white)
                                             .font(.system(size: 20, weight: .bold))
                                             .frame(width: 100, height: 40)
@@ -97,9 +97,9 @@ struct StockView: View {
                             }
 
                             HStack(spacing: 50) {
-                                Text(inputStock.currentIndex == 0 ?
+                                Text(inputStock.tagIndex == 0 ?
                                          "- \(inputStock.searchItemNameText) -" :
-                                        "-  \(itemVM.tags[inputStock.currentIndex].tagName) -")
+                                        "-  \(itemVM.tags[inputStock.tagIndex].tagName) -")
                                 .font(.title.bold())
                                 .foregroundColor(.white)
                                 .shadow(radius: 3, x: 4, y: 6)
@@ -130,7 +130,7 @@ struct StockView: View {
                             TagSortCards(itemVM: itemVM,
                                          inputStock: $inputStock,
                                          cartResults: $cartResults,
-                                         selectFilterTag: itemVM.tags[inputStock.currentIndex].tagName)
+                                         selectFilterTag: itemVM.tags[inputStock.tagIndex].tagName)
                         } // ScrollView (アイテムロケーション)
 
                     } // VStack
@@ -199,7 +199,7 @@ struct StockView: View {
                             scrollProxy.scrollTo("search", anchor: .top)
                             }
 //                        withAnimation(.easeIn(duration: 0.3)) {
-                            inputStock.currentIndex = 0 // タグを「All」に更新
+                            inputStock.tagIndex = 0 // タグを「All」に更新
 //                        }
                     } // if
                 } // .onChange
@@ -352,26 +352,26 @@ struct SideTagBarOverlay: View {
         // NOTE: タグサイドバー枠内で、現在選択しているタグの前後の値をインフォメーションします。
             .overlay {
                 HStack {
-                    if inputStock.currentIndex - 1 >= 0 {
+                    if inputStock.tagIndex - 1 >= 0 {
                         HStack {
                             Text("<")
-                            Text("\(tags[inputStock.currentIndex - 1].tagName)")
+                            Text("\(tags[inputStock.tagIndex - 1].tagName)")
                                 .frame(width: 60)
                                 .lineLimit(1)
                         } // HStack
-                        .onTapGesture { inputStock.currentIndex -= 1 }
+                        .onTapGesture { inputStock.tagIndex -= 1 }
                     }
 
                     Spacer()
 
-                    if inputStock.currentIndex + 1 < tags.count {
+                    if inputStock.tagIndex + 1 < tags.count {
                         HStack {
-                            Text("\(tags[inputStock.currentIndex + 1].tagName)")
+                            Text("\(tags[inputStock.tagIndex + 1].tagName)")
                                 .frame(width: 60)
                                 .lineLimit(1)
                             Text(">")
                         } // HStack
-                        .onTapGesture { inputStock.currentIndex += 1 }
+                        .onTapGesture { inputStock.tagIndex += 1 }
                     }
                 } // HStack
                 .foregroundColor(.white)

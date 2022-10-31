@@ -167,7 +167,6 @@ struct SystemSideMenu: View {
         var tag: Bool = false
         var help: Bool = false
         var editMode: EditMode = .inactive
-
     }
 
     @State private var inputSideMenu: InputSideMenu = InputSideMenu()
@@ -212,8 +211,9 @@ struct SystemSideMenu: View {
 
                             // Item Menu...
                             VStack(alignment: .leading) {
-                                SideMenuButton(open: $inputSideMenu.item,
-                                               title: "アイテム", image: "shippingbox")
+
+                                SideMenuButton(open: $inputSideMenu.item, title: "アイテム", image: "shippingbox")
+
                                 if inputSideMenu.item {
 
                                     VStack(alignment: .leading, spacing: 40) {
@@ -225,6 +225,7 @@ struct SystemSideMenu: View {
                                         .onTapGesture { inputHome.isPresentedEditItem.toggle() }
 
                                     } // VStack
+                                    .foregroundColor(.white)
                                     .frame(width: 210, height: 60, alignment: .topLeading)
                                     .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
                                     .offset(x: 20, y: 30)
@@ -235,16 +236,20 @@ struct SystemSideMenu: View {
                             // Tag Menu...
                             VStack(alignment: .leading) {
                                 HStack {
-                                    SideMenuButton(open: $inputSideMenu.tag,
-                                                   title: "タグ", image: "tag")
+
+                                    SideMenuButton(open: $inputSideMenu.tag, title: "タグ", image: "tag")
+
                                     if inputSideMenu.tag {
-                                        Button(action: {
-                                            inputSideMenu.editMode = inputSideMenu.editMode.isEditing ? .inactive : .active
-                                        }, label: {
-                                            Text(inputSideMenu.editMode.isEditing ? "終了" : "編集")
-                                                .opacity(itemVM.tags.count == 0 ? 0.0 : 1.0)
-                                        })
-                                        .padding(.leading, 20).padding(.trailing, 10)
+
+                                        if itemVM.tags.count != 0 {
+                                            Button(action: {
+                                                inputSideMenu.editMode = inputSideMenu.editMode.isEditing ? .inactive : .active
+                                            }, label: {
+                                                Text(inputSideMenu.editMode.isEditing ? "終了" : "編集")
+                                                    .opacity(itemVM.tags.count == 0 ? 0.0 : 1.0)
+                                            })
+                                            .offset(x: 20)
+                                        }
 
                                         Button {
                                             inputHome.isShowSystemSideMenu.toggle()
@@ -256,6 +261,9 @@ struct SystemSideMenu: View {
                                         } label: {
                                             Image(systemName: "plus.square")
                                         }
+                                        .offset(x: 30)
+
+
                                     }
                                 }
 
@@ -279,15 +287,17 @@ struct SystemSideMenu: View {
 
                                                     Spacer()
 
-                                                    Image(systemName: inputSideMenu.editMode.isEditing ? "" : "highlighter")
+                                                    Image(systemName: "highlighter")
                                                     .foregroundColor(.gray)
-                                                    .opacity(0.6)
+                                                    .opacity(inputSideMenu.editMode.isEditing ? 0.0 : 0.6)
                                                     .onTapGesture { print("タグ編集ボタンタップ") }
                                                     .overlay {
-                                                        Image(systemName: colorScheme == .dark ? "" : "line.3.horizontal")
-                                                        .foregroundColor(.yellow)
-                                                        .opacity(inputSideMenu.editMode.isEditing ? 0.6 : 0.0)
-                                                        .offset(x: 20)
+                                                        if colorScheme == .light {
+                                                            Image(systemName: "line.3.horizontal")
+                                                            .foregroundColor(.gray)
+                                                            .opacity(inputSideMenu.editMode.isEditing ? 0.6 : 0.0)
+                                                            .offset(x: 30)
+                                                        }
                                                     }
                                                 } // HStack
                                                 .listRowBackground(Color.clear)
@@ -314,19 +324,20 @@ struct SystemSideMenu: View {
                                     Spacer(minLength: 0)
 
                                 } // if inputSideMenu.tag...
-                            } // VStack
+                            }
 
                             // Account Menu...
                             VStack(alignment: .leading) {
-                                SideMenuButton(open: $inputSideMenu.account,
-                                               title: "アカウント", image: "person")
+
+                                SideMenuButton(open: $inputSideMenu.account, title: "アカウント", image: "person")
+
                                 if inputSideMenu.account {
 
                                     VStack(alignment: .leading, spacing: 40) {
 
                                         HStack {
                                             Image(systemName: "person.crop.circle.fill")
-                                            Text("アカウント情報変更")
+                                            Text("ユーザ設定")
                                         }
                                         .onTapGesture { inputHome.isPresentedEditItem.toggle() }
 
@@ -337,6 +348,7 @@ struct SystemSideMenu: View {
                                         .onTapGesture { inputHome.isPresentedEditItem.toggle() }
 
                                     } // VStack
+                                    .foregroundColor(.white)
                                     .frame(width: 210, height: 120, alignment: .topLeading)
                                     .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
                                     .offset(x: 20, y: 30)
@@ -346,8 +358,9 @@ struct SystemSideMenu: View {
 
                             // Help Menu...
                             VStack(alignment: .leading) {
-                                SideMenuButton(open: $inputSideMenu.help,
-                                               title: "ヘルプ", image: "questionmark.circle")
+
+                                SideMenuButton(open: $inputSideMenu.help, title: "ヘルプ", image: "questionmark.circle")
+
                                 if inputSideMenu.help {
 
                                     VStack(alignment: .leading, spacing: 40) {
@@ -377,6 +390,7 @@ struct SystemSideMenu: View {
                                         .onTapGesture { inputHome.isPresentedEditItem.toggle() }
 
                                     } // VStack
+                                    .foregroundColor(.white)
                                     .frame(width: 210, height: 120, alignment: .topLeading)
                                     .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
                                     .offset(x: 20, y: 30)
@@ -388,7 +402,8 @@ struct SystemSideMenu: View {
                         .padding([.leading, .top])
 
                         Color.clear
-                            .frame(height: 200)
+                            .frame(height: 300)
+
                     } // ScrollView
                     .frame(width: UIScreen.main.bounds.width / 2 + 50)
                     Spacer()
@@ -398,6 +413,7 @@ struct SystemSideMenu: View {
         } // ZStack
 
         .clipShape(SideMenuShape())
+        .contentShape(SideMenuShape())
 
         .background(
 
@@ -417,7 +433,6 @@ struct SystemSideMenu: View {
 
         )
         .ignoresSafeArea()
-        .contentShape(SideMenuShape())
         .offset(x: dragOffset)
         .gesture(
             DragGesture()
@@ -438,7 +453,7 @@ struct SystemSideMenu: View {
         .animation(.interpolatingSpring(mass: 0.8,
                                         stiffness: 100,
                                         damping: 80,
-                                        initialVelocity: 0.1),value: dragOffset)
+                                        initialVelocity: 0.1), value: dragOffset)
 
     } // body
         func rowRemove(offsets: IndexSet) {
