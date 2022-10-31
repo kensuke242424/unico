@@ -37,6 +37,7 @@ class ItemViewModel: ObservableObject {
     [
         Tag(tagName: "Clothes", tagColor: .red),
         Tag(tagName: "Shoes", tagColor: .blue),
+        Tag(tagName: "タオル", tagColor: .blue),
         Tag(tagName: "Goods", tagColor: .yellow)
     ]
 
