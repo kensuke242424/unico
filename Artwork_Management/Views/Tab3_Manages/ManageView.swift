@@ -54,7 +54,7 @@ struct ManageView: View {
                                 if tagRow != itemVM.tags.first! && tagRow != itemVM.tags.last! {
                                     Text(tagRow.tagName)
                                         .foregroundColor(.white)
-                                        .font(.largeTitle.bold())
+                                        .font(.title.bold())
                                         .shadow(radius: 2, x: 4, y: 6)
                                         .padding(.vertical)
 
@@ -89,11 +89,16 @@ struct ManageView: View {
 
                             // "タグ無し"タグのついたアイテムが存在した場合
                             if itemVM.items.contains(where: {$0.tag == (itemVM.tags.last!.tagName)}) {
-                                Text("- \(itemVM.tags.last!.tagName) -")
+                                Text("\(itemVM.tags.last!.tagName)")
                                     .foregroundColor(.white)
-                                    .font(.largeTitle.bold())
+                                    .font(.title.bold())
                                     .shadow(radius: 2, x: 4, y: 6)
                                     .padding(.vertical)
+
+                                LinearGradient(gradient: Gradient(colors: [.gray, .clear]),
+                                                           startPoint: .leading, endPoint: .trailing)
+                                    .frame(height: 1)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
 
                                     ForEach(Array(itemVM.items.enumerated()), id: \.offset) { offset, item in
 
@@ -135,6 +140,7 @@ struct ManageView: View {
                                        startPoint: .top, endPoint: .bottom))
             .navigationTitle("Manage")
             .navigationBarTitleDisplayMode(.inline)
+            .animation(.spring(response: 0.5), value: inputManage.tagGroup)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {

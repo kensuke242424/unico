@@ -160,15 +160,33 @@ struct LibraryView: View {
 
             Menu {
                 ForEach(itemVM.tags) { tag in
-                    Button {
-                        inputLibrary.selectFilterTag = tag.tagName
-                    } label: {
-                        if inputLibrary.selectFilterTag == tag.tagName {
-                            Text("\(tag.tagName)　　 ✔︎")
-                        } else {
-                            Text(tag.tagName)
+
+                    if tag != itemVM.tags.last! {
+                        Button {
+                            inputLibrary.selectFilterTag = tag.tagName
+                        } label: {
+                            if inputLibrary.selectFilterTag == tag.tagName {
+                                Text("\(tag.tagName)　　 ✔︎")
+                            } else {
+                                Text(tag.tagName)
+                            }
+                        }
+
+                    } else {
+                        if itemVM.items.contains(where: {$0.tag == (itemVM.tags.last!.tagName)}) {
+                            Button {
+                                inputLibrary.selectFilterTag = tag.tagName
+                            } label: {
+                                if inputLibrary.selectFilterTag == tag.tagName {
+                                    Text("\(tag.tagName)　　 ✔︎")
+                                } else {
+                                    Text(tag.tagName)
+                                }
+                            }
+
                         }
                     }
+
                 } // ForEach
             } label: {
                 Image(systemName: "list.bullet")

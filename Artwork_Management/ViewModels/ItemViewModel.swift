@@ -40,7 +40,7 @@ class ItemViewModel: ObservableObject {
         Tag(tagName: "Shoes", tagColor: .blue),
         Tag(tagName: "タオル", tagColor: .blue),
         Tag(tagName: "Goods", tagColor: .yellow),
-        Tag(tagName: "タグ無し", tagColor: .gray)
+        Tag(tagName: "未グループ", tagColor: .gray)
     ]
 
     // ✅ NOTE: アイテム配列を各項目に沿ってソートするメソッド

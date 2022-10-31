@@ -98,7 +98,7 @@ struct HomeTabView: View {
 
         } // ZStack
         .animation(.easeIn(duration: 0.2), value: inputHome.sideMenuBackGround)
-        .animation(.spring(response: 0.2, blendDuration: 1.0), value: inputHome.isShowSystemSideMenu)
+        .animation(.spring(response: 0.3, blendDuration: 1.0), value: inputHome.isShowSystemSideMenu)
         .navigationBarBackButtonHidden()
 
         .sheet(isPresented: $inputHome.isPresentedEditItem) {
@@ -286,19 +286,23 @@ struct SystemSideMenu: View {
 
                                                         Spacer()
 
-                                                        Image(systemName: "highlighter")
-                                                        .foregroundColor(.gray)
-                                                        .opacity(inputSideMenu.editMode.isEditing ? 0.0 : 0.6)
-                                                        .onTapGesture { print("タグ編集ボタンタップ") }
-                                                        .overlay {
-                                                            if colorScheme == .light {
-                                                                Image(systemName: "line.3.horizontal")
-                                                                .foregroundColor(.gray)
-                                                                .opacity(inputSideMenu.editMode.isEditing ? 0.6 : 0.0)
-                                                                .offset(x: 30)
-                                                            }
+                                                        if inputSideMenu.editMode == .inactive {
+                                                            Image(systemName: "highlighter")
+                                                            .foregroundColor(.gray)
+                                                            .opacity(inputSideMenu.editMode.isEditing ? 0.0 : 0.6)
+                                                            .onTapGesture { print("タグ編集ボタンタップ") }
                                                         }
+
                                                     } // HStack
+                                                    .overlay {
+                                                        if colorScheme == .light {
+                                                            Image(systemName: "line.3.horizontal")
+                                                            .foregroundColor(.gray)
+                                                            .opacity(inputSideMenu.editMode.isEditing ? 0.6 : 0.0)
+                                                            .frame(width: UIScreen.main.bounds.width * 0.58, alignment: .leading)
+                                                            .offset(x: UIScreen.main.bounds.width * 0.44)
+                                                        }
+                                                    }
                                                     .listRowBackground(Color.clear)
                                                 }
                                             }
@@ -306,7 +310,7 @@ struct SystemSideMenu: View {
                                             .onMove(perform: rowReplace)
                                         } // List
                                         .environment(\.editMode, $inputSideMenu.editMode)
-                                        .frame(width: UIScreen.main.bounds.width * 0.6,
+                                        .frame(width: UIScreen.main.bounds.width * 0.58,
                                                height: 60 + (40 * CGFloat(itemVM.tags.count - 2)))
                                         .animation(.easeIn(duration: 0.2), value: inputSideMenu.editMode)
                                         .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
@@ -454,12 +458,26 @@ struct SystemSideMenu: View {
                                         initialVelocity: 0.1), value: dragOffset)
 
     } // body
+
         func rowRemove(offsets: IndexSet) {
-            itemVM.tags.remove(atOffsets: offsets)
+
+            for tagIndex in offsets {
+                for itemIndex in itemVM.items.indices {
+                    if itemVM.items[itemIndex].tag == itemVM.tags[tagIndex].tagName {
+                        itemVM.items[itemIndex].tag = itemVM.tags.last!.tagName
+                    }
+                }
+            }
+            withAnimation(.easeIn(duration: 0.1)) {
+                itemVM.tags.remove(atOffsets: offsets)
+            }
         }
         func rowReplace(_ from: IndexSet, _ to: Int) {
-            itemVM.tags.move(fromOffsets: from, toOffset: to)
+            withAnimation(.spring()) {
+                itemVM.tags.move(fromOffsets: from, toOffset: to)
+            }
         }
+
 }
 
 struct SideMenuButton: View {
