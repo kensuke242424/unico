@@ -46,25 +46,45 @@ struct ManageView: View {
                         switch inputManage.tagGroup {
 
                         case .on:
+
                             // タグの要素数の分リストを作成
-                            ForEach(itemVM.tags) { tag in
+                            ForEach(itemVM.tags) { tagRow in
 
                                 // firstには"ALL", lastには"タグ無し"
-                                if tag != itemVM.tags.first! && tag != itemVM.tags.last! {
-                                    Text("- \(tag.tagName) -")
+                                if tagRow != itemVM.tags.first! && tagRow != itemVM.tags.last! {
+                                    Text(tagRow.tagName)
                                         .foregroundColor(.white)
                                         .font(.largeTitle.bold())
                                         .shadow(radius: 2, x: 4, y: 6)
                                         .padding(.vertical)
-                                }
 
-                                ForEach(Array(itemVM.items.enumerated()), id: \.offset) { offset, item in
+                                    Spacer(minLength: 0)
 
-                                    if item.tag == tag.tagName {
-                                        salesItemListRow(item: item, listIndex: offset)
+                                    LinearGradient(gradient: Gradient(colors: [.gray, .clear]),
+                                                               startPoint: .leading, endPoint: .trailing)
+                                        .frame(height: 1)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                                    if itemVM.items.contains(where: {$0.tag == tagRow.tagName}) {
+
+                                        VStack {
+                                            ForEach(Array(itemVM.items.enumerated()), id: \.offset) { offset, item in
+
+                                                if item.tag == tagRow.tagName {
+                                                    salesItemListRow(item: item, listIndex: offset)
+                                                }
+                                            }
+                                            Color.clear
+                                                .frame(height: 20)
+                                        }
+
+                                    } else {
+                                        Text("タグに該当するアイテムはありません")
+                                            .font(.subheadline)
+                                            .foregroundColor(.white).opacity(0.6)
+                                            .frame(height: 100)
                                     }
                                 }
-
                             } // ForEach itemVM.tags
 
                             // "タグ無し"タグのついたアイテムが存在した場合

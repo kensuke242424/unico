@@ -235,18 +235,18 @@ struct SystemSideMenu: View {
 
                             // Tag Menu...
                             VStack(alignment: .leading) {
+
                                 HStack {
 
                                     SideMenuButton(open: $inputSideMenu.tag, title: "タグ", image: "tag")
 
                                     if inputSideMenu.tag {
 
-                                        if itemVM.tags.count != 0 {
+                                        if itemVM.tags.count > 2 {
                                             Button(action: {
                                                 inputSideMenu.editMode = inputSideMenu.editMode.isEditing ? .inactive : .active
                                             }, label: {
                                                 Text(inputSideMenu.editMode.isEditing ? "終了" : "編集")
-                                                    .opacity(itemVM.tags.count == 0 ? 0.0 : 1.0)
                                             })
                                             .offset(x: 20)
                                         }
@@ -263,18 +263,18 @@ struct SystemSideMenu: View {
                                         }
                                         .offset(x: 30)
                                     }
-                                }
+                                } // HStack
 
                                 if inputSideMenu.tag {
 
                                     Spacer(minLength: 0)
 
-                                    if itemVM.tags.count > 1 {
+                                    if itemVM.tags.count > 2 {
                                         List {
 
                                             ForEach(Array(itemVM.tags.enumerated()), id: \.offset) { offset, tag in
 
-                                                if tag.tagName != "ALL" || tag.tagName != "タグ無し" {
+                                                if tag != itemVM.tags.first! && tag != itemVM.tags.last! {
                                                     HStack {
                                                         Image(systemName: "tag.fill")
                                                             .font(.caption).foregroundColor(tag.tagColor.color).opacity(0.6)
@@ -307,22 +307,20 @@ struct SystemSideMenu: View {
                                         } // List
                                         .environment(\.editMode, $inputSideMenu.editMode)
                                         .frame(width: UIScreen.main.bounds.width * 0.6,
-                                               height: 40 * CGFloat(itemVM.tags.count - 1) + 100 )
+                                               height: 60 + (40 * CGFloat(itemVM.tags.count - 2)))
                                         .animation(.easeIn(duration: 0.2), value: inputSideMenu.editMode)
                                         .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
                                         .scrollContentBackground(.hidden)
                                         .offset(x: -10)
                                     } else {
-                                        VStack(spacing: 30) {
-                                            Text("登録タグはありません")
-                                                .font(.subheadline).foregroundColor(.white)
-                                        }
-                                        .opacity(itemVM.tags == [] ? 0.8 : 0.0)
-                                        .offset(y: 30)
-                                    } // if itemVM.tags != []
 
-                                    Spacer(minLength: 0)
+                                        Text("登録タグはありません")
+                                            .font(.subheadline).foregroundColor(.white)
+                                            .opacity(0.7)
+                                            .frame(height: 60)
+                                            .offset(y: 30)
 
+                                    } // if itemVM.tags.count > 2
                                 } // if inputSideMenu.tag...
                             }
 

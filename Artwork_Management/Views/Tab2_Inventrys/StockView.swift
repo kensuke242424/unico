@@ -51,16 +51,20 @@ struct StockView: View {
                             TagTitle(title: "最近更新したアイテム", font: .title3)
                                 .foregroundColor(.white)
                                 .opacity(0.8)
-                                .padding(.top)
+                                .padding(.vertical)
 
                             Divider()
                                 .background(.gray)
-                                .padding()
+                                .padding(.horizontal)
 
                             // ✅カスタムView: 最近更新したアイテムをHStack表示します。(横スクロール)
                             UpdateTimeSortCards(itemVM: itemVM,
                                                 inputStock: $inputStock,
                                                 commerceResults: $cartResults)
+
+                            Divider()
+                                .background(.gray)
+                                .padding([.horizontal, .bottom])
 
                             Text(itemVM.tags[inputStock.tagIndex].tagName)
                                             .foregroundColor(.white)
@@ -124,7 +128,7 @@ struct StockView: View {
                                 }
                                 Spacer()
                             } // HStack
-                            .padding()
+                            .padding([.leading, .vertical])
 
                             // ✅カスタムView: アイテムを表示します。(縦スクロール)
                             TagSortCards(itemVM: itemVM,
