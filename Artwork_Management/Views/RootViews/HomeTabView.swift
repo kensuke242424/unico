@@ -262,8 +262,6 @@ struct SystemSideMenu: View {
                                             Image(systemName: "plus.square")
                                         }
                                         .offset(x: 30)
-
-
                                     }
                                 }
 
@@ -271,36 +269,38 @@ struct SystemSideMenu: View {
 
                                     Spacer(minLength: 0)
 
-                                    if itemVM.tags != [] {
+                                    if itemVM.tags.count > 1 {
                                         List {
 
-                                            ForEach(Array(itemVM.tags.enumerated()), id: \.offset) { offset, item in
+                                            ForEach(Array(itemVM.tags.enumerated()), id: \.offset) { offset, tag in
 
-                                                HStack {
-                                                    Image(systemName: "tag.fill")
-                                                        .font(.caption).foregroundColor(item.tagColor.color).opacity(0.6)
+                                                if tag.tagName != "ALL" || tag.tagName != "タグ無し" {
+                                                    HStack {
+                                                        Image(systemName: "tag.fill")
+                                                            .font(.caption).foregroundColor(tag.tagColor.color).opacity(0.6)
 
-                                                    Text(item.tagName)
-                                                        .lineLimit(1)
-                                                        .frame(alignment: .leading)
-                                                        .foregroundColor(.white)
+                                                        Text(tag.tagName)
+                                                            .lineLimit(1)
+                                                            .frame(alignment: .leading)
+                                                            .foregroundColor(.white)
 
-                                                    Spacer()
+                                                        Spacer()
 
-                                                    Image(systemName: "highlighter")
-                                                    .foregroundColor(.gray)
-                                                    .opacity(inputSideMenu.editMode.isEditing ? 0.0 : 0.6)
-                                                    .onTapGesture { print("タグ編集ボタンタップ") }
-                                                    .overlay {
-                                                        if colorScheme == .light {
-                                                            Image(systemName: "line.3.horizontal")
-                                                            .foregroundColor(.gray)
-                                                            .opacity(inputSideMenu.editMode.isEditing ? 0.6 : 0.0)
-                                                            .offset(x: 30)
+                                                        Image(systemName: "highlighter")
+                                                        .foregroundColor(.gray)
+                                                        .opacity(inputSideMenu.editMode.isEditing ? 0.0 : 0.6)
+                                                        .onTapGesture { print("タグ編集ボタンタップ") }
+                                                        .overlay {
+                                                            if colorScheme == .light {
+                                                                Image(systemName: "line.3.horizontal")
+                                                                .foregroundColor(.gray)
+                                                                .opacity(inputSideMenu.editMode.isEditing ? 0.6 : 0.0)
+                                                                .offset(x: 30)
+                                                            }
                                                         }
-                                                    }
-                                                } // HStack
-                                                .listRowBackground(Color.clear)
+                                                    } // HStack
+                                                    .listRowBackground(Color.clear)
+                                                }
                                             }
                                             .onDelete(perform: rowRemove)
                                             .onMove(perform: rowReplace)

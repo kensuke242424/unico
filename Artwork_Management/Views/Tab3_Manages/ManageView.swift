@@ -49,25 +49,43 @@ struct ManageView: View {
                             // タグの要素数の分リストを作成
                             ForEach(itemVM.tags) { tag in
 
-                                Text("- \(tag.tagName) -")
-                                    .foregroundColor(.white)
-                                    .font(.largeTitle.bold())
-                                    .shadow(radius: 2, x: 4, y: 6)
-                                    .padding(.vertical)
+                                // firstには"ALL", lastには"タグ無し"
+                                if tag != itemVM.tags.first! && tag != itemVM.tags.last! {
+                                    Text("- \(tag.tagName) -")
+                                        .foregroundColor(.white)
+                                        .font(.largeTitle.bold())
+                                        .shadow(radius: 2, x: 4, y: 6)
+                                        .padding(.vertical)
+                                }
 
-                                // タグごとに分配してリスト表示
-                                // enumerated ⇨ 要素とインデックス両方取得
                                 ForEach(Array(itemVM.items.enumerated()), id: \.offset) { offset, item in
 
                                     if item.tag == tag.tagName {
                                         salesItemListRow(item: item, listIndex: offset)
                                     }
-                                } // ForEach item
-                            } // case .groupOn
+                                }
+
+                            } // ForEach itemVM.tags
+
+                            // "タグ無し"タグのついたアイテムが存在した場合
+                            if itemVM.items.contains(where: {$0.tag == (itemVM.tags.last!.tagName)}) {
+                                Text("- \(itemVM.tags.last!.tagName) -")
+                                    .foregroundColor(.white)
+                                    .font(.largeTitle.bold())
+                                    .shadow(radius: 2, x: 4, y: 6)
+                                    .padding(.vertical)
+
+                                    ForEach(Array(itemVM.items.enumerated()), id: \.offset) { offset, item in
+
+                                        if item.tag == "\(itemVM.tags.last!.tagName)" {
+                                            salesItemListRow(item: item, listIndex: offset)
+                                        }
+                                    } // ForEach item
+                            } // if
 
                         case .off:
 
-                            Text("- ALL -")
+                            Text("- \(itemVM.tags[0].tagName) -")
                                 .font(.largeTitle.bold())
                                 .shadow(radius: 2, x: 4, y: 6)
                                 .padding(.vertical)

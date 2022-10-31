@@ -164,10 +164,10 @@ struct SideMenuEditTagView: View {
                                 print("タグが重複しました。")
                                 input.isShowAlert.toggle()
                             } else {
-                                // 新規タグデータを追加、配列の１番目に保存(at: 0)
+                                // 新規タグデータを追加、配列の2番目に保存(at: 1)
                                 itemVM.tags.insert(Tag(tagName: input.newTagName,
                                                        tagColor: input.selectionSideMenuTagColor),
-                                                   at: 0)
+                                                   at: 1)
 
                                 selectionTagName = input.newTagName
                             } // if contains

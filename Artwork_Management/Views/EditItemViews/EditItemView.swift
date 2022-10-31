@@ -268,7 +268,7 @@ struct InputForms: View {
 
     var body: some View {
 
-        VStack(spacing: 30) {
+        VStack(spacing: 40) {
 
             VStack(alignment: .leading) {
                 InputFormTitle(title: "■タグ設定", isNeed: true)
@@ -280,8 +280,8 @@ struct InputForms: View {
                     Picker("", selection: $selectionTagName) {
                         ForEach(0 ..< itemVM.tags.count, id: \.self) { index in
 
-                            if let tagsRow = itemVM.tags[index] {
-                                Text(tagsRow.tagName).tag(tagsRow.tagName)
+                            if index != 0 {
+                                Text(itemVM.tags[index].tagName).tag(itemVM.tags[index].tagName)
                             }
                         } // ForEach
                         Text("＋タグを追加").tag("＋タグを追加")
@@ -373,7 +373,7 @@ struct InputForms: View {
                     .font(.title3)
 
                 TextEditor(text: $editItemDetail)
-                    .frame(width: UIScreen.main.bounds.width - 20, height: 200)
+                    .frame(height: 200)
                     .shadow(radius: 3, x: 0, y: 0)
                     .autocapitalization(.none)
                     .focused($focusedField, equals: .detail)
@@ -392,9 +392,8 @@ struct InputForms: View {
             .padding(.top)
 
         } // VStack(入力フォーム全体)
-
         .padding(.vertical, 20)
-        .padding(.horizontal, 30)
+        .padding(.horizontal, 20)
         .onTapGesture { focusedField = nil }
     }
 }
