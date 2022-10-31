@@ -293,9 +293,6 @@ struct SystemSideMenu: View {
 
                                     Spacer(minLength: 0)
 
-                                } // if inputSideMenu.tag...
-                            }
-
                                     if itemVM.tags.count > 2 {
                                         List {
 
