@@ -170,6 +170,7 @@ struct EditItemView: View {
                 if let passItemData = passItemData {
 
                     inputEdit.selectionTagName = passItemData.tag
+                    inputEdit.photoURL = passItemData.photo
                     inputEdit.editItemName = passItemData.name
                     inputEdit.editItemInventry = String(passItemData.inventory)
                     inputEdit.editItemPrice = String(passItemData.price)
@@ -178,7 +179,7 @@ struct EditItemView: View {
 
                 } else {
                     guard let defaultTag = itemVM.tags.first else { return }
-                    inputEdit.selectionTagName = defaultTag.tagName
+                    inputEdit.selectionTagName = itemVM.tags[1].tagName
                 }
 
             } // onAppear

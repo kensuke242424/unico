@@ -68,10 +68,10 @@ struct ManageView: View {
                                     if itemVM.items.contains(where: {$0.tag == tagRow.tagName}) {
 
                                         VStack {
-                                            ForEach(Array(itemVM.items.enumerated()), id: \.offset) { offset, item in
+                                            ForEach(itemVM.items) { item in
 
                                                 if item.tag == tagRow.tagName {
-                                                    salesItemListRow(item: item, listIndex: offset)
+                                                    manageListRow(item: item)
                                                 }
                                             }
                                             Color.clear
@@ -100,10 +100,10 @@ struct ManageView: View {
                                     .frame(height: 1)
                                     .frame(maxWidth: .infinity, alignment: .leading)
 
-                                    ForEach(Array(itemVM.items.enumerated()), id: \.offset) { offset, item in
+                                    ForEach(itemVM.items) { item in
 
                                         if item.tag == "\(itemVM.tags.last!.tagName)" {
-                                            salesItemListRow(item: item, listIndex: offset)
+                                            manageListRow(item: item)
                                         }
                                     } // ForEach item
                             } // if
@@ -115,9 +115,9 @@ struct ManageView: View {
                                 .shadow(radius: 2, x: 4, y: 6)
                                 .padding(.vertical)
 
-                            ForEach(Array(itemVM.items.enumerated()), id: \.offset) { offset, item in
+                            ForEach(itemVM.items) { item in
 
-                                salesItemListRow(item: item, listIndex: offset)
+                                manageListRow(item: item)
 
                             } // case .groupOff
                         } // switch tagGroup
@@ -141,6 +141,7 @@ struct ManageView: View {
             .navigationTitle("Manage")
             .navigationBarTitleDisplayMode(.inline)
             .animation(.spring(response: 0.5), value: inputManage.tagGroup)
+            // sort Menu...
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
@@ -217,7 +218,8 @@ struct ManageView: View {
                             .frame(width: 30, height: 30)
                     }
                 }
-            } // .toolbar
+            }
+            // System Side Menu ...
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button {
@@ -228,24 +230,20 @@ struct ManageView: View {
                     }
                 }
             }
-            .sheet(isPresented: $inputHome.isPresentedEditItem) {
-                EditItemView(itemVM: itemVM,
-                             isPresentedEditItem: $inputHome.isPresentedEditItem,
-                                itemIndex: 0,
-                                passItemData: nil,
-                                editItemStatus: .create)
-            } // sheet(新規アイテム)
         } // NavigationView
     } // body
 
     @ViewBuilder
-    func salesItemListRow(item: Item, listIndex: Int) -> some View {
+    func manageListRow(item: Item) -> some View {
 
         VStack(alignment: .leading, spacing: 20) {
 
             HStack(spacing: 20) {
 
                 ShowItemPhoto(photo: item.photo, size: 70)
+                    .onTapGesture {
+                        print("画像タップ")
+                    }
 
                 VStack(alignment: .leading, spacing: 10) {
                     HStack(spacing: 40) {
@@ -254,9 +252,15 @@ struct ManageView: View {
                             .opacity(0.8)
                             .font(.subheadline.bold())
                         Button {
-                            inputManage.listIndex = listIndex
-                            inputManage.isShowItemDetail.toggle()
-                            print("isShowItemDetail: \(inputManage.isShowItemDetail)")
+
+                            if let listIndex = itemVM.items.firstIndex(of: item) {
+                                inputManage.listIndex = listIndex
+                                inputManage.isShowItemDetail.toggle()
+                                print("isShowItemDetail: \(inputManage.isShowItemDetail)")
+                                print(listIndex)
+                            } else {
+                                print("インデックス取得失敗")
+                            }
 
                         } label: {
                             Image(systemName: "info.circle.fill")

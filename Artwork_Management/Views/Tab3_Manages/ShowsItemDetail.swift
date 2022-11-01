@@ -19,6 +19,7 @@ struct ShowsItemDetail: View {
     struct InputItemDetail {
         var opacity: Double = 0
         var isShowAlert: Bool = false
+        var isPresentedEditItem: Bool = false
     }
 
     @State private var inputDetail: InputItemDetail = InputItemDetail()
@@ -79,7 +80,7 @@ struct ShowsItemDetail: View {
                                         }
 
                                         Button {
-                                            isPresentedEditItem.toggle()
+                                            inputDetail.isPresentedEditItem.toggle()
                                         } label: {
                                             Text("はい")
                                         }
@@ -133,11 +134,11 @@ struct ShowsItemDetail: View {
         } // ZStack(全体)
         .opacity(inputDetail.opacity)
 
-        .sheet(isPresented: $isPresentedEditItem) {
+        .sheet(isPresented: $inputDetail.isPresentedEditItem) {
 
             // NOTE: itemがnilでない場合のみボタンを有効にしているため、ボタンアクション時には値を強制アンラップします。
             EditItemView(itemVM: itemVM,
-                         isPresentedEditItem: $isPresentedEditItem,
+                         isPresentedEditItem: $inputDetail.isPresentedEditItem,
                          itemIndex: itemIndex,
                          passItemData: item,
                          editItemStatus: .update)
