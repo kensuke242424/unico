@@ -7,6 +7,23 @@
 
 import SwiftUI
 
+struct InputEditItem {
+
+    var selectionTagName: String = ""
+    var selectionTagColor: UsedColor = .red
+    var photoURL: String = ""  // Todo: 写真取り込み機能追加後使用
+    var editItemName: String = ""
+    var editItemInventry: String = ""
+    var editItemPrice: String = ""
+    var editItemSales: String = ""
+    var editItemDetail: String = ""
+    var disableButton: Bool = true
+    var isOpenSideMenu: Bool = false
+    var offset: CGFloat = 0
+    var geometryMinY: CGFloat = 0
+    var isCheckedFocuseDetail: Bool = false
+}
+
 struct EditItemView: View {
 
     @StateObject var itemVM: ItemViewModel
@@ -19,22 +36,7 @@ struct EditItemView: View {
     let editItemStatus: Status
 
     // NOTE: ＠Stateの入力プロパティを構造体化
-    struct InputEditItem {
 
-        var selectionTagName: String = ""
-        var selectionTagColor: UsedColor = .red
-        var photoURL: String = ""  // Todo: 写真取り込み機能追加後使用
-        var editItemName: String = ""
-        var editItemInventry: String = ""
-        var editItemPrice: String = ""
-        var editItemSales: String = ""
-        var editItemDetail: String = ""
-        var disableButton: Bool = true
-        var isOpenSideMenu: Bool = false
-        var offset: CGFloat = 0
-        var geometryMinY: CGFloat = 0
-        var isCheckedFocuseDetail: Bool = false
-    }
     @State private var inputEdit: InputEditItem = InputEditItem()
 
     var body: some View {
@@ -57,17 +59,9 @@ struct EditItemView: View {
                         SelectItemPhotoArea(item: passItemData)
 
                         InputForms(itemVM: itemVM,
-                                   selectionTagName: $inputEdit.selectionTagName,
-                                   isOpenSideMenu: $inputEdit.isOpenSideMenu,
-                                   editItemName: $inputEdit.editItemName,
-                                   editItemInventry: $inputEdit.editItemInventry,
-                                   editItemPrice: $inputEdit.editItemPrice,
-                                   editItemSales: $inputEdit.editItemSales,
-                                   editItemDetail: $inputEdit.editItemDetail,
-                                   geometryMinY: $inputEdit.geometryMinY,
-                                   offset: $inputEdit.offset,
+                                   inputEdit: $inputEdit,
                                    editItemStatus: editItemStatus,
-                                   tagColor: inputEdit.selectionTagColor)
+                                   passItem: passItemData)
 
                     } // VStack(パーツ全体)
 
@@ -178,7 +172,7 @@ struct EditItemView: View {
                     inputEdit.editItemDetail = passItemData.detail
 
                 } else {
-                    guard let defaultTag = itemVM.tags.first else { return }
+                    // tags[0]には"ALL"があるため、一つ飛ばして[1]を初期値として代入
                     inputEdit.selectionTagName = itemVM.tags[1].tagName
                 }
 
@@ -251,19 +245,11 @@ struct InputForms: View {
     }
 
     @StateObject var itemVM: ItemViewModel
-    @Binding var selectionTagName: String
-    @Binding var isOpenSideMenu: Bool
-    @Binding var editItemName: String
-    @Binding var editItemInventry: String
-    @Binding var editItemPrice: String
-    @Binding var editItemSales: String
-    @Binding var editItemDetail: String
-    @Binding var geometryMinY: CGFloat
-    @Binding var offset: CGFloat
+    @Binding var inputEdit: InputEditItem
 
     // NOTE: enum「Status」を用いて、「.create」と「.update」とでViewレイアウトを分岐します。
     let editItemStatus: Status
-    let tagColor: UsedColor
+    let passItem: Item?
 
     @FocusState private var focusedField: EditItemField?
 
@@ -277,21 +263,33 @@ struct InputForms: View {
 
                 HStack {
                     Image(systemName: "tag.fill")
-                        .foregroundColor(tagColor.color)
-                    Picker("", selection: $selectionTagName) {
-                        ForEach(0 ..< itemVM.tags.count, id: \.self) { index in
+                        .foregroundColor(inputEdit.selectionTagColor.color)
+                    Picker("", selection: $inputEdit.selectionTagName) {
 
-                            if index != 0 {
-                                Text(itemVM.tags[index].tagName).tag(itemVM.tags[index].tagName)
+                        if passItem?.tag == itemVM.tags.last!.tagName {
+
+                            ForEach(itemVM.tags) { tag in
+                                if tag != itemVM.tags.first! {
+                                    Text(tag.tagName).tag(tag.tagName)
+                                }
                             }
-                        } // ForEach
+
+                        } else {
+
+                            ForEach(itemVM.tags) { tag in
+                                if tag != itemVM.tags.first! && tag != itemVM.tags.last! {
+                                    Text(tag.tagName).tag(tag.tagName)
+                                }
+                            }
+                        }
+
                         Text("＋タグを追加").tag("＋タグを追加")
                     } // Picker
 
                     Spacer()
 
                     Button {
-                        isOpenSideMenu.toggle()
+                        inputEdit.isOpenSideMenu.toggle()
                     } label: { Text("タグ編集>>") }
                     .padding(.trailing)
                 } // HStack(Pickerタグ要素)
@@ -306,7 +304,7 @@ struct InputForms: View {
                 InputFormTitle(title: "■アイテム名", isNeed: true)
                     .padding(.bottom)
 
-                TextField("1st Album「...」", text: $editItemName)
+                TextField("1st Album「...」", text: $inputEdit.editItemName)
                     .foregroundColor(.white)
                     .focused($focusedField, equals: .name)
                     .autocapitalization(.none)
@@ -322,7 +320,7 @@ struct InputForms: View {
                 InputFormTitle(title: "■在庫数", isNeed: false)
                     .padding(.bottom)
 
-                TextField("100", text: $editItemInventry)
+                TextField("100", text: $inputEdit.editItemInventry)
                     .foregroundColor(.white)
                     .keyboardType(.numberPad)
                     .focused($focusedField, equals: .stock)
@@ -338,7 +336,7 @@ struct InputForms: View {
                 InputFormTitle(title: "■価格(税込)", isNeed: false)
                     .padding(.bottom)
 
-                TextField("2000", text: $editItemPrice)
+                TextField("2000", text: $inputEdit.editItemPrice)
                     .foregroundColor(.white)
                     .keyboardType(.numberPad)
                     .focused($focusedField, equals: .price)
@@ -356,7 +354,7 @@ struct InputForms: View {
                     InputFormTitle(title: "■総売上げ", isNeed: false)
                         .padding(.bottom)
 
-                    TextField("2000", text: $editItemSales)
+                    TextField("2000", text: $inputEdit.editItemSales)
                         .foregroundColor(.white)
                         .keyboardType(.numberPad)
                         .focused($focusedField, equals: .sales)
@@ -373,7 +371,7 @@ struct InputForms: View {
                 InputFormTitle(title: "■アイテム詳細(メモ)", isNeed: false)
                     .font(.title3)
 
-                TextEditor(text: $editItemDetail)
+                TextEditor(text: $inputEdit.editItemDetail)
                     .frame(height: 200)
                     .shadow(radius: 3, x: 0, y: 0)
                     .autocapitalization(.none)
@@ -381,7 +379,7 @@ struct InputForms: View {
                     .onTapGesture { focusedField = .detail }
                     .overlay(alignment: .topLeading) {
                         if focusedField != .detail {
-                            if editItemDetail.isEmpty {
+                            if inputEdit.editItemDetail.isEmpty {
                                 Text("アイテムについてメモを残しましょう。")
                                     .opacity(0.5)
                                     .padding()
