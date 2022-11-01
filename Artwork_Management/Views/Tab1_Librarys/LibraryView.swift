@@ -40,6 +40,23 @@ struct LibraryView: View {
             VStack {
 
                 homeHeaderPhoto(photo: "homePhoto_sample", userIcon: "cloth_sample1")
+                    // Todo: ホームレイアウトのカスタム
+                    .overlay(alignment: .bottomTrailing) {
+                        Menu {
+                            Button {
+
+                            } label: {
+                                Text("準備中")
+                            }
+                        } label: {
+
+                            Image(systemName: "gearshape.2")
+                                .foregroundColor(.white).opacity(0.5)
+                                .padding(.trailing)
+
+                        } // Menu
+                        .offset(y: 40)
+                    } // overlay
 
                 // 時刻レイアウト
                 HStack {
@@ -51,12 +68,12 @@ struct LibraryView: View {
                                 .frame(height: 40)
                                 .opacity(0.4)
 
-                            Text(inputTime.weekFormatter.string(from: inputTime.nowDate))
+                            Text("\(inputTime.weekFormatter.string(from: inputTime.nowDate)).")
                                 .font(.subheadline)
                                 .opacity(0.4)
 
                             Text(inputTime.dateStyleFormatter.string(from: inputTime.nowDate))
-                                .font(.headline.bold())
+                                .font(.subheadline.bold())
                                 .opacity(0.5)
                                 .padding(.leading)
                         }
@@ -171,7 +188,7 @@ struct LibraryView: View {
         .onAppear {
             inputTime.timeFormatter.setTemplate(.time) // 時間
             inputTime.weekFormatter.setTemplate(.usWeek) // 週
-            inputTime.dateStyleFormatter.dateStyle = .medium // Nov 1, 2022
+            inputTime.dateStyleFormatter.setTemplate(.usMonthDay) // Nov 1, 2022
 
             if inputLibrary.selectFilterTag == "ALL" {
                 inputLibrary.tagFilterItemCards = itemVM.items
