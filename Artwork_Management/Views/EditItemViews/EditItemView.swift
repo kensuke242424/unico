@@ -210,16 +210,18 @@ struct EditItemView: View {
                             }
 
                         case .update:
+                            // NOTE: テストデータに情報の変更を保存
 
-                            itemVM.items[itemIndex].tag = input.selectionTagName
-                            itemVM.items[itemIndex].tagColor = input.selectionTagColor.text
-                            itemVM.items[itemIndex].name = input.editItemName
-                            itemVM.items[itemIndex].detail = input.editItemDetail != "" ? input.editItemDetail : "none."
-                            itemVM.items[itemIndex].photo = "" // Todo: 写真取り込み実装後、変更
-                            itemVM.items[itemIndex].price = Int(input.editItemPrice) ?? 0
-                            itemVM.items[itemIndex].sales = Int(input.editItemSales) ?? 0
-                            itemVM.items[itemIndex].inventory = Int(input.editItemInventry) ?? 0
-
+                            // NOTE: アイテムを更新
+                            itemVM.items[itemIndex].tag = inputEdit.selectionTagName
+                            itemVM.items[itemIndex].tagColor = inputEdit.selectionTagColor.text
+                            itemVM.items[itemIndex].name = inputEdit.editItemName
+                            itemVM.items[itemIndex].detail = inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "none."
+                            itemVM.items[itemIndex].photo = inputEdit.photoURL
+                            itemVM.items[itemIndex].price = Int(inputEdit.editItemPrice) ?? 0
+                            itemVM.items[itemIndex].sales = Int(inputEdit.editItemSales) ?? 0
+                            itemVM.items[itemIndex].inventory = Int(inputEdit.editItemInventry) ?? 0
+                            itemVM.items[itemIndex].updateTime = Date() // Todo: Timestamp実装後、変更
                             print("更新されたアイテム: \(itemVM.items[itemIndex])")
 
                         } // switch editItemStatus(データ追加、更新)
@@ -372,7 +374,7 @@ struct InputForms: View {
                     .font(.title3)
 
                 TextEditor(text: $inputEdit.editItemDetail)
-                    .frame(height: 200)
+                    .frame(height: 300)
                     .shadow(radius: 3, x: 0, y: 0)
                     .autocapitalization(.none)
                     .focused($focusedField, equals: .detail)

@@ -89,7 +89,7 @@ struct ManageView: View {
 
                             // "タグ無し"タグのついたアイテムが存在した場合
                             if itemVM.items.contains(where: {$0.tag == (itemVM.tags.last!.tagName)}) {
-                                Text("\(itemVM.tags.last!.tagName)")
+                                Text(itemVM.tags.last!.tagName)
                                     .foregroundColor(.white)
                                     .font(.title.bold())
                                     .shadow(radius: 2, x: 4, y: 6)
@@ -110,10 +110,18 @@ struct ManageView: View {
 
                         case .off:
 
-                            Text("- \(itemVM.tags[0].tagName) -")
+                            Text(itemVM.tags[0].tagName)
                                 .font(.largeTitle.bold())
+                                .foregroundColor(.white)
                                 .shadow(radius: 2, x: 4, y: 6)
                                 .padding(.vertical)
+
+                            Spacer(minLength: 0)
+
+                            LinearGradient(gradient: Gradient(colors: [.gray, .clear]),
+                                                       startPoint: .leading, endPoint: .trailing)
+                                .frame(height: 1)
+                                .frame(maxWidth: .infinity, alignment: .leading)
 
                             ForEach(itemVM.items) { item in
 

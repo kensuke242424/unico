@@ -64,7 +64,6 @@ struct ShowsItemDetail: View {
                                     Button {
                                         // NOTE: アイテム編集画面へ遷移するかをアラートで選択
                                         inputDetail.isShowAlert.toggle()
-                                        print("isShowAlert: \(inputDetail.isShowAlert)")
 
                                     } label: {
                                         Image(systemName: "highlighter")
@@ -96,12 +95,7 @@ struct ShowsItemDetail: View {
                                     .padding()
 
                                 // NOTE: アイテムの情報が格納羅列されたカスタムViewです
-                                ItemDetailData(sales: item.sales,
-                                                   price: item.price,
-                                                   inventory: item.inventory,
-                                                   createAt: item.createTime,
-                                                   updateAt: item.updateTime
-                                )
+                                ItemDetailData(item: item)
 
                                 Divider()
                                     .background(.white)
@@ -119,12 +113,13 @@ struct ShowsItemDetail: View {
                                     .foregroundColor(.gray)
                                     .frame(width: 250, height: 300)
                                     .opacity(0.2)
-                                    .overlay(alignment: .top) {
-                                        Text(item.detail)
-                                            .font(.footnote)
-                                            .foregroundColor(.white)
-                                            .frame(width: 240)
-                                            .padding(.vertical)
+                                    .overlay(alignment: .topLeading) {
+                                        ScrollView {
+                                            Text(item.detail)
+                                                .font(.caption)
+                                                .foregroundColor(.white)
+                                                .padding(10)
+                                        }
                                     }
                             } // VStack
                         } // ScrollView

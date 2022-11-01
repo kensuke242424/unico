@@ -300,7 +300,8 @@ struct LibraryView: View {
                                 if inputLibrary.isShowCardInfomation {
                                     Button {
                                         if let cardRowIndex =
-                                            itemVM.items.firstIndex(of: inputLibrary.tagFilterItemCards[index]) {
+                                            itemVM.items.firstIndex(where: { $0.id == inputLibrary.tagFilterItemCards[index].id }) {
+
                                             inputLibrary.libraryCardIndex = cardRowIndex
                                             inputHome.isShowItemDetail.toggle()
                                         } else {
