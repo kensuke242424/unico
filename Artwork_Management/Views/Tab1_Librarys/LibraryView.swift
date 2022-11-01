@@ -188,7 +188,7 @@ struct LibraryView: View {
         .onAppear {
             inputTime.timeFormatter.setTemplate(.time) // 時間
             inputTime.weekFormatter.setTemplate(.usWeek) // 週
-            inputTime.dateStyleFormatter.setTemplate(.usMonthDay) // Nov 1, 2022
+            inputTime.dateStyleFormatter.setTemplate(.usMonthDay) // 月日
 
             if inputLibrary.selectFilterTag == "ALL" {
                 inputLibrary.tagFilterItemCards = itemVM.items

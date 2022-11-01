@@ -16,8 +16,8 @@ extension DateFormatter {
         case full = "yMdkHms" // 2017/1/1 12:39:22
         case onlyHour = "k"   // 17時
         case era = "GG"       // "西暦" (default) or "平成" (本体設定で和暦を指定している場合)
-        case usWeek = "EEE" // Mon
-        case usMonthDay = "MMMM.d" // Jun. 10
+        case usWeek = "EEE" // Tue
+        case usMonthDay = "MMMM.d" // Jun 10
     }
 
     func setTemplate(_ template: Template) {
