@@ -19,7 +19,6 @@ struct ItemCardRow: View {
     let itemHeight: CGFloat = 210
 
     @State private var cardCount: Int =  0
-    @State private var soldOpacity: CGFloat = 0.0
     @State private var countUpDisable: Bool = false
     @State private var itemSold: Bool = false
 
@@ -151,7 +150,7 @@ struct ItemCardRow: View {
                         .foregroundColor(.customSoldOutTagColor)
                         .offset(x: -12, y: -3)
                         .shadow(radius: 3, x: 5, y: 5)
-                        .opacity(soldOpacity)
+                        .opacity(itemSold == true ? 1.0 : 0.0)
                         .rotationEffect(Angle(degrees: -30.0))
                         .scaleEffect(itemSold ? 1.0 : 1.9)
                         .animation(Animation.default, value: itemSold)
@@ -173,7 +172,9 @@ struct ItemCardRow: View {
         } // .onChange
 
         .onChange(of: cartResults.resultCartItems) { _ in
-            if cartResults.resultCartItems == [] { cardCount = 0 }
+            if cartResults.resultCartItems == [] {
+                cardCount = 0
+            }
         }
 
         .onChange(of: cardCount) { newCardCount in
@@ -190,14 +191,11 @@ struct ItemCardRow: View {
 
         .onChange(of: itemRow.inventory) {newInventory in
             itemSold = newInventory == 0 ? true : false
-            soldOpacity = newInventory == 0 ? 1.0 : 0.0
-            print("onChange_itemSold: \(itemSold)")
         }
 
         .onAppear {
             itemSold = itemRow.inventory == 0 ? true : false
-            soldOpacity = itemRow.inventory == 0 ? 1.0 : 0.0
-            print("onAppear_itemSold: \(itemSold)")
+            countUpDisable = itemRow.inventory == 0 ? true : false
         }
 
     } // body

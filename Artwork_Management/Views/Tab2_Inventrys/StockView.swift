@@ -130,11 +130,11 @@ struct StockView: View {
                             } // HStack
                             .padding([.leading, .vertical])
 
-                            // ✅カスタムView: アイテムを表示します。(縦スクロール)
                             TagSortCards(itemVM: itemVM,
                                          inputStock: $inputStock,
                                          cartResults: $cartResults,
                                          selectFilterTag: itemVM.tags[inputStock.tagIndex].tagName)
+
                         } // ScrollView (アイテムロケーション)
 
                     } // VStack
