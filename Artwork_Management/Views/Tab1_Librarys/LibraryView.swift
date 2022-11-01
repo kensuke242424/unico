@@ -19,6 +19,9 @@ struct InputLibrary {
 
 struct InputTime {
     var nowDate =  Date()
+    let timeFormatter = DateFormatter()
+    let weekFormatter = DateFormatter()
+    let dateStyleFormatter = DateFormatter()
     let timer = Timer.publish(every: 1, on: .current, in: .common).autoconnect()
 }
 
@@ -42,14 +45,20 @@ struct LibraryView: View {
                 HStack {
                     VStack(alignment: .leading, spacing: 8) {
                         Group {
-                            Text(itemVM.nowDateTime(date: inputTime.nowDate, type: "time"))
+                            Text(inputTime.timeFormatter.string(from: inputTime.nowDate))
+                                .tracking(8)
                                 .font(.title3.bold())
                                 .frame(height: 40)
                                 .opacity(0.4)
 
-                            Text(itemVM.nowDateTime(date: inputTime.nowDate, type: "date"))
-                                .font(.title3.bold())
-                                .opacity(0.6)
+                            Text(inputTime.weekFormatter.string(from: inputTime.nowDate))
+                                .font(.subheadline)
+                                .opacity(0.4)
+
+                            Text(inputTime.dateStyleFormatter.string(from: inputTime.nowDate))
+                                .font(.headline.bold())
+                                .opacity(0.5)
+                                .padding(.leading)
                         }
                         .italic()
                         .tracking(5)
@@ -160,6 +169,10 @@ struct LibraryView: View {
         } // .onChange
 
         .onAppear {
+            inputTime.timeFormatter.setTemplate(.time) // 時間
+            inputTime.weekFormatter.setTemplate(.usWeek) // 週
+            inputTime.dateStyleFormatter.dateStyle = .medium // Nov 1, 2022
+
             if inputLibrary.selectFilterTag == "ALL" {
                 inputLibrary.tagFilterItemCards = itemVM.items
             } else {
