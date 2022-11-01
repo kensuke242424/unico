@@ -24,7 +24,6 @@ struct ItemCardRow: View {
 
     var body: some View {
 
-        VStack {
             // NOTE: アイテムカードの色(ダークモードを判定してopacityをスイッチ)
             RoundedRectangle(cornerRadius: 10)
                 .foregroundColor(.white)
@@ -138,7 +137,6 @@ struct ItemCardRow: View {
                 }
 
                 .overlay(alignment: .topLeading) {
-//                    if itemSold {
                         Group {
                             RoundedRectangle(cornerRadius: 0)
                                 .stroke(lineWidth: 6)
@@ -154,10 +152,8 @@ struct ItemCardRow: View {
                         .rotationEffect(Angle(degrees: -30.0))
                         .scaleEffect(itemSold ? 1.0 : 1.9)
                         .animation(Animation.default, value: itemSold)
-//                    } // if
                 } // .overlay
 
-        } // VStack
         .onChange(of: cartResults.resultItemAmount) { [before = cartResults.resultItemAmount] after in
             if before < after {
                 if itemRow == itemVM.items[inputStock.actionRowIndex] {
