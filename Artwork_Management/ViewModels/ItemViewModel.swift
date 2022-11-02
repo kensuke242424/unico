@@ -97,18 +97,18 @@ class ItemViewModel: ObservableObject {
 
     // ✅ メソッド: 変更内容をもとに、tags内の対象データのタグネーム、タグカラーを更新します。
     func updateTagsData(itemVM: ItemViewModel,
-                        itemTagName: String,
-                        selectTagName: String,
-                        selectTagColor: UsedColor) {
+                        defaultTag: Tag,
+                        newTagName: String,
+                        newTagColor: UsedColor) {
 
         print("ーーーーーーー　updateTagsDataメソッド_実行　ーーーーーーーーー")
 
         // NOTE: for where文で更新対象要素を選出し、enumurated()でデータとインデックスを両方取得します。
         for (index, tagData) in itemVM.tags.enumerated()
-        where tagData.tagName == itemTagName {
+        where tagData.tagName == defaultTag.tagName {
 
-            itemVM.tags[index] = Tag(tagName: selectTagName,
-                                     tagColor: selectTagColor)
+            itemVM.tags[index] = Tag(tagName: newTagName,
+                                     tagColor: newTagColor)
 
             print("更新されたitemVM.tags: \(itemVM.tags[index])")
 
@@ -117,7 +117,7 @@ class ItemViewModel: ObservableObject {
 
     // ✅ メソッド: 変更内容をもとに、items内の対象データのタグネーム、タグカラーを更新します。
     func updateItemsTagData(itemVM: ItemViewModel,
-                            itemTagName: String,
+                            defaultTag: Tag,
                             newTagName: String,
                             newTagColorString: String) {
 
@@ -125,7 +125,7 @@ class ItemViewModel: ObservableObject {
 
         // NOTE: アイテムデータ内の更新対象タグを取り出して、同じタググループアイテムをまとめて更新します。
         for (index, itemData) in itemVM.items.enumerated()
-        where itemData.tag == itemTagName {
+        where itemData.tag == defaultTag.tagName {
 
             itemVM.items[index].tag = newTagName
             itemVM.items[index].tagColor = newTagColorString

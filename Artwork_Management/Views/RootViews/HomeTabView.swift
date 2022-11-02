@@ -15,18 +15,33 @@ struct InputHome {
     var isShowItemDetail: Bool = false
     var isPresentedEditItem: Bool = false
     var isOpenSideMenu: Bool = false
+    var isOpenEditTagSideMenu: Bool = false
     var isShowSearchField: Bool = false
     var isShowSystemSideMenu: Bool = false
+    var editTagSideMenuBackground: Bool = false
     var sideMenuBackGround: Bool = false
     var doCommerce: Bool = false
     var cartState: ResizableSheetState = .hidden
     var commerceState: ResizableSheetState = .hidden
 }
 
+struct InputSideMenu {
+    var account: Bool = false
+    var item: Bool = false
+    var tag: Bool = false
+    var help: Bool = false
+    var editMode: EditMode = .inactive
+
+    var tagEditStatus: EditStatus = .create
+    var selectTag: Tag = Tag(tagName: "", tagColor: .red)
+}
+
 struct HomeTabView: View {
 
     @StateObject var rootItemVM = ItemViewModel()
     @State private var inputHome: InputHome = InputHome()
+    @State private var inputEdit: InputEditItem = InputEditItem()
+    @State private var inputSideMenu: InputSideMenu = InputSideMenu()
 
     var body: some View {
 
@@ -88,33 +103,35 @@ struct HomeTabView: View {
             // sideMenu_background...
             Color.black
                 .ignoresSafeArea()
-                .opacity(inputHome.sideMenuBackGround ? 0.25 : 0)
+                .opacity(inputHome.sideMenuBackGround ? 0.4 : 0)
                 .onTapGesture {
                     inputHome.sideMenuBackGround.toggle()
                     inputHome.isShowSystemSideMenu.toggle()
                 }
 
-            SystemSideMenu(itemVM: rootItemVM, inputHome: $inputHome)
+            SystemSideMenu(itemVM: rootItemVM, inputHome: $inputHome, inputSideMenu: $inputSideMenu)
                 .offset(x: inputHome.isShowSystemSideMenu ? 0 : -UIScreen.main.bounds.width)
 
-//            if inputHome.isOpenSideMenu {
-//
-//                SideMenuEditTagView(
-//                    itemVM: itemVM,
-//                    isOpenSideMenu: $inputHome.isOpenSideMenu,
-//                    geometryMinY: $inputEdit.geometryMinY,
-//                    selectionTagName: $inputEdit.selectionTagName,
-//                    selectionTagColor: $inputEdit.selectionTagColor,
-//                    itemTagName: inputEdit.selectionTagName,
-//                    itemTagColor: inputEdit.selectionTagColor,
-//                    editItemStatus: editItemStatus,
-//                    // Warning_TextSimbol: "＋タグを追加"
-//                    tagSideMenuStatus: inputEdit.selectionTagName == "＋タグを追加" ? .create : .update)
-//            } // if isOpenSideMenu
+            // sideMenu_background...
+            Color.black
+                .ignoresSafeArea()
+                .opacity(inputHome.editTagSideMenuBackground ? 0.4 : 0)
+                .onTapGesture {
+                    inputHome.editTagSideMenuBackground.toggle()
+                    inputHome.isOpenEditTagSideMenu.toggle()
+                }
+
+            // Open TagSideMenu...
+            SideMenuEditTagView(itemVM: rootItemVM, inputHome: $inputHome, inputEdit: $inputEdit,
+                                defaultTag: inputSideMenu.tagEditStatus == .create ? nil : inputSideMenu.selectTag,
+                                tagSideMenuStatus: inputSideMenu.tagEditStatus)
+            .offset(x: inputHome.isOpenEditTagSideMenu ? UIScreen.main.bounds.width / 2 - 30 : UIScreen.main.bounds.width)
 
         } // ZStack
         .animation(.easeIn(duration: 0.2), value: inputHome.sideMenuBackGround)
+        .animation(.easeIn(duration: 0.2), value: inputHome.editTagSideMenuBackground)
         .animation(.spring(response: 0.3, blendDuration: 1.0), value: inputHome.isShowSystemSideMenu)
+        .animation(.spring(response: 0.3, blendDuration: 1.0), value: inputHome.isOpenEditTagSideMenu)
         .navigationBarBackButtonHidden()
 
         .sheet(isPresented: $inputHome.isPresentedEditItem) {
@@ -176,16 +193,8 @@ struct SystemSideMenu: View {
 
     @StateObject var itemVM: ItemViewModel
     @Binding var inputHome: InputHome
+    @Binding var inputSideMenu: InputSideMenu
 
-    struct InputSideMenu {
-        var account: Bool = false
-        var item: Bool = false
-        var tag: Bool = false
-        var help: Bool = false
-        var editMode: EditMode = .inactive
-    }
-
-    @State private var inputSideMenu: InputSideMenu = InputSideMenu()
     @GestureState var dragOffset: CGFloat = 0.0
 
     var body: some View {
@@ -268,12 +277,10 @@ struct SystemSideMenu: View {
                                         }
 
                                         Button {
-                                            inputHome.isShowSystemSideMenu.toggle()
-                                            inputHome.sideMenuBackGround.toggle()
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                                                inputHome.isPresentedEditItem.toggle()
-                                                print("タグ追加ボタンタップ")
-                                            }
+                                            print("タグ追加ボタンタップ")
+                                            inputHome.isOpenEditTagSideMenu.toggle()
+                                            inputHome.editTagSideMenuBackground.toggle()
+
                                         } label: {
                                             Image(systemName: "plus.square")
                                         }
@@ -306,7 +313,14 @@ struct SystemSideMenu: View {
                                                             Image(systemName: "highlighter")
                                                             .foregroundColor(.gray)
                                                             .opacity(inputSideMenu.editMode.isEditing ? 0.0 : 0.6)
-                                                            .onTapGesture { print("タグ編集ボタンタップ") }
+                                                            .onTapGesture {
+
+                                                                print("タグ編集ボタンタップ")
+                                                                inputSideMenu.tagEditStatus = .update
+                                                                inputSideMenu.selectTag = tag
+                                                                inputHome.isOpenEditTagSideMenu.toggle()
+                                                                inputHome.editTagSideMenuBackground.toggle()
+                                                            }
                                                         }
 
                                                     } // HStack

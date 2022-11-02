@@ -33,7 +33,7 @@ struct EditItemView: View {
     let passItemData: Item?
 
     // NOTE: enum「Status」を用いて、「.create」と「.update」とでViewレイアウトを分岐します。
-    let editItemStatus: Status
+    let editItemStatus: EditStatus
 
     // NOTE: ＠Stateの入力プロパティを構造体化
 
@@ -65,20 +65,20 @@ struct EditItemView: View {
 
                     } // VStack(パーツ全体)
 
-                    if inputEdit.isOpenSideMenu {
-
-                        SideMenuEditTagView(
-                            itemVM: itemVM,
-                            isOpenSideMenu: $inputEdit.isOpenSideMenu,
-                            geometryMinY: $inputEdit.geometryMinY,
-                            selectionTagName: $inputEdit.selectionTagName,
-                            selectionTagColor: $inputEdit.selectionTagColor,
-                            itemTagName: inputEdit.selectionTagName,
-                            itemTagColor: inputEdit.selectionTagColor,
-                            editItemStatus: editItemStatus,
-                            // Warning_TextSimbol: "＋タグを追加"
-                            tagSideMenuStatus: inputEdit.selectionTagName == "＋タグを追加" ? .create : .update)
-                    } // if isOpenSideMenu
+//                    if inputEdit.isOpenSideMenu {
+//
+//                        SideMenuEditTagView(
+//                            itemVM: itemVM,
+//                            isOpenSideMenu: $inputEdit.isOpenSideMenu,
+//                            geometryMinY: $inputEdit.geometryMinY,
+//                            selectionTagName: $inputEdit.selectionTagName,
+//                            selectionTagColor: $inputEdit.selectionTagColor,
+//                            itemTagName: inputEdit.selectionTagName,
+//                            itemTagColor: inputEdit.selectionTagColor,
+//                            editItemStatus: editItemStatus,
+//                            // Warning_TextSimbol: "＋タグを追加"
+//                            tagSideMenuStatus: inputEdit.selectionTagName == "＋タグを追加" ? .create : .update)
+//                    } // if isOpenSideMenu
 
                 } // ZStack(View全体)
                 .animation(.easeIn(duration: 0.3), value: inputEdit.offset)
@@ -250,7 +250,7 @@ struct InputForms: View {
     @Binding var inputEdit: InputEditItem
 
     // NOTE: enum「Status」を用いて、「.create」と「.update」とでViewレイアウトを分岐します。
-    let editItemStatus: Status
+    let editItemStatus: EditStatus
     let passItem: Item?
 
     @FocusState private var focusedField: EditItemField?
