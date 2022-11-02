@@ -30,6 +30,7 @@ struct ManageView: View {
         var listIndex = 0
         var tagGroup: TagGroup = .on
         var sortType: SortType = .start
+        var isTagGroup: Bool = true
     }
 
     @State private var inputManage: InputManage = InputManage()
@@ -43,20 +44,24 @@ struct ManageView: View {
                     VStack(alignment: .leading) {
 
                         // NOTE: タグ表示の「ON」「OFF」で表示を切り替えます
-                        switch inputManage.tagGroup {
+                        switch inputManage.isTagGroup {
 
-                        case .on:
+                        case true:
 
                             // タグの要素数の分リストを作成
                             ForEach(itemVM.tags) { tagRow in
 
                                 // firstには"ALL", lastには"タグ無し"
                                 if tagRow != itemVM.tags.first! && tagRow != itemVM.tags.last! {
-                                    Text(tagRow.tagName)
-                                        .foregroundColor(.white)
-                                        .font(.title.bold())
-                                        .shadow(radius: 2, x: 4, y: 6)
-                                        .padding(.vertical)
+
+                                    HStack {
+                                        Text(tagRow.tagName)
+                                            .foregroundColor(.white)
+                                            .font(.title.bold())
+                                            .shadow(radius: 2, x: 4, y: 6)
+                                            .padding(.vertical)
+
+                                    }
 
                                     Spacer(minLength: 0)
 
@@ -91,7 +96,7 @@ struct ManageView: View {
                             if itemVM.items.contains(where: {$0.tag == (itemVM.tags.last!.tagName)}) {
                                 Text(itemVM.tags.last!.tagName)
                                     .foregroundColor(.white)
-                                    .font(.title.bold())
+                                    .font(.title2.bold())
                                     .shadow(radius: 2, x: 4, y: 6)
                                     .padding(.vertical)
 
@@ -108,7 +113,7 @@ struct ManageView: View {
                                     } // ForEach item
                             } // if
 
-                        case .off:
+                        case false:
 
                             Text(itemVM.tags[0].tagName)
                                 .font(.largeTitle.bold())
@@ -148,33 +153,22 @@ struct ManageView: View {
                                        startPoint: .top, endPoint: .bottom))
             .navigationTitle("Manage")
             .navigationBarTitleDisplayMode(.inline)
-            .animation(.spring(response: 0.5), value: inputManage.tagGroup)
+            .animation(.spring(response: 0.5), value: inputManage.isTagGroup)
             // sort Menu...
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
-                        Menu("タググループ") {
 
-                            Button {
-                                inputManage.tagGroup = .on
-                            } label: {
-                                if inputManage.tagGroup == .on {
-                                    Text("ON   　　　　　 ✔︎")
-                                } else {
-                                    Text("ON")
-                                }
-                            } // ON
+                        Toggle(isOn: $inputManage.isTagGroup) {
+                            HStack {
+                                Image(systemName: inputManage.isTagGroup ? "tag.fill" : "tag.slash")
+                                    .resizable()
+                                    .foregroundColor(inputManage.isTagGroup ? .green : .gray)
+                                Text("タググループ")
+                            }
+                        }
 
-                            Button {
-                                inputManage.tagGroup = .off
-                            } label: {
-                                if inputManage.tagGroup == .off {
-                                    Text("OFF   　　　　　 ✔︎")
-                                } else {
-                                    Text("OFF")
-                                }
-                            } // OFF
-                        } // タググループオプション
+
 
                         Menu("並び替え") {
                             Button {

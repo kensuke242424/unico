@@ -14,6 +14,7 @@ struct InputHome {
     var basketInfomationOpacity: CGFloat = 0.0
     var isShowItemDetail: Bool = false
     var isPresentedEditItem: Bool = false
+    var isOpenSideMenu: Bool = false
     var isShowSearchField: Bool = false
     var isShowSystemSideMenu: Bool = false
     var sideMenuBackGround: Bool = false
@@ -95,6 +96,21 @@ struct HomeTabView: View {
 
             SystemSideMenu(itemVM: rootItemVM, inputHome: $inputHome)
                 .offset(x: inputHome.isShowSystemSideMenu ? 0 : -UIScreen.main.bounds.width)
+
+//            if inputHome.isOpenSideMenu {
+//
+//                SideMenuEditTagView(
+//                    itemVM: itemVM,
+//                    isOpenSideMenu: $inputHome.isOpenSideMenu,
+//                    geometryMinY: $inputEdit.geometryMinY,
+//                    selectionTagName: $inputEdit.selectionTagName,
+//                    selectionTagColor: $inputEdit.selectionTagColor,
+//                    itemTagName: inputEdit.selectionTagName,
+//                    itemTagColor: inputEdit.selectionTagColor,
+//                    editItemStatus: editItemStatus,
+//                    // Warning_TextSimbol: "＋タグを追加"
+//                    tagSideMenuStatus: inputEdit.selectionTagName == "＋タグを追加" ? .create : .update)
+//            } // if isOpenSideMenu
 
         } // ZStack
         .animation(.easeIn(duration: 0.2), value: inputHome.sideMenuBackGround)
@@ -198,7 +214,7 @@ struct SystemSideMenu: View {
 
                     CircleIcon(photo: "cloth_sample1", size: 120)
 
-                    Text("BUMP OF CHICKEN")
+                    Text("Account_Name")
                         .font(.title3.bold()).foregroundColor(.white)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
