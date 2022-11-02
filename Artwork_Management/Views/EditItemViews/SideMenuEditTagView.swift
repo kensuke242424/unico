@@ -141,18 +141,26 @@ struct SideMenuEditTagView: View {
                             .fontWeight(.heavy)
                             .foregroundColor(.white)
 
-                        HStack(spacing: 20) {
-                            Text("◀︎")
-                            Image(systemName: "rectangle.and.hand.point.up.left.filled")
-                            Text("▶︎")
-                        }
+                        RoundedRectangle(cornerRadius: 5)
+                            .frame(width: 30, height: 15)
+                            .foregroundColor(.gray)
+                            .overlay {
+                                Text("必須")
+                                    .font(.caption)
+                            } // overlay
+                            .opacity(0.8)
+                    } // HStack
+
+                    TextField("名前を入力", text: $inputTag.newTagNameText)
                         .foregroundColor(.white)
-                        .opacity(0.5)
-                        .padding(.top)
+                        .autocapitalization(.none)
+                        .padding()
+                        .frame(width: 200, height: 20)
+                        .focused($focusedField, equals: .tag)
 
                         Picker("色を選択", selection: $inputTag.selectionSideMenuTagColor) {
-
-                            ForEach(UsedColor.allCases, id: \.self) { value in
+                } // タグネーム
+                .padding(.bottom)
 
                                 if value.color != .gray {
                                     Text(value.text)

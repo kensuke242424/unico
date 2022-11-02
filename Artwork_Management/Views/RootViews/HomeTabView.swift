@@ -26,6 +26,17 @@ struct InputHome {
     var commerceHalfSheet: ResizableSheetState = .hidden
 }
 
+struct InputSideMenu {
+    var account: Bool = false
+    var item: Bool = false
+    var tag: Bool = false
+    var help: Bool = false
+    var editMode: EditMode = .inactive
+
+    var tagEditStatus: EditStatus = .create
+    var selectTag: Tag = Tag(tagName: "", tagColor: .red)
+}
+
 struct HomeTabView: View {
 
     @StateObject var rootItemVM = ItemViewModel()
