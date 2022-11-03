@@ -244,10 +244,10 @@ struct LibraryView: View {
                     Button {
                         withAnimation(.spring(response: 0.3, blendDuration: 1)) {
                             inputHome.isShowSystemSideMenu.toggle()
-                        }
-                        withAnimation(.easeIn(duration: 0.2)) {
+//                        }
+//                        withAnimation(.easeIn(duration: 0.2)) {
                             inputHome.sideMenuBackGround.toggle()
-                        }
+//                        }
                     } label: {
                         CircleIcon(photo: userIcon, size: getSafeArea().top - 20)
                             .padding(.leading)
