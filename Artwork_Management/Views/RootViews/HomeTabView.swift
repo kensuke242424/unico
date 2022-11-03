@@ -25,23 +25,13 @@ struct InputHome {
     var commerceState: ResizableSheetState = .hidden
 }
 
-struct InputSideMenu {
-    var account: Bool = false
-    var item: Bool = false
-    var tag: Bool = false
-    var help: Bool = false
-    var editMode: EditMode = .inactive
-
-    var tagEditStatus: EditStatus = .create
-    var selectTag: Tag = Tag(tagName: "", tagColor: .red)
-}
-
 struct HomeTabView: View {
 
     @StateObject var rootItemVM = ItemViewModel()
     @State private var inputHome: InputHome = InputHome()
-    @State private var inputEdit: InputEditItem = InputEditItem()
     @State private var inputSideMenu: InputSideMenu = InputSideMenu()
+    @State private var inputTag: InputTagSideMenu = InputTagSideMenu()
+
     @State private var test: String = ""
 
     var body: some View {
@@ -95,10 +85,7 @@ struct HomeTabView: View {
                     .opacity(inputHome.basketInfomationOpacity)
                 Spacer()
             }
-
             .offset(y: 80)
-            .animation(.easeIn(duration: 0.2), value: inputHome.itemsInfomationOpacity)
-            .animation(.easeIn(duration: 0.2), value: inputHome.basketInfomationOpacity)
 
             // Todo: 各タブごとにオプションが変わるボタン
             UsefulButton(inputHome: $inputHome)
@@ -112,7 +99,10 @@ struct HomeTabView: View {
                     inputHome.isShowSystemSideMenu.toggle()
                 }
 
-            SystemSideMenu(itemVM: rootItemVM, inputHome: $inputHome, inputSideMenu: $inputSideMenu)
+            SystemSideMenu(itemVM: rootItemVM,
+                           inputHome: $inputHome,
+                           inputTag: $inputTag,
+                           inputSideMenu: $inputSideMenu)
                 .offset(x: inputHome.isShowSystemSideMenu ? 0 : -UIScreen.main.bounds.width)
 
             // sideMenu_background...
@@ -125,12 +115,14 @@ struct HomeTabView: View {
                 }
 
             // Open TagSideMenu...
-            SideMenuEditTagView(itemVM: rootItemVM, inputHome: $inputHome, inputEdit: $inputEdit,
-                                defaultTag: inputSideMenu.tagEditStatus == .create ? nil : inputSideMenu.selectTag,
-                                tagSideMenuStatus: inputSideMenu.tagEditStatus)
+            SideMenuEditTagView(itemVM: rootItemVM, inputHome: $inputHome, inputTag: $inputTag,
+                                defaultTag: inputTag.tagSideMenuStatus == .create ? nil : inputSideMenu.selectTag)
             .offset(x: inputHome.isOpenEditTagSideMenu ? UIScreen.main.bounds.width / 2 - 30 : UIScreen.main.bounds.width + 10)
+//            .offset(x:UIScreen.main.bounds.width / 2 + 10)
 
         } // ZStack
+        .animation(.easeIn(duration: 0.2), value: inputHome.itemsInfomationOpacity)
+        .animation(.easeIn(duration: 0.2), value: inputHome.basketInfomationOpacity)
         .animation(.easeIn(duration: 0.2), value: inputHome.sideMenuBackGround)
         .animation(.easeIn(duration: 0.2), value: inputHome.editTagSideMenuBackground)
         .animation(.spring(response: 0.3, blendDuration: 1.0), value: inputHome.isShowSystemSideMenu)
@@ -144,50 +136,17 @@ struct HomeTabView: View {
                          passItemData: nil,
                          editItemStatus: .create)
         }
-
-        .onChange(of: inputHome.tabIndex) { newTabIndex in
-            if newTabIndex == 0 || newTabIndex == 1 {
-                if rootItemVM.tags.contains(where: {$0.tagName == "ALL"}) { return }
-                rootItemVM.tags.insert(Tag(tagName: "ALL", tagColor: .gray), at: 0)
-            }
-            if newTabIndex == 2 || newTabIndex == 3 || inputHome.isPresentedEditItem {
-                rootItemVM.tags.removeAll(where: {$0.tagName == "ALL"})
-            }
-        } // .onChange
-
-        .onChange(of: inputHome.isPresentedEditItem) { present in
-            if present {
-                rootItemVM.tags.removeAll(where: { $0.tagName == "ALL" })
-            } else {
-                if rootItemVM.tags.contains(where: {$0.tagName == "ALL"}) || inputHome.isShowSystemSideMenu { return }
-
-                if inputHome.tabIndex == 0 || inputHome.tabIndex == 1 {
-                    rootItemVM.tags.insert(Tag(tagName: "ALL", tagColor: .gray), at: 0)
-                }
-            }
-        }
-
-        .onChange(of: inputHome.isShowSystemSideMenu) { present in
-            if present {
-                rootItemVM.tags.removeAll(where: { $0.tagName == "ALL" })
-                print("ALLタグを削除")
-            } else {
-                if rootItemVM.tags.contains(where: {$0.tagName == "ALL"}) { return }
-
-                if inputHome.tabIndex == 0 || inputHome.tabIndex == 1 {
-                    rootItemVM.tags.insert(Tag(tagName: "ALL", tagColor: .gray), at: 0)
-                    print("ALLタグを追加")
-                }
-            }
-        }
-
-        .onAppear {
-            if rootItemVM.tags.contains(where: {$0.tagName == "ALL"}) { return }
-            rootItemVM.tags.insert(Tag(tagName: "ALL", tagColor: .gray), at: 0)
-        }
-
     } // body
 } // View
+
+struct InputSideMenu {
+    var account: Bool = false
+    var item: Bool = false
+    var tag: Bool = false
+    var help: Bool = false
+    var editMode: EditMode = .inactive
+    var selectTag: Tag = Tag(tagName: "", tagColor: .red)
+}
 
 struct SystemSideMenu: View {
 
@@ -196,6 +155,7 @@ struct SystemSideMenu: View {
 
     @StateObject var itemVM: ItemViewModel
     @Binding var inputHome: InputHome
+    @Binding var inputTag: InputTagSideMenu
     @Binding var inputSideMenu: InputSideMenu
 
     @GestureState var dragOffset: CGFloat = 0.0
@@ -272,7 +232,10 @@ struct SystemSideMenu: View {
 
                                         if itemVM.tags.count > 2 {
                                             Button(action: {
-                                                inputSideMenu.editMode = inputSideMenu.editMode.isEditing ? .inactive : .active
+                                                withAnimation {
+                                                    inputSideMenu.editMode = inputSideMenu.editMode.isEditing ? .inactive : .active
+                                                }
+
                                             }, label: {
                                                 Text(inputSideMenu.editMode.isEditing ? "終了" : "編集")
                                             })
@@ -281,6 +244,7 @@ struct SystemSideMenu: View {
 
                                         Button {
                                             print("タグ追加ボタンタップ")
+                                            inputTag.tagSideMenuStatus = .create
                                             inputHome.isOpenEditTagSideMenu.toggle()
                                             inputHome.editTagSideMenuBackground.toggle()
 
@@ -319,8 +283,10 @@ struct SystemSideMenu: View {
                                                             .onTapGesture {
 
                                                                 print("タグ編集ボタンタップ")
-                                                                inputSideMenu.tagEditStatus = .update
+                                                                inputTag.tagSideMenuStatus = .update
                                                                 inputSideMenu.selectTag = tag
+                                                                inputTag.newTagNameText = tag.tagName
+                                                                inputTag.selectionSideMenuTagColor = tag.tagColor
                                                                 inputHome.isOpenEditTagSideMenu.toggle()
                                                                 inputHome.editTagSideMenuBackground.toggle()
                                                             }
@@ -345,7 +311,6 @@ struct SystemSideMenu: View {
                                         .environment(\.editMode, $inputSideMenu.editMode)
                                         .frame(width: UIScreen.main.bounds.width * 0.58,
                                                height: 60 + (40 * CGFloat(itemVM.tags.count - 2)))
-                                        .animation(.easeIn(duration: 0.2), value: inputSideMenu.editMode)
                                         .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
                                         .scrollContentBackground(.hidden)
                                         .offset(x: -10)
@@ -487,10 +452,8 @@ struct SystemSideMenu: View {
                     }})
                 .onEnded { value in
                     if value.translation.width < -100 {
-                        withAnimation(.easeIn(duration: 0.2)) {
-                            inputHome.isShowSystemSideMenu.toggle()
-                            inputHome.sideMenuBackGround.toggle()
-                        }
+                        inputHome.isShowSystemSideMenu.toggle()
+                        inputHome.sideMenuBackGround.toggle()
                     }
                 }
         )

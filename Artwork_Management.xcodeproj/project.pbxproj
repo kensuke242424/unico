@@ -117,11 +117,8 @@
 			isa = PBXGroup;
 			children = (
 				E05FE94428F71BFB00263F98 /* ColorExtension.swift */,
-<<<<<<< HEAD
 				E0A6147F2910E46A0020D043 /* DateFormatterExtension.swift */,
-=======
 				E0CB9DCA2913964F00D95C54 /* ViewExtension.swift */,
->>>>>>> 2e9cb4c (home TagEdit 繋ぎ込み)
 			);
 			path = Extensions;
 			sourceTree = "<group>";

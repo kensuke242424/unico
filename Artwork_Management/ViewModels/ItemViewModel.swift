@@ -14,15 +14,9 @@ class ItemViewModel: ObservableObject {
      @Published var items: [Item] =
     [
         Item(tag: "Clothes", tagColor: "赤", name: "カッターシャツ(白)", detail: "シャツ(白)のアイテム紹介テキストです。", photo: "cloth_sample1",
-<<<<<<< HEAD
              cost: 1000, price: 2800, sales: 128000, inventory: 2, totalAmount: 150, totalInventory: 250, createTime: Date(), updateTime: Date()),
         Item(tag: "Clothes", tagColor: "赤", name: "トップス(黒)", detail: "トップス(黒)のアイテム紹介テキストです。", photo: "cloth_sample2",
              cost: 1000, price: 3800, sales: 80000, inventory: 4, totalAmount: 150, totalInventory: 250, createTime: Date(), updateTime: Date()),
-=======
-             price: 2800, sales: 128000, inventory: 2, createTime: Date(), updateTime: Date()),
-        Item(tag: "Clothes", tagColor: "赤", name: "トップス(黒)", detail: "トップス(黒)のアイテム紹介テキストです。余白が変？", photo: "cloth_sample2",
-             price: 3800, sales: 80000, inventory: 4, createTime: Date(), updateTime: Date()),
->>>>>>> 859fbb8 (rowIndexの取得 調整)
         Item(tag: "Clothes", tagColor: "赤", name: "Tシャツ(黒)", detail: "Tシャツ(黒)のアイテム紹介テキストです。", photo: "cloth_sample4",
              cost: 1000, price: 3200, sales: 107000, inventory: 402, totalAmount: 150, totalInventory: 250, createTime: Date(), updateTime: Date()),
         Item(tag: "Shoes", tagColor: "青", name: "シューズ(灰)", detail: "シューズ1のアイテム紹介テキストです。", photo: "shoes_sample1",
