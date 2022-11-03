@@ -110,6 +110,7 @@ struct SideMenuEditTagView: View {
                             Text("■タグネーム")
                                 .fontWeight(.heavy)
                                 .foregroundColor(.white)
+                                .padding(.bottom)
 
                             RoundedRectangle(cornerRadius: 5)
                                 .frame(width: 30, height: 15)
