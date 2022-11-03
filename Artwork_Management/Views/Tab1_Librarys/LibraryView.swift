@@ -51,6 +51,11 @@ struct LibraryView: View {
     var body: some View {
 
         ZStack {
+
+            LinearGradient(gradient: Gradient(colors: [.customDarkGray1, .customLightGray1]),
+                           startPoint: .top, endPoint: .bottom)
+            .ignoresSafeArea()
+
             VStack {
 
                 homeHeaderPhoto(photo: "homePhoto_sample", userIcon: "cloth_sample1")
@@ -147,10 +152,7 @@ struct LibraryView: View {
                 Spacer()
 
             } // VStack
-            .background(
-                LinearGradient(gradient: Gradient(colors: [.customDarkGray1, .customLightGray1]),
-                               startPoint: .top, endPoint: .bottom)
-            )
+            .ignoresSafeArea()
 
             CustomArcShape()
                 .ignoresSafeArea()
@@ -192,12 +194,14 @@ struct LibraryView: View {
                 Image(systemName: "list.bullet")
                     .foregroundColor(.white)
             } // Menu
+            .ignoresSafeArea()
             .offset(x: -UIScreen.main.bounds.width / 2.5,
                     y: UIScreen.main.bounds.height / 10)
 
             homeItemPhotoPanel()
-                    .offset(x: -UIScreen.main.bounds.width / 10,
-                            y: UIScreen.main.bounds.height / 4)
+                .ignoresSafeArea()
+                .offset(x: -UIScreen.main.bounds.width / 10,
+                        y: UIScreen.main.bounds.height / 4)
 
             if inputHome.isShowItemDetail {
                 ShowsItemDetail(itemVM: itemVM,
@@ -233,9 +237,8 @@ struct LibraryView: View {
 
         Image(photo)
             .resizable()
-            .scaledToFill()
-            .ignoresSafeArea()
-            .frame(height: UIScreen.main.bounds.height * 0.3)
+            .frame(height: UIScreen.main.bounds.height * 0.35)
+            .clipped()
             .shadow(radius: 5, x: 0, y: 10)
             .overlay {
                 if inputLibrary.isShowHeaderPhotoInfomation {
@@ -255,6 +258,7 @@ struct LibraryView: View {
                     } label: {
                         CircleIcon(photo: userIcon, size: 35)
                             .padding(.leading)
+                            .padding(.top, getSafeArea().top)
                     }
                 }
             } // overlay
@@ -269,6 +273,7 @@ struct LibraryView: View {
                     }
                 }
             } // overlay
+//            .ignoresSafeArea()
             .animation(.easeIn(duration: 0.2), value: inputLibrary.isShowHeaderPhotoInfomation)
             .onTapGesture { inputLibrary.isShowHeaderPhotoInfomation.toggle() }
     } // homeHeaderPhoto

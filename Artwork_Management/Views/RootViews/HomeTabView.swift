@@ -42,6 +42,7 @@ struct HomeTabView: View {
     @State private var inputHome: InputHome = InputHome()
     @State private var inputEdit: InputEditItem = InputEditItem()
     @State private var inputSideMenu: InputSideMenu = InputSideMenu()
+    @State private var test: String = ""
 
     var body: some View {
 
@@ -73,6 +74,7 @@ struct HomeTabView: View {
             } // TabViewここまで
 
             VStack {
+
                 RoundedRectangle(cornerRadius: 10)
                     .foregroundColor(.white)
                     .frame(width: 300, height: 30)
@@ -93,6 +95,7 @@ struct HomeTabView: View {
                     .opacity(inputHome.basketInfomationOpacity)
                 Spacer()
             }
+
             .offset(y: 80)
             .animation(.easeIn(duration: 0.2), value: inputHome.itemsInfomationOpacity)
             .animation(.easeIn(duration: 0.2), value: inputHome.basketInfomationOpacity)
@@ -125,7 +128,7 @@ struct HomeTabView: View {
             SideMenuEditTagView(itemVM: rootItemVM, inputHome: $inputHome, inputEdit: $inputEdit,
                                 defaultTag: inputSideMenu.tagEditStatus == .create ? nil : inputSideMenu.selectTag,
                                 tagSideMenuStatus: inputSideMenu.tagEditStatus)
-            .offset(x: inputHome.isOpenEditTagSideMenu ? UIScreen.main.bounds.width / 2 - 30 : UIScreen.main.bounds.width)
+            .offset(x: inputHome.isOpenEditTagSideMenu ? UIScreen.main.bounds.width / 2 - 30 : UIScreen.main.bounds.width + 10)
 
         } // ZStack
         .animation(.easeIn(duration: 0.2), value: inputHome.sideMenuBackGround)
@@ -443,6 +446,15 @@ struct SystemSideMenu: View {
             } // VStack
             .offset(y: UIScreen.main.bounds.height / 12)
         } // ZStack
+        .onChange(of: inputHome.isShowSystemSideMenu) { newValue in
+            if !newValue {
+                inputSideMenu.item = false
+                inputSideMenu.tag = false
+                inputSideMenu.account = false
+                inputSideMenu.help = false
+                inputSideMenu.editMode = .inactive
+            }
+        }
 
         .clipShape(SideMenuShape())
         .contentShape(SideMenuShape())

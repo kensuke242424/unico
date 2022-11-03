@@ -19,8 +19,12 @@ struct SideMenuEditTagView: View {
     let screenSize = UIScreen.main.bounds
     let defaultTag: Tag?
     let tagSideMenuStatus: EditStatus
+<<<<<<< HEAD
 
     @FocusState var focusedField: EditTagField?
+=======
+    @FocusState var focusedField: Field?
+>>>>>>> 2e9cb4c (home TagEdit 繋ぎ込み)
 
     // NOTE: サイドタグメニューの入力値を構造体化
     struct InputTagSideMenu {
@@ -36,238 +40,232 @@ struct SideMenuEditTagView: View {
 
     var body: some View {
 
-        // Todo: サイドメニューViewレイアウトここから
+        Color.clear
+            .ignoresSafeArea()
 
-        ZStack {
+            // TagSideMenu Detail...
+            .overlay {
 
-            RoundedRectangle(cornerRadius: 20)
-                .foregroundColor(Color.black)
-                .frame(width: screenSize.width, height: 600)
+                RoundedRectangle(cornerRadius: 20)
+                    .foregroundColor(Color.customDarkGray2).opacity(0.9)
+                    .blur(radius: 20)
+                    .frame(width: screenSize.width, height: 600)
 
-                .overlay {
-                    // Blur View...
-                    Color.customDarkGray1
-                        .blur(radius: 20)
-                        .opacity(0.7)
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(.white.opacity(0.4), lineWidth: 2)
+                    .frame(width: screenSize.width, height: 600)
 
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(.white.opacity(0.4), lineWidth: 2)
-                        .frame(width: screenSize.width, height: 600)
+                // 入力フォーム...
+                VStack(alignment: .leading, spacing: 20) {
 
-                }
-                .shadow(radius: 2, x: 5, y: 5)
+                    VStack(alignment: .leading) {
+                        Button {
+                            inputHome.isOpenEditTagSideMenu.toggle()
+                            inputHome.editTagSideMenuBackground.toggle()
+                        } label: {
+                            Text("戻る>>")
+                        }
 
-            VStack(alignment: .leading, spacing: 20) {
+                        Text(tagSideMenuStatus == .create ? "新規タグ" : "タグ編集")
+                            .font(.title2)
+                            .foregroundColor(.white)
+                            .opacity(0.5)
+                            .fontWeight(.bold)
+                            .padding(.top, 20)
 
-                VStack(alignment: .leading) {
-                    Button {
-                        inputHome.isOpenEditTagSideMenu.toggle()
-                        inputHome.editTagSideMenuBackground.toggle()
-                    } label: {
-                        Text("戻る>>")
-                    }
+                        Rectangle()
+                            .foregroundColor(.white)
+                            .opacity(0.2)
+                            .frame(width: screenSize.width, height: 5)
+                            .padding(.bottom, 50)
 
-                    Text(tagSideMenuStatus == .create ? "新規タグ" : "タグ編集")
-                        .font(.title2)
-                        .foregroundColor(.white)
-                        .opacity(0.5)
-                        .fontWeight(.bold)
-                        .padding(.top, 20)
+                    } // タイトル(新規タグ)
 
-                    Rectangle()
-                        .foregroundColor(.white)
-                        .opacity(0.2)
-                        .frame(width: screenSize.width, height: 5)
-                        .padding(.bottom, 50)
+                    VStack(alignment: .leading) {
 
-                } // タイトル(新規タグ)
+                        HStack(spacing: 10) {
+                            Text("■タグネーム")
+                                .fontWeight(.heavy)
+                                .foregroundColor(.white)
 
-                VStack(alignment: .leading) {
+                            RoundedRectangle(cornerRadius: 5)
+                                .frame(width: 30, height: 15)
+                                .foregroundColor(.gray)
+                                .overlay {
+                                    Text("必須")
+                                        .font(.caption)
+                                } // overlay
+                                .opacity(0.8)
+                        } // HStack
 
-                    HStack(spacing: 10) {
-                        Text("■タグネーム")
+                        TextField("名前を入力", text: $inputTag.newTagNameText)
+                            .foregroundColor(.white)
+                            .autocapitalization(.none)
+                            .padding()
+                            .frame(width: 200, height: 20)
+                            .focused($focusedField, equals: .tag)
+
+                        FocusedLineRow(select: focusedField == .tag ? true : false)
+                            .frame(width: screenSize.width / 2)
+
+                    } // タグネーム
+                    .padding(.bottom)
+
+                    VStack(alignment: .leading) {
+                        Text("■タグ色")
                             .fontWeight(.heavy)
                             .foregroundColor(.white)
 
-                        RoundedRectangle(cornerRadius: 5)
-                            .frame(width: 30, height: 15)
-                            .foregroundColor(.gray)
-                            .overlay {
-                                Text("必須")
-                                    .font(.caption)
-                            } // overlay
-                            .opacity(0.8)
-                    } // HStack
-
-                    TextField("名前を入力", text: $inputTag.newTagNameText)
+                        HStack(spacing: 20) {
+                            Text("◀︎")
+                            Image(systemName: "rectangle.and.hand.point.up.left.filled")
+                            Text("▶︎")
+                        }
                         .foregroundColor(.white)
-                        .autocapitalization(.none)
-                        .padding()
-                        .frame(width: 200, height: 20)
-                        .focused($focusedField, equals: .tag)
+                        .opacity(0.5)
+                        .padding(.top)
 
-                    FocusedLineRow(select: focusedField == .tag ? true : false)
-                        .frame(width: screenSize.width / 2)
+                        Picker("色を選択", selection: $inputTag.selectionSideMenuTagColor) {
 
-                } // タグネーム
-                .padding(.bottom)
+                            ForEach(UsedColor.allCases, id: \.self) { value in
 
-                VStack(alignment: .leading) {
-                    Text("■タグ色")
-                        .fontWeight(.heavy)
+                                Text(value.text)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                        .padding(.bottom)
+                        .padding(.trailing, screenSize.width / 2)
+                    } // タグ色
+
+                    Text("-  \(inputTag.newTagNameText)  -")
+                        .fontWeight(.bold)
                         .foregroundColor(.white)
 
-                    HStack(spacing: 20) {
-                        Text("◀︎")
-                        Image(systemName: "rectangle.and.hand.point.up.left.filled")
-                        Text("▶︎")
-                    }
-                    .foregroundColor(.white)
-                    .opacity(0.5)
-                    .padding(.top)
+                    IndicatorRow(salesValue: 170000,
+                                 tagColor: inputTag.selectionSideMenuTagColor)
 
-                    Picker("色を選択", selection: $inputTag.selectionSideMenuTagColor) {
+                    Button {
 
-                        ForEach(UsedColor.allCases, id: \.self) { value in
+                        switch tagSideMenuStatus {
 
-                            Text(value.text)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                    .padding(.bottom)
-                    .padding(.trailing, screenSize.width / 2)
-                } // タグ色
+                        case .create:
+                            // NOTE: 既存のタグと重複していないかを確認します。重複していればアラート表示
+                            if itemVM.tags.contains(where: { $0.tagName == inputTag.newTagNameText }) {
+                                print(".create エラー inputTag.newTagNameText: \(inputTag.newTagNameText)")
+                                inputTag.overlapTagNameAlert.toggle()
+                                return
+                            }
+                            // 新規タグデータを追加、配列の2番目に保存(at: 1) 0は"ALL"タグ
+                            withAnimation {
+                                itemVM.tags.insert(Tag(tagName: inputTag.newTagNameText,
+                                                       tagColor: inputTag.selectionSideMenuTagColor), at: 1)
+                            }
 
-                Text("-  \(inputTag.newTagNameText)  -")
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-                    .shadow(radius: 4, x: 4, y: 6)
+                            inputHome.isOpenEditTagSideMenu.toggle()
+                            inputHome.editTagSideMenuBackground.toggle()
+                            inputEdit.selectionTagName = inputTag.newTagNameText
+                            inputTag.newTagNameText = ""
 
-                IndicatorRow(salesValue: 170000,
-                             tagColor: inputTag.selectionSideMenuTagColor)
+                        case .update:
 
-                Button {
+                            guard let unwrappedDefaultTag = defaultTag else {
+                                print("更新対象タグの取得エラー！！")
+                                return
+                            }
 
-                    switch tagSideMenuStatus {
+                            if itemVM.tags.contains(where: { $0.tagName == inputTag.newTagNameText }) {
+                                print(".create エラー inputTag.newTagNameText: \(inputTag.newTagNameText)")
+                                inputTag.overlapTagNameAlert.toggle()
+                                return
+                            }
 
-                    case .create:
-                        // NOTE: 既存のタグと重複していないかを確認します。重複していればアラート表示
-                        if itemVM.tags.contains(where: { $0.tagName == inputTag.newTagNameText }) {
-                            print(".create エラー inputTag.newTagNameText: \(inputTag.newTagNameText)")
-                            inputTag.overlapTagNameAlert.toggle()
-                            return
-                        }
-                        // 新規タグデータを追加、配列の2番目に保存(at: 1) 0は"ALL"タグ
-                        withAnimation {
-                            itemVM.tags.insert(Tag(tagName: inputTag.newTagNameText,
-                                                   tagColor: inputTag.selectionSideMenuTagColor), at: 1)
-                        }
+                            // 要る？
+                            inputEdit.selectionTagName = inputTag.newTagNameText
+                            inputEdit.selectionTagColor = inputTag.selectionSideMenuTagColor
 
-                        inputHome.isOpenEditTagSideMenu.toggle()
-                        inputHome.editTagSideMenuBackground.toggle()
-                        inputEdit.selectionTagName = inputTag.newTagNameText
-                        inputTag.newTagNameText = ""
-
-                    case .update:
-
-                        guard let unwrappedDefaultTag = defaultTag else {
-                            print("更新対象タグの取得エラー！！")
-                            return
-                        }
-
-                        if itemVM.tags.contains(where: { $0.tagName == inputTag.newTagNameText }) {
-                            print(".create エラー inputTag.newTagNameText: \(inputTag.newTagNameText)")
-                            inputTag.overlapTagNameAlert.toggle()
-                            return
-                        }
-
-                        // 要る？
-                        inputEdit.selectionTagName = inputTag.newTagNameText
-                        inputEdit.selectionTagColor = inputTag.selectionSideMenuTagColor
-
-                        // メソッド: 更新内容を受け取って、itemVM.tagsの対象タグデータを更新するメソッドです。
-                        itemVM.updateTagsData(itemVM: itemVM,
-                                              defaultTag: unwrappedDefaultTag,
-                                              newTagName: inputTag.newTagNameText,
-                                              newTagColor: inputTag.selectionSideMenuTagColor)
-
-                        // メソッド: 更新内容を受け取って、itemVM.itemsの対象タグデータを更新するメソッドです。
-                        itemVM.updateItemsTagData(itemVM: itemVM,
+                            // メソッド: 更新内容を受け取って、itemVM.tagsの対象タグデータを更新するメソッドです。
+                            itemVM.updateTagsData(itemVM: itemVM,
                                                   defaultTag: unwrappedDefaultTag,
                                                   newTagName: inputTag.newTagNameText,
-                                                  newTagColorString: inputTag.selectionSideMenuTagColor.text)
+                                                  newTagColor: inputTag.selectionSideMenuTagColor)
 
-                        inputTag.newTagNameText = ""
-                    } // switch
+                            // メソッド: 更新内容を受け取って、itemVM.itemsの対象タグデータを更新するメソッドです。
+                            itemVM.updateItemsTagData(itemVM: itemVM,
+                                                      defaultTag: unwrappedDefaultTag,
+                                                      newTagName: inputTag.newTagNameText,
+                                                      newTagColorString: inputTag.selectionSideMenuTagColor.text)
 
-                } label: {
-                    Text(tagSideMenuStatus == .create ? "追加" : "更新")
-                } // Button(追加 or 更新)
-                .frame(width: 70, height: 30)
-                .buttonStyle(.borderedProminent)
-                .disabled(inputTag.disableButton)
-                .padding(.top)
+                            inputTag.newTagNameText = ""
+                        } // switch
 
-                // Alert overlapTagName...
-                .alert("タグの重複", isPresented: $inputTag.overlapTagNameAlert) {
-
-                    Button {
-                        inputTag.overlapTagNameAlert.toggle()
                     } label: {
-                        Text("OK")
+                        Text(tagSideMenuStatus == .create ? "追加" : "更新")
+                    } // Button(追加 or 更新)
+                    .frame(width: 70, height: 30)
+                    .buttonStyle(.borderedProminent)
+                    .disabled(inputTag.disableButton)
+                    .padding(.top)
+
+                    // Alert overlapTagName...
+                    .alert("タグの重複", isPresented: $inputTag.overlapTagNameAlert) {
+
+                        Button {
+                            inputTag.overlapTagNameAlert.toggle()
+                        } label: {
+                            Text("OK")
+                        }
+                    } message: {
+                        Text("入力したタグネームは既に存在します。")
                     }
-                } message: {
-                    Text("入力したタグネームは既に存在します。")
-                }
 
-                // Alert updateTagError...
-                .alert("更新エラー", isPresented: $inputTag.updateTagErrorAlert) {
+                    // Alert updateTagError...
+                    .alert("更新エラー", isPresented: $inputTag.updateTagErrorAlert) {
 
-                    Button {
-                        inputTag.updateTagErrorAlert.toggle()
-                    } label: {
-                        Text("OK")
-                    }
-                } message: {
-                    Text("タグの更新に失敗しました。")
-                } // alert
+                        Button {
+                            inputTag.updateTagErrorAlert.toggle()
+                        } label: {
+                            Text("OK")
+                        }
+                    } message: {
+                        Text("タグの更新に失敗しました。")
+                    } // alert
 
-                // NOTE: タグネームの入力値がisEmptyの場合、追加ボタンを無効化します
-                .onChange(of: inputTag.newTagNameText) {newValue in
-                    withAnimation(.easeIn(duration: 0.15)) {
+                    // NOTE: タグネームの入力値がisEmptyの場合、追加ボタンを無効化します
+                    .onChange(of: inputTag.newTagNameText) {newValue in
                         if newValue.isEmpty {
                             inputTag.disableButton = true
                         } else {
                             inputTag.disableButton = false
                         }
-                    }
-                } // .onChange
-            } // VStack
-            .padding(.leading, 30)
-        } // ZStack (タグサイドメニューブロック)
-        .onTapGesture { focusedField = nil }
-        .animation(.easeOut(duration: 0.3), value: focusedField)
-        .offset(x: dragOffset)
-        .gesture(
-            DragGesture()
-                .updating(self.$dragOffset, body: { (value, state, _) in
+                    } // .onChange
 
-                    print(value.translation.width)
+                } // VStack
+                .offset(x: 20)
 
-                    if value.translation.width > 0 {
-                        state = value.translation.width
-                    }})
-                .onEnded { value in
-                    if value.translation.width > 100 {
-                        inputHome.isOpenEditTagSideMenu.toggle()
-                        inputHome.editTagSideMenuBackground.toggle()
+            }
+            .onTapGesture { focusedField = nil }
+            .animation(.easeOut(duration: 0.3), value: inputTag.disableButton)
+            .offset(x: dragOffset)
+            .gesture(
+                DragGesture()
+                    .updating(self.$dragOffset, body: { (value, state, _) in
+
+                        print(value.translation.width)
+
+                        if value.translation.width > 0 {
+                            state = value.translation.width
+                        }})
+                    .onEnded { value in
+                        if value.translation.width > 100 {
+                            inputHome.isOpenEditTagSideMenu.toggle()
+                            inputHome.editTagSideMenuBackground.toggle()
+                        }
                     }
-                }
-        )
-        .animation(.interpolatingSpring(mass: 0.8,
-                                        stiffness: 100,
-                                        damping: 80,
-                                        initialVelocity: 0.1), value: dragOffset)
+            )
+            .animation(.interpolatingSpring(mass: 0.8,
+                                            stiffness: 100,
+                                            damping: 80,
+                                            initialVelocity: 0.1), value: dragOffset)
 
         .onAppear {
             // // タグ編集の場合は、親Viewから受け取ったアイテムの値を渡す
