@@ -95,8 +95,12 @@ struct HomeTabView: View {
                 .ignoresSafeArea()
                 .opacity(inputHome.sideMenuBackGround ? 0.4 : 0)
                 .onTapGesture {
-                    inputHome.sideMenuBackGround.toggle()
-                    inputHome.isShowSystemSideMenu.toggle()
+                    withAnimation(.spring(response: 0.4, blendDuration: 1)) {
+                        inputHome.isShowSystemSideMenu.toggle()
+                    }
+                    withAnimation(.easeIn(duration: 0.2)) {
+                        inputHome.sideMenuBackGround.toggle()
+                    }
                 }
 
             SystemSideMenu(itemVM: rootItemVM,
@@ -110,23 +114,22 @@ struct HomeTabView: View {
                 .ignoresSafeArea()
                 .opacity(inputHome.editTagSideMenuBackground ? 0.4 : 0)
                 .onTapGesture {
-                    inputHome.editTagSideMenuBackground.toggle()
-                    inputHome.isOpenEditTagSideMenu.toggle()
+                    withAnimation(.spring(response: 0.4, blendDuration: 1)) {
+                        inputHome.editTagSideMenuBackground.toggle()
+                    }
+                    withAnimation(.easeIn(duration: 0.2)) {
+                        inputHome.isOpenEditTagSideMenu.toggle()
+                    }
                 }
 
             // Open TagSideMenu...
             SideMenuEditTagView(itemVM: rootItemVM, inputHome: $inputHome, inputTag: $inputTag,
                                 defaultTag: inputTag.tagSideMenuStatus == .create ? nil : inputSideMenu.selectTag)
             .offset(x: inputHome.isOpenEditTagSideMenu ? UIScreen.main.bounds.width / 2 - 30 : UIScreen.main.bounds.width + 10)
-//            .offset(x:UIScreen.main.bounds.width / 2 + 10)
 
         } // ZStack
         .animation(.easeIn(duration: 0.2), value: inputHome.itemsInfomationOpacity)
         .animation(.easeIn(duration: 0.2), value: inputHome.basketInfomationOpacity)
-        .animation(.easeIn(duration: 0.2), value: inputHome.sideMenuBackGround)
-        .animation(.easeIn(duration: 0.2), value: inputHome.editTagSideMenuBackground)
-        .animation(.spring(response: 0.3, blendDuration: 1.0), value: inputHome.isShowSystemSideMenu)
-        .animation(.spring(response: 0.3, blendDuration: 1.0), value: inputHome.isOpenEditTagSideMenu)
         .navigationBarBackButtonHidden()
 
         .sheet(isPresented: $inputHome.isPresentedEditItem) {
@@ -151,7 +154,7 @@ struct InputSideMenu {
 struct SystemSideMenu: View {
 
     @Environment(\.colorScheme) var colorScheme: ColorScheme
-    @Environment(\.editMode) var editMode
+//    @Environment(\.editMode) var editMode
 
     @StateObject var itemVM: ItemViewModel
     @Binding var inputHome: InputHome
@@ -171,8 +174,12 @@ struct SystemSideMenu: View {
                 .blur(radius: 15)
 
             Button {
-                inputHome.isShowSystemSideMenu.toggle()
-                inputHome.sideMenuBackGround.toggle()
+                withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+                    inputHome.isShowSystemSideMenu.toggle()
+                }
+                withAnimation(.easeIn(duration: 0.2)) {
+                    inputHome.sideMenuBackGround.toggle()
+                }
             } label: {
                 Image(systemName: "chevron.left.2")
                     .font(.title).opacity(0.5)
@@ -215,7 +222,6 @@ struct SystemSideMenu: View {
                                     } // VStack
                                     .foregroundColor(.white)
                                     .frame(width: 210, height: 60, alignment: .topLeading)
-                                    .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
                                     .offset(x: 20, y: 30)
 
                                 }
@@ -245,8 +251,14 @@ struct SystemSideMenu: View {
                                         Button {
                                             print("タグ追加ボタンタップ")
                                             inputTag.tagSideMenuStatus = .create
-                                            inputHome.isOpenEditTagSideMenu.toggle()
-                                            inputHome.editTagSideMenuBackground.toggle()
+
+                                            withAnimation(.spring(response: 0.2, blendDuration: 1)) {
+                                                inputHome.isOpenEditTagSideMenu.toggle()
+                                            }
+
+                                            withAnimation(.easeIn(duration: 0.2)) {
+                                                inputHome.editTagSideMenuBackground.toggle()
+                                            }
 
                                         } label: {
                                             Image(systemName: "plus.square")
@@ -287,8 +299,14 @@ struct SystemSideMenu: View {
                                                                 inputSideMenu.selectTag = tag
                                                                 inputTag.newTagNameText = tag.tagName
                                                                 inputTag.selectionSideMenuTagColor = tag.tagColor
-                                                                inputHome.isOpenEditTagSideMenu.toggle()
-                                                                inputHome.editTagSideMenuBackground.toggle()
+
+                                                                withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+                                                                    inputHome.isOpenEditTagSideMenu.toggle()
+                                                                }
+
+                                                                withAnimation(.easeIn(duration: 0.2)) {
+                                                                    inputHome.editTagSideMenuBackground.toggle()
+                                                                }
                                                             }
                                                         }
 
@@ -448,14 +466,22 @@ struct SystemSideMenu: View {
                 .updating(self.$dragOffset, body: { (value, state, _) in
 
                     if value.translation.width < 0 {
+
                         state = value.translation.width
+
                     }})
                 .onEnded { value in
                     if value.translation.width < -100 {
-                        inputHome.isShowSystemSideMenu.toggle()
-                        inputHome.sideMenuBackGround.toggle()
+
+                        withAnimation(.spring(response: 0.4, blendDuration: 1)) {
+                            inputHome.isShowSystemSideMenu.toggle()
+                        }
+                        withAnimation(.easeIn(duration: 0.2)) {
+                            inputHome.sideMenuBackGround.toggle()
+                        }
                     }
                 }
+
         )
         .animation(.interpolatingSpring(mass: 0.8,
                                         stiffness: 100,
@@ -506,7 +532,6 @@ struct SideMenuButton: View {
 
                 Text(title)
                     .font(.system(size: 20))
-//                    .fontWeight(.medium)
                     .foregroundColor(.white.opacity(0.7))
 
                 Image(systemName: "chevron.down")

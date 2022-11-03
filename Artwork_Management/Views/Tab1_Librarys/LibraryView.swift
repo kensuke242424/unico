@@ -249,12 +249,12 @@ struct LibraryView: View {
             .overlay(alignment: .topLeading) {
                 if inputLibrary.isShowHeaderPhotoInfomation {
                     Button {
-//                        withAnimation(.spring(response: 0.2, blendDuration: 1)) {
+                        withAnimation(.spring(response: 0.3, blendDuration: 1)) {
                             inputHome.isShowSystemSideMenu.toggle()
-//                        }
-//                        withAnimation(.easeIn(duration: 0.2)) {
+                        }
+                        withAnimation(.easeIn(duration: 0.2)) {
                             inputHome.sideMenuBackGround.toggle()
-//                        }
+                        }
                     } label: {
                         CircleIcon(photo: userIcon, size: 35)
                             .padding(.leading)

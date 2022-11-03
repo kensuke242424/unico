@@ -54,8 +54,26 @@ struct SideMenuEditTagView: View {
 
                 RoundedRectangle(cornerRadius: 20)
                     .foregroundColor(Color.customDarkGray2).opacity(0.9)
-                    .blur(radius: 20)
+                    .blur(radius: 10)
                     .frame(width: screenSize.width, height: 600)
+                    .overlay(alignment: .topLeading) {
+                        Button {
+                            inputTag.newTagNameText = ""
+                            inputTag.selectionSideMenuTagColor = .red
+                            withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+                                inputHome.isOpenEditTagSideMenu.toggle()
+                            }
+                            withAnimation(.easeIn(duration: 0.2)) {
+                                inputHome.editTagSideMenuBackground.toggle()
+                            }
+                        } label: {
+                            Image(systemName: "multiply.circle.fill")
+                                .font(.title3)
+                                .foregroundColor(.white)
+                                .padding()
+                        }
+
+                    }
 
                 RoundedRectangle(cornerRadius: 20)
                     .stroke(.white.opacity(0.4), lineWidth: 2)
@@ -65,27 +83,18 @@ struct SideMenuEditTagView: View {
                 VStack(alignment: .leading, spacing: 20) {
 
                     VStack(alignment: .leading) {
-                        Button {
-                            inputTag.newTagNameText = ""
-                            inputTag.selectionSideMenuTagColor = .red
-                            inputHome.isOpenEditTagSideMenu.toggle()
-                            inputHome.editTagSideMenuBackground.toggle()
-                        } label: {
-                            Text("戻る>>")
-                        }
 
                         Text(inputTag.tagSideMenuStatus == .create ? "新規タグ" : "タグ編集")
                             .font(.title2)
                             .foregroundColor(.white)
                             .opacity(0.5)
                             .fontWeight(.bold)
-                            .padding(.top, 20)
 
                         Rectangle()
                             .foregroundColor(.white)
                             .opacity(0.2)
                             .frame(width: screenSize.width, height: 5)
-                            .padding(.bottom, 50)
+                            .padding(.bottom, 30)
 
                     } // タイトル(新規タグ)
 
@@ -138,6 +147,7 @@ struct SideMenuEditTagView: View {
                             ForEach(UsedColor.allCases, id: \.self) { value in
 
                                 Text(value.text)
+
                             }
                         }
                         .pickerStyle(.segmented)
@@ -148,7 +158,6 @@ struct SideMenuEditTagView: View {
                     // show edit Result...
                     VStack(alignment: .leading) {
                         Text("-  \(inputTag.newTagNameText)  -")
-                            .animation(.none)
                             .fontWeight(.bold)
                             .foregroundColor(.white)
 
@@ -156,7 +165,6 @@ struct SideMenuEditTagView: View {
                                      tagColor: inputTag.selectionSideMenuTagColor)
 
                         Button {
-
                             switch inputTag.tagSideMenuStatus {
 
                             case .create:
@@ -172,8 +180,12 @@ struct SideMenuEditTagView: View {
                                                            tagColor: inputTag.selectionSideMenuTagColor), at: 1)
                                 }
 
-                                inputHome.isOpenEditTagSideMenu.toggle()
-                                inputHome.editTagSideMenuBackground.toggle()
+                                withAnimation(.easeIn(duration: 0.2)) {
+                                    inputHome.isOpenEditTagSideMenu.toggle()
+                                }
+                                withAnimation(.easeIn(duration: 0.2)) {
+                                    inputHome.editTagSideMenuBackground.toggle()
+                                }
                                 inputTag.newTagNameText = ""
                                 inputTag.selectionSideMenuTagColor = .red
 
@@ -184,10 +196,12 @@ struct SideMenuEditTagView: View {
                                     return
                                 }
 
-                                if itemVM.tags.contains(where: { $0.tagName == inputTag.newTagNameText }) {
-                                    print(".create タグネーム重複 inputTag.newTagNameText: \(inputTag.newTagNameText)")
-                                    inputTag.overlapTagNameAlert.toggle()
-                                    return
+                                if defaultTag!.tagName != inputTag.newTagNameText {
+                                    if itemVM.tags.contains(where: { $0.tagName == inputTag.newTagNameText }) {
+                                        print(".create タグネーム重複 inputTag.newTagNameText: \(inputTag.newTagNameText)")
+                                        inputTag.overlapTagNameAlert.toggle()
+                                        return
+                                    }
                                 }
 
                                 // メソッド: 更新内容を受け取って、itemVM.tagsの対象タグデータを更新するメソッドです。
@@ -202,8 +216,15 @@ struct SideMenuEditTagView: View {
                                                           newTagName: inputTag.newTagNameText,
                                                           newTagColorString: inputTag.selectionSideMenuTagColor.text)
 
+                                withAnimation(.easeIn(duration: 0.2)) {
+                                    inputHome.isOpenEditTagSideMenu.toggle()
+                                }
+                                withAnimation(.easeIn(duration: 0.2)) {
+                                    inputHome.editTagSideMenuBackground.toggle()
+                                }
                                 inputTag.newTagNameText = ""
                                 inputTag.selectionSideMenuTagColor = .red
+
                             } // switch
 
                         } label: {
@@ -212,7 +233,7 @@ struct SideMenuEditTagView: View {
                         .frame(width: 70, height: 30)
                         .buttonStyle(.borderedProminent)
                         .disabled(inputTag.disableButton)
-                        .padding(.top)
+                        .padding(.top, 40)
                     }
 
                     // Alert overlapTagName...
@@ -254,24 +275,7 @@ struct SideMenuEditTagView: View {
             }
             .onTapGesture { focusedField = nil }
             .offset(x: dragOffset)
-            .gesture(
-                DragGesture()
-                    .updating(self.$dragOffset, body: { (value, state, _) in
-
-                        print(value.translation.width)
-
-                        if value.translation.width > 0 {
-                            state = value.translation.width
-                        }})
-                    .onEnded { value in
-                        if value.translation.width > 100 {
-                            inputTag.newTagNameText = ""
-                            inputTag.selectionSideMenuTagColor = .red
-                            inputHome.isOpenEditTagSideMenu.toggle()
-                            inputHome.editTagSideMenuBackground.toggle()
-                        }
-                    }
-            )
+            .animation(.easeIn(duration: 0.15), value: inputTag.disableButton)
             .animation(.interpolatingSpring(mass: 0.8,
                                             stiffness: 100,
                                             damping: 80,
