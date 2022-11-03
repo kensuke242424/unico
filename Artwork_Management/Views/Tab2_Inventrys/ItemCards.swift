@@ -12,6 +12,7 @@ struct TagSortCards: View {
 
     @StateObject var itemVM: ItemViewModel
 
+    @Binding var inputHome: InputHome
     @Binding var inputStock: InputStock
     @Binding var cartResults: CartResults
     let selectFilterTag: String
@@ -29,6 +30,7 @@ struct TagSortCards: View {
                 ForEach(itemVM.items) { item in
 
                     ItemCardRow(itemVM: itemVM,
+                                inputHome: $inputHome,
                                 inputStock: $inputStock,
                                 cartResults: $cartResults,
                                 itemRow: item)
@@ -48,6 +50,7 @@ struct TagSortCards: View {
                         item.tag.contains(inputStock.searchItemNameText) ||
                         item.tag.contains(selectFilterTag) {
                         ItemCardRow(itemVM: itemVM,
+                                    inputHome: $inputHome,
                                     inputStock: $inputStock,
                                     cartResults: $cartResults,
                                     itemRow: item)
@@ -73,6 +76,7 @@ struct UpdateTimeSortCards: View {
 
     @StateObject var itemVM: ItemViewModel
 
+    @Binding var inputHome: InputHome
     @Binding var inputStock: InputStock
     @Binding var commerceResults: CartResults
 
@@ -86,6 +90,7 @@ struct UpdateTimeSortCards: View {
                 ForEach(itemVM.items) { item in
 
                     ItemCardRow(itemVM: itemVM,
+                                inputHome: $inputHome,
                                 inputStock: $inputStock,
                                 cartResults: $commerceResults,
                                 itemRow: item)
@@ -106,6 +111,7 @@ struct TagCards_Previews: PreviewProvider {
              // ✅カスタムView: 最近更新したアイテムをHStack表示します。(横スクロール)
              ScrollView(.horizontal) {
                  UpdateTimeSortCards(itemVM: ItemViewModel(),
+                                     inputHome: .constant(InputHome()),
                                      inputStock: .constant(InputStock()),
                                      commerceResults: .constant(CartResults())
                  )
@@ -118,6 +124,7 @@ struct TagCards_Previews: PreviewProvider {
             TagTitle(title: "アイテム", font: .title)
             // ✅カスタムView: アイテムを表示します。(縦スクロール)
             TagSortCards(itemVM: ItemViewModel(),
+                         inputHome: .constant(InputHome()),
                          inputStock: .constant(InputStock()),
                          cartResults: .constant(CartResults()),
                          selectFilterTag: "Album"

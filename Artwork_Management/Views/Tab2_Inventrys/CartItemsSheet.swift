@@ -121,7 +121,7 @@ struct CartItemRow: View {
                         Button {
 
                             if let newActionIndex = itemVM.items.firstIndex(of: itemRow) {
-                                inputStock.actionRowIndex = newActionIndex
+                                inputHome.actionItemIndex = newActionIndex
                                 print("newActionIndex: \(newActionIndex)")
                             } else {
                                 print("アクションIndexの取得に失敗しました")
@@ -148,7 +148,7 @@ struct CartItemRow: View {
                         Button {
                             // プラスボタン
                             if let newActionIndex = itemVM.items.firstIndex(of: itemRow) {
-                                inputStock.actionRowIndex = newActionIndex
+                                inputHome.actionItemIndex = newActionIndex
                                 commerceResults.resultItemAmount += 1
                             } else {
                                 print("アクションIndexの取得に失敗しました")
@@ -202,7 +202,7 @@ struct CartItemRow: View {
         //       メインのカードView側からのアイテム追加とカウントを同期させるために必要です。
         .onChange(of: commerceResults.resultItemAmount) { [beforeAmount = commerceResults.resultItemAmount] afterAmount in
 
-            if itemRow == itemVM.items[inputStock.actionRowIndex] {
+            if itemRow == itemVM.items[inputHome.actionItemIndex] {
                 if beforeAmount < afterAmount {
                     basketItemCount += 1
                     commerceResults.resultPrice += itemRow.price
@@ -211,7 +211,7 @@ struct CartItemRow: View {
                     // NOTE: カート内のアイテム削除処理が発生した際、onchange内のカウント減処理が他のアイテムに適用されてしまうため、
                     //       アイテム削除処理が発火する条件である「count1」の時は、マイナス処理をスキップしています。
                     if basketItemCount == 1 { return }
-                    if itemRow == itemVM.items[inputStock.actionRowIndex] {
+                    if itemRow == itemVM.items[inputHome.actionItemIndex] {
                         print("カウント減実行")
                         commerceResults.resultPrice -= itemRow.price
                         basketItemCount -= 1
@@ -222,11 +222,11 @@ struct CartItemRow: View {
 
         .onChange(of: basketItemCount) { newCount in
             if newCount == itemRow.inventory {
-                if itemRow == itemVM.items[inputStock.actionRowIndex] {
+                if itemRow == itemVM.items[inputHome.actionItemIndex] {
                     countUpDisable = true
                 }
             } else {
-                if itemRow == itemVM.items[inputStock.actionRowIndex] {
+                if itemRow == itemVM.items[inputHome.actionItemIndex] {
                     countUpDisable = false
                 }
             }

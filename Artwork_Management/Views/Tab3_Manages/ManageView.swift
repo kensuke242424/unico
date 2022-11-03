@@ -26,8 +26,6 @@ struct ManageView: View {
     @Binding var inputHome: InputHome
 
     struct InputManage {
-        var isShowItemDetail = false
-        var listIndex = 0
         var tagGroup: TagGroup = .on
         var sortType: SortType = .start
         var isTagGroup: Bool = true
@@ -138,16 +136,6 @@ struct ManageView: View {
                     .padding(.leading)
 
                 } // ScrollView
-
-                if inputManage.isShowItemDetail {
-                    ShowsItemDetail(itemVM: itemVM,
-                                    item: itemVM.items[inputManage.listIndex],
-                                    itemIndex: inputManage.listIndex,
-                                    isShowItemDetail: $inputManage.isShowItemDetail,
-                                    isPresentedEditItem: $inputHome.isPresentedEditItem)
-
-                } // if isShowItemDetail
-
             } // ZStack
             .background(LinearGradient(gradient: Gradient(colors: [.customDarkGray1, .customLightGray1]),
                                        startPoint: .top, endPoint: .bottom))
@@ -167,8 +155,6 @@ struct ManageView: View {
                                 Text("タググループ")
                             }
                         }
-
-
 
                         Menu("並び替え") {
                             Button {
@@ -225,8 +211,12 @@ struct ManageView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button {
-                        inputHome.isShowSystemSideMenu.toggle()
-                        inputHome.sideMenuBackGround.toggle()
+                        withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+                            inputHome.isShowSystemSideMenu.toggle()
+                        }
+                        withAnimation(.easeIn(duration: 0.2)) {
+                            inputHome.sideMenuBackGround.toggle()
+                        }
                     } label: {
                         CircleIcon(photo: "cloth_sample1", size: 35)
                     }
@@ -255,11 +245,11 @@ struct ManageView: View {
                             .font(.subheadline.bold())
                         Button {
 
-                            if let listIndex = itemVM.items.firstIndex(of: item) {
-                                inputManage.listIndex = listIndex
-                                inputManage.isShowItemDetail.toggle()
-                                print("isShowItemDetail: \(inputManage.isShowItemDetail)")
-                                print(listIndex)
+                            if let actionItemIndex = itemVM.items.firstIndex(of: item) {
+                                inputHome.actionItemIndex = actionItemIndex
+                                withAnimation(.easeIn(duration: 0.15)) {
+                                    inputHome.isShowItemDetail.toggle()
+                                }
                             } else {
                                 print("インデックス取得失敗")
                             }

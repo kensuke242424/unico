@@ -11,6 +11,7 @@ struct ItemCardRow: View {
 
     @Environment(\.colorScheme) var colorScheme
     @StateObject var itemVM: ItemViewModel
+    @Binding var inputHome: InputHome
     @Binding var inputStock: InputStock
     @Binding var cartResults: CartResults
     let itemRow: Item
@@ -36,11 +37,12 @@ struct ItemCardRow: View {
                             print("アクションIndexの取得に失敗しました")
                             return
                         }
-                        inputStock.actionRowIndex = newActionIndex
-                        print("actionRowIndex: \(inputStock.actionRowIndex)")
+                        inputHome.actionItemIndex = newActionIndex
+                        print("actionRowIndex: \(inputHome.actionItemIndex)")
                             // アイテム詳細表示
-                        inputStock.isShowItemDetail.toggle()
-                        print("ItemStockView_アイテム詳細ボタンタップ: \(inputStock.isShowItemDetail)")
+                        withAnimation(.easeIn(duration: 0.15)) {
+                            inputHome.isShowItemDetail.toggle()
+                        }
 
                     } label: {
                         Image(systemName: "info.circle.fill")
@@ -100,7 +102,7 @@ struct ItemCardRow: View {
                                     print("アクションIndexの取得に失敗しました")
                                     return
                                 }
-                                inputStock.actionRowIndex = newActionIndex
+                                inputHome.actionItemIndex = newActionIndex
                                 cartResults.resultItemAmount += 1
 
                                 // カート内に対象アイテムがなければ、カートに要素を新規追加
@@ -156,12 +158,12 @@ struct ItemCardRow: View {
 
         .onChange(of: cartResults.resultItemAmount) { [before = cartResults.resultItemAmount] after in
             if before < after {
-                if itemRow == itemVM.items[inputStock.actionRowIndex] {
+                if itemRow == itemVM.items[inputHome.actionItemIndex] {
                     cardCount += 1
                 }
             }
             if before > after {
-                if itemRow == itemVM.items[inputStock.actionRowIndex] {
+                if itemRow == itemVM.items[inputHome.actionItemIndex] {
                     cardCount -= 1
                 }
             }
@@ -175,11 +177,11 @@ struct ItemCardRow: View {
 
         .onChange(of: cardCount) { newCardCount in
             if newCardCount == itemRow.inventory {
-                if itemRow == itemVM.items[inputStock.actionRowIndex] {
+                if itemRow == itemVM.items[inputHome.actionItemIndex] {
                     countUpDisable = true
                 }
             } else {
-                if itemRow == itemVM.items[inputStock.actionRowIndex] {
+                if itemRow == itemVM.items[inputHome.actionItemIndex] {
                     countUpDisable = false
                 }
             }
@@ -201,6 +203,7 @@ struct ItemCardRow_Previews: PreviewProvider {
     static var previews: some View {
 
         ItemCardRow(itemVM: ItemViewModel(),
+                    inputHome: .constant(InputHome()),
                     inputStock: .constant(InputStock()),
                     cartResults: .constant(CartResults()),
                     itemRow: TestItem().testItem)

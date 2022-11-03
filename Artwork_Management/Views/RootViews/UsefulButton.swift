@@ -37,6 +37,7 @@ struct UsefulButton: View {
 
             case .manege:
                 print("manege画面ボタンアクション実行")
+                inputHome.editItemStatus = .create
                 inputHome.isPresentedEditItem.toggle()
 
             case .account:

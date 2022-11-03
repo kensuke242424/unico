@@ -9,7 +9,9 @@ import SwiftUI
 import ResizableSheet
 
 struct InputHome {
-    var tabIndex = 0
+    var tabIndex: Int = 0
+    var actionItemIndex: Int = 0
+    var editItemStatus: EditStatus = .create
     var itemsInfomationOpacity: CGFloat = 0.0
     var basketInfomationOpacity: CGFloat = 0.0
     var isShowItemDetail: Bool = false
@@ -90,6 +92,11 @@ struct HomeTabView: View {
             // Todo: 各タブごとにオプションが変わるボタン
             UsefulButton(inputHome: $inputHome)
 
+            ShowsItemDetail(itemVM: rootItemVM,
+                            inputHome: $inputHome,
+                            item: rootItemVM.items[inputHome.actionItemIndex])
+            .opacity(inputHome.isShowItemDetail ? 1.0 : 0.0)
+
             // sideMenu_background...
             Color.black
                 .ignoresSafeArea()
@@ -134,10 +141,11 @@ struct HomeTabView: View {
 
         .sheet(isPresented: $inputHome.isPresentedEditItem) {
             EditItemView(itemVM: rootItemVM,
-                         isPresentedEditItem: $inputHome.isPresentedEditItem,
-                         itemIndex: 0,
-                         passItemData: nil,
-                         editItemStatus: .create)
+                         inputHome: $inputHome,
+                         itemIndex: inputHome.actionItemIndex,
+                         passItemData: inputHome.editItemStatus == .create ?
+                         nil : rootItemVM.items[inputHome.actionItemIndex],
+                         editItemStatus: inputHome.editItemStatus)
         }
     } // body
 } // View
@@ -154,7 +162,6 @@ struct InputSideMenu {
 struct SystemSideMenu: View {
 
     @Environment(\.colorScheme) var colorScheme: ColorScheme
-//    @Environment(\.editMode) var editMode
 
     @StateObject var itemVM: ItemViewModel
     @Binding var inputHome: InputHome
@@ -217,7 +224,11 @@ struct SystemSideMenu: View {
                                             Image(systemName: "shippingbox.fill")
                                             Text("アイテム追加")
                                         }
-                                        .onTapGesture { inputHome.isPresentedEditItem.toggle() }
+                                        .onTapGesture {
+                                            inputHome.editItemStatus = .create
+                                            inputHome.isPresentedEditItem.toggle()
+
+                                        }
 
                                     } // VStack
                                     .foregroundColor(.white)

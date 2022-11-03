@@ -59,6 +59,7 @@ struct StockView: View {
 
                             // ✅カスタムView: 最近更新したアイテムをHStack表示します。(横スクロール)
                             UpdateTimeSortCards(itemVM: itemVM,
+                                                inputHome: $inputHome,
                                                 inputStock: $inputStock,
                                                 commerceResults: $cartResults)
 
@@ -103,7 +104,7 @@ struct StockView: View {
                             HStack(spacing: 50) {
                                 Text(inputStock.tagIndex == 0 ?
                                          "- \(inputStock.searchItemNameText) -" :
-                                        "-  \(itemVM.tags[inputStock.tagIndex].tagName) -")
+                                        "- \(itemVM.tags[inputStock.tagIndex].tagName) -")
                                 .font(.title.bold())
                                 .foregroundColor(.white)
                                 .shadow(radius: 3, x: 4, y: 6)
@@ -131,6 +132,7 @@ struct StockView: View {
                             .padding([.leading, .vertical])
 
                             TagSortCards(itemVM: itemVM,
+                                         inputHome: $inputHome,
                                          inputStock: $inputStock,
                                          cartResults: $cartResults,
                                          selectFilterTag: itemVM.tags[inputStock.tagIndex].tagName)
@@ -138,14 +140,6 @@ struct StockView: View {
                         } // ScrollView (アイテムロケーション)
 
                     } // VStack
-                    // NOTE: アイテム詳細ボタンをタップすると、詳細画面が発火します。
-                    if inputStock.isShowItemDetail {
-                        ShowsItemDetail(itemVM: itemVM,
-                                        item: itemVM.items[inputStock.actionRowIndex],
-                                        itemIndex: inputStock.actionRowIndex,
-                                        isShowItemDetail: $inputStock.isShowItemDetail,
-                                        isPresentedEditItem: $inputHome.isPresentedEditItem)
-                    } // if isShowItemDetail
                 } // ZStack
 
                 // NOTE: バスケット内にアイテムが追加された時点で、ハーフモーダルを表示します。
@@ -201,10 +195,8 @@ struct StockView: View {
                     if newValue {
                         withAnimation(.easeIn(duration: 2.0)) {
                             scrollProxy.scrollTo("search", anchor: .top)
-                            }
-//                        withAnimation(.easeIn(duration: 0.3)) {
-                            inputStock.tagIndex = 0 // タグを「All」に更新
-//                        }
+                        }
+                        inputStock.tagIndex = 0 // タグを「All」に更新
                     } // if
                 } // .onChange
 
@@ -317,8 +309,12 @@ struct StockView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button {
-                        inputHome.isShowSystemSideMenu.toggle()
-                        inputHome.sideMenuBackGround.toggle()
+                        withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+                            inputHome.isShowSystemSideMenu.toggle()
+                        }
+                        withAnimation(.easeIn(duration: 0.2)) {
+                            inputHome.sideMenuBackGround.toggle()
+                        }
                     } label: {
                         CircleIcon(photo: "cloth_sample1", size: 35)
                     }

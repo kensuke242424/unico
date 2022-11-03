@@ -11,10 +11,8 @@ struct ShowsItemDetail: View {
 
     @StateObject var itemVM: ItemViewModel
 
+    @Binding var inputHome: InputHome
     let item: Item
-    let itemIndex: Int
-    @Binding var isShowItemDetail: Bool
-    @Binding var isPresentedEditItem: Bool
 
     struct InputItemDetail {
         var opacity: Double = 0
@@ -31,7 +29,11 @@ struct ShowsItemDetail: View {
             Color(.black)
                 .ignoresSafeArea()
                 .opacity(0.4)
-                .onTapGesture { isShowItemDetail = false }
+                .onTapGesture {
+                    withAnimation(.easeIn(duration: 0.15)) {
+                        inputHome.isShowItemDetail.toggle()
+                    }
+                }
 
             RoundedRectangle(cornerRadius: 20)
                 .foregroundColor(.black)
@@ -43,7 +45,9 @@ struct ShowsItemDetail: View {
                         .blur(radius: 20)
                         .overlay(alignment: .topLeading) {
                             Button {
-                                inputDetail.opacity = 0.0
+                                withAnimation(.easeIn(duration: 0.15)) {
+                                    inputHome.isShowItemDetail.toggle()
+                                }
                             } label: {
                                 Image(systemName: "multiply.circle.fill")
                                     .font(.title2)
@@ -90,7 +94,8 @@ struct ShowsItemDetail: View {
                                         }
 
                                         Button {
-                                            inputDetail.isPresentedEditItem.toggle()
+                                            inputHome.editItemStatus = .update
+                                            inputHome.isPresentedEditItem.toggle()
                                         } label: {
                                             Text("はい")
                                         }
@@ -144,8 +149,8 @@ struct ShowsItemDetail: View {
 
             // NOTE: itemがnilでない場合のみボタンを有効にしているため、ボタンアクション時には値を強制アンラップします。
             EditItemView(itemVM: itemVM,
-                         isPresentedEditItem: $inputDetail.isPresentedEditItem,
-                         itemIndex: itemIndex,
+                         inputHome: $inputHome,
+                         itemIndex: inputHome.actionItemIndex,
                          passItemData: item,
                          editItemStatus: .update)
         } // sheet(アイテム更新シート)
@@ -162,10 +167,7 @@ struct ShowsItemDetail: View {
 struct ShowsItemDetail_Previews: PreviewProvider {
     static var previews: some View {
         ShowsItemDetail(itemVM: ItemViewModel(),
-                        item: TestItem().testItem,
-                        itemIndex: 0,
-                        isShowItemDetail: .constant(false),
-                        isPresentedEditItem: .constant(false)
-        )
+                        inputHome: .constant(InputHome()),
+                        item: TestItem().testItem)
     }
 }

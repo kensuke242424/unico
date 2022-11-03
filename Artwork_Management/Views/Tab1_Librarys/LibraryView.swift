@@ -204,14 +204,6 @@ struct LibraryView: View {
                 .offset(x: -UIScreen.main.bounds.width / 10,
                         y: UIScreen.main.bounds.height / 4)
 
-            if inputHome.isShowItemDetail {
-                ShowsItemDetail(itemVM: itemVM,
-                                item: itemVM.items[inputLibrary.libraryCardIndex],
-                                itemIndex: inputLibrary.libraryCardIndex,
-                                isShowItemDetail: $inputHome.isShowItemDetail,
-                                isPresentedEditItem: $inputHome.isPresentedEditItem)
-            } // if isShowItemDetail
-
         } // ZStack
         .onChange(of: inputLibrary.selectFilterTag) { newValue in
             if newValue == "ALL" {
@@ -309,8 +301,11 @@ struct LibraryView: View {
                                         if let cardRowIndex =
                                             itemVM.items.firstIndex(where: { $0.id == inputLibrary.tagFilterItemCards[index].id }) {
 
-                                            inputLibrary.libraryCardIndex = cardRowIndex
-                                            inputHome.isShowItemDetail.toggle()
+                                            inputHome.actionItemIndex = cardRowIndex
+                                            
+                                            withAnimation(.easeIn(duration: 0.15)) {
+                                                inputHome.isShowItemDetail.toggle()
+                                            }
                                         } else {
                                             print("LibraryCardIndexの取得エラー")
                                         }

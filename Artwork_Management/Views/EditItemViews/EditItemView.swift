@@ -18,7 +18,6 @@ struct InputEditItem {
     var editItemSales: String = ""
     var editItemDetail: String = ""
     var disableButton: Bool = true
-    var isOpenSideMenu: Bool = false
     var offset: CGFloat = 0
     var isCheckedFocuseDetail: Bool = false
 }
@@ -26,7 +25,7 @@ struct InputEditItem {
 struct EditItemView: View {
 
     @StateObject var itemVM: ItemViewModel
-    @Binding var isPresentedEditItem: Bool
+    @Binding var inputHome: InputHome
 
     let itemIndex: Int
     let passItemData: Item?
@@ -60,26 +59,11 @@ struct EditItemView: View {
 
                         InputForms(itemVM: itemVM,
                                    inputEdit: $inputEdit,
+                                   isOpenEditTagSideMenu: $inputHome.isOpenEditTagSideMenu,
                                    editItemStatus: editItemStatus,
                                    passItem: passItemData)
 
                     } // VStack(パーツ全体)
-
-//                    if inputEdit.isOpenSideMenu {
-//
-//                        SideMenuEditTagView(
-//                            itemVM: itemVM,
-//                            isOpenSideMenu: $inputEdit.isOpenSideMenu,
-//                            geometryMinY: $inputEdit.geometryMinY,
-//                            selectionTagName: $inputEdit.selectionTagName,
-//                            selectionTagColor: $inputEdit.selectionTagColor,
-//                            itemTagName: inputEdit.selectionTagName,
-//                            itemTagColor: inputEdit.selectionTagColor,
-//                            editItemStatus: editItemStatus,
-//                            // Warning_TextSimbol: "＋タグを追加"
-//                            tagSideMenuStatus: inputEdit.selectionTagName == "＋タグを追加" ? .create : .update)
-//                    } // if isOpenSideMenu
-
                 } // ZStack(View全体)
                 .animation(.easeIn(duration: 0.3), value: inputEdit.offset)
 
@@ -93,13 +77,7 @@ struct EditItemView: View {
                 withAnimation(.easeIn(duration: 0.25)) {
                     inputEdit.selectionTagColor = searchedTagColor
                 }
-
-                // NOTE: タグ選択で「+タグを追加」が選択された時、新規タグ追加Viewを表示します。
-                // Warning_TextSimbol: "＋タグを追加"
-                if selection == "＋タグを追加" {
-                    inputEdit.isOpenSideMenu.toggle()
-                }
-            } // onChange (selectionTagName)
+            }
 
             .onChange(of: inputEdit.editItemName) { newValue in
 
@@ -112,37 +90,8 @@ struct EditItemView: View {
                 }
             } // onChange(ボタンdisable分岐)
 
-            // NOTE: タグ追加サイドメニュー表示後、新規タグが追加されず、サイドメニューが閉じられた時(タグ選択が「＋タグ選択」のままの状態)
-            //       タグピッカーの選択をアイテムが保有するタグに戻します。
-            .onChange(of: inputEdit.isOpenSideMenu) { isOpen in
-
-                if isOpen == false {
-                    // Warning_TextSimbol: "＋タグを追加"
-                    if inputEdit.selectionTagName == "＋タグを追加" {
-
-                        switch editItemStatus {
-
-                        case .create:
-                            if let defaultTag = itemVM.tags.first {
-                                inputEdit.selectionTagName = defaultTag.tagName
-                            }
-
-                        case .update:
-                            if let editItemData = passItemData {
-                                inputEdit.selectionTagName = editItemData.tag
-                            }
-                        } // switch
-
-                    } // if selectionTagName == "＋タグを追加"
-                } // if isOpen == false
-            } // onChange(サイドメニューが綴じられた後の選択タグ監視)
-
             // NOTE: updateitemView呼び出し時に、親Viewから受け取ったアイテム情報を各入力欄に格納します。
             .onAppear {
-
-                print("EditItemView_onAppear")
-
-                print("アイテム編集ステータス: \(editItemStatus)")
 
                 // NOTE: 新規アイテム登録遷移の場合、passItemDataにはnilが代入されている
                 if let passItemData = passItemData {
@@ -192,6 +141,7 @@ struct EditItemView: View {
                             if let appendNewItem = itemVM.items.last {
                                 print("新規追加されたアイテム: \(appendNewItem)")
                             }
+                            inputHome.isPresentedEditItem.toggle()
 
                         case .update:
                             // NOTE: テストデータに情報の変更を保存
@@ -208,11 +158,9 @@ struct EditItemView: View {
                             itemVM.items[itemIndex].updateTime = Date() // Todo: Timestamp実装後、変更
                             print("更新されたアイテム: \(itemVM.items[itemIndex])")
 
+                            inputHome.isPresentedEditItem.toggle()
+
                         } // switch editItemStatus(データ追加、更新)
-
-                        // シートを閉じる
-                        isPresentedEditItem.toggle()
-
                     } label: {
                         Text(editItemStatus == .create ? "追加する" : "更新する")
                     }
@@ -232,6 +180,7 @@ struct InputForms: View {
 
     @StateObject var itemVM: ItemViewModel
     @Binding var inputEdit: InputEditItem
+    @Binding var isOpenEditTagSideMenu: Bool
 
     // NOTE: enum「Status」を用いて、「.create」と「.update」とでViewレイアウトを分岐します。
     let editItemStatus: EditStatus
@@ -268,16 +217,10 @@ struct InputForms: View {
                                 }
                             }
                         }
-
-                        Text("＋タグを追加").tag("＋タグを追加")
                     } // Picker
 
                     Spacer()
 
-                    Button {
-                        inputEdit.isOpenSideMenu.toggle()
-                    } label: { Text("タグ編集>>") }
-                    .padding(.trailing)
                 } // HStack(Pickerタグ要素)
 
                 // NOTE: フォーカスの有無によって、入力欄の下線の色をスイッチします。(カスタムView)
@@ -392,7 +335,7 @@ private struct OffsetPreferenceKey: PreferenceKey, Equatable {
 struct EditItemView_Previews: PreviewProvider {
     static var previews: some View {
         EditItemView(itemVM: ItemViewModel(),
-                     isPresentedEditItem: .constant(true),
+                     inputHome: .constant(InputHome()),
                      itemIndex: 0,
                      passItemData: TestItem().testItem,
                      editItemStatus: .update
