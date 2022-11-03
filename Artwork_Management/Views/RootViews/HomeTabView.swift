@@ -252,7 +252,7 @@ struct SystemSideMenu: View {
                                             print("タグ追加ボタンタップ")
                                             inputTag.tagSideMenuStatus = .create
 
-                                            withAnimation(.spring(response: 0.2, blendDuration: 1)) {
+                                            withAnimation(.spring(response: 0.3, blendDuration: 1)) {
                                                 inputHome.isOpenEditTagSideMenu.toggle()
                                             }
 

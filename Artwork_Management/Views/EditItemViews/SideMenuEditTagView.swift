@@ -60,7 +60,7 @@ struct SideMenuEditTagView: View {
                         Button {
                             inputTag.newTagNameText = ""
                             inputTag.selectionSideMenuTagColor = .red
-                            withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+                            withAnimation(.easeIn(duration: 0.2)) {
                                 inputHome.isOpenEditTagSideMenu.toggle()
                             }
                             withAnimation(.easeIn(duration: 0.2)) {
@@ -68,11 +68,10 @@ struct SideMenuEditTagView: View {
                             }
                         } label: {
                             Image(systemName: "multiply.circle.fill")
-                                .font(.title3)
+                                .font(.title2)
                                 .foregroundColor(.white)
                                 .padding()
                         }
-
                     }
 
                 RoundedRectangle(cornerRadius: 20)
@@ -104,6 +103,7 @@ struct SideMenuEditTagView: View {
                             Text("■タグネーム")
                                 .fontWeight(.heavy)
                                 .foregroundColor(.white)
+                                .padding(.bottom)
 
                             RoundedRectangle(cornerRadius: 5)
                                 .frame(width: 30, height: 15)
@@ -160,6 +160,7 @@ struct SideMenuEditTagView: View {
                         Text("-  \(inputTag.newTagNameText)  -")
                             .fontWeight(.bold)
                             .foregroundColor(.white)
+                            .frame(width: 180, alignment: .leading)
 
                         IndicatorRow(salesValue: 170000,
                                      tagColor: inputTag.selectionSideMenuTagColor)
@@ -249,7 +250,7 @@ struct SideMenuEditTagView: View {
                     }
 
                     // Alert updateTagError...
-                    .alert("更新エラー", isPresented: $inputTag.updateTagErrorAlert) {
+                    .alert("タグ更新エラー", isPresented: $inputTag.updateTagErrorAlert) {
 
                         Button {
                             inputTag.updateTagErrorAlert.toggle()
@@ -272,6 +273,11 @@ struct SideMenuEditTagView: View {
                 } // VStack
                 .offset(x: 20)
 
+            }
+            .onChange(of: inputHome.isOpenEditTagSideMenu) { isOpenEditTag in
+                if isOpenEditTag == false {
+                    focusedField = nil
+                }
             }
             .onTapGesture { focusedField = nil }
             .offset(x: dragOffset)

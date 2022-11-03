@@ -38,6 +38,7 @@ struct EditItemView: View {
     // NOTE: ＠Stateの入力プロパティを構造体化
 
     @State private var inputEdit: InputEditItem = InputEditItem()
+    @State private var inputTag: InputTagSideMenu = InputTagSideMenu()
 
     var body: some View {
 

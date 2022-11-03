@@ -102,7 +102,7 @@ struct LibraryView: View {
                     } // VStack
                     Spacer()
                 } // HStack
-                .padding(.top, 20)
+                .padding(.top, 35)
                 .padding(.leading, 20)
                 .shadow(radius: 4, x: 3, y: 3)
                 .onReceive(inputTime.timer) { _ in
@@ -192,6 +192,7 @@ struct LibraryView: View {
                 } // ForEach
             } label: {
                 Image(systemName: "list.bullet")
+                    .font(.title3)
                     .foregroundColor(.white)
             } // Menu
             .ignoresSafeArea()
@@ -281,12 +282,13 @@ struct LibraryView: View {
         GeometryReader { bodyView in
 
             let libraryItemPadding: CGFloat = 200
+            let panelSize = UIScreen.main.bounds.width / 2 - 10
 
             LazyHStack(spacing: libraryItemPadding) {
 
                 ForEach(inputLibrary.tagFilterItemCards.indices, id: \.self) {index in
 
-                    ShowItemPhoto(photo: inputLibrary.tagFilterItemCards[index].photo, size: 180)
+                    ShowItemPhoto(photo: inputLibrary.tagFilterItemCards[index].photo, size: panelSize)
                             .overlay {
                                 if inputLibrary.isShowCardInfomation {
                                     LinearGradient(gradient: Gradient(colors: [.clear, .black.opacity(0.4)]),

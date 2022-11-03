@@ -28,7 +28,7 @@ struct ShowsItemDetail: View {
 
         ZStack {
 
-            Color(.gray)
+            Color(.black)
                 .ignoresSafeArea()
                 .opacity(0.4)
                 .onTapGesture { isShowItemDetail = false }
@@ -41,6 +41,17 @@ struct ShowsItemDetail: View {
                     Color.customDarkBlue2
                         .opacity(0.5)
                         .blur(radius: 20)
+                        .overlay(alignment: .topLeading) {
+                            Button {
+                                inputDetail.opacity = 0.0
+                            } label: {
+                                Image(systemName: "multiply.circle.fill")
+                                    .font(.title2)
+                                    .foregroundColor(.white)
+                                    .padding()
+                            }
+
+                        }
                 }
 
                 .overlay {
