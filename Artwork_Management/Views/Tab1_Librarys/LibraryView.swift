@@ -18,11 +18,25 @@ struct InputLibrary {
 }
 
 struct InputTime {
+
     var nowDate =  Date()
-    let timeFormatter = DateFormatter()
-    let weekFormatter = DateFormatter()
-    let dateStyleFormatter = DateFormatter()
     let timer = Timer.publish(every: 1, on: .current, in: .common).autoconnect()
+
+    var time: String {
+        let formatter = DateFormatter()
+        formatter.setTemplate(.time)
+        return formatter.string(from: nowDate)
+    }
+    var week: String {
+        let formatter = DateFormatter()
+        formatter.setTemplate(.usWeek)
+        return formatter.string(from: nowDate)
+    }
+    var dateStyle: String {
+        let formatter = DateFormatter()
+        formatter.setTemplate(.usMonthDay)
+        return formatter.string(from: nowDate)
+    }
 }
 
 struct LibraryView: View {
@@ -62,17 +76,17 @@ struct LibraryView: View {
                 HStack {
                     VStack(alignment: .leading, spacing: 8) {
                         Group {
-                            Text(inputTime.timeFormatter.string(from: inputTime.nowDate))
+                            Text(inputTime.time)
                                 .tracking(8)
                                 .font(.title3.bold())
                                 .frame(height: 40)
                                 .opacity(0.4)
 
-                            Text("\(inputTime.weekFormatter.string(from: inputTime.nowDate)).")
+                            Text("\(inputTime.week).")
                                 .font(.subheadline)
                                 .opacity(0.4)
 
-                            Text(inputTime.dateStyleFormatter.string(from: inputTime.nowDate))
+                            Text(inputTime.dateStyle)
                                 .font(.subheadline.bold())
                                 .opacity(0.5)
                                 .padding(.leading)
@@ -186,9 +200,6 @@ struct LibraryView: View {
         } // .onChange
 
         .onAppear {
-            inputTime.timeFormatter.setTemplate(.time) // 時間
-            inputTime.weekFormatter.setTemplate(.usWeek) // 週
-            inputTime.dateStyleFormatter.setTemplate(.usMonthDay) // 月日
 
             if inputLibrary.selectFilterTag == "ALL" {
                 inputLibrary.tagFilterItemCards = itemVM.items
@@ -196,7 +207,6 @@ struct LibraryView: View {
                 inputLibrary.tagFilterItemCards = itemVM.items.filter({ $0.tag == inputLibrary.selectFilterTag })
             }
         } // .onAppear
-
     } // body
 
     @ViewBuilder
