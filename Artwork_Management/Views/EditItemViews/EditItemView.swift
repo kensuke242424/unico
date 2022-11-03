@@ -20,7 +20,6 @@ struct InputEditItem {
     var disableButton: Bool = true
     var isOpenSideMenu: Bool = false
     var offset: CGFloat = 0
-    var geometryMinY: CGFloat = 0
     var isCheckedFocuseDetail: Bool = false
 }
 
@@ -84,23 +83,7 @@ struct EditItemView: View {
                 } // ZStack(View全体)
                 .animation(.easeIn(duration: 0.3), value: inputEdit.offset)
 
-                // NOTE: スクロールView全体を.backgroundからgeometry取得します。
-                .background(
-                    GeometryReader { geometry in
-                        Color.clear
-                            .preference(key: OffsetPreferenceKey.self,
-                                        value: geometry.frame(in: .named("scrollSpace")).minY)
-                            .onChange(of: geometry.frame(in: .named("scrollFrame_Space")).minY) { newValue in
-
-                                withAnimation(.easeIn(duration: 0.1)) {
-                                    inputEdit.geometryMinY = newValue
-                                }
-                            } // onChange
-                    } // Geometry
-                ) // .background(geometry)
-
             } // ScrollView
-            .coordinateSpace(name: "scrollFrame_Space")
 
             .onChange(of: inputEdit.selectionTagName) { selection in
 
