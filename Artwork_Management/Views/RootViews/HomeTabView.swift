@@ -161,7 +161,6 @@ struct InputSideMenu {
 struct SystemSideMenu: View {
 
     @Environment(\.colorScheme) var colorScheme: ColorScheme
-//    @Environment(\.editMode) var editMode
 
     @StateObject var itemVM: ItemViewModel
     @Binding var inputHome: InputHome
