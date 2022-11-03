@@ -234,7 +234,6 @@ struct SideMenuEditTagView: View {
                                 withAnimation(.easeIn(duration: 0.2)) {
                                     inputHome.editTagSideMenuBackground.toggle()
                                 }
-
                                 inputTag.newTagNameText = ""
                                 inputTag.selectionSideMenuTagColor = .red
 

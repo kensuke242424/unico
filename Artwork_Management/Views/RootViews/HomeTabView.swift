@@ -161,7 +161,7 @@ struct InputSideMenu {
 struct SystemSideMenu: View {
 
     @Environment(\.colorScheme) var colorScheme: ColorScheme
-    @Environment(\.editMode) var editMode
+//    @Environment(\.editMode) var editMode
 
     @StateObject var itemVM: ItemViewModel
     @Binding var inputHome: InputHome
@@ -503,6 +503,7 @@ struct SystemSideMenu: View {
                         }
                     }
                 }
+
         )
         .animation(.interpolatingSpring(mass: 0.8,
                                         stiffness: 100,
