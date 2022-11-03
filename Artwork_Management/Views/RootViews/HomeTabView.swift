@@ -97,6 +97,7 @@ struct HomeTabView: View {
                     .opacity(inputHome.basketInfomationOpacity)
                 Spacer()
             }
+
             .offset(y: 80)
 
             // Todo: 各タブごとにオプションが変わるボタン
