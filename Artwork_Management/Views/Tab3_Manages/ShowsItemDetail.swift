@@ -20,6 +20,7 @@ struct ShowsItemDetail: View {
         var isPresentedEditItem: Bool = false
     }
 
+    private let screenSize: CGRect = UIScreen.main.bounds
     @State private var inputDetail: InputItemDetail = InputItemDetail()
 
     var body: some View {
@@ -30,29 +31,29 @@ struct ShowsItemDetail: View {
                 .ignoresSafeArea()
                 .opacity(0.4)
                 .onTapGesture {
-                    withAnimation(.easeIn(duration: 0.15)) {
-                        inputHome.isShowItemDetail.toggle()
-                    }
+                    inputHome.isShowItemDetail.toggle()
                 }
 
             RoundedRectangle(cornerRadius: 20)
                 .foregroundColor(.black)
-                .frame(width: 300, height: 470)
+                .frame(width: screenSize.width * 0.75, height: screenSize.height * 0.55)
                 .opacity(0.9)
                 .overlay {
                     Color.customDarkBlue2
                         .opacity(0.5)
                         .blur(radius: 20)
-                        .overlay(alignment: .topLeading) {
+                        .overlay(alignment: .bottom) {
+
                             Button {
-                                withAnimation(.easeIn(duration: 0.15)) {
-                                    inputHome.isShowItemDetail.toggle()
-                                }
+                                inputHome.isShowItemDetail.toggle()
                             } label: {
-                                Image(systemName: "multiply.circle.fill")
-                                    .font(.title2)
-                                    .foregroundColor(.white)
-                                    .padding()
+                                HStack {
+                                    Image(systemName: "multiply.circle.fill")
+                                    Text("閉じる")
+                                }
+                                .font(.title3)
+                                .foregroundColor(.white)
+                                .offset(y: 50)
                             }
 
                         }
@@ -69,7 +70,8 @@ struct ShowsItemDetail: View {
                         ScrollView(showsIndicators: false) {
                             VStack(spacing: 10) {
 
-                                ShowItemPhoto(photo: item.photo, size: 150)
+                                ShowItemPhoto(photo: item.photo, size: screenSize.width * 0.4)
+                                    .padding()
 
                                 HStack {
                                     Text("　アイテム情報")
@@ -142,6 +144,7 @@ struct ShowsItemDetail: View {
                     } // VStack
                     .padding(.vertical, 30)
                 }// overlay
+                .offset(y: -30)
         } // ZStack(全体)
         .opacity(inputDetail.opacity)
 

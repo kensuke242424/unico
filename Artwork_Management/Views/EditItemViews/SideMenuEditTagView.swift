@@ -56,7 +56,7 @@ struct SideMenuEditTagView: View {
                 RoundedRectangle(cornerRadius: 20)
                     .foregroundColor(Color.customDarkGray2).opacity(0.9)
                     .blur(radius: 10)
-                    .frame(width: screenSize.width, height: screenSize.height * 0.7)
+                    .frame(width: screenSize.width, height: screenSize.height * 0.65)
                     .overlay(alignment: .bottomLeading) {
                         Button {
                             inputTag.newTagNameText = ""
@@ -83,10 +83,10 @@ struct SideMenuEditTagView: View {
 
                 RoundedRectangle(cornerRadius: 20)
                     .stroke(.white.opacity(0.4), lineWidth: 2)
-                    .frame(width: screenSize.width, height: screenSize.height * 0.7)
+                    .frame(width: screenSize.width, height: screenSize.height * 0.65)
 
                 // 入力フォーム...
-                VStack(alignment: .leading, spacing: screenSize.height * 0.7 * 0.07) {
+                VStack(alignment: .leading, spacing: screenSize.height * 0.65 * 0.04) {
 
                     VStack(alignment: .leading) {
 
@@ -110,7 +110,6 @@ struct SideMenuEditTagView: View {
                             Text("■タグネーム")
                                 .fontWeight(.heavy)
                                 .foregroundColor(.white)
-                                .padding(.bottom)
 
                             RoundedRectangle(cornerRadius: 5)
                                 .frame(width: 30, height: 15)
@@ -118,9 +117,11 @@ struct SideMenuEditTagView: View {
                                 .overlay {
                                     Text("必須")
                                         .font(.caption)
+                                        .foregroundColor(.black)
                                 } // overlay
                                 .opacity(0.8)
                         } // HStack
+                        .padding(.bottom)
 
                         TextField("名前を入力", text: $inputTag.newTagNameText)
                             .foregroundColor(.white)
