@@ -37,9 +37,9 @@ struct FirstSignInView: View {
                 Spacer()
 
             } // VStack
-        }
-    }
-}
+        } // ZStack
+    } // body
+} // View
 
 // ✅ログイン時の入力欄のカスタムViewです。
 struct FirstLogInInfomation: View {

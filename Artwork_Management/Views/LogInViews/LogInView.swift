@@ -46,7 +46,6 @@ struct LogInView: View {
 
                     Spacer()
 
-                    // ロゴマークのカスタムView
                     RogoMark()
 
                     Spacer()
@@ -119,6 +118,7 @@ struct LogInInfomation: View {
                 } // HStack‚
 
                 TextField("artwork/@gmail.com", text: $input.address)
+                    .padding(.bottom)
 
                 HStack {
                     Text("パスワード")
@@ -154,11 +154,12 @@ struct LogInInfomation: View {
             .font(.subheadline)
             .autocapitalization(.none)
             .keyboardType(.emailAddress)
-            .padding(.bottom, 15)
             .padding(.horizontal, 25)
 
         } // VStack(.leading)
         .padding()
+
+        Spacer()
 
         VStack {
 
