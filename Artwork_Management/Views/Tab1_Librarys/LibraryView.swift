@@ -87,6 +87,7 @@ struct LibraryView: View {
                                 .frame(height: 40)
                                 .opacity(0.4)
 
+<<<<<<< HEAD
                             Text("\(inputTime.week).")
                                 .font(.subheadline)
                                 .opacity(0.4)
@@ -95,6 +96,11 @@ struct LibraryView: View {
                                 .font(.subheadline.bold())
                                 .opacity(0.5)
                                 .padding(.leading)
+=======
+                            Text(itemVM.nowDateTime(date: inputTime.nowDate, type: "date"))
+                                .font(.title2.bold())
+                                .opacity(0.6)
+>>>>>>> 0d7d4c9 (アイテム表示幅 調整)
                         }
                         .italic()
                         .tracking(5)
@@ -197,7 +203,7 @@ struct LibraryView: View {
             } // Menu
             .ignoresSafeArea()
             .offset(x: -UIScreen.main.bounds.width / 2.5,
-                    y: UIScreen.main.bounds.height / 10)
+                    y: UIScreen.main.bounds.height / 11)
 
             homeItemPhotoPanel()
                 .ignoresSafeArea()
@@ -249,7 +255,7 @@ struct LibraryView: View {
                             inputHome.sideMenuBackGround.toggle()
                         }
                     } label: {
-                        CircleIcon(photo: userIcon, size: 35)
+                        CircleIcon(photo: userIcon, size: getSafeArea().top - 20)
                             .padding(.leading)
                             .padding(.top, getSafeArea().top)
                     }
@@ -274,7 +280,7 @@ struct LibraryView: View {
         GeometryReader { bodyView in
 
             let libraryItemPadding: CGFloat = 200
-            let panelSize = UIScreen.main.bounds.width / 2 - 10
+            let panelSize = UIScreen.main.bounds.height / 4
 
             LazyHStack(spacing: libraryItemPadding) {
 

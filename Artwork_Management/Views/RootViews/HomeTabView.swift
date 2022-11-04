@@ -132,7 +132,7 @@ struct HomeTabView: View {
             // Open TagSideMenu...
             SideMenuEditTagView(itemVM: rootItemVM, inputHome: $inputHome, inputTag: $inputTag,
                                 defaultTag: inputTag.tagSideMenuStatus == .create ? nil : inputSideMenu.selectTag)
-            .offset(x: inputHome.isOpenEditTagSideMenu ? UIScreen.main.bounds.width / 2 - 30 : UIScreen.main.bounds.width + 10)
+            .offset(x: inputHome.isOpenEditTagSideMenu ? UIScreen.main.bounds.width / 2 - 25 : UIScreen.main.bounds.width + 10)
 
         } // ZStack
         .animation(.easeIn(duration: 0.2), value: inputHome.itemsInfomationOpacity)
@@ -198,10 +198,11 @@ struct SystemSideMenu: View {
             VStack {
                 VStack(alignment: .leading, spacing: 20) {
 
-                    CircleIcon(photo: "cloth_sample1", size: 120)
+                    CircleIcon(photo: "cloth_sample1", size: getRect().width / 3 + 20)
 
                     Text("Account_Name")
                         .font(.title3.bold()).foregroundColor(.white)
+//                        .padding(.leading)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()

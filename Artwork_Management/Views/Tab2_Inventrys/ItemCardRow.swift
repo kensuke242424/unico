@@ -16,8 +16,8 @@ struct ItemCardRow: View {
     @Binding var cartResults: CartResults
     let itemRow: Item
 
-    let itemWidth: CGFloat = 165
-    let itemHeight: CGFloat = 210
+    let itemWidth: CGFloat = UIScreen.main.bounds.width / 2 - 30
+    let itemHeight: CGFloat = UIScreen.main.bounds.height / 4
 
     @State private var cardCount: Int =  0
     @State private var countUpDisable: Bool = false
@@ -74,7 +74,7 @@ struct ItemCardRow: View {
                 .overlay {
                     VStack {
 
-                    ShowItemPhoto(photo: itemRow.photo, size: itemWidth - 50)
+                    ShowItemPhoto(photo: itemRow.photo, size: itemWidth - 45)
 
                         Text(itemRow.name)
                             .foregroundColor(.black)

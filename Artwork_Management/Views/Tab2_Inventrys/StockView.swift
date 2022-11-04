@@ -316,7 +316,7 @@ struct StockView: View {
                             inputHome.sideMenuBackGround.toggle()
                         }
                     } label: {
-                        CircleIcon(photo: "cloth_sample1", size: 35)
+                        CircleIcon(photo: "cloth_sample1", size: getSafeArea().top - 20)
                     }
                 }
             }

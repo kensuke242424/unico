@@ -218,7 +218,7 @@ struct ManageView: View {
                             inputHome.sideMenuBackGround.toggle()
                         }
                     } label: {
-                        CircleIcon(photo: "cloth_sample1", size: 35)
+                        CircleIcon(photo: "cloth_sample1", size: getSafeArea().top - 20)
                     }
                 }
             }
@@ -232,7 +232,7 @@ struct ManageView: View {
 
             HStack(spacing: 20) {
 
-                ShowItemPhoto(photo: item.photo, size: 70)
+                ShowItemPhoto(photo: item.photo, size: UIScreen.main.bounds.width / 5)
                     .onTapGesture {
                         print("画像タップ")
                     }
