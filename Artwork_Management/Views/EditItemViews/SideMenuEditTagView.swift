@@ -26,7 +26,6 @@ struct SideMenuEditTagView: View {
     @StateObject var itemVM: ItemViewModel
     @Binding var inputHome: InputHome
     @Binding var inputTag: InputTagSideMenu
-    let screenSize = UIScreen.main.bounds
     let defaultTag: Tag?
     let tagSideMenuStatus: EditStatus
 
@@ -44,6 +43,8 @@ struct SideMenuEditTagView: View {
     @State private var inputTag: InputTagSideMenu = InputTagSideMenu()
     @GestureState var dragOffset: CGFloat = 0.0
 
+    let screenSize = UIScreen.main.bounds
+
     var body: some View {
 
         Color.clear
@@ -55,8 +56,8 @@ struct SideMenuEditTagView: View {
                 RoundedRectangle(cornerRadius: 20)
                     .foregroundColor(Color.customDarkGray2).opacity(0.9)
                     .blur(radius: 10)
-                    .frame(width: screenSize.width, height: 600)
-                    .overlay(alignment: .topLeading) {
+                    .frame(width: screenSize.width, height: screenSize.height * 0.7)
+                    .overlay(alignment: .bottomLeading) {
                         Button {
                             inputTag.newTagNameText = ""
                             inputTag.selectionSideMenuTagColor = .red
@@ -64,22 +65,28 @@ struct SideMenuEditTagView: View {
                                 inputHome.isOpenEditTagSideMenu.toggle()
                             }
                             withAnimation(.easeIn(duration: 0.2)) {
+                                inputTag.newTagNameText = ""
+                                inputTag.selectionSideMenuTagColor = .red
                                 inputHome.editTagSideMenuBackground.toggle()
                             }
                         } label: {
-                            Image(systemName: "multiply.circle.fill")
-                                .font(.title2)
-                                .foregroundColor(.white)
-                                .padding()
+                            HStack {
+                                Image(systemName: "multiply.circle.fill")
+                                Text("閉じる")
+                            }
+
+                            .font(.title3)
+                            .foregroundColor(.white)
+                            .offset(x: 20, y: 50)
                         }
                     }
 
                 RoundedRectangle(cornerRadius: 20)
                     .stroke(.white.opacity(0.4), lineWidth: 2)
-                    .frame(width: screenSize.width, height: 600)
+                    .frame(width: screenSize.width, height: screenSize.height * 0.7)
 
                 // 入力フォーム...
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: screenSize.height * 0.7 * 0.07) {
 
                     VStack(alignment: .leading) {
 
@@ -160,7 +167,9 @@ struct SideMenuEditTagView: View {
                         Text("-  \(inputTag.newTagNameText)  -")
                             .fontWeight(.bold)
                             .foregroundColor(.white)
-                            .frame(width: 180, alignment: .leading)
+                            .frame(width: 200, alignment: .leading)
+                            .lineLimit(1)
+                            .padding(.bottom)
 
                         IndicatorRow(salesValue: 170000,
                                      tagColor: inputTag.selectionSideMenuTagColor)
@@ -223,6 +232,7 @@ struct SideMenuEditTagView: View {
                                 withAnimation(.easeIn(duration: 0.2)) {
                                     inputHome.editTagSideMenuBackground.toggle()
                                 }
+
                                 inputTag.newTagNameText = ""
                                 inputTag.selectionSideMenuTagColor = .red
 
@@ -274,9 +284,12 @@ struct SideMenuEditTagView: View {
                 .offset(x: 20)
 
             }
+
             .onChange(of: inputHome.isOpenEditTagSideMenu) { isOpenEditTag in
                 if isOpenEditTag == false {
                     focusedField = nil
+                    inputTag.newTagNameText = ""
+                    inputTag.selectionSideMenuTagColor = .red
                 }
             }
             .onTapGesture { focusedField = nil }
