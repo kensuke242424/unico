@@ -9,6 +9,10 @@ import SwiftUI
 
 struct SideMenuEditTagView: View {
 
+    enum EditTagField {
+        case tag, name
+    }
+
     @StateObject var itemVM: ItemViewModel
     @Binding var isOpenSideMenu: Bool
     @Binding var geometryMinY: CGFloat
@@ -21,7 +25,7 @@ struct SideMenuEditTagView: View {
     let editItemStatus: Status
     let tagSideMenuStatus: Status
 
-    @FocusState var focusedField: Field?
+    @FocusState var focusedField: EditTagField?
 
     // NOTE: サイドタグメニューの入力値を構造体化
     struct InputSideMenuTag {

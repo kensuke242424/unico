@@ -9,6 +9,11 @@ import SwiftUI
 
 struct CartItemsSheet: View {
 
+    enum HalfSheetScroll {
+        case main
+        case additional
+    }
+
     @StateObject var itemVM: ItemViewModel
     @Binding var cartResults: CartResults
     @Binding var inputStock: InputStock

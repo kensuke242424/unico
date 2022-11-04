@@ -25,6 +25,10 @@ struct CartResults {
 
 struct StockView: View {
 
+    enum SearchFocus {
+        case check
+    }
+
     @Environment(\.colorScheme) var colorScheme
     @StateObject var itemVM: ItemViewModel
     @Binding var inputHome: InputHome

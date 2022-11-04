@@ -246,6 +246,10 @@ struct EditItemView: View {
 
 struct InputForms: View {
 
+    enum EditItemField {
+        case tag, name, stock, price ,sales, detail
+    }
+
     @StateObject var itemVM: ItemViewModel
     @Binding var selectionTagName: String
     @Binding var isOpenSideMenu: Bool
@@ -261,7 +265,7 @@ struct InputForms: View {
     let editItemStatus: Status
     let tagColor: UsedColor
 
-    @FocusState private var focusedField: Field?
+    @FocusState private var focusedField: EditItemField?
 
     var body: some View {
 

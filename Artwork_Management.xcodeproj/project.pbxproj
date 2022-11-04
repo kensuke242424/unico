@@ -16,7 +16,6 @@
 		E0796AD528F4850D0094E50C /* ButtonModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0796AD428F4850D0094E50C /* ButtonModel.swift */; };
 		E0796AD728F485850094E50C /* ButtonViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0796AD628F485850094E50C /* ButtonViewModel.swift */; };
 		E0796ADD28F5F2830094E50C /* CartItemsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0796ADC28F5F2830094E50C /* CartItemsSheet.swift */; };
-		E0796AE128F67A6A0094E50C /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0796AE028F67A6A0094E50C /* Enums.swift */; };
 		E0796AE328F6D77A0094E50C /* CommerceSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0796AE228F6D77A0094E50C /* CommerceSheet.swift */; };
 		E08F272528DDA08E00329C5E /* Artwork_ManagementApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E08F272428DDA08E00329C5E /* Artwork_ManagementApp.swift */; };
 		E08F272928DDA09000329C5E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E08F272828DDA09000329C5E /* Assets.xcassets */; };
@@ -61,7 +60,6 @@
 		E0796AD428F4850D0094E50C /* ButtonModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonModel.swift; sourceTree = "<group>"; };
 		E0796AD628F485850094E50C /* ButtonViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonViewModel.swift; sourceTree = "<group>"; };
 		E0796ADC28F5F2830094E50C /* CartItemsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartItemsSheet.swift; sourceTree = "<group>"; };
-		E0796AE028F67A6A0094E50C /* Enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
 		E0796AE228F6D77A0094E50C /* CommerceSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommerceSheet.swift; sourceTree = "<group>"; };
 		E08F272128DDA08E00329C5E /* Artwork_Management.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Artwork_Management.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E08F272428DDA08E00329C5E /* Artwork_ManagementApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Artwork_ManagementApp.swift; sourceTree = "<group>"; };
@@ -128,15 +126,6 @@
 			path = RootViews;
 			sourceTree = "<group>";
 		};
-		E0796ADF28F67A550094E50C /* Enums */ = {
-			isa = PBXGroup;
-			children = (
-				E0796AE028F67A6A0094E50C /* Enums.swift */,
-				E05FE94328F71BE400263F98 /* Extensions */,
-			);
-			path = Enums;
-			sourceTree = "<group>";
-		};
 		E08F271828DDA08E00329C5E = {
 			isa = PBXGroup;
 			children = (
@@ -177,7 +166,7 @@
 		E08F273228DDB3B200329C5E /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				E0796ADF28F67A550094E50C /* Enums */,
+				E05FE94328F71BE400263F98 /* Extensions */,
 				E0796AD828F48D530094E50C /* RootViews */,
 				E0A7DE4C290C2811008C3F3F /* PhotoViews */,
 				E094F0FE28E20BB800D3C845 /* LogInViews */,
@@ -400,7 +389,6 @@
 				E0CF7EF228DF166700735142 /* ItemViewModel.swift in Sources */,
 				E0CF7EF028DF152D00735142 /* ItemModel.swift in Sources */,
 				E0A7DE4E290C289A008C3F3F /* CircleIcon.swift in Sources */,
-				E0796AE128F67A6A0094E50C /* Enums.swift in Sources */,
 				E0796AE328F6D77A0094E50C /* CommerceSheet.swift in Sources */,
 				E0A7DE4B290B9E0A008C3F3F /* ShowItemPhoto.swift in Sources */,
 				E08F273E28DDB65F00329C5E /* HomeTabView.swift in Sources */,
