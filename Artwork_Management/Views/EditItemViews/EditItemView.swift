@@ -247,7 +247,7 @@ struct EditItemView: View {
 struct InputForms: View {
 
     enum EditItemField {
-        case tag, name, stock, price ,sales, detail
+        case tag, name, stock, price, sales, detail
     }
 
     @StateObject var itemVM: ItemViewModel
