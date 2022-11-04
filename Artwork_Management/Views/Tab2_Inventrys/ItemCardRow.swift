@@ -13,188 +13,139 @@ struct ItemCardRow: View {
     @StateObject var itemVM: ItemViewModel
     @Binding var inputHome: InputHome
     @Binding var inputStock: InputStock
-    @Binding var cartResults: CartResults
     let itemRow: Item
 
     let itemWidth: CGFloat = UIScreen.main.bounds.width / 2 - 30
     let itemHeight: CGFloat = UIScreen.main.bounds.height / 4
 
     @State private var cardCount: Int =  0
-    @State private var countUpDisable: Bool = false
     @State private var itemSold: Bool = false
 
     var body: some View {
 
-            // NOTE: アイテムカードの色(ダークモードを判定してopacityをスイッチ)
-            RoundedRectangle(cornerRadius: 10)
-                .foregroundColor(.white)
-                .frame(width: itemWidth, height: itemHeight)
-                .opacity(colorScheme == .dark ? 0.3 : 0.3)
-                .overlay(alignment: .topTrailing) {
-                    Button {
+        RoundedRectangle(cornerRadius: 10)
+            .foregroundColor(.white)
+            .frame(width: itemWidth, height: itemHeight)
+            .opacity(colorScheme == .dark ? 0.3 : 0.3)
+            .overlay(alignment: .topTrailing) {
+                Button {
 
-                        guard let newActionIndex = itemVM.items.firstIndex(where: { $0 == itemRow }) else {
-                            print("アクションIndexの取得に失敗しました")
-                            return
-                        }
-                        inputHome.actionItemIndex = newActionIndex
-                        print("actionRowIndex: \(inputHome.actionItemIndex)")
-                            // アイテム詳細表示
-                        withAnimation(.easeIn(duration: 0.15)) {
-                            inputHome.isShowItemDetail.toggle()
-                        }
+                    guard let newActionIndex = itemVM.items.firstIndex(where: { $0.id == itemRow.id }) else {
+                        print("アクションIndexの取得に失敗しました")
+                        return
+                    }
+                    inputHome.actionItemIndex = newActionIndex
+                    print("actionRowIndex: \(inputHome.actionItemIndex)")
+                    // アイテム詳細表示
+                    withAnimation(.easeIn(duration: 0.15)) {
+                        inputHome.isShowItemDetail.toggle()
+                    }
 
-                    } label: {
-                        Image(systemName: "info.circle.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 23, height: 23)
-                            .foregroundColor(.customDarkGray1)
-                            .opacity(0.6)
-                    } // Button
-                } // .overlay
-
-                // NOTE: アイテムカードのフレーム
-                .overlay {
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(lineWidth: 0.2)
-                        .shadow(radius: 3, x: 4, y: 4)
-                        .shadow(radius: 3, x: 4, y: 4)
-                        .shadow(radius: 3, x: 4, y: 4)
-                        .shadow(radius: 3, x: 4, y: 4)
-                        .shadow(radius: 3, x: 1, y: 1)
-                        .shadow(radius: 3, x: 1, y: 1)
-                        .shadow(radius: 4)
-                        .shadow(radius: 4)
+                } label: {
+                    Image(systemName: "info.circle.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 23, height: 23)
                         .foregroundColor(.customDarkGray1)
-                        .frame(width: itemWidth, height: itemHeight)
-                } // overlay
+                        .opacity(0.6)
+                } // Button
+            } // .overlay
 
-                // NOTE: アイテムカードの内容
-                .overlay {
-                    VStack {
+        // NOTE: アイテムカードのフレーム
+            .overlay {
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(lineWidth: 0.2)
+                    .shadow(radius: 3, x: 4, y: 4)
+                    .shadow(radius: 3, x: 4, y: 4)
+                    .shadow(radius: 3, x: 4, y: 4)
+                    .shadow(radius: 3, x: 4, y: 4)
+                    .shadow(radius: 3, x: 1, y: 1)
+                    .shadow(radius: 3, x: 1, y: 1)
+                    .shadow(radius: 4)
+                    .shadow(radius: 4)
+                    .foregroundColor(.customDarkGray1)
+                    .frame(width: itemWidth, height: itemHeight)
+            } // overlay
+
+        // NOTE: アイテムカードの内容
+            .overlay {
+                VStack {
 
                     ShowItemPhoto(photo: itemRow.photo, size: itemWidth - 45)
 
-                        Text(itemRow.name)
-                            .foregroundColor(.black)
-                            .font(.caption)
-                            .padding(.horizontal, 5)
-                            .padding(.top, 5)
-                            .frame(width: itemWidth * 0.9)
-                            .lineLimit(1)
+                    Text(itemRow.name)
+                        .foregroundColor(.black)
+                        .font(.caption)
+                        .padding(.horizontal, 5)
+                        .padding(.top, 5)
+                        .frame(width: itemWidth * 0.9)
+                        .lineLimit(1)
 
+                    Spacer()
+
+                    HStack(alignment: .bottom) {
+                        Text("¥")
+                            .foregroundColor(.black)
+                        Text(String(itemRow.price))
+                            .font(.title3)
+                            .fontWeight(.heavy)
+                            .foregroundColor(.black)
                         Spacer()
 
-                        HStack(alignment: .bottom) {
-                            Text("¥")
-                                .foregroundColor(.black)
-                            Text(String(itemRow.price))
-                                .font(.title3)
-                                .fontWeight(.heavy)
-                                .foregroundColor(.black)
-                            Spacer()
+                        Button {
+                            // 取引かごに追加するボタン
+                            // タップするたびに、値段合計、個数、カート内アイテム要素にプラスする
+                            guard let newActionIndex = itemVM.items.firstIndex(where: { $0.id == itemRow.id }) else {
+                                print("アクションIndexの取得に失敗しました")
+                                return
+                            }
 
-                            Button {
-                                // 取引かごに追加するボタン
-                                // タップするたびに、値段合計、個数、カート内アイテム要素にプラスする
-                                guard let newActionIndex = itemVM.items.firstIndex(where: { $0 == itemRow }) else {
-                                    print("アクションIndexの取得に失敗しました")
-                                    return
-                                }
-                                inputHome.actionItemIndex = newActionIndex
-                                cartResults.resultItemAmount += 1
+                            inputHome.actionItemIndex = newActionIndex
+                            itemVM.items[newActionIndex].amount += 1
+                            inputStock.resultCartAmount += 1
+                            inputStock.resultCartPrice += itemRow.price
 
-                                // カート内に対象アイテムがなければ、カートに要素を新規追加
-                                if cartResults.resultCartItems.filter({ $0 == itemRow }) == [] {
-                                    cartResults.resultCartItems.append(itemRow)
-                                }
+                        } label: {
+                            Image(systemName: "plus.circle.fill")
+                                .resizable()
+                                .frame(width: 28, height: 28)
+                                .foregroundColor(.customDarkGray1)
+                                .opacity(itemRow.inventory == itemRow.amount ? 0.2 : 1.0)
+                        } // Button
+                        .offset(x: 5, y: 5)
+                        .disabled(itemRow.inventory == 0 || itemRow.amount == itemRow.inventory ? true : false)
+                    } // HStack
+                } // VStack
+                .padding()
+            } // overlay
 
-                                print("resultPrice: \(cartResults.resultPrice)円")
-                                print("resultItemAmount: \(cartResults.resultItemAmount)個")
-
-                            } label: {
-                                Image(systemName: "plus.circle.fill")
-                                    .resizable()
-                                    .frame(width: 28, height: 28)
-                                    .foregroundColor(.customDarkGray1)
-                                    .opacity(countUpDisable ? 0.2 : 1.0)
-                            } // Button
-                            .offset(x: 5, y: 5)
-                            .disabled(countUpDisable)
-                        } // HStack
-                    } // VStack
-                    .padding()
-                } // overlay
-
-                .overlay(alignment: .topLeading) {
-                    if cardCount > 0 {
-                        Text("\(cardCount)").font(.title.bold())
-                            .foregroundColor(.black)
+            .overlay(alignment: .topLeading) {
+                if itemRow.amount > 0 {
+                    Text("\(itemRow.amount)").font(.title.bold())
+                        .foregroundColor(.black)
                         .shadow(color: .white, radius: 1)
                         .shadow(color: .white, radius: 1)
                         .shadow(color: .white, radius: 1)
                         .offset(y: -15)
-                    }
-                }
-
-                .overlay(alignment: .topLeading) {
-                        Group {
-                            RoundedRectangle(cornerRadius: 0)
-                                .stroke(lineWidth: 6)
-                                .frame(width: 80, height: 30)
-                            Text("SOLD OUT")
-                                .font(.footnote)
-                                .fontWeight(.black)
-                        }
-                        .foregroundColor(.customSoldOutTagColor)
-                        .offset(x: -12, y: -3)
-                        .shadow(radius: 3, x: 5, y: 5)
-                        .opacity(itemSold == true ? 1.0 : 0.0)
-                        .rotationEffect(Angle(degrees: -30.0))
-                        .scaleEffect(itemSold ? 1.0 : 1.9)
-                        .animation(Animation.default, value: itemSold)
-                } // .overlay
-
-        .onChange(of: cartResults.resultItemAmount) { [before = cartResults.resultItemAmount] after in
-            if before < after {
-                if itemRow == itemVM.items[inputHome.actionItemIndex] {
-                    cardCount += 1
                 }
             }
-            if before > after {
-                if itemRow == itemVM.items[inputHome.actionItemIndex] {
-                    cardCount -= 1
+
+            .overlay(alignment: .topLeading) {
+                Group {
+                    RoundedRectangle(cornerRadius: 0)
+                        .stroke(lineWidth: 6)
+                        .frame(width: 80, height: 30)
+                    Text("SOLD OUT")
+                        .font(.footnote)
+                        .fontWeight(.black)
                 }
-            }
-        } // .onChange
-
-        .onChange(of: cartResults.resultCartItems) { _ in
-            if cartResults.resultCartItems == [] {
-                cardCount = 0
-            }
-        }
-
-        .onChange(of: cardCount) { newCardCount in
-            if newCardCount == itemRow.inventory {
-                if itemRow == itemVM.items[inputHome.actionItemIndex] {
-                    countUpDisable = true
-                }
-            } else {
-                if itemRow == itemVM.items[inputHome.actionItemIndex] {
-                    countUpDisable = false
-                }
-            }
-        }
-
-        .onChange(of: itemRow.inventory) {newInventory in
-            itemSold = newInventory == 0 ? true : false
-        }
-
-        .onAppear {
-            itemSold = itemRow.inventory == 0 ? true : false
-            countUpDisable = itemRow.inventory == 0 ? true : false
-        }
+                .foregroundColor(.customSoldOutTagColor)
+                .offset(x: -12, y: -3)
+                .shadow(radius: 3, x: 5, y: 5)
+                .opacity(itemRow.inventory == 0 ? 1.0 : 0.0)
+                .rotationEffect(Angle(degrees: -30.0))
+                .scaleEffect(itemRow.inventory == 0 ? 1.0 : 1.9)
+            } // .overlay
 
     } // body
 } // View
@@ -205,7 +156,6 @@ struct ItemCardRow_Previews: PreviewProvider {
         ItemCardRow(itemVM: ItemViewModel(),
                     inputHome: .constant(InputHome()),
                     inputStock: .constant(InputStock()),
-                    cartResults: .constant(CartResults()),
                     itemRow: TestItem().testItem)
         .previewLayout(.sizeThatFits)
     }

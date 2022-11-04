@@ -154,8 +154,9 @@ struct SideMenuEditTagView: View {
 
                             ForEach(UsedColor.allCases, id: \.self) { value in
 
-                                Text(value.text)
-
+                                if value.color != .gray {
+                                    Text(value.text)
+                                }
                             }
                         }
                         .pickerStyle(.segmented)

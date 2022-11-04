@@ -140,6 +140,7 @@ struct TestItem {
                               photo: "cloth_sample1",
                               cost: 1000,
                               price: 2800,
+                              amount: 0,
                               sales: 128000,
                               inventory: 2,
                               totalAmount: 120,

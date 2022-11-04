@@ -9,22 +9,21 @@ import SwiftUI
 import ResizableSheet
 
 struct InputHome {
-    var tabIndex: Int = 0
+    var homeTabIndex: Int = 0
     var actionItemIndex: Int = 0
     var editItemStatus: EditStatus = .create
     var itemsInfomationOpacity: CGFloat = 0.0
     var basketInfomationOpacity: CGFloat = 0.0
     var isShowItemDetail: Bool = false
     var isPresentedEditItem: Bool = false
-    var isOpenSideMenu: Bool = false
     var isOpenEditTagSideMenu: Bool = false
     var isShowSearchField: Bool = false
     var isShowSystemSideMenu: Bool = false
     var editTagSideMenuBackground: Bool = false
     var sideMenuBackGround: Bool = false
     var doCommerce: Bool = false
-    var cartState: ResizableSheetState = .hidden
-    var commerceState: ResizableSheetState = .hidden
+    var cartHalfSheet: ResizableSheetState = .hidden
+    var commerceHalfSheet: ResizableSheetState = .hidden
 }
 
 struct HomeTabView: View {
@@ -40,7 +39,7 @@ struct HomeTabView: View {
 
         ZStack {
 
-            TabView(selection: $inputHome.tabIndex) {
+            TabView(selection: $inputHome.homeTabIndex) {
 
                 LibraryView(itemVM: rootItemVM, inputHome: $inputHome)
                     .tabItem {

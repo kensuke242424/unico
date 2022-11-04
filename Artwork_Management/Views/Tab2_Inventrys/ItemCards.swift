@@ -14,7 +14,6 @@ struct TagSortCards: View {
 
     @Binding var inputHome: InputHome
     @Binding var inputStock: InputStock
-    @Binding var cartResults: CartResults
     let selectFilterTag: String
 
     private let columnsV: [GridItem] = Array(repeating: .init(.flexible()), count: 2)
@@ -22,7 +21,7 @@ struct TagSortCards: View {
     var body: some View {
 
         // NOTE: タグインデックス「0」 && searthItemTextが 「tags.first」 or  ""
-        if inputStock.tagIndex == 0 &&
+        if inputStock.filterTagIndex == 0 &&
             inputStock.searchItemNameText == itemVM.tags.first!.tagName ||
             inputStock.searchItemNameText == "" {
 
@@ -32,7 +31,6 @@ struct TagSortCards: View {
                     ItemCardRow(itemVM: itemVM,
                                 inputHome: $inputHome,
                                 inputStock: $inputStock,
-                                cartResults: $cartResults,
                                 itemRow: item)
                 }
             }
@@ -52,7 +50,6 @@ struct TagSortCards: View {
                         ItemCardRow(itemVM: itemVM,
                                     inputHome: $inputHome,
                                     inputStock: $inputStock,
-                                    cartResults: $cartResults,
                                     itemRow: item)
                     }
                 }
@@ -78,7 +75,6 @@ struct UpdateTimeSortCards: View {
 
     @Binding var inputHome: InputHome
     @Binding var inputStock: InputStock
-    @Binding var commerceResults: CartResults
 
     // アイテムのディテールを指定します。
     let columnsH: [GridItem] = Array(repeating: .init(.flexible()), count: 1)
@@ -92,7 +88,6 @@ struct UpdateTimeSortCards: View {
                     ItemCardRow(itemVM: itemVM,
                                 inputHome: $inputHome,
                                 inputStock: $inputStock,
-                                cartResults: $commerceResults,
                                 itemRow: item)
 
                 } // ForEach
@@ -112,9 +107,7 @@ struct TagCards_Previews: PreviewProvider {
              ScrollView(.horizontal) {
                  UpdateTimeSortCards(itemVM: ItemViewModel(),
                                      inputHome: .constant(InputHome()),
-                                     inputStock: .constant(InputStock()),
-                                     commerceResults: .constant(CartResults())
-                 )
+                                     inputStock: .constant(InputStock()))
              } // ScrollView
 
             Divider()
@@ -126,9 +119,7 @@ struct TagCards_Previews: PreviewProvider {
             TagSortCards(itemVM: ItemViewModel(),
                          inputHome: .constant(InputHome()),
                          inputStock: .constant(InputStock()),
-                         cartResults: .constant(CartResults()),
-                         selectFilterTag: "Album"
-            )
+                         selectFilterTag: "Album")
         } // ScrollView (アイテムロケーション)
     }
 } // TagCards_Previews

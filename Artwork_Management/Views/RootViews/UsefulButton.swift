@@ -56,9 +56,9 @@ struct UsefulButton: View {
         .opacity(opacity)
         .animation(.easeIn(duration: 0.1), value: opacity)
 
-        .onChange(of: inputHome.cartState) { _ in
+        .onChange(of: inputHome.cartHalfSheet) { _ in
             withAnimation(.easeOut(duration: 0.3)) {
-                switch inputHome.cartState {
+                switch inputHome.cartHalfSheet {
                 case .hidden: offsetY = 0.0
                 case .medium: offsetY = -60.0
                 case .large: offsetY = -60.0
@@ -66,7 +66,7 @@ struct UsefulButton: View {
             }
         } // .onChange(cartState)
 
-        .onChange(of: inputHome.tabIndex) { newIndex in
+        .onChange(of: inputHome.homeTabIndex) { newIndex in
             buttonStyle = buttonVM.buttonStyleChenged(tabIndex: newIndex)
             buttonIcon = buttonVM.iconChenge(style: buttonStyle, change: change)
 

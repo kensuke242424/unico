@@ -87,7 +87,6 @@ struct LibraryView: View {
                                 .frame(height: 40)
                                 .opacity(0.4)
 
-<<<<<<< HEAD
                             Text("\(inputTime.week).")
                                 .font(.subheadline)
                                 .opacity(0.4)
@@ -96,11 +95,6 @@ struct LibraryView: View {
                                 .font(.subheadline.bold())
                                 .opacity(0.5)
                                 .padding(.leading)
-=======
-                            Text(itemVM.nowDateTime(date: inputTime.nowDate, type: "date"))
-                                .font(.title2.bold())
-                                .opacity(0.6)
->>>>>>> 0d7d4c9 (アイテム表示幅 調整)
                         }
                         .italic()
                         .tracking(5)
