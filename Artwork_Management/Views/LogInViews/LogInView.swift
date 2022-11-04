@@ -7,8 +7,24 @@
 
 import SwiftUI
 
+enum LogInNavigation: Hashable {
+    case signUp, home
+}
+
+struct InputLogIn {
+    var address: String = ""
+    var password: String = ""
+    var password2: String = ""
+    var passHidden: Bool = true
+    var passHidden2: Bool = true
+    var resultAddress: Bool = true
+    var resultPassword: Bool = true
+}
+
 // ✅ ログイン画面の親Viewです。
 struct LogInView: View {
+
+    @State private var logInNavigationPath: [LogInNavigation] = []
 
     // テスト用のダミーデータです。
     let testUser: User = User(name: "中川賢亮",
@@ -18,9 +34,14 @@ struct LogInView: View {
 
     var body: some View {
 
-        NavigationView {
+        NavigationStack(path: $logInNavigationPath) {
 
             ZStack {
+
+                LinearGradient(gradient: Gradient(colors: [.customDarkGray1, .customLightGray1]),
+                                           startPoint: .top, endPoint: .bottom)
+                .ignoresSafeArea()
+
                 VStack {
 
                     Spacer()
@@ -31,15 +52,25 @@ struct LogInView: View {
                     Spacer()
 
                     // ログイン画面のインフォメーション部品のカスタムView
-                    LogInInfomation(user: testUser)
+                    LogInInfomation(logInNavigationPath: $logInNavigationPath,
+                                    user: testUser)
 
                     Spacer()
 
                 } // VStack
             } // ZStack
-            .background(LinearGradient(gradient: Gradient(colors: [.customDarkGray1, .customLightGray1]),
-                                       startPoint: .top, endPoint: .bottom))
-        } // NavigationView
+            .navigationDestination(for: LogInNavigation.self) { destination in
+
+                switch destination {
+                case .home:
+                    HomeTabView()
+
+                case .signUp:
+                    FirstSignInView(logInNavigationPath: $logInNavigationPath,
+                                    testUser: testUser)
+                }
+            } // navigationDestination
+        } // NavigationStack
     } // body
 } // View
 
@@ -65,16 +96,8 @@ struct RogoMark: View {
 // ✅ログイン時の入力欄のカスタムViewです。
 struct LogInInfomation: View {
 
+    @Binding var logInNavigationPath: [LogInNavigation]
     let user: User
-
-    struct InputLogIn {
-        var address: String = ""
-        var password: String = ""
-        var passHidden: Bool = true
-        var isActive: Bool = false
-        var resultAddress: Bool = true
-        var resultPassword: Bool = true
-    }
 
     @State private var input: InputLogIn = InputLogIn()
 
@@ -120,7 +143,7 @@ struct LogInInfomation: View {
                         Button {
                             input.passHidden.toggle()
                         } label: {
-                            Image(systemName: "eye.fill")
+                            Image(systemName: input.passHidden ? "eye.slash.fill" : "eye.fill")
                                 .foregroundColor(.gray)
                         } // Button
                     } // HStack
@@ -132,56 +155,53 @@ struct LogInInfomation: View {
             .autocapitalization(.none)
             .keyboardType(.emailAddress)
             .padding(.bottom, 15)
+            .padding(.horizontal, 25)
 
         } // VStack(.leading)
         .padding()
 
         VStack {
 
-            NavigationLink(destination: HomeTabView(),
-                           isActive: $input.isActive,
-                           label: {
-                Button {
-
-                    // アドレスが存在するかチェック
-                    if user.address != input.address {
-                        input.resultAddress = false
-                    } else {
-                        input.resultAddress = true
-                    }
-
-                    // メールアドレスが存在したら、パスワードが合っているかチェック
-                    if input.resultAddress {
-                        if user.password != input.password {
-                            input.resultPassword = false
-                        } else {
-                            input.resultPassword = true
-                        }
-                    }
-
-                    // アドレス、パスワードが一致したらログイン、遷移
-                    if input.resultAddress, input.resultPassword {
-                        input.isActive.toggle()
-                    }
-
-                } label: {
-                    Text("ログイン")
+            Button("ログイン") {
+                // アドレスが存在するかチェック
+                if user.address != input.address {
+                    input.resultAddress = false
+                } else {
+                    input.resultAddress = true
                 }
-                .buttonStyle(.borderedProminent)
 
-            }) // NavigationLink
+                // メールアドレスが存在したら、パスワードが合っているかチェック
+                if input.resultAddress {
+                    if user.password != input.password {
+                        input.resultPassword = false
+                    } else {
+                        input.resultPassword = true
+                    }
+                }
+
+                // アドレス、パスワードが一致したらログイン、遷移
+                if input.resultAddress, input.resultPassword {
+                    logInNavigationPath.append(.home)
+                    print(logInNavigationPath)
+                }
+            }
+            .buttonStyle(.borderedProminent)
 
             Group {
-                NavigationLink("初めての方はこちら>>",
-                               destination: FirstSignInView(user: user))
+                Button("初めての方はこちら>>") {
+                    logInNavigationPath.append(.signUp)
+                    print(logInNavigationPath)
+                }
                 .foregroundColor(.blue)
                 .padding()
 
                 Text("- または -")
                     .padding()
 
-                NavigationLink("試しに始めてみる",
-                               destination: HomeTabView())
+                Button("試しに初めてみる") {
+                    logInNavigationPath.append(.home)
+                    print(logInNavigationPath)
+                }
             } // Group
             .font(.subheadline)
         } // VStack

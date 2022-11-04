@@ -9,49 +9,45 @@ import SwiftUI
 
 struct FirstSignInView: View {
 
+    @Binding var logInNavigationPath: [LogInNavigation]
     // テスト用のデータ
-    let user: User
+    let testUser: User
 
     var body: some View {
 
-        VStack {
+        ZStack {
 
-            Spacer()
+            LinearGradient(gradient: Gradient(colors: [.customDarkGray1, .customLightGray1]),
+                           startPoint: .top, endPoint: .bottom)
+            .ignoresSafeArea()
 
-            RogoMark()
+            VStack {
 
-            Spacer()
+                RogoMark()
 
-            Text("アカウント登録")
-                .font(.title2)
-                .fontWeight(.medium)
-                .padding(30)
+                Spacer()
 
-            FirstLogInInfomation(user: user)
+                Text("アカウント登録")
+                    .font(.title2)
+                    .fontWeight(.medium)
+                    .padding(30)
 
-            Spacer()
+                FirstLogInInfomation(logInNavigationPath: $logInNavigationPath, user: testUser)
 
-        } // VStack
-        .background(LinearGradient(gradient: Gradient(colors: [.customDarkGray1, .customLightGray1]), startPoint: .top, endPoint: .bottom))
+                Spacer()
+
+            } // VStack
+        }
     }
 }
 
 // ✅ログイン時の入力欄のカスタムViewです。
 struct FirstLogInInfomation: View {
 
+    @Binding var logInNavigationPath: [LogInNavigation]
     let user: User
 
-    struct InputFirstLogin {
-        var address: String = ""
-        var password: String = ""
-        var password2: String = ""
-        var passHidden: Bool = true
-        var passHidden2: Bool = true
-        var resultPassword: Bool = true
-        var isActive: Bool = false
-    }
-
-    @State private var input: InputFirstLogin = InputFirstLogin()
+    @State private var input: InputLogIn = InputLogIn()
 
     var body: some View {
 
@@ -64,26 +60,25 @@ struct FirstLogInInfomation: View {
 
                 Text("パスワード")
 
-                ZStack {
+                HStack {
                     if input.passHidden {
                         SecureField("●●●●", text: $input.password)
                     } else {
                         TextField("●●●●", text: $input.password)
                     } // if passHidden
 
-                    HStack {
-                        Spacer()
+                } // HStack
+                .overlay(alignment: .trailing) {
+                    Button {
+                        input.passHidden.toggle()
+                        print("passHidden: \(input.passHidden)")
+                    } label: {
+                        Image(systemName: input.passHidden2 ? "eye.slash.fill" : "eye.fill")
+                            .foregroundColor(.gray)
+                    } // Button
+                }
 
-                        Button {
-                            input.passHidden.toggle()
-                            print("passHidden: \(input.passHidden)")
-                        } label: {
-                            Image(systemName: "eye.fill")
-                                .foregroundColor(.gray)
-                        } // Button
-                    } // HStack
-                    .padding(.horizontal)
-                } // ZStack
+
 
                 HStack {
                     Text("再度入力してください")
@@ -97,41 +92,35 @@ struct FirstLogInInfomation: View {
                     } // if
                 } // HStack
 
-                ZStack {
-
-                    if input.passHidden2 {
+                HStack {
+                    if input.passHidden {
                         SecureField("●●●●", text: $input.password2)
                     } else {
                         TextField("●●●●", text: $input.password2)
                     } // if passHidden
 
-                    HStack {
-                        Spacer()
-
-                        Button {
-                            input.passHidden2.toggle()
-                            print("passHidden: \(input.passHidden2)")
-                        } label: {
-                            Image(systemName: "eye.fill")
-                                .foregroundColor(.gray)
-                        } // Button
-                    } // HStack
-                    .padding(.horizontal)
-                } // ZStack
+                } // HStack
+                .overlay(alignment: .trailing) {
+                    Button {
+                        input.passHidden2.toggle()
+                        print("passHidden: \(input.passHidden2)")
+                    } label: {
+                        Image(systemName: input.passHidden2 ? "eye.slash.fill" : "eye.fill")
+                            .foregroundColor(.gray)
+                    } // Button
+                }
 
             } // Group(入力欄全体)
             .font(.subheadline)
             .autocapitalization(.none)
             .keyboardType(.emailAddress)
             .padding(.bottom, 10)
-
+            .padding(.horizontal, 25)
         } // VStack
         .padding()
 
-        NavigationLink(destination: HomeTabView(),
-                       isActive: $input.isActive,
-                       label: {
-            Button {
+        VStack {
+            Button("サインアップ") {
 
                 if input.password != input.password2 {
                     input.resultPassword = false
@@ -140,22 +129,22 @@ struct FirstLogInInfomation: View {
                 }
 
                 if input.resultPassword {
-                    input.isActive.toggle()
+                    logInNavigationPath.append(.home)
                 }
 
-            } label: {
-                Text("サインアップ")
             }
             .buttonStyle(.borderedProminent)
+        }
+        .padding()
 
-        }) // NavigationLink
     } // body
 } // View
 
 struct FirstLogInView_Previews: PreviewProvider {
     static var previews: some View {
 
-        FirstSignInView(user: User(name: "中川賢亮",
+        FirstSignInView(logInNavigationPath: .constant([]),
+                        testUser: User(name: "中川賢亮",
                                     address: "kennsuke242424@gmail.com",
                                     password: "ninnzinn2424")
         )
