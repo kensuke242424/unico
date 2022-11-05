@@ -113,6 +113,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E02FB03F291671B900F72E1A /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				E0A6147F2910E46A0020D043 /* DateFormatterExtension.swift */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
 		E05FE94328F71BE400263F98 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -139,6 +147,7 @@
 			children = (
 				E08F272328DDA08E00329C5E /* Artwork_Management */,
 				E08F272228DDA08E00329C5E /* Products */,
+				E02FB03F291671B900F72E1A /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
