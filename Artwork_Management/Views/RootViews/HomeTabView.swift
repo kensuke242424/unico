@@ -226,10 +226,7 @@ struct SystemSideMenu: View {
 
                                     VStack(alignment: .leading, spacing: 40) {
 
-                                        HStack {
-                                            Image(systemName: "shippingbox.fill")
-                                            Text("アイテム追加")
-                                        }
+                                        Label("アイテム追加", systemImage: "shippingbox.fill")
                                         .onTapGesture {
                                             inputHome.editItemStatus = .create
                                             inputHome.isPresentedEditItem.toggle()
@@ -380,24 +377,17 @@ struct SystemSideMenu: View {
 
                                     VStack(alignment: .leading, spacing: 40) {
 
-                                        HStack {
-                                            Image(systemName: "person.crop.circle.fill")
-                                            Text("ユーザ設定")
-                                        }
-                                        .onTapGesture { inputHome.isPresentedEditItem.toggle() }
+                                        Label("ユーザ設定", systemImage: "person.crop.circle.fill")
+                                        .onTapGesture {  }
 
-                                        HStack {
-                                            Image(systemName: "qrcode")
-                                            Text("QRコード招待")
-                                        }
-                                        .onTapGesture { inputHome.isPresentedEditItem.toggle() }
+                                        Label("QRコード招待", systemImage: "qrcode")
+                                        .onTapGesture {  }
 
                                     } // VStack
                                     .foregroundColor(.white)
                                     .frame(width: 210, height: 120, alignment: .topLeading)
                                     .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
                                     .offset(x: 20, y: 30)
-
                                 }
                             }
 
@@ -410,29 +400,20 @@ struct SystemSideMenu: View {
 
                                     VStack(alignment: .leading, spacing: 40) {
 
-                                        HStack {
-                                            Image(systemName: "scribble.variable")
-                                            Text("アプリについて")
-                                        }
-                                        .onTapGesture { inputHome.isPresentedEditItem.toggle() }
+                                        Label("アプリについて", systemImage: "scribble.variable")
+                                            .onTapGesture {  }
 
-                                        HStack {
-                                            Image(systemName: "star.bubble.fill")
-                                            Text("アプリの評価")
-                                        }
-                                        .onTapGesture { inputHome.isPresentedEditItem.toggle() }
+                                        Label("アプリの評価", systemImage: "star.bubble.fill")
+                                            .onTapGesture {  }
 
-                                        HStack {
-                                            Image(systemName: "network.badge.shield.half.filled")
-                                            Text("利用規約")
-                                        }
-                                        .onTapGesture { inputHome.isPresentedEditItem.toggle() }
+                                        Label("利用規約", systemImage: "network.badge.shield.half.filled")
+                                            .onTapGesture {  }
 
-                                        HStack {
-                                            Image(systemName: "ellipsis.bubble.fill")
-                                            Text("お問い合わせ")
-                                        }
-                                        .onTapGesture { inputHome.isPresentedEditItem.toggle() }
+                                        Label("お問い合わせ", systemImage: "ellipsis.bubble.fill")
+                                            .onTapGesture {  }
+
+                                        Label("プライバシーポリシー", systemImage: "hand.raised.fill")
+                                            .onTapGesture {  }
 
                                     } // VStack
                                     .foregroundColor(.white)
