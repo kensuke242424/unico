@@ -304,9 +304,7 @@ struct StockView: View {
                 } // switch
                 print("ディスプレイモード: \(inputStock.mode)")
             } // .onChangek
-        }
-
-
+        } // NavigationView
     } // body
 } // View
 
