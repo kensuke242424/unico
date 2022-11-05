@@ -15,8 +15,8 @@ struct ItemCardRow: View {
     @Binding var inputStock: InputStock
     let itemRow: Item
 
-    let itemWidth: CGFloat = UIScreen.main.bounds.width / 2 - 30
-    let itemHeight: CGFloat = UIScreen.main.bounds.height / 4
+    private let itemWidth: CGFloat = UIScreen.main.bounds.width / 2 - 30
+    private let itemHeight: CGFloat = UIScreen.main.bounds.height / 4
 
     @State private var cardCount: Int =  0
     @State private var itemSold: Bool = false

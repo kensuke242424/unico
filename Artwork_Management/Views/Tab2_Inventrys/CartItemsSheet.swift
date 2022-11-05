@@ -19,8 +19,6 @@ struct CartItemsSheet: View {
     @Binding var inputHome: InputHome
 
     let halfSheetScroll: HalfSheetScroll
-
-    // .medium表示時の要素表示数
     private let listLimit: Int = 0
 
     var body: some View {
@@ -193,9 +191,7 @@ struct CartItemRow: View {
                     }
                 } // VStack
             } // HStack
-
         } // VStack(全体)
-
     } // body
 } // view
 //

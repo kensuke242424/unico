@@ -28,9 +28,7 @@ struct SideMenuEditTagView: View {
     @Binding var inputTag: InputTagSideMenu
     let defaultTag: Tag?
     let tagSideMenuStatus: EditStatus
-
     @FocusState var focusedField: EditTagField?
-    @GestureState var dragOffset: CGFloat = 0.0
 
     let screenSize = UIScreen.main.bounds
 
@@ -46,6 +44,7 @@ struct SideMenuEditTagView: View {
                     .foregroundColor(Color.customDarkGray2).opacity(0.9)
                     .blur(radius: 10)
                     .frame(width: screenSize.width, height: screenSize.height * 0.65)
+                    .onTapGesture { focusedField = nil }
                     .overlay(alignment: .bottomLeading) {
                         Button {
                             inputTag.newTagNameText = ""
@@ -197,7 +196,7 @@ struct SideMenuEditTagView: View {
                                     return
                                 }
 
-                                if defaultTag!.tagName != inputTag.newTagNameText {
+                                if unwrappedDefaultTag.tagName != inputTag.newTagNameText {
                                     if itemVM.tags.contains(where: { $0.tagName == inputTag.newTagNameText }) {
                                         print(".create タグネーム重複 inputTag.newTagNameText: \(inputTag.newTagNameText)")
                                         inputTag.overlapTagNameAlert.toggle()
@@ -283,13 +282,7 @@ struct SideMenuEditTagView: View {
                     inputTag.selectionSideMenuTagColor = .red
                 }
             }
-            .onTapGesture { focusedField = nil }
-            .offset(x: dragOffset)
-            .animation(.easeIn(duration: 0.15), value: inputTag.disableButton)
-            .animation(.interpolatingSpring(mass: 0.8,
-                                            stiffness: 100,
-                                            damping: 80,
-                                            initialVelocity: 0.1), value: dragOffset)
+
     } // body
 } // View
 

@@ -24,17 +24,17 @@ struct InputTime {
 
     var time: String {
         let formatter = DateFormatter()
-        formatter.setTemplate(.time)
+        formatter.setTemplate(.time, .enUS)
         return formatter.string(from: nowDate)
     }
     var week: String {
         let formatter = DateFormatter()
-        formatter.setTemplate(.usWeek)
+        formatter.setTemplate(.usWeek, .enUS)
         return formatter.string(from: nowDate)
     }
     var dateStyle: String {
         let formatter = DateFormatter()
-        formatter.setTemplate(.usMonthDay)
+        formatter.setTemplate(.usMonthDay, .enUS)
         return formatter.string(from: nowDate)
     }
 }
@@ -63,7 +63,7 @@ struct LibraryView: View {
                     .overlay(alignment: .bottomTrailing) {
                         Menu {
                             Button {
-
+                                // Todo: Homeカスタム
                             } label: {
                                 Text("準備中")
                             }
@@ -102,7 +102,7 @@ struct LibraryView: View {
                     } // VStack
                     Spacer()
                 } // HStack
-                .padding(.top, 35)
+                .padding(.top, 30)
                 .padding(.leading, 20)
                 .shadow(radius: 4, x: 3, y: 3)
                 .onReceive(inputTime.timer) { _ in
@@ -302,7 +302,7 @@ struct LibraryView: View {
                                             itemVM.items.firstIndex(where: { $0.id == inputLibrary.tagFilterItemCards[index].id }) {
 
                                             inputHome.actionItemIndex = cardRowIndex
-                                            
+
                                             withAnimation(.easeIn(duration: 0.15)) {
                                                 inputHome.isShowItemDetail.toggle()
                                             }

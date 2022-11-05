@@ -53,7 +53,6 @@ struct CommerceSheet: View {
                                             .font(.caption)
                                             .offset(x: 7, y: -12)
                                     }
-
                             }
                         } // overlay
                 } // Button
@@ -88,7 +87,6 @@ struct CommerceSheet: View {
                         }
                         inputStock.resultCartPrice = 0
                         inputStock.resultCartAmount = 0
-
                         inputHome.doCommerce = true
                     },
                     label: {
@@ -120,7 +118,7 @@ struct CommerceSheet: View {
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                     inputHome.doCommerce = false
-                    print("遅延後doCommerceをfalse")
+                    print("DispatchQueue2秒後doCommerceをfalse")
                 }
 
             }

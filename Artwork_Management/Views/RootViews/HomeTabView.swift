@@ -208,7 +208,6 @@ struct SystemSideMenu: View {
 
                     Text("Account_Name")
                         .font(.title3.bold()).foregroundColor(.white)
-//                        .padding(.leading)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()

@@ -9,6 +9,11 @@ import Foundation
 
 extension DateFormatter {
 
+    enum SelectLocale: String {
+        case enUS = "en_US"
+        case jaJP = "ja_JP"
+    }
+
     // テンプレートの定義(例)
     enum Template: String {
         case date = "yMd"     // 2017/1/1
@@ -20,8 +25,8 @@ extension DateFormatter {
         case usMonthDay = "MMMM.d" // Jun 10
     }
 
-    func setTemplate(_ template: Template) {
+    func setTemplate(_ template: Template, _ locale: SelectLocale) {
             // optionsは拡張用の引数だが使用されていないため常に0
-            dateFormat = DateFormatter.dateFormat(fromTemplate: template.rawValue, options: 0, locale: .current)
+        dateFormat = DateFormatter.dateFormat(fromTemplate: template.rawValue, options: 0, locale: Locale(identifier: locale.rawValue))
         }
 }
