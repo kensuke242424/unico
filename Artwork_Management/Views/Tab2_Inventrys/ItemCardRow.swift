@@ -73,15 +73,12 @@ struct ItemCardRow: View {
                 // NOTE: アイテムカードの内容
                 .overlay {
                     VStack {
-                        RoundedRectangle(cornerRadius: 5)
-                            .foregroundColor(.white)
-                            .opacity(0.5)
-                            .frame(width: itemWidth - 50, height: itemWidth - 50)
+
+                    ShowItemPhoto(photo: itemRow.photo, size: itemWidth - 50)
 
                         Text(itemRow.name)
                             .foregroundColor(.black)
-                            .font(.callout)
-                            .fontWeight(.heavy)
+                            .font(.caption)
                             .padding(.horizontal, 5)
                             .padding(.top, 5)
                             .frame(width: itemWidth * 0.9)

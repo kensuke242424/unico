@@ -15,6 +15,7 @@ struct UsefulButton: View {
     @Binding var inputHome: InputHome
 
     @State private var offsetY: CGFloat = 0.0
+    @State private var opacity: CGFloat = 0.0
     @State private var change: Bool = false
     @State private var buttonStyle: ButtonStyle = .stock
     @State private var buttonIcon: ButtonIcon = ButtonIcon(icon: "shippingbox.fill",
@@ -51,6 +52,8 @@ struct UsefulButton: View {
         .offset(x: UIScreen.main.bounds.width / 3 - 5,
                 y: UIScreen.main.bounds.height / 3 - 10)
         .offset(y: offsetY)
+        .opacity(opacity)
+        .animation(.easeIn(duration: 0.1), value: opacity)
 
         .onChange(of: inputHome.cartState) { _ in
             withAnimation(.easeOut(duration: 0.3)) {
@@ -63,8 +66,14 @@ struct UsefulButton: View {
         } // .onChange(cartState)
 
         .onChange(of: inputHome.tabIndex) { newIndex in
-            self.buttonStyle = buttonVM.buttonStyleChenged(tabIndex: newIndex)
-            self.buttonIcon = buttonVM.iconChenge(style: buttonStyle, change: change)
+            buttonStyle = buttonVM.buttonStyleChenged(tabIndex: newIndex)
+            buttonIcon = buttonVM.iconChenge(style: buttonStyle, change: change)
+
+            if newIndex == 0 {
+                opacity = 0.0
+            } else {
+                opacity = 1.0
+            }
         } // onChange(tabIndex)
     } // body
 } // View
@@ -84,7 +93,7 @@ struct ButtonStyleView: View {
             .frame(width: 65)
             .padding()
             .blur(radius: 1)
-            .shadow(color: .gray, radius: 10, x: 4, y: 11)
+//            .shadow(color: .gray, radius: 10, x: 4, y: 11)
 
             // ボタンのアイコン
             .overlay {

@@ -9,43 +9,35 @@ import SwiftUI
 
 struct SelectItemPhotoArea: View {
 
-    let selectTagColor: UsedColor
+    let item: Item?
 
     var body: some View {
 
 //        selectTagColor.color
         Color.customLightGray1
             .frame(width: UIScreen.main.bounds.width, height: 350)
-            .blur(radius: 2.0)
+            .blur(radius: 0)
 
             .overlay {
                 LinearGradient(colors:
                                 [Color.clear, Color.black], startPoint: .top, endPoint: .bottom)
-                .blur(radius: 10)
+                .blur(radius: 5)
             }
 
             .overlay {
                 VStack {
 
-                    RoundedRectangle(cornerRadius: 10)
-                        .foregroundColor(.gray)
-                        .frame(width: 270, height: 270)
-                        .opacity(0.4)
-                        .overlay {
-                            Text("No Image...")
-                                .foregroundColor(.white)
-                                .font(.title2)
-                                .fontWeight(.black)
-                        }
+                    ShowItemPhoto(photo: item?.photo ?? "", size: 270)
                         .overlay(alignment: .bottomTrailing) {
                             Button {
                                 // Todo: アイテム写真追加処理
                             } label: {
-                                Image(systemName: "plus.rectangle.fill.on.rectangle.fill")
+                                Image(systemName: "photo.on.rectangle.angled")
                                     .resizable()
                                     .scaledToFit()
+                                    .foregroundColor(.white)
                                     .frame(width: 40, height: 40)
-                                    .offset(x: 7, y: 7)
+                                    .offset(x: 10, y: 10)
                             } // Button
                         } // .overlay(ボタン)
                 } // VStack
@@ -55,6 +47,6 @@ struct SelectItemPhotoArea: View {
 
 struct SelectItemPhotoArea_Previews: PreviewProvider {
     static var previews: some View {
-        SelectItemPhotoArea(selectTagColor: .red)
+        SelectItemPhotoArea(item: TestItem().testItem)
     }
 }

@@ -9,6 +9,11 @@ import SwiftUI
 
 struct CartItemsSheet: View {
 
+    enum HalfSheetScroll {
+        case main
+        case additional
+    }
+
     @StateObject var itemVM: ItemViewModel
     @Binding var cartResults: CartResults
     @Binding var inputStock: InputStock
@@ -90,10 +95,8 @@ struct CartItemRow: View {
                 .background(.gray)
 
             HStack {
-                RoundedRectangle(cornerRadius: 10)
-                    .frame(width: 100, height: 100)
-                    .foregroundColor(.customLightGray1)
-                    .opacity(0.3)
+
+                ShowItemPhoto(photo: itemRow.photo, size: 100)
 
                 Spacer()
 
@@ -113,7 +116,7 @@ struct CartItemRow: View {
                                 .foregroundColor(.black)
                                 .font(.title3)
                                 .fontWeight(.heavy)
-                            Spacer()
+                                .padding(.trailing)
                         }
                         Button {
 

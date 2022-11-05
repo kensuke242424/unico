@@ -54,7 +54,7 @@ struct EditItemView: View {
                         .offset(y: 340)
                     VStack {
                         // ✅カスタムView 写真ゾーン
-                        SelectItemPhotoArea(selectTagColor: input.selectionTagColor)
+                        SelectItemPhotoArea(item: passItemData)
 
                         InputForms(itemVM: itemVM,
                                    selectionTagName: $input.selectionTagName,
@@ -246,6 +246,10 @@ struct EditItemView: View {
 
 struct InputForms: View {
 
+    enum EditItemField {
+        case tag, name, stock, price, sales, detail
+    }
+
     @StateObject var itemVM: ItemViewModel
     @Binding var selectionTagName: String
     @Binding var isOpenSideMenu: Bool
@@ -261,7 +265,7 @@ struct InputForms: View {
     let editItemStatus: Status
     let tagColor: UsedColor
 
-    @FocusState private var focusedField: Field?
+    @FocusState private var focusedField: EditItemField?
 
     var body: some View {
 
@@ -407,17 +411,7 @@ struct EditItemView_Previews: PreviewProvider {
         EditItemView(itemVM: ItemViewModel(),
                      isPresentedEditItem: .constant(true),
                      itemIndex: 0,
-                     passItemData:
-                        Item(tag: "Album",
-                             tagColor: "赤",
-                             name: "Album1",
-                             detail: "Album1のアイテム紹介テキストです。",
-                             photo: "",
-                             price: 1800,
-                             sales: 88000,
-                             inventory: 200,
-                             createTime: Date(),
-                             updateTime: Date()),
+                     passItemData: TestItem().testItem,
                      editItemStatus: .update
         )
     }

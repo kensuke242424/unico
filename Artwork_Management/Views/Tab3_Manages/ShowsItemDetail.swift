@@ -11,22 +11,17 @@ struct ShowsItemDetail: View {
 
     @StateObject var itemVM: ItemViewModel
 
-    // NOTE: 親Viewから選択Itemとインデックスを取得
-    //       Itemはnilを許容し、nilだった場合「データが取得できませんでした」と表示
-    let item: Item?
+    let item: Item
     let itemIndex: Int
-    @Binding var isShowitemDetail: Bool
+    @Binding var isShowItemDetail: Bool
+    @Binding var isPresentedEditItem: Bool
 
     struct InputItemDetail {
         var opacity: Double = 0
         var isShowAlert: Bool = false
-        var isShowResetBasketAlert: Bool = false
-        var disabledButton: Bool = true
-        var isPlesentedUpdateItem: Bool = false
-        var isPlesentedErrorInfomation: Bool = false
     }
 
-    @State private var input: InputItemDetail = InputItemDetail()
+    @State private var inputDetail: InputItemDetail = InputItemDetail()
 
     var body: some View {
 
@@ -34,157 +29,136 @@ struct ShowsItemDetail: View {
 
             Color(.gray)
                 .ignoresSafeArea()
-                .opacity(0.3)
-            // NOTE: アイテム詳細の外側をタップすると、詳細画面を閉じます
-                .onTapGesture {
-                    isShowitemDetail = false
-                    print("onTapGesture_isShowitemDetail: \(isShowitemDetail)")
-                } // onTapGesture
+                .opacity(0.4)
+                .onTapGesture { isShowItemDetail = false }
 
-            if let showItem = item {
+            RoundedRectangle(cornerRadius: 20)
+                .foregroundColor(.black)
+                .frame(width: 300, height: 470)
+                .opacity(0.9)
+                .overlay {
+                    Color.customDarkBlue2
+                        .opacity(0.5)
+                        .blur(radius: 20)
+                }
 
-                RoundedRectangle(cornerRadius: 20)
-                    .foregroundColor(.black)
-                    .frame(width: 300, height: 470)
-                    .opacity(0.7)
-
-                VStack(spacing: 10) {
-                    Text(showItem.name)
-                        .fontWeight(.black)
-                        .foregroundColor(.white)
-
-                    RoundedRectangle(cornerRadius: 4)
-                        .frame(width: 150, height: 150)
-                        .foregroundColor(.gray)
-                        .overlay {
-                            Text("No Image.")
-                                .font(.title2)
-                                .fontWeight(.black)
-                                .foregroundColor(.white)
-                        }
-
-                    HStack {
-                        Text("　アイテム情報")
-                            .fontWeight(.medium)
+                .overlay {
+                    VStack {
+                        Text(item.name)
+                            .fontWeight(.bold)
                             .foregroundColor(.white)
+                            .tracking(1)
+                            .lineLimit(1)
 
-                        Button {
-                            // NOTE: アイテム編集画面へ遷移するかをアラートで選択
-                            input.isShowAlert.toggle()
-                            print("isShowAlert: \(input.isShowAlert)")
+                        ScrollView(showsIndicators: false) {
+                            VStack(spacing: 10) {
 
-                        } label: {
-                            Image(systemName: "highlighter")
-                                .foregroundColor(input.disabledButton ? .gray : .yellow)
-                        }
-                        .disabled(input.disabledButton)
-                        .alert("編集", isPresented: $input.isShowAlert) {
+                                ShowItemPhoto(photo: item.photo, size: 150)
 
-                            Button {
-                                input.isShowAlert.toggle()
-                                print("isShowAlert: \(input.isShowAlert)")
-                            } label: {
-                                Text("戻る")
-                            }
+                                HStack {
+                                    Text("　アイテム情報")
+                                        .fontWeight(.medium)
+                                        .foregroundColor(.white)
 
-                            Button {
-                                input.isPlesentedUpdateItem.toggle()
-                                print("isShowItemEdit: \(input.isPlesentedUpdateItem)")
-                            } label: {
-                                Text("はい")
-                            }
-                        } message: {
-                            Text("アイテムデータを編集しますか？")
-                        } // alert
+                                    Button {
+                                        // NOTE: アイテム編集画面へ遷移するかをアラートで選択
+                                        inputDetail.isShowAlert.toggle()
+                                        print("isShowAlert: \(inputDetail.isShowAlert)")
 
-                    } // HStack
+                                    } label: {
+                                        Image(systemName: "highlighter")
+                                            .foregroundColor(.yellow)
+                                    }
+                                    .alert("編集", isPresented: $inputDetail.isShowAlert) {
 
-                    Text("ーーーーーーーーーーーーー")
-                        .foregroundColor(.white)
+                                        Button {
+                                            inputDetail.isShowAlert.toggle()
+                                            print("isShowAlert: \(inputDetail.isShowAlert)")
+                                        } label: {
+                                            Text("戻る")
+                                        }
 
-                    // NOTE: アイテムの情報が格納羅列されたカスタムViewです
-                    ItemDetailContents(sales: showItem.sales,
-                                       price: showItem.price,
-                                       inventory: showItem.inventory,
-                                       createAt: showItem.createTime,
-                                       updateAt: showItem.updateTime
-                    )
+                                        Button {
+                                            isPresentedEditItem.toggle()
+                                        } label: {
+                                            Text("はい")
+                                        }
+                                    } message: {
+                                        Text("アイテムデータを編集しますか？")
+                                    } // alert
 
-                    Text("ーーーーーーーーーーーーー")
-                        .foregroundColor(.white)
+                                } // HStack
 
-                } // VStack(item != nil の時)
-
-            } else {
-
-                VStack {
-
-                    RoundedRectangle(cornerRadius: 20)
-                        .foregroundColor(.black)
-                        .frame(width: 300, height: 470)
-                        .opacity(0.7)
-                        .overlay {
-                            Text("アイテムデータが取得できません")
-                                .fontWeight(.bold)
-                                .foregroundColor(.white)
-                        }
-                        .overlay(alignment: .bottomTrailing) {
-
-                            Button {
-                                // Todo: エラー報告インフォメーションへ遷移
-                                input.isPlesentedErrorInfomation.toggle()
-                            } label: {
-                                Text("エラーを報告する>>")
+                                Divider()
+                                    .background(.white)
+                                    .opacity(0.5)
                                     .padding()
-                            } // Button
-                        } // overlay
-                } // VStack(item == nil の時)
 
-            } // if let item
+                                // NOTE: アイテムの情報が格納羅列されたカスタムViewです
+                                ItemDetailData(sales: item.sales,
+                                                   price: item.price,
+                                                   inventory: item.inventory,
+                                                   createAt: item.createTime,
+                                                   updateAt: item.updateTime
+                                )
 
+                                Divider()
+                                    .background(.white)
+                                    .opacity(0.5)
+                                    .padding()
+
+                                HStack {
+                                    Text("Memo.")
+                                        .foregroundColor(.white)
+                                    Spacer()
+                                }
+                                .padding(.leading, 20)
+
+                                RoundedRectangle(cornerRadius: 10)
+                                    .foregroundColor(.gray)
+                                    .frame(width: 250, height: 300)
+                                    .opacity(0.2)
+                                    .overlay(alignment: .top) {
+                                        Text(item.detail)
+                                            .font(.footnote)
+                                            .foregroundColor(.white)
+                                            .frame(width: 240)
+                                            .padding(.vertical)
+                                    }
+                            } // VStack
+                        } // ScrollView
+                    } // VStack
+                    .padding(.vertical, 30)
+                }// overlay
         } // ZStack(全体)
-        .opacity(input.opacity)
+        .opacity(inputDetail.opacity)
 
-        .sheet(isPresented: $input.isPlesentedUpdateItem) {
+        .sheet(isPresented: $isPresentedEditItem) {
 
             // NOTE: itemがnilでない場合のみボタンを有効にしているため、ボタンアクション時には値を強制アンラップします。
             EditItemView(itemVM: itemVM,
-                         isPresentedEditItem: $input.isPlesentedUpdateItem,
+                         isPresentedEditItem: $isPresentedEditItem,
                          itemIndex: itemIndex,
-                         passItemData: item!,
+                         passItemData: item,
                          editItemStatus: .update)
         } // sheet(アイテム更新シート)
 
         .onAppear {
-            // NOTE: itemに値が存在した場合、アイテム編集ボタンを有効化
-            if item != nil {
-                input.disabledButton.toggle()
-            }
-
-            // NOTE: opacityの動的な値の変化を使ったフェードアニメーション
             withAnimation(.linear(duration: 0.2)) {
-                input.opacity = 1.0
+                inputDetail.opacity = 1.0
             }
-
         } // .onAppear
 
     } // body
 } // View
 
-struct SalesItemDetailView_Previews: PreviewProvider {
+struct ShowsItemDetail_Previews: PreviewProvider {
     static var previews: some View {
         ShowsItemDetail(itemVM: ItemViewModel(),
-                        item: Item(tag: "Album",
-                                   tagColor: "赤",
-                                   name: "Album1",
-                                   detail: "Album1のアイテム紹介テキストです。",
-                                   photo: "",
-                                   price: 1800, sales: 88000,
-                                   inventory: 200,
-                                   createTime: Date(),
-                                   updateTime: Date()),
+                        item: TestItem().testItem,
                         itemIndex: 0,
-                        isShowitemDetail: .constant(false)
+                        isShowItemDetail: .constant(false),
+                        isPresentedEditItem: .constant(false)
         )
     }
 }

@@ -7,6 +7,17 @@
 
 import SwiftUI
 
+// NOTE: アイテムのソートタイプを管理します
+enum SortType {
+    case salesUp, salesDown, updateAtUp, createAtUp, start
+}
+
+// NOTE: アイテムのタググループ有無を管理します
+enum TagGroup {
+    case on // swiftlint:disable:this identifier_name
+    case off
+}
+
 struct ManageView: View {
 
     @StateObject var itemVM: ItemViewModel
@@ -25,7 +36,7 @@ struct ManageView: View {
         var sortType: SortType = .start
     }
 
-    @State private var input: InputManage = InputManage()
+    @State private var inputManage: InputManage = InputManage()
 
     var body: some View {
 
@@ -36,7 +47,7 @@ struct ManageView: View {
                     VStack(alignment: .leading) {
 
                         // NOTE: タグ表示の「ON」「OFF」で表示を切り替えます
-                        switch input.tagGroup {
+                        switch inputManage.tagGroup {
 
                         case .on:
                             // タグの要素数の分リストを作成
@@ -60,7 +71,7 @@ struct ManageView: View {
 
                         case .off:
 
-                            Text("- 全てのアイテム -")
+                            Text("- ALL -")
                                 .font(.largeTitle.bold())
                                 .shadow(radius: 2, x: 4, y: 6)
                                 .padding(.vertical)
@@ -76,12 +87,13 @@ struct ManageView: View {
 
                 } // ScrollView
 
-                if input.isShowItemDetail {
+                if inputManage.isShowItemDetail {
                     ShowsItemDetail(itemVM: itemVM,
-                                    item: itemVM.items[input.listIndex],
-                                    itemIndex: input.listIndex,
-                                    isShowitemDetail: $input.isShowItemDetail
-                    )
+                                    item: itemVM.items[inputManage.listIndex],
+                                    itemIndex: inputManage.listIndex,
+                                    isShowItemDetail: $inputManage.isShowItemDetail,
+                                    isPresentedEditItem: $isPresentedEditItem)
+
                 } // if isShowItemDetail
 
             } // ZStack
@@ -94,9 +106,9 @@ struct ManageView: View {
                         Menu("タググループ") {
 
                             Button {
-                                input.tagGroup = .on
+                                inputManage.tagGroup = .on
                             } label: {
-                                if input.tagGroup == .on {
+                                if inputManage.tagGroup == .on {
                                     Text("ON   　　　　　 ✔︎")
                                 } else {
                                     Text("ON")
@@ -104,9 +116,9 @@ struct ManageView: View {
                             } // ON
 
                             Button {
-                                input.tagGroup = .off
+                                inputManage.tagGroup = .off
                             } label: {
-                                if input.tagGroup == .off {
+                                if inputManage.tagGroup == .off {
                                     Text("OFF   　　　　　 ✔︎")
                                 } else {
                                     Text("OFF")
@@ -116,40 +128,40 @@ struct ManageView: View {
 
                         Menu("並び替え") {
                             Button {
-                                input.sortType = .salesUp
-                                itemVM.items = itemVM.itemsSort(sort: input.sortType, items: itemVM.items)
+                                inputManage.sortType = .salesUp
+                                itemVM.items = itemVM.itemsSort(sort: inputManage.sortType, items: itemVM.items)
                             } label: {
-                                if input.sortType == .salesUp {
+                                if inputManage.sortType == .salesUp {
                                     Text("売り上げ(↑)　　 ✔︎")
                                 } else {
                                     Text("売り上げ(↑)")
                                 }
                             }
                             Button {
-                                input.sortType = .salesDown
-                                itemVM.items = itemVM.itemsSort(sort: input.sortType, items: itemVM.items)
+                                inputManage.sortType = .salesDown
+                                itemVM.items = itemVM.itemsSort(sort: inputManage.sortType, items: itemVM.items)
                             } label: {
-                                if input.sortType == .salesDown {
+                                if inputManage.sortType == .salesDown {
                                     Text("売り上げ(↓)　　 ✔︎")
                                 } else {
                                     Text("売り上げ(↓)")
                                 }
                             }
                             Button {
-                                input.sortType = .updateAtUp
-                                itemVM.items = itemVM.itemsSort(sort: input.sortType, items: itemVM.items)
+                                inputManage.sortType = .updateAtUp
+                                itemVM.items = itemVM.itemsSort(sort: inputManage.sortType, items: itemVM.items)
                             } label: {
-                                if input.sortType == .updateAtUp {
+                                if inputManage.sortType == .updateAtUp {
                                     Text("最終更新日　　　✔︎")
                                 } else {
                                     Text("最終更新日")
                                 }
                             }
                             Button {
-                                input.sortType = .createAtUp
-                                itemVM.items = itemVM.itemsSort(sort: input.sortType, items: itemVM.items)
+                                inputManage.sortType = .createAtUp
+                                itemVM.items = itemVM.itemsSort(sort: inputManage.sortType, items: itemVM.items)
                             } label: {
-                                if input.sortType == .createAtUp {
+                                if inputManage.sortType == .createAtUp {
                                     Text("追加日　　　✔︎")
                                 } else {
                                     Text("追加日")
@@ -183,26 +195,19 @@ struct ManageView: View {
         VStack(alignment: .leading, spacing: 20) {
 
             HStack(spacing: 20) {
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(Color.gray)
-                    .frame(width: 70, height: 70)
-                    .shadow(radius: 4, x: 5, y: 5)
-                    .overlay {
-                        Text("No Image.")
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
-                    }
+
+                ShowItemPhoto(photo: item.photo, size: 70)
 
                 VStack(alignment: .leading, spacing: 10) {
                     HStack(spacing: 40) {
-                        Text("\(item.sales)円")
+                        Text("¥ \(item.sales)")
                             .foregroundColor(.white)
                             .opacity(0.8)
                             .font(.subheadline.bold())
                         Button {
-                            input.listIndex = listIndex
-                            input.isShowItemDetail.toggle()
-                            print("isShowItemDetail: \(input.isShowItemDetail)")
+                            inputManage.listIndex = listIndex
+                            inputManage.isShowItemDetail.toggle()
+                            print("isShowItemDetail: \(inputManage.isShowItemDetail)")
 
                         } label: {
                             Image(systemName: "info.circle.fill")
@@ -213,7 +218,7 @@ struct ManageView: View {
                     } // HStack
 
                     // NOTE: ラインの外枠を透明フレームで置いておくことで、
-                    // ラインが端まで行ってもレイアウトが崩れない
+                    // インジケーターが端まで行ってもレイアウトが崩れない
                     switch item.tagColor {
                     case "赤": IndicatorRow(salesValue: item.sales, tagColor: .red)
                     case "青": IndicatorRow(salesValue: item.sales, tagColor: .blue)

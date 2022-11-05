@@ -23,7 +23,6 @@ struct InputHome {
 struct HomeTabView: View {
 
     @StateObject var rootItemVM = ItemViewModel()
-
     @State private var inputHome: InputHome = InputHome()
 
     var body: some View {
@@ -32,7 +31,7 @@ struct HomeTabView: View {
 
             TabView(selection: $inputHome.tabIndex) {
 
-                LibraryView(itemVM: rootItemVM, isShowItemDetail: $inputHome.isShowItemDetail)
+                LibraryView(itemVM: rootItemVM, inputHome: $inputHome)
                     .tabItem {
                         Image(systemName: "house")
                         Text("Home")
@@ -93,15 +92,38 @@ struct HomeTabView: View {
 
         } // ZStack
         .navigationBarBackButtonHidden()
-        .onChange(of: inputHome.tabIndex) { newTabIndex in
 
-            // ストック画面でのみ、"ALL"タグを追加
-            if newTabIndex == 1 || inputHome.isPresentedEditItem {
+        .onChange(of: inputHome.tabIndex) { newTabIndex in
+            if newTabIndex == 0 || newTabIndex == 1 {
+                if rootItemVM.tags.contains(where: {$0.tagName == "ALL"}) { return }
                 rootItemVM.tags.insert(Tag(tagName: "ALL", tagColor: .gray), at: 0)
-            } else {
+                print("ALLタグを追加")
+            }
+            if newTabIndex == 2 || newTabIndex == 3 || inputHome.isPresentedEditItem {
                 rootItemVM.tags.removeAll(where: {$0.tagName == "ALL"})
+                print("ALLタグを削除")
+            }
+        } // .onChange
+
+        .onChange(of: inputHome.isPresentedEditItem) { present in
+            if present {
+                rootItemVM.tags.removeAll(where: { $0.tagName == "ALL" })
+                print("ALLタグを削除")
+            } else {
+                if rootItemVM.tags.contains(where: {$0.tagName == "ALL"}) { return }
+
+                if inputHome.tabIndex == 0 || inputHome.tabIndex == 1 {
+                    rootItemVM.tags.insert(Tag(tagName: "ALL", tagColor: .gray), at: 0)
+                    print("ALLタグを追加")
+                }
             }
         }
+
+        .onAppear {
+            if rootItemVM.tags.contains(where: {$0.tagName == "ALL"}) { return }
+            rootItemVM.tags.insert(Tag(tagName: "ALL", tagColor: .gray), at: 0)
+        }
+
     } // body
 } // View
 

@@ -24,11 +24,19 @@ struct TagSortCards: View {
             ForEach(itemVM.items) { item in
 
                 if selectFilterTag == "ALL" || selectFilterTag == "検索" {
-                    ItemCardRow(itemVM: itemVM,
-                                inputStock: $inputStock,
-                                cartResults: $cartResults,
-                                itemRow: item)
-
+                    if inputStock.searchItemNameText == "ALL" || inputStock.searchItemNameText == "" {
+                        ItemCardRow(itemVM: itemVM,
+                                    inputStock: $inputStock,
+                                    cartResults: $cartResults,
+                                    itemRow: item)
+                    } else {
+                        if item.name.lowercased().contains(inputStock.searchItemNameText.lowercased()) {
+                            ItemCardRow(itemVM: itemVM,
+                                        inputStock: $inputStock,
+                                        cartResults: $cartResults,
+                                        itemRow: item)
+                        }
+                    }
                 } else if item.tag == selectFilterTag {
                     ItemCardRow(itemVM: itemVM,
                                 inputStock: $inputStock,
