@@ -32,265 +32,265 @@ struct StockView: View {
     @State private var inputStock: InputStock = InputStock()
 
     var body: some View {
-        NavigationView {
 
-            ScrollViewReader { scrollProxy in
-                ZStack {
-                    VStack {
+        ScrollViewReader { scrollProxy in
+            ZStack {
+                VStack {
 
-                        // NOTE: アイテム要素全体のロケーション
-                        ScrollView {
-                            TagTitle(title: "最近更新したアイテム", font: .title3)
-                                .foregroundColor(.white)
-                                .opacity(0.8)
-                                .padding(.vertical)
+                    // NOTE: アイテム要素全体のロケーション
+                    ScrollView {
+                        TagTitle(title: "最近更新したアイテム", font: .title3)
+                            .foregroundColor(.white)
+                            .opacity(0.8)
+                            .padding(.vertical)
 
-                            Divider()
-                                .background(.gray)
-                                .padding(.horizontal)
+                        Divider()
+                            .background(.gray)
+                            .padding(.horizontal)
 
-                            // ✅カスタムView: 最近更新したアイテムをHStack表示します。(横スクロール)
-                            UpdateTimeSortCards(itemVM: itemVM,
-                                                inputHome: $inputHome,
-                                                inputStock: $inputStock)
+                        // ✅カスタムView: 最近更新したアイテムをHStack表示します。(横スクロール)
+                        UpdateTimeSortCards(itemVM: itemVM,
+                                            inputHome: $inputHome,
+                                            inputStock: $inputStock)
 
-                            Divider()
-                                .background(.gray)
-                                .padding([.horizontal, .bottom])
+                        Divider()
+                            .background(.gray)
+                            .padding([.horizontal, .bottom])
 
-                            Text(itemVM.tags[inputStock.filterTagIndex].tagName)
-                                            .foregroundColor(.white)
-                                            .font(.system(size: 20, weight: .bold))
-                                            .frame(width: 100, height: 40)
-                                            .padding()
+                        Text(itemVM.tags[inputStock.filterTagIndex].tagName)
+                            .foregroundColor(.white)
+                            .font(.system(size: 20, weight: .bold))
+                            .frame(width: 100, height: 40)
+                            .padding()
 
-                            // NOTE: サイドタグバーの枠フレームおよび、前後のタグインフォメーションを表示します。
+                        // NOTE: サイドタグバーの枠フレームおよび、前後のタグインフォメーションを表示します。
                             .overlay {
                                 SideTagBarOverlay(inputStock: $inputStock,
                                                   tags: $itemVM.tags)
                             } // overlay
                             .id("search")
 
-                            // NOTE: 検索ボックスの表示管理
-                            if inputHome.isShowSearchField {
-                                TextField("キーワード検索", text: $inputStock.searchItemNameText)
-                                    .foregroundColor(.white)
-                                    .autocapitalization(.none)
-                                    .focused($searchFocused, equals: .check)
-                                    .padding(.horizontal)
-                                    .padding(.bottom)
-                            }
-
-                            HStack(spacing: 50) {
-                                Text(inputStock.filterTagIndex == 0 ?
-                                         "- \(inputStock.searchItemNameText) -" :
-                                        "- \(itemVM.tags[inputStock.filterTagIndex].tagName) -")
-                                .font(.title.bold())
+                        // NOTE: 検索ボックスの表示管理
+                        if inputHome.isShowSearchField {
+                            TextField("キーワード検索", text: $inputStock.searchItemNameText)
                                 .foregroundColor(.white)
-                                .shadow(radius: 3, x: 4, y: 6)
-                                .lineLimit(1)
-                                .opacity(0.8)
-
-                                if !inputStock.searchItemNameText.isEmpty,
-                                   inputStock.searchItemNameText != "ALL" {
-                                    Button {
-                                        inputStock.searchItemNameText = "ALL"
-                                        itemVM.tags[0].tagName = "ALL"
-                                    } label: {
-                                        RoundedRectangle(cornerRadius: 10)
-                                            .foregroundColor(.gray)
-                                            .frame(width: 40)
-                                            .overlay {
-                                                Image(systemName: "trash.fill")
-                                                    .foregroundColor(.white)
-                                            }
-                                    } // Button
-                                    .opacity(0.3)
-                                }
-                                Spacer()
-                            } // HStack
-                            .padding([.leading, .vertical])
-
-                            TagSortCards(itemVM: itemVM,
-                                         inputHome: $inputHome,
-                                         inputStock: $inputStock,
-                                         selectFilterTag: itemVM.tags[inputStock.filterTagIndex].tagName)
-
-                        } // ScrollView (アイテムロケーション)
-
-                    } // VStack
-                } // ZStack
-
-                // NOTE: カート内のアイテムを監視してハーフモーダルを表示
-                //       カートが空になったら、更新インフォメーションを表示
-                .onChange(of: inputStock.resultCartAmount) { [before = inputStock.resultCartAmount] after in
-
-                    if before == 0 {
-                        inputHome.commerceHalfSheet = .medium
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                            inputHome.cartHalfSheet = .medium
+                                .autocapitalization(.none)
+                                .focused($searchFocused, equals: .check)
+                                .padding(.horizontal)
+                                .padding(.bottom)
                         }
-                    }
-                    if after == 0 {
-                        inputHome.cartHalfSheet = .hidden
-                        inputHome.commerceHalfSheet = .hidden
-                        inputHome.basketInfomationOpacity = 0.7
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.9) {
-                            inputHome.basketInfomationOpacity = 0.0
-                        }
-                    }
-                }
-                // NOTE: 入力フィールドの表示に合わせて、フォーカスを切り替えます。
-                // NOTE: 入力フィールド表示時に、指定の位置まで自動フォーカスします。
-                .onChange(of: inputHome.isShowSearchField) { newValue in
 
-                    searchFocused = newValue ? .check : nil
-                    if newValue == true {
-                        if inputStock.searchItemNameText == "ALL" {
-                            inputStock.searchItemNameText = ""
-                            itemVM.tags[0].tagName = "検索"
-                        }
-                    }
-                    if newValue == false {
-                        if inputStock.searchItemNameText == "" {
-                            inputStock.searchItemNameText = "ALL"
-                            itemVM.tags[0].tagName = "ALL"
-                        }
-                    }
+                        HStack(spacing: 50) {
+                            Text(inputStock.filterTagIndex == 0 ?
+                                 "- \(inputStock.searchItemNameText) -" :
+                                    "- \(itemVM.tags[inputStock.filterTagIndex].tagName) -")
+                            .font(.title.bold())
+                            .foregroundColor(.white)
+                            .shadow(radius: 3, x: 4, y: 6)
+                            .lineLimit(1)
+                            .opacity(0.8)
 
-                    if newValue {
-                        withAnimation(.easeIn(duration: 2.0)) {
-                            scrollProxy.scrollTo("search", anchor: .top)
-                        }
-                        inputStock.filterTagIndex = 0 // タグを「All」に更新
-                    } // if
-                } // .onChange
-
-                .onChange(of: searchFocused) { newFocus in
-                    if newFocus == nil {
-                        inputHome.isShowSearchField = false
-                    }
-                } // .onChange
-
-            } // ScrollViewReader
-
-            .background(LinearGradient(gradient: Gradient(colors: [.customDarkGray1,
-                                                                   .customLightGray1]),
-                                       startPoint: .top, endPoint: .bottom))
-            // アイテム取引かごのシート画面
-            .resizableSheet($inputHome.cartHalfSheet, id: "A") { builder in
-                builder.content { context in
-
-                    VStack {
-                        Spacer(minLength: 0)
-                        GrabBar()
-                            .foregroundColor(.black)
-                        Spacer(minLength: 0)
-
-                        HStack(alignment: .bottom) {
-                            Text("カート内のアイテム")
-                                .foregroundColor(.black)
-                                .font(.headline)
-                                .fontWeight(.black)
-                                .opacity(0.6)
-                            Spacer()
-                            Button(
-                                action: {
-                                    inputStock.resultCartPrice = 0
-                                    inputStock.resultCartAmount = 0
-
-                                    for index in itemVM.items.indices {
-
-                                        if itemVM.items[index].amount == 0 { return }
-                                        itemVM.items[index].amount = 0
-                                    }
-                                },
-                                label: {
-                                    HStack {
-                                        Image(systemName: "trash.fill")
-                                        Text("全て削除")
-                                            .font(.callout)
-                                    }
-                                    .foregroundColor(.red)
-                                }
-                            ) // Button
-                        } // HStack
-                        .padding(.horizontal, 20)
-
-                        Spacer(minLength: 8)
-
-                        ResizableScrollView(
-                            context: context,
-                            main: {
-                                CartItemsSheet(
-                                    itemVM: itemVM,
-                                    inputStock: $inputStock,
-                                    inputHome: $inputHome,
-                                    halfSheetScroll: .main)
-                            },
-                            additional: {
-                                CartItemsSheet(
-                                    itemVM: itemVM,
-                                    inputStock: $inputStock,
-                                    inputHome: $inputHome,
-                                    halfSheetScroll: .additional)
-
-                                Spacer()
-                                    .frame(height: 100)
+                            if !inputStock.searchItemNameText.isEmpty,
+                               inputStock.searchItemNameText != "ALL" {
+                                Button {
+                                    inputStock.searchItemNameText = "ALL"
+                                    itemVM.tags[0].tagName = "ALL"
+                                } label: {
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .foregroundColor(.gray)
+                                        .frame(width: 40)
+                                        .overlay {
+                                            Image(systemName: "trash.fill")
+                                                .foregroundColor(.white)
+                                        }
+                                } // Button
+                                .opacity(0.3)
                             }
-                        )
-                        Spacer()
-                            .frame(height: 80)
-                    } // VStack
-                } // builder.content
-                .sheetBackground { _ in
-                    LinearGradient(gradient: Gradient(colors: [.white, .customLightGray1]),
-                                   startPoint: .leading, endPoint: .trailing)
-                    .opacity(0.95)
-                    .blur(radius: 1)
-                }
-                .background { _ in
-                    EmptyView()
-                }
-            } // .resizableSheet
+                            Spacer()
+                        } // HStack
+                        .padding([.leading, .vertical])
 
-            // 決済リザルトのシート画面
-            .resizableSheet($inputHome.commerceHalfSheet, id: "B") {builder in
-                builder.content { _ in
+                        TagSortCards(itemVM: itemVM,
+                                     inputHome: $inputHome,
+                                     inputStock: $inputStock,
+                                     selectFilterTag: itemVM.tags[inputStock.filterTagIndex].tagName)
 
-                    CommerceSheet(itemVM: itemVM,
-                                  inputHome: $inputHome,
-                                  inputStock: $inputStock)
+                    } // ScrollView (アイテムロケーション)
 
-                } // builder.content
-                .supportedState([.medium])
-                .sheetBackground { _ in
-                    LinearGradient(gradient: Gradient(colors: [.white, .customLightGray1]),
-                                   startPoint: .leading, endPoint: .trailing)
-                    .opacity(0.95)
+                } // VStack
+            } // ZStack
+
+            // NOTE: カート内のアイテムを監視してハーフモーダルを表示
+            //       カートが空になったら、更新インフォメーションを表示
+            .onChange(of: inputStock.resultCartAmount) { [before = inputStock.resultCartAmount] after in
+
+                if before == 0 {
+                    inputHome.commerceHalfSheet = .medium
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                        inputHome.cartHalfSheet = .medium
+                    }
                 }
-                .background { _ in
-                    EmptyView()
-                }
-            } // .resizableSheet
-            .animation(.easeIn(duration: 0.2), value: inputHome.isShowSearchField)
-            .navigationTitle("Stock")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button {
-                        withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                            inputHome.isShowSystemSideMenu.toggle()
-                        }
-                        withAnimation(.easeIn(duration: 0.2)) {
-                            inputHome.sideMenuBackGround.toggle()
-                        }
-                    } label: {
-                        CircleIcon(photo: "cloth_sample1", size: getSafeArea().top - 20)
+                if after == 0 {
+                    inputHome.cartHalfSheet = .hidden
+                    inputHome.commerceHalfSheet = .hidden
+                    inputHome.basketInfomationOpacity = 0.7
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.9) {
+                        inputHome.basketInfomationOpacity = 0.0
                     }
                 }
             }
-        } // NavigationView
+            // NOTE: 入力フィールドの表示に合わせて、フォーカスを切り替えます。
+            // NOTE: 入力フィールド表示時に、指定の位置まで自動フォーカスします。
+            .onChange(of: inputHome.isShowSearchField) { newValue in
+
+                searchFocused = newValue ? .check : nil
+                if newValue == true {
+                    if inputStock.searchItemNameText == "ALL" {
+                        inputStock.searchItemNameText = ""
+                        itemVM.tags[0].tagName = "検索"
+                    }
+                }
+                if newValue == false {
+                    if inputStock.searchItemNameText == "" {
+                        inputStock.searchItemNameText = "ALL"
+                        itemVM.tags[0].tagName = "ALL"
+                    }
+                }
+
+                if newValue {
+                    withAnimation(.easeIn(duration: 2.0)) {
+                        scrollProxy.scrollTo("search", anchor: .top)
+                    }
+                    inputStock.filterTagIndex = 0 // タグを「All」に更新
+                } // if
+            } // .onChange
+
+            .onChange(of: searchFocused) { newFocus in
+                if newFocus == nil {
+                    inputHome.isShowSearchField = false
+                }
+            } // .onChange
+
+        } // ScrollViewReader
+
+        .background(LinearGradient(gradient: Gradient(colors: [.customDarkGray1,
+                                                               .customLightGray1]),
+                                   startPoint: .top, endPoint: .bottom))
+        // アイテム取引かごのシート画面
+        .resizableSheet($inputHome.cartHalfSheet, id: "A") { builder in
+            builder.content { context in
+
+                VStack {
+                    Spacer(minLength: 0)
+                    GrabBar()
+                        .foregroundColor(.black)
+                    Spacer(minLength: 0)
+
+                    HStack(alignment: .bottom) {
+                        Text("カート内のアイテム")
+                            .foregroundColor(.black)
+                            .font(.headline)
+                            .fontWeight(.black)
+                            .opacity(0.6)
+                        Spacer()
+                        Button(
+                            action: {
+                                inputStock.resultCartPrice = 0
+                                inputStock.resultCartAmount = 0
+
+                                for index in itemVM.items.indices {
+
+                                    if itemVM.items[index].amount != 0 {
+                                        itemVM.items[index].amount = 0
+                                    }
+                                }
+                            },
+                            label: {
+                                HStack {
+                                    Image(systemName: "trash.fill")
+                                    Text("全て削除")
+                                        .font(.callout)
+                                }
+                                .foregroundColor(.red)
+                            }
+                        ) // Button
+                    } // HStack
+                    .padding(.horizontal, 20)
+
+                    Spacer(minLength: 8)
+
+                    ResizableScrollView(
+                        context: context,
+                        main: {
+                            CartItemsSheet(
+                                itemVM: itemVM,
+                                inputStock: $inputStock,
+                                inputHome: $inputHome,
+                                halfSheetScroll: .main)
+                        },
+                        additional: {
+                            CartItemsSheet(
+                                itemVM: itemVM,
+                                inputStock: $inputStock,
+                                inputHome: $inputHome,
+                                halfSheetScroll: .additional)
+
+                            Spacer()
+                                .frame(height: 100)
+                        }
+                    )
+                    Spacer()
+                        .frame(height: 80)
+                } // VStack
+            } // builder.content
+            .sheetBackground { _ in
+                LinearGradient(gradient: Gradient(colors: [.white, .customLightGray1]),
+                               startPoint: .leading, endPoint: .trailing)
+                .opacity(0.95)
+                .blur(radius: 1)
+            }
+            .background { _ in
+                EmptyView()
+            }
+        } // .resizableSheet
+
+        // 決済リザルトのシート画面
+        .resizableSheet($inputHome.commerceHalfSheet, id: "B") {builder in
+            builder.content { _ in
+
+                CommerceSheet(itemVM: itemVM,
+                              inputHome: $inputHome,
+                              inputStock: $inputStock)
+
+            } // builder.content
+            .supportedState([.medium])
+            .sheetBackground { _ in
+                LinearGradient(gradient: Gradient(colors: [.white, .customLightGray1]),
+                               startPoint: .leading, endPoint: .trailing)
+                .opacity(0.95)
+            }
+            .background { _ in
+                EmptyView()
+            }
+        } // .resizableSheet
+        .animation(.easeIn(duration: 0.2), value: inputHome.isShowSearchField)
+        .navigationTitle("Stock")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button {
+                    withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+                        inputHome.isShowSystemSideMenu.toggle()
+                    }
+                    withAnimation(.easeIn(duration: 0.2)) {
+                        inputHome.sideMenuBackGround.toggle()
+                    }
+                } label: {
+                    CircleIcon(photo: "cloth_sample1", size: getSafeArea().top - 20)
+                }
+            }
+        }
+
         .onTapGesture { searchFocused = nil }
 
         // NOTE: ディスプレイのカラーモードを検知し、enumを切り替えます。

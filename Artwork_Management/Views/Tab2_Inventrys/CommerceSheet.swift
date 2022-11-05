@@ -76,20 +76,18 @@ struct CommerceSheet: View {
                         // 各アイテムデータに結果を反映
                         for index in itemVM.items.indices {
                             if itemVM.items[index].amount != 0 {
-                                print("\(index)アイテムデータ反映開始")
+                                print("index\(index)アイテムデータ反映開始")
                                 itemVM.items[index].sales += itemVM.items[index].price * itemVM.items[index].amount
                                 withAnimation(.spring(response: 0.6)) {
                                     itemVM.items[index].inventory -= itemVM.items[index].amount
                                 }
 
                                 itemVM.items[index].amount = 0
-                                print("\(index)アイテムデータ反映終了")
+                                print("index\(index)アイテムデータ反映終了")
                             }
                         }
-                        print("リザルトデータリセット開始")
                         inputStock.resultCartPrice = 0
                         inputStock.resultCartAmount = 0
-                        print("リザルトデータリセット終了")
 
                         inputHome.doCommerce = true
                     },
