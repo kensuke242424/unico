@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		E0003D0328FD3BB0007308B0 /* TagTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0003D0228FD3BB0007308B0 /* TagTitle.swift */; };
 		E01AA3A32916C674000FCD37 /* TagModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E01AA3A22916C674000FCD37 /* TagModel.swift */; };
+		E01AA3A129167F02000FCD37 /* ResizableSheet in Frameworks */ = {isa = PBXBuildFile; productRef = E01AA3A029167F02000FCD37 /* ResizableSheet */; };
 		E04ACF4128E6DD600054A6C4 /* ShowsItemDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04ACF4028E6DD600054A6C4 /* ShowsItemDetail.swift */; };
 		E04ACF4328E73C660054A6C4 /* IndicatorRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04ACF4228E73C660054A6C4 /* IndicatorRow.swift */; };
 		E05130E228F341620092FE46 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E05130E128F341610092FE46 /* RootView.swift */; };
@@ -29,14 +30,12 @@
 		E094F10028E20F1000D3C845 /* LogInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E094F0FF28E20F1000D3C845 /* LogInView.swift */; };
 		E094F10228E21EBA00D3C845 /* FirstSignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E094F10128E21EBA00D3C845 /* FirstSignInView.swift */; };
 		E09F09BC28EAF33500D07669 /* FocusedLineRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09F09BB28EAF33500D07669 /* FocusedLineRow.swift */; };
-		E09F09C128EC4A1800D07669 /* ResizableSheet in Frameworks */ = {isa = PBXBuildFile; productRef = E09F09C028EC4A1800D07669 /* ResizableSheet */; };
 		E09F09C528ED5DEA00D07669 /* SideMenuEditTagView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09F09C428ED5DEA00D07669 /* SideMenuEditTagView.swift */; };
 		E09F09C728EE266600D07669 /* InputFormTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09F09C628EE266500D07669 /* InputFormTitle.swift */; };
 		E09F09C928EE3B4900D07669 /* UsefulButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09F09C828EE3B4900D07669 /* UsefulButton.swift */; };
 		E09F09CB28EFEA8700D07669 /* SelectItemPhotoArea.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09F09CA28EFEA8600D07669 /* SelectItemPhotoArea.swift */; };
 		E09F09CE28F146DB00D07669 /* EditItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09F09CD28F146DB00D07669 /* EditItemView.swift */; };
 		E0A36452290A37A600B30A14 /* CustomArcShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0A36451290A37A600B30A14 /* CustomArcShape.swift */; };
-		E0A614802910E46A0020D043 /* DateFormatterExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0A6147F2910E46A0020D043 /* DateFormatterExtension.swift */; };
 		E0A7DE4B290B9E0A008C3F3F /* ShowItemPhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0A7DE4A290B9E09008C3F3F /* ShowItemPhoto.swift */; };
 		E0A7DE4E290C289A008C3F3F /* CircleIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0A7DE4D290C289A008C3F3F /* CircleIcon.swift */; };
 		E0A7DE50290DAB40008C3F3F /* BlurView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0A7DE4F290DAB40008C3F3F /* BlurView.swift */; };
@@ -106,7 +105,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E09F09C128EC4A1800D07669 /* ResizableSheet in Frameworks */,
+				E01AA3A129167F02000FCD37 /* ResizableSheet in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -311,7 +310,7 @@
 			);
 			name = Artwork_Management;
 			packageProductDependencies = (
-				E09F09C028EC4A1800D07669 /* ResizableSheet */,
+				E01AA3A029167F02000FCD37 /* ResizableSheet */,
 			);
 			productName = Artwork_Management;
 			productReference = E08F272128DDA08E00329C5E /* Artwork_Management.app */;
@@ -342,7 +341,7 @@
 			);
 			mainGroup = E08F271828DDA08E00329C5E;
 			packageReferences = (
-				E09F09BF28EC4A1800D07669 /* XCRemoteSwiftPackageReference "ResizableSheet" */,
+				E01AA39F29167F02000FCD37 /* XCRemoteSwiftPackageReference "ResizableSheet" */,
 			);
 			productRefGroup = E08F272228DDA08E00329C5E /* Products */;
 			projectDirPath = "";
@@ -397,7 +396,6 @@
 				E01AA3A32916C674000FCD37 /* TagModel.swift in Sources */,
 				E08F273C28DDB61A00329C5E /* LibraryView.swift in Sources */,
 				E08F273828DDB51600329C5E /* ManageView.swift in Sources */,
-				E0A614802910E46A0020D043 /* DateFormatterExtension.swift in Sources */,
 				E0796AD728F485850094E50C /* ButtonViewModel.swift in Sources */,
 				E04ACF4328E73C660054A6C4 /* IndicatorRow.swift in Sources */,
 				E09F09BC28EAF33500D07669 /* FocusedLineRow.swift in Sources */,
@@ -415,6 +413,7 @@
 				E05130E228F341620092FE46 /* RootView.swift in Sources */,
 				E08F272528DDA08E00329C5E /* Artwork_ManagementApp.swift in Sources */,
 				E09F09C528ED5DEA00D07669 /* SideMenuEditTagView.swift in Sources */,
+				E01AA39E29167B28000FCD37 /* DateFormatterExtension.swift in Sources */,
 				E0796ADD28F5F2830094E50C /* CartItemsSheet.swift in Sources */,
 				E094F10028E20F1000D3C845 /* LogInView.swift in Sources */,
 				E0003D0328FD3BB0007308B0 /* TagTitle.swift in Sources */,
@@ -634,20 +633,20 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		E09F09BF28EC4A1800D07669 /* XCRemoteSwiftPackageReference "ResizableSheet" */ = {
+		E01AA39F29167F02000FCD37 /* XCRemoteSwiftPackageReference "ResizableSheet" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/mtj0928/ResizableSheet.git";
 			requirement = {
-				branch = 0.0.5;
+				branch = main;
 				kind = branch;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		E09F09C028EC4A1800D07669 /* ResizableSheet */ = {
+		E01AA3A029167F02000FCD37 /* ResizableSheet */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E09F09BF28EC4A1800D07669 /* XCRemoteSwiftPackageReference "ResizableSheet" */;
+			package = E01AA39F29167F02000FCD37 /* XCRemoteSwiftPackageReference "ResizableSheet" */;
 			productName = ResizableSheet;
 		};
 /* End XCSwiftPackageProductDependency section */

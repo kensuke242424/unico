@@ -8,6 +8,13 @@
 import SwiftUI
 import ResizableSheet
 
+
+// NOTE: アイテムの「追加」「更新」を管理します
+enum EditStatus {
+    case create
+    case update
+}
+
 struct InputHome {
     var homeTabIndex: Int = 0
     var actionItemIndex: Int = 0
@@ -130,7 +137,7 @@ struct HomeTabView: View {
 
             // Open TagSideMenu...
             SideMenuEditTagView(itemVM: rootItemVM, inputHome: $inputHome, inputTag: $inputTag,
-                                defaultTag: inputTag.tagSideMenuStatus == .create ? nil : inputSideMenu.selectTag)
+                                defaultTag: inputTag.tagSideMenuStatus == .create ? nil : inputSideMenu.selectTag, tagSideMenuStatus: inputTag.tagSideMenuStatus)
             .offset(x: inputHome.isOpenEditTagSideMenu ? UIScreen.main.bounds.width / 2 - 25 : UIScreen.main.bounds.width + 10)
 
         } // ZStack

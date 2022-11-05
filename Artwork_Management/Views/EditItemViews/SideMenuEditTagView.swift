@@ -30,17 +30,6 @@ struct SideMenuEditTagView: View {
     let tagSideMenuStatus: EditStatus
 
     @FocusState var focusedField: EditTagField?
-
-    // NOTE: サイドタグメニューの入力値を構造体化
-    struct InputTagSideMenu {
-        var newTagNameText: String = ""
-        var disableButton: Bool = true
-        var selectionSideMenuTagColor: UsedColor = .red
-        var overlapTagNameAlert: Bool = false
-        var updateTagErrorAlert: Bool = false
-        // NOTE: 初期値として画面横幅分をoffset(x)軸に渡すことで、呼び出されるまでの間、画面外へ除いておく
-    }
-    @State private var inputTag: InputTagSideMenu = InputTagSideMenu()
     @GestureState var dragOffset: CGFloat = 0.0
 
     let screenSize = UIScreen.main.bounds
@@ -310,7 +299,7 @@ struct SideMenuNewTagView_Previews: PreviewProvider {
             itemVM: ItemViewModel(),
             inputHome: .constant(InputHome()),
             inputTag: .constant(InputTagSideMenu()),
-            defaultTag: Tag(tagName: "テストタグ", tagColor: .green)
-        )
+            defaultTag: Tag(tagName: "テストタグ", tagColor: .green),
+            tagSideMenuStatus: .create)
     }
 }

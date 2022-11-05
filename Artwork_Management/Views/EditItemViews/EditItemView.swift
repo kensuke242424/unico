@@ -30,7 +30,7 @@ struct EditItemView: View {
     let itemIndex: Int
     let passItemData: Item?
 
-    // NOTE: enum「Status」を用いて、「.create」と「.update」とでViewレイアウトを分岐します。
+    // NOTE: enum「EditStatus」を用いて、「.create」と「.update」とでViewレイアウトを分岐します。
     let editItemStatus: EditStatus
 
     // NOTE: ＠Stateの入力プロパティを構造体化
