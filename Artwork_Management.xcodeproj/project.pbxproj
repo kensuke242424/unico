@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		E0003D0328FD3BB0007308B0 /* TagTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0003D0228FD3BB0007308B0 /* TagTitle.swift */; };
+		E01AA3A32916C674000FCD37 /* TagModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E01AA3A22916C674000FCD37 /* TagModel.swift */; };
 		E04ACF4128E6DD600054A6C4 /* ShowsItemDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04ACF4028E6DD600054A6C4 /* ShowsItemDetail.swift */; };
 		E04ACF4328E73C660054A6C4 /* IndicatorRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04ACF4228E73C660054A6C4 /* IndicatorRow.swift */; };
 		E05130E228F341620092FE46 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E05130E128F341610092FE46 /* RootView.swift */; };
@@ -52,6 +53,7 @@
 
 /* Begin PBXFileReference section */
 		E0003D0228FD3BB0007308B0 /* TagTitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagTitle.swift; sourceTree = "<group>"; };
+		E01AA3A22916C674000FCD37 /* TagModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagModel.swift; sourceTree = "<group>"; };
 		E04ACF4028E6DD600054A6C4 /* ShowsItemDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowsItemDetail.swift; sourceTree = "<group>"; };
 		E04ACF4228E73C660054A6C4 /* IndicatorRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndicatorRow.swift; sourceTree = "<group>"; };
 		E05130E128F341610092FE46 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
@@ -192,8 +194,9 @@
 		E08F273428DDB3CA00329C5E /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				E0CF7EEF28DF152D00735142 /* ItemModel.swift */,
 				E0CC79B528E761EA00CE0B19 /* UserModel.swift */,
+				E0CF7EEF28DF152D00735142 /* ItemModel.swift */,
+				E01AA3A22916C674000FCD37 /* TagModel.swift */,
 				E0796AD428F4850D0094E50C /* ButtonModel.swift */,
 			);
 			path = Models;
@@ -376,6 +379,7 @@
 				E09F09C728EE266600D07669 /* InputFormTitle.swift in Sources */,
 				E0CF7EF828DF7BFA00735142 /* SystemListView.swift in Sources */,
 				E04ACF4128E6DD600054A6C4 /* ShowsItemDetail.swift in Sources */,
+				E01AA3A32916C674000FCD37 /* TagModel.swift in Sources */,
 				E08F273C28DDB61A00329C5E /* LibraryView.swift in Sources */,
 				E08F273828DDB51600329C5E /* ManageView.swift in Sources */,
 				E0A614802910E46A0020D043 /* DateFormatterExtension.swift in Sources */,

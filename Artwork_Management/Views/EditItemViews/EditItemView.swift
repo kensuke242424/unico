@@ -201,9 +201,12 @@ struct EditItemView: View {
                                                      name: input.editItemName,
                                                      detail: input.editItemDetail != "" ? input.editItemDetail : "none.",
                                                      photo: "", // Todo: 写真取り込み実装後、変更
+                                                     cost: 1000,
                                                      price: Int(input.editItemPrice) ?? 0,
                                                      sales: 0,
                                                      inventory: Int(input.editItemInventry) ?? 0,
+                                                     totalAmount: 0,
+                                                     totalInventory: 0,
                                                      createTime: Date(), // Todo: Timestamp実装後、変更
                                                      updateTime: Date())) // Todo: Timestamp実装後、変更
 
@@ -212,20 +215,16 @@ struct EditItemView: View {
                             }
 
                         case .update:
-                            // NOTE: テストデータに情報の変更を保存
-                            let updateItemSource = Item(tag: input.selectionTagName,
-                                                        tagColor: input.selectionTagColor.text,
-                                                        name: input.editItemName,
-                                                        detail: input.editItemDetail != "" ? input.editItemDetail : "none.",
-                                                        photo: "", // Todo: 写真取り込み実装後、変更
-                                                        price: Int(input.editItemPrice) ?? 0,
-                                                        sales: Int(input.editItemSales) ?? 0,
-                                                        inventory: Int(input.editItemInventry) ?? 0,
-                                                        createTime: Date(), // Todo: Timestamp実装後、変更
-                                                        updateTime: Date()) // Todo: Timestamp実装後、変更
 
-                            // NOTE: アイテムを更新
-                            itemVM.items[itemIndex] = updateItemSource
+                            itemVM.items[itemIndex].tag = input.selectionTagName
+                            itemVM.items[itemIndex].tagColor = input.selectionTagColor.text
+                            itemVM.items[itemIndex].name = input.editItemName
+                            itemVM.items[itemIndex].detail = input.editItemDetail != "" ? input.editItemDetail : "none."
+                            itemVM.items[itemIndex].photo = "" // Todo: 写真取り込み実装後、変更
+                            itemVM.items[itemIndex].price = Int(input.editItemPrice) ?? 0
+                            itemVM.items[itemIndex].sales = Int(input.editItemSales) ?? 0
+                            itemVM.items[itemIndex].inventory = Int(input.editItemInventry) ?? 0
+
                             print("更新されたアイテム: \(itemVM.items[itemIndex])")
 
                         } // switch editItemStatus(データ追加、更新)
