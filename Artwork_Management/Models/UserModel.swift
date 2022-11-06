@@ -12,4 +12,5 @@ struct User: Identifiable {
     var name: String
     var address: String
     var password: String
+    var photoURL: String
 }

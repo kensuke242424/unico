@@ -142,9 +142,6 @@ struct FirstLogInView_Previews: PreviewProvider {
     static var previews: some View {
 
         FirstSignInView(logInNavigationPath: .constant([]),
-                        testUser: User(name: "中川賢亮",
-                                    address: "kennsuke242424@gmail.com",
-                                    password: "ninnzinn2424")
-        )
+                        testUser: TestUser().testUser)
     }
 }

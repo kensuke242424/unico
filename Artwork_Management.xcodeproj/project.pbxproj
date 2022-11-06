@@ -10,6 +10,11 @@
 		E0003D0328FD3BB0007308B0 /* TagTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0003D0228FD3BB0007308B0 /* TagTitle.swift */; };
 		E01AA3A129167F02000FCD37 /* ResizableSheet in Frameworks */ = {isa = PBXBuildFile; productRef = E01AA3A029167F02000FCD37 /* ResizableSheet */; };
 		E01AA3A32916C674000FCD37 /* TagModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E01AA3A22916C674000FCD37 /* TagModel.swift */; };
+		E01AA3A529176FE7000FCD37 /* PHPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E01AA3A429176FE7000FCD37 /* PHPickerView.swift */; };
+		E01AA3A729177A76000FCD37 /* UserViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E01AA3A629177A76000FCD37 /* UserViewModel.swift */; };
+		E01AA3A9291780DD000FCD37 /* UIImageExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E01AA3A8291780DD000FCD37 /* UIImageExtension.swift */; };
+		E01AA3AB291780ED000FCD37 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E01AA3AA291780ED000FCD37 /* StringExtension.swift */; };
+		E01AA3AD2917AD4C000FCD37 /* ViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E01AA3AC2917AD4C000FCD37 /* ViewExtension.swift */; };
 		E04ACF4128E6DD600054A6C4 /* ShowsItemDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04ACF4028E6DD600054A6C4 /* ShowsItemDetail.swift */; };
 		E04ACF4328E73C660054A6C4 /* IndicatorRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04ACF4228E73C660054A6C4 /* IndicatorRow.swift */; };
 		E05130E228F341620092FE46 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E05130E128F341610092FE46 /* RootView.swift */; };
@@ -55,6 +60,11 @@
 /* Begin PBXFileReference section */
 		E0003D0228FD3BB0007308B0 /* TagTitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagTitle.swift; sourceTree = "<group>"; };
 		E01AA3A22916C674000FCD37 /* TagModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagModel.swift; sourceTree = "<group>"; };
+		E01AA3A429176FE7000FCD37 /* PHPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PHPickerView.swift; sourceTree = "<group>"; };
+		E01AA3A629177A76000FCD37 /* UserViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserViewModel.swift; sourceTree = "<group>"; };
+		E01AA3A8291780DD000FCD37 /* UIImageExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageExtension.swift; sourceTree = "<group>"; };
+		E01AA3AA291780ED000FCD37 /* StringExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
+		E01AA3AC2917AD4C000FCD37 /* ViewExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewExtension.swift; sourceTree = "<group>"; };
 		E04ACF4028E6DD600054A6C4 /* ShowsItemDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowsItemDetail.swift; sourceTree = "<group>"; };
 		E04ACF4228E73C660054A6C4 /* IndicatorRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndicatorRow.swift; sourceTree = "<group>"; };
 		E05130E128F341610092FE46 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
@@ -126,6 +136,10 @@
 				E05FE94428F71BFB00263F98 /* ColorExtension.swift */,
 				E0CB9DCA2913964F00D95C54 /* ViewExtension.swift */,
 				E0F78FC32919F06D00A95CD1 /* DateFormatterExtension.swift */,
+				E0A6147F2910E46A0020D043 /* DateFormatterExtension.swift */,
+				E01AA3A8291780DD000FCD37 /* UIImageExtension.swift */,
+				E01AA3AA291780ED000FCD37 /* StringExtension.swift */,
+				E01AA3AC2917AD4C000FCD37 /* ViewExtension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -199,6 +213,7 @@
 			isa = PBXGroup;
 			children = (
 				E0DE98D728E2DBB800471AB4 /* LogInViewModel.swift */,
+				E01AA3A629177A76000FCD37 /* UserViewModel.swift */,
 				E0CF7EF128DF166700735142 /* ItemViewModel.swift */,
 				E0796AD628F485850094E50C /* ButtonViewModel.swift */,
 			);
@@ -287,6 +302,7 @@
 			children = (
 				E0A7DE4A290B9E09008C3F3F /* ShowItemPhoto.swift */,
 				E0A7DE4D290C289A008C3F3F /* CircleIcon.swift */,
+				E01AA3A429176FE7000FCD37 /* PHPickerView.swift */,
 			);
 			path = PhotoViews;
 			sourceTree = "<group>";
@@ -394,7 +410,11 @@
 				E04ACF4128E6DD600054A6C4 /* ShowsItemDetail.swift in Sources */,
 				E01AA3A32916C674000FCD37 /* TagModel.swift in Sources */,
 				E08F273C28DDB61A00329C5E /* LibraryView.swift in Sources */,
+				E01AA3A9291780DD000FCD37 /* UIImageExtension.swift in Sources */,
 				E08F273828DDB51600329C5E /* ManageView.swift in Sources */,
+				E01AA3A529176FE7000FCD37 /* PHPickerView.swift in Sources */,
+				E0A614802910E46A0020D043 /* DateFormatterExtension.swift in Sources */,
+				E01AA3AB291780ED000FCD37 /* StringExtension.swift in Sources */,
 				E0796AD728F485850094E50C /* ButtonViewModel.swift in Sources */,
 				E04ACF4328E73C660054A6C4 /* IndicatorRow.swift in Sources */,
 				E09F09BC28EAF33500D07669 /* FocusedLineRow.swift in Sources */,
@@ -406,6 +426,7 @@
 				E0CF7EF028DF152D00735142 /* ItemModel.swift in Sources */,
 				E0CB9DCB2913964F00D95C54 /* ViewExtension.swift in Sources */,
 				E0A7DE4E290C289A008C3F3F /* CircleIcon.swift in Sources */,
+				E01AA3AD2917AD4C000FCD37 /* ViewExtension.swift in Sources */,
 				E0796AE328F6D77A0094E50C /* CommerceSheet.swift in Sources */,
 				E0A7DE4B290B9E0A008C3F3F /* ShowItemPhoto.swift in Sources */,
 				E08F273E28DDB65F00329C5E /* HomeTabView.swift in Sources */,
@@ -422,6 +443,7 @@
 				E08F273A28DDB53700329C5E /* SystemView.swift in Sources */,
 				E0CC79B628E761EA00CE0B19 /* UserModel.swift in Sources */,
 				E0A36452290A37A600B30A14 /* CustomArcShape.swift in Sources */,
+				E01AA3A729177A76000FCD37 /* UserViewModel.swift in Sources */,
 				E0CF7EF628DF6E6F00735142 /* AccountIconView.swift in Sources */,
 				E09F09CE28F146DB00D07669 /* EditItemView.swift in Sources */,
 				E0CF7EEC28DEEED700735142 /* LibraryListView.swift in Sources */,

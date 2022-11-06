@@ -29,7 +29,8 @@ struct LogInView: View {
     // テスト用のダミーデータです。
     let testUser: User = User(name: "中川賢亮",
                               address: "kennsuke242424@gmail.com",
-                              password: "ninnzinn2424"
+                              password: "ninnzinn2424",
+                              photoURL: ""
     ) // testUser
 
     var body: some View {

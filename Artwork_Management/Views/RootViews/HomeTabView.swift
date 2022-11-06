@@ -18,6 +18,8 @@ struct InputHome {
     var homeTabIndex: Int = 0
     var actionItemIndex: Int = 0
     var editItemStatus: EditStatus = .create
+    var selectImage: UIImage = UIImage()
+    var tabIndex = 0
     var itemsInfomationOpacity: CGFloat = 0.0
     var basketInfomationOpacity: CGFloat = 0.0
     var isShowItemDetail: Bool = false
@@ -27,6 +29,7 @@ struct InputHome {
     var isShowSystemSideMenu: Bool = false
     var editTagSideMenuBackground: Bool = false
     var sideMenuBackGround: Bool = false
+    var isShowSelectImageSheet: Bool = false
     var doCommerce: Bool = false
     var cartHalfSheet: ResizableSheetState = .hidden
     var commerceHalfSheet: ResizableSheetState = .hidden
@@ -34,6 +37,7 @@ struct InputHome {
 
 struct HomeTabView: View {
 
+    @StateObject var userVM = UserViewModel()
     @StateObject var rootItemVM = ItemViewModel()
     @State private var inputHome: InputHome = InputHome()
     @State private var inputSideMenu: InputSideMenu = InputSideMenu()

@@ -58,7 +58,7 @@ struct LibraryView: View {
 
             VStack {
 
-                homeHeaderPhoto(photo: "homePhoto_sample", userIcon: "cloth_sample1")
+                homeHeaderPhoto(photo: inputHome.selectImage, userIcon: "cloth_sample1")
                     // Todo: ホームレイアウトのカスタム
                     .overlay(alignment: .bottomTrailing) {
                         Menu {
@@ -226,9 +226,9 @@ struct LibraryView: View {
     } // body
 
     @ViewBuilder
-    func homeHeaderPhoto(photo: String, userIcon: String) -> some View {
+    func homeHeaderPhoto(photo: UIImage, userIcon: String) -> some View {
 
-        Image(photo)
+        Image(uiImage: photo)
             .resizable()
             .frame(height: UIScreen.main.bounds.height * 0.35)
             .clipped()
@@ -259,6 +259,7 @@ struct LibraryView: View {
                 if inputLibrary.isShowHeaderPhotoInfomation {
                     Button {
                         // Todo: 画像変更処理
+                        inputHome.isShowSelectImageSheet.toggle()
                     } label: {
                         Image(systemName: "photo.on.rectangle.angled")
                             .foregroundColor(.white)
