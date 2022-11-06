@@ -24,6 +24,7 @@ struct PHPickerView: UIViewControllerRepresentable {
 
             guard let result = results.first else {
                 print("Error: guard let result = results.first")
+                self.parent.isShowSheet = false
                 return
             }
 
