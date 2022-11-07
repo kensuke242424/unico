@@ -97,24 +97,20 @@ struct HomeTabView: View {
             if newTabIndex == 0 || newTabIndex == 1 {
                 if rootItemVM.tags.contains(where: {$0.tagName == "ALL"}) { return }
                 rootItemVM.tags.insert(Tag(tagName: "ALL", tagColor: .gray), at: 0)
-                print("ALLタグを追加")
             }
             if newTabIndex == 2 || newTabIndex == 3 || inputHome.isPresentedEditItem {
                 rootItemVM.tags.removeAll(where: {$0.tagName == "ALL"})
-                print("ALLタグを削除")
             }
         } // .onChange
 
         .onChange(of: inputHome.isPresentedEditItem) { present in
             if present {
                 rootItemVM.tags.removeAll(where: { $0.tagName == "ALL" })
-                print("ALLタグを削除")
             } else {
                 if rootItemVM.tags.contains(where: {$0.tagName == "ALL"}) { return }
 
                 if inputHome.tabIndex == 0 || inputHome.tabIndex == 1 {
                     rootItemVM.tags.insert(Tag(tagName: "ALL", tagColor: .gray), at: 0)
-                    print("ALLタグを追加")
                 }
             }
         }

@@ -14,23 +14,23 @@ class ItemViewModel: ObservableObject {
      @Published var items: [Item] =
     [
         Item(tag: "Clothes", tagColor: "赤", name: "カッターシャツ(白)", detail: "シャツ(白)のアイテム紹介テキストです。", photo: "cloth_sample1",
-             price: 2800, sales: 128000, inventory: 2, createTime: Date(), updateTime: Date()),
+             cost: 1000, price: 2800, sales: 128000, inventory: 2, totalAmount: 150, totalInventory: 250, createTime: Date(), updateTime: Date()),
         Item(tag: "Clothes", tagColor: "赤", name: "トップス(黒)", detail: "トップス(黒)のアイテム紹介テキストです。", photo: "cloth_sample2",
-             price: 3800, sales: 80000, inventory: 4, createTime: Date(), updateTime: Date()),
+             cost: 1000, price: 3800, sales: 80000, inventory: 4, totalAmount: 150, totalInventory: 250, createTime: Date(), updateTime: Date()),
         Item(tag: "Clothes", tagColor: "赤", name: "Tシャツ(黒)", detail: "Tシャツ(黒)のアイテム紹介テキストです。", photo: "cloth_sample4",
-             price: 3200, sales: 107000, inventory: 402, createTime: Date(), updateTime: Date()),
+             cost: 1000, price: 3200, sales: 107000, inventory: 402, totalAmount: 150, totalInventory: 250, createTime: Date(), updateTime: Date()),
         Item(tag: "Shoes", tagColor: "青", name: "シューズ(灰)", detail: "シューズ1のアイテム紹介テキストです。", photo: "shoes_sample1",
-             price: 8800, sales: 182000, inventory: 199, createTime: Date(), updateTime: Date()),
+             cost: 1000, price: 8800, sales: 182000, inventory: 199, totalAmount: 150, totalInventory: 250, createTime: Date(), updateTime: Date()),
         Item(tag: "Shoes", tagColor: "青", name: "シューズ(赤)", detail: "シューズ2のアイテム紹介テキストです。", photo: "shoes_sample2",
-             price: 13100, sales: 105000, inventory: 43, createTime: Date(), updateTime: Date()),
+             cost: 1000, price: 13100, sales: 105000, inventory: 43, totalAmount: 150, totalInventory: 250, createTime: Date(), updateTime: Date()),
         Item(tag: "Shoes", tagColor: "青", name: "シューズ(白)", detail: "シューズ3のアイテム紹介テキストです。", photo: "shoes_sample3",
-             price: 10700, sales: 185000, inventory: 97, createTime: Date(), updateTime: Date()),
+             cost: 1000, price: 10700, sales: 185000, inventory: 97, totalAmount: 150, totalInventory: 250, createTime: Date(), updateTime: Date()),
         Item(tag: "Goods", tagColor: "黄", name: "オリジナルキャップ", detail: "グッズ「オリジナルキャップ」のアイテム紹介テキストです。", photo: "goods_sample6",
-             price: 4300, sales: 59000, inventory: 88, createTime: Date(), updateTime: Date()),
+             cost: 1000, price: 4300, sales: 59000, inventory: 88, totalAmount: 150, totalInventory: 250, createTime: Date(), updateTime: Date()),
         Item(tag: "Goods", tagColor: "黄", name: "トートバッグ(黒)", detail: "グッズ「トートバッグ」のアイテム紹介テキストです。", photo: "goods_sample5",
-             price: 2500, sales: 39000, inventory: 105, createTime: Date(), updateTime: Date()),
+             cost: 1000, price: 2500, sales: 39000, inventory: 105, totalAmount: 150, totalInventory: 250, createTime: Date(), updateTime: Date()),
         Item(tag: "Goods", tagColor: "黄", name: "マグカップ", detail: "グッズ「マグカップ」のアイテム紹介テキストです。", photo: "goods_sample3",
-             price: 2000, sales: 22000, inventory: 97, createTime: Date(), updateTime: Date())
+             cost: 1000, price: 2000, sales: 22000, inventory: 97, totalAmount: 150, totalInventory: 250, createTime: Date(), updateTime: Date())
     ]
 
     @Published var tags: [Tag] =
@@ -135,9 +135,12 @@ struct TestItem {
                               name: "カッターシャツ(白)",
                               detail: "シャツ(白)のアイテム紹介テキストです。",
                               photo: "cloth_sample1",
+                              cost: 1000,
                               price: 2800,
                               sales: 128000,
                               inventory: 2,
+                              totalAmount: 120,
+                              totalInventory: 200,
                               createTime: Date(),
                               updateTime: Date())
 }
