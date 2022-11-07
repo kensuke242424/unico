@@ -42,7 +42,7 @@ struct InputHome {
 struct HomeTabView: View {
 
     @StateObject var userVM = UserViewModel()
-    @StateObject var rootItemVM = ItemViewModel()
+    @StateObject var itemVM = ItemViewModel()
     @State private var inputHome: InputHome = InputHome()
     @State private var inputSideMenu: InputSideMenu = InputSideMenu()
     @State private var inputTag: InputTagSideMenu = InputTagSideMenu()
@@ -55,7 +55,7 @@ struct HomeTabView: View {
 
             TabView(selection: $inputHome.homeTabIndex) {
 
-                LibraryView(itemVM: rootItemVM, inputHome: $inputHome,
+                LibraryView(itemVM: itemVM, inputHome: $inputHome,
                             headerImage: userVM.users[0].headerImage.toImage())
                     .tabItem {
                         Image(systemName: "house")
@@ -63,7 +63,7 @@ struct HomeTabView: View {
                     }
                     .tag(0)
 
-                StockView(itemVM: rootItemVM, inputHome: $inputHome)
+                StockView(itemVM: itemVM, inputHome: $inputHome)
                     .tabItem {
                         Image(systemName: "shippingbox.fill")
                         Text("inventory")
@@ -170,7 +170,7 @@ struct HomeTabView: View {
         }
 
         .sheet(isPresented: $inputHome.isShowSelectImageSheet) {
-            PHPickerView(editImage: $inputHome.selectUpdateImage, isShowSheet: $inputHome.isShowSelectImageSheet)
+            PHPickerView(selectImage: $inputHome.selectUpdateImage, isShowSheet: $inputHome.isShowSelectImageSheet)
         }
 
         // convert UIImage ⇨ base64String...

@@ -41,6 +41,10 @@ struct InputTime {
 
 struct LibraryView: View {
 
+    enum HeaderImageSize {
+        case fit, fill
+    }
+
     @StateObject var itemVM: ItemViewModel
     @Binding var inputHome: InputHome
     let headerImage: UIImage?
@@ -48,6 +52,7 @@ struct LibraryView: View {
     @GestureState private var dragOffset: CGFloat = 0
     @State private var inputLibrary: InputLibrary = InputLibrary()
     @State private var inputTime: InputTime = InputTime()
+    @State private var headerImageSize: HeaderImageSize = .fit
 
     var body: some View {
 
@@ -282,33 +287,118 @@ struct LibraryView: View {
     @ViewBuilder
     func homeHeaderPhoto(photo: UIImage?, userIcon: String) -> some View {
 
-        if let photo = photo {
-            Image(uiImage: photo)
-                .resizable()
-                .scaledToFit()
+        Group {
+            if let photo = photo {
+                Group {
+                    switch headerImageSize {
+                    case .fit:
+                        Image(uiImage: photo)
+                            .resizable()
+                            .scaledToFit()
+                    case .fill:
+                        Image(uiImage: photo)
+                            .resizable()
+                            .scaledToFill()
+                    }
+                }
                 .frame(width: getRect().width, height: getRect().height * 0.35)
                 .clipped()
                 .shadow(radius: 5, x: 0, y: 10)
 
-        } else {
-            VStack {
-                Text("写真を選択しましょう")
-                    .foregroundColor(.white.opacity(0.3))
+            } else {
+                VStack {
+                    Text("写真を選択しましょう")
+                        .foregroundColor(.white.opacity(0.3))
+
+                    Button {
+                        // Todo: 画像変更処理
+                        inputHome.editImageStatus = .header
+                        inputHome.isShowSelectImageSheet.toggle()
+                    } label: {
+                        Image(systemName: "photo.on.rectangle.angled")
+                            .foregroundColor(.white.opacity(0.8))
+                            .padding(.top, 30)
+                    }
+                }
+                .frame(width: getRect().width, height: getRect().height * 0.35)
+
+            } // if let photo
+        }
+        .overlay {
+
+            LinearGradient(gradient: Gradient(colors: [.clear, .black.opacity(0.2)]),
+                           startPoint: .top, endPoint: .bottom)
+            .shadow(radius: 5, x: 0, y: 10)
+            .opacity(inputLibrary.isShowHeaderPhotoInfomation ? 0.7 : 0.0)
+
+        } // overlay
+
+        .overlay(alignment: .topLeading) {
+            Button {
+                inputLibrary.isShowHeaderPhotoInfomation.toggle()
+            } label: {
+                CircleIcon(photo: "cloth_sample1", size: 35)
+                    .offset(y: getSafeArea().top)
+                    .opacity(inputLibrary.isShowHeaderPhotoInfomation || photo == nil ? 1.0 : 0.0)
+            }
+        } // overlay
+
+        .overlay(alignment: .bottomTrailing) {
+
+            Menu {
+                Menu("サイズ調整") {
+                    Button {
+                        withAnimation(.spring()) { headerImageSize = .fit }
+                    } label: {
+                        Label(headerImageSize == .fit ? "Fit  　　     ✔︎" : "Fit", systemImage: "crop")
+                    }
+                    Button {
+                        withAnimation(.spring()) { headerImageSize = .fill }
+                    } label: {
+                        Label(headerImageSize == .fill ? "Full        ✔︎" : "Full", systemImage: "rectangle.dashed")
+                    }
+                }
 
                 Button {
-                    // Todo: 画像変更処理
                     inputHome.editImageStatus = .header
                     inputHome.isShowSelectImageSheet.toggle()
                 } label: {
-                    Image(systemName: "photo.on.rectangle.angled")
-                        .foregroundColor(.white.opacity(0.8))
-                        .padding(.top, 30)
+                    Label("写真を選択", systemImage: "photo")
                 }
+
+            } label: {
+                Image(systemName: "photo.on.rectangle.angled")
+                    .font(.title3)
+                    .foregroundColor(.white.opacity(0.8))
+                    .padding(.top, 30)
+            } // Menu
+            .padding()
+            .opacity(inputLibrary.isShowHeaderPhotoInfomation ? 1.0 : 0.0)
+        } // overlay
+
+        .onTapGesture {
+            withAnimation(.easeIn(duration: 0.2)) {
+                inputLibrary.isShowHeaderPhotoInfomation.toggle()
             }
-            .frame(width: getRect().width, height: getRect().height * 0.35)
+        }
+        // Todo: ホームレイアウトのカスタム
+        .overlay(alignment: .bottomTrailing) {
+            Menu {
+                Button {
 
-        } // if let photo
+                } label: {
+                    Text("準備中")
+                }
+            } label: {
 
+                Image(systemName: "gearshape.2")
+                    .foregroundColor(.white).opacity(0.5)
+                    .padding(.trailing)
+
+            } // Menu
+            .offset(y: 40)
+        } // overlay
+        .ignoresSafeArea()
     } // homeHeaderPhoto
 
     func homeItemPhotoPanel() -> some View {
