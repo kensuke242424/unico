@@ -317,6 +317,7 @@ struct LibraryView: View {
                 VStack {
                     Text("写真を選択しましょう")
                         .foregroundColor(.white.opacity(0.3))
+                        .offset(y: 20)
 
                     Button {
                         // Todo: 画像変更処理
@@ -327,6 +328,7 @@ struct LibraryView: View {
                             .foregroundColor(.white.opacity(0.8))
                             .padding(.top, 30)
                     }
+                    .offset(y: 20)
                 }
                 .frame(width: getRect().width, height: getRect().height * 0.35)
             } // if let photo
@@ -403,7 +405,7 @@ struct LibraryView: View {
                     .padding(.trailing)
 
             } // Menu
-            .offset(y: 40)
+            .offset(y: 50)
         } // overlay
         .ignoresSafeArea()
     } // homeHeaderPhoto
