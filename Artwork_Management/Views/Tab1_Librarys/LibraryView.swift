@@ -211,7 +211,15 @@ struct LibraryView: View {
                 Spacer()
 
             } // VStack
+<<<<<<< HEAD
             .ignoresSafeArea()
+=======
+            .offset(y: -getSafeArea().top)
+            .background(
+                LinearGradient(gradient: Gradient(colors: [.customDarkGray1, .customLightGray1]),
+                               startPoint: .top, endPoint: .bottom)
+            )
+>>>>>>> 1b85594 (微修正)
 
             CustomArcShape()
                 .ignoresSafeArea()
@@ -321,9 +329,8 @@ struct LibraryView: View {
                     }
                 }
                 .frame(width: getRect().width, height: getRect().height * 0.35)
-
             } // if let photo
-        }
+        } // Group
         .overlay {
 
             LinearGradient(gradient: Gradient(colors: [.clear, .black.opacity(0.2)]),
