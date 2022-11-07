@@ -26,6 +26,7 @@ struct InputHome {
     var tabIndex = 0
     var itemsInfomationOpacity: CGFloat = 0.0
     var basketInfomationOpacity: CGFloat = 0.0
+    var showErrorFetchImage: Bool = false
     var isShowItemDetail: Bool = false
     var isPresentedEditItem: Bool = false
     var isOpenEditTagSideMenu: Bool = false
@@ -42,7 +43,7 @@ struct InputHome {
 struct HomeTabView: View {
 
     @StateObject var userVM = UserViewModel()
-    @StateObject var itemVM = ItemViewModel()
+    @StateObject var rootItemVM = ItemViewModel()
     @State private var inputHome: InputHome = InputHome()
     @State private var inputSideMenu: InputSideMenu = InputSideMenu()
     @State private var inputTag: InputTagSideMenu = InputTagSideMenu()
@@ -55,7 +56,7 @@ struct HomeTabView: View {
 
             TabView(selection: $inputHome.homeTabIndex) {
 
-                LibraryView(itemVM: itemVM, inputHome: $inputHome,
+                LibraryView(itemVM: rootItemVM, inputHome: $inputHome,
                             headerImage: userVM.users[0].headerImage.toImage())
                     .tabItem {
                         Image(systemName: "house")
@@ -63,7 +64,7 @@ struct HomeTabView: View {
                     }
                     .tag(0)
 
-                StockView(itemVM: itemVM, inputHome: $inputHome)
+                StockView(itemVM: rootItemVM, inputHome: $inputHome)
                     .tabItem {
                         Image(systemName: "shippingbox.fill")
                         Text("inventory")
@@ -144,13 +145,28 @@ struct HomeTabView: View {
                             .fontWeight(.bold)
                     }
                     .opacity(inputHome.basketInfomationOpacity)
+
+                RoundedRectangle(cornerRadius: 10)
+                    .foregroundColor(.white)
+                    .frame(width: 300, height: 30)
+                    .overlay {
+                        Text("写真の取得に失敗しました。")
+                            .foregroundColor(.black)
+                            .fontWeight(.bold)
+                    }
+                    .offset(y: 20)
+                    .opacity(inputHome.showErrorFetchImage ? 0.7 : 0.0)
                 Spacer()
             }
             .offset(y: 80)
 
+            // Todo: 各タブごとにオプションが変わるボタン
+            UsefulButton(inputHome: $inputHome)
+
         } // ZStack
         .animation(.easeIn(duration: 0.2), value: inputHome.itemsInfomationOpacity)
         .animation(.easeIn(duration: 0.2), value: inputHome.basketInfomationOpacity)
+        .animation(.easeIn(duration: 0.2), value: inputHome.showErrorFetchImage)
         .navigationBarBackButtonHidden()
 
         .sheet(isPresented: $inputHome.isPresentedEditItem) {
@@ -170,13 +186,21 @@ struct HomeTabView: View {
         }
 
         .sheet(isPresented: $inputHome.isShowSelectImageSheet) {
-            PHPickerView(selectImage: $inputHome.selectUpdateImage, isShowSheet: $inputHome.isShowSelectImageSheet)
+            PHPickerView(selectImage: $inputHome.selectUpdateImage,
+                         isShowSheet: $inputHome.isShowSelectImageSheet,
+                         isShowError: $inputHome.showErrorFetchImage)
         }
 
         // convert UIImage ⇨ base64String...
         .onChange(of: inputHome.selectUpdateImage) { newImage in
 
-            guard let base64StringImage = newImage?.toBase64String() else { return }
+            guard let base64StringImage = newImage?.toBase64String() else {
+                inputHome.showErrorFetchImage.toggle()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                    inputHome.showErrorFetchImage.toggle()
+                }
+                return
+            }
 
             switch inputHome.editImageStatus {
             case .item:

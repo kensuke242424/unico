@@ -211,15 +211,7 @@ struct LibraryView: View {
                 Spacer()
 
             } // VStack
-<<<<<<< HEAD
             .ignoresSafeArea()
-=======
-            .offset(y: -getSafeArea().top)
-            .background(
-                LinearGradient(gradient: Gradient(colors: [.customDarkGray1, .customLightGray1]),
-                               startPoint: .top, endPoint: .bottom)
-            )
->>>>>>> 1b85594 (微修正)
 
             CustomArcShape()
                 .ignoresSafeArea()
