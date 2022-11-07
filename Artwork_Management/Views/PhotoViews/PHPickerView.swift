@@ -16,6 +16,7 @@ struct PHPickerView: UIViewControllerRepresentable {
     class Coordinator: NSObject, PHPickerViewControllerDelegate {
 
         var parent: PHPickerView
+
         init(parent: PHPickerView) {
             self.parent = parent
         }
@@ -30,8 +31,8 @@ struct PHPickerView: UIViewControllerRepresentable {
 
             result.itemProvider.loadObject(ofClass: UIImage.self) { (image, _) in
                 if let unwrapImage = image as? UIImage {
+                    print("PHPickerView_UIImage取得成功: \(unwrapImage)")
 
-                    print("PHPickerView_unwrapImage as? UIImage: \(unwrapImage)")
                     self.parent.editImage = unwrapImage
                 } else {
                     print("Error: image as? UIImage")
@@ -64,4 +65,5 @@ struct PHPickerView: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: PHPickerViewController, context: UIViewControllerRepresentableContext<PHPickerView>) {
         // 処理なし
     }
+
 }

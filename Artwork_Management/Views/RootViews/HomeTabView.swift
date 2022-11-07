@@ -21,6 +21,7 @@ struct InputHome {
     var selectImage: UIImage = UIImage()
     var convertUIImage: UIImage = UIImage()
     var selectUpdateImage: UIImage? = nil
+    var selectUpdateImage: UIImage? = UIImage()
     var editImageStatus: ImageStatus = .item
     var tabIndex = 0
     var itemsInfomationOpacity: CGFloat = 0.0
@@ -172,11 +173,15 @@ struct HomeTabView: View {
             PHPickerView(editImage: $inputHome.selectUpdateImage, isShowSheet: $inputHome.isShowSelectImageSheet)
         }
 
+        // convert UIImage ⇨ base64String...
         .onChange(of: inputHome.selectUpdateImage) { newImage in
+
             guard let base64StringImage = newImage?.toBase64String() else { return }
+
             switch inputHome.editImageStatus {
             case .item:
                 print("別のブランチでInputHomeにactionItemIndexが格納されているため、マージ後そちらを使用して更新")
+//                userVM.items[inputHome.actionItemIndex].photo = base64StringImage
             case .icon:
                 guard userVM.users.first != nil else { return }
                 userVM.users[0].iconImage = base64StringImage
