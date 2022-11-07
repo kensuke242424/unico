@@ -30,6 +30,7 @@ struct PHPickerView: UIViewControllerRepresentable {
 
             result.itemProvider.loadObject(ofClass: UIImage.self) { (image, _) in
                 if let unwrapImage = image as? UIImage {
+                    print(unwrapImage)
                     self.parent.selectImage = unwrapImage
                 } else {
                     print("Error: image as? UIImage")

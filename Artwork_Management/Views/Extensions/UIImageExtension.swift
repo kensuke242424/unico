@@ -8,13 +8,10 @@
 import SwiftUI
 
 extension UIImage {
-    func toString() -> String? {
 
-        // 指定された画像を含む PNG 形式のデータオブジェクトを返す
-        let pngData = self.pngData()
+    func toBase64String() -> String? {
 
-        // Base-64でエンコードされた文字列を返す
-        // 行の最大長を64文字に設定し、それ以降は行末を挿入
-        return pngData?.base64EncodedString(options: .lineLength64Characters)
+        guard let imageData = self.jpegData(compressionQuality: 1.0) else { return nil }
+        return imageData.base64EncodedString(options: .lineLength64Characters)
     }
 }

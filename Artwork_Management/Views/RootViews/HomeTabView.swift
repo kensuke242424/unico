@@ -19,6 +19,7 @@ struct InputHome {
     var actionItemIndex: Int = 0
     var editItemStatus: EditStatus = .create
     var selectImage: UIImage = UIImage()
+    var convertUIImage: UIImage = UIImage()
     var tabIndex = 0
     var itemsInfomationOpacity: CGFloat = 0.0
     var basketInfomationOpacity: CGFloat = 0.0
@@ -51,7 +52,7 @@ struct HomeTabView: View {
 
             TabView(selection: $inputHome.homeTabIndex) {
 
-                LibraryView(itemVM: rootItemVM, inputHome: $inputHome)
+                LibraryView(itemVM: rootItemVM, userVM: userVM, inputHome: $inputHome)
                     .tabItem {
                         Image(systemName: "house")
                         Text("Home")
@@ -160,8 +161,7 @@ struct HomeTabView: View {
         .onChange(of: rootItemVM.items) { _ in
             inputHome.itemsInfomationOpacity = 0.7
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                inputHome.itemsInfomationOpacity = 0.0
-            }
+                inputHome.itemsInfomationOpacity = 0.0            }
         }
     } // body
 } // View

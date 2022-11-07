@@ -27,11 +27,7 @@ struct LogInView: View {
     @State private var logInNavigationPath: [LogInNavigation] = []
 
     // テスト用のダミーデータです。
-    let testUser: User = User(name: "中川賢亮",
-                              address: "kennsuke242424@gmail.com",
-                              password: "ninnzinn2424",
-                              photoURL: ""
-    ) // testUser
+    let testUser: User = TestUser().testUser
 
     var body: some View {
 

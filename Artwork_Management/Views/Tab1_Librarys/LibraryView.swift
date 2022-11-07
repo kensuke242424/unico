@@ -42,11 +42,17 @@ struct InputTime {
 struct LibraryView: View {
 
     @StateObject var itemVM: ItemViewModel
+    @StateObject var userVM: UserViewModel
     @Binding var inputHome: InputHome
 
     @GestureState private var dragOffset: CGFloat = 0
     @State private var inputLibrary: InputLibrary = InputLibrary()
     @State private var inputTime: InputTime = InputTime()
+
+    var userImage: UIImage? {
+        let convertImage = userVM.convertBase64ToImage(userVM.users[0].photoImage)
+        return convertImage
+    }
 
     var body: some View {
 
@@ -58,6 +64,7 @@ struct LibraryView: View {
 
             VStack {
 
+<<<<<<< HEAD
                 homeHeaderPhoto(photo: inputHome.selectImage, userIcon: "cloth_sample1")
                     // Todo: ホームレイアウトのカスタム
                     .overlay(alignment: .bottomTrailing) {
@@ -76,6 +83,11 @@ struct LibraryView: View {
                         } // Menu
                         .offset(y: 40)
                     } // overlay
+=======
+                homeHeaderPhoto(photo: userImage,
+                                userIcon: "cloth_sample1")
+
+>>>>>>> 8c313c3 (写真取得時のテキスト)
 
                 // 時刻レイアウト
                 HStack {
@@ -226,51 +238,82 @@ struct LibraryView: View {
     } // body
 
     @ViewBuilder
-    func homeHeaderPhoto(photo: UIImage, userIcon: String) -> some View {
+    func homeHeaderPhoto(photo: UIImage?, userIcon: String) -> some View {
 
-        Image(uiImage: photo)
-            .resizable()
-            .frame(height: UIScreen.main.bounds.height * 0.35)
-            .clipped()
-            .shadow(radius: 5, x: 0, y: 10)
-            .overlay {
-                if inputLibrary.isShowHeaderPhotoInfomation {
-                    LinearGradient(gradient: Gradient(colors: [.clear, .black.opacity(0.6)]),
-                                   startPoint: .top, endPoint: .bottom)
-                }
-            } // overlay
-            .overlay(alignment: .topLeading) {
-                if inputLibrary.isShowHeaderPhotoInfomation {
-                    Button {
-                        withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                            inputHome.isShowSystemSideMenu.toggle()
-                        }
-                        withAnimation(.easeIn(duration: 0.2)) {
-                            inputHome.sideMenuBackGround.toggle()
-                        }
-                    } label: {
-                        CircleIcon(photo: userIcon, size: getSafeArea().top - 20)
-                            .padding(.leading)
-                            .padding(.top, getSafeArea().top)
+        if let photo = photo {
+            Image(uiImage: photo)
+                .resizable()
+                .scaledToFit()
+                .frame(width: getRect().width, height: getRect().height * 0.35)
+                .clipped()
+                .shadow(radius: 5, x: 0, y: 10)
+                .overlay {
+                    if inputLibrary.isShowHeaderPhotoInfomation {
+                        LinearGradient(gradient: Gradient(colors: [.clear, .black.opacity(0.2)]),
+                                       startPoint: .top, endPoint: .bottom)
                     }
-                }
-            } // overlay
+                } // overlay
+                .overlay(alignment: .topLeading) {
+                    if inputLibrary.isShowHeaderPhotoInfomation {
+                        Button {
+                            inputLibrary.isShowHeaderPhotoInfomation.toggle()
+                        } label: {
+                            CircleIcon(photo: userIcon, size: 35)
+                                .offset(y: getSafeArea().top)
+                        }
+                    }
+                } // overlay
+                .overlay(alignment: .bottomTrailing) {
+                    if inputLibrary.isShowHeaderPhotoInfomation {
+                        Button {
+                            // Todo: 画像変更処理
+                            inputHome.isShowSelectImageSheet.toggle()
+                        } label: {
+                            Image(systemName: "photo.on.rectangle.angled")
+                                .foregroundColor(.white)
+                                .padding()
+                        }
+                    }
+                } // overlay
+                .animation(.easeIn(duration: 0.2), value: inputLibrary.isShowHeaderPhotoInfomation)
+                .onTapGesture { inputLibrary.isShowHeaderPhotoInfomation.toggle() }
+            // Todo: ホームレイアウトのカスタム
             .overlay(alignment: .bottomTrailing) {
-                if inputLibrary.isShowHeaderPhotoInfomation {
+                Menu {
                     Button {
-                        // Todo: 画像変更処理
-                        inputHome.isShowSelectImageSheet.toggle()
+
                     } label: {
-                        Image(systemName: "photo.on.rectangle.angled")
-                            .foregroundColor(.white)
-                            .padding()
+                        Text("準備中")
                     }
-                }
+                } label: {
+
+                    Image(systemName: "gearshape.2")
+                        .foregroundColor(.white).opacity(0.5)
+                        .padding(.trailing)
+
+                } // Menu
+                .offset(y: 40)
             } // overlay
-//            .ignoresSafeArea()
-            .animation(.easeIn(duration: 0.2), value: inputLibrary.isShowHeaderPhotoInfomation)
-            .onTapGesture { inputLibrary.isShowHeaderPhotoInfomation.toggle() }
+        } else {
+            VStack {
+                Text("写真の取得ができませんでした")
+                    .foregroundColor(.white.opacity(0.3))
+
+                Button {
+                    // Todo: 画像変更処理
+                    inputHome.isShowSelectImageSheet.toggle()
+                } label: {
+                    Image(systemName: "photo.on.rectangle.angled")
+                        .foregroundColor(.white.opacity(0.8))
+                        .padding(.top, 30)
+                }
+            }
+            .frame(width: getRect().width, height: getRect().height * 0.35)
+
+        } // if let photo
+
     } // homeHeaderPhoto
+
     func homeItemPhotoPanel() -> some View {
         GeometryReader { bodyView in
 
@@ -379,6 +422,7 @@ struct LibraryView: View {
 struct LibraryView_Previews: PreviewProvider {
     static var previews: some View {
         LibraryView(itemVM: ItemViewModel(),
+                    userVM: UserViewModel(),
                     inputHome: .constant(InputHome()))
     }
 }
