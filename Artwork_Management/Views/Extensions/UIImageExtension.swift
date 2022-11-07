@@ -11,7 +11,12 @@ extension UIImage {
 
     func toBase64String() -> String? {
 
-        guard let imageData = self.jpegData(compressionQuality: 1.0) else { return nil }
-        return imageData.base64EncodedString(options: .lineLength64Characters)
+        guard let imageData = self.jpegData(compressionQuality: 1.0) else {
+            print("Error: self.jpegData(compressionQuality: 1.0)")
+            return nil
+        }
+        print("UIImage ⇨ jpegData変換成功: \(imageData)")
+        return imageData.base64EncodedString()
+
     }
 }

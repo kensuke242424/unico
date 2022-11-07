@@ -42,17 +42,12 @@ struct InputTime {
 struct LibraryView: View {
 
     @StateObject var itemVM: ItemViewModel
-    @StateObject var userVM: UserViewModel
     @Binding var inputHome: InputHome
+    let headerImage: UIImage?
 
     @GestureState private var dragOffset: CGFloat = 0
     @State private var inputLibrary: InputLibrary = InputLibrary()
     @State private var inputTime: InputTime = InputTime()
-
-    var userImage: UIImage? {
-        let convertImage = userVM.convertBase64ToImage(userVM.users[0].photoImage)
-        return convertImage
-    }
 
     var body: some View {
 
@@ -64,7 +59,6 @@ struct LibraryView: View {
 
             VStack {
 
-<<<<<<< HEAD
                 homeHeaderPhoto(photo: inputHome.selectImage, userIcon: "cloth_sample1")
                     // Todo: ホームレイアウトのカスタム
                     .overlay(alignment: .bottomTrailing) {
@@ -83,11 +77,59 @@ struct LibraryView: View {
                         } // Menu
                         .offset(y: 40)
                     } // overlay
-=======
-                homeHeaderPhoto(photo: userImage,
-                                userIcon: "cloth_sample1")
+                .overlay {
 
->>>>>>> 8c313c3 (写真取得時のテキスト)
+                    LinearGradient(gradient: Gradient(colors: [.clear, .black.opacity(0.2)]),
+                                   startPoint: .top, endPoint: .bottom)
+                    .opacity(inputLibrary.isShowHeaderPhotoInfomation ? 0.3 : 0.0)
+
+                } // overlay
+
+                .overlay(alignment: .topLeading) {
+                    Button {
+                        inputLibrary.isShowHeaderPhotoInfomation.toggle()
+                    } label: {
+                        CircleIcon(photo: "cloth_sample1", size: 35)
+                            .offset(y: getSafeArea().top)
+                            .opacity(inputLibrary.isShowHeaderPhotoInfomation ? 1.0 : 0.0)
+                    }
+                } // overlay
+
+                .overlay(alignment: .bottomTrailing) {
+                    Button {
+                        inputHome.editImageStatus = .header
+                        inputHome.isShowSelectImageSheet.toggle()
+                    } label: {
+                        Image(systemName: "photo.on.rectangle.angled")
+                            .foregroundColor(.white)
+                            .padding()
+                            .opacity(inputLibrary.isShowHeaderPhotoInfomation ? 1.0 : 0.0)
+                    }
+
+                } // overlay
+
+                .onTapGesture {
+                    withAnimation(.easeIn(duration: 0.2)) {
+                        inputLibrary.isShowHeaderPhotoInfomation.toggle()
+                    }
+                }
+                // Todo: ホームレイアウトのカスタム
+                .overlay(alignment: .bottomTrailing) {
+                    Menu {
+                        Button {
+
+                        } label: {
+                            Text("準備中")
+                        }
+                    } label: {
+
+                        Image(systemName: "gearshape.2")
+                            .foregroundColor(.white).opacity(0.5)
+                            .padding(.trailing)
+
+                    } // Menu
+                    .offset(y: 40)
+                } // overlay
 
                 // 時刻レイアウト
                 HStack {
@@ -247,60 +289,15 @@ struct LibraryView: View {
                 .frame(width: getRect().width, height: getRect().height * 0.35)
                 .clipped()
                 .shadow(radius: 5, x: 0, y: 10)
-                .overlay {
-                    if inputLibrary.isShowHeaderPhotoInfomation {
-                        LinearGradient(gradient: Gradient(colors: [.clear, .black.opacity(0.2)]),
-                                       startPoint: .top, endPoint: .bottom)
-                    }
-                } // overlay
-                .overlay(alignment: .topLeading) {
-                    if inputLibrary.isShowHeaderPhotoInfomation {
-                        Button {
-                            inputLibrary.isShowHeaderPhotoInfomation.toggle()
-                        } label: {
-                            CircleIcon(photo: userIcon, size: 35)
-                                .offset(y: getSafeArea().top)
-                        }
-                    }
-                } // overlay
-                .overlay(alignment: .bottomTrailing) {
-                    if inputLibrary.isShowHeaderPhotoInfomation {
-                        Button {
-                            // Todo: 画像変更処理
-                            inputHome.isShowSelectImageSheet.toggle()
-                        } label: {
-                            Image(systemName: "photo.on.rectangle.angled")
-                                .foregroundColor(.white)
-                                .padding()
-                        }
-                    }
-                } // overlay
-                .animation(.easeIn(duration: 0.2), value: inputLibrary.isShowHeaderPhotoInfomation)
-                .onTapGesture { inputLibrary.isShowHeaderPhotoInfomation.toggle() }
-            // Todo: ホームレイアウトのカスタム
-            .overlay(alignment: .bottomTrailing) {
-                Menu {
-                    Button {
 
-                    } label: {
-                        Text("準備中")
-                    }
-                } label: {
-
-                    Image(systemName: "gearshape.2")
-                        .foregroundColor(.white).opacity(0.5)
-                        .padding(.trailing)
-
-                } // Menu
-                .offset(y: 40)
-            } // overlay
         } else {
             VStack {
-                Text("写真の取得ができませんでした")
+                Text("写真を選択しましょう")
                     .foregroundColor(.white.opacity(0.3))
 
                 Button {
                     // Todo: 画像変更処理
+                    inputHome.editImageStatus = .header
                     inputHome.isShowSelectImageSheet.toggle()
                 } label: {
                     Image(systemName: "photo.on.rectangle.angled")
@@ -422,7 +419,7 @@ struct LibraryView: View {
 struct LibraryView_Previews: PreviewProvider {
     static var previews: some View {
         LibraryView(itemVM: ItemViewModel(),
-                    userVM: UserViewModel(),
-                    inputHome: .constant(InputHome()))
+                    inputHome: .constant(InputHome()),
+                    headerImage: nil)
     }
 }

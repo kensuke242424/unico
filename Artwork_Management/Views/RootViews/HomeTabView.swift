@@ -20,6 +20,8 @@ struct InputHome {
     var editItemStatus: EditStatus = .create
     var selectImage: UIImage = UIImage()
     var convertUIImage: UIImage = UIImage()
+    var selectUpdateImage: UIImage? = nil
+    var editImageStatus: ImageStatus = .item
     var tabIndex = 0
     var itemsInfomationOpacity: CGFloat = 0.0
     var basketInfomationOpacity: CGFloat = 0.0
@@ -52,7 +54,8 @@ struct HomeTabView: View {
 
             TabView(selection: $inputHome.homeTabIndex) {
 
-                LibraryView(itemVM: rootItemVM, userVM: userVM, inputHome: $inputHome)
+                LibraryView(itemVM: rootItemVM, inputHome: $inputHome,
+                            headerImage: userVM.users[0].headerImage.toImage())
                     .tabItem {
                         Image(systemName: "house")
                         Text("Home")
@@ -161,7 +164,28 @@ struct HomeTabView: View {
         .onChange(of: rootItemVM.items) { _ in
             inputHome.itemsInfomationOpacity = 0.7
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                inputHome.itemsInfomationOpacity = 0.0            }
+                inputHome.itemsInfomationOpacity = 0.0
+            }
+        }
+
+        .sheet(isPresented: $inputHome.isShowSelectImageSheet) {
+            PHPickerView(editImage: $inputHome.selectUpdateImage, isShowSheet: $inputHome.isShowSelectImageSheet)
+        }
+
+        .onChange(of: inputHome.selectUpdateImage) { newImage in
+            guard let base64StringImage = newImage?.toBase64String() else { return }
+            switch inputHome.editImageStatus {
+            case .item:
+                print("別のブランチでInputHomeにactionItemIndexが格納されているため、マージ後そちらを使用して更新")
+            case .icon:
+                guard userVM.users.first != nil else { return }
+                userVM.users[0].iconImage = base64StringImage
+                print("アイコン情報変更OK")
+            case .header:
+                guard userVM.users.first != nil else { return }
+                userVM.users[0].headerImage = base64StringImage
+                print("ヘッダー情報変更OK")
+            }
         }
     } // body
 } // View
