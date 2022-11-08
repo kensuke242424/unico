@@ -6,9 +6,15 @@
 //
 
 import SwiftUI
+import Firebase
 
 @main
 struct ArtworkManagementApp: App {
+
+    init() {
+        FirebaseApp.configure()
+    }
+
     var body: some Scene {
         WindowGroup {
             RootView()

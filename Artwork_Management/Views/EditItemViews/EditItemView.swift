@@ -122,7 +122,6 @@ struct EditItemView: View {
 
                             // NOTE: テストデータに新規アイテムを保存
                             itemVM.items.append(Item(tag: inputEdit.selectionTagName,
-                                                     tagColor: inputEdit.selectionTagColor.text,
                                                      name: inputEdit.editItemName,
                                                      detail: inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "none.",
                                                      photo: "", // Todo: 写真取り込み実装後、変更
@@ -146,7 +145,6 @@ struct EditItemView: View {
 
                             // NOTE: アイテムを更新
                             itemVM.items[itemIndex].tag = inputEdit.selectionTagName
-                            itemVM.items[itemIndex].tagColor = inputEdit.selectionTagColor.text
                             itemVM.items[itemIndex].name = inputEdit.editItemName
                             itemVM.items[itemIndex].detail = inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "none."
                             itemVM.items[itemIndex].photo = inputEdit.photoURL

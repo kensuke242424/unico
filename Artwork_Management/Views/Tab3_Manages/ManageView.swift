@@ -263,14 +263,14 @@ struct ManageView: View {
                         } // Button
                     } // HStack
 
-                    // NOTE: ラインの外枠を透明フレームで置いておくことで、
-                    // インジケーターが端まで行ってもレイアウトが崩れない
-                    switch item.tagColor {
-                    case "赤": IndicatorRow(salesValue: item.sales, tagColor: .red)
-                    case "青": IndicatorRow(salesValue: item.sales, tagColor: .blue)
-                    case "黄": IndicatorRow(salesValue: item.sales, tagColor: .yellow)
-                    case "緑": IndicatorRow(salesValue: item.sales, tagColor: .green)
-                    default: IndicatorRow(salesValue: item.sales, tagColor: .gray)
+                    if let itemRowTag = itemVM.tags.first(where: { $0.tagName == item.tag }) {
+
+                        IndicatorRow(salesValue: item.sales, tagColor: itemRowTag.tagColor)
+
+                    } else {
+
+                        IndicatorRow(salesValue: item.sales, tagColor: .gray)
+
                     }
 
                     Text(item.name)

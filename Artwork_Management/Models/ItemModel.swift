@@ -11,7 +11,6 @@ struct Item: Identifiable, Equatable, Hashable {
 
     var id = UUID().uuidString
     var tag: String
-    var tagColor: String
     var name: String
     var detail: String
     var photo: String
