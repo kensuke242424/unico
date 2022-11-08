@@ -126,9 +126,10 @@ struct EditItemView: View {
                                                      detail: inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "none.",
                                                      photo: "", // Todo: 写真取り込み実装後、変更
                                                      cost: 1000,
-                                                     price: Int(input.editItemPrice) ?? 0,
+                                                     price: Int(inputEdit.editItemPrice) ?? 0,
+                                                     amount: 0,
                                                      sales: 0,
-                                                     inventory: Int(input.editItemInventry) ?? 0,
+                                                     inventory: Int(inputEdit.editItemInventry) ?? 0,
                                                      totalAmount: 0,
                                                      totalInventory: 0,
                                                      createTime: Date(), // Todo: Timestamp実装後、変更

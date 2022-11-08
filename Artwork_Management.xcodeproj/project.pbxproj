@@ -8,8 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		E0003D0328FD3BB0007308B0 /* TagTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0003D0228FD3BB0007308B0 /* TagTitle.swift */; };
-		E01AA3A32916C674000FCD37 /* TagModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E01AA3A22916C674000FCD37 /* TagModel.swift */; };
 		E01AA3A129167F02000FCD37 /* ResizableSheet in Frameworks */ = {isa = PBXBuildFile; productRef = E01AA3A029167F02000FCD37 /* ResizableSheet */; };
+		E01AA3A32916C674000FCD37 /* TagModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E01AA3A22916C674000FCD37 /* TagModel.swift */; };
 		E04ACF4128E6DD600054A6C4 /* ShowsItemDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04ACF4028E6DD600054A6C4 /* ShowsItemDetail.swift */; };
 		E04ACF4328E73C660054A6C4 /* IndicatorRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04ACF4228E73C660054A6C4 /* IndicatorRow.swift */; };
 		E05130E228F341620092FE46 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E05130E128F341610092FE46 /* RootView.swift */; };
@@ -49,6 +49,7 @@
 		E0CF7EF628DF6E6F00735142 /* AccountIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0CF7EF528DF6E6F00735142 /* AccountIconView.swift */; };
 		E0CF7EF828DF7BFA00735142 /* SystemListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0CF7EF728DF7BFA00735142 /* SystemListView.swift */; };
 		E0DE98D828E2DBB800471AB4 /* LogInViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0DE98D728E2DBB800471AB4 /* LogInViewModel.swift */; };
+		E0F78FC42919F06D00A95CD1 /* DateFormatterExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0F78FC32919F06D00A95CD1 /* DateFormatterExtension.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -96,6 +97,7 @@
 		E0CF7EF728DF7BFA00735142 /* SystemListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemListView.swift; sourceTree = "<group>"; };
 		E0DE98D528E2D85E00471AB4 /* LogInCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogInCheckView.swift; sourceTree = "<group>"; };
 		E0DE98D728E2DBB800471AB4 /* LogInViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogInViewModel.swift; sourceTree = "<group>"; };
+		E0F78FC32919F06D00A95CD1 /* DateFormatterExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFormatterExtension.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -122,8 +124,8 @@
 			isa = PBXGroup;
 			children = (
 				E05FE94428F71BFB00263F98 /* ColorExtension.swift */,
-				E0A6147F2910E46A0020D043 /* DateFormatterExtension.swift */,
 				E0CB9DCA2913964F00D95C54 /* ViewExtension.swift */,
+				E0F78FC32919F06D00A95CD1 /* DateFormatterExtension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -409,8 +411,8 @@
 				E08F273E28DDB65F00329C5E /* HomeTabView.swift in Sources */,
 				E05130E228F341620092FE46 /* RootView.swift in Sources */,
 				E08F272528DDA08E00329C5E /* Artwork_ManagementApp.swift in Sources */,
+				E0F78FC42919F06D00A95CD1 /* DateFormatterExtension.swift in Sources */,
 				E09F09C528ED5DEA00D07669 /* SideMenuEditTagView.swift in Sources */,
-				E01AA39E29167B28000FCD37 /* DateFormatterExtension.swift in Sources */,
 				E0796ADD28F5F2830094E50C /* CartItemsSheet.swift in Sources */,
 				E094F10028E20F1000D3C845 /* LogInView.swift in Sources */,
 				E0003D0328FD3BB0007308B0 /* TagTitle.swift in Sources */,

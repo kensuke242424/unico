@@ -91,7 +91,6 @@ struct SideMenuEditTagView: View {
                             .padding(.bottom, 30)
 
                     } // タイトル(新規タグ)
-
                     VStack(alignment: .leading) {
 
                         HStack(spacing: 10) {
@@ -139,8 +138,8 @@ struct SideMenuEditTagView: View {
                         .padding(.top)
 
                         Picker("色を選択", selection: $inputTag.selectionSideMenuTagColor) {
-                } // タグネーム
-                .padding(.bottom)
+
+                            ForEach(UsedColor.allCases, id: \.self) { value in
 
                                 if value.color != .gray {
                                     Text(value.text)
@@ -151,7 +150,6 @@ struct SideMenuEditTagView: View {
                         .padding(.bottom)
                         .padding(.trailing, screenSize.width / 2)
                     } // タグ色
-
                     // show edit Result...
                     VStack(alignment: .leading) {
                         Text("-  \(inputTag.newTagNameText)  -")
@@ -227,7 +225,6 @@ struct SideMenuEditTagView: View {
                                 inputTag.selectionSideMenuTagColor = .red
 
                             } // switch
-
                         } label: {
                             Text(inputTag.tagSideMenuStatus == .create ? "追加" : "更新")
                         } // Button(追加 or 更新)
@@ -260,7 +257,6 @@ struct SideMenuEditTagView: View {
                     } message: {
                         Text("タグの更新に失敗しました。")
                     } // alert
-
                     // NOTE: タグネームの入力値がisEmptyの場合、追加ボタンを無効化します
                     .onChange(of: inputTag.newTagNameText) {newValue in
                         if newValue.isEmpty {
@@ -269,7 +265,6 @@ struct SideMenuEditTagView: View {
                             inputTag.disableButton = false
                         }
                     } // .onChange
-
                 } // VStack
                 .offset(x: 20)
 
