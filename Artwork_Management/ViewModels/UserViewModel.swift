@@ -11,9 +11,8 @@ class UserViewModel: ObservableObject {
 
     @Published var users: [User] = [User(name: "User_Name", address: "kennsuke242424@gmail.com", password: "ninnzinn2424", iconImage: "", headerImage: "")]
 
-    var headerImage: UIImage? {
-        return users[0].headerImage.toImage()
-    }
+//    var headerImage: UIImage? = users[0].headerImage.toImage()
+
 
 }
 

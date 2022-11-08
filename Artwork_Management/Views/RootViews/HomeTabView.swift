@@ -40,11 +40,17 @@ struct InputHome {
     var commerceHalfSheet: ResizableSheetState = .hidden
 }
 
+struct InputImage {
+    var headerImage: UIImage? = nil
+    var iconImage: UIImage? = nil
+}
+
 struct HomeTabView: View {
 
     @StateObject var userVM = UserViewModel()
     @StateObject var rootItemVM = ItemViewModel()
     @State private var inputHome: InputHome = InputHome()
+    @State private var inputImage: InputImage = InputImage()
     @State private var inputSideMenu: InputSideMenu = InputSideMenu()
     @State private var inputTag: InputTagSideMenu = InputTagSideMenu()
 
@@ -57,7 +63,7 @@ struct HomeTabView: View {
             TabView(selection: $inputHome.homeTabIndex) {
 
                 LibraryView(itemVM: rootItemVM, inputHome: $inputHome,
-                            headerImage: userVM.headerImage)
+                            inputImage: $inputImage)
                     .tabItem {
                         Image(systemName: "house")
                         Text("Home")
@@ -216,8 +222,15 @@ struct HomeTabView: View {
             case .header:
                 guard userVM.users.first != nil else { return }
                 userVM.users[0].headerImage = base64StringImage
+                inputImage.headerImage = userVM.users.first!.headerImage.toImage()
+
                 print("ヘッダー情報変更OK")
             }
+        }
+
+        .onAppear {
+            guard userVM.users.first != nil else { return }
+            inputImage.headerImage = userVM.users.first!.headerImage.toImage()
         }
     } // body
 } // View

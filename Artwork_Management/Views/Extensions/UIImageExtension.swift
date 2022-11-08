@@ -15,7 +15,7 @@ extension UIImage {
             print("Error: self.jpegData(compressionQuality: 1.0)")
             return nil
         }
-        print("UIImage ⇨ jpegData変換成功: \(imageData)")
+        print("UIImageExtension_toBase64String()実行: \(imageData)")
         return imageData.base64EncodedString()
 
     }

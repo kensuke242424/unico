@@ -47,7 +47,7 @@ struct LibraryView: View {
 
     @StateObject var itemVM: ItemViewModel
     @Binding var inputHome: InputHome
-    let headerImage: UIImage?
+    @Binding var inputImage: InputImage
 
     @GestureState private var dragOffset: CGFloat = 0
     @State private var inputLibrary: InputLibrary = InputLibrary()
@@ -64,7 +64,7 @@ struct LibraryView: View {
 
             VStack {
 
-                homeHeaderPhoto(photo: headerImage, userIcon: "cloth_sample1")
+                homeHeaderPhoto(photo: inputImage.headerImage, userIcon: "cloth_sample1")
                 // 時刻レイアウト
                 HStack {
                     VStack(alignment: .leading, spacing: 8) {
@@ -456,6 +456,6 @@ struct LibraryView_Previews: PreviewProvider {
     static var previews: some View {
         LibraryView(itemVM: ItemViewModel(),
                     inputHome: .constant(InputHome()),
-                    headerImage: nil)
+                    inputImage: .constant(InputImage()))
     }
 }
