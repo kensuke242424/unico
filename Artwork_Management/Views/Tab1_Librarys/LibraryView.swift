@@ -24,17 +24,17 @@ struct InputTime {
 
     var time: String {
         let formatter = DateFormatter()
-        formatter.setTemplate(.time)
+        formatter.setTemplate(.time, .enUS)
         return formatter.string(from: nowDate)
     }
     var week: String {
         let formatter = DateFormatter()
-        formatter.setTemplate(.usWeek)
+        formatter.setTemplate(.usWeek, .enUS)
         return formatter.string(from: nowDate)
     }
     var dateStyle: String {
         let formatter = DateFormatter()
-        formatter.setTemplate(.usMonthDay)
+        formatter.setTemplate(.usMonthDay, .enUS)
         return formatter.string(from: nowDate)
     }
 }
@@ -51,6 +51,11 @@ struct LibraryView: View {
     var body: some View {
 
         ZStack {
+
+            LinearGradient(gradient: Gradient(colors: [.customDarkGray1, .customLightGray1]),
+                           startPoint: .top, endPoint: .bottom)
+            .ignoresSafeArea()
+
             VStack {
 
                 homeHeaderPhoto(photo: "homePhoto_sample", userIcon: "cloth_sample1")
@@ -58,7 +63,7 @@ struct LibraryView: View {
                     .overlay(alignment: .bottomTrailing) {
                         Menu {
                             Button {
-
+                                // Todo: Homeカスタム
                             } label: {
                                 Text("準備中")
                             }
@@ -97,7 +102,7 @@ struct LibraryView: View {
                     } // VStack
                     Spacer()
                 } // HStack
-                .padding(.top, 20)
+                .padding(.top, 30)
                 .padding(.leading, 20)
                 .shadow(radius: 4, x: 3, y: 3)
                 .onReceive(inputTime.timer) { _ in
@@ -147,10 +152,8 @@ struct LibraryView: View {
                 Spacer()
 
             } // VStack
-            .background(
-                LinearGradient(gradient: Gradient(colors: [.customDarkGray1, .customLightGray1]),
-                               startPoint: .top, endPoint: .bottom)
-            )
+            .ignoresSafeArea()
+
             CustomArcShape()
                 .ignoresSafeArea()
                 .foregroundColor(.white)
@@ -159,34 +162,47 @@ struct LibraryView: View {
 
             Menu {
                 ForEach(itemVM.tags) { tag in
-                    Button {
-                        inputLibrary.selectFilterTag = tag.tagName
-                    } label: {
-                        if inputLibrary.selectFilterTag == tag.tagName {
-                            Text("\(tag.tagName)　　 ✔︎")
-                        } else {
-                            Text(tag.tagName)
+
+                    if tag != itemVM.tags.last! {
+                        Button {
+                            inputLibrary.selectFilterTag = tag.tagName
+                        } label: {
+                            if inputLibrary.selectFilterTag == tag.tagName {
+                                Text("\(tag.tagName)　　 ✔︎")
+                            } else {
+                                Text(tag.tagName)
+                            }
+                        }
+
+                    } else {
+                        if itemVM.items.contains(where: {$0.tag == (itemVM.tags.last!.tagName)}) {
+                            Button {
+                                inputLibrary.selectFilterTag = tag.tagName
+                            } label: {
+                                if inputLibrary.selectFilterTag == tag.tagName {
+                                    Text("\(tag.tagName)　　 ✔︎")
+                                } else {
+                                    Text(tag.tagName)
+                                }
+                            }
+
                         }
                     }
+
                 } // ForEach
             } label: {
                 Image(systemName: "list.bullet")
+                    .font(.title3)
                     .foregroundColor(.white)
             } // Menu
+            .ignoresSafeArea()
             .offset(x: -UIScreen.main.bounds.width / 2.5,
-                    y: UIScreen.main.bounds.height / 10)
+                    y: UIScreen.main.bounds.height / 11)
 
             homeItemPhotoPanel()
-                    .offset(x: -UIScreen.main.bounds.width / 10,
-                            y: UIScreen.main.bounds.height / 4)
-
-            if inputHome.isShowItemDetail {
-                ShowsItemDetail(itemVM: itemVM,
-                                item: itemVM.items[inputLibrary.libraryCardIndex],
-                                itemIndex: inputLibrary.libraryCardIndex,
-                                isShowItemDetail: $inputHome.isShowItemDetail,
-                                isPresentedEditItem: $inputHome.isPresentedEditItem)
-            } // if isShowItemDetail
+                .ignoresSafeArea()
+                .offset(x: -UIScreen.main.bounds.width / 10,
+                        y: UIScreen.main.bounds.height / 4)
 
         } // ZStack
         .onChange(of: inputLibrary.selectFilterTag) { newValue in
@@ -214,9 +230,8 @@ struct LibraryView: View {
 
         Image(photo)
             .resizable()
-            .scaledToFill()
-            .ignoresSafeArea()
-            .frame(height: UIScreen.main.bounds.height * 0.3)
+            .frame(height: UIScreen.main.bounds.height * 0.35)
+            .clipped()
             .shadow(radius: 5, x: 0, y: 10)
             .overlay {
                 if inputLibrary.isShowHeaderPhotoInfomation {
@@ -227,9 +242,16 @@ struct LibraryView: View {
             .overlay(alignment: .topLeading) {
                 if inputLibrary.isShowHeaderPhotoInfomation {
                     Button {
-                        inputLibrary.isShowHeaderPhotoInfomation.toggle()
+                        withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+                            inputHome.isShowSystemSideMenu.toggle()
+                        }
+                        withAnimation(.easeIn(duration: 0.2)) {
+                            inputHome.sideMenuBackGround.toggle()
+                        }
                     } label: {
-                        CircleIcon(photo: userIcon, size: 35)
+                        CircleIcon(photo: userIcon, size: getSafeArea().top - 20)
+                            .padding(.leading)
+                            .padding(.top, getSafeArea().top)
                     }
                 }
             } // overlay
@@ -244,6 +266,7 @@ struct LibraryView: View {
                     }
                 }
             } // overlay
+//            .ignoresSafeArea()
             .animation(.easeIn(duration: 0.2), value: inputLibrary.isShowHeaderPhotoInfomation)
             .onTapGesture { inputLibrary.isShowHeaderPhotoInfomation.toggle() }
     } // homeHeaderPhoto
@@ -251,12 +274,13 @@ struct LibraryView: View {
         GeometryReader { bodyView in
 
             let libraryItemPadding: CGFloat = 200
+            let panelSize = UIScreen.main.bounds.height / 4
 
             LazyHStack(spacing: libraryItemPadding) {
 
                 ForEach(inputLibrary.tagFilterItemCards.indices, id: \.self) {index in
 
-                    ShowItemPhoto(photo: inputLibrary.tagFilterItemCards[index].photo, size: 180)
+                    ShowItemPhoto(photo: inputLibrary.tagFilterItemCards[index].photo, size: panelSize)
                             .overlay {
                                 if inputLibrary.isShowCardInfomation {
                                     LinearGradient(gradient: Gradient(colors: [.clear, .black.opacity(0.4)]),
@@ -275,9 +299,13 @@ struct LibraryView: View {
                                 if inputLibrary.isShowCardInfomation {
                                     Button {
                                         if let cardRowIndex =
-                                            itemVM.items.firstIndex(of: inputLibrary.tagFilterItemCards[index]) {
-                                            inputLibrary.libraryCardIndex = cardRowIndex
-                                            inputHome.isShowItemDetail.toggle()
+                                            itemVM.items.firstIndex(where: { $0.id == inputLibrary.tagFilterItemCards[index].id }) {
+
+                                            inputHome.actionItemIndex = cardRowIndex
+
+                                            withAnimation(.easeIn(duration: 0.15)) {
+                                                inputHome.isShowItemDetail.toggle()
+                                            }
                                         } else {
                                             print("LibraryCardIndexの取得エラー")
                                         }

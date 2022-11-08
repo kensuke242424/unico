@@ -37,6 +37,7 @@ struct UsefulButton: View {
 
             case .manege:
                 print("manege画面ボタンアクション実行")
+                inputHome.editItemStatus = .create
                 inputHome.isPresentedEditItem.toggle()
 
             case .account:
@@ -46,7 +47,7 @@ struct UsefulButton: View {
         } label: {
 
             // ✅カスタムView
-            ButtonStyleView(buttonIcon: $buttonIcon, buttonStyle: $buttonStyle)
+            ButtonStyleView(buttonIcon: buttonIcon, buttonStyle: buttonStyle)
 
         } // Button
         .offset(x: UIScreen.main.bounds.width / 3 - 5,
@@ -55,9 +56,9 @@ struct UsefulButton: View {
         .opacity(opacity)
         .animation(.easeIn(duration: 0.1), value: opacity)
 
-        .onChange(of: inputHome.cartState) { _ in
+        .onChange(of: inputHome.cartHalfSheet) { _ in
             withAnimation(.easeOut(duration: 0.3)) {
-                switch inputHome.cartState {
+                switch inputHome.cartHalfSheet {
                 case .hidden: offsetY = 0.0
                 case .medium: offsetY = -60.0
                 case .large: offsetY = -60.0
@@ -65,7 +66,7 @@ struct UsefulButton: View {
             }
         } // .onChange(cartState)
 
-        .onChange(of: inputHome.tabIndex) { newIndex in
+        .onChange(of: inputHome.homeTabIndex) { newIndex in
             buttonStyle = buttonVM.buttonStyleChenged(tabIndex: newIndex)
             buttonIcon = buttonVM.iconChenge(style: buttonStyle, change: change)
 
@@ -80,8 +81,8 @@ struct UsefulButton: View {
 
 struct ButtonStyleView: View {
 
-    @Binding var buttonIcon: ButtonIcon
-    @Binding var buttonStyle: ButtonStyle
+    let buttonIcon: ButtonIcon
+    let buttonStyle: ButtonStyle
 
     @State private var angle: CGFloat = 0.0
 
@@ -93,7 +94,6 @@ struct ButtonStyleView: View {
             .frame(width: 65)
             .padding()
             .blur(radius: 1)
-//            .shadow(color: .gray, radius: 10, x: 4, y: 11)
 
             // ボタンのアイコン
             .overlay {

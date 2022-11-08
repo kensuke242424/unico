@@ -17,6 +17,7 @@ struct Item: Identifiable, Equatable, Hashable {
     var photo: String
     var cost: Int
     var price: Int
+    var amount: Int
     var sales: Int
     var inventory: Int
     var totalAmount: Int
@@ -34,4 +35,3 @@ enum Mode {
     case dark
     case light
 }
-

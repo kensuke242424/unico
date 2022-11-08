@@ -11,49 +11,62 @@ struct ShowsItemDetail: View {
 
     @StateObject var itemVM: ItemViewModel
 
+    @Binding var inputHome: InputHome
     let item: Item
-    let itemIndex: Int
-    @Binding var isShowItemDetail: Bool
-    @Binding var isPresentedEditItem: Bool
 
     struct InputItemDetail {
         var opacity: Double = 0
         var isShowAlert: Bool = false
+        var isPresentedEditItem: Bool = false
     }
 
+    private let screenSize: CGRect = UIScreen.main.bounds
     @State private var inputDetail: InputItemDetail = InputItemDetail()
 
     var body: some View {
 
         ZStack {
 
-            Color(.gray)
+            Color(.black).opacity(0.4)
                 .ignoresSafeArea()
-                .opacity(0.4)
-                .onTapGesture { isShowItemDetail = false }
+                .onTapGesture {
+                    inputHome.isShowItemDetail.toggle()
+                }
 
             RoundedRectangle(cornerRadius: 20)
                 .foregroundColor(.black)
-                .frame(width: 300, height: 470)
+                .frame(width: screenSize.width * 0.75, height: screenSize.height * 0.55)
                 .opacity(0.9)
                 .overlay {
-                    Color.customDarkBlue2
-                        .opacity(0.5)
+                    Color.customDarkBlue2.opacity(0.5)
                         .blur(radius: 20)
+                        .overlay(alignment: .bottom) {
+
+                            Button {
+                                inputHome.isShowItemDetail.toggle()
+                            } label: {
+                                HStack {
+                                    Image(systemName: "multiply.circle.fill")
+                                    Text("閉じる")
+                                }
+                                .font(.title3).foregroundColor(.white)
+                                .offset(y: 50)
+                            }
+
+                        }
                 }
 
                 .overlay {
                     VStack {
-                        Text(item.name)
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
+                        Text(item.name).fontWeight(.bold).foregroundColor(.white)
                             .tracking(1)
                             .lineLimit(1)
 
                         ScrollView(showsIndicators: false) {
                             VStack(spacing: 10) {
 
-                                ShowItemPhoto(photo: item.photo, size: 150)
+                                ShowItemPhoto(photo: item.photo, size: screenSize.width * 0.35)
+                                    .padding()
 
                                 HStack {
                                     Text("　アイテム情報")
@@ -61,9 +74,8 @@ struct ShowsItemDetail: View {
                                         .foregroundColor(.white)
 
                                     Button {
-                                        // NOTE: アイテム編集画面へ遷移するかをアラートで選択
+
                                         inputDetail.isShowAlert.toggle()
-                                        print("isShowAlert: \(inputDetail.isShowAlert)")
 
                                     } label: {
                                         Image(systemName: "highlighter")
@@ -73,13 +85,13 @@ struct ShowsItemDetail: View {
 
                                         Button {
                                             inputDetail.isShowAlert.toggle()
-                                            print("isShowAlert: \(inputDetail.isShowAlert)")
                                         } label: {
                                             Text("戻る")
                                         }
 
                                         Button {
-                                            isPresentedEditItem.toggle()
+                                            inputHome.editItemStatus = .update
+                                            inputHome.isPresentedEditItem.toggle()
                                         } label: {
                                             Text("はい")
                                         }
@@ -89,22 +101,13 @@ struct ShowsItemDetail: View {
 
                                 } // HStack
 
-                                Divider()
-                                    .background(.white)
-                                    .opacity(0.5)
+                                Divider().background(.white).opacity(0.5)
                                     .padding()
 
                                 // NOTE: アイテムの情報が格納羅列されたカスタムViewです
-                                ItemDetailData(sales: item.sales,
-                                                   price: item.price,
-                                                   inventory: item.inventory,
-                                                   createAt: item.createTime,
-                                                   updateAt: item.updateTime
-                                )
+                                ItemDetailData(item: item)
 
-                                Divider()
-                                    .background(.white)
-                                    .opacity(0.5)
+                                Divider().background(.white).opacity(0.5)
                                     .padding()
 
                                 HStack {
@@ -115,30 +118,29 @@ struct ShowsItemDetail: View {
                                 .padding(.leading, 20)
 
                                 RoundedRectangle(cornerRadius: 10)
-                                    .foregroundColor(.gray)
-                                    .frame(width: 250, height: 300)
-                                    .opacity(0.2)
-                                    .overlay(alignment: .top) {
-                                        Text(item.detail)
-                                            .font(.footnote)
-                                            .foregroundColor(.white)
-                                            .frame(width: 240)
-                                            .padding(.vertical)
+                                    .foregroundColor(.gray).opacity(0.2)
+                                    .frame(width: screenSize.width * 0.6, height: 300)
+                                    .overlay(alignment: .topLeading) {
+                                        ScrollView {
+                                            Text(item.detail).font(.caption).foregroundColor(.white)
+                                                .padding(10)
+                                        }
                                     }
                             } // VStack
                         } // ScrollView
                     } // VStack
                     .padding(.vertical, 30)
                 }// overlay
+                .offset(y: -30)
         } // ZStack(全体)
         .opacity(inputDetail.opacity)
 
-        .sheet(isPresented: $isPresentedEditItem) {
+        .sheet(isPresented: $inputDetail.isPresentedEditItem) {
 
             // NOTE: itemがnilでない場合のみボタンを有効にしているため、ボタンアクション時には値を強制アンラップします。
             EditItemView(itemVM: itemVM,
-                         isPresentedEditItem: $isPresentedEditItem,
-                         itemIndex: itemIndex,
+                         inputHome: $inputHome,
+                         itemIndex: inputHome.actionItemIndex,
                          passItemData: item,
                          editItemStatus: .update)
         } // sheet(アイテム更新シート)
@@ -155,10 +157,7 @@ struct ShowsItemDetail: View {
 struct ShowsItemDetail_Previews: PreviewProvider {
     static var previews: some View {
         ShowsItemDetail(itemVM: ItemViewModel(),
-                        item: TestItem().testItem,
-                        itemIndex: 0,
-                        isShowItemDetail: .constant(false),
-                        isPresentedEditItem: .constant(false)
-        )
+                        inputHome: .constant(InputHome()),
+                        item: TestItem().testItem)
     }
 }

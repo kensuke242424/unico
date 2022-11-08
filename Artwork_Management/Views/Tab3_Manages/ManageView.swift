@@ -23,17 +23,12 @@ struct ManageView: View {
     @StateObject var itemVM: ItemViewModel
 
     // NOTE: 新規アイテム追加Viewの発現を管理します
-    @Binding var isPresentedEditItem: Bool
+    @Binding var inputHome: InputHome
 
     struct InputManage {
-        // NOTE: リスト内のアイテム詳細を表示するトリガーです
-        var isShowItemDetail = false
-        // NOTE: リストの一要素Indexを、アイテム詳細画面表示時に渡します
-        var listIndex = 0
-        // NOTE: タググループ表示の切り替えに用います
         var tagGroup: TagGroup = .on
-        // NOTE: アイテムのソート処理の切り替えに用います
         var sortType: SortType = .start
+        var isTagGroup: Bool = true
     }
 
     @State private var inputManage: InputManage = InputManage()
@@ -47,38 +42,93 @@ struct ManageView: View {
                     VStack(alignment: .leading) {
 
                         // NOTE: タグ表示の「ON」「OFF」で表示を切り替えます
-                        switch inputManage.tagGroup {
+                        switch inputManage.isTagGroup {
 
-                        case .on:
+                        case true:
+
                             // タグの要素数の分リストを作成
-                            ForEach(itemVM.tags) { tag in
+                            ForEach(itemVM.tags) { tagRow in
 
-                                Text("- \(tag.tagName) -")
+                                // firstには"ALL", lastには"タグ無し"
+                                if tagRow != itemVM.tags.first! && tagRow != itemVM.tags.last! {
+
+                                    HStack {
+                                        Text(tagRow.tagName)
+                                            .foregroundColor(.white)
+                                            .font(.title.bold())
+                                            .shadow(radius: 2, x: 4, y: 6)
+                                            .padding(.vertical)
+
+                                    }
+
+                                    Spacer(minLength: 0)
+
+                                    LinearGradient(gradient: Gradient(colors: [.gray, .clear]),
+                                                               startPoint: .leading, endPoint: .trailing)
+                                        .frame(height: 1)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                                    if itemVM.items.contains(where: {$0.tag == tagRow.tagName}) {
+
+                                        VStack {
+                                            ForEach(itemVM.items) { item in
+
+                                                if item.tag == tagRow.tagName {
+                                                    manageListRow(item: item)
+                                                }
+                                            }
+                                            Color.clear
+                                                .frame(height: 20)
+                                        }
+
+                                    } else {
+                                        Text("タグに該当するアイテムはありません")
+                                            .font(.subheadline)
+                                            .foregroundColor(.white).opacity(0.6)
+                                            .frame(height: 100)
+                                    }
+                                }
+                            } // ForEach itemVM.tags
+
+                            // "タグ無し"タグのついたアイテムが存在した場合
+                            if itemVM.items.contains(where: {$0.tag == (itemVM.tags.last!.tagName)}) {
+                                Text(itemVM.tags.last!.tagName)
                                     .foregroundColor(.white)
-                                    .font(.largeTitle.bold())
+                                    .font(.title2.bold())
                                     .shadow(radius: 2, x: 4, y: 6)
                                     .padding(.vertical)
 
-                                // タグごとに分配してリスト表示
-                                // enumerated ⇨ 要素とインデックス両方取得
-                                ForEach(Array(itemVM.items.enumerated()), id: \.offset) { offset, item in
+                                LinearGradient(gradient: Gradient(colors: [.gray, .clear]),
+                                                           startPoint: .leading, endPoint: .trailing)
+                                    .frame(height: 1)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
 
-                                    if item.tag == tag.tagName {
-                                        salesItemListRow(item: item, listIndex: offset)
-                                    }
-                                } // ForEach item
-                            } // case .groupOn
+                                    ForEach(itemVM.items) { item in
 
-                        case .off:
+                                        if item.tag == "\(itemVM.tags.last!.tagName)" {
+                                            manageListRow(item: item)
+                                        }
+                                    } // ForEach item
+                            } // if
 
-                            Text("- ALL -")
+                        case false:
+
+                            Text(itemVM.tags[0].tagName)
                                 .font(.largeTitle.bold())
+                                .foregroundColor(.white)
                                 .shadow(radius: 2, x: 4, y: 6)
                                 .padding(.vertical)
 
-                            ForEach(Array(itemVM.items.enumerated()), id: \.offset) { offset, item in
+                            Spacer(minLength: 0)
 
-                                salesItemListRow(item: item, listIndex: offset)
+                            LinearGradient(gradient: Gradient(colors: [.gray, .clear]),
+                                                       startPoint: .leading, endPoint: .trailing)
+                                .frame(height: 1)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+
+                            ForEach(itemVM.items) { item in
+
+                                manageListRow(item: item)
 
                             } // case .groupOff
                         } // switch tagGroup
@@ -86,45 +136,25 @@ struct ManageView: View {
                     .padding(.leading)
 
                 } // ScrollView
-
-                if inputManage.isShowItemDetail {
-                    ShowsItemDetail(itemVM: itemVM,
-                                    item: itemVM.items[inputManage.listIndex],
-                                    itemIndex: inputManage.listIndex,
-                                    isShowItemDetail: $inputManage.isShowItemDetail,
-                                    isPresentedEditItem: $isPresentedEditItem)
-
-                } // if isShowItemDetail
-
             } // ZStack
             .background(LinearGradient(gradient: Gradient(colors: [.customDarkGray1, .customLightGray1]),
                                        startPoint: .top, endPoint: .bottom))
             .navigationTitle("Manage")
+            .navigationBarTitleDisplayMode(.inline)
+            .animation(.spring(response: 0.5), value: inputManage.isTagGroup)
+            // sort Menu...
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
-                        Menu("タググループ") {
 
-                            Button {
-                                inputManage.tagGroup = .on
-                            } label: {
-                                if inputManage.tagGroup == .on {
-                                    Text("ON   　　　　　 ✔︎")
-                                } else {
-                                    Text("ON")
-                                }
-                            } // ON
-
-                            Button {
-                                inputManage.tagGroup = .off
-                            } label: {
-                                if inputManage.tagGroup == .off {
-                                    Text("OFF   　　　　　 ✔︎")
-                                } else {
-                                    Text("OFF")
-                                }
-                            } // OFF
-                        } // タググループオプション
+                        Toggle(isOn: $inputManage.isTagGroup) {
+                            HStack {
+                                Image(systemName: inputManage.isTagGroup ? "tag.fill" : "tag.slash")
+                                    .resizable()
+                                    .foregroundColor(inputManage.isTagGroup ? .green : .gray)
+                                Text("タググループ")
+                            }
+                        }
 
                         Menu("並び替え") {
                             Button {
@@ -176,27 +206,36 @@ struct ManageView: View {
                             .frame(width: 30, height: 30)
                     }
                 }
-            } // .toolbar
-            .sheet(isPresented: $isPresentedEditItem) {
-                EditItemView(itemVM: itemVM,
-                                isPresentedEditItem: $isPresentedEditItem,
-                                itemIndex: 0,
-                                passItemData: nil,
-                                editItemStatus: .create)
-            } // sheet(新規アイテム)
-
-            .navigationBarTitleDisplayMode(.inline)
+            }
+            // System Side Menu ...
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+                            inputHome.isShowSystemSideMenu.toggle()
+                        }
+                        withAnimation(.easeIn(duration: 0.2)) {
+                            inputHome.sideMenuBackGround.toggle()
+                        }
+                    } label: {
+                        CircleIcon(photo: "cloth_sample1", size: getSafeArea().top - 20)
+                    }
+                }
+            }
         } // NavigationView
     } // body
 
     @ViewBuilder
-    func salesItemListRow(item: Item, listIndex: Int) -> some View {
+    func manageListRow(item: Item) -> some View {
 
         VStack(alignment: .leading, spacing: 20) {
 
             HStack(spacing: 20) {
 
-                ShowItemPhoto(photo: item.photo, size: 70)
+                ShowItemPhoto(photo: item.photo, size: UIScreen.main.bounds.width / 5)
+                    .onTapGesture {
+                        print("画像タップ")
+                    }
 
                 VStack(alignment: .leading, spacing: 10) {
                     HStack(spacing: 40) {
@@ -205,9 +244,15 @@ struct ManageView: View {
                             .opacity(0.8)
                             .font(.subheadline.bold())
                         Button {
-                            inputManage.listIndex = listIndex
-                            inputManage.isShowItemDetail.toggle()
-                            print("isShowItemDetail: \(inputManage.isShowItemDetail)")
+
+                            if let actionItemIndex = itemVM.items.firstIndex(of: item) {
+                                inputHome.actionItemIndex = actionItemIndex
+                                withAnimation(.easeIn(duration: 0.15)) {
+                                    inputHome.isShowItemDetail.toggle()
+                                }
+                            } else {
+                                print("インデックス取得失敗")
+                            }
 
                         } label: {
                             Image(systemName: "info.circle.fill")
@@ -240,6 +285,6 @@ struct ManageView: View {
 
 struct ManageView_Previews: PreviewProvider {
     static var previews: some View {
-        ManageView(itemVM: ItemViewModel(), isPresentedEditItem: .constant(false))
+        ManageView(itemVM: ItemViewModel(), inputHome: .constant(InputHome()))
     }
 }

@@ -12,41 +12,59 @@ struct TagSortCards: View {
 
     @StateObject var itemVM: ItemViewModel
 
+    @Binding var inputHome: InputHome
     @Binding var inputStock: InputStock
-    @Binding var cartResults: CartResults
     let selectFilterTag: String
 
     private let columnsV: [GridItem] = Array(repeating: .init(.flexible()), count: 2)
 
     var body: some View {
 
-        LazyVGrid(columns: columnsV, spacing: 20) {
-            ForEach(itemVM.items) { item in
+        // NOTE: タグインデックス「0」 && searthItemTextが 「tags.first」 or  ""
+        if inputStock.filterTagIndex == 0 &&
+            inputStock.searchItemNameText == itemVM.tags.first!.tagName ||
+            inputStock.searchItemNameText == "" {
 
-                if selectFilterTag == "ALL" || selectFilterTag == "検索" {
-                    if inputStock.searchItemNameText == "ALL" || inputStock.searchItemNameText == "" {
-                        ItemCardRow(itemVM: itemVM,
-                                    inputStock: $inputStock,
-                                    cartResults: $cartResults,
-                                    itemRow: item)
-                    } else {
-                        if item.name.lowercased().contains(inputStock.searchItemNameText.lowercased()) {
-                            ItemCardRow(itemVM: itemVM,
-                                        inputStock: $inputStock,
-                                        cartResults: $cartResults,
-                                        itemRow: item)
-                        }
-                    }
-                } else if item.tag == selectFilterTag {
+            LazyVGrid(columns: columnsV, spacing: 20) {
+                ForEach(itemVM.items) { item in
+
                     ItemCardRow(itemVM: itemVM,
+                                inputHome: $inputHome,
                                 inputStock: $inputStock,
-                                cartResults: $cartResults,
                                 itemRow: item)
                 }
-            } // ForEach
-        } // LazyVGrid
-        .padding(.horizontal, 10)
-        Spacer().frame(height: 200)
+            }
+            .padding(.horizontal, 10)
+            Spacer().frame(height: 200)
+
+        // NOTE: itemVM.items.「item.name」「item.tag」の中に一つでも検索条件が当てはまったら
+        } else if itemVM.items.contains(where: { $0.name.contains(inputStock.searchItemNameText) }) ||
+                    itemVM.items.contains(where: { $0.tag.contains(selectFilterTag) }) {
+
+            LazyVGrid(columns: columnsV, spacing: 20) {
+                ForEach(itemVM.items) { item in
+
+                    if item.name.contains(inputStock.searchItemNameText) ||
+                        item.tag.contains(inputStock.searchItemNameText) ||
+                        item.tag.contains(selectFilterTag) {
+                        ItemCardRow(itemVM: itemVM,
+                                    inputHome: $inputHome,
+                                    inputStock: $inputStock,
+                                    itemRow: item)
+                    }
+                }
+            }
+            .padding(.horizontal, 10)
+            Spacer().frame(height: 200)
+
+        } else {
+            Text("タグに該当するアイテムはありません")
+                .font(.subheadline)
+                .foregroundColor(.white).opacity(0.6)
+                .frame(height: 200)
+            Spacer().frame(height: 300)
+        }
+
     } // body
 } // View
 
@@ -55,8 +73,8 @@ struct UpdateTimeSortCards: View {
 
     @StateObject var itemVM: ItemViewModel
 
+    @Binding var inputHome: InputHome
     @Binding var inputStock: InputStock
-    @Binding var commerceResults: CartResults
 
     // アイテムのディテールを指定します。
     let columnsH: [GridItem] = Array(repeating: .init(.flexible()), count: 1)
@@ -68,8 +86,8 @@ struct UpdateTimeSortCards: View {
                 ForEach(itemVM.items) { item in
 
                     ItemCardRow(itemVM: itemVM,
+                                inputHome: $inputHome,
                                 inputStock: $inputStock,
-                                cartResults: $commerceResults,
                                 itemRow: item)
 
                 } // ForEach
@@ -88,9 +106,8 @@ struct TagCards_Previews: PreviewProvider {
              // ✅カスタムView: 最近更新したアイテムをHStack表示します。(横スクロール)
              ScrollView(.horizontal) {
                  UpdateTimeSortCards(itemVM: ItemViewModel(),
-                                     inputStock: .constant(InputStock()),
-                                     commerceResults: .constant(CartResults())
-                 )
+                                     inputHome: .constant(InputHome()),
+                                     inputStock: .constant(InputStock()))
              } // ScrollView
 
             Divider()
@@ -100,10 +117,9 @@ struct TagCards_Previews: PreviewProvider {
             TagTitle(title: "アイテム", font: .title)
             // ✅カスタムView: アイテムを表示します。(縦スクロール)
             TagSortCards(itemVM: ItemViewModel(),
+                         inputHome: .constant(InputHome()),
                          inputStock: .constant(InputStock()),
-                         cartResults: .constant(CartResults()),
-                         selectFilterTag: "Album"
-            )
+                         selectFilterTag: "Album")
         } // ScrollView (アイテムロケーション)
     }
 } // TagCards_Previews

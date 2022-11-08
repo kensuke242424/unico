@@ -2,12 +2,17 @@
 //  DateFormatterExtension.swift
 //  Artwork_Management
 //
-//  Created by 中川賢亮 on 2022/11/01.
+//  Created by 中川賢亮 on 2022/11/08.
 //
 
 import Foundation
 
 extension DateFormatter {
+
+    enum SelectLocale: String {
+        case enUS = "en_US"
+        case jaJP = "ja_JP"
+    }
 
     // テンプレートの定義(例)
     enum Template: String {
@@ -20,8 +25,8 @@ extension DateFormatter {
         case usMonthDay = "MMMM.d" // Jun 10
     }
 
-    func setTemplate(_ template: Template) {
+    func setTemplate(_ template: Template, _ locale: SelectLocale) {
             // optionsは拡張用の引数だが使用されていないため常に0
-            dateFormat = DateFormatter.dateFormat(fromTemplate: template.rawValue, options: 0, locale: .current)
+        dateFormat = DateFormatter.dateFormat(fromTemplate: template.rawValue, options: 0, locale: Locale(identifier: locale.rawValue))
         }
 }

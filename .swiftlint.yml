@@ -5,3 +5,4 @@ disabled_rules:
 - force_cast
 - cyclomatic_complexity
 - function_body_length
+- identifier_name

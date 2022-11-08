@@ -10,17 +10,10 @@ import ResizableSheet
 
 struct InputStock {
     var searchItemNameText: String = "ALL"
-    var currentIndex: Int = 0
-    var actionRowIndex: Int = 0
-    var sideTagOpacity: CGFloat = 0.4
-    var isShowItemDetail: Bool = false
+    var filterTagIndex: Int = 0
+    var resultCartAmount: Int = 0
+    var resultCartPrice: Int = 0
     var mode: Mode = .dark
-}
-
-struct CartResults {
-    var resultItemAmount: Int = 0
-    var resultPrice: Int = 0
-    var resultCartItems: [Item] = []
 }
 
 struct StockView: View {
@@ -37,11 +30,10 @@ struct StockView: View {
     @GestureState private var dragOffset: CGFloat = 0
 
     @State private var inputStock: InputStock = InputStock()
-    @State private var cartResults: CartResults = CartResults()
 
     var body: some View {
-        NavigationView {
 
+        NavigationView {
             ScrollViewReader { scrollProxy in
                 ZStack {
                     VStack {
@@ -51,41 +43,33 @@ struct StockView: View {
                             TagTitle(title: "最近更新したアイテム", font: .title3)
                                 .foregroundColor(.white)
                                 .opacity(0.8)
-                                .padding(.top)
+                                .padding(.vertical)
 
                             Divider()
                                 .background(.gray)
-                                .padding()
+                                .padding(.horizontal)
 
                             // ✅カスタムView: 最近更新したアイテムをHStack表示します。(横スクロール)
                             UpdateTimeSortCards(itemVM: itemVM,
-                                                inputStock: $inputStock,
-                                                commerceResults: $cartResults)
+                                                inputHome: $inputHome,
+                                                inputStock: $inputStock)
 
-                            Text(itemVM.tags[inputStock.currentIndex].tagName)
-                                            .foregroundColor(.white)
-                                            .font(.system(size: 20, weight: .bold))
-                                            .frame(width: 100, height: 40)
-                                            .padding()
+                            Divider()
+                                .background(.gray)
+                                .padding([.horizontal, .bottom])
+
+                            Text(itemVM.tags[inputStock.filterTagIndex].tagName)
+                                .foregroundColor(.white)
+                                .font(.system(size: 20, weight: .bold))
+                                .frame(width: 100, height: 40)
+                                .padding()
 
                             // NOTE: サイドタグバーの枠フレームおよび、前後のタグインフォメーションを表示します。
-                            .overlay {
-                                SideTagBarOverlay(inputStock: $inputStock,
-                                                  tags: $itemVM.tags)
-                            } // overlay
-                            .id("search")
-//                            .padding()
-
-                            // NOTE: サイドタグバー両端のタグインフォメーションopacityを、ドラッグ位置を監視して管理しています。
-                            .onChange(of: dragOffset) { newValue in
-                                if newValue == 0 {
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                        inputStock.sideTagOpacity = 0.4
-                                    }
-                                } else {
-                                    inputStock.sideTagOpacity = 0.0
-                                }
-                            } // onChange
+                                .overlay {
+                                    SideTagBarOverlay(inputStock: $inputStock,
+                                                      tags: $itemVM.tags)
+                                } // overlay
+                                .id("search")
 
                             // NOTE: 検索ボックスの表示管理
                             if inputHome.isShowSearchField {
@@ -98,9 +82,9 @@ struct StockView: View {
                             }
 
                             HStack(spacing: 50) {
-                                Text(inputStock.currentIndex == 0 ?
-                                         "- \(inputStock.searchItemNameText) -" :
-                                        "-  \(itemVM.tags[inputStock.currentIndex].tagName) -")
+                                Text(inputStock.filterTagIndex == 0 ?
+                                     "- \(inputStock.searchItemNameText) -" :
+                                        "- \(itemVM.tags[inputStock.filterTagIndex].tagName) -")
                                 .font(.title.bold())
                                 .foregroundColor(.white)
                                 .shadow(radius: 3, x: 4, y: 6)
@@ -125,58 +109,37 @@ struct StockView: View {
                                 }
                                 Spacer()
                             } // HStack
-                            .padding()
+                            .padding([.leading, .vertical])
 
-                            // ✅カスタムView: アイテムを表示します。(縦スクロール)
                             TagSortCards(itemVM: itemVM,
+                                         inputHome: $inputHome,
                                          inputStock: $inputStock,
-                                         cartResults: $cartResults,
-                                         selectFilterTag: itemVM.tags[inputStock.currentIndex].tagName)
+                                         selectFilterTag: itemVM.tags[inputStock.filterTagIndex].tagName)
+
                         } // ScrollView (アイテムロケーション)
 
                     } // VStack
-                    // NOTE: アイテム詳細ボタンをタップすると、詳細画面が発火します。
-                    if inputStock.isShowItemDetail {
-                        ShowsItemDetail(itemVM: itemVM,
-                                        item: itemVM.items[inputStock.actionRowIndex],
-                                        itemIndex: inputStock.actionRowIndex,
-                                        isShowItemDetail: $inputStock.isShowItemDetail,
-                                        isPresentedEditItem: $inputHome.isPresentedEditItem)
-                    } // if isShowItemDetail
                 } // ZStack
 
-                // NOTE: バスケット内にアイテムが追加された時点で、ハーフモーダルを表示します。
-                .onChange(of: cartResults.resultCartItems) { [before = cartResults.resultCartItems] after in
+                // NOTE: カート内のアイテムを監視してハーフモーダルを表示
+                //       カートが空になったら、更新インフォメーションを表示
+                .onChange(of: inputStock.resultCartAmount) { [before = inputStock.resultCartAmount] after in
 
-                    if before.count == 0 {
-                        inputHome.commerceState = .medium
+                    if before == 0 {
+                        inputHome.commerceHalfSheet = .medium
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                            inputHome.cartState = .medium
+                            inputHome.cartHalfSheet = .medium
                         }
                     }
-                    if after == [] {
-                        inputHome.commerceState = .hidden
-                        inputHome.cartState = .hidden
+                    if after == 0 {
+                        inputHome.cartHalfSheet = .hidden
+                        inputHome.commerceHalfSheet = .hidden
                         inputHome.basketInfomationOpacity = 0.7
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.9) {
                             inputHome.basketInfomationOpacity = 0.0
                         }
                     }
                 }
-
-                // NOTE: アイテム情報の更新が入った時、カート内にアイテムがあればリセットします。
-                .onChange(of: itemVM.items) { _ in
-
-                    cartResults.resultCartItems = []
-                    cartResults.resultItemAmount = 0
-                    cartResults.resultPrice = 0
-
-                    inputHome.itemsInfomationOpacity = 0.7
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.7) {
-                        inputHome.itemsInfomationOpacity = 0.0
-                    }
-                } // .onChange
-
                 // NOTE: 入力フィールドの表示に合わせて、フォーカスを切り替えます。
                 // NOTE: 入力フィールド表示時に、指定の位置まで自動フォーカスします。
                 .onChange(of: inputHome.isShowSearchField) { newValue in
@@ -198,10 +161,8 @@ struct StockView: View {
                     if newValue {
                         withAnimation(.easeIn(duration: 2.0)) {
                             scrollProxy.scrollTo("search", anchor: .top)
-                            }
-//                        withAnimation(.easeIn(duration: 0.3)) {
-                            inputStock.currentIndex = 0 // タグを「All」に更新
-//                        }
+                        }
+                        inputStock.filterTagIndex = 0 // タグを「All」に更新
                     } // if
                 } // .onChange
 
@@ -217,7 +178,7 @@ struct StockView: View {
                                                                    .customLightGray1]),
                                        startPoint: .top, endPoint: .bottom))
             // アイテム取引かごのシート画面
-            .resizableSheet($inputHome.cartState, id: "A") { builder in
+            .resizableSheet($inputHome.cartHalfSheet, id: "A") { builder in
                 builder.content { context in
 
                     VStack {
@@ -235,9 +196,15 @@ struct StockView: View {
                             Spacer()
                             Button(
                                 action: {
-                                    cartResults.resultCartItems = []
-                                    cartResults.resultPrice = 0
-                                    cartResults.resultItemAmount = 0
+                                    inputStock.resultCartPrice = 0
+                                    inputStock.resultCartAmount = 0
+
+                                    for index in itemVM.items.indices {
+
+                                        if itemVM.items[index].amount != 0 {
+                                            itemVM.items[index].amount = 0
+                                        }
+                                    }
                                 },
                                 label: {
                                     HStack {
@@ -258,7 +225,6 @@ struct StockView: View {
                             main: {
                                 CartItemsSheet(
                                     itemVM: itemVM,
-                                    cartResults: $cartResults,
                                     inputStock: $inputStock,
                                     inputHome: $inputHome,
                                     halfSheetScroll: .main)
@@ -266,7 +232,6 @@ struct StockView: View {
                             additional: {
                                 CartItemsSheet(
                                     itemVM: itemVM,
-                                    cartResults: $cartResults,
                                     inputStock: $inputStock,
                                     inputHome: $inputHome,
                                     halfSheetScroll: .additional)
@@ -291,11 +256,12 @@ struct StockView: View {
             } // .resizableSheet
 
             // 決済リザルトのシート画面
-            .resizableSheet($inputHome.commerceState, id: "B") {builder in
+            .resizableSheet($inputHome.commerceHalfSheet, id: "B") {builder in
                 builder.content { _ in
 
-                    CommerceSheet(inputHome: $inputHome,
-                                  commerceResults: $cartResults)
+                    CommerceSheet(itemVM: itemVM,
+                                  inputHome: $inputHome,
+                                  inputStock: $inputStock)
 
                 } // builder.content
                 .supportedState([.medium])
@@ -308,23 +274,37 @@ struct StockView: View {
                     EmptyView()
                 }
             } // .resizableSheet
-
             .animation(.easeIn(duration: 0.2), value: inputHome.isShowSearchField)
             .navigationTitle("Stock")
             .navigationBarTitleDisplayMode(.inline)
-        } // NavigationView
-        .onTapGesture { searchFocused = nil }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+                            inputHome.isShowSystemSideMenu.toggle()
+                        }
+                        withAnimation(.easeIn(duration: 0.2)) {
+                            inputHome.sideMenuBackGround.toggle()
+                        }
+                    } label: {
+                        CircleIcon(photo: "cloth_sample1", size: getSafeArea().top - 20)
+                    }
+                }
+            }
 
-        // NOTE: ディスプレイのカラーモードを検知し、enumを切り替えます。
-        .onChange(of: colorScheme) { _ in
-            switch colorScheme {
-            case .light: inputStock.mode = .light
-            case .dark: inputStock.mode = .dark
-            default:
-                fatalError()
-            } // switch
-            print("ディスプレイモード: \(inputStock.mode)")
-        } // .onChangek
+            .onTapGesture { searchFocused = nil }
+
+            // NOTE: ディスプレイのカラーモードを検知し、enumを切り替えます。
+            .onChange(of: colorScheme) { _ in
+                switch colorScheme {
+                case .light: inputStock.mode = .light
+                case .dark: inputStock.mode = .dark
+                default:
+                    fatalError()
+                } // switch
+                print("ディスプレイモード: \(inputStock.mode)")
+            } // .onChangek
+        } // NavigationView
     } // body
 } // View
 
@@ -344,34 +324,32 @@ struct SideTagBarOverlay: View {
         // NOTE: タグサイドバー枠内で、現在選択しているタグの前後の値をインフォメーションします。
             .overlay {
                 HStack {
-                    if inputStock.currentIndex - 1 >= 0 {
+                    if inputStock.filterTagIndex - 1 >= 0 {
                         HStack {
                             Text("<")
-                            Text("\(tags[inputStock.currentIndex - 1].tagName)")
+                            Text("\(tags[inputStock.filterTagIndex - 1].tagName)")
                                 .frame(width: 60)
                                 .lineLimit(1)
                         } // HStack
-                        .onTapGesture { inputStock.currentIndex -= 1 }
+                        .onTapGesture { inputStock.filterTagIndex -= 1 }
                     }
 
                     Spacer()
 
-                    if inputStock.currentIndex + 1 < tags.count {
+                    if inputStock.filterTagIndex + 1 < tags.count {
                         HStack {
-                            Text("\(tags[inputStock.currentIndex + 1].tagName)")
+                            Text("\(tags[inputStock.filterTagIndex + 1].tagName)")
                                 .frame(width: 60)
                                 .lineLimit(1)
                             Text(">")
                         } // HStack
-                        .onTapGesture { inputStock.currentIndex += 1 }
+                        .onTapGesture { inputStock.filterTagIndex += 1 }
                     }
                 } // HStack
                 .foregroundColor(.white)
                 .padding(.horizontal, 20)
-                .opacity(inputStock.sideTagOpacity)
 
             } // overlay(サイドタグ情報)
-            .animation(.easeIn(duration: 0.2), value: inputStock.sideTagOpacity)
     }
 } // カスタムView
 

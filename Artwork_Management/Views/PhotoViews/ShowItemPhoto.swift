@@ -25,7 +25,7 @@ struct ShowItemPhoto: View {
                     .frame(width: size, height: size)
                     .clipShape(RoundedRectangle(cornerRadius: 5))
                     .allowsHitTesting(false)
-                    .shadow(radius: 4, x: 5, y: 5)
+                    .shadow(radius: 4, x: 4, y: 4)
 
             }
 
