@@ -8,7 +8,6 @@
 import SwiftUI
 import ResizableSheet
 
-
 // NOTE: アイテムの「追加」「更新」を管理します
 enum EditStatus {
     case create
@@ -71,30 +70,6 @@ struct HomeTabView: View {
 
             } // TabViewここまで
 
-            VStack {
-
-                RoundedRectangle(cornerRadius: 10)
-                    .foregroundColor(.white)
-                    .frame(width: 300, height: 30)
-                    .overlay {
-                        Text("アイテム情報が更新されました。")
-                            .foregroundColor(.black)
-                            .fontWeight(.bold)
-                    }
-                    .opacity(inputHome.itemsInfomationOpacity)
-                RoundedRectangle(cornerRadius: 10)
-                    .foregroundColor(.white)
-                    .frame(width: 300, height: 30)
-                    .overlay {
-                        Text(inputHome.doCommerce ? "カート内の処理が確定しました。" : "カート内がリセットされました。")
-                            .foregroundColor(.black)
-                            .fontWeight(.bold)
-                    }
-                    .opacity(inputHome.basketInfomationOpacity)
-                Spacer()
-            }
-            .offset(y: 80)
-
             // Todo: 各タブごとにオプションが変わるボタン
             UsefulButton(inputHome: $inputHome)
 
@@ -140,6 +115,30 @@ struct HomeTabView: View {
                                 defaultTag: inputTag.tagSideMenuStatus == .create ? nil : inputSideMenu.selectTag, tagSideMenuStatus: inputTag.tagSideMenuStatus)
             .offset(x: inputHome.isOpenEditTagSideMenu ? UIScreen.main.bounds.width / 2 - 25 : UIScreen.main.bounds.width + 10)
 
+            VStack {
+
+                RoundedRectangle(cornerRadius: 10)
+                    .foregroundColor(.white)
+                    .frame(width: 300, height: 30)
+                    .overlay {
+                        Text("アイテム情報が更新されました。")
+                            .foregroundColor(.black)
+                            .fontWeight(.bold)
+                    }
+                    .opacity(inputHome.itemsInfomationOpacity)
+                RoundedRectangle(cornerRadius: 10)
+                    .foregroundColor(.white)
+                    .frame(width: 300, height: 30)
+                    .overlay {
+                        Text(inputHome.doCommerce ? "カート内の処理が確定しました。" : "カート内がリセットされました。")
+                            .foregroundColor(.black)
+                            .fontWeight(.bold)
+                    }
+                    .opacity(inputHome.basketInfomationOpacity)
+                Spacer()
+            }
+            .offset(y: 80)
+
         } // ZStack
         .animation(.easeIn(duration: 0.2), value: inputHome.itemsInfomationOpacity)
         .animation(.easeIn(duration: 0.2), value: inputHome.basketInfomationOpacity)
@@ -152,6 +151,13 @@ struct HomeTabView: View {
                          passItemData: inputHome.editItemStatus == .create ?
                          nil : rootItemVM.items[inputHome.actionItemIndex],
                          editItemStatus: inputHome.editItemStatus)
+        }
+
+        .onChange(of: rootItemVM.items) { _ in
+            inputHome.itemsInfomationOpacity = 0.7
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                inputHome.itemsInfomationOpacity = 0.0
+            }
         }
     } // body
 } // View

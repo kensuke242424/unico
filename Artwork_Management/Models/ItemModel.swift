@@ -35,4 +35,3 @@ enum Mode {
     case dark
     case light
 }
-

@@ -78,8 +78,6 @@ struct FirstLogInInfomation: View {
                     } // Button
                 }
 
-
-
                 HStack {
                     Text("再度入力してください")
                         .foregroundColor(.gray)

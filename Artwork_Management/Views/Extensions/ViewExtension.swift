@@ -8,7 +8,7 @@
 import SwiftUI
 
 extension View {
-    
+
     func getSafeArea() -> UIEdgeInsets {
 
         guard let screen =
