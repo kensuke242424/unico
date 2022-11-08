@@ -74,7 +74,6 @@ struct ShowsItemDetail: View {
                                         .foregroundColor(.white)
 
                                     Button {
-
                                         inputDetail.isShowAlert.toggle()
 
                                     } label: {
@@ -134,16 +133,6 @@ struct ShowsItemDetail: View {
                 .offset(y: -30)
         } // ZStack(全体)
         .opacity(inputDetail.opacity)
-
-        .sheet(isPresented: $inputDetail.isPresentedEditItem) {
-
-            // NOTE: itemがnilでない場合のみボタンを有効にしているため、ボタンアクション時には値を強制アンラップします。
-            EditItemView(itemVM: itemVM,
-                         inputHome: $inputHome,
-                         itemIndex: inputHome.actionItemIndex,
-                         passItemData: item,
-                         editItemStatus: .update)
-        } // sheet(アイテム更新シート)
 
         .onAppear {
             withAnimation(.linear(duration: 0.2)) {

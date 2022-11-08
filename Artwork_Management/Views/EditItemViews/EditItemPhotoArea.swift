@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct SelectItemPhotoArea: View {
+struct EditItemPhotoArea: View {
 
     let item: Item?
 
@@ -47,6 +47,6 @@ struct SelectItemPhotoArea: View {
 
 struct SelectItemPhotoArea_Previews: PreviewProvider {
     static var previews: some View {
-        SelectItemPhotoArea(item: TestItem().testItem)
+        EditItemPhotoArea(item: TestItem().testItem)
     }
 }

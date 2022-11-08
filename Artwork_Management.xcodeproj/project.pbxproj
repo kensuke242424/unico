@@ -37,7 +37,7 @@
 		E09F09C528ED5DEA00D07669 /* SideMenuEditTagView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09F09C428ED5DEA00D07669 /* SideMenuEditTagView.swift */; };
 		E09F09C728EE266600D07669 /* InputFormTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09F09C628EE266500D07669 /* InputFormTitle.swift */; };
 		E09F09C928EE3B4900D07669 /* UsefulButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09F09C828EE3B4900D07669 /* UsefulButton.swift */; };
-		E09F09CB28EFEA8700D07669 /* SelectItemPhotoArea.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09F09CA28EFEA8600D07669 /* SelectItemPhotoArea.swift */; };
+		E09F09CB28EFEA8700D07669 /* EditItemPhotoArea.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09F09CA28EFEA8600D07669 /* EditItemPhotoArea.swift */; };
 		E09F09CE28F146DB00D07669 /* EditItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09F09CD28F146DB00D07669 /* EditItemView.swift */; };
 		E0A36452290A37A600B30A14 /* CustomArcShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0A36451290A37A600B30A14 /* CustomArcShape.swift */; };
 		E0A7DE4B290B9E0A008C3F3F /* ShowItemPhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0A7DE4A290B9E09008C3F3F /* ShowItemPhoto.swift */; };
@@ -88,7 +88,7 @@
 		E09F09C428ED5DEA00D07669 /* SideMenuEditTagView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideMenuEditTagView.swift; sourceTree = "<group>"; };
 		E09F09C628EE266500D07669 /* InputFormTitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputFormTitle.swift; sourceTree = "<group>"; };
 		E09F09C828EE3B4900D07669 /* UsefulButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsefulButton.swift; sourceTree = "<group>"; };
-		E09F09CA28EFEA8600D07669 /* SelectItemPhotoArea.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectItemPhotoArea.swift; sourceTree = "<group>"; };
+		E09F09CA28EFEA8600D07669 /* EditItemPhotoArea.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditItemPhotoArea.swift; sourceTree = "<group>"; };
 		E09F09CD28F146DB00D07669 /* EditItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditItemView.swift; sourceTree = "<group>"; };
 		E0A36451290A37A600B30A14 /* CustomArcShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomArcShape.swift; sourceTree = "<group>"; };
 		E0A6147F2910E46A0020D043 /* DateFormatterExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFormatterExtension.swift; sourceTree = "<group>"; };
@@ -288,7 +288,7 @@
 				E09F09CD28F146DB00D07669 /* EditItemView.swift */,
 				E09F09C428ED5DEA00D07669 /* SideMenuEditTagView.swift */,
 				E04ACF4028E6DD600054A6C4 /* ShowsItemDetail.swift */,
-				E09F09CA28EFEA8600D07669 /* SelectItemPhotoArea.swift */,
+				E09F09CA28EFEA8600D07669 /* EditItemPhotoArea.swift */,
 				E09F09C628EE266500D07669 /* InputFormTitle.swift */,
 				E09F09BB28EAF33500D07669 /* FocusedLineRow.swift */,
 			);
@@ -415,7 +415,7 @@
 				E0796AD728F485850094E50C /* ButtonViewModel.swift in Sources */,
 				E04ACF4328E73C660054A6C4 /* IndicatorRow.swift in Sources */,
 				E09F09BC28EAF33500D07669 /* FocusedLineRow.swift in Sources */,
-				E09F09CB28EFEA8700D07669 /* SelectItemPhotoArea.swift in Sources */,
+				E09F09CB28EFEA8700D07669 /* EditItemPhotoArea.swift in Sources */,
 				E0796AD328F46CC90094E50C /* ItemCardRow.swift in Sources */,
 				E08F273628DDB48100329C5E /* StockView.swift in Sources */,
 				E094F10228E21EBA00D3C845 /* FirstSignInView.swift in Sources */,

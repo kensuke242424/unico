@@ -26,6 +26,7 @@ struct EditItemView: View {
 
     @StateObject var itemVM: ItemViewModel
     @Binding var inputHome: InputHome
+    @Binding var inputImage: InputImage
 
     let itemIndex: Int
     let passItemData: Item?
@@ -51,7 +52,7 @@ struct EditItemView: View {
                         .offset(y: 340)
                     VStack {
                         // ✅カスタムView 写真ゾーン
-                        SelectItemPhotoArea(item: passItemData)
+                        EditItemPhotoArea(item: passItemData)
 
                         InputForms(itemVM: itemVM,
                                    inputEdit: $inputEdit,
@@ -333,6 +334,7 @@ struct EditItemView_Previews: PreviewProvider {
     static var previews: some View {
         EditItemView(itemVM: ItemViewModel(),
                      inputHome: .constant(InputHome()),
+                     inputImage: .constant(InputImage()),
                      itemIndex: 0,
                      passItemData: TestItem().testItem,
                      editItemStatus: .update

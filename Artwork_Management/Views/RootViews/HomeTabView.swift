@@ -21,7 +21,7 @@ enum UpdateImageStatus {
 struct InputHome {
     var homeTabIndex: Int = 0
     var actionItemIndex: Int = 0
-    var selectUpdateImage: UIImage? = UIImage()
+    var selectCaptureImage: UIImage? = UIImage()
     var itemsInfomationOpacity: CGFloat = 0.0
     var basketInfomationOpacity: CGFloat = 0.0
     var showErrorFetchImage: Bool = false
@@ -180,6 +180,7 @@ struct HomeTabView: View {
         .sheet(isPresented: $inputHome.isPresentedEditItem) {
             EditItemView(itemVM: rootItemVM,
                          inputHome: $inputHome,
+                         inputImage: $inputImage,
                          itemIndex: inputHome.actionItemIndex,
                          passItemData: inputHome.editItemStatus == .create ?
                          nil : rootItemVM.items[inputHome.actionItemIndex],
@@ -187,7 +188,7 @@ struct HomeTabView: View {
         }
 
         .sheet(isPresented: $inputHome.isShowSelectImageSheet) {
-            PHPickerView(selectImage: $inputHome.selectUpdateImage,
+            PHPickerView(captureImage: $inputHome.selectCaptureImage,
                          isShowSheet: $inputHome.isShowSelectImageSheet,
                          isShowError: $inputHome.showErrorFetchImage)
         }
@@ -202,9 +203,8 @@ struct HomeTabView: View {
             }
         }
 
-
         // convert UIImage ⇨ base64String...
-        .onChange(of: inputHome.selectUpdateImage) { newImage in
+        .onChange(of: inputHome.selectCaptureImage) { newImage in
 
             guard let base64StringImage = newImage?.toBase64String() else {
                 inputHome.showErrorFetchImage.toggle()

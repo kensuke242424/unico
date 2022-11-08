@@ -10,7 +10,7 @@ import PhotosUI
 
 struct PHPickerView: UIViewControllerRepresentable {
 
-    @Binding var selectImage: UIImage?
+    @Binding var captureImage: UIImage?
     @Binding var isShowSheet: Bool
     @Binding var isShowError: Bool
 
@@ -34,7 +34,7 @@ struct PHPickerView: UIViewControllerRepresentable {
                 if let unwrapImage = image as? UIImage {
                     print("PHPickerView_UIImage取得成功: \(unwrapImage)")
 
-                    self.parent.selectImage = unwrapImage
+                    self.parent.captureImage = unwrapImage
                 } else {
                     print("Error: image as? UIImage")
                     self.parent.isShowError.toggle()
