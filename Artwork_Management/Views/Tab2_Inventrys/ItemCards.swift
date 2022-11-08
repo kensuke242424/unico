@@ -58,7 +58,7 @@ struct TagSortCards: View {
             Spacer().frame(height: 200)
 
         } else {
-            Text("タグに該当するアイテムはありません")
+            Text(inputStock.filterTagIndex == 0 ? "検索に該当するアイテムはありません" : "タグに該当するアイテムはありません")
                 .font(.subheadline)
                 .foregroundColor(.white).opacity(0.6)
                 .frame(height: 200)

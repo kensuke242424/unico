@@ -87,7 +87,6 @@ struct HomeTabView: View {
 
             } // TabViewここまで
 
-            // Todo: 各タブごとにオプションが変わるボタン
             UsefulButton(inputHome: $inputHome)
 
             ShowsItemDetail(itemVM: rootItemVM,
@@ -167,9 +166,6 @@ struct HomeTabView: View {
                 Spacer()
             }
             .offset(y: 80)
-
-            // Todo: 各タブごとにオプションが変わるボタン
-            UsefulButton(inputHome: $inputHome)
 
         } // ZStack
         .animation(.easeIn(duration: 0.2), value: inputHome.itemsInfomationOpacity)

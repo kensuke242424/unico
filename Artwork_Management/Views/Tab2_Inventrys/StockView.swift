@@ -141,6 +141,11 @@ struct StockView: View {
                         }
                     }
                 }
+
+                .onChange(of: inputStock.filterTagIndex) { newIndex in
+                    if newIndex != 0 { inputHome.isShowSearchField = false }
+                }
+
                 // NOTE: 入力フィールドの表示に合わせて、フォーカスを切り替えます。
                 // NOTE: 入力フィールド表示時に、指定の位置まで自動フォーカスします。
                 .onChange(of: inputHome.isShowSearchField) { newValue in
