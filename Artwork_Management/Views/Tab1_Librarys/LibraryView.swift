@@ -64,78 +64,7 @@ struct LibraryView: View {
 
             VStack {
 
-                homeHeaderPhoto(photo: inputHome.selectImage, userIcon: "cloth_sample1")
-                    // Todo: ホームレイアウトのカスタム
-                    .overlay(alignment: .bottomTrailing) {
-                        Menu {
-                            Button {
-                                // Todo: Homeカスタム
-                            } label: {
-                                Text("準備中")
-                            }
-                        } label: {
-
-                            Image(systemName: "gearshape.2")
-                                .foregroundColor(.white).opacity(0.5)
-                                .padding(.trailing)
-
-                        } // Menu
-                        .offset(y: 40)
-                    } // overlay
-                .overlay {
-
-                    LinearGradient(gradient: Gradient(colors: [.clear, .black.opacity(0.2)]),
-                                   startPoint: .top, endPoint: .bottom)
-                    .opacity(inputLibrary.isShowHeaderPhotoInfomation ? 0.3 : 0.0)
-
-                } // overlay
-
-                .overlay(alignment: .topLeading) {
-                    Button {
-                        inputLibrary.isShowHeaderPhotoInfomation.toggle()
-                    } label: {
-                        CircleIcon(photo: "cloth_sample1", size: 35)
-                            .offset(y: getSafeArea().top)
-                            .opacity(inputLibrary.isShowHeaderPhotoInfomation ? 1.0 : 0.0)
-                    }
-                } // overlay
-
-                .overlay(alignment: .bottomTrailing) {
-                    Button {
-                        inputHome.editImageStatus = .header
-                        inputHome.isShowSelectImageSheet.toggle()
-                    } label: {
-                        Image(systemName: "photo.on.rectangle.angled")
-                            .foregroundColor(.white)
-                            .padding()
-                            .opacity(inputLibrary.isShowHeaderPhotoInfomation ? 1.0 : 0.0)
-                    }
-
-                } // overlay
-
-                .onTapGesture {
-                    withAnimation(.easeIn(duration: 0.2)) {
-                        inputLibrary.isShowHeaderPhotoInfomation.toggle()
-                    }
-                }
-                // Todo: ホームレイアウトのカスタム
-                .overlay(alignment: .bottomTrailing) {
-                    Menu {
-                        Button {
-
-                        } label: {
-                            Text("準備中")
-                        }
-                    } label: {
-
-                        Image(systemName: "gearshape.2")
-                            .foregroundColor(.white).opacity(0.5)
-                            .padding(.trailing)
-
-                    } // Menu
-                    .offset(y: 40)
-                } // overlay
-
+                homeHeaderPhoto(photo: headerImage, userIcon: "cloth_sample1")
                 // 時刻レイアウト
                 HStack {
                     VStack(alignment: .leading, spacing: 8) {
@@ -289,21 +218,32 @@ struct LibraryView: View {
 
         Group {
             if let photo = photo {
-                Group {
-                    switch headerImageSize {
-                    case .fit:
-                        Image(uiImage: photo)
-                            .resizable()
-                            .scaledToFit()
-                    case .fill:
-                        Image(uiImage: photo)
-                            .resizable()
-                            .scaledToFill()
+                ZStack {
+
+                    Rectangle().opacity(0.0001)
+                        .frame(width: getRect().width, height: getRect().height * 0.35)
+                        .onTapGesture {
+                            withAnimation(.easeIn(duration: 0.2)) {
+                                inputLibrary.isShowHeaderPhotoInfomation.toggle()
+                            }
+                        }
+                    Group {
+                        switch headerImageSize {
+                        case .fit:
+                            Image(uiImage: photo)
+                                .resizable()
+                                .scaledToFit()
+                        case .fill:
+                            Image(uiImage: photo)
+                                .resizable()
+                                .scaledToFill()
+                        }
                     }
+                    .frame(width: getRect().width, height: getRect().height * 0.35)
+                    .clipped()
+                    .allowsHitTesting(false)
+                    .shadow(radius: 5, x: 0, y: 10)
                 }
-                .frame(width: getRect().width, height: getRect().height * 0.35)
-                .clipped()
-                .shadow(radius: 5, x: 0, y: 10)
 
             } else {
                 VStack {
@@ -313,7 +253,7 @@ struct LibraryView: View {
 
                     Button {
                         // Todo: 画像変更処理
-                        inputHome.editImageStatus = .header
+                        inputHome.updateImageStatus = .header
                         inputHome.isShowSelectImageSheet.toggle()
                     } label: {
                         Image(systemName: "photo.on.rectangle.angled")
@@ -330,18 +270,13 @@ struct LibraryView: View {
             LinearGradient(gradient: Gradient(colors: [.clear, .black.opacity(0.2)]),
                            startPoint: .top, endPoint: .bottom)
             .shadow(radius: 5, x: 0, y: 10)
-            .opacity(inputLibrary.isShowHeaderPhotoInfomation ? 0.7 : 0.0)
-
-        } // overlay
-
-        .overlay(alignment: .topLeading) {
-            Button {
-                inputLibrary.isShowHeaderPhotoInfomation.toggle()
-            } label: {
-                CircleIcon(photo: "cloth_sample1", size: 35)
-                    .offset(y: getSafeArea().top)
-                    .opacity(inputLibrary.isShowHeaderPhotoInfomation || photo == nil ? 1.0 : 0.0)
+            .opacity(inputLibrary.isShowHeaderPhotoInfomation ? 0.4 : 0.0)
+            .onTapGesture {
+                withAnimation(.easeIn(duration: 0.2)) {
+                    inputLibrary.isShowHeaderPhotoInfomation.toggle()
+                }
             }
+
         } // overlay
 
         .overlay(alignment: .bottomTrailing) {
@@ -361,7 +296,7 @@ struct LibraryView: View {
                 }
 
                 Button {
-                    inputHome.editImageStatus = .header
+                    inputHome.updateImageStatus = .header
                     inputHome.isShowSelectImageSheet.toggle()
                 } label: {
                     Label("写真を選択", systemImage: "photo")
@@ -371,17 +306,27 @@ struct LibraryView: View {
                 Image(systemName: "photo.on.rectangle.angled")
                     .font(.title3)
                     .foregroundColor(.white.opacity(0.8))
-                    .padding(.top, 30)
             } // Menu
             .padding()
             .opacity(inputLibrary.isShowHeaderPhotoInfomation ? 1.0 : 0.0)
         } // overlay
 
-        .onTapGesture {
-            withAnimation(.easeIn(duration: 0.2)) {
-                inputLibrary.isShowHeaderPhotoInfomation.toggle()
+        .overlay(alignment: .topLeading) {
+            Button {
+                withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+                    inputHome.isShowSystemSideMenu.toggle()
+                }
+                withAnimation(.easeIn(duration: 0.2)) {
+                    inputHome.sideMenuBackGround.toggle()
+                }
+            } label: {
+                CircleIcon(photo: "cloth_sample1", size: 35)
             }
-        }
+            .padding(.leading)
+            .offset(y: getSafeArea().top)
+            .opacity(inputLibrary.isShowHeaderPhotoInfomation || photo == nil ? 1.0 : 0.0)
+        } // overlay
+
         // Todo: ホームレイアウトのカスタム
         .overlay(alignment: .bottomTrailing) {
             Menu {

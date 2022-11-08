@@ -27,10 +27,6 @@ struct PHPickerView: UIViewControllerRepresentable {
             guard let result = results.first else {
                 print("Error: guard let result = results.first")
                 self.parent.isShowSheet = false
-                self.parent.isShowError.toggle()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                    self.parent.isShowError.toggle()
-                }
                 return
             }
 

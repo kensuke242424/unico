@@ -14,16 +14,16 @@ enum EditStatus {
     case update
 }
 
+enum UpdateImageStatus {
+    case item, header, icon
+}
+
 struct InputHome {
     var homeTabIndex: Int = 0
     var actionItemIndex: Int = 0
     var editItemStatus: EditStatus = .create
-    var selectImage: UIImage = UIImage()
-    var convertUIImage: UIImage = UIImage()
-    var selectUpdateImage: UIImage? = nil
     var selectUpdateImage: UIImage? = UIImage()
-    var editImageStatus: ImageStatus = .item
-    var tabIndex = 0
+    var updateImageStatus: UpdateImageStatus = .item
     var itemsInfomationOpacity: CGFloat = 0.0
     var basketInfomationOpacity: CGFloat = 0.0
     var showErrorFetchImage: Bool = false
@@ -202,7 +202,7 @@ struct HomeTabView: View {
                 return
             }
 
-            switch inputHome.editImageStatus {
+            switch inputHome.updateImageStatus {
             case .item:
                 print("別のブランチでInputHomeにactionItemIndexが格納されているため、マージ後そちらを使用して更新")
 //                userVM.items[inputHome.actionItemIndex].photo = base64StringImage
@@ -248,23 +248,30 @@ struct SystemSideMenu: View {
             Color.customDarkGray1
                 .opacity(0.7)
                 .blur(radius: 15)
+                .overlay(alignment: .topLeading) {
+                    Button {
+                        withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+                            inputHome.isShowSystemSideMenu.toggle()
+                        }
+                        withAnimation(.easeIn(duration: 0.2)) {
+                            inputHome.sideMenuBackGround.toggle()
+                        }
+                    } label: {
+                        Image(systemName: "multiply.circle.fill")
+                            .font(.title).foregroundColor(.white.opacity(0.4))
+                            .padding(.leading)
+                            .padding(.top, getSafeArea().top)
+                    }
+                }
 
-            Button {
-                withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                    inputHome.isShowSystemSideMenu.toggle()
-                }
-                withAnimation(.easeIn(duration: 0.2)) {
-                    inputHome.sideMenuBackGround.toggle()
-                }
-            } label: {
-                Image(systemName: "chevron.left.2")
-                    .font(.title).opacity(0.5)
-            }
-            .foregroundColor(.white.opacity(0.6))
-            .offset(x: UIScreen.main.bounds.width / 4,
-                    y: -UIScreen.main.bounds.height / 3)
+            Image(systemName: "chevron.left.2")
+                .font(.title).opacity(0.5)
+                .foregroundColor(.white.opacity(0.6))
+                .offset(x: UIScreen.main.bounds.width / 4,
+                        y: -UIScreen.main.bounds.height / 3)
 
             VStack {
+
                 VStack(alignment: .leading, spacing: 20) {
 
                     CircleIcon(photo: "cloth_sample1", size: getRect().width / 3 + 20)
@@ -274,6 +281,7 @@ struct SystemSideMenu: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
+                .padding(.top)
 
                 Spacer(minLength: 40)
                 HStack {
