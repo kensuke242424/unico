@@ -21,9 +21,7 @@ enum UpdateImageStatus {
 struct InputHome {
     var homeTabIndex: Int = 0
     var actionItemIndex: Int = 0
-    var editItemStatus: EditStatus = .create
     var selectUpdateImage: UIImage? = UIImage()
-    var updateImageStatus: UpdateImageStatus = .item
     var itemsInfomationOpacity: CGFloat = 0.0
     var basketInfomationOpacity: CGFloat = 0.0
     var showErrorFetchImage: Bool = false
@@ -36,6 +34,8 @@ struct InputHome {
     var sideMenuBackGround: Bool = false
     var isShowSelectImageSheet: Bool = false
     var doCommerce: Bool = false
+    var editItemStatus: EditStatus = .create
+    var updateImageStatus: UpdateImageStatus = .item
     var cartHalfSheet: ResizableSheetState = .hidden
     var commerceHalfSheet: ResizableSheetState = .hidden
 }
@@ -57,7 +57,7 @@ struct HomeTabView: View {
             TabView(selection: $inputHome.homeTabIndex) {
 
                 LibraryView(itemVM: rootItemVM, inputHome: $inputHome,
-                            headerImage: userVM.users[0].headerImage.toImage())
+                            headerImage: userVM.headerImage)
                     .tabItem {
                         Image(systemName: "house")
                         Text("Home")
@@ -178,7 +178,10 @@ struct HomeTabView: View {
                          editItemStatus: inputHome.editItemStatus)
         }
 
-        .onChange(of: rootItemVM.items) { _ in
+        .onChange(of: rootItemVM.items) { [beforeItems = rootItemVM.items] newitems in
+
+            if newitems[inputHome.actionItemIndex].amount != beforeItems[inputHome.actionItemIndex].amount && !inputHome.doCommerce { return }
+
             inputHome.itemsInfomationOpacity = 0.7
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                 inputHome.itemsInfomationOpacity = 0.0
