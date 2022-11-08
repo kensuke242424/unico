@@ -14,7 +14,6 @@
 		E01AA3A729177A76000FCD37 /* UserViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E01AA3A629177A76000FCD37 /* UserViewModel.swift */; };
 		E01AA3A9291780DD000FCD37 /* UIImageExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E01AA3A8291780DD000FCD37 /* UIImageExtension.swift */; };
 		E01AA3AB291780ED000FCD37 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E01AA3AA291780ED000FCD37 /* StringExtension.swift */; };
-		E01AA3AD2917AD4C000FCD37 /* ViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E01AA3AC2917AD4C000FCD37 /* ViewExtension.swift */; };
 		E04ACF4128E6DD600054A6C4 /* ShowsItemDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04ACF4028E6DD600054A6C4 /* ShowsItemDetail.swift */; };
 		E04ACF4328E73C660054A6C4 /* IndicatorRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04ACF4228E73C660054A6C4 /* IndicatorRow.swift */; };
 		E05130E228F341620092FE46 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E05130E128F341610092FE46 /* RootView.swift */; };
@@ -136,7 +135,6 @@
 				E05FE94428F71BFB00263F98 /* ColorExtension.swift */,
 				E0CB9DCA2913964F00D95C54 /* ViewExtension.swift */,
 				E0F78FC32919F06D00A95CD1 /* DateFormatterExtension.swift */,
-				E0A6147F2910E46A0020D043 /* DateFormatterExtension.swift */,
 				E01AA3A8291780DD000FCD37 /* UIImageExtension.swift */,
 				E01AA3AA291780ED000FCD37 /* StringExtension.swift */,
 				E01AA3AC2917AD4C000FCD37 /* ViewExtension.swift */,
@@ -413,7 +411,6 @@
 				E01AA3A9291780DD000FCD37 /* UIImageExtension.swift in Sources */,
 				E08F273828DDB51600329C5E /* ManageView.swift in Sources */,
 				E01AA3A529176FE7000FCD37 /* PHPickerView.swift in Sources */,
-				E0A614802910E46A0020D043 /* DateFormatterExtension.swift in Sources */,
 				E01AA3AB291780ED000FCD37 /* StringExtension.swift in Sources */,
 				E0796AD728F485850094E50C /* ButtonViewModel.swift in Sources */,
 				E04ACF4328E73C660054A6C4 /* IndicatorRow.swift in Sources */,
@@ -426,7 +423,6 @@
 				E0CF7EF028DF152D00735142 /* ItemModel.swift in Sources */,
 				E0CB9DCB2913964F00D95C54 /* ViewExtension.swift in Sources */,
 				E0A7DE4E290C289A008C3F3F /* CircleIcon.swift in Sources */,
-				E01AA3AD2917AD4C000FCD37 /* ViewExtension.swift in Sources */,
 				E0796AE328F6D77A0094E50C /* CommerceSheet.swift in Sources */,
 				E0A7DE4B290B9E0A008C3F3F /* ShowItemPhoto.swift in Sources */,
 				E08F273E28DDB65F00329C5E /* HomeTabView.swift in Sources */,
