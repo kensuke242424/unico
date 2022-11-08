@@ -24,6 +24,7 @@ struct ManageView: View {
 
     // NOTE: 新規アイテム追加Viewの発現を管理します
     @Binding var inputHome: InputHome
+    @Binding var inputImage: InputImage
 
     struct InputManage {
         var tagGroup: TagGroup = .on
@@ -218,7 +219,7 @@ struct ManageView: View {
                             inputHome.sideMenuBackGround.toggle()
                         }
                     } label: {
-                        CircleIcon(photo: "cloth_sample1", size: getSafeArea().top - 20)
+                        CircleIcon(photo: inputImage.iconImage, size: getSafeArea().top - 20)
                     }
                 }
             }
@@ -285,6 +286,6 @@ struct ManageView: View {
 
 struct ManageView_Previews: PreviewProvider {
     static var previews: some View {
-        ManageView(itemVM: ItemViewModel(), inputHome: .constant(InputHome()))
+        ManageView(itemVM: ItemViewModel(), inputHome: .constant(InputHome()), inputImage: .constant(InputImage()))
     }
 }

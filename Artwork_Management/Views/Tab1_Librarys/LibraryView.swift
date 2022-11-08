@@ -320,7 +320,7 @@ struct LibraryView: View {
                     inputHome.sideMenuBackGround.toggle()
                 }
             } label: {
-                CircleIcon(photo: "cloth_sample1", size: 35)
+                CircleIcon(photo: inputImage.iconImage, size: getSafeArea().top - 20)
             }
             .padding(.leading)
             .offset(y: getSafeArea().top)

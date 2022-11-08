@@ -43,6 +43,7 @@ struct InputHome {
 struct InputImage {
     var headerImage: UIImage? = nil
     var iconImage: UIImage? = nil
+    var itemImage: UIImage? = nil
 }
 
 struct HomeTabView: View {
@@ -70,14 +71,14 @@ struct HomeTabView: View {
                     }
                     .tag(0)
 
-                StockView(itemVM: rootItemVM, inputHome: $inputHome)
+                StockView(itemVM: rootItemVM, inputHome: $inputHome, inputImage: $inputImage)
                     .tabItem {
                         Image(systemName: "shippingbox.fill")
                         Text("inventory")
                     }
                     .tag(1)
 
-                ManageView(itemVM: rootItemVM, inputHome: $inputHome)
+                ManageView(itemVM: rootItemVM, inputHome: $inputHome, inputImage: $inputImage)
                     .tabItem {
                         Image(systemName: "chart.xyaxis.line")
                         Text("Manage")
@@ -109,6 +110,7 @@ struct HomeTabView: View {
 
             SystemSideMenu(itemVM: rootItemVM,
                            inputHome: $inputHome,
+                           inputImage: $inputImage,
                            inputTag: $inputTag,
                            inputSideMenu: $inputSideMenu)
                 .offset(x: inputHome.isShowSystemSideMenu ? 0 : -UIScreen.main.bounds.width)
@@ -184,6 +186,12 @@ struct HomeTabView: View {
                          editItemStatus: inputHome.editItemStatus)
         }
 
+        .sheet(isPresented: $inputHome.isShowSelectImageSheet) {
+            PHPickerView(selectImage: $inputHome.selectUpdateImage,
+                         isShowSheet: $inputHome.isShowSelectImageSheet,
+                         isShowError: $inputHome.showErrorFetchImage)
+        }
+
         .onChange(of: rootItemVM.items) { [beforeItems = rootItemVM.items] newitems in
 
             if newitems[inputHome.actionItemIndex].amount != beforeItems[inputHome.actionItemIndex].amount && !inputHome.doCommerce { return }
@@ -194,11 +202,6 @@ struct HomeTabView: View {
             }
         }
 
-        .sheet(isPresented: $inputHome.isShowSelectImageSheet) {
-            PHPickerView(selectImage: $inputHome.selectUpdateImage,
-                         isShowSheet: $inputHome.isShowSelectImageSheet,
-                         isShowError: $inputHome.showErrorFetchImage)
-        }
 
         // convert UIImage ⇨ base64String...
         .onChange(of: inputHome.selectUpdateImage) { newImage in
@@ -218,6 +221,7 @@ struct HomeTabView: View {
             case .icon:
                 guard userVM.users.first != nil else { return }
                 userVM.users[0].iconImage = base64StringImage
+                inputImage.iconImage = userVM.users.first!.iconImage.toImage()
                 print("アイコン情報変更OK")
             case .header:
                 guard userVM.users.first != nil else { return }
@@ -250,6 +254,7 @@ struct SystemSideMenu: View {
 
     @StateObject var itemVM: ItemViewModel
     @Binding var inputHome: InputHome
+    @Binding var inputImage: InputImage
     @Binding var inputTag: InputTagSideMenu
     @Binding var inputSideMenu: InputSideMenu
 
@@ -290,7 +295,18 @@ struct SystemSideMenu: View {
 
                 VStack(alignment: .leading, spacing: 20) {
 
-                    CircleIcon(photo: "cloth_sample1", size: getRect().width / 3 + 20)
+                    CircleIcon(photo: inputImage.iconImage, size: getRect().width / 3 + 20)
+                        .overlay(alignment: .bottomTrailing) {
+                            Button {
+                                inputHome.updateImageStatus = .icon
+                                inputHome.isShowSelectImageSheet.toggle()
+                            } label: {
+                                Image(systemName: "photo.on.rectangle")
+                                    .foregroundColor(.white.opacity(0.6))
+                                    .offset(x: 10)
+                            }
+
+                        }
 
                     Text("Account_Name")
                         .font(.title3.bold()).foregroundColor(.white)

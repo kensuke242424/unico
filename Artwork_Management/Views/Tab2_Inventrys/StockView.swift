@@ -25,6 +25,7 @@ struct StockView: View {
     @Environment(\.colorScheme) var colorScheme
     @StateObject var itemVM: ItemViewModel
     @Binding var inputHome: InputHome
+    @Binding var inputImage: InputImage
 
     @FocusState var searchFocused: SearchFocus?
     @GestureState private var dragOffset: CGFloat = 0
@@ -287,7 +288,7 @@ struct StockView: View {
                             inputHome.sideMenuBackGround.toggle()
                         }
                     } label: {
-                        CircleIcon(photo: "cloth_sample1", size: getSafeArea().top - 20)
+                        CircleIcon(photo: inputImage.iconImage, size: getSafeArea().top - 20)
                     }
                 }
             }
@@ -365,7 +366,8 @@ struct StockView_Previews: PreviewProvider {
         }
 
         return StockView(itemVM: ItemViewModel(),
-                             inputHome: .constant(InputHome())
+                             inputHome: .constant(InputHome()),
+                         inputImage: .constant(InputImage())
         )
         .environment(\.resizableSheetCenter, resizableSheetCenter)
     }
