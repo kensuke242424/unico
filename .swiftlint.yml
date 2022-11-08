@@ -6,3 +6,4 @@ disabled_rules:
 - cyclomatic_complexity
 - function_body_length
 - identifier_name
+- redundant_optional_initialization
