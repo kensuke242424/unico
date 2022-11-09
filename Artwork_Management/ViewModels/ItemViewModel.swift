@@ -64,12 +64,25 @@ class ItemViewModel: ObservableObject {
 
         do {
             _ = try db!.collection(collectionID).addDocument(from: itemData)
-
         } catch {
             print("Error: try db!.collection(collectionID).addDocument(from: itemData)")
         }
-
         print("addItem完了")
+    }
+
+    func updateItem(itemData: Item, tag: String, userID: String) {
+
+        print("updateItem実行")
+
+        guard db != nil else { return }
+        guard let itemID = itemData.id else { return }
+
+        let collectionID = "app/items/\(userID)"
+
+        do {
+            _ = try? db!.collection(collectionID).document(itemID).setData(from: itemData)
+            print("updateItem完了")
+        }
     }
 
     // ✅ NOTE: アイテム配列を各項目に沿ってソートするメソッド
