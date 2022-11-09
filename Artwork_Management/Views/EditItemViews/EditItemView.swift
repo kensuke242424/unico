@@ -28,6 +28,7 @@ struct EditItemView: View {
     @Binding var inputHome: InputHome
     @Binding var inputImage: InputImage
 
+    let userID: String // Todo: ユーザID取得次第、引数で受け取る
     let itemIndex: Int
     let passItemData: Item?
     let editItemStatus: EditStatus
@@ -121,9 +122,9 @@ struct EditItemView: View {
                         case .create:
 
                             // NOTE: テストデータに新規アイテムを保存
-                            itemVM.items.append(Item(tag: inputEdit.selectionTagName,
+                            let itemData = (Item(tag: inputEdit.selectionTagName,
                                                      name: inputEdit.editItemName,
-                                                     detail: inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "none.",
+                                                     detail: inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "メモなし",
                                                      photo: "", // Todo: 写真取り込み実装後、変更
                                                      cost: 1000,
                                                      price: Int(inputEdit.editItemPrice) ?? 0,
@@ -131,13 +132,11 @@ struct EditItemView: View {
                                                      sales: 0,
                                                      inventory: Int(inputEdit.editItemInventry) ?? 0,
                                                      totalAmount: 0,
-                                                     totalInventory: 0,
-                                                     createTime: Date(), // Todo: Timestamp実装後、変更
-                                                     updateTime: Date())) // Todo: Timestamp実装後、変更
+                                                     totalInventory: 0))
 
-                            if let appendNewItem = itemVM.items.last {
-                                print("新規追加されたアイテム: \(appendNewItem)")
-                            }
+                            // Firestoreにコーダブル保存
+                            itemVM.addItem(itemData: itemData, tag: inputEdit.selectionTagName, userID: userID)
+
                             inputHome.isPresentedEditItem.toggle()
 
                         case .update:
@@ -151,7 +150,6 @@ struct EditItemView: View {
                             itemVM.items[itemIndex].price = Int(inputEdit.editItemPrice) ?? 0
                             itemVM.items[itemIndex].sales = Int(inputEdit.editItemSales) ?? 0
                             itemVM.items[itemIndex].inventory = Int(inputEdit.editItemInventry) ?? 0
-                            itemVM.items[itemIndex].updateTime = Date() // Todo: Timestamp実装後、変更
                             print("更新されたアイテム: \(itemVM.items[itemIndex])")
 
                             inputHome.isPresentedEditItem.toggle()
@@ -333,6 +331,7 @@ struct EditItemView_Previews: PreviewProvider {
         EditItemView(itemVM: ItemViewModel(),
                      inputHome: .constant(InputHome()),
                      inputImage: .constant(InputImage()),
+                     userID: "AAAAAAAAAAAA",
                      itemIndex: 0,
                      passItemData: TestItem().testItem,
                      editItemStatus: .update

@@ -5,11 +5,14 @@
 //  Created by 中川賢亮 on 2022/09/24.
 //
 
-import SwiftUI
+import FirebaseFirestore
+import FirebaseFirestoreSwift
 
-struct Item: Identifiable, Equatable, Hashable {
+struct Item: Identifiable, Equatable, Hashable, Codable {
 
-    var id = UUID().uuidString
+    @DocumentID var id: String? = UUID().uuidString
+    @ServerTimestamp var createTime: Timestamp?
+    @ServerTimestamp var updateTime: Timestamp?
     var tag: String
     var name: String
     var detail: String
@@ -21,13 +24,6 @@ struct Item: Identifiable, Equatable, Hashable {
     var inventory: Int
     var totalAmount: Int
     var totalInventory: Int
-    let createTime: Date
-    var updateTime: Date
-}
-
-enum Status {
-    case create
-    case update
 }
 
 enum Mode {

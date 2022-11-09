@@ -19,7 +19,7 @@ enum UpdateImageStatus {
 }
 
 struct InputHome {
-    var homeTabIndex: Int = 0
+    var homeTabIndex: Int = 1
     var actionItemIndex: Int = 0
     var selectCaptureImage: UIImage? = UIImage()
     var itemsInfomationOpacity: CGFloat = 0.0
@@ -55,7 +55,7 @@ struct HomeTabView: View {
     @State private var inputSideMenu: InputSideMenu = InputSideMenu()
     @State private var inputTag: InputTagSideMenu = InputTagSideMenu()
 
-    @State private var test: String = ""
+    let userID: String
 
     var body: some View {
 
@@ -89,10 +89,12 @@ struct HomeTabView: View {
 
             UsefulButton(inputHome: $inputHome)
 
-            ShowsItemDetail(itemVM: rootItemVM,
-                            inputHome: $inputHome,
-                            item: rootItemVM.items[inputHome.actionItemIndex])
-            .opacity(inputHome.isShowItemDetail ? 1.0 : 0.0)
+            if rootItemVM.items.count != 0 {
+                ShowsItemDetail(itemVM: rootItemVM,
+                                inputHome: $inputHome,
+                                item: rootItemVM.items[inputHome.actionItemIndex])
+                .opacity(inputHome.isShowItemDetail ? 1.0 : 0.0)
+            }
 
             // sideMenu_background...
             Color.black
@@ -177,6 +179,7 @@ struct HomeTabView: View {
             EditItemView(itemVM: rootItemVM,
                          inputHome: $inputHome,
                          inputImage: $inputImage,
+                         userID: userID,
                          itemIndex: inputHome.actionItemIndex,
                          passItemData: inputHome.editItemStatus == .create ?
                          nil : rootItemVM.items[inputHome.actionItemIndex],
@@ -187,16 +190,6 @@ struct HomeTabView: View {
             PHPickerView(captureImage: $inputHome.selectCaptureImage,
                          isShowSheet: $inputHome.isShowSelectImageSheet,
                          isShowError: $inputHome.showErrorFetchImage)
-        }
-
-        .onChange(of: rootItemVM.items) { [beforeItems = rootItemVM.items] newitems in
-
-            if newitems[inputHome.actionItemIndex].amount != beforeItems[inputHome.actionItemIndex].amount && !inputHome.doCommerce { return }
-
-            inputHome.itemsInfomationOpacity = 0.7
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                inputHome.itemsInfomationOpacity = 0.0
-            }
         }
 
         // convert UIImage ⇨ base64String...
@@ -229,8 +222,15 @@ struct HomeTabView: View {
         }
 
         .onAppear {
+            // fetch itemData
+            rootItemVM.fetchItem(userID: userID)
+            print("fetchしたitem: \(rootItemVM.items)")
             guard userVM.users.first != nil else { return }
             inputImage.headerImage = userVM.users.first!.headerImage.toImage()
+        }
+        .onDisappear {
+            print("MessageView_Disappear.")
+            rootItemVM.listener?.remove()
         }
     } // body
 } // View
@@ -675,7 +675,7 @@ struct HomeTabView_Previews: PreviewProvider {
                    windowScene.flatMap(ResizableSheetCenter.resolve(for:))
                }
 
-            return HomeTabView()
+        return HomeTabView(userID: "AAAAAAAAAAAA")
             .environment(\.resizableSheetCenter, resizableSheetCenter)
 
     }

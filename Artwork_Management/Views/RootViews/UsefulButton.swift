@@ -132,7 +132,6 @@ struct ButtonStyleView: View {
             .onChange(of: buttonIcon) { _ in
                 withAnimation(.easeIn(duration: 0.2)) {
                     self.angle = 50.0
-                    print(angle)
                 }
             } // .onChange(buttonIcon)
 
