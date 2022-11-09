@@ -19,7 +19,7 @@ enum UpdateImageStatus {
 }
 
 struct InputHome {
-    var homeTabIndex: Int = 1
+    var homeTabIndex: Int = 0
     var actionItemIndex: Int = 0
     var selectCaptureImage: UIImage? = UIImage()
     var itemsInfomationOpacity: CGFloat = 0.0

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct InputLibrary {
     var selectFilterTag: String = "ALL"
-    var currentIndex: Int = 0
+    var homeCardsIndex: Int = 0
     var libraryCardIndex: Int = 0
     var cardOpacity: CGFloat =  1.0
     var tagFilterItemCards: [Item] = []
@@ -193,14 +193,16 @@ struct LibraryView: View {
                         y: UIScreen.main.bounds.height / 4)
 
         } // ZStack
-        .onChange(of: inputLibrary.selectFilterTag) { newValue in
-            if newValue == "ALL" {
+
+
+        .onChange(of: itemVM.items) { _ in
+            if inputLibrary.selectFilterTag == "ALL" {
                 inputLibrary.tagFilterItemCards = itemVM.items
-                inputLibrary.currentIndex =  0
+                inputLibrary.homeCardsIndex =  0
                 return
             }
-            inputLibrary.tagFilterItemCards = itemVM.items.filter({ $0.tag == newValue })
-            inputLibrary.currentIndex =  0
+            inputLibrary.tagFilterItemCards = itemVM.items.filter({ $0.tag == inputLibrary.selectFilterTag })
+            inputLibrary.homeCardsIndex =  0
         } // .onChange
 
         .onAppear {
@@ -402,16 +404,16 @@ struct LibraryView: View {
             } // LazyHStack
             .padding()
             .offset(x: dragOffset, y: dragOffset)
-            .offset(x: -CGFloat(inputLibrary.currentIndex) * (bodyView.size.width * 0.7 + libraryItemPadding))
+            .offset(x: -CGFloat(inputLibrary.homeCardsIndex) * (bodyView.size.width * 0.7 + libraryItemPadding))
 
             .gesture(
                 DragGesture()
                     .updating(self.$dragOffset, body: { (value, state, _) in
 
                         // 先頭・末尾ではスクロールする必要がないので、画面幅の1/5までドラッグで制御する
-                        if inputLibrary.currentIndex == 0, value.translation.width > 0 {
+                        if inputLibrary.homeCardsIndex == 0, value.translation.width > 0 {
                             state = value.translation.width / 5
-                        } else if inputLibrary.currentIndex == (inputLibrary.tagFilterItemCards.count - 1), value.translation.width < 0 {
+                        } else if inputLibrary.homeCardsIndex == (inputLibrary.tagFilterItemCards.count - 1), value.translation.width < 0 {
                             state = value.translation.width / 5
                         } else {
                             state = value.translation.width
@@ -425,19 +427,19 @@ struct LibraryView: View {
                     })
                     .onEnded({ value in
 
-                        var newIndex = inputLibrary.currentIndex
+                        var newIndex = inputLibrary.homeCardsIndex
                         inputLibrary.cardOpacity = 1.0
 
                         // ドラッグ幅からページングを判定
                         if abs(value.translation.width) > bodyView.size.width * 0.2 {
-                            newIndex = value.translation.width > 0 ? inputLibrary.currentIndex - 1 : inputLibrary.currentIndex + 1
+                            newIndex = value.translation.width > 0 ? inputLibrary.homeCardsIndex - 1 : inputLibrary.homeCardsIndex + 1
                         }
                         if newIndex < 0 {
                             newIndex = 0
                         } else if newIndex > (inputLibrary.tagFilterItemCards.count - 1) {
                             newIndex = inputLibrary.tagFilterItemCards.count - 1
                         }
-                        inputLibrary.currentIndex = newIndex
+                        inputLibrary.homeCardsIndex = newIndex
 
                     }) // .onEnded
             ) // .gesture
