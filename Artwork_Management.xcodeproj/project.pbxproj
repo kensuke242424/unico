@@ -265,7 +265,6 @@
 			isa = PBXGroup;
 			children = (
 				E08F273728DDB51600329C5E /* ManageView.swift */,
-				E0CC79B728E7811500CE0B19 /* ItemDetailData.swift */,
 				E04ACF4228E73C660054A6C4 /* IndicatorRow.swift */,
 			);
 			path = Tab3_Manages;
@@ -297,6 +296,7 @@
 				E09F09CD28F146DB00D07669 /* EditItemView.swift */,
 				E09F09C428ED5DEA00D07669 /* SideMenuEditTagView.swift */,
 				E04ACF4028E6DD600054A6C4 /* ShowsItemDetail.swift */,
+				E0CC79B728E7811500CE0B19 /* ItemDetailData.swift */,
 				E09F09CA28EFEA8600D07669 /* EditItemPhotoArea.swift */,
 				E09F09C628EE266500D07669 /* InputFormTitle.swift */,
 				E09F09BB28EAF33500D07669 /* FocusedLineRow.swift */,

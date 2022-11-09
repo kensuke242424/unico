@@ -35,9 +35,7 @@ class ItemViewModel: ObservableObject {
 
         guard db != nil else { return }
 
-        let collectionID = "app/items/\(userID)"
-
-        listener = db!.collection(collectionID).addSnapshotListener { (snap, _) in
+        listener = db!.collection("items").addSnapshotListener { (snap, _) in
 
             guard let documents = snap?.documents else {
                 print("Error: guard let documents = snap?.documents")
@@ -58,12 +56,10 @@ class ItemViewModel: ObservableObject {
 
         print("addItem実行")
 
-        let collectionID = "app/items/\(userID)"
-
         guard db != nil else { return }
 
         do {
-            _ = try db!.collection(collectionID).addDocument(from: itemData)
+            _ = try db!.collection("items").addDocument(from: itemData)
         } catch {
             print("Error: try db!.collection(collectionID).addDocument(from: itemData)")
         }
@@ -77,10 +73,8 @@ class ItemViewModel: ObservableObject {
         guard db != nil else { print("Error: guard db != nil"); return }
         guard let itemID = defaultData.id else { print("Error: guard let itemID = defaultData.id"); return }
 
-        let collectionID = "app/items/\(userID)"
-
         do {
-            try db!.collection(collectionID).document(itemID).setData(from: updateData)
+            try db!.collection("items").document(itemID).setData(from: updateData)
         } catch {
             print("Error: try db!.collection(collectionID).document(itemID).setData(from: updateData)")
             return
@@ -89,23 +83,28 @@ class ItemViewModel: ObservableObject {
         print("updateItem完了")
     }
 
-    func updateCommerse(itemData: Item, userID: String, amount: Int) {
+    func updateCommerse() {
 
-        print("countAmount実行")
+        print("updateCommerse実行")
 
-        guard db != nil else { print("Error: guard db != nil"); return }
-        guard let itemID = itemData.id else { print("Error: guard let itemID = defaultData.id"); return }
+        for index in items.indices {
+            if items[index].amount != 0 {
 
-        let collectionID = "app/items/\(userID)"
+                guard db != nil else { print("Error: guard db != nil"); continue }
+                guard let itemID = items[index].id else { print("Error: guard let itemID = defaultData.id"); continue }
 
-        db!.collection(collectionID).document(itemID).updateData(
-            [
-                "sales": (itemData.sales + itemData.price * amount) as Any,
-                
-            ]
-        )
-
-        print("countAmount完了")
+                db!.collection("items").document(itemID).updateData(
+                    [
+                        "updateTime": Timestamp(date: Date()) as Any,
+                        "sales": (items[index].sales + items[index].price * items[index].amount) as Any,
+                        "inventory": (items[index].inventory - items[index].amount) as Any,
+                        "totalAmount": (items[index].totalAmount + items[index].amount ) as Any,
+                        "amount": 0
+                    ]
+                )
+            }
+        }
+        print("updateCommerse完了")
     }
 
     // ✅ NOTE: アイテム配列を各項目に沿ってソートするメソッド
@@ -136,20 +135,13 @@ class ItemViewModel: ObservableObject {
     // ✅ NOTE: 新規アイテム作成時に選択したタグの登録カラーを取り出します。
     func searchSelectTagColor(selectTagName: String, tags: [Tag]) -> UsedColor {
 
-        print("＝＝＝＝＝＝＝searchSelectTagColor_実行＝＝＝＝＝＝＝＝＝")
-
         let filterTag = tags.filter { $0.tagName == selectTagName }
 
-        print("　filterで取得したタグデータ: \(filterTag)")
-
         if let firstFilterTag = filterTag.first {
-
-            print("　現在選択タグ「\(selectTagName)」の登録タグColor: \(firstFilterTag.tagColor)")
 
             return firstFilterTag.tagColor
 
         } else {
-            print("　firstFilterTagの取得に失敗しました")
             return.gray
         }
     } // func castStringIntoColor
@@ -160,16 +152,12 @@ class ItemViewModel: ObservableObject {
                         newTagName: String,
                         newTagColor: UsedColor) {
 
-        print("ーーーーーーー　updateTagsDataメソッド_実行　ーーーーーーーーー")
-
         // NOTE: for where文で更新対象要素を選出し、enumurated()でデータとインデックスを両方取得します。
         for (index, tagData) in itemVM.tags.enumerated()
         where tagData.tagName == defaultTag.tagName {
 
             itemVM.tags[index] = Tag(tagName: newTagName,
                                      tagColor: newTagColor)
-
-            print("更新されたitemVM.tags: \(itemVM.tags[index])")
 
         } // for where
     } // func updateTagsData
@@ -180,15 +168,11 @@ class ItemViewModel: ObservableObject {
                             newTagName: String,
                             newTagColorString: String) {
 
-        print("ーーーーーーー　updateItemsTagDataメソッド_実行　ーーーーーーーーー")
-
         // NOTE: アイテムデータ内の更新対象タグを取り出して、同じタググループアイテムをまとめて更新します。
         for (index, itemData) in itemVM.items.enumerated()
         where itemData.tag == defaultTag.tagName {
 
             itemVM.items[index].tag = newTagName
-
-            print("更新されたitemVM.items: \(itemVM.items[index])")
 
         } // for where
     } // func updateItemsTagData

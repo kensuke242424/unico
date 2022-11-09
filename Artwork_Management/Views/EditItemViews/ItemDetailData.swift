@@ -23,8 +23,8 @@ struct ItemDetailData: View {
                 .padding(.bottom, 12)
 
             // NOTE: 下記二つの要素にはTimestampによる登録日が記述されます
-            Text("登録日　　:　　 2022. 8.30")
-            Text("最終更新　:　　 2022. 9.24")
+//            Text("登録日　　:　　 \(item.createTime!.dateValue())")
+//            Text("最終更新　:　　 \(item.updateTime!.dateValue())")
 
         } // VStack
         .font(.callout)

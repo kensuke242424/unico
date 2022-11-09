@@ -71,18 +71,8 @@ struct CommerceSheet: View {
 
                 Button(
                     action: {
-                        print("取引確定ボタンタップ")
 
-                        // 各アイテムデータに結果を反映
-                        for index in itemVM.items.indices {
-                            if itemVM.items[index].amount != 0 {
-                                print("index\(index)アイテムデータ反映開始")
-                                itemVM.updateCommerse(itemData: itemVM.items[inputHome.actionItemIndex],
-                                                      userID: userID,
-                                                      amount: itemVM.items[inputHome.actionItemIndex].amount)
-                                print("index\(index)アイテムデータ反映終了")
-                            }
-                        }
+                        itemVM.updateCommerse()
                         inputStock.resultCartPrice = 0
                         inputStock.resultCartAmount = 0
                         inputHome.doCommerce = true

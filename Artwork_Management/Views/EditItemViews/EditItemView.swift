@@ -161,8 +161,11 @@ struct EditItemView: View {
                                                    totalAmount: 0,
                                                    totalInventory: 0))
 
-                            itemVM.updateItem(defaultData: passItemData!, updateData: updateData, userID: userID)
-                            print("更新されたアイテム: \(itemVM.items[itemIndex])")
+                            if let passItemData = passItemData {
+                                itemVM.updateItem(defaultData: passItemData, updateData: updateData, userID: userID)
+                            } else {
+                                print("Error: if let passItemData = passItemData")
+                            }
 
                             inputHome.isPresentedEditItem.toggle()
 
