@@ -132,13 +132,13 @@ struct EditItemView: View {
                                                      name: inputEdit.editItemName,
                                                      detail: inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "メモなし",
                                                      photo: "", // Todo: 写真取り込み実装後、変更
-                                                     cost: 1000,
+                                                     cost: 0,
                                                      price: Int(inputEdit.editItemPrice) ?? 0,
                                                      amount: 0,
                                                      sales: 0,
                                                      inventory: Int(inputEdit.editItemInventry) ?? 0,
                                                      totalAmount: 0,
-                                                     totalInventory: 0))
+                                                     totalInventory: Int(inputEdit.editItemInventry) ?? 0))
 
                             // Firestoreにコーダブル保存
                             itemVM.addItem(itemData: itemData, tag: inputEdit.selectionTagName, userID: userID)
