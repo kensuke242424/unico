@@ -14,6 +14,7 @@ struct CommerceSheet: View {
     @StateObject var itemVM: ItemViewModel
     @Binding var inputHome: InputHome
     @Binding var inputStock: InputStock
+    let userID: String
 
     @State private var commerceButtonDisable: Bool = false
     @State private var commerceButtonOpacity: CGFloat =  1.0
@@ -76,12 +77,9 @@ struct CommerceSheet: View {
                         for index in itemVM.items.indices {
                             if itemVM.items[index].amount != 0 {
                                 print("index\(index)アイテムデータ反映開始")
-                                itemVM.items[index].sales += itemVM.items[index].price * itemVM.items[index].amount
-                                withAnimation(.spring(response: 0.6)) {
-                                    itemVM.items[index].inventory -= itemVM.items[index].amount
-                                }
-
-                                itemVM.items[index].amount = 0
+                                itemVM.updateCommerse(itemData: itemVM.items[inputHome.actionItemIndex],
+                                                      userID: userID,
+                                                      amount: itemVM.items[inputHome.actionItemIndex].amount)
                                 print("index\(index)アイテムデータ反映終了")
                             }
                         }

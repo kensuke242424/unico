@@ -14,9 +14,12 @@ struct InputEditItem {
     var photoURL: String = ""  // Todo: 写真取り込み機能追加後使用
     var editItemName: String = ""
     var editItemInventry: String = ""
+    var editItemCost: String = ""
     var editItemPrice: String = ""
     var editItemSales: String = ""
     var editItemDetail: String = ""
+    var editItemTotalAmount: String = ""
+    var editItemTotalInventry: String = ""
     var disableButton: Bool = true
     var offset: CGFloat = 0
     var isCheckedFocuseDetail: Bool = false
@@ -98,9 +101,12 @@ struct EditItemView: View {
                     inputEdit.photoURL = passItemData.photo
                     inputEdit.editItemName = passItemData.name
                     inputEdit.editItemInventry = String(passItemData.inventory)
+                    inputEdit.editItemCost = String(passItemData.cost)
                     inputEdit.editItemPrice = String(passItemData.price)
                     inputEdit.editItemSales = String(passItemData.sales)
                     inputEdit.editItemDetail = passItemData.detail
+                    inputEdit.editItemTotalAmount = String(passItemData.totalAmount)
+                    inputEdit.editItemTotalInventry = String(passItemData.totalInventory)
 
                 } else {
                     // tags[0]には"ALL"があるため、一つ飛ばして[1]を初期値として代入
@@ -143,13 +149,19 @@ struct EditItemView: View {
                             // NOTE: テストデータに情報の変更を保存
 
                             // NOTE: アイテムを更新
-                            itemVM.items[itemIndex].tag = inputEdit.selectionTagName
-                            itemVM.items[itemIndex].name = inputEdit.editItemName
-                            itemVM.items[itemIndex].detail = inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "none."
-                            itemVM.items[itemIndex].photo = inputEdit.photoURL
-                            itemVM.items[itemIndex].price = Int(inputEdit.editItemPrice) ?? 0
-                            itemVM.items[itemIndex].sales = Int(inputEdit.editItemSales) ?? 0
-                            itemVM.items[itemIndex].inventory = Int(inputEdit.editItemInventry) ?? 0
+                            let updateData = (Item(tag: inputEdit.selectionTagName,
+                                                   name: inputEdit.editItemName,
+                                                   detail: inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "メモなし",
+                                                   photo: inputEdit.photoURL != "" ? inputEdit.photoURL : "", // Todo: 写真取り込み実装後、変更
+                                                   cost: 1000,
+                                                   price: Int(inputEdit.editItemPrice) ?? 0,
+                                                   amount: 0,
+                                                   sales: Int(inputEdit.editItemSales) ?? 0,
+                                                   inventory: Int(inputEdit.editItemInventry) ?? 0,
+                                                   totalAmount: 0,
+                                                   totalInventory: 0))
+
+                            itemVM.updateItem(defaultData: passItemData!, updateData: updateData, userID: userID)
                             print("更新されたアイテム: \(itemVM.items[itemIndex])")
 
                             inputHome.isPresentedEditItem.toggle()

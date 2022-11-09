@@ -70,19 +70,42 @@ class ItemViewModel: ObservableObject {
         print("addItem完了")
     }
 
-    func updateItem(itemData: Item, tag: String, userID: String) {
+    func updateItem(defaultData: Item, updateData: Item, userID: String) {
 
         print("updateItem実行")
 
-        guard db != nil else { return }
-        guard let itemID = itemData.id else { return }
+        guard db != nil else { print("Error: guard db != nil"); return }
+        guard let itemID = defaultData.id else { print("Error: guard let itemID = defaultData.id"); return }
 
         let collectionID = "app/items/\(userID)"
 
         do {
-            _ = try? db!.collection(collectionID).document(itemID).setData(from: itemData)
-            print("updateItem完了")
+            try db!.collection(collectionID).document(itemID).setData(from: updateData)
+        } catch {
+            print("Error: try db!.collection(collectionID).document(itemID).setData(from: updateData)")
+            return
         }
+
+        print("updateItem完了")
+    }
+
+    func updateCommerse(itemData: Item, userID: String, amount: Int) {
+
+        print("countAmount実行")
+
+        guard db != nil else { print("Error: guard db != nil"); return }
+        guard let itemID = itemData.id else { print("Error: guard let itemID = defaultData.id"); return }
+
+        let collectionID = "app/items/\(userID)"
+
+        db!.collection(collectionID).document(itemID).updateData(
+            [
+                "sales": (itemData.sales + itemData.price * amount) as Any,
+                
+            ]
+        )
+
+        print("countAmount完了")
     }
 
     // ✅ NOTE: アイテム配列を各項目に沿ってソートするメソッド

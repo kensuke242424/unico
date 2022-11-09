@@ -26,6 +26,7 @@ struct StockView: View {
     @StateObject var itemVM: ItemViewModel
     @Binding var inputHome: InputHome
     @Binding var inputImage: InputImage
+    let userID: String
 
     @FocusState var searchFocused: SearchFocus?
     @GestureState private var dragOffset: CGFloat = 0
@@ -267,7 +268,8 @@ struct StockView: View {
 
                     CommerceSheet(itemVM: itemVM,
                                   inputHome: $inputHome,
-                                  inputStock: $inputStock)
+                                  inputStock: $inputStock,
+                                  userID: userID)
 
                 } // builder.content
                 .supportedState([.medium])
@@ -372,7 +374,8 @@ struct StockView_Previews: PreviewProvider {
 
         return StockView(itemVM: ItemViewModel(),
                              inputHome: .constant(InputHome()),
-                         inputImage: .constant(InputImage())
+                         inputImage: .constant(InputImage()),
+                         userID: ""
         )
         .environment(\.resizableSheetCenter, resizableSheetCenter)
     }
