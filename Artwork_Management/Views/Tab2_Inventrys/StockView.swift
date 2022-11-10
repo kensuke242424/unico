@@ -93,11 +93,10 @@ struct StockView: View {
                                 .lineLimit(1)
                                 .opacity(0.8)
 
-                                if !inputStock.searchItemNameText.isEmpty,
-                                   inputStock.searchItemNameText != "ALL" {
+                                if !inputStock.searchItemNameText.isEmpty, inputStock.searchItemNameText != "ALL" {
                                     Button {
-                                        inputStock.searchItemNameText = "ALL"
-                                        itemVM.tags[0].tagName = "ALL"
+                                        inputStock.searchItemNameText = inputHome.isShowSearchField ? "" : "ALL"
+                                        itemVM.tags[0].tagName = inputHome.isShowSearchField ? "検索" : "ALL"
                                     } label: {
                                         RoundedRectangle(cornerRadius: 10)
                                             .foregroundColor(.gray)

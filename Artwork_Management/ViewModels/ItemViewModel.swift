@@ -94,8 +94,8 @@ class ItemViewModel: ObservableObject {
         for index in items.indices {
             if items[index].amount != 0 {
 
-                guard db != nil else { print("Error: guard db != nil"); continue }
-                guard let itemID = items[index].id else { print("Error: guard let itemID = defaultData.id"); continue }
+                guard db != nil else { print("Error: guard db != nil"); return }
+                guard let itemID = items[index].id else { print("Error: guard let itemID = defaultData.id"); return }
 
                 db!.collection("items").document(itemID).updateData(
                     [
