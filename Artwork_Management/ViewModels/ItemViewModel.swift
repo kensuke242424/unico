@@ -66,12 +66,11 @@ class ItemViewModel: ObservableObject {
         print("addItem完了")
     }
 
-    func updateItem(defaultData: Item, updateData: Item, userID: String) {
+    func updateItem(updateData: Item, defaultDataID: String) {
 
         print("updateItem実行")
 
-        guard let itemID = defaultData.id else { print("Error: guard let itemID = defaultData.id"); return }
-        guard  let reference = db?.collection("items").document(itemID) else { print("Error: guard  let reference"); return }
+        guard  let reference = db?.collection("items").document(defaultDataID) else { print("Error: guard  let reference"); return }
 
         do {
 
@@ -89,23 +88,25 @@ class ItemViewModel: ObservableObject {
 
         guard let reference = db?.collection("items") else { print("Error: guard db != nil"); return }
 
-        for index in items.indices {
-            if items[index].amount != 0 {
+        for item in items where item.amount != 0 {
 
-                guard let itemID = items[index].id else {
-                    print("Error: 「\(items[index].name)」guard let itemID = defaultData.id")
-                    continue
-                }
+            guard let itemID = item.id else {
+                print("Error: 「\(item.name)」 guard let = item.id")
+                continue
+            }
 
-                reference.document(itemID).updateData(
-                    [
-                        "updateTime": Timestamp(date: Date()),
-                        "sales": (items[index].sales + items[index].price * items[index].amount),
-                        "inventory": (items[index].inventory - items[index].amount),
-                        "totalAmount": (items[index].totalAmount + items[index].amount ),
-                        "amount": 0
-                    ]
-                )
+            var item = item
+
+            item.updateTime = nil // nilを代入することで、保存時にTimestamp発火
+            item.sales += item.price * item.amount
+            item.inventory -= item.amount
+            item.totalAmount += item.amount
+            item.amount = 0
+
+            do {
+                try reference.document(itemID).setData(from: item)
+            } catch {
+                print("Error: 「\(item.name)」try reference.document(itemID).setData(from: item)")
             }
         }
         print("updateCommerse完了")

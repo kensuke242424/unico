@@ -13,7 +13,7 @@ struct InputEditItem {
     var selectionTagColor: UsedColor = .red
     var photoURL: String = ""  // Todo: 写真取り込み機能追加後使用
     var editItemName: String = ""
-    var editItemInventry: String = ""
+    var editItemInventory: String = ""
     var editItemCost: String = ""
     var editItemPrice: String = ""
     var editItemSales: String = ""
@@ -70,6 +70,12 @@ struct EditItemView: View {
 
             } // ScrollView
 
+            .onChange(of: itemVM.items[itemIndex]) { _ in
+                inputEdit.editItemSales = String(itemVM.items[itemIndex].sales)
+                inputEdit.editItemPrice = String(itemVM.items[itemIndex].price)
+                inputEdit.editItemInventory = String(itemVM.items[itemIndex].inventory)
+            }
+
             .onChange(of: inputEdit.selectionTagName) { selection in
 
                 // NOTE: 選択されたタグネームと紐づいたタグカラーを取り出し、selectionTagColorに格納します。
@@ -100,7 +106,7 @@ struct EditItemView: View {
                     inputEdit.selectionTagName = passItemData.tag
                     inputEdit.photoURL = passItemData.photo
                     inputEdit.editItemName = passItemData.name
-                    inputEdit.editItemInventry = String(passItemData.inventory)
+                    inputEdit.editItemInventory = String(passItemData.inventory)
                     inputEdit.editItemCost = String(passItemData.cost)
                     inputEdit.editItemPrice = String(passItemData.price)
                     inputEdit.editItemSales = String(passItemData.sales)
@@ -127,7 +133,8 @@ struct EditItemView: View {
 
                         case .create:
 
-                            print(passItemData!.createTime!.dateValue())
+                            guard let inputPrice = Int(inputEdit.editItemPrice) else { return }
+                            guard let inputInventory = Int(inputEdit.editItemInventory) else { return }
 
                             // NOTE: テストデータに新規アイテムを保存
                             let itemData = (Item(tag: inputEdit.selectionTagName,
@@ -135,12 +142,12 @@ struct EditItemView: View {
                                                  detail: inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "メモなし",
                                                  photo: "", // Todo: 写真取り込み実装後、変更
                                                  cost: 0,
-                                                 price: Int(inputEdit.editItemPrice) ?? 0,
+                                                 price: inputPrice,
                                                  amount: 0,
                                                  sales: 0,
-                                                 inventory: Int(inputEdit.editItemInventry) ?? 0,
+                                                 inventory: inputInventory,
                                                  totalAmount: 0,
-                                                 totalInventory: Int(inputEdit.editItemInventry) ?? 0))
+                                                 totalInventory: inputInventory))
 
                             // Firestoreにコーダブル保存
                             itemVM.addItem(itemData: itemData, tag: inputEdit.selectionTagName, userID: userID)
@@ -150,23 +157,29 @@ struct EditItemView: View {
                         case .update:
 
                             guard let passItemData = passItemData else { return }
+                            guard let defaultDataID = passItemData.id else { return }
+                            guard let editPrice = Int(inputEdit.editItemPrice) else { return }
+                            guard let editSales = Int(inputEdit.editItemSales) else { return }
+                            guard let editInventory = Int(inputEdit.editItemInventory) else { return }
 
                             // NOTE: アイテムを更新
-                            let updateData = (Item(createTime: passItemData.createTime,
-                                                   tag: inputEdit.selectionTagName,
-                                                   name: inputEdit.editItemName,
-                                                   detail: inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "メモなし",
-                                                   photo: inputEdit.photoURL != "" ? inputEdit.photoURL : "", // Todo: 写真取り込み実装後、変更
-                                                   cost: 1000,
-                                                   price: Int(inputEdit.editItemPrice) ?? 0,
-                                                   amount: 0,
-                                                   sales: Int(inputEdit.editItemSales) ?? 0,
-                                                   inventory: Int(inputEdit.editItemInventry) ?? 0,
-                                                   totalAmount: 0,
-                                                   totalInventory: 0))
+                            let updateItemData = (Item(createTime: passItemData.createTime,
+                                                       tag: inputEdit.selectionTagName,
+                                                       name: inputEdit.editItemName,
+                                                       detail: inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "メモなし",
+                                                       photo: inputEdit.photoURL != "" ? inputEdit.photoURL : "", // Todo: 写真取り込み実装後、変更
+                                                       cost: 0,
+                                                       price: editPrice,
+                                                       amount: passItemData.amount,
+                                                       sales: editSales,
+                                                       inventory: editInventory,
+                                                       totalAmount: passItemData.totalAmount,
+                                                       totalInventory: passItemData.inventory < editInventory ?
+                                                       passItemData.totalInventory + (editInventory - passItemData.inventory) :
+                                                        passItemData.totalInventory - (passItemData.inventory - editInventory) ))
 
+                            itemVM.updateItem(updateData: updateItemData, defaultDataID: defaultDataID)
 
-                            itemVM.updateItem(defaultData: passItemData, updateData: updateData, userID: userID)
                             inputHome.isPresentedEditItem.toggle()
 
                         } // switch editItemStatus(データ追加、更新)
@@ -258,7 +271,7 @@ struct InputForms: View {
                 InputFormTitle(title: "■在庫数", isNeed: false)
                     .padding(.bottom)
 
-                TextField("100", text: $inputEdit.editItemInventry)
+                TextField("100", text: $inputEdit.editItemInventory)
                     .foregroundColor(.white)
                     .keyboardType(.numberPad)
                     .focused($focusedField, equals: .stock)
