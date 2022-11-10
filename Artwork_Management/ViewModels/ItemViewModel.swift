@@ -71,20 +71,15 @@ class ItemViewModel: ObservableObject {
         print("updateItem実行")
 
         guard let itemID = defaultData.id else { print("Error: guard let itemID = defaultData.id"); return }
-
         guard  let reference = db?.collection("items").document(itemID) else { print("Error: guard  let reference"); return }
 
-        reference.updateData(
-            [
-                "updateTime": Timestamp(date: Date()),
-                "sales": updateData.sales,
-                "inventory": updateData.inventory,
-                "detail": updateData.detail,
-                "totalInventory": defaultData.inventory < updateData.inventory ?
-                (defaultData.totalInventory + updateData.inventory - defaultData.inventory) : defaultData.totalInventory,
-                "amount": 0
-            ]
-        )
+        do {
+
+            try reference.setData(from: updateData)
+
+        } catch {
+            print("updateItem失敗")
+        }
         print("updateItem完了")
     }
 

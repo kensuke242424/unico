@@ -127,18 +127,20 @@ struct EditItemView: View {
 
                         case .create:
 
+                            print(passItemData!.createTime!.dateValue())
+
                             // NOTE: テストデータに新規アイテムを保存
                             let itemData = (Item(tag: inputEdit.selectionTagName,
-                                                     name: inputEdit.editItemName,
-                                                     detail: inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "メモなし",
-                                                     photo: "", // Todo: 写真取り込み実装後、変更
-                                                     cost: 0,
-                                                     price: Int(inputEdit.editItemPrice) ?? 0,
-                                                     amount: 0,
-                                                     sales: 0,
-                                                     inventory: Int(inputEdit.editItemInventry) ?? 0,
-                                                     totalAmount: 0,
-                                                     totalInventory: Int(inputEdit.editItemInventry) ?? 0))
+                                                 name: inputEdit.editItemName,
+                                                 detail: inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "メモなし",
+                                                 photo: "", // Todo: 写真取り込み実装後、変更
+                                                 cost: 0,
+                                                 price: Int(inputEdit.editItemPrice) ?? 0,
+                                                 amount: 0,
+                                                 sales: 0,
+                                                 inventory: Int(inputEdit.editItemInventry) ?? 0,
+                                                 totalAmount: 0,
+                                                 totalInventory: Int(inputEdit.editItemInventry) ?? 0))
 
                             // Firestoreにコーダブル保存
                             itemVM.addItem(itemData: itemData, tag: inputEdit.selectionTagName, userID: userID)
@@ -146,10 +148,12 @@ struct EditItemView: View {
                             inputHome.isPresentedEditItem.toggle()
 
                         case .update:
-                            // NOTE: テストデータに情報の変更を保存
+
+                            guard let passItemData = passItemData else { return }
 
                             // NOTE: アイテムを更新
-                            let updateData = (Item(tag: inputEdit.selectionTagName,
+                            let updateData = (Item(createTime: passItemData.createTime,
+                                                   tag: inputEdit.selectionTagName,
                                                    name: inputEdit.editItemName,
                                                    detail: inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "メモなし",
                                                    photo: inputEdit.photoURL != "" ? inputEdit.photoURL : "", // Todo: 写真取り込み実装後、変更
@@ -161,12 +165,8 @@ struct EditItemView: View {
                                                    totalAmount: 0,
                                                    totalInventory: 0))
 
-                            if let passItemData = passItemData {
-                                itemVM.updateItem(defaultData: passItemData, updateData: updateData, userID: userID)
-                            } else {
-                                print("Error: if let passItemData = passItemData")
-                            }
 
+                            itemVM.updateItem(defaultData: passItemData, updateData: updateData, userID: userID)
                             inputHome.isPresentedEditItem.toggle()
 
                         } // switch editItemStatus(データ追加、更新)
