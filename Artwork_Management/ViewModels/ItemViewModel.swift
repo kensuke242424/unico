@@ -70,10 +70,11 @@ class ItemViewModel: ObservableObject {
 
         print("updateItem実行")
 
-        guard db != nil else { print("Error: guard db != nil"); return }
         guard let itemID = defaultData.id else { print("Error: guard let itemID = defaultData.id"); return }
 
-        db!.collection("items").document(itemID).updateData(
+        guard  let reference = db?.collection("items").document(itemID) else { print("Error: guard  let reference"); return }
+
+        reference.updateData(
             [
                 "updateTime": Timestamp(date: Date()),
                 "sales": updateData.sales,
@@ -91,13 +92,17 @@ class ItemViewModel: ObservableObject {
 
         print("updateCommerse実行")
 
+        guard let reference = db?.collection("items") else { print("Error: guard db != nil"); return }
+
         for index in items.indices {
             if items[index].amount != 0 {
 
-                guard db != nil else { print("Error: guard db != nil"); return }
-                guard let itemID = items[index].id else { print("Error: guard let itemID = defaultData.id"); return }
+                guard let itemID = items[index].id else {
+                    print("Error: 「\(items[index].name)」guard let itemID = defaultData.id")
+                    continue
+                }
 
-                db!.collection("items").document(itemID).updateData(
+                reference.document(itemID).updateData(
                     [
                         "updateTime": Timestamp(date: Date()),
                         "sales": (items[index].sales + items[index].price * items[index].amount),
