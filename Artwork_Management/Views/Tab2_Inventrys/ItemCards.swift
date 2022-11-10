@@ -35,7 +35,7 @@ struct TagSortCards: View {
                 }
             }
             .padding(.horizontal, 10)
-            Spacer().frame(height: 200)
+            Spacer().frame(height: 300)
 
         // NOTE: itemVM.items.「item.name」「item.tag」の中に一つでも検索条件が当てはまったら
         } else if itemVM.items.contains(where: { $0.name.contains(inputStock.searchItemNameText) }) ||

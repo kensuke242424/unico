@@ -82,6 +82,30 @@ class ItemViewModel: ObservableObject {
         print("updateItem完了")
     }
 
+    func resetAmount() {
+        print("resetAmount実行")
+
+        guard let reference = db?.collection("items") else { print("Error: guard db != nil"); return }
+
+        for index in items.indices where items[index].amount != 0 {
+
+            guard let itemID = items[index].id else {
+                print("Error: 「\(items[index].name)」 guard let = item.id")
+                continue
+            }
+
+            items[index].amount = 0
+
+            do {
+                try reference.document(itemID).setData(from: items[index])
+
+            } catch {
+                print("Error: 「\(items[index].name)」try reference.document(itemID).setData(from: item)")
+            }
+        }
+        print("resetAmount完了")
+    }
+
     func updateCommerse() {
 
         print("updateCommerse実行")

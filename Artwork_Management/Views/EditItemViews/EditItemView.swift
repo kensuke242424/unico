@@ -21,6 +21,7 @@ struct InputEditItem {
     var editItemTotalAmount: String = ""
     var editItemTotalInventry: String = ""
     var disableButton: Bool = true
+    var errorInventory: Bool = false
     var offset: CGFloat = 0
     var isCheckedFocuseDetail: Bool = false
 }
@@ -70,7 +71,7 @@ struct EditItemView: View {
 
             } // ScrollView
 
-            .onChange(of: itemVM.items[itemIndex]) { _ in
+            .onChange(of: inputHome.doItemEdit) { _ in
                 inputEdit.editItemSales = String(itemVM.items[itemIndex].sales)
                 inputEdit.editItemPrice = String(itemVM.items[itemIndex].price)
                 inputEdit.editItemInventory = String(itemVM.items[itemIndex].inventory)
@@ -96,6 +97,20 @@ struct EditItemView: View {
                     }
                 }
             } // onChange(ボタンdisable分岐)
+
+            .onChange(of: inputEdit.editItemInventory) {editInventory in
+                if editItemStatus == .update {
+                    let itemAmount = itemVM.items[itemIndex].amount
+                    let editInventory = Int(editInventory) ?? 0
+                    if itemAmount > editInventory {
+                        inputEdit.errorInventory = true
+                        inputEdit.disableButton = true
+                    } else {
+                        inputEdit.errorInventory = false
+                        inputEdit.disableButton = false
+                    }
+                }
+            }
 
             // NOTE: updateitemView呼び出し時に、親Viewから受け取ったアイテム情報を各入力欄に格納します。
             .onAppear {
@@ -268,8 +283,22 @@ struct InputForms: View {
 
             VStack(alignment: .leading) {
 
-                InputFormTitle(title: "■在庫数", isNeed: false)
-                    .padding(.bottom)
+                HStack {
+                    InputFormTitle(title: "■在庫数", isNeed: false)
+
+                    if inputEdit.errorInventory {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 10)
+                                .foregroundColor(.black.opacity(0.2))
+                            Text("※在庫がカート内のアイテム数より少ないです")
+                                .font(.caption).foregroundColor(.red)
+                        }
+
+                    }
+
+                    Spacer()
+                }
+                .padding(.bottom)
 
                 TextField("100", text: $inputEdit.editItemInventory)
                     .foregroundColor(.white)

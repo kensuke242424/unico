@@ -42,7 +42,7 @@ struct CommerceSheet: View {
                         .padding(.horizontal)
                         .overlay(alignment: .topTrailing) {
                             if inputStock.resultCartAmount <= 50 {
-                                Image(systemName: "\(inputStock.resultCartAmount).circle.fill")
+                                Image(systemName: "\(commerseResults().amount).circle.fill")
                                     .foregroundColor(.customLightBlue2)
                                     .offset(y: -8)
                             } else {
@@ -61,7 +61,7 @@ struct CommerceSheet: View {
                     Text("¥")
                         .foregroundColor(.black)
                         .font(.title2.bold())
-                    Text(String(inputStock.resultCartPrice))
+                    Text(String(commerseResults().price))
                         .foregroundColor(.black)
                         .font(.title.bold())
                     Spacer()
@@ -108,12 +108,20 @@ struct CommerceSheet: View {
                     inputHome.doCommerce = false
                     print("DispatchQueue2秒後doCommerceをfalse")
                 }
-
             }
         }
 
-        .onAppear {
-            print("CommerceSheet_onAppear")
-        }
     } // body
+    private func commerseResults() -> (price: Int, amount: Int) {
+
+        var resultPrices: Int = 0
+        var resultAmounts: Int = 0
+
+        for item in itemVM.items where item.amount != 0 {
+            resultPrices += item.amount * item.price
+            resultAmounts += item.amount
+        }
+
+        return (price: resultPrices, amount: resultAmounts)
+    }
 } // View

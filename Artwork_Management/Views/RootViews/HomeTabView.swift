@@ -34,6 +34,7 @@ struct InputHome {
     var sideMenuBackGround: Bool = false
     var isShowSelectImageSheet: Bool = false
     var doCommerce: Bool = false
+    var doItemEdit: Bool = false
     var editItemStatus: EditStatus = .create
     var updateImageStatus: UpdateImageStatus = .item
     var cartHalfSheet: ResizableSheetState = .hidden
@@ -222,6 +223,7 @@ struct HomeTabView: View {
         .onAppear {
             // fetch itemData
             rootItemVM.fetchItem(userID: userID)
+            rootItemVM.resetAmount()
             guard userVM.users.first != nil else { return }
             inputImage.headerImage = userVM.users.first!.headerImage.toImage()
         }

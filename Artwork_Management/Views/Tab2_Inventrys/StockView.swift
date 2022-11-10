@@ -204,13 +204,8 @@ struct StockView: View {
                                 action: {
                                     inputStock.resultCartPrice = 0
                                     inputStock.resultCartAmount = 0
+                                    itemVM.resetAmount()
 
-                                    for index in itemVM.items.indices {
-
-                                        if itemVM.items[index].amount != 0 {
-                                            itemVM.items[index].amount = 0
-                                        }
-                                    }
                                 },
                                 label: {
                                     HStack {
