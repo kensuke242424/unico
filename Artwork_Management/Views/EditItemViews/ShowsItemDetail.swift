@@ -16,7 +16,8 @@ struct ShowsItemDetail: View {
 
     struct InputItemDetail {
         var opacity: Double = 0
-        var isShowAlert: Bool = false
+        var isShowEditHearAlert: Bool = false
+        var isShowAmountAlert: Bool = false
         var isPresentedEditItem: Bool = false
     }
 
@@ -74,16 +75,22 @@ struct ShowsItemDetail: View {
                                         .foregroundColor(.white)
 
                                     Button {
-                                        inputDetail.isShowAlert.toggle()
+
+                                        if item.amount != 0 {
+                                            inputDetail.isShowAmountAlert.toggle()
+                                            return
+                                        }
+
+                                        inputDetail.isShowEditHearAlert.toggle()
 
                                     } label: {
                                         Image(systemName: "highlighter")
                                             .foregroundColor(.yellow)
                                     }
-                                    .alert("編集", isPresented: $inputDetail.isShowAlert) {
+                                    .alert("確認", isPresented: $inputDetail.isShowEditHearAlert) {
 
                                         Button {
-                                            inputDetail.isShowAlert.toggle()
+                                            inputDetail.isShowEditHearAlert.toggle()
                                         } label: {
                                             Text("戻る")
                                         }
@@ -96,6 +103,15 @@ struct ShowsItemDetail: View {
                                         }
                                     } message: {
                                         Text("アイテムデータを編集しますか？")
+                                    } // alert
+
+                                    .alert("編集", isPresented: $inputDetail.isShowAmountAlert) {
+
+                                        Button("OK") {
+                                            inputDetail.isShowAmountAlert.toggle()
+                                        }
+                                    } message: {
+                                        Text("カート内のアイテムは編集できません")
                                     } // alert
 
                                 } // HStack

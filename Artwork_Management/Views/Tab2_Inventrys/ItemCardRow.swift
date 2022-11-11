@@ -35,8 +35,6 @@ struct ItemCardRow: View {
                         return
                     }
                     inputHome.actionItemIndex = newActionIndex
-                    print("actionRowIndex: \(inputHome.actionItemIndex)")
-                    // アイテム詳細表示
                     withAnimation(.easeIn(duration: 0.15)) {
                         inputHome.isShowItemDetail.toggle()
                     }

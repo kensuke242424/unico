@@ -21,7 +21,6 @@ struct InputEditItem {
     var editItemTotalAmount: String = ""
     var editItemTotalInventry: String = ""
     var disableButton: Bool = true
-    var errorInventory: Bool = false
     var offset: CGFloat = 0
     var isCheckedFocuseDetail: Bool = false
 }
@@ -71,12 +70,6 @@ struct EditItemView: View {
 
             } // ScrollView
 
-            .onChange(of: inputHome.doItemEdit) { _ in
-                inputEdit.editItemSales = String(itemVM.items[itemIndex].sales)
-                inputEdit.editItemPrice = String(itemVM.items[itemIndex].price)
-                inputEdit.editItemInventory = String(itemVM.items[itemIndex].inventory)
-            }
-
             .onChange(of: inputEdit.selectionTagName) { selection in
 
                 // NOTE: 選択されたタグネームと紐づいたタグカラーを取り出し、selectionTagColorに格納します。
@@ -97,20 +90,6 @@ struct EditItemView: View {
                     }
                 }
             } // onChange(ボタンdisable分岐)
-
-            .onChange(of: inputEdit.editItemInventory) {editInventory in
-                if editItemStatus == .update {
-                    let itemAmount = itemVM.items[itemIndex].amount
-                    let editInventory = Int(editInventory) ?? 0
-                    if itemAmount > editInventory {
-                        inputEdit.errorInventory = true
-                        inputEdit.disableButton = true
-                    } else {
-                        inputEdit.errorInventory = false
-                        inputEdit.disableButton = false
-                    }
-                }
-            }
 
             // NOTE: updateitemView呼び出し時に、親Viewから受け取ったアイテム情報を各入力欄に格納します。
             .onAppear {
@@ -175,6 +154,7 @@ struct EditItemView: View {
                             guard let defaultDataID = passItemData.id else { return }
                             guard let editPrice = Int(inputEdit.editItemPrice) else { return }
                             guard let editSales = Int(inputEdit.editItemSales) else { return }
+                            guard let editCost = Int(inputEdit.editItemCost) else { return }
                             guard let editInventory = Int(inputEdit.editItemInventory) else { return }
 
                             // NOTE: アイテムを更新
@@ -183,9 +163,9 @@ struct EditItemView: View {
                                                        name: inputEdit.editItemName,
                                                        detail: inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "メモなし",
                                                        photo: inputEdit.photoURL != "" ? inputEdit.photoURL : "", // Todo: 写真取り込み実装後、変更
-                                                       cost: 0,
+                                                       cost: editCost,
                                                        price: editPrice,
-                                                       amount: passItemData.amount,
+                                                       amount: 0,
                                                        sales: editSales,
                                                        inventory: editInventory,
                                                        totalAmount: passItemData.totalAmount,
@@ -283,21 +263,7 @@ struct InputForms: View {
 
             VStack(alignment: .leading) {
 
-                HStack {
-                    InputFormTitle(title: "■在庫数", isNeed: false)
-
-                    if inputEdit.errorInventory {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 10)
-                                .foregroundColor(.black.opacity(0.2))
-                            Text("※在庫がカート内のアイテム数より少ないです")
-                                .font(.caption).foregroundColor(.red)
-                        }
-
-                    }
-
-                    Spacer()
-                }
+                InputFormTitle(title: "■在庫数", isNeed: false)
                 .padding(.bottom)
 
                 TextField("100", text: $inputEdit.editItemInventory)
