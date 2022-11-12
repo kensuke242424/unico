@@ -180,10 +180,9 @@ struct SideMenuEditTagView: View {
 
                                 withAnimation(.easeIn(duration: 0.2)) {
                                     inputHome.isOpenEditTagSideMenu.toggle()
-                                }
-                                withAnimation(.easeIn(duration: 0.2)) {
                                     inputHome.editTagSideMenuBackground.toggle()
                                 }
+
                                 inputTag.newTagNameText = ""
                                 inputTag.selectionSideMenuTagColor = .red
 
@@ -216,8 +215,6 @@ struct SideMenuEditTagView: View {
 
                                 withAnimation(.easeIn(duration: 0.2)) {
                                     inputHome.isOpenEditTagSideMenu.toggle()
-                                }
-                                withAnimation(.easeIn(duration: 0.2)) {
                                     inputHome.editTagSideMenuBackground.toggle()
                                 }
 
