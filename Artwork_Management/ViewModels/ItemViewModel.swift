@@ -106,7 +106,7 @@ class ItemViewModel: ObservableObject {
         print("resetAmount完了")
     }
 
-    func updateCommerse() {
+    func updateCommerseItems() {
 
         print("updateCommerse実行")
 

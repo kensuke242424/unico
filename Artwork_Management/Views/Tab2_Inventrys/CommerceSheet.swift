@@ -72,7 +72,7 @@ struct CommerceSheet: View {
                 Button(
                     action: {
 
-                        itemVM.updateCommerse()
+                        itemVM.updateCommerseItems()
                         inputStock.resultCartPrice = 0
                         inputStock.resultCartAmount = 0
                         inputHome.doCommerce = true
