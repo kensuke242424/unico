@@ -188,13 +188,17 @@ struct LibraryView: View {
             .offset(x: -UIScreen.main.bounds.width / 2.5,
                     y: UIScreen.main.bounds.height / 11)
 
-            homeItemPhotoPanel()
-                .ignoresSafeArea()
-                .offset(x: -UIScreen.main.bounds.width / 10,
-                        y: UIScreen.main.bounds.height / 4)
-
+            if itemVM.items == [] {
+                EmptyItemView(inputHome: $inputHome, text: "")
+                    .offset(x: -UIScreen.main.bounds.width / 4,
+                            y: UIScreen.main.bounds.height / 5)
+            } else {
+                homeItemPhotoPanel()
+                    .ignoresSafeArea()
+                    .offset(x: -UIScreen.main.bounds.width / 10,
+                            y: UIScreen.main.bounds.height / 4)
+            }
         } // ZStack
-
 
         .onChange(of: itemVM.items) { _ in
             if inputLibrary.selectFilterTag == "ALL" {
@@ -361,46 +365,47 @@ struct LibraryView: View {
                 ForEach(inputLibrary.tagFilterItemCards.indices, id: \.self) {index in
 
                     ShowItemPhoto(photo: inputLibrary.tagFilterItemCards[index].photo, size: panelSize)
-                            .overlay {
-                                if inputLibrary.isShowCardInfomation {
-                                    LinearGradient(gradient: Gradient(colors: [.clear, .black.opacity(0.4)]),
-                                                   startPoint: .top, endPoint: .bottom)
-                                }
-                            }
-                            .overlay(alignment: .bottomTrailing) {
-                                if inputLibrary.isShowCardInfomation {
-                                    Text(inputLibrary.tagFilterItemCards[index].name)
-                                        .font(.footnote).foregroundColor(.white).opacity(0.7)
-                                        .tracking(2)
-                                        .lineLimit(1)
-                                }
-                            }
-                            .overlay(alignment: .topTrailing) {
-                                if inputLibrary.isShowCardInfomation {
-                                    Button {
-                                        if let cardRowIndex =
-                                            itemVM.items.firstIndex(where: { $0.id == inputLibrary.tagFilterItemCards[index].id }) {
 
-                                            inputHome.actionItemIndex = cardRowIndex
+                        .overlay {
+                            if inputLibrary.isShowCardInfomation {
+                                LinearGradient(gradient: Gradient(colors: [.clear, .black.opacity(0.4)]),
+                                               startPoint: .top, endPoint: .bottom)
+                            }
+                        }
+                        .overlay(alignment: .bottomTrailing) {
+                            if inputLibrary.isShowCardInfomation {
+                                Text(inputLibrary.tagFilterItemCards[index].name)
+                                    .font(.footnote).foregroundColor(.white).opacity(0.7)
+                                    .tracking(2)
+                                    .lineLimit(1)
+                            }
+                        }
+                        .overlay(alignment: .topTrailing) {
+                            if inputLibrary.isShowCardInfomation {
+                                Button {
+                                    if let cardRowIndex =
+                                        itemVM.items.firstIndex(where: { $0.id == inputLibrary.tagFilterItemCards[index].id }) {
 
-                                            withAnimation(.easeIn(duration: 0.15)) {
-                                                inputHome.isShowItemDetail.toggle()
-                                            }
-                                        } else {
-                                            print("LibraryCardIndexの取得エラー")
+                                        inputHome.actionItemIndex = cardRowIndex
+
+                                        withAnimation(.easeIn(duration: 0.15)) {
+                                            inputHome.isShowItemDetail.toggle()
                                         }
-                                    } label: {
-                                        Image(systemName: "info.circle.fill")
-                                            .resizable().scaledToFit().frame(width: 20)
-                                            .foregroundColor(.white)
-                                    } // Button
-                                } // if
-                            } // overlay
-                            .opacity(inputLibrary.cardOpacity)
-                            .shadow(radius: 4, x: 5, y: 5)
-                            .frame(width: bodyView.size.width * 0.7, height: 40)
-                            .animation(.easeIn(duration: 0.2), value: inputLibrary.isShowCardInfomation)
-                            .onTapGesture { inputLibrary.isShowCardInfomation.toggle() }
+                                    } else {
+                                        print("LibraryCardIndexの取得エラー")
+                                    }
+                                } label: {
+                                    Image(systemName: "info.circle.fill")
+                                        .resizable().scaledToFit().frame(width: 20)
+                                        .foregroundColor(.white)
+                                } // Button
+                            } // if
+                        } // overlay
+                        .opacity(inputLibrary.cardOpacity)
+                        .shadow(radius: 4, x: 5, y: 5)
+                        .frame(width: bodyView.size.width * 0.7, height: 40)
+                        .animation(.easeIn(duration: 0.2), value: inputLibrary.isShowCardInfomation)
+                        .onTapGesture { inputLibrary.isShowCardInfomation.toggle() }
                 } // ForEach
             } // LazyHStack
             .padding()

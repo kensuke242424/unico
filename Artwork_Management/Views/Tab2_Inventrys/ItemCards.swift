@@ -21,49 +21,56 @@ struct TagSortCards: View {
 
     var body: some View {
 
-        // NOTE: タグインデックス「0」 && searthItemTextが 「tags.first」 or  ""
-        if inputStock.filterTagIndex == 0 &&
-            inputStock.searchItemNameText == tagVM.tags.first!.tagName ||
-            inputStock.searchItemNameText == "" {
+        if itemVM.items == [] {
+            EmptyItemView(inputHome: $inputHome, text: "アイテムが存在しません")
 
-            LazyVGrid(columns: columnsV, spacing: 20) {
-                ForEach(itemVM.items) { item in
+        } else {
 
-                    ItemCardRow(itemVM: itemVM,
-                                inputHome: $inputHome,
-                                inputStock: $inputStock,
-                                itemRow: item)
-                }
-            }
-            .padding(.horizontal, 10)
-            Spacer().frame(height: 300)
+            // NOTE: タグインデックス「0」 && searthItemTextが 「tags.first」 or  ""
+            if inputStock.filterTagIndex == 0 &&
+                inputStock.searchItemNameText == tagVM.tags.first!.tagName ||
+                inputStock.searchItemNameText == "" {
 
-        // NOTE: itemVM.items.「item.name」「item.tag」の中に一つでも検索条件が当てはまったら
-        } else if itemVM.items.contains(where: { $0.name.contains(inputStock.searchItemNameText) }) ||
-                    itemVM.items.contains(where: { $0.tag.contains(selectFilterTag) }) {
 
-            LazyVGrid(columns: columnsV, spacing: 20) {
-                ForEach(itemVM.items) { item in
+                LazyVGrid(columns: columnsV, spacing: 20) {
+                    ForEach(itemVM.items) { item in
 
-                    if item.name.contains(inputStock.searchItemNameText) ||
-                        item.tag.contains(inputStock.searchItemNameText) ||
-                        item.tag.contains(selectFilterTag) {
                         ItemCardRow(itemVM: itemVM,
                                     inputHome: $inputHome,
                                     inputStock: $inputStock,
                                     itemRow: item)
                     }
                 }
-            }
-            .padding(.horizontal, 10)
-            Spacer().frame(height: 200)
+                .padding(.horizontal, 10)
+                Spacer().frame(height: 300)
 
-        } else {
-            Text(inputStock.filterTagIndex == 0 ? "検索に該当するアイテムはありません" : "タグに該当するアイテムはありません")
-                .font(.subheadline)
-                .foregroundColor(.white).opacity(0.6)
-                .frame(height: 200)
-            Spacer().frame(height: 300)
+                // NOTE: itemVM.items.「item.name」「item.tag」の中に一つでも検索条件が当てはまったら
+            } else if itemVM.items.contains(where: { $0.name.contains(inputStock.searchItemNameText) }) ||
+                        itemVM.items.contains(where: { $0.tag.contains(selectFilterTag) }) {
+
+                LazyVGrid(columns: columnsV, spacing: 20) {
+                    ForEach(itemVM.items) { item in
+
+                        if item.name.contains(inputStock.searchItemNameText) ||
+                            item.tag.contains(inputStock.searchItemNameText) ||
+                            item.tag.contains(selectFilterTag) {
+                            ItemCardRow(itemVM: itemVM,
+                                        inputHome: $inputHome,
+                                        inputStock: $inputStock,
+                                        itemRow: item)
+                        }
+                    }
+                }
+                .padding(.horizontal, 10)
+                Spacer().frame(height: 200)
+
+            } else {
+                Text(inputStock.filterTagIndex == 0 ? "検索に該当するアイテムはありません" : "タグに該当するアイテムはありません")
+                    .font(.subheadline)
+                    .foregroundColor(.white).opacity(0.6)
+                    .frame(height: 200)
+                Spacer().frame(height: 300)
+            }
         }
 
     } // body
@@ -82,20 +89,26 @@ struct UpdateTimeSortCards: View {
 
     var body: some View {
 
-        ScrollView(.horizontal) {
-            LazyHGrid(rows: columnsH, spacing: 20) {
-                ForEach(itemVM.items) { item in
+        if itemVM.items == [] {
+            EmptyItemView(inputHome: $inputHome, text: "アイテムが存在しません")
 
-                    ItemCardRow(itemVM: itemVM,
-                                inputHome: $inputHome,
-                                inputStock: $inputStock,
-                                itemRow: item)
+        } else {
 
-                } // ForEach
-            } // LazyHGrid
-            .padding()
+            ScrollView(.horizontal) {
+                LazyHGrid(rows: columnsH, spacing: 20) {
+                    ForEach(itemVM.items) { item in
+
+                        ItemCardRow(itemVM: itemVM,
+                                    inputHome: $inputHome,
+                                    inputStock: $inputStock,
+                                    itemRow: item)
+
+                    } // ForEach
+                } // LazyHGrid
+                .padding()
+            }
+            .frame(height: 246)
         }
-        .frame(height: 246)
     } // body
 } // View
 

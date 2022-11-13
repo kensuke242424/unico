@@ -48,15 +48,9 @@ struct ManageView: View {
 
                         case true:
 
-                            if tagVM.tags.count < 3 {
+                            if itemVM.items == [] {
 
-                                VStack {
-                                    Text("アイテムが存在しません")
-                                        .font(.subheadline)
-                                        .foregroundColor(.white).opacity(0.6)
-                                        .frame(height: 200)
-                                }
-                                .frame(maxWidth: .infinity)
+                                EmptyItemView(inputHome: $inputHome, text: "アイテムが存在しません")
 
                             } else {
                                 // タグの要素数の分リストを作成
