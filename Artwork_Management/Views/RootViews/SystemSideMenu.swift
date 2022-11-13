@@ -313,6 +313,13 @@ struct SystemSideMenu: View {
             }
         }
 
+        // NOTE: ローカルのタグ順番操作をfirestoreに保存
+        .onChange(of: inputSideMenu.editMode) { newEdit in
+            if newEdit == .inactive {
+                tagVM.updateOderTagIndex()
+            }
+        }
+
         .clipShape(SideMenuShape())
         .contentShape(SideMenuShape())
 
@@ -367,15 +374,20 @@ struct SystemSideMenu: View {
         func rowRemove(offsets: IndexSet) {
 
             for tagIndex in offsets {
-                for itemIndex in itemVM.items.indices {
-                    if itemVM.items[itemIndex].tag == tagVM.tags[tagIndex].tagName {
-                        itemVM.items[itemIndex].tag = tagVM.tags.last!.tagName
-                    }
-                }
+                tagVM.deleteTag(deleteTag: tagVM.tags[tagIndex])
             }
-            withAnimation(.easeIn(duration: 0.1)) {
-                tagVM.tags.remove(atOffsets: offsets)
-            }
+
+
+//            for tagIndex in offsets {
+//                for itemIndex in itemVM.items.indices {
+//                    if itemVM.items[itemIndex].tag == tagVM.tags[tagIndex].tagName {
+//                        itemVM.items[itemIndex].tag = tagVM.tags.last!.tagName
+//                    }
+//                }
+//            }
+//            withAnimation(.easeIn(duration: 0.1)) {
+//                tagVM.tags.remove(atOffsets: offsets)
+//            }
         }
         func rowReplace(_ from: IndexSet, _ to: Int) {
             withAnimation(.spring()) {

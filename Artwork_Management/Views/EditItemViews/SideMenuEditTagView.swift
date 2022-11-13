@@ -175,7 +175,7 @@ struct SideMenuEditTagView: View {
                                     return
                                 }
 
-                                let newTagData = Tag(oderIndex: tagVM.tags.count - 2,
+                                let newTagData = Tag(oderIndex: tagVM.tags.count - 1,
                                                      tagName: inputTag.newTagNameText,
                                                      tagColor: inputTag.selectionSideMenuTagColor.text)
 

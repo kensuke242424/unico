@@ -47,9 +47,11 @@ class TagViewModel: ObservableObject {
                 }
             }
 
+            self.tags.sort { $0.oderIndex < $1.oderIndex }
+
             // firestoreからタグのfetch後、ローカル環境にALLと未グループを追加
             self.tags.insert(Tag(oderIndex: 0, tagName: "ALL", tagColor: "灰"), at: 0)
-            self.tags.append(Tag(oderIndex: self.tags.count - 1, tagName: "未グループ", tagColor: "灰"))
+            self.tags.append(Tag(oderIndex: self.tags.count, tagName: "未グループ", tagColor: "灰"))
 
             print("fetchTag完了")
             print(self.tags)
@@ -63,6 +65,18 @@ class TagViewModel: ObservableObject {
             _ = try tagsRef.addDocument(from: tagData)
         } catch {
             print("Error: try db!.collection(collectionID).addDocument(from: itemData)")
+        }
+    }
+
+    func updateOderTagIndex() {
+
+        guard let tagsRef = db?.collection("groups/\(groupID)/tags") else { return }
+
+        for (index, tag) in tags.enumerated() {
+            if index == 0 && index == tags.count - 1 { continue }
+            guard let tagID = tag.id else { continue }
+            tagsRef.document(tagID).updateData(["oderIndex": index])
+            print("\(tags[index].tagName).oderIndex: \(index)")
         }
     }
 
@@ -94,6 +108,28 @@ class TagViewModel: ObservableObject {
             }
         }
 
+    }
+
+    func deleteTag(deleteTag: Tag) {
+
+        guard let tagID = deleteTag.id else { return }
+        guard let tagRef = db?.collection("groups/\(groupID)/tags").document(tagID) else { return }
+        guard let itemsRef = db?.collection("groups/\(groupID)/items") else { return }
+
+        itemsRef.whereField("tag", isEqualTo: deleteTag.tagName).getDocuments { (snaps, error) in
+
+            if let error = error {
+                print("Error: \(error)")
+            } else {
+                guard let snaps = snaps else { return }
+                for document in snaps.documents {
+                    let itemID = document.documentID
+                    // タグの削除と、紐ずくアイテムのタグ解除
+                    itemsRef.document(itemID).updateData(["tag": self.tags.last!.tagName])
+                    tagRef.delete()
+                }
+            }
+        }
     }
 
     func filterTagsData(selectTagName: String) -> UsedColor {
