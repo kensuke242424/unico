@@ -18,6 +18,7 @@ struct ShowsItemDetail: View {
         var opacity: Double = 0
         var isShowEditHearAlert: Bool = false
         var isShowAmountAlert: Bool = false
+        var isShowDeleteItemAlert: Bool = false
         var isPresentedEditItem: Bool = false
     }
 
@@ -114,6 +115,22 @@ struct ShowsItemDetail: View {
                                         Text("カート内のアイテムは編集できません")
                                     } // alert
 
+                                    .alert("確認", isPresented: $inputDetail.isShowDeleteItemAlert) {
+
+                                        Button("削除", role: .destructive) {
+                                            inputHome.isShowItemDetail.toggle()
+                                            withAnimation {
+                                                itemVM.items.removeAll(where: { $0.id == item.id })
+                                            }
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                                itemVM.deleteItem(deleteItem: item)
+                                            }
+                                        }
+                                        .foregroundColor(.red)
+                                    } message: {
+                                        Text("\(item.name)を削除しますか？")
+                                    } // alert
+
                                 } // HStack
 
                                 Divider().background(.white).opacity(0.5)
@@ -146,6 +163,22 @@ struct ShowsItemDetail: View {
                     } // VStack
                     .padding(.vertical, 30)
                 }// overlay
+                .overlay(alignment: .topLeading) {
+                    Button {
+                        // アイテム削除
+                        inputDetail.isShowDeleteItemAlert.toggle()
+                    } label: {
+                        ZStack {
+                            Circle()
+                                .foregroundColor(.red)
+                                .frame(width: 35)
+                            Image(systemName: "trash.fill")
+                                .foregroundColor(.white)
+                        }
+                        .opacity(0.7)
+                    }
+                    .offset(x: -10, y: -10)
+                }
                 .offset(y: -30)
         } // ZStack(全体)
         .opacity(inputDetail.opacity)

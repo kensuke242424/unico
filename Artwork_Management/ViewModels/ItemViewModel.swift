@@ -84,6 +84,17 @@ class ItemViewModel: ObservableObject {
         print("updateItem完了")
     }
 
+    func deleteItem(deleteItem: Item) {
+
+        guard let itemID = deleteItem.id else { return }
+        guard let itemRef = db?.collection("groups").document(groupID).collection("items").document(itemID) else {
+            print("error: deleteItem_guard let ItemRef")
+            return
+        }
+
+        itemRef.delete()
+    }
+
     func resetAmount() {
         print("resetAmount実行")
 
