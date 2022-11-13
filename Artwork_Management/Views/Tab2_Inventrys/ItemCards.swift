@@ -11,6 +11,7 @@ import SwiftUI
 struct TagSortCards: View {
 
     @StateObject var itemVM: ItemViewModel
+    @StateObject var tagVM: TagViewModel
 
     @Binding var inputHome: InputHome
     @Binding var inputStock: InputStock
@@ -22,7 +23,7 @@ struct TagSortCards: View {
 
         // NOTE: タグインデックス「0」 && searthItemTextが 「tags.first」 or  ""
         if inputStock.filterTagIndex == 0 &&
-            inputStock.searchItemNameText == itemVM.tags.first!.tagName ||
+            inputStock.searchItemNameText == tagVM.tags.first!.tagName ||
             inputStock.searchItemNameText == "" {
 
             LazyVGrid(columns: columnsV, spacing: 20) {
@@ -117,6 +118,7 @@ struct TagCards_Previews: PreviewProvider {
             TagTitle(title: "アイテム", font: .title)
             // ✅カスタムView: アイテムを表示します。(縦スクロール)
             TagSortCards(itemVM: ItemViewModel(),
+                         tagVM: TagViewModel(),
                          inputHome: .constant(InputHome()),
                          inputStock: .constant(InputStock()),
                          selectFilterTag: "Album")

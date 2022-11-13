@@ -7,11 +7,11 @@
 
 import Foundation
 
-struct User: Identifiable {
+struct User: Identifiable, Codable {
     var id = UUID().uuidString
     var name: String
     var address: String
     var password: String
     var iconImage: String
-    var headerImage: String
+    var joins: [String]
 }

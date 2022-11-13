@@ -9,13 +9,12 @@ import SwiftUI
 
 class UserViewModel: ObservableObject {
 
-    @Published var users: [User] = [User(name: "User_Name", address: "kennsuke242424@gmail.com", password: "ninnzinn2424", iconImage: "", headerImage: "")]
+    @Published var users: [User] = [User(name: "User_Name", address: "kennsuke242424@gmail.com", password: "ninnzinn2424", iconImage: "", joins: [])]
 
 //    var headerImage: UIImage? = users[0].headerImage.toImage()
-
 
 }
 
 struct TestUser {
-    let testUser: User = User(name: "User_Name", address: "kennsuke242424@gmail.com", password: "ninnzinn2424", iconImage: "", headerImage: "")
+    let testUser: User = User(name: "User_Name", address: "kennsuke242424@gmail.com", password: "ninnzinn2424", iconImage: "", joins: [])
 }

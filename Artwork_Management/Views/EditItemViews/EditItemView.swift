@@ -28,6 +28,7 @@ struct InputEditItem {
 struct EditItemView: View {
 
     @StateObject var itemVM: ItemViewModel
+    @StateObject var tagVM: TagViewModel
     @Binding var inputHome: InputHome
     @Binding var inputImage: InputImage
 
@@ -59,6 +60,7 @@ struct EditItemView: View {
                         EditItemPhotoArea(item: passItemData)
 
                         InputForms(itemVM: itemVM,
+                                   tagVM: tagVM,
                                    inputEdit: $inputEdit,
                                    isOpenEditTagSideMenu: $inputHome.isOpenEditTagSideMenu,
                                    editItemStatus: editItemStatus,
@@ -73,8 +75,7 @@ struct EditItemView: View {
             .onChange(of: inputEdit.selectionTagName) { selection in
 
                 // NOTE: 選択されたタグネームと紐づいたタグカラーを取り出し、selectionTagColorに格納します。
-                let searchedTagColor = itemVM.searchSelectTagColor(selectTagName: selection,
-                                                                   tags: itemVM.tags)
+                let searchedTagColor = tagVM.filterTagsData(selectTagName: selection)
                 withAnimation(.easeIn(duration: 0.25)) {
                     inputEdit.selectionTagColor = searchedTagColor
                 }
@@ -110,7 +111,7 @@ struct EditItemView: View {
 
                 } else {
                     // tags[0]には"ALL"があるため、一つ飛ばして[1]を初期値として代入
-                    inputEdit.selectionTagName = itemVM.tags[1].tagName
+                    inputEdit.selectionTagName = tagVM.tags[1].tagName
                 }
 
             } // onAppear
@@ -196,6 +197,7 @@ struct InputForms: View {
     }
 
     @StateObject var itemVM: ItemViewModel
+    @StateObject var tagVM: TagViewModel
     @Binding var inputEdit: InputEditItem
     @Binding var isOpenEditTagSideMenu: Bool
 
@@ -218,18 +220,18 @@ struct InputForms: View {
                         .foregroundColor(inputEdit.selectionTagColor.color)
                     Picker("", selection: $inputEdit.selectionTagName) {
 
-                        if passItem?.tag == itemVM.tags.last!.tagName {
+                        if passItem?.tag == tagVM.tags.last!.tagName {
 
-                            ForEach(itemVM.tags) { tag in
-                                if tag != itemVM.tags.first! {
+                            ForEach(tagVM.tags) { tag in
+                                if tag != tagVM.tags.first! {
                                     Text(tag.tagName).tag(tag.tagName)
                                 }
                             }
 
                         } else {
 
-                            ForEach(itemVM.tags) { tag in
-                                if tag != itemVM.tags.first! && tag != itemVM.tags.last! {
+                            ForEach(tagVM.tags) { tag in
+                                if tag != tagVM.tags.first! && tag != tagVM.tags.last! {
                                     Text(tag.tagName).tag(tag.tagName)
                                 }
                             }
@@ -352,6 +354,7 @@ private struct OffsetPreferenceKey: PreferenceKey, Equatable {
 struct EditItemView_Previews: PreviewProvider {
     static var previews: some View {
         EditItemView(itemVM: ItemViewModel(),
+                     tagVM: TagViewModel(),
                      inputHome: .constant(InputHome()),
                      inputImage: .constant(InputImage()),
                      userID: "AAAAAAAAAAAA",

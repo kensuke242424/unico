@@ -13,7 +13,7 @@ struct InputSideMenu {
     var tag: Bool = false
     var help: Bool = false
     var editMode: EditMode = .inactive
-    var selectTag: Tag = Tag(tagName: "", tagColor: .red)
+    var selectTag: Tag = Tag(oderIndex: 1, tagName: "", tagColor: "赤")
 }
 
 struct SystemSideMenu: View {
@@ -21,6 +21,8 @@ struct SystemSideMenu: View {
     @Environment(\.colorScheme) var colorScheme: ColorScheme
 
     @StateObject var itemVM: ItemViewModel
+    @StateObject var tagVM: TagViewModel
+
     @Binding var inputHome: InputHome
     @Binding var inputImage: InputImage
     @Binding var inputTag: InputTagSideMenu
@@ -120,7 +122,7 @@ struct SystemSideMenu: View {
 
                                     if inputSideMenu.tag {
 
-                                        if itemVM.tags.count > 2 {
+                                        if tagVM.tags.count > 2 {
                                             Button(action: {
                                                 withAnimation {
                                                     inputSideMenu.editMode = inputSideMenu.editMode.isEditing ? .inactive : .active
@@ -155,15 +157,19 @@ struct SystemSideMenu: View {
 
                                     Spacer(minLength: 0)
 
-                                    if itemVM.tags.count > 2 {
+                                    if tagVM.tags.count > 2 {
                                         List {
 
-                                            ForEach(Array(itemVM.tags.enumerated()), id: \.offset) { offset, tag in
+                                            ForEach(Array(tagVM.tags.enumerated()), id: \.offset) { offset, tag in
 
-                                                if tag != itemVM.tags.first! && tag != itemVM.tags.last! {
+                                                let tagUsedColor = tagVM.filterTagsData(selectTagName: tag.tagColor)
+
+                                                if tag != tagVM.tags.first! && tag != tagVM.tags.last! {
                                                     HStack {
                                                         Image(systemName: "tag.fill")
-                                                            .font(.caption).foregroundColor(tag.tagColor.color).opacity(0.6)
+                                                            .font(.caption)
+                                                            .foregroundColor(tagUsedColor.color)
+                                                            .opacity(0.6)
 
                                                         Text(tag.tagName)
                                                             .lineLimit(1)
@@ -181,8 +187,8 @@ struct SystemSideMenu: View {
                                                                 print("タグ編集ボタンタップ")
                                                                 inputTag.tagSideMenuStatus = .update
                                                                 inputSideMenu.selectTag = tag
-                                                                inputTag.newTagNameText = tag.tagName
-                                                                inputTag.selectionSideMenuTagColor = tag.tagColor
+                                                                inputTag.newTagNameText = tagUsedColor.text
+                                                                inputTag.selectionSideMenuTagColor = tagUsedColor
 
                                                                 withAnimation(.spring(response: 0.3, blendDuration: 1)) {
                                                                     inputHome.isOpenEditTagSideMenu.toggle()
@@ -212,7 +218,7 @@ struct SystemSideMenu: View {
                                         } // List
                                         .environment(\.editMode, $inputSideMenu.editMode)
                                         .frame(width: UIScreen.main.bounds.width * 0.58,
-                                               height: 60 + (40 * CGFloat(itemVM.tags.count - 2)))
+                                               height: 60 + (40 * CGFloat(tagVM.tags.count - 2)))
                                         .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
                                         .scrollContentBackground(.hidden)
                                         .offset(x: -10)
@@ -224,7 +230,7 @@ struct SystemSideMenu: View {
                                             .frame(height: 60)
                                             .offset(y: 30)
 
-                                    } // if itemVM.tags.count > 2
+                                    } // if tagVM.tags.count > 2
                                 } // if inputSideMenu.tag...
                             }
 
@@ -362,18 +368,18 @@ struct SystemSideMenu: View {
 
             for tagIndex in offsets {
                 for itemIndex in itemVM.items.indices {
-                    if itemVM.items[itemIndex].tag == itemVM.tags[tagIndex].tagName {
-                        itemVM.items[itemIndex].tag = itemVM.tags.last!.tagName
+                    if itemVM.items[itemIndex].tag == tagVM.tags[tagIndex].tagName {
+                        itemVM.items[itemIndex].tag = tagVM.tags.last!.tagName
                     }
                 }
             }
             withAnimation(.easeIn(duration: 0.1)) {
-                itemVM.tags.remove(atOffsets: offsets)
+                tagVM.tags.remove(atOffsets: offsets)
             }
         }
         func rowReplace(_ from: IndexSet, _ to: Int) {
             withAnimation(.spring()) {
-                itemVM.tags.move(fromOffsets: from, toOffset: to)
+                tagVM.tags.move(fromOffsets: from, toOffset: to)
             }
         }
 

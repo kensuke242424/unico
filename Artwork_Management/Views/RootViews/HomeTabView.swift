@@ -49,8 +49,9 @@ struct InputImage {
 
 struct HomeTabView: View {
 
-    @StateObject var userVM = UserViewModel()
-    @StateObject var rootItemVM = ItemViewModel()
+    @StateObject var userVM: UserViewModel = UserViewModel()
+    @StateObject var rootItemVM: ItemViewModel = ItemViewModel()
+    @StateObject var tagVM: TagViewModel = TagViewModel()
     @State private var inputHome: InputHome = InputHome()
     @State private var inputImage: InputImage = InputImage()
     @State private var inputSideMenu: InputSideMenu = InputSideMenu()
@@ -64,7 +65,9 @@ struct HomeTabView: View {
 
             TabView(selection: $inputHome.homeTabIndex) {
 
-                LibraryView(itemVM: rootItemVM, inputHome: $inputHome,
+                LibraryView(itemVM: rootItemVM,
+                            tagVM: tagVM,
+                            inputHome: $inputHome,
                             inputImage: $inputImage)
                     .tabItem {
                         Image(systemName: "house")
@@ -72,14 +75,21 @@ struct HomeTabView: View {
                     }
                     .tag(0)
 
-                StockView(itemVM: rootItemVM, inputHome: $inputHome, inputImage: $inputImage, userID: userID)
+                StockView(itemVM: rootItemVM,
+                          tagVM: tagVM,
+                          inputHome: $inputHome,
+                          inputImage: $inputImage,
+                          userID: userID)
                     .tabItem {
                         Image(systemName: "shippingbox.fill")
                         Text("inventory")
                     }
                     .tag(1)
 
-                ManageView(itemVM: rootItemVM, inputHome: $inputHome, inputImage: $inputImage)
+                ManageView(itemVM: rootItemVM,
+                           tagVM: tagVM,
+                           inputHome: $inputHome,
+                           inputImage: $inputImage)
                     .tabItem {
                         Image(systemName: "chart.xyaxis.line")
                         Text("Manage")
@@ -111,6 +121,7 @@ struct HomeTabView: View {
                 }
 
             SystemSideMenu(itemVM: rootItemVM,
+                           tagVM: tagVM,
                            inputHome: $inputHome,
                            inputImage: $inputImage,
                            inputTag: $inputTag,
@@ -131,7 +142,10 @@ struct HomeTabView: View {
                 }
 
             // Open TagSideMenu...
-            SideMenuEditTagView(itemVM: rootItemVM, inputHome: $inputHome, inputTag: $inputTag,
+            SideMenuEditTagView(itemVM: rootItemVM,
+                                tagVM: tagVM,
+                                inputHome: $inputHome,
+                                inputTag: $inputTag,
                                 defaultTag: inputTag.tagSideMenuStatus == .create ? nil : inputSideMenu.selectTag, tagSideMenuStatus: inputTag.tagSideMenuStatus)
             .offset(x: inputHome.isOpenEditTagSideMenu ? UIScreen.main.bounds.width / 2 - 25 : UIScreen.main.bounds.width + 10)
 
@@ -178,6 +192,7 @@ struct HomeTabView: View {
 
         .sheet(isPresented: $inputHome.isPresentedEditItem) {
             EditItemView(itemVM: rootItemVM,
+                         tagVM: tagVM,
                          inputHome: $inputHome,
                          inputImage: $inputImage,
                          userID: userID,
@@ -214,23 +229,19 @@ struct HomeTabView: View {
 
             case .header:
                 guard userVM.users.first != nil else { return }
-                userVM.users[0].headerImage = base64StringImage
-                inputImage.headerImage = userVM.users.first!.headerImage.toImage()
+
+            }
+        }
+        .onAppear {
+            Task {
+                await tagVM.fetchTag(groupID: tagVM.groupID)
+                print("fetchTagメソッド終わり")
+                await rootItemVM.fetchItem()
+                print("fetchItemメソッド終わり")
 
             }
         }
 
-        .onAppear {
-            // fetch itemData
-            rootItemVM.fetchItem(userID: userID)
-            rootItemVM.resetAmount()
-            guard userVM.users.first != nil else { return }
-            inputImage.headerImage = userVM.users.first!.headerImage.toImage()
-        }
-        .onDisappear {
-            print("MessageView_Disappear.")
-            rootItemVM.listener?.remove()
-        }
     } // body
 } // View
 

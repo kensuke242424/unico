@@ -46,6 +46,7 @@ struct LibraryView: View {
     }
 
     @StateObject var itemVM: ItemViewModel
+    @StateObject var tagVM: TagViewModel
     @Binding var inputHome: InputHome
     @Binding var inputImage: InputImage
 
@@ -149,9 +150,9 @@ struct LibraryView: View {
                 .opacity(0.08)
 
             Menu {
-                ForEach(itemVM.tags) { tag in
+                ForEach(tagVM.tags) { tag in
 
-                    if tag != itemVM.tags.last! {
+                    if tag != tagVM.tags.last! {
                         Button {
                             inputLibrary.selectFilterTag = tag.tagName
                         } label: {
@@ -163,7 +164,7 @@ struct LibraryView: View {
                         }
 
                     } else {
-                        if itemVM.items.contains(where: {$0.tag == (itemVM.tags.last!.tagName)}) {
+                        if itemVM.items.contains(where: {$0.tag == (tagVM.tags.last!.tagName)}) {
                             Button {
                                 inputLibrary.selectFilterTag = tag.tagName
                             } label: {
@@ -457,6 +458,7 @@ struct LibraryView: View {
 struct LibraryView_Previews: PreviewProvider {
     static var previews: some View {
         LibraryView(itemVM: ItemViewModel(),
+                    tagVM: TagViewModel(),
                     inputHome: .constant(InputHome()),
                     inputImage: .constant(InputImage()))
     }

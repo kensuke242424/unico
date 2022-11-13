@@ -21,6 +21,7 @@ enum TagGroup {
 struct ManageView: View {
 
     @StateObject var itemVM: ItemViewModel
+    @StateObject var tagVM: TagViewModel
 
     // NOTE: 新規アイテム追加Viewの発現を管理します
     @Binding var inputHome: InputHome
@@ -47,74 +48,86 @@ struct ManageView: View {
 
                         case true:
 
-                            // タグの要素数の分リストを作成
-                            ForEach(itemVM.tags) { tagRow in
+                            if tagVM.tags.count < 3 {
 
-                                // firstには"ALL", lastには"タグ無し"
-                                if tagRow != itemVM.tags.first! && tagRow != itemVM.tags.last! {
+                                VStack {
+                                    Text("アイテムが存在しません")
+                                        .font(.subheadline)
+                                        .foregroundColor(.white).opacity(0.6)
+                                        .frame(height: 200)
+                                }
+                                .frame(maxWidth: .infinity)
 
-                                    HStack {
-                                        Text(tagRow.tagName)
-                                            .foregroundColor(.white)
-                                            .font(.title.bold())
-                                            .shadow(radius: 2, x: 4, y: 6)
-                                            .padding(.vertical)
+                            } else {
+                                // タグの要素数の分リストを作成
+                                ForEach(tagVM.tags) { tagRow in
 
+                                    // firstには"ALL", lastには"タグ無し"
+                                    if tagRow != tagVM.tags.first! && tagRow != tagVM.tags.last! {
+
+                                        HStack {
+                                            Text(tagRow.tagName)
+                                                .foregroundColor(.white)
+                                                .font(.title.bold())
+                                                .shadow(radius: 2, x: 4, y: 6)
+                                                .padding(.vertical)
+
+                                        }
+
+                                        Spacer(minLength: 0)
+
+                                        LinearGradient(gradient: Gradient(colors: [.gray, .clear]),
+                                                                   startPoint: .leading, endPoint: .trailing)
+                                            .frame(height: 1)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+
+                                        if itemVM.items.contains(where: {$0.tag == tagRow.tagName}) {
+
+                                            VStack {
+                                                ForEach(itemVM.items) { item in
+
+                                                    if item.tag == tagRow.tagName {
+                                                        manageListRow(item: item)
+                                                    }
+                                                }
+                                                Color.clear
+                                                    .frame(height: 20)
+                                            }
+
+                                        } else {
+                                            Text("タグに該当するアイテムはありません")
+                                                .font(.subheadline)
+                                                .foregroundColor(.white).opacity(0.6)
+                                                .frame(height: 100)
+                                        }
                                     }
+                                } // ForEach tagVM.tags
 
-                                    Spacer(minLength: 0)
+                                // "未グループ"タグのついたアイテムが存在した場合
+                                if itemVM.items.contains(where: {$0.tag == (tagVM.tags.last!.tagName)}) {
+                                    Text(tagVM.tags.last!.tagName)
+                                        .foregroundColor(.white)
+                                        .font(.title2.bold())
+                                        .shadow(radius: 2, x: 4, y: 6)
+                                        .padding(.vertical)
 
                                     LinearGradient(gradient: Gradient(colors: [.gray, .clear]),
                                                                startPoint: .leading, endPoint: .trailing)
                                         .frame(height: 1)
                                         .frame(maxWidth: .infinity, alignment: .leading)
 
-                                    if itemVM.items.contains(where: {$0.tag == tagRow.tagName}) {
+                                        ForEach(itemVM.items) { item in
 
-                                        VStack {
-                                            ForEach(itemVM.items) { item in
-
-                                                if item.tag == tagRow.tagName {
-                                                    manageListRow(item: item)
-                                                }
+                                            if item.tag == "\(tagVM.tags.last!.tagName)" {
+                                                manageListRow(item: item)
                                             }
-                                            Color.clear
-                                                .frame(height: 20)
-                                        }
-
-                                    } else {
-                                        Text("タグに該当するアイテムはありません")
-                                            .font(.subheadline)
-                                            .foregroundColor(.white).opacity(0.6)
-                                            .frame(height: 100)
-                                    }
-                                }
-                            } // ForEach itemVM.tags
-
-                            // "タグ無し"タグのついたアイテムが存在した場合
-                            if itemVM.items.contains(where: {$0.tag == (itemVM.tags.last!.tagName)}) {
-                                Text(itemVM.tags.last!.tagName)
-                                    .foregroundColor(.white)
-                                    .font(.title2.bold())
-                                    .shadow(radius: 2, x: 4, y: 6)
-                                    .padding(.vertical)
-
-                                LinearGradient(gradient: Gradient(colors: [.gray, .clear]),
-                                                           startPoint: .leading, endPoint: .trailing)
-                                    .frame(height: 1)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-
-                                    ForEach(itemVM.items) { item in
-
-                                        if item.tag == "\(itemVM.tags.last!.tagName)" {
-                                            manageListRow(item: item)
-                                        }
-                                    } // ForEach item
-                            } // if
+                                        } // ForEach item
+                                } // if
+                            }
 
                         case false:
 
-                            Text(itemVM.tags[0].tagName)
+                            Text(tagVM.tags[0].tagName)
                                 .font(.largeTitle.bold())
                                 .foregroundColor(.white)
                                 .shadow(radius: 2, x: 4, y: 6)
@@ -263,9 +276,9 @@ struct ManageView: View {
                         } // Button
                     } // HStack
 
-                    if let itemRowTag = itemVM.tags.first(where: { $0.tagName == item.tag }) {
+                    if let itemRowTag = tagVM.tags.first(where: { $0.tagName == item.tag }) {
 
-                        IndicatorRow(salesValue: item.sales, tagColor: itemRowTag.tagColor)
+                        IndicatorRow(salesValue: item.sales, tagColor: tagVM.filterTagsData(selectTagName: itemRowTag.tagColor))
 
                     } else {
 
@@ -286,6 +299,9 @@ struct ManageView: View {
 
 struct ManageView_Previews: PreviewProvider {
     static var previews: some View {
-        ManageView(itemVM: ItemViewModel(), inputHome: .constant(InputHome()), inputImage: .constant(InputImage()))
+        ManageView(itemVM: ItemViewModel(),
+                   tagVM: TagViewModel(),
+                   inputHome: .constant(InputHome()),
+                   inputImage: .constant(InputImage()))
     }
 }

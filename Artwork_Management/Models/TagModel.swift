@@ -6,11 +6,14 @@
 //
 
 import SwiftUI
+import FirebaseFirestore
+import FirebaseFirestoreSwift
 
-struct Tag: Identifiable, Equatable {
-    var id = UUID()
+struct Tag: Identifiable, Equatable, Codable {
+    @DocumentID var id = UUID().uuidString
+    var oderIndex: Int
     var tagName: String
-    var tagColor: UsedColor
+    var tagColor: String
 }
 
 enum UsedColor: CaseIterable {
