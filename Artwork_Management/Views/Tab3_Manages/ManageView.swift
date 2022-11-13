@@ -272,7 +272,7 @@ struct ManageView: View {
 
                     if let itemRowTag = tagVM.tags.first(where: { $0.tagName == item.tag }) {
 
-                        IndicatorRow(salesValue: item.sales, tagColor: tagVM.filterTagsData(selectTagName: itemRowTag.tagColor))
+                        IndicatorRow(salesValue: item.sales, tagColor: tagVM.filterTagsData(selectTagColor: itemRowTag.tagColor))
 
                     } else {
 

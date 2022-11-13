@@ -131,9 +131,9 @@ class TagViewModel: ObservableObject {
         }
     }
 
-    func filterTagsData(selectTagName: String) -> UsedColor {
+    func filterTagsData(selectTagColor: String) -> UsedColor {
 
-            switch selectTagName {
+            switch selectTagColor {
             case "赤": return .red
             case "青": return .blue
             case "黄": return .yellow

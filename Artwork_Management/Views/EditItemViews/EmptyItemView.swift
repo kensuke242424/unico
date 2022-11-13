@@ -23,7 +23,7 @@ struct EmptyItemView: View {
                 inputHome.isPresentedEditItem.toggle()
             } label: {
                 RoundedRectangle(cornerRadius: 10)
-                    .foregroundColor(.black.opacity(0.4))
+                    .foregroundColor(.black.opacity(0.2))
                     .frame(width: 80, height: 30)
                     .overlay {
                         HStack {

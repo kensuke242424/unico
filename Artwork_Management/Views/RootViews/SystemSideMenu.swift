@@ -162,7 +162,7 @@ struct SystemSideMenu: View {
 
                                             ForEach(Array(tagVM.tags.enumerated()), id: \.offset) { offset, tag in
 
-                                                let tagUsedColor = tagVM.filterTagsData(selectTagName: tag.tagColor)
+                                                let tagUsedColor = tagVM.filterTagsData(selectTagColor: tag.tagColor)
 
                                                 if tag != tagVM.tags.first! && tag != tagVM.tags.last! {
                                                     HStack {
@@ -377,19 +377,8 @@ struct SystemSideMenu: View {
                 print(tagIndex)
                 tagVM.deleteTag(deleteTag: tagVM.tags[tagIndex])
             }
-
-
-//            for tagIndex in offsets {
-//                for itemIndex in itemVM.items.indices {
-//                    if itemVM.items[itemIndex].tag == tagVM.tags[tagIndex].tagName {
-//                        itemVM.items[itemIndex].tag = tagVM.tags.last!.tagName
-//                    }
-//                }
-//            }
-//            withAnimation(.easeIn(duration: 0.1)) {
-//                tagVM.tags.remove(atOffsets: offsets)
-//            }
         }
+
         func rowReplace(_ from: IndexSet, _ to: Int) {
             withAnimation(.spring()) {
                 tagVM.tags.move(fromOffsets: from, toOffset: to)

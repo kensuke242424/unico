@@ -10,7 +10,6 @@ import SwiftUI
 struct InputEditItem {
 
     var selectionTagName: String = ""
-    var selectionTagColor: UsedColor = .red
     var photoURL: String = ""  // Todo: 写真取り込み機能追加後使用
     var editItemName: String = ""
     var editItemInventory: String = ""
@@ -71,15 +70,6 @@ struct EditItemView: View {
                 .animation(.easeIn(duration: 0.3), value: inputEdit.offset)
 
             } // ScrollView
-
-            .onChange(of: inputEdit.selectionTagName) { selection in
-
-                // NOTE: 選択されたタグネームと紐づいたタグカラーを取り出し、selectionTagColorに格納します。
-                let searchedTagColor = tagVM.filterTagsData(selectTagName: selection)
-                withAnimation(.easeIn(duration: 0.25)) {
-                    inputEdit.selectionTagColor = searchedTagColor
-                }
-            }
 
             .onChange(of: inputEdit.editItemName) { newValue in
 
@@ -205,6 +195,15 @@ struct InputForms: View {
     let editItemStatus: EditStatus
     let passItem: Item?
 
+    var tagColor: Color {
+        let selectTag = tagVM.tags.filter({ $0.tagName == inputEdit.selectionTagName })
+        if let selectTag = selectTag.first {
+            return tagVM.filterTagsData(selectTagColor: selectTag.tagColor).color
+        } else {
+            return .gray
+        }
+    }
+
     @FocusState private var focusedField: EditItemField?
 
     var body: some View {
@@ -217,7 +216,7 @@ struct InputForms: View {
 
                 HStack {
                     Image(systemName: "tag.fill")
-                        .foregroundColor(inputEdit.selectionTagColor.color)
+                        .foregroundColor(tagColor)
                     Picker("", selection: $inputEdit.selectionTagName) {
 
                         if passItem?.tag == tagVM.tags.last!.tagName {
