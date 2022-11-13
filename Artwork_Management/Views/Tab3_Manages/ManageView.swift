@@ -53,6 +53,7 @@ struct ManageView: View {
                                 EmptyItemView(inputHome: $inputHome, text: "アイテムが存在しません")
 
                             } else {
+                                Spacer().frame(height: 50)
                                 // タグの要素数の分リストを作成
                                 ForEach(tagVM.tags) { tagRow in
 
@@ -62,7 +63,7 @@ struct ManageView: View {
                                         HStack {
                                             Text(tagRow.tagName)
                                                 .foregroundColor(.white)
-                                                .font(.title.bold())
+                                                .font(.title2.bold())
                                                 .shadow(radius: 2, x: 4, y: 6)
                                                 .padding(.vertical)
 
@@ -247,7 +248,7 @@ struct ManageView: View {
 
                 VStack(alignment: .leading, spacing: 10) {
                     HStack(spacing: 40) {
-                        Text("¥ \(item.sales)")
+                        Text(item.sales != 0 ? "¥ \(item.sales)" : "¥ -")
                             .foregroundColor(.white)
                             .opacity(0.8)
                             .font(.subheadline.bold())
@@ -272,7 +273,17 @@ struct ManageView: View {
 
                     if let itemRowTag = tagVM.tags.first(where: { $0.tagName == item.tag }) {
 
-                        IndicatorRow(salesValue: item.sales, tagColor: tagVM.filterTagsData(selectTagColor: itemRowTag.tagColor))
+                        if item.sales != 0 {
+                            IndicatorRow(salesValue: item.sales, tagColor: tagVM.filterTagsData(selectTagColor: itemRowTag.tagColor))
+                        } else {
+                            IndicatorRow(salesValue: 100000, tagColor: .gray).opacity(0.5)
+                                .overlay(alignment: .leading) {
+                                    Text("データはありません")
+                                        .font(.caption)
+                                        .foregroundColor(.white.opacity(0.7))
+                                        .offset(x: 20)
+                                }
+                        }
 
                     } else {
 

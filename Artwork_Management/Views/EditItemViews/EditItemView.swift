@@ -118,21 +118,18 @@ struct EditItemView: View {
 
                         case .create:
 
-                            guard let inputPrice = Int(inputEdit.editItemPrice) else { return }
-                            guard let inputInventory = Int(inputEdit.editItemInventory) else { return }
-
                             // NOTE: テストデータに新規アイテムを保存
-                            let itemData = (Item(tag: inputEdit.selectionTagName,
+                            let itemData = Item(tag: inputEdit.selectionTagName,
                                                  name: inputEdit.editItemName,
                                                  detail: inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "メモなし",
                                                  photo: "", // Todo: 写真取り込み実装後、変更
                                                  cost: 0,
-                                                 price: inputPrice,
+                                                 price: Int(inputEdit.editItemPrice) ?? 0,
                                                  amount: 0,
                                                  sales: 0,
-                                                 inventory: inputInventory,
+                                                 inventory: Int(inputEdit.editItemInventory) ??  0,
                                                  totalAmount: 0,
-                                                 totalInventory: inputInventory))
+                                                 totalInventory: Int(inputEdit.editItemInventory) ?? 0)
 
                             // Firestoreにコーダブル保存
                             itemVM.addItem(itemData: itemData, tag: inputEdit.selectionTagName, userID: userID)
@@ -143,10 +140,7 @@ struct EditItemView: View {
 
                             guard let passItemData = passItemData else { return }
                             guard let defaultDataID = passItemData.id else { return }
-                            guard let editPrice = Int(inputEdit.editItemPrice) else { return }
-                            guard let editSales = Int(inputEdit.editItemSales) else { return }
-                            guard let editCost = Int(inputEdit.editItemCost) else { return }
-                            guard let editInventory = Int(inputEdit.editItemInventory) else { return }
+                            let editInventory = Int(inputEdit.editItemInventory) ?? 0
 
                             // NOTE: アイテムを更新
                             let updateItemData = (Item(createTime: passItemData.createTime,
@@ -154,10 +148,10 @@ struct EditItemView: View {
                                                        name: inputEdit.editItemName,
                                                        detail: inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "メモなし",
                                                        photo: inputEdit.photoURL != "" ? inputEdit.photoURL : "", // Todo: 写真取り込み実装後、変更
-                                                       cost: editCost,
-                                                       price: editPrice,
+                                                       cost: Int(inputEdit.editItemCost) ?? 0,
+                                                       price: Int(inputEdit.editItemPrice) ?? 0,
                                                        amount: 0,
-                                                       sales: editSales,
+                                                       sales: Int(inputEdit.editItemSales) ?? 0,
                                                        inventory: editInventory,
                                                        totalAmount: passItemData.totalAmount,
                                                        totalInventory: passItemData.inventory < editInventory ?

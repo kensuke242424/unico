@@ -43,6 +43,9 @@ struct StockView: View {
 
                         // NOTE: アイテム要素全体のロケーション
                         ScrollView {
+
+                            Spacer().frame(height: 50)
+
                             TagTitle(title: "最近更新したアイテム", font: .title3)
                                 .foregroundColor(.white)
                                 .opacity(0.8)
@@ -350,7 +353,7 @@ struct SideTagBarOverlay: View {
                         .onTapGesture { inputStock.filterTagIndex += 1 }
                     }
                 } // HStack
-                .foregroundColor(.white)
+                .foregroundColor(.white.opacity(0.6))
                 .padding(.horizontal, 20)
 
             } // overlay(サイドタグ情報)

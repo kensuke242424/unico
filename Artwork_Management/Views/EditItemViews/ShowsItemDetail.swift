@@ -87,7 +87,9 @@ struct ShowsItemDetail: View {
                                     } label: {
                                         Image(systemName: "highlighter")
                                             .foregroundColor(.yellow)
+
                                     }
+                                    .offset(x: 10)
                                     .alert("確認", isPresented: $inputDetail.isShowEditHearAlert) {
 
                                         Button {
@@ -158,28 +160,24 @@ struct ShowsItemDetail: View {
                                                 .padding(10)
                                         }
                                     }
+                                Button {
+                                    // アイテム削除
+                                    inputDetail.isShowDeleteItemAlert.toggle()
+                                } label: {
+                                    ZStack {
+                                        Circle()
+                                            .foregroundColor(.red)
+                                            .frame(width: 35)
+                                        Image(systemName: "trash.fill")
+                                            .foregroundColor(.white)
+                                    }
+                                    .opacity(0.7)
+                                }
                             } // VStack
                         } // ScrollView
                     } // VStack
                     .padding(.vertical, 30)
                 }// overlay
-                .overlay(alignment: .topLeading) {
-                    Button {
-                        // アイテム削除
-                        inputDetail.isShowDeleteItemAlert.toggle()
-                    } label: {
-                        ZStack {
-                            Circle()
-                                .foregroundColor(.red)
-                                .frame(width: 35)
-                            Image(systemName: "trash.fill")
-                                .foregroundColor(.white)
-                        }
-                        .opacity(0.7)
-                    }
-                    .offset(x: -10, y: -10)
-                }
-                .offset(y: -30)
         } // ZStack(全体)
         .opacity(inputDetail.opacity)
 

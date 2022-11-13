@@ -84,7 +84,7 @@ struct ItemCardRow: View {
                     HStack(alignment: .bottom) {
                         Text("¥")
                             .foregroundColor(.black)
-                        Text(String(itemRow.price))
+                        Text(itemRow.price != 0 ? String(itemRow.price) : "-")
                             .font(.title3)
                             .fontWeight(.heavy)
                             .foregroundColor(.black)
