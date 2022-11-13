@@ -88,7 +88,7 @@ class TagViewModel: ObservableObject {
                 guard let snaps = snaps else { return }
 
                 for document in snaps.documents {
-                    var itemID = document.documentID
+                    let itemID = document.documentID
                     updateItemsRef.document(itemID).updateData(["tag": updateData.tagName])
                 }
             }
@@ -98,11 +98,7 @@ class TagViewModel: ObservableObject {
 
     func filterTagsData(selectTagName: String) -> UsedColor {
 
-        let filterTag = tags.filter { $0.tagName == selectTagName }
-
-        if let filterTag = filterTag.first {
-
-            switch filterTag.tagColor {
+            switch selectTagName {
             case "赤": return .red
             case "青": return .blue
             case "黄": return .yellow
@@ -111,9 +107,6 @@ class TagViewModel: ObservableObject {
                 return .gray
             }
 
-        } else {
-            return.gray
-        }
     } // func castStringIntoColor
 
     deinit {

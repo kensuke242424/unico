@@ -187,7 +187,7 @@ struct SystemSideMenu: View {
                                                                 print("タグ編集ボタンタップ")
                                                                 inputTag.tagSideMenuStatus = .update
                                                                 inputSideMenu.selectTag = tag
-                                                                inputTag.newTagNameText = tagUsedColor.text
+                                                                inputTag.newTagNameText = tag.tagName
                                                                 inputTag.selectionSideMenuTagColor = tagUsedColor
 
                                                                 withAnimation(.spring(response: 0.3, blendDuration: 1)) {
