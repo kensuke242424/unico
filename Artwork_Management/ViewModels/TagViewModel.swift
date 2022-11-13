@@ -54,7 +54,6 @@ class TagViewModel: ObservableObject {
             self.tags.append(Tag(oderIndex: self.tags.count, tagName: "未グループ", tagColor: "灰"))
 
             print("fetchTag完了")
-            print(self.tags)
 
         }
     }
@@ -126,8 +125,8 @@ class TagViewModel: ObservableObject {
                     let itemID = document.documentID
                     // タグの削除と、紐ずくアイテムのタグ解除
                     itemsRef.document(itemID).updateData(["tag": self.tags.last!.tagName])
-                    tagRef.delete()
                 }
+                tagRef.delete()
             }
         }
     }

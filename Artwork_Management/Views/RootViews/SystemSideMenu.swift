@@ -374,6 +374,7 @@ struct SystemSideMenu: View {
         func rowRemove(offsets: IndexSet) {
 
             for tagIndex in offsets {
+                print(tagIndex)
                 tagVM.deleteTag(deleteTag: tagVM.tags[tagIndex])
             }
 
