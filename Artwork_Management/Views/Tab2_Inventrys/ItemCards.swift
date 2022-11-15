@@ -87,6 +87,17 @@ struct UpdateTimeSortCards: View {
     // アイテムのディテールを指定します。
     let columnsH: [GridItem] = Array(repeating: .init(.flexible()), count: 1)
 
+    var updateTimeSortItems: [Item] {
+
+        var sortItems: [Item] = itemVM.items.sorted { before, after in
+            return before.updateTime!.dateValue() > after.updateTime!.dateValue() ? true : false
+        }
+
+        let prefixItems = sortItems.prefix(10)
+
+        return Array(prefixItems)
+    }
+
     var body: some View {
 
         if itemVM.items == [] {
@@ -96,7 +107,7 @@ struct UpdateTimeSortCards: View {
 
             ScrollView(.horizontal) {
                 LazyHGrid(rows: columnsH, spacing: 20) {
-                    ForEach(itemVM.items) { item in
+                    ForEach(updateTimeSortItems) { item in
 
                         ItemCardRow(itemVM: itemVM,
                                     inputHome: $inputHome,

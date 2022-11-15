@@ -135,7 +135,7 @@ struct ShowsItemDetail: View {
                                     } // HStack
 
                                     Divider().background(.white).opacity(0.5)
-                                        .padding(.bottom)
+                                        .padding()
 
                                     // NOTE: アイテムの情報が格納羅列されたカスタムViewです
                                     ItemDetailData(item: item)

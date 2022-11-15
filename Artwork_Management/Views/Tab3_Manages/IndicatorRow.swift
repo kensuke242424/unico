@@ -57,13 +57,12 @@ struct IndicatorRow: View {
 
             .overlay(alignment: .leading) {
                 if value == 0 {
-                    Text("売上データなし")
+                    Text("データなし")
                         .font(.caption)
                         .foregroundColor(.white.opacity(0.5))
+                        .offset(x: 20)
                 }
             }
-
-
 
             .onAppear {
                 withAnimation(.linear(duration: 0.8)) {

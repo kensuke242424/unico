@@ -56,9 +56,8 @@ struct ManageView: View {
                                 // タグの要素数の分リストを作成
                                 ForEach(tagVM.tags) { tagRow in
 
-                                    // firstには"ALL", lastには"タグ無し"
+                                    // firstには"ALL", lastには"未グループ"
                                     if tagRow != tagVM.tags.first! && tagRow != tagVM.tags.last! {
-
 
                                         HStack {
                                             Text(tagRow.tagName)
@@ -70,10 +69,8 @@ struct ManageView: View {
 
                                         Spacer(minLength: 0)
 
-                                        LinearGradient(gradient: Gradient(colors: [.gray, .clear]),
-                                                                   startPoint: .leading, endPoint: .trailing)
-                                            .frame(height: 1)
-                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                        GradientLine(color1: .white, color2: .clear)
+                                            .padding(.bottom)
 
                                         if itemVM.items.contains(where: {$0.tag == tagRow.tagName}) {
 
@@ -85,17 +82,20 @@ struct ManageView: View {
                                                     }
                                                 }
                                                 Color.clear
-                                                    .frame(height: 20)
+                                                    .frame(height: 30)
 
-                                                HStack {
-                                                    Spacer()
-                                                    Text("\(tagRow.tagName) ¥")
-                                                        .font(.subheadline)
-//                                                    Text(String(tagItemsSales))
+                                                HStack(alignment: .bottom) {
+                                                    Text("\(tagRow.tagName)  合計  ¥ ")
+                                                        .font(.caption)
+                                                    Text(String(tagGroupTotalSales(items: itemVM.items, tag: tagRow.tagName)))
                                                 }
                                                 .foregroundColor(.white.opacity(0.6))
-                                                .padding(.trailing, 20)
-
+                                                .overlay(alignment: .bottomTrailing) {
+                                                    GradientLine(color1: .white, color2: .white).opacity(0.5)
+                                                        .offset(y: 7)
+                                                }
+                                                .offset(x: getRect().width / 5)
+                                                .padding()
                                             }
 
                                         } else {
@@ -127,6 +127,7 @@ struct ManageView: View {
                                             }
                                         } // ForEach item
                                 } // if
+                                Spacer().frame(height: 300)
                             }
 
                         case false:
@@ -250,17 +251,17 @@ struct ManageView: View {
     @ViewBuilder
     func manageListRow(item: Item) -> some View {
 
-        VStack(alignment: .leading, spacing: 20) {
+        VStack {
 
-            HStack(spacing: 20) {
+            HStack(alignment: .top, spacing: 20) {
 
                 ShowItemPhoto(photo: item.photo, size: UIScreen.main.bounds.width / 5)
 
-                VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: 13) {
 
                     HStack {
 
-                        Text("総計 ¥")
+                        Text("売上 ¥")
                             .font(.caption).opacity(0.7)
                             .foregroundColor(.white)
 
@@ -294,11 +295,12 @@ struct ManageView: View {
                     Text(item.name)
                         .font(.caption.bold())
                         .foregroundColor(.white.opacity(0.7))
-                        .offset(y: 3)
+                        .offset(y: 10)
                 } // VStack
                 Spacer()
             } // HStack
         } // VStack
+        .padding(.vertical)
         .onTapGesture {
             if let actionItemIndex = itemVM.items.firstIndex(of: item) {
                 inputHome.actionItemIndex = actionItemIndex
@@ -309,7 +311,6 @@ struct ManageView: View {
                 print("インデックス取得失敗")
             }
         }
-        .padding(.top)
     }
 
     private func switchIndicatorValue(item: Item, status: ElementStatus) -> Int {
@@ -320,11 +321,11 @@ struct ManageView: View {
         }
     }
 
-    private func tagGroupItemsSales(items: [Item]) -> Int {
+    private func tagGroupTotalSales(items: [Item], tag: String) -> Int {
 
         var itemsSales = 0
 
-        for item in items {
+        for item in items.filter({ $0.tag.contains(tag)}) {
             itemsSales += item.sales
         }
 
