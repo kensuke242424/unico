@@ -19,6 +19,7 @@ enum UpdateImageStatus {
 }
 
 struct InputHome {
+    var switchElement: ElementStatus = .stock
     var homeTabIndex: Int = 0
     var actionItemIndex: Int = 0
     var selectCaptureImage: UIImage? = UIImage()
@@ -56,6 +57,7 @@ struct HomeTabView: View {
     @State private var inputImage: InputImage = InputImage()
     @State private var inputSideMenu: InputSideMenu = InputSideMenu()
     @State private var inputTag: InputTagSideMenu = InputTagSideMenu()
+    @State private var cartAvertOffsetY: CGFloat = 0.0
 
     let userID: String
 
@@ -99,6 +101,13 @@ struct HomeTabView: View {
             } // TabViewここまで
 
             UsefulButton(inputHome: $inputHome)
+                .offset(x: UIScreen.main.bounds.width / 3 - 5,
+                        y: UIScreen.main.bounds.height / 3 - 10)
+                .offset(y: cartAvertOffsetY)
+
+            ElementSwitchingPickerView(switchElement: $inputHome.switchElement, tabIndex: $inputHome.homeTabIndex)
+                .offset(y: getRect().height / 2 - getSafeArea().bottom - 110)
+                .offset(y: cartAvertOffsetY)
 
             if rootItemVM.items.count != 0 {
                 ShowsItemDetail(itemVM: rootItemVM,
@@ -232,6 +241,17 @@ struct HomeTabView: View {
 
             }
         }
+
+        .onChange(of: inputHome.cartHalfSheet) { _ in
+            withAnimation(.easeOut(duration: 0.3)) {
+                switch inputHome.cartHalfSheet {
+                case .hidden: cartAvertOffsetY = 0.0
+                case .medium: cartAvertOffsetY = -60.0
+                case .large: cartAvertOffsetY = -60.0
+                }
+            }
+        } // .onChange(cartState)
+
         .onAppear {
             Task {
                 await tagVM.fetchTag(groupID: tagVM.groupID)

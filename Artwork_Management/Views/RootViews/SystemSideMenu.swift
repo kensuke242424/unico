@@ -162,13 +162,13 @@ struct SystemSideMenu: View {
 
                                             ForEach(Array(tagVM.tags.enumerated()), id: \.offset) { offset, tag in
 
-                                                let tagUsedColor = tagVM.filterTagsData(selectTagColor: tag.tagColor)
+                                                let fetchUsedColor = tagVM.fetchUsedColor(tagName: tag.tagName)
 
                                                 if tag != tagVM.tags.first! && tag != tagVM.tags.last! {
                                                     HStack {
                                                         Image(systemName: "tag.fill")
                                                             .font(.caption)
-                                                            .foregroundColor(tagUsedColor.color)
+                                                            .foregroundColor(fetchUsedColor.color)
                                                             .opacity(0.6)
 
                                                         Text(tag.tagName)
@@ -188,7 +188,7 @@ struct SystemSideMenu: View {
                                                                 inputTag.tagSideMenuStatus = .update
                                                                 inputSideMenu.selectTag = tag
                                                                 inputTag.newTagNameText = tag.tagName
-                                                                inputTag.selectionSideMenuTagColor = tagUsedColor
+                                                                inputTag.selectionSideMenuTagColor = fetchUsedColor
 
                                                                 withAnimation(.spring(response: 0.3, blendDuration: 1)) {
                                                                     inputHome.isOpenEditTagSideMenu.toggle()

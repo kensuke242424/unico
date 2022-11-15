@@ -23,7 +23,6 @@ struct ManageView: View {
     @StateObject var itemVM: ItemViewModel
     @StateObject var tagVM: TagViewModel
 
-    // NOTE: 新規アイテム追加Viewの発現を管理します
     @Binding var inputHome: InputHome
     @Binding var inputImage: InputImage
 
@@ -53,12 +52,13 @@ struct ManageView: View {
                                 EmptyItemView(inputHome: $inputHome, text: "アイテムが存在しません")
 
                             } else {
-                                Spacer().frame(height: 50)
+                                Spacer().frame(height: 60)
                                 // タグの要素数の分リストを作成
                                 ForEach(tagVM.tags) { tagRow in
 
                                     // firstには"ALL", lastには"タグ無し"
                                     if tagRow != tagVM.tags.first! && tagRow != tagVM.tags.last! {
+
 
                                         HStack {
                                             Text(tagRow.tagName)
@@ -66,7 +66,6 @@ struct ManageView: View {
                                                 .font(.title2.bold())
                                                 .shadow(radius: 2, x: 4, y: 6)
                                                 .padding(.vertical)
-
                                         }
 
                                         Spacer(minLength: 0)
@@ -87,6 +86,16 @@ struct ManageView: View {
                                                 }
                                                 Color.clear
                                                     .frame(height: 20)
+
+                                                HStack {
+                                                    Spacer()
+                                                    Text("\(tagRow.tagName) ¥")
+                                                        .font(.subheadline)
+//                                                    Text(String(tagItemsSales))
+                                                }
+                                                .foregroundColor(.white.opacity(0.6))
+                                                .padding(.trailing, 20)
+
                                             }
 
                                         } else {
@@ -122,6 +131,8 @@ struct ManageView: View {
 
                         case false:
 
+                            Spacer().frame(height: 70)
+
                             Text(tagVM.tags[0].tagName)
                                 .font(.largeTitle.bold())
                                 .foregroundColor(.white)
@@ -151,6 +162,7 @@ struct ManageView: View {
             .navigationTitle("Manage")
             .navigationBarTitleDisplayMode(.inline)
             .animation(.spring(response: 0.5), value: inputManage.isTagGroup)
+
             // sort Menu...
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -234,6 +246,7 @@ struct ManageView: View {
         } // NavigationView
     } // body
 
+    // Manage List Row...
     @ViewBuilder
     func manageListRow(item: Item) -> some View {
 
@@ -242,64 +255,82 @@ struct ManageView: View {
             HStack(spacing: 20) {
 
                 ShowItemPhoto(photo: item.photo, size: UIScreen.main.bounds.width / 5)
-                    .onTapGesture {
-                        print("画像タップ")
-                    }
 
-                VStack(alignment: .leading, spacing: 10) {
-                    HStack(spacing: 40) {
-                        Text(item.sales != 0 ? "¥ \(item.sales)" : "¥ -")
+                VStack(alignment: .leading, spacing: 12) {
+
+                    HStack {
+
+                        Text("総計 ¥")
+                            .font(.caption).opacity(0.7)
                             .foregroundColor(.white)
-                            .opacity(0.8)
-                            .font(.subheadline.bold())
-                        Button {
 
-                            if let actionItemIndex = itemVM.items.firstIndex(of: item) {
-                                inputHome.actionItemIndex = actionItemIndex
-                                withAnimation(.easeIn(duration: 0.15)) {
-                                    inputHome.isShowItemDetail.toggle()
-                                }
-                            } else {
-                                print("インデックス取得失敗")
+                        Text(item.sales != 0 ? String(item.sales) : "-")
+                            .font(.subheadline.bold()).opacity(0.8)
+                            .foregroundColor(.white)
+                            .frame(width: 90, alignment: .leading)
+
+                        HStack {
+                            inputHome.switchElement.icon.font(.caption).opacity(0.5)
+
+                            switch inputHome.switchElement {
+                            case .stock:
+                                Text(" \(item.inventory) 個")
+                            case .price:
+                                Text(item.price != 0 ? " \(item.price) 円" : " -")
                             }
-
-                        } label: {
-                            Image(systemName: "info.circle.fill")
-                                .foregroundColor(.gray)
-                                .opacity(0.7)
-
-                        } // Button
-                    } // HStack
-
-                    if let itemRowTag = tagVM.tags.first(where: { $0.tagName == item.tag }) {
-
-                        if item.sales != 0 {
-                            IndicatorRow(salesValue: item.sales, tagColor: tagVM.filterTagsData(selectTagColor: itemRowTag.tagColor))
-                        } else {
-                            IndicatorRow(salesValue: 100000, tagColor: .gray).opacity(0.5)
-                                .overlay(alignment: .leading) {
-                                    Text("データはありません")
-                                        .font(.caption)
-                                        .foregroundColor(.white.opacity(0.7))
-                                        .offset(x: 20)
-                                }
                         }
-
-                    } else {
-
-                        IndicatorRow(salesValue: item.sales, tagColor: .gray)
-
+                        .padding(5)
+                        .font(.caption.bold()).opacity(0.7)
+                        .foregroundColor(.white)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 20)
+                                .foregroundColor(.black.opacity(0.2))
+                        }
                     }
+
+                    IndicatorRow(value: item.sales,
+                                 color: tagVM.fetchUsedColor(tagName: item.tag))
 
                     Text(item.name)
                         .font(.caption.bold())
-                        .foregroundColor(.gray)
+                        .foregroundColor(.white.opacity(0.7))
+                        .offset(y: 3)
                 } // VStack
                 Spacer()
             } // HStack
         } // VStack
+        .onTapGesture {
+            if let actionItemIndex = itemVM.items.firstIndex(of: item) {
+                inputHome.actionItemIndex = actionItemIndex
+                withAnimation(.easeIn(duration: 0.15)) {
+                    inputHome.isShowItemDetail.toggle()
+                }
+            } else {
+                print("インデックス取得失敗")
+            }
+        }
         .padding(.top)
-    } // リストレイアウト
+    }
+
+    private func switchIndicatorValue(item: Item, status: ElementStatus) -> Int {
+
+        switch status {
+        case .stock: return item.inventory
+        case .price: return item.price
+        }
+    }
+
+    private func tagGroupItemsSales(items: [Item]) -> Int {
+
+        var itemsSales = 0
+
+        for item in items {
+            itemsSales += item.sales
+        }
+
+        return itemsSales
+    }
+
 } // View
 
 struct ManageView_Previews: PreviewProvider {

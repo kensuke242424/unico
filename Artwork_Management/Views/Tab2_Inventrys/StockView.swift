@@ -44,7 +44,7 @@ struct StockView: View {
                         // NOTE: アイテム要素全体のロケーション
                         ScrollView {
 
-                            Spacer().frame(height: 50)
+                            Spacer().frame(height: 60)
 
                             TagTitle(title: "最近更新したアイテム", font: .title3)
                                 .foregroundColor(.white)

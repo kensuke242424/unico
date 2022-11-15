@@ -192,7 +192,7 @@ struct InputForms: View {
     var tagColor: Color {
         let selectTag = tagVM.tags.filter({ $0.tagName == inputEdit.selectionTagName })
         if let selectTag = selectTag.first {
-            return tagVM.filterTagsData(selectTagColor: selectTag.tagColor).color
+            return tagVM.fetchUsedColor(tagName: selectTag.tagName).color
         } else {
             return .gray
         }

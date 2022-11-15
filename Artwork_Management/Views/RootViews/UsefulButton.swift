@@ -14,7 +14,6 @@ struct UsefulButton: View {
 
     @Binding var inputHome: InputHome
 
-    @State private var offsetY: CGFloat = 0.0
     @State private var opacity: CGFloat = 0.0
     @State private var change: Bool = false
     @State private var buttonStyle: ButtonStyle = .stock
@@ -50,21 +49,8 @@ struct UsefulButton: View {
             ButtonStyleView(buttonIcon: buttonIcon, buttonStyle: buttonStyle)
 
         } // Button
-        .offset(x: UIScreen.main.bounds.width / 3 - 5,
-                y: UIScreen.main.bounds.height / 3 - 10)
-        .offset(y: offsetY)
         .opacity(opacity)
         .animation(.easeIn(duration: 0.1), value: opacity)
-
-        .onChange(of: inputHome.cartHalfSheet) { _ in
-            withAnimation(.easeOut(duration: 0.3)) {
-                switch inputHome.cartHalfSheet {
-                case .hidden: offsetY = 0.0
-                case .medium: offsetY = -60.0
-                case .large: offsetY = -60.0
-                }
-            }
-        } // .onChange(cartState)
 
         .onChange(of: inputHome.homeTabIndex) { newIndex in
             buttonStyle = buttonVM.buttonStyleChenged(tabIndex: newIndex)

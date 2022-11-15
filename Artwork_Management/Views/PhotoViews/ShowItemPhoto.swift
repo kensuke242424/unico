@@ -36,6 +36,7 @@ struct ShowItemPhoto: View {
                 .shadow(radius: 4, x: 5, y: 5)
                 .overlay {
                     Text("No Image.")
+                        .font(.subheadline)
                         .fontWeight(.bold)
                         .foregroundColor(.white)
                         .opacity(0.5)

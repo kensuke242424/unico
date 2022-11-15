@@ -21,6 +21,16 @@ struct ItemCardRow: View {
     @State private var cardCount: Int =  0
     @State private var itemSold: Bool = false
 
+    var cardElement: (text: String, icon: Image) {
+
+        switch inputHome.switchElement {
+        case .stock:
+            return (text: String(itemRow.inventory), icon: Image(systemName: "shippingbox.fill"))
+        case .price:
+            return (text: String(itemRow.price), icon: Image(systemName: "yensign.circle.fill"))
+        }
+    }
+
     var body: some View {
 
         RoundedRectangle(cornerRadius: 10)
@@ -82,9 +92,15 @@ struct ItemCardRow: View {
                     Spacer()
 
                     HStack(alignment: .bottom) {
-                        Text("¥")
-                            .foregroundColor(.black)
-                        Text(itemRow.price != 0 ? String(itemRow.price) : "-")
+                        if inputHome.switchElement == .stock {
+                            cardElement.icon
+                                .foregroundColor(.black.opacity(0.7))
+                        } else {
+                            Text("¥")
+                                .foregroundColor(.black.opacity(0.7))
+                        }
+
+                        Text(cardElement.text)
                             .font(.title3)
                             .fontWeight(.heavy)
                             .foregroundColor(.black)

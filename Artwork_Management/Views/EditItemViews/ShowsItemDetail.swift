@@ -42,139 +42,140 @@ struct ShowsItemDetail: View {
                 .overlay {
                     Color.customDarkBlue2.opacity(0.5)
                         .blur(radius: 20)
-                        .overlay(alignment: .bottom) {
+                        .overlay(alignment: .bottomLeading) {
 
                             Button {
                                 inputHome.isShowItemDetail.toggle()
                             } label: {
-                                HStack {
-                                    Image(systemName: "multiply.circle.fill")
-                                    Text("閉じる")
-                                }
-                                .font(.title3).foregroundColor(.white)
-                                .offset(y: 50)
+                                Image(systemName: "multiply.circle.fill")
+                                    .font(.title3).foregroundColor(.white)
+                                    .offset(x: 10, y: 40)
                             }
-
                         }
                 }
 
                 .overlay {
+
                     VStack {
                         Text(item.name).fontWeight(.bold).foregroundColor(.white)
                             .tracking(1)
                             .lineLimit(1)
 
-                        ScrollView(showsIndicators: false) {
-                            VStack(spacing: 10) {
+                        ScrollViewReader { scrollProxy in
+                            ScrollView(showsIndicators: false) {
+                                VStack(spacing: 10) {
 
-                                ShowItemPhoto(photo: item.photo, size: screenSize.width * 0.35)
-                                    .padding()
+                                    ShowItemPhoto(photo: item.photo, size: screenSize.width * 0.35)
+                                        .padding()
+                                        .id("top")
 
-                                HStack {
-                                    Text("　アイテム情報")
-                                        .fontWeight(.medium)
-                                        .foregroundColor(.white)
-
-                                    Button {
-
-                                        if item.amount != 0 {
-                                            inputDetail.isShowAmountAlert.toggle()
-                                            return
-                                        }
-
-                                        inputDetail.isShowEditHearAlert.toggle()
-
-                                    } label: {
-                                        Image(systemName: "highlighter")
-                                            .foregroundColor(.yellow)
-
-                                    }
-                                    .offset(x: 10)
-                                    .alert("確認", isPresented: $inputDetail.isShowEditHearAlert) {
+                                    HStack {
+                                        Text("　アイテム情報")
+                                            .fontWeight(.medium)
+                                            .foregroundColor(.white)
 
                                         Button {
+
+                                            if item.amount != 0 {
+                                                inputDetail.isShowAmountAlert.toggle()
+                                                return
+                                            }
+
                                             inputDetail.isShowEditHearAlert.toggle()
+
                                         } label: {
-                                            Text("戻る")
+                                            Image(systemName: "highlighter")
+                                                .foregroundColor(.yellow)
+
                                         }
+                                        .offset(x: 10)
+                                        .alert("確認", isPresented: $inputDetail.isShowEditHearAlert) {
 
-                                        Button {
-                                            inputHome.editItemStatus = .update
-                                            inputHome.isPresentedEditItem.toggle()
-                                        } label: {
-                                            Text("はい")
-                                        }
-                                    } message: {
-                                        Text("アイテムデータを編集しますか？")
-                                    } // alert
-
-                                    .alert("編集", isPresented: $inputDetail.isShowAmountAlert) {
-
-                                        Button("OK") {
-                                            inputDetail.isShowAmountAlert.toggle()
-                                        }
-                                    } message: {
-                                        Text("カート内のアイテムは編集できません")
-                                    } // alert
-
-                                    .alert("確認", isPresented: $inputDetail.isShowDeleteItemAlert) {
-
-                                        Button("削除", role: .destructive) {
-                                            inputHome.isShowItemDetail.toggle()
-                                            withAnimation {
-                                                itemVM.items.removeAll(where: { $0.id == item.id })
+                                            Button {
+                                                inputDetail.isShowEditHearAlert.toggle()
+                                            } label: {
+                                                Text("戻る")
                                             }
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                                itemVM.deleteItem(deleteItem: item)
+
+                                            Button {
+                                                inputHome.editItemStatus = .update
+                                                inputHome.isPresentedEditItem.toggle()
+                                            } label: {
+                                                Text("はい")
                                             }
-                                        }
-                                        .foregroundColor(.red)
-                                    } message: {
-                                        Text("\(item.name)を削除しますか？")
-                                    } // alert
+                                        } message: {
+                                            Text("\(item.name) を編集しますか？")
+                                        } // alert
 
-                                } // HStack
+                                        .alert("編集", isPresented: $inputDetail.isShowAmountAlert) {
 
-                                Divider().background(.white).opacity(0.5)
-                                    .padding()
+                                            Button("OK") {
+                                                inputDetail.isShowAmountAlert.toggle()
+                                            }
+                                        } message: {
+                                            Text("カート内のアイテムは編集できません")
+                                        } // alert
 
-                                // NOTE: アイテムの情報が格納羅列されたカスタムViewです
-                                ItemDetailData(item: item)
+                                        .alert("確認", isPresented: $inputDetail.isShowDeleteItemAlert) {
 
-                                Divider().background(.white).opacity(0.5)
-                                    .padding()
+                                            Button("削除", role: .destructive) {
+                                                inputHome.isShowItemDetail.toggle()
+                                                withAnimation {
+                                                    itemVM.items.removeAll(where: { $0.id == item.id })
+                                                }
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                                    itemVM.deleteItem(deleteItem: item)
+                                                }
+                                            }
+                                            .foregroundColor(.red)
+                                        } message: {
+                                            Text("\(item.name) を削除しますか？")
+                                        } // alert
 
-                                HStack {
+                                    } // HStack
+
+                                    Divider().background(.white).opacity(0.5)
+                                        .padding(.bottom)
+
+                                    // NOTE: アイテムの情報が格納羅列されたカスタムViewです
+                                    ItemDetailData(item: item)
+
+                                    Divider().background(.white).opacity(0.5)
+                                        .padding()
+
                                     Text("Memo.")
                                         .foregroundColor(.white)
-                                    Spacer()
-                                }
-                                .padding(.leading, 20)
 
-                                RoundedRectangle(cornerRadius: 10)
-                                    .foregroundColor(.gray).opacity(0.2)
-                                    .frame(width: screenSize.width * 0.6, height: 300)
-                                    .overlay(alignment: .topLeading) {
-                                        ScrollView {
-                                            Text(item.detail).font(.caption).foregroundColor(.white)
-                                                .padding(10)
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .foregroundColor(.gray).opacity(0.2)
+                                        .frame(width: screenSize.width * 0.6, height: 300)
+                                        .overlay(alignment: .topLeading) {
+                                            ScrollView {
+                                                Text(item.detail).font(.caption).foregroundColor(.white)
+                                                    .padding(10)
+                                            }
                                         }
+                                    Button {
+                                        // アイテム削除
+                                        inputDetail.isShowDeleteItemAlert.toggle()
+                                    } label: {
+                                        ZStack {
+                                            Circle()
+                                                .foregroundColor(.red)
+                                                .frame(width: 35)
+                                            Image(systemName: "trash.fill")
+                                                .foregroundColor(.white)
+                                        }
+                                        .opacity(0.7)
                                     }
-                                Button {
-                                    // アイテム削除
-                                    inputDetail.isShowDeleteItemAlert.toggle()
-                                } label: {
-                                    ZStack {
-                                        Circle()
-                                            .foregroundColor(.red)
-                                            .frame(width: 35)
-                                        Image(systemName: "trash.fill")
-                                            .foregroundColor(.white)
+                                } // VStack
+                                .onChange(of: inputHome.isShowItemDetail) { showValue in
+                                    if showValue == false {
+                                        scrollProxy.scrollTo("top", anchor: .top)
                                     }
-                                    .opacity(0.7)
                                 }
-                            } // VStack
-                        } // ScrollView
+                            } // ScrollView
+                        }
                     } // VStack
                     .padding(.vertical, 30)
                 }// overlay

@@ -131,9 +131,12 @@ class TagViewModel: ObservableObject {
         }
     }
 
-    func filterTagsData(selectTagColor: String) -> UsedColor {
+    func fetchUsedColor(tagName: String) -> UsedColor {
 
-            switch selectTagColor {
+        // タグ名からUsedColorを受け取る
+        if let itemRowTag = tags.first(where: { $0.tagName == tagName }) {
+
+            switch itemRowTag.tagColor {
             case "赤": return .red
             case "青": return .blue
             case "黄": return .yellow
@@ -141,6 +144,9 @@ class TagViewModel: ObservableObject {
             default:
                 return .gray
             }
+        } else {
+            return .gray
+        }
 
     } // func castStringIntoColor
 
