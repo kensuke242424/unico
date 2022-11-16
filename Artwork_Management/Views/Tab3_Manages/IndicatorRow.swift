@@ -13,7 +13,7 @@ struct IndicatorRow: View {
     let item: Item
     let color: UsedColor
 
-    @State private var animationValue: Int = 0
+    @State private var animationValue: CGFloat = 0
 
     var body: some View {
 
@@ -70,27 +70,30 @@ struct IndicatorRow: View {
 
             .onChange(of: inputManage.indicatorValueStatus) { _ in
                 animationValue = 0
+                let newValue = indicatorElement(item: item, limit: inputManage.indicatorWidthLimit.value).value
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                     withAnimation(.spring(response: 1.5)) {
-                        animationValue = indicatorElement(item: item, limit: inputManage.indicatorWidthLimit.value).value
+                        animationValue = newValue
                     }
                 }
             }
 
             .onChange(of: inputManage.indicatorWidthLimit) { _ in
                 animationValue = 0
+                let newValue = indicatorElement(item: item, limit: inputManage.indicatorWidthLimit.value).value
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                     withAnimation(.spring(response: 1.5)) {
-                        animationValue = indicatorElement(item: item, limit: inputManage.indicatorWidthLimit.value).value
+                        animationValue = newValue
                     }
                 }
             }
 
             .onAppear {
+                let startValue = indicatorElement(item: item, limit: inputManage.indicatorWidthLimit.value).value
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                     withAnimation(.spring(response: 1.5)) {
-                        animationValue = indicatorElement(item: item, limit: inputManage.indicatorWidthLimit.value).value
+                        animationValue = startValue
                     }
                 }
             }
@@ -99,31 +102,31 @@ struct IndicatorRow: View {
             }
     }
 
-    private func indicatorElement(item: Item, limit: Int) -> (value: Int, guide: Int) {
+    private func indicatorElement(item: Item, limit: Int) -> (value: CGFloat, guide: Int) {
 
-        // 各データごとのインジケータガイドの基準値
-        let inventoryGuide: Int = 50
-        let priceGuide: Int = 1000
-        let salesGuide: Int = 10000
+        // value値はCGFloat型で返すため、limit値のCGFloat型を用意
+        let cgFloatLimit: CGFloat = CGFloat(limit)
 
         switch inputManage.indicatorValueStatus {
 
-            // NOTE: limit値を用いて、ゲージ幅の限界値を変化させる(ゲージ上限が10倍(limit = 10)の時、value値を10%に)
-            // NOTE: value値が、「limit値以下」かつ「0ではない」場合に、切り捨てられて0にならないようにする
+        // NOTE: limit値を用いて、ゲージ幅の限界値を変化させる(ゲージ上限が10倍(limit = 10)の時、value値を10%に)
         case .stock:
-            let resultValue = item.inventory < limit && item.inventory != 0 ? 1 : item.inventory / limit
+            let resultValue: CGFloat = CGFloat(item.inventory) / cgFloatLimit
+            let inventoryGuide: Int = 50 * limit
 
-            return (value: resultValue, guide: inventoryGuide * limit)
+            return (value: resultValue, guide: inventoryGuide)
 
         case .price:
-            let resultValue = item.price < limit * 10 && item.price != 0 ? 1 : item.price / 10 / limit
+            let resultValue: CGFloat = CGFloat(item.price) / 20 / cgFloatLimit
+            let priceGuide: Int = 2000 * limit
 
-            return (value: resultValue, guide: priceGuide * limit)
+            return (value: resultValue, guide: priceGuide)
 
         case .sales:
-            let resultValue = item.sales < limit * 100 && item.sales != 0 ? 1 : item.sales / 100 / limit
+            let resultValue: CGFloat = CGFloat(item.sales) / 100 / cgFloatLimit
+            let salesGuide: Int = 10000 * limit
 
-            return (value: resultValue, guide: salesGuide * limit)
+            return (value: resultValue, guide: salesGuide)
 
         }
     }
