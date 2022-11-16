@@ -30,3 +30,18 @@ enum Mode {
     case dark
     case light
 }
+
+struct TestItem {
+
+    var testItem: Item = Item(tag: "Clothes",
+                              name: "カッターシャツ(白)",
+                              detail: "シャツ(白)のアイテム紹介テキストです。",
+                              photo: "cloth_sample1",
+                              cost: 1000,
+                              price: 2800,
+                              amount: 0,
+                              sales: 128000,
+                              inventory: 2,
+                              totalAmount: 120,
+                              totalInventory: 200)
+}

@@ -152,34 +152,76 @@ class ItemViewModel: ObservableObject {
         print("updateCommerse完了")
     }
 
-    func itemsSort(sort: UpDownOrder, items: [Item]) -> [Item] {
+    func itemsUpDownOderSort() {
 
-        print("＝＝＝＝＝＝＝＝itemsSortメソッド実行＝＝＝＝＝＝＝＝＝＝")
+        items.reverse()
+    }
 
-        // NOTE: 更新可能なvar値として再格納しています
-        var varItems = items
+    func itemsValueSort(order: UpDownOrder, status: IndicatorValueStatus) {
 
-        switch sort {
+        switch order {
 
         case .up:
-            varItems.sort { $0.sales > $1.sales }
-        case .down:
-            varItems.sort { $0.sales < $1.sales }
-//        case .createAtUp:
-//            varItems.sort { before, after in
-//
-//                before.createTime!.dateValue() > after.createTime!.dateValue() ? true : false
-//            }
-//        case .updateAtUp:
-//            varItems.sort { before, after in
-//
-//                before.updateTime!.dateValue() > after.updateTime!.dateValue() ? true : false
-//            }
-//        case .start:
-//            print("起動時の初期値です")
-        }
 
-        return varItems
+            switch status {
+            case .stock:
+                items.sort(by: { $0.inventory > $1.inventory })
+            case .price:
+                items.sort(by: { $0.price > $1.price })
+            case .sales:
+                items.sort(by: { $0.sales > $1.sales })
+            }
+
+        case .down:
+
+            switch status {
+            case .stock:
+                items.sort(by: { $0.inventory < $1.inventory })
+            case .price:
+                items.sort(by: { $0.price < $1.price })
+            case .sales:
+                items.sort(by: { $0.sales < $1.sales })
+            }
+        }
+    }
+
+    func itemsNameSort(order: UpDownOrder) {
+
+        switch order {
+
+        case .up:
+            items.sort(by: { $0.name > $1.name })
+
+        case .down:
+            items.sort(by: { $0.name < $1.name })
+        }
+    }
+
+    func itemsCreateTimeSort(order: UpDownOrder) {
+
+        switch order {
+        case .up:
+            items.sort { before, after in
+                before.createTime!.dateValue() > after.createTime!.dateValue() ? true : false
+            }
+        case .down:
+            items.sort { before, after in
+                before.createTime!.dateValue() < after.createTime!.dateValue() ? true : false
+            }
+        }
+    }
+
+    func itemsUpdateTimeSort(order: UpDownOrder) {
+        switch order {
+        case .up:
+            items.sort { before, after in
+                before.updateTime!.dateValue() > after.updateTime!.dateValue() ? true : false
+            }
+        case .down:
+            items.sort { before, after in
+                before.updateTime!.dateValue() < after.updateTime!.dateValue() ? true : false
+            }
+        }
     }
 
     deinit {
@@ -189,18 +231,3 @@ class ItemViewModel: ObservableObject {
     }
 
 } // class
-
-struct TestItem {
-
-    var testItem: Item = Item(tag: "Clothes",
-                              name: "カッターシャツ(白)",
-                              detail: "シャツ(白)のアイテム紹介テキストです。",
-                              photo: "cloth_sample1",
-                              cost: 1000,
-                              price: 2800,
-                              amount: 0,
-                              sales: 128000,
-                              inventory: 2,
-                              totalAmount: 120,
-                              totalInventory: 200)
-}

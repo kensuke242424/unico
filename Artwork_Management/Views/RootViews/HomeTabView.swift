@@ -114,7 +114,7 @@ struct HomeTabView: View {
 
             ManageCustomizeSideMenu(inputManage: $inputManage, isOpen: $inputHome.isShowManageCustomSideMenu)
                 .offset(x: getRect().width, y: -30)
-                .offset(x: inputHome.isShowManageCustomSideMenu ? -160 : 50)
+                .offset(x: inputHome.isShowManageCustomSideMenu ? -170 : 50)
                 .opacity(inputHome.homeTabIndex == 2 ? 1.0 : 0.0)
 
             if rootItemVM.items.count != 0 {

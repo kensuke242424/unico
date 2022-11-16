@@ -67,9 +67,10 @@ struct ManageView: View {
 
                                                 HStack(alignment: .bottom) {
                                                     Spacer()
-                                                    Text("\(tagRow.tagName)  売上  ¥ ")
+                                                    Text("\(tagRow.tagName)  合計 ¥ ")
                                                         .font(.caption)
                                                     Text(String(tagGroupTotalSales(items: itemVM.items, tag: tagRow.tagName)))
+                                                        .font(.subheadline.bold())
                                                 }
                                                 .frame(alignment: .trailing)
                                                 .foregroundColor(.white.opacity(0.6))
@@ -78,7 +79,7 @@ struct ManageView: View {
                                                         .offset(y: 7)
                                                 }
                                                 .padding(.vertical)
-                                                .padding(.bottom, 30)
+                                                .padding(.bottom, 40)
                                             }
 
                                         } else {
@@ -141,8 +142,9 @@ struct ManageView: View {
             .navigationTitle("Manage")
             .navigationBarTitleDisplayMode(.inline)
             .animation(.spring(response: 0.5), value: inputManage.isTagGroup)
-            .animation(.spring(response: 0.5), value: inputManage.sortType)
+//            .animation(.spring(response: 0.5), value: inputManage.sortType)
 
+            // New item edit...
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
@@ -174,6 +176,64 @@ struct ManageView: View {
                     }
                 }
             }
+
+            // items sort...
+            .onChange(of: inputManage.indicatorValueStatus) { _ in
+
+                if inputManage.sortType == .value {
+                    withAnimation(.spring(response: 0.7)) {
+                        itemVM.itemsValueSort(order: inputManage.upDownOrder, status: inputManage.indicatorValueStatus)
+                    }
+                }
+            }
+            .onChange(of: inputManage.sortType) { _ in
+
+                switch inputManage.sortType {
+                case .value:
+                    withAnimation(.spring(response: 0.7)) {
+                        itemVM.itemsValueSort(order: inputManage.upDownOrder, status: inputManage.indicatorValueStatus)
+                    }
+                case .name:
+                    withAnimation(.spring(response: 0.7)) {
+                        itemVM.itemsNameSort(order: inputManage.upDownOrder)
+                    }
+                case .createTime:
+                    withAnimation(.spring(response: 0.7)) {
+                        itemVM.itemsCreateTimeSort(order: inputManage.upDownOrder)
+                    }
+                case .updateTime:
+                    withAnimation(.spring(response: 0.7)) {
+                        itemVM.itemsUpdateTimeSort(order: inputManage.upDownOrder)
+                    }
+                }
+            }
+            .onChange(of: inputManage.upDownOrder) { _ in
+                withAnimation(.spring(response: 0.7)) {
+                    itemVM.itemsUpDownOderSort()
+                }
+            }
+
+            .onAppear {
+                switch inputManage.sortType {
+                case .value:
+                    withAnimation(.spring(response: 0.7)) {
+                        itemVM.itemsValueSort(order: inputManage.upDownOrder, status: inputManage.indicatorValueStatus)
+                    }
+                case .name:
+                    withAnimation(.spring(response: 0.7)) {
+                        itemVM.itemsNameSort(order: inputManage.upDownOrder)
+                    }
+                case .createTime:
+                    withAnimation(.spring(response: 0.7)) {
+                        itemVM.itemsCreateTimeSort(order: inputManage.upDownOrder)
+                    }
+                case .updateTime:
+                    withAnimation(.spring(response: 0.7)) {
+                        itemVM.itemsUpdateTimeSort(order: inputManage.upDownOrder)
+                    }
+                }
+            }
+
         } // NavigationView
     } // body
 
@@ -209,7 +269,7 @@ struct ManageView: View {
                                 Text(item.sales != 0 ? String(item.sales) : "-")
                             }
                         }
-                        .font(.subheadline.bold()).opacity(0.5)
+                        .font(.subheadline.bold()).opacity(0.7)
                         .foregroundColor(.white)
                         .frame(width: 90, alignment: .leading)
                     }
@@ -259,14 +319,6 @@ struct ManageView: View {
         }
     }
 
-    private func switchIndicatorValue(item: Item, status: ElementStatus) -> Int {
-
-        switch status {
-        case .stock: return item.inventory
-        case .price: return item.price
-        }
-    }
-
     private func tagGroupTotalSales(items: [Item], tag: String) -> Int {
 
         var itemsSales = 0
@@ -275,10 +327,6 @@ struct ManageView: View {
             itemsSales += item.sales
         }
         return itemsSales
-    }
-
-    func manageListSort(items: [Item], sort: SortType, order: UpDownOrder) {
-
     }
 
 } // View

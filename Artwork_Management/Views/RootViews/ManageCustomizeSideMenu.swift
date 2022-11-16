@@ -18,15 +18,15 @@ enum UpDownOrder: CaseIterable {
     }
 }
 
-enum SortType: CaseIterable {
+enum ItemsSortType: CaseIterable {
     case value, name, updateTime, createTime
 
     var text: String {
         switch self {
-        case .value: return "取得データ順"
+        case .value: return "データ順"
         case .name: return "名前順"
-        case .createTime: return "作成日順"
-        case .updateTime: return "更新日順"
+        case .createTime: return "作成した日"
+        case .updateTime: return "最終更新日"
         }
     }
 }
@@ -70,7 +70,7 @@ enum IndicatorValueStatus: CaseIterable {
 }
 
 struct InputManageCustomizeSideMenu {
-    var sortType: SortType = .value
+    var sortType: ItemsSortType = .value
     var upDownOrder: UpDownOrder = .up
     var indicatorWidthLimit: IndicatorWidthLimit = .medium
     var indicatorValueStatus: IndicatorValueStatus = .sales
@@ -91,10 +91,10 @@ struct ManageCustomizeSideMenu: View {
 
             RoundedRectangle(cornerRadius: 20)
                 .foregroundColor(Color.customDarkGray2)
-                .frame(height: 530)
+                .frame(height: 540)
 
                 .overlay(alignment: .leading) {
-                    VStack(alignment: .leading, spacing: 30) {
+                    VStack(alignment: .leading, spacing: 33) {
                         VStack(alignment: .leading) {
 
                             Label("タググループ", systemImage: inputManage.isTagGroup == true ? "tag.fill" : "tag.slash").font(.subheadline)
@@ -104,7 +104,7 @@ struct ManageCustomizeSideMenu: View {
                         }
 
                         VStack(alignment: .leading) {
-                            Label("取得データ", systemImage: "cube.fill").font(.subheadline)
+                            Label("データ選択", systemImage: "cube.fill").font(.subheadline)
                             Divider().background(.white)
 
                             Picker("ゲージ表示の要素", selection: $inputManage.indicatorValueStatus) {
@@ -118,22 +118,10 @@ struct ManageCustomizeSideMenu: View {
                         }
 
                         VStack(alignment: .leading) {
-                            Label("条件指定", systemImage: "books.vertical.fill").font(.subheadline)
-                            Divider().background(.white)
-                            Picker("要素の条件並び替え", selection: $inputManage.sortType) {
-                                ForEach(SortType.allCases, id: \.self) { value in
-                                    Text(value.text)
-                                }
-                            }
-                            .pickerStyle(.menu)
-                            .frame(width: 150, alignment: .leading)
-                        }
-
-                        VStack(alignment: .leading) {
-                            Label("上り降り順", systemImage: "arrow.up.arrow.down").font(.subheadline)
+                            Label("並び替え", systemImage: "arrow.up.arrow.down").font(.subheadline)
                             Divider().background(.white)
 
-                            Picker("上り降り順の選択", selection: $inputManage.upDownOrder) {
+                            Picker("並び替え", selection: $inputManage.upDownOrder) {
                                 ForEach(UpDownOrder.allCases, id: \.self) { value in
                                     value.icon
                                 }
@@ -143,11 +131,24 @@ struct ManageCustomizeSideMenu: View {
                         }
 
                         VStack(alignment: .leading) {
-
-                            Label("ゲージ上限値", systemImage: "align.horizontal.left.fill").font(.subheadline)
+                            Label("並び替え条件", systemImage: "books.vertical.fill").font(.subheadline)
                             Divider().background(.white)
 
-                            Picker("ゲージ表示の要素", selection: $inputManage.indicatorWidthLimit) {
+                            Picker("並び替え条件", selection: $inputManage.sortType) {
+                                ForEach(ItemsSortType.allCases, id: \.self) { value in
+                                    Text(value.text)
+                                }
+                            }
+                            .pickerStyle(.menu)
+                            .frame(width: 150, alignment: .leading)
+                        }
+
+                        VStack(alignment: .leading) {
+
+                            Label("メーター上限値", systemImage: "align.horizontal.left.fill").font(.subheadline)
+                            Divider().background(.white)
+
+                            Picker("メーター上限値", selection: $inputManage.indicatorWidthLimit) {
                                 ForEach(IndicatorWidthLimit.allCases, id: \.self) { value in
                                     Text(value.text)
                                 }
@@ -158,7 +159,7 @@ struct ManageCustomizeSideMenu: View {
 
                     }
                     .foregroundColor(.white)
-                    .offset(x: 15)
+                    .offset(x: 20)
                 } // overlay
                 .offset(x: dragOffset)
                 .gesture(
@@ -180,11 +181,7 @@ struct ManageCustomizeSideMenu: View {
                         }
 
                 )
-                .animation(.interpolatingSpring(mass: 0.8,
-                                                stiffness: 100,
-                                                damping: 80,
-                                                initialVelocity: 0.1), value: dragOffset)
-
+                .animation(.interpolatingSpring(mass: 0.8, stiffness: 100, damping: 80, initialVelocity: 0.1), value: dragOffset)
         }
     }
 }

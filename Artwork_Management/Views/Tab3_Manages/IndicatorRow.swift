@@ -32,7 +32,7 @@ struct IndicatorRow: View {
                             Text("|")
                                 .opacity(0.2)
                             Text(String(guide))
-                                .font(.system(size: 8, weight: .light, design: .default)).opacity(0.5)
+                                .font(.system(size: 10, weight: .light, design: .default)).opacity(0.5)
                                 .offset(y: 3)
                         }
                         .offset(x: -50, y: 2)
@@ -41,7 +41,7 @@ struct IndicatorRow: View {
                             Text("|")
                                 .opacity(0.2)
                             Text(String(guide * 2))
-                                .font(.system(size: 8, weight: .light, design: .default)).opacity(0.5)
+                                .font(.system(size: 10, weight: .light, design: .default)).opacity(0.5)
                                 .offset(y: 3)
                         }
                         .offset(x: 50, y: 2)
@@ -71,7 +71,7 @@ struct IndicatorRow: View {
             .onChange(of: inputManage.indicatorValueStatus) { _ in
                 animationValue = 0
                 let newValue = indicatorElement(item: item, limit: inputManage.indicatorWidthLimit.value).value
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                     withAnimation(.spring(response: 1.5)) {
                         animationValue = newValue
                     }
@@ -82,7 +82,7 @@ struct IndicatorRow: View {
                 animationValue = 0
                 let newValue = indicatorElement(item: item, limit: inputManage.indicatorWidthLimit.value).value
 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                     withAnimation(.spring(response: 1.5)) {
                         animationValue = newValue
                     }
@@ -91,7 +91,7 @@ struct IndicatorRow: View {
 
             .onAppear {
                 let startValue = indicatorElement(item: item, limit: inputManage.indicatorWidthLimit.value).value
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                     withAnimation(.spring(response: 1.5)) {
                         animationValue = startValue
                     }
@@ -111,7 +111,7 @@ struct IndicatorRow: View {
 
         // NOTE: limit値を用いて、ゲージ幅の限界値を変化させる(ゲージ上限が10倍(limit = 10)の時、value値を10%に)
         case .stock:
-            let resultValue: CGFloat = CGFloat(item.inventory) / cgFloatLimit
+            let resultValue: CGFloat = CGFloat(item.inventory) * 2 / cgFloatLimit
             let inventoryGuide: Int = 50 * limit
 
             return (value: resultValue, guide: inventoryGuide)
