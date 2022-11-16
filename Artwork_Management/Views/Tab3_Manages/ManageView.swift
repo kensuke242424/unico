@@ -143,10 +143,20 @@ struct ManageView: View {
             .animation(.spring(response: 0.5), value: inputManage.isTagGroup)
             .animation(.spring(response: 0.5), value: inputManage.sortType)
 
-            // sort Menu...
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-
+                    Button {
+                        inputHome.editItemStatus = .create
+                        inputHome.isPresentedEditItem.toggle()
+                    } label: {
+                        Image(systemName: "shippingbox.fill")
+                            .overlay(alignment: .topTrailing) {
+                                Image(systemName: "plus.circle.fill")
+                                    .resizable()
+                                    .frame(width: 10, height: 10)
+                                    .offset(x: 3, y: -3)
+                            }
+                    }
                 }
             }
             // System Side Menu ...
@@ -181,9 +191,13 @@ struct ManageView: View {
 
                     HStack {
 
-                        inputManage.indicatorValueStatus.icon
-                            .font(.caption).opacity(0.5)
-                            .foregroundColor(.white)
+                        Group {
+                            Text(inputManage.indicatorValueStatus.text)
+                            inputManage.indicatorValueStatus.icon
+                                .offset(x: -5)
+                        }
+                        .font(.caption).opacity(0.5)
+                        .foregroundColor(.white)
 
                         Group {
                             switch inputManage.indicatorValueStatus {
@@ -198,15 +212,16 @@ struct ManageView: View {
                         .font(.subheadline.bold()).opacity(0.5)
                         .foregroundColor(.white)
                         .frame(width: 90, alignment: .leading)
-
+                    }
+                    .overlay(alignment: .trailing) {
                         HStack {
                             inputHome.switchElement.icon.font(.caption).opacity(0.5)
 
                             switch inputHome.switchElement {
                             case .stock:
-                                Text(" \(item.inventory) 個")
+                                Text(" \(item.inventory)")
                             case .price:
-                                Text(item.price != 0 ? " \(item.price) 円" : " -")
+                                Text(item.price != 0 ? " \(item.price)" : " -")
                             }
                         }
                         .padding(5)
@@ -216,6 +231,7 @@ struct ManageView: View {
                             RoundedRectangle(cornerRadius: 20)
                                 .foregroundColor(.black.opacity(0.2))
                         }
+                        .offset(x: 80)
                     }
 
                     IndicatorRow(inputManage: $inputManage,
@@ -258,8 +274,11 @@ struct ManageView: View {
         for item in items.filter({ $0.tag.contains(tag)}) {
             itemsSales += item.sales
         }
-
         return itemsSales
+    }
+
+    func manageListSort(items: [Item], sort: SortType, order: UpDownOrder) {
+
     }
 
 } // View

@@ -160,8 +160,9 @@ struct SideMenuEditTagView: View {
                             .lineLimit(1)
                             .padding(.bottom)
 
-//                        IndicatorRow(value: 170000,
-//                                     color: inputTag.selectionSideMenuTagColor)
+                        Rectangle()
+                            .foregroundColor(inputTag.selectionSideMenuTagColor.color).opacity(0.5)
+                            .frame(width: 200, height: 15, alignment: .leading)
 
                         Button {
                             print(tagSideMenuStatus)

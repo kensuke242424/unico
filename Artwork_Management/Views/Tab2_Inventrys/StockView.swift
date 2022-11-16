@@ -298,6 +298,22 @@ struct StockView: View {
                     }
                 }
             }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        inputHome.editItemStatus = .create
+                        inputHome.isPresentedEditItem.toggle()
+                    } label: {
+                        Image(systemName: "shippingbox.fill")
+                            .overlay(alignment: .topTrailing) {
+                                Image(systemName: "plus.circle.fill")
+                                    .resizable()
+                                    .frame(width: 10, height: 10)
+                                    .offset(x: 3, y: -3)
+                            }
+                    }
+                }
+            }
 
             .onTapGesture { searchFocused = nil }
 

@@ -36,20 +36,15 @@ struct UsefulButton: View {
 
             case .manege:
                 print("manege画面ボタンアクション実行")
-//                inputHome.editItemStatus = .create
-//                inputHome.isPresentedEditItem.toggle()
-                withAnimation {
+                withAnimation(.spring(response: 0.4, blendDuration: 1)) {
                     inputHome.isShowManageCustomSideMenu.toggle()
                 }
-
-            case .account:
-                print("account画面ボタンアクション実行")
             } // switch
 
         } label: {
 
             // ✅カスタムView
-            ButtonStyleView(buttonIcon: buttonIcon, buttonStyle: buttonStyle)
+            ButtonStyleView(inputHome: $inputHome, buttonIcon: buttonIcon, buttonStyle: buttonStyle)
 
         } // Button
         .opacity(opacity)
@@ -70,6 +65,7 @@ struct UsefulButton: View {
 
 struct ButtonStyleView: View {
 
+    @Binding var inputHome: InputHome
     let buttonIcon: ButtonIcon
     let buttonStyle: ButtonStyle
 
@@ -92,6 +88,8 @@ struct ButtonStyleView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 35, height: 35)
+                        .opacity(inputHome.homeTabIndex == 2 && inputHome.isShowManageCustomSideMenu ? 0.3 : 1.0)
+                        .opacity(inputHome.homeTabIndex == 1 && inputHome.isShowSearchField ? 0.3 : 1.0)
                         .shadow(radius: 10, x: 3, y: 5)
 
                     // アイコン右上に付くバッジ
@@ -99,8 +97,15 @@ struct ButtonStyleView: View {
                             Image(systemName: buttonIcon.badge)
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 18, height: 18)
+                                .frame(width: 14, height: 14)
+                                .foregroundColor(.green)
+                                .overlay {
+                                    Circle()
+                                        .stroke(Color.yellow, lineWidth: 1)
+//                                        .blur(radius: 10)
+                                }
                                 .offset(x: 10, y: -10)
+                                .opacity(inputHome.homeTabIndex == 2 && inputHome.isShowManageCustomSideMenu ? 0.8 : 0.0)
                         } // overlay
 
                         .overlay {
