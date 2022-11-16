@@ -55,6 +55,15 @@ struct LibraryView: View {
     @State private var inputTime: InputTime = InputTime()
     @State private var headerImageSize: HeaderImageSize = .fit
 
+    var tagFilterItemCards: [Item] {
+
+        if inputLibrary.selectFilterTag == tagVM.tags.first!.tagName {
+            return itemVM.items
+        } else {
+            return itemVM .items.filter({ $0.tag == inputLibrary.selectFilterTag })
+        }
+    }
+
     var body: some View {
 
         ZStack {
@@ -156,11 +165,7 @@ struct LibraryView: View {
                         Button {
                             inputLibrary.selectFilterTag = tag.tagName
                         } label: {
-                            if inputLibrary.selectFilterTag == tag.tagName {
-                                Text("\(tag.tagName)　　 ✔︎")
-                            } else {
-                                Text(tag.tagName)
-                            }
+                            Text(inputLibrary.selectFilterTag == tag.tagName ? "\(tag.tagName)　　 ✔︎" : tag.tagName)
                         }
 
                     } else {
@@ -168,13 +173,8 @@ struct LibraryView: View {
                             Button {
                                 inputLibrary.selectFilterTag = tag.tagName
                             } label: {
-                                if inputLibrary.selectFilterTag == tag.tagName {
-                                    Text("\(tag.tagName)　　 ✔︎")
-                                } else {
-                                    Text(tag.tagName)
-                                }
+                                Text(inputLibrary.selectFilterTag == tag.tagName ? "\(tag.tagName)　　 ✔︎" : tag.tagName)
                             }
-
                         }
                     }
 
@@ -192,32 +192,26 @@ struct LibraryView: View {
                 EmptyItemView(inputHome: $inputHome, text: "")
                     .offset(x: -UIScreen.main.bounds.width / 4,
                             y: UIScreen.main.bounds.height / 5)
+            } else if tagFilterItemCards == [] {
+                VStack(spacing: 10) {
+                    Text(inputLibrary.selectFilterTag)
+                    Text("該当アイテムなし")
+                }
+                .foregroundColor(.white.opacity(0.7))
+                .offset(x: -UIScreen.main.bounds.width / 4,
+                        y: UIScreen.main.bounds.height / 5)
             } else {
-                homeItemPhotoPanel()
+                homeItemPhotoPanel(items: tagFilterItemCards)
                     .ignoresSafeArea()
                     .offset(x: -UIScreen.main.bounds.width / 10,
                             y: UIScreen.main.bounds.height / 4)
             }
         } // ZStack
 
-        .onChange(of: itemVM.items) { _ in
-            if inputLibrary.selectFilterTag == "ALL" {
-                inputLibrary.tagFilterItemCards = itemVM.items
-                inputLibrary.homeCardsIndex =  0
-                return
-            }
-            inputLibrary.tagFilterItemCards = itemVM.items.filter({ $0.tag == inputLibrary.selectFilterTag })
+        .onChange(of: inputLibrary.selectFilterTag) { _ in
             inputLibrary.homeCardsIndex =  0
         } // .onChange
 
-        .onAppear {
-
-            if inputLibrary.selectFilterTag == "ALL" {
-                inputLibrary.tagFilterItemCards = itemVM.items
-            } else {
-                inputLibrary.tagFilterItemCards = itemVM.items.filter({ $0.tag == inputLibrary.selectFilterTag })
-            }
-        } // .onAppear
     } // body
 
     @ViewBuilder
@@ -354,7 +348,7 @@ struct LibraryView: View {
         .ignoresSafeArea()
     } // homeHeaderPhoto
 
-    func homeItemPhotoPanel() -> some View {
+    func homeItemPhotoPanel(items: [Item]) -> some View {
         GeometryReader { bodyView in
 
             let libraryItemPadding: CGFloat = 200
@@ -362,9 +356,9 @@ struct LibraryView: View {
 
             LazyHStack(spacing: libraryItemPadding) {
 
-                ForEach(inputLibrary.tagFilterItemCards.indices, id: \.self) {index in
+                ForEach(tagFilterItemCards.indices, id: \.self) {index in
 
-                    ShowItemPhoto(photo: inputLibrary.tagFilterItemCards[index].photo, size: panelSize)
+                    ShowItemPhoto(photo: tagFilterItemCards[index].photo, size: panelSize)
 
                         .overlay {
                             if inputLibrary.isShowCardInfomation {
@@ -374,7 +368,7 @@ struct LibraryView: View {
                         }
                         .overlay(alignment: .bottomTrailing) {
                             if inputLibrary.isShowCardInfomation {
-                                Text(inputLibrary.tagFilterItemCards[index].name)
+                                Text(tagFilterItemCards[index].name)
                                     .font(.footnote).foregroundColor(.white).opacity(0.7)
                                     .tracking(2)
                                     .lineLimit(1)
@@ -384,7 +378,7 @@ struct LibraryView: View {
                             if inputLibrary.isShowCardInfomation {
                                 Button {
                                     if let cardRowIndex =
-                                        itemVM.items.firstIndex(where: { $0.id == inputLibrary.tagFilterItemCards[index].id }) {
+                                        itemVM.items.firstIndex(where: { $0.id == tagFilterItemCards[index].id }) {
 
                                         inputHome.actionItemIndex = cardRowIndex
 
@@ -419,7 +413,7 @@ struct LibraryView: View {
                         // 先頭・末尾ではスクロールする必要がないので、画面幅の1/5までドラッグで制御する
                         if inputLibrary.homeCardsIndex == 0, value.translation.width > 0 {
                             state = value.translation.width / 5
-                        } else if inputLibrary.homeCardsIndex == (inputLibrary.tagFilterItemCards.count - 1), value.translation.width < 0 {
+                        } else if inputLibrary.homeCardsIndex == (tagFilterItemCards.count - 1), value.translation.width < 0 {
                             state = value.translation.width / 5
                         } else {
                             state = value.translation.width
@@ -442,8 +436,8 @@ struct LibraryView: View {
                         }
                         if newIndex < 0 {
                             newIndex = 0
-                        } else if newIndex > (inputLibrary.tagFilterItemCards.count - 1) {
-                            newIndex = inputLibrary.tagFilterItemCards.count - 1
+                        } else if newIndex > (tagFilterItemCards.count - 1) {
+                            newIndex = tagFilterItemCards.count - 1
                         }
                         inputLibrary.homeCardsIndex = newIndex
 

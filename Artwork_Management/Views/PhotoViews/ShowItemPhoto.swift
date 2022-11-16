@@ -31,7 +31,7 @@ struct ShowItemPhoto: View {
 
         } else {
             RoundedRectangle(cornerRadius: 10)
-                .fill(Color.gray)
+                .foregroundColor(Color.gray)
                 .frame(width: size, height: size)
                 .shadow(radius: 4, x: 5, y: 5)
                 .overlay {

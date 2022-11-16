@@ -21,13 +21,13 @@ struct ItemCardRow: View {
     @State private var cardCount: Int =  0
     @State private var itemSold: Bool = false
 
-    var cardElement: (text: String, icon: Image) {
+    var cardElement: (value: Int, icon: Image) {
 
         switch inputHome.switchElement {
         case .stock:
-            return (text: String(itemRow.inventory), icon: Image(systemName: "shippingbox.fill"))
+            return (value: itemRow.inventory, icon: Image(systemName: "shippingbox.fill"))
         case .price:
-            return (text: String(itemRow.price), icon: Image(systemName: "yensign.circle.fill"))
+            return (value: itemRow.price, icon: Image(systemName: "yensign.circle.fill"))
         }
     }
 
@@ -100,7 +100,8 @@ struct ItemCardRow: View {
                                 .foregroundColor(.black.opacity(0.7))
                         }
 
-                        Text(cardElement.text)
+                        Text(cardElement.value == 0 && inputHome.switchElement == .price ?
+                             "-" : String(cardElement.value))
                             .font(.title3)
                             .fontWeight(.heavy)
                             .foregroundColor(.black)

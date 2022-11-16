@@ -42,14 +42,14 @@ struct ShowsItemDetail: View {
                 .overlay {
                     Color.customDarkBlue2.opacity(0.5)
                         .blur(radius: 20)
-                        .overlay(alignment: .bottomLeading) {
+                        .overlay(alignment: .bottom) {
 
                             Button {
                                 inputHome.isShowItemDetail.toggle()
                             } label: {
                                 Image(systemName: "multiply.circle.fill")
                                     .font(.title3).foregroundColor(.white)
-                                    .offset(x: 10, y: 40)
+                                    .offset(y: 30)
                             }
                         }
                 }

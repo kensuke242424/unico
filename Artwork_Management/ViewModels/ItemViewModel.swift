@@ -166,9 +166,15 @@ class ItemViewModel: ObservableObject {
         case .salesDown:
             varItems.sort { $0.sales < $1.sales }
         case .createAtUp:
-            print("createAtUp ⇨ Timestampが格納され次第、実装します。")
+            varItems.sort { before, after in
+
+                before.createTime!.dateValue() > after.createTime!.dateValue() ? true : false
+            }
         case .updateAtUp:
-            print("updateAtUp ⇨ Timestampが格納され次第、実装します。")
+            varItems.sort { before, after in
+
+                before.updateTime!.dateValue() > after.updateTime!.dateValue() ? true : false
+            }
         case .start:
             print("起動時の初期値です")
         }

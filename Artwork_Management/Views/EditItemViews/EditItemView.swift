@@ -333,7 +333,7 @@ struct InputForms: View {
 
         } // VStack(入力フォーム全体)
         .padding(.vertical, 20)
-        .padding(.horizontal, 20)
+        .padding(.horizontal, 40)
         .onTapGesture { focusedField = nil }
     }
 }

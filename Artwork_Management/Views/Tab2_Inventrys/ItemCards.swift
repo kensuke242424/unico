@@ -89,7 +89,8 @@ struct UpdateTimeSortCards: View {
 
     var updateTimeSortItems: [Item] {
 
-        var sortItems: [Item] = itemVM.items.sorted { before, after in
+        let sortItems: [Item] = itemVM.items.sorted { before, after in
+
             return before.updateTime!.dateValue() > after.updateTime!.dateValue() ? true : false
         }
 
@@ -118,7 +119,7 @@ struct UpdateTimeSortCards: View {
                 } // LazyHGrid
                 .padding()
             }
-            .frame(height: 246)
+            .frame(height: getRect().height / 4 + 50)
         }
     } // body
 } // View

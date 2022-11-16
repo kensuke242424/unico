@@ -35,6 +35,7 @@ struct ItemDetailData: View {
         VStack(alignment: .listRowSeparatorLeading, spacing: 8) {
 
             Text("タグ　　　:　　 \(item.tag)")
+                .frame(width: getRect().width * 0.6)
                 .padding(.bottom, 12)
             Text("在庫　　　:　　 \(item.inventory) 個")
             Text(item.price != 0 ? "価格　　　:　　 ¥ \(item.price)" : "価格　　　:　　   -")
@@ -50,6 +51,7 @@ struct ItemDetailData: View {
         .fontWeight(.light)
         .foregroundColor(.white)
         .tracking(1)
+        .lineLimit(1)
     } // body
 } // View
 

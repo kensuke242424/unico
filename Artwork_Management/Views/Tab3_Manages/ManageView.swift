@@ -12,10 +12,56 @@ enum SortType {
     case salesUp, salesDown, updateAtUp, createAtUp, start
 }
 
+enum IndicatorWidthLimit: CaseIterable {
+    case medium, lerge
+
+    var text: String {
+        switch self {
+        case .medium: return "小"
+        case .lerge: return "大"
+        }
+    }
+
+    var value: Int {
+        switch self {
+        case .medium: return 1
+        case .lerge: return 10
+        }
+    }
+}
+
+enum IndicatorValueStatus: CaseIterable {
+    case stock, price, sales
+
+    var text: String {
+        switch self {
+        case .stock: return "在庫"
+        case .price: return "価格"
+        case .sales: return "売上"
+        }
+    }
+
+    var icon: Image {
+        switch self {
+        case .stock: return Image(systemName: "shippingbox.fill")
+        case .price: return Image(systemName: "yensign.circle.fill")
+        case .sales: return Image(systemName: "banknote.fill")
+        }
+    }
+}
+
 // NOTE: アイテムのタググループ有無を管理します
 enum TagGroup {
     case on // swiftlint:disable:this identifier_name
     case off
+}
+
+struct InputManage {
+    var tagGroup: TagGroup = .on
+    var sortType: SortType = .start
+    var indicatorWidthLimit: IndicatorWidthLimit = .lerge
+    var indicatorValueStatus: IndicatorValueStatus = .sales
+    var isTagGroup: Bool = true
 }
 
 struct ManageView: View {
@@ -26,12 +72,6 @@ struct ManageView: View {
     @Binding var inputHome: InputHome
     @Binding var inputImage: InputImage
 
-    struct InputManage {
-        var tagGroup: TagGroup = .on
-        var sortType: SortType = .start
-        var isTagGroup: Bool = true
-    }
-
     @State private var inputManage: InputManage = InputManage()
 
     var body: some View {
@@ -41,6 +81,22 @@ struct ManageView: View {
                 ScrollView(.vertical) {
 
                     VStack(alignment: .leading) {
+
+                        Picker("売上管理画面の表示ステータス", selection: $inputManage.indicatorValueStatus) {
+                            ForEach(IndicatorValueStatus.allCases, id: \.self) { value in
+
+                                Text(value.text).tag(value.text)
+
+                            }
+                        }
+
+                        Picker("売上管理画面のゲージ幅選択", selection: $inputManage.indicatorWidthLimit) {
+                            ForEach(IndicatorWidthLimit.allCases, id: \.self) { value in
+
+                                Text(value.text).tag(value.text)
+
+                            }
+                        }
 
                         // NOTE: タグ表示の「ON」「OFF」で表示を切り替えます
                         switch inputManage.isTagGroup {
@@ -69,7 +125,7 @@ struct ManageView: View {
 
                                         Spacer(minLength: 0)
 
-                                        GradientLine(color1: .white, color2: .clear)
+                                        GradientLine(color1: .gray, color2: .clear)
                                             .padding(.bottom)
 
                                         if itemVM.items.contains(where: {$0.tag == tagRow.tagName}) {
@@ -81,21 +137,23 @@ struct ManageView: View {
                                                         manageListRow(item: item)
                                                     }
                                                 }
-                                                Color.clear
-                                                    .frame(height: 30)
+                                                Spacer().frame(height: 20)
 
                                                 HStack(alignment: .bottom) {
-                                                    Text("\(tagRow.tagName)  合計  ¥ ")
+                                                    Spacer()
+                                                    Text("\(tagRow.tagName)  売上  ¥ ")
                                                         .font(.caption)
                                                     Text(String(tagGroupTotalSales(items: itemVM.items, tag: tagRow.tagName)))
                                                 }
+                                                .frame(alignment: .trailing)
                                                 .foregroundColor(.white.opacity(0.6))
                                                 .overlay(alignment: .bottomTrailing) {
-                                                    GradientLine(color1: .white, color2: .white).opacity(0.5)
+                                                    GradientLine(color1: .clear, color2: .white).opacity(0.3)
+//                                                        .frame(width: getRect().width * 0.5, alignment: .trailing)
                                                         .offset(y: 7)
                                                 }
-                                                .offset(x: getRect().width / 5)
-                                                .padding()
+                                                .padding(.vertical)
+                                                .padding(.bottom, 30)
                                             }
 
                                         } else {
@@ -115,10 +173,7 @@ struct ManageView: View {
                                         .shadow(radius: 2, x: 4, y: 6)
                                         .padding(.vertical)
 
-                                    LinearGradient(gradient: Gradient(colors: [.gray, .clear]),
-                                                               startPoint: .leading, endPoint: .trailing)
-                                        .frame(height: 1)
-                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                    GradientLine(color1: .gray, color2: .clear)
 
                                         ForEach(itemVM.items) { item in
 
@@ -132,7 +187,7 @@ struct ManageView: View {
 
                         case false:
 
-                            Spacer().frame(height: 70)
+                            Spacer().frame(height: 60)
 
                             Text(tagVM.tags[0].tagName)
                                 .font(.largeTitle.bold())
@@ -140,21 +195,19 @@ struct ManageView: View {
                                 .shadow(radius: 2, x: 4, y: 6)
                                 .padding(.vertical)
 
-                            Spacer(minLength: 0)
-
-                            LinearGradient(gradient: Gradient(colors: [.gray, .clear]),
-                                                       startPoint: .leading, endPoint: .trailing)
-                                .frame(height: 1)
-                                .frame(maxWidth: .infinity, alignment: .leading)
+                            GradientLine(color1: .gray, color2: .clear)
 
                             ForEach(itemVM.items) { item in
 
                                 manageListRow(item: item)
 
                             } // case .groupOff
+
+                            Spacer().frame(height: 250)
+
                         } // switch tagGroup
                     } // VStack
-                    .padding(.leading)
+                    .padding(.horizontal)
 
                 } // ScrollView
             } // ZStack
@@ -163,6 +216,7 @@ struct ManageView: View {
             .navigationTitle("Manage")
             .navigationBarTitleDisplayMode(.inline)
             .animation(.spring(response: 0.5), value: inputManage.isTagGroup)
+            .animation(.spring(response: 0.5), value: inputManage.sortType)
 
             // sort Menu...
             .toolbar {
@@ -261,14 +315,23 @@ struct ManageView: View {
 
                     HStack {
 
-                        Text("売上 ¥")
-                            .font(.caption).opacity(0.7)
+                        inputManage.indicatorValueStatus.icon
+                            .font(.caption).opacity(0.5)
                             .foregroundColor(.white)
 
-                        Text(item.sales != 0 ? String(item.sales) : "-")
-                            .font(.subheadline.bold()).opacity(0.8)
-                            .foregroundColor(.white)
-                            .frame(width: 90, alignment: .leading)
+                        Group {
+                            switch inputManage.indicatorValueStatus {
+                            case .stock:
+                                Text(String(item.inventory))
+                            case .price:
+                                Text(item.price != 0 ? String(item.price) : "-")
+                            case .sales:
+                                Text(item.sales != 0 ? String(item.sales) : "-")
+                            }
+                        }
+                        .font(.subheadline.bold()).opacity(0.5)
+                        .foregroundColor(.white)
+                        .frame(width: 90, alignment: .leading)
 
                         HStack {
                             inputHome.switchElement.icon.font(.caption).opacity(0.5)
@@ -289,7 +352,8 @@ struct ManageView: View {
                         }
                     }
 
-                    IndicatorRow(value: item.sales,
+                    IndicatorRow(inputManage: $inputManage,
+                                 item: item,
                                  color: tagVM.fetchUsedColor(tagName: item.tag))
 
                     Text(item.name)

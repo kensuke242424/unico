@@ -67,7 +67,7 @@ struct StockView: View {
                             Text(tagVM.tags[inputStock.filterTagIndex].tagName)
                                 .foregroundColor(.white)
                                 .font(.system(size: 20, weight: .bold))
-                                .frame(width: 100, height: 40)
+                                .frame(width: 150, height: 40)
                                 .padding()
 
                             // NOTE: サイドタグバーの枠フレームおよび、前後のタグインフォメーションを表示します。
@@ -335,7 +335,8 @@ struct SideTagBarOverlay: View {
                         HStack {
                             Text("<")
                             Text("\(tags[inputStock.filterTagIndex - 1].tagName)")
-                                .frame(width: 60)
+                                .font(.subheadline)
+                                .frame(width: 80, alignment: .leading)
                                 .lineLimit(1)
                         } // HStack
                         .onTapGesture { inputStock.filterTagIndex -= 1 }
@@ -346,7 +347,8 @@ struct SideTagBarOverlay: View {
                     if inputStock.filterTagIndex + 1 < tags.count {
                         HStack {
                             Text("\(tags[inputStock.filterTagIndex + 1].tagName)")
-                                .frame(width: 60)
+                                .font(.subheadline)
+                                .frame(width: 80, alignment: .trailing)
                                 .lineLimit(1)
                             Text(">")
                         } // HStack
