@@ -152,7 +152,7 @@ class ItemViewModel: ObservableObject {
         print("updateCommerse完了")
     }
 
-    func itemsSort(sort: SortType, items: [Item]) -> [Item] {
+    func itemsSort(sort: UpDownOrder, items: [Item]) -> [Item] {
 
         print("＝＝＝＝＝＝＝＝itemsSortメソッド実行＝＝＝＝＝＝＝＝＝＝")
 
@@ -161,22 +161,22 @@ class ItemViewModel: ObservableObject {
 
         switch sort {
 
-        case .salesUp:
+        case .up:
             varItems.sort { $0.sales > $1.sales }
-        case .salesDown:
+        case .down:
             varItems.sort { $0.sales < $1.sales }
-        case .createAtUp:
-            varItems.sort { before, after in
-
-                before.createTime!.dateValue() > after.createTime!.dateValue() ? true : false
-            }
-        case .updateAtUp:
-            varItems.sort { before, after in
-
-                before.updateTime!.dateValue() > after.updateTime!.dateValue() ? true : false
-            }
-        case .start:
-            print("起動時の初期値です")
+//        case .createAtUp:
+//            varItems.sort { before, after in
+//
+//                before.createTime!.dateValue() > after.createTime!.dateValue() ? true : false
+//            }
+//        case .updateAtUp:
+//            varItems.sort { before, after in
+//
+//                before.updateTime!.dateValue() > after.updateTime!.dateValue() ? true : false
+//            }
+//        case .start:
+//            print("起動時の初期値です")
         }
 
         return varItems

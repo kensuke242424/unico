@@ -9,7 +9,7 @@ import SwiftUI
 
 struct IndicatorRow: View {
 
-    @Binding var inputManage: InputManage
+    @Binding var inputManage: InputManageCustomizeSideMenu
     let item: Item
     let color: UsedColor
 
@@ -134,6 +134,6 @@ struct IndicatorRow: View {
 
 struct IndicatorView_Previews: PreviewProvider {
     static var previews: some View {
-        IndicatorRow(inputManage: .constant(InputManage()), item: TestItem().testItem, color: .red)
+        IndicatorRow(inputManage: .constant(InputManageCustomizeSideMenu()), item: TestItem().testItem, color: .red)
     }
 }

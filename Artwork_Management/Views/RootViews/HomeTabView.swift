@@ -31,6 +31,7 @@ struct InputHome {
     var isOpenEditTagSideMenu: Bool = false
     var isShowSearchField: Bool = false
     var isShowSystemSideMenu: Bool = false
+    var isShowManageCustomSideMenu: Bool = false
     var editTagSideMenuBackground: Bool = false
     var sideMenuBackGround: Bool = false
     var isShowSelectImageSheet: Bool = false
@@ -57,6 +58,7 @@ struct HomeTabView: View {
     @State private var inputImage: InputImage = InputImage()
     @State private var inputSideMenu: InputSideMenu = InputSideMenu()
     @State private var inputTag: InputTagSideMenu = InputTagSideMenu()
+    @State private var inputManage: InputManageCustomizeSideMenu = InputManageCustomizeSideMenu()
     @State private var cartAvertOffsetY: CGFloat = 0.0
 
     let userID: String
@@ -91,7 +93,8 @@ struct HomeTabView: View {
                 ManageView(itemVM: rootItemVM,
                            tagVM: tagVM,
                            inputHome: $inputHome,
-                           inputImage: $inputImage)
+                           inputImage: $inputImage,
+                           inputManage: $inputManage)
                     .tabItem {
                         Image(systemName: "chart.xyaxis.line")
                         Text("Manage")
@@ -101,13 +104,18 @@ struct HomeTabView: View {
             } // TabViewここまで
 
             UsefulButton(inputHome: $inputHome)
-                .offset(x: UIScreen.main.bounds.width / 3 - 5,
-                        y: UIScreen.main.bounds.height / 3 - 10)
+                .offset(x: UIScreen.main.bounds.width / 3 + 5,
+                        y: UIScreen.main.bounds.height / 3)
                 .offset(y: cartAvertOffsetY)
 
             ElementSwitchingPickerView(switchElement: $inputHome.switchElement, tabIndex: $inputHome.homeTabIndex)
                 .offset(y: getRect().height / 2 - getSafeArea().bottom - 110)
                 .offset(y: cartAvertOffsetY)
+
+            ManageCustomizeSideMenu(inputManage: $inputManage)
+                .offset(x: getRect().width, y: -50)
+                .offset(x: inputHome.isShowManageCustomSideMenu ? -170 : 0)
+                .opacity(inputHome.homeTabIndex == 2 ? 1.0 : 0.0)
 
             if rootItemVM.items.count != 0 {
                 ShowsItemDetail(itemVM: rootItemVM,

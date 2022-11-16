@@ -7,63 +7,6 @@
 
 import SwiftUI
 
-// NOTE: アイテムのソートタイプを管理します
-enum SortType {
-    case salesUp, salesDown, updateAtUp, createAtUp, start
-}
-
-enum IndicatorWidthLimit: CaseIterable {
-    case medium, lerge
-
-    var text: String {
-        switch self {
-        case .medium: return "小"
-        case .lerge: return "大"
-        }
-    }
-
-    var value: Int {
-        switch self {
-        case .medium: return 1
-        case .lerge: return 10
-        }
-    }
-}
-
-enum IndicatorValueStatus: CaseIterable {
-    case stock, price, sales
-
-    var text: String {
-        switch self {
-        case .stock: return "在庫"
-        case .price: return "価格"
-        case .sales: return "売上"
-        }
-    }
-
-    var icon: Image {
-        switch self {
-        case .stock: return Image(systemName: "shippingbox.fill")
-        case .price: return Image(systemName: "yensign.circle.fill")
-        case .sales: return Image(systemName: "banknote.fill")
-        }
-    }
-}
-
-// NOTE: アイテムのタググループ有無を管理します
-enum TagGroup {
-    case on // swiftlint:disable:this identifier_name
-    case off
-}
-
-struct InputManage {
-    var tagGroup: TagGroup = .on
-    var sortType: SortType = .start
-    var indicatorWidthLimit: IndicatorWidthLimit = .lerge
-    var indicatorValueStatus: IndicatorValueStatus = .sales
-    var isTagGroup: Bool = true
-}
-
 struct ManageView: View {
 
     @StateObject var itemVM: ItemViewModel
@@ -71,8 +14,7 @@ struct ManageView: View {
 
     @Binding var inputHome: InputHome
     @Binding var inputImage: InputImage
-
-    @State private var inputManage: InputManage = InputManage()
+    @Binding var inputManage: InputManageCustomizeSideMenu
 
     var body: some View {
 
@@ -81,22 +23,6 @@ struct ManageView: View {
                 ScrollView(.vertical) {
 
                     VStack(alignment: .leading) {
-
-                        Picker("売上管理画面の表示ステータス", selection: $inputManage.indicatorValueStatus) {
-                            ForEach(IndicatorValueStatus.allCases, id: \.self) { value in
-
-                                Text(value.text).tag(value.text)
-
-                            }
-                        }
-
-                        Picker("売上管理画面のゲージ幅選択", selection: $inputManage.indicatorWidthLimit) {
-                            ForEach(IndicatorWidthLimit.allCases, id: \.self) { value in
-
-                                Text(value.text).tag(value.text)
-
-                            }
-                        }
 
                         // NOTE: タグ表示の「ON」「OFF」で表示を切り替えます
                         switch inputManage.isTagGroup {
@@ -149,7 +75,6 @@ struct ManageView: View {
                                                 .foregroundColor(.white.opacity(0.6))
                                                 .overlay(alignment: .bottomTrailing) {
                                                     GradientLine(color1: .clear, color2: .white).opacity(0.3)
-//                                                        .frame(width: getRect().width * 0.5, alignment: .trailing)
                                                         .offset(y: 7)
                                                 }
                                                 .padding(.vertical)
@@ -221,66 +146,7 @@ struct ManageView: View {
             // sort Menu...
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Menu {
 
-                        Toggle(isOn: $inputManage.isTagGroup) {
-                            HStack {
-                                Image(systemName: inputManage.isTagGroup ? "tag.fill" : "tag.slash")
-                                    .resizable()
-                                    .foregroundColor(inputManage.isTagGroup ? .green : .gray)
-                                Text("タググループ")
-                            }
-                        }
-
-                        Menu("並び替え") {
-                            Button {
-                                inputManage.sortType = .salesUp
-                                itemVM.items = itemVM.itemsSort(sort: inputManage.sortType, items: itemVM.items)
-                            } label: {
-                                if inputManage.sortType == .salesUp {
-                                    Text("売り上げ(↑)　　 ✔︎")
-                                } else {
-                                    Text("売り上げ(↑)")
-                                }
-                            }
-                            Button {
-                                inputManage.sortType = .salesDown
-                                itemVM.items = itemVM.itemsSort(sort: inputManage.sortType, items: itemVM.items)
-                            } label: {
-                                if inputManage.sortType == .salesDown {
-                                    Text("売り上げ(↓)　　 ✔︎")
-                                } else {
-                                    Text("売り上げ(↓)")
-                                }
-                            }
-                            Button {
-                                inputManage.sortType = .updateAtUp
-                                itemVM.items = itemVM.itemsSort(sort: inputManage.sortType, items: itemVM.items)
-                            } label: {
-                                if inputManage.sortType == .updateAtUp {
-                                    Text("最終更新日　　　✔︎")
-                                } else {
-                                    Text("最終更新日")
-                                }
-                            }
-                            Button {
-                                inputManage.sortType = .createAtUp
-                                itemVM.items = itemVM.itemsSort(sort: inputManage.sortType, items: itemVM.items)
-                            } label: {
-                                if inputManage.sortType == .createAtUp {
-                                    Text("追加日　　　✔︎")
-                                } else {
-                                    Text("追加日")
-                                }
-                            }
-                        } // 並び替えオプション
-
-                    } label: {
-                        Image(systemName: "list.bullet.indent")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 30, height: 30)
-                    }
                 }
             }
             // System Side Menu ...
@@ -403,6 +269,7 @@ struct ManageView_Previews: PreviewProvider {
         ManageView(itemVM: ItemViewModel(),
                    tagVM: TagViewModel(),
                    inputHome: .constant(InputHome()),
-                   inputImage: .constant(InputImage()))
+                   inputImage: .constant(InputImage()),
+                   inputManage: .constant(InputManageCustomizeSideMenu()))
     }
 }
