@@ -89,8 +89,9 @@ struct ManageCustomizeSideMenu: View {
             Color.clear
                 .ignoresSafeArea()
 
-            RoundedRectangle(cornerRadius: 20)
-                .foregroundColor(Color.customDarkGray2)
+            Rectangle()
+                .background(.ultraThinMaterial).clipShape(RoundedRectangle(cornerRadius: 20))
+                .foregroundColor(Color.customDarkGray2).opacity(0.6)
                 .frame(height: 540)
 
                 .overlay(alignment: .leading) {

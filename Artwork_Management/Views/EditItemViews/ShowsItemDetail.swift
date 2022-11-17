@@ -30,6 +30,7 @@ struct ShowsItemDetail: View {
         ZStack {
 
             Color(.black).opacity(0.4)
+                .background(.ultraThinMaterial).opacity(0.95)
                 .ignoresSafeArea()
                 .onTapGesture {
                     inputHome.isShowItemDetail.toggle()

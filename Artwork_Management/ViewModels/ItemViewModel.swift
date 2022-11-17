@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseStorage
 import FirebaseFirestore
 import FirebaseFirestoreSwift
 
@@ -95,8 +96,27 @@ class ItemViewModel: ObservableObject {
         itemRef.delete()
     }
 
+    func uploadImage(_ image: UIImage) async -> (url: URL?, filePath: String?) {
+
+        guard let imageData = image.jpegData(compressionQuality: 0.8) else {
+            return (url: nil, filePath: nil)
+        }
+
+        do {
+            let storage = Storage.storage()
+            let reference = storage.reference()
+            let filePath = "gs://unico-cc222.appspot.com/test/test.jpeg"
+            let imageRef = reference.child(filePath)
+            let _ = try await imageRef.putDataAsync(imageData)
+            let url = try await imageRef.downloadURL()
+
+            return (url: url, filePath: filePath)
+        } catch {
+            return (url: nil, filePath: nil)
+        }
+    }
+
     func resetAmount() {
-        print("resetAmount実行")
 
         guard let reference = db?.collection("items") else { print("Error: guard db != nil"); return }
 

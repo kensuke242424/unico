@@ -42,8 +42,8 @@ struct SideMenuEditTagView: View {
             .overlay {
 
                 RoundedRectangle(cornerRadius: 20)
+                    .background(.ultraThinMaterial).clipShape(RoundedRectangle(cornerRadius: 20))
                     .foregroundColor(Color.customDarkGray2).opacity(0.9)
-                    .blur(radius: 10)
                     .frame(width: screenSize.width, height: screenSize.height * 0.65)
                     .onTapGesture { focusedField = nil }
                     .overlay(alignment: .bottomLeading) {

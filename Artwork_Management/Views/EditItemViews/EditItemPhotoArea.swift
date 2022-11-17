@@ -13,14 +13,16 @@ struct EditItemPhotoArea: View {
 
     var body: some View {
 
-//        selectTagColor.color
-        Color.customLightGray1
+        Color.clear
             .frame(width: UIScreen.main.bounds.width, height: 350)
-            .blur(radius: 0)
-
+            .background(.ultraThinMaterial)
+            .background {
+                Image("homePhoto_sample")
+                    .resizable()
+                    .scaledToFill()
+            }
             .overlay {
-                LinearGradient(colors:
-                                [Color.clear, Color.black], startPoint: .top, endPoint: .bottom)
+                LinearGradient(colors: [.clear, .black.opacity(0.3)], startPoint: .top, endPoint: .bottom)
                 .blur(radius: 5)
             }
 

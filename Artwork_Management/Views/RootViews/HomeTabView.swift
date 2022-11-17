@@ -104,8 +104,8 @@ struct HomeTabView: View {
             } // TabViewここまで
 
             UsefulButton(inputHome: $inputHome)
-                .offset(x: UIScreen.main.bounds.width / 3 + 5,
-                        y: UIScreen.main.bounds.height / 3)
+                .offset(x: UIScreen.main.bounds.width / 3,
+                        y: UIScreen.main.bounds.height / 3 - 5)
                 .offset(y: cartAvertOffsetY)
 
             ElementSwitchingPickerView(switchElement: $inputHome.switchElement, tabIndex: $inputHome.homeTabIndex)
@@ -113,7 +113,7 @@ struct HomeTabView: View {
                 .offset(y: cartAvertOffsetY)
 
             ManageCustomizeSideMenu(inputManage: $inputManage, isOpen: $inputHome.isShowManageCustomSideMenu)
-                .offset(x: getRect().width, y: -30)
+                .offset(x: getRect().width, y: -40)
                 .offset(x: inputHome.isShowManageCustomSideMenu ? -170 : 50)
                 .opacity(inputHome.homeTabIndex == 2 ? 1.0 : 0.0)
 
@@ -148,7 +148,8 @@ struct HomeTabView: View {
             // sideMenu_background...
             Color.black
                 .ignoresSafeArea()
-                .opacity(inputHome.editTagSideMenuBackground ? 0.4 : 0)
+                .background(.ultraThinMaterial)
+                .opacity(inputHome.editTagSideMenuBackground ? 0.7 : 0)
                 .onTapGesture {
                     withAnimation(.spring(response: 0.4, blendDuration: 1)) {
                         inputHome.editTagSideMenuBackground.toggle()
