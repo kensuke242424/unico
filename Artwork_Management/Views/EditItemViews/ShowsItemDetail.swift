@@ -45,13 +45,17 @@ struct ShowsItemDetail: View {
                         .blur(radius: 20)
                         .overlay(alignment: .bottom) {
 
-                            Button {
-                                inputHome.isShowItemDetail.toggle()
-                            } label: {
-                                Image(systemName: "multiply.circle.fill")
-                                    .font(.title3).foregroundColor(.white)
-                                    .offset(y: 30)
+                            HStack {
+                                Button {
+                                    inputHome.isShowItemDetail.toggle()
+                                } label: {
+                                    Image(systemName: "multiply.circle.fill")
+                                        .font(.title3).foregroundColor(.white)
+                                }
+                                Text("閉じる")
                             }
+                            .offset(y: 50)
+
                         }
                 }
 

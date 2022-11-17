@@ -69,8 +69,11 @@ struct ManageView: View {
                                                     Spacer()
                                                     Text("\(tagRow.tagName)  合計 ¥ ")
                                                         .font(.caption)
-                                                    Text(String(tagGroupTotalSales(items: itemVM.items, tag: tagRow.tagName)))
-                                                        .font(.subheadline.bold())
+
+                                                    Text(String(tagGroupTotalSales(items: itemVM.items,
+                                                                                   tag: tagRow.tagName,
+                                                                                   group: inputManage.isTagGroup)))
+                                                    .font(.subheadline.bold())
                                                 }
                                                 .frame(alignment: .trailing)
                                                 .foregroundColor(.white.opacity(0.6))
@@ -115,7 +118,7 @@ struct ManageView: View {
 
                             Spacer().frame(height: 60)
 
-                            Text(tagVM.tags[0].tagName)
+                            Text(tagVM.tags.first!.tagName)
                                 .font(.largeTitle.bold())
                                 .foregroundColor(.white)
                                 .shadow(radius: 2, x: 4, y: 6)
@@ -127,7 +130,26 @@ struct ManageView: View {
 
                                 manageListRow(item: item)
 
-                            } // case .groupOff
+                            }
+
+                            HStack(alignment: .bottom) {
+                                Spacer()
+                                Text("\(tagVM.tags.first!.tagName)  合計 ¥ ")
+                                    .font(.caption)
+
+                                Text(String(tagGroupTotalSales(items: itemVM.items,
+                                                               tag: tagVM.tags.first!.tagName,
+                                                               group: inputManage.isTagGroup)))
+                                .font(.subheadline.bold())
+                            }
+                            .frame(alignment: .trailing)
+                            .foregroundColor(.white.opacity(0.6))
+                            .overlay(alignment: .bottomTrailing) {
+                                GradientLine(color1: .clear, color2: .white).opacity(0.3)
+                                    .offset(y: 7)
+                            }
+                            .padding(.vertical)
+                            .padding(.bottom, 40)
 
                             Spacer().frame(height: 250)
 
@@ -142,7 +164,6 @@ struct ManageView: View {
             .navigationTitle("Manage")
             .navigationBarTitleDisplayMode(.inline)
             .animation(.spring(response: 0.5), value: inputManage.isTagGroup)
-//            .animation(.spring(response: 0.5), value: inputManage.sortType)
 
             // New item edit...
             .toolbar {
@@ -319,14 +340,22 @@ struct ManageView: View {
         }
     }
 
-    private func tagGroupTotalSales(items: [Item], tag: String) -> Int {
+    private func tagGroupTotalSales(items: [Item], tag: String, group: Bool) -> Int {
 
         var itemsSales = 0
 
-        for item in items.filter({ $0.tag.contains(tag)}) {
-            itemsSales += item.sales
+        if group {
+            for item in items.filter({ $0.tag.contains(tag)}) {
+                itemsSales += item.sales
+            }
+            return itemsSales
+
+        } else {
+            for item in items {
+                itemsSales += item.sales
+            }
+            return itemsSales
         }
-        return itemsSales
     }
 
 } // View
