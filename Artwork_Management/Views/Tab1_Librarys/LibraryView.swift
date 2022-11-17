@@ -364,6 +364,7 @@ struct LibraryView: View {
                             if inputLibrary.isShowCardInfomation {
                                 LinearGradient(gradient: Gradient(colors: [.clear, .black.opacity(0.4)]),
                                                startPoint: .top, endPoint: .bottom)
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
                             }
                         }
                         .overlay(alignment: .bottomTrailing) {

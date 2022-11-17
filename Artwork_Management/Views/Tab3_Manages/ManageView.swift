@@ -267,6 +267,16 @@ struct ManageView: View {
             HStack(alignment: .top, spacing: 20) {
 
                 ShowItemPhoto(photo: item.photo, size: UIScreen.main.bounds.width / 5)
+                    .onTapGesture {
+                        if let actionItemIndex = itemVM.items.firstIndex(of: item) {
+                            inputHome.actionItemIndex = actionItemIndex
+                            withAnimation(.easeIn(duration: 0.15)) {
+                                inputHome.isShowItemDetail.toggle()
+                            }
+                        } else {
+                            print("インデックス取得失敗")
+                        }
+                    }
 
                 VStack(alignment: .leading, spacing: 13) {
 
@@ -328,16 +338,6 @@ struct ManageView: View {
             } // HStack
         } // VStack
         .padding(.vertical)
-        .onTapGesture {
-            if let actionItemIndex = itemVM.items.firstIndex(of: item) {
-                inputHome.actionItemIndex = actionItemIndex
-                withAnimation(.easeIn(duration: 0.15)) {
-                    inputHome.isShowItemDetail.toggle()
-                }
-            } else {
-                print("インデックス取得失敗")
-            }
-        }
     }
 
     private func tagGroupTotalSales(items: [Item], tag: String, group: Bool) -> Int {
