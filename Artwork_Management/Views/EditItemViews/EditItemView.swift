@@ -9,8 +9,9 @@ import SwiftUI
 
 struct InputEditItem {
 
+    var captureImage: UIImage = UIImage()
     var selectionTagName: String = ""
-    var photoURL: String = ""  // Todo: 写真取り込み機能追加後使用
+    var photoURL: URL? = nil
     var editItemName: String = ""
     var editItemInventory: String = ""
     var editItemCost: String = ""
@@ -22,6 +23,7 @@ struct InputEditItem {
     var disableButton: Bool = true
     var offset: CGFloat = 0
     var isCheckedFocuseDetail: Bool = false
+    var isShowItemImageSelectSheet: Bool = false
 }
 
 struct EditItemView: View {
@@ -56,7 +58,8 @@ struct EditItemView: View {
                         .offset(y: 340)
                     VStack {
                         // ✅カスタムView 写真ゾーン
-                        EditItemPhotoArea(item: passItemData)
+                        EditItemPhotoArea(showImageSheet: $inputEdit.isShowItemImageSelectSheet,
+                                          photoURL: inputEdit.photoURL)
 
                         InputForms(itemVM: itemVM,
                                    tagVM: tagVM,
@@ -71,6 +74,12 @@ struct EditItemView: View {
 
             } // ScrollView
 
+            .sheet(isPresented: $inputEdit.isShowItemImageSelectSheet) {
+                PHPickerView(captureImage: $inputEdit.captureImage,
+                             isShowSheet: $inputEdit.isShowItemImageSelectSheet,
+                             isShowError: $inputHome.showErrorFetchImage)
+            }
+
             .onChange(of: inputEdit.editItemName) { newValue in
 
                 withAnimation(.easeIn(duration: 0.2)) {
@@ -82,6 +91,15 @@ struct EditItemView: View {
                 }
             } // onChange(ボタンdisable分岐)
 
+            .onChange(of: inputEdit.captureImage) { newImage in
+
+                Task {
+                    let uploadImage =  await itemVM.uploadImage(newImage, uid: userID)
+                    print(uploadImage)
+                    inputEdit.photoURL = uploadImage.url
+                }
+            }
+
             // NOTE: updateitemView呼び出し時に、親Viewから受け取ったアイテム情報を各入力欄に格納します。
             .onAppear {
 
@@ -89,7 +107,7 @@ struct EditItemView: View {
                 if let passItemData = passItemData {
 
                     inputEdit.selectionTagName = passItemData.tag
-                    inputEdit.photoURL = passItemData.photo
+                    inputEdit.photoURL = passItemData.photoURL
                     inputEdit.editItemName = passItemData.name
                     inputEdit.editItemInventory = String(passItemData.inventory)
                     inputEdit.editItemCost = String(passItemData.cost)
@@ -120,16 +138,16 @@ struct EditItemView: View {
 
                             // NOTE: テストデータに新規アイテムを保存
                             let itemData = Item(tag: inputEdit.selectionTagName,
-                                                 name: inputEdit.editItemName,
-                                                 detail: inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "メモなし",
-                                                 photo: "", // Todo: 写真取り込み実装後、変更
-                                                 cost: 0,
-                                                 price: Int(inputEdit.editItemPrice) ?? 0,
-                                                 amount: 0,
-                                                 sales: 0,
-                                                 inventory: Int(inputEdit.editItemInventory) ??  0,
-                                                 totalAmount: 0,
-                                                 totalInventory: Int(inputEdit.editItemInventory) ?? 0)
+                                                name: inputEdit.editItemName,
+                                                detail: inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "メモなし",
+                                                photoURL: inputEdit.photoURL,
+                                                cost: 0,
+                                                price: Int(inputEdit.editItemPrice) ?? 0,
+                                                amount: 0,
+                                                sales: 0,
+                                                inventory: Int(inputEdit.editItemInventory) ??  0,
+                                                totalAmount: 0,
+                                                totalInventory: Int(inputEdit.editItemInventory) ?? 0)
 
                             // Firestoreにコーダブル保存
                             itemVM.addItem(itemData: itemData, tag: inputEdit.selectionTagName, userID: userID)
@@ -147,7 +165,7 @@ struct EditItemView: View {
                                                        tag: inputEdit.selectionTagName,
                                                        name: inputEdit.editItemName,
                                                        detail: inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "メモなし",
-                                                       photo: inputEdit.photoURL != "" ? inputEdit.photoURL : "", // Todo: 写真取り込み実装後、変更
+                                                       photoURL: inputEdit.photoURL,
                                                        cost: Int(inputEdit.editItemCost) ?? 0,
                                                        price: Int(inputEdit.editItemPrice) ?? 0,
                                                        amount: 0,

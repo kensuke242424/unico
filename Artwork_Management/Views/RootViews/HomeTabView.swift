@@ -8,7 +8,6 @@
 import SwiftUI
 import ResizableSheet
 
-// NOTE: アイテムの「追加」「更新」を管理します
 enum EditStatus {
     case create
     case update
@@ -22,11 +21,12 @@ struct InputHome {
     var switchElement: ElementStatus = .stock
     var homeTabIndex: Int = 0
     var actionItemIndex: Int = 0
-    var selectCaptureImage: UIImage? = UIImage()
+    var selectCaptureImage: UIImage = UIImage()
     var itemsInfomationOpacity: CGFloat = 0.0
     var basketInfomationOpacity: CGFloat = 0.0
     var showErrorFetchImage: Bool = false
     var isShowItemDetail: Bool = false
+    var isShowHomeTopNavigation: Bool = false
     var isPresentedEditItem: Bool = false
     var isOpenEditTagSideMenu: Bool = false
     var isShowSearchField: Bool = false
@@ -44,9 +44,8 @@ struct InputHome {
 }
 
 struct InputImage {
-    var headerImage: UIImage? = nil
-    var iconImage: UIImage? = nil
-    var itemImage: UIImage? = nil
+    var homeHeaderURL: URL? = nil
+    var userColor: Color = .gray
 }
 
 struct HomeTabView: View {
@@ -103,25 +102,33 @@ struct HomeTabView: View {
 
             } // TabViewここまで
 
-            UsefulButton(inputHome: $inputHome)
-                .offset(x: UIScreen.main.bounds.width / 3,
-                        y: UIScreen.main.bounds.height / 3 - 5)
-                .offset(y: cartAvertOffsetY)
+            Group {
 
-            ElementSwitchingPickerView(switchElement: $inputHome.switchElement, tabIndex: $inputHome.homeTabIndex)
-                .offset(y: getRect().height / 2 - getSafeArea().bottom - 110)
-                .offset(y: cartAvertOffsetY)
+                UsefulButton(inputHome: $inputHome)
+                    .offset(x: UIScreen.main.bounds.width / 3,
+                            y: UIScreen.main.bounds.height / 3 - 5)
+                    .offset(y: cartAvertOffsetY)
+
+                ElementSwitchingPickerView(switchElement: $inputHome.switchElement, tabIndex: $inputHome.homeTabIndex)
+                    .offset(y: getRect().height / 2 - getSafeArea().bottom - 110)
+                    .offset(y: cartAvertOffsetY)
+
+                NavigationHeader(inputHome: $inputHome, photoURL: userVM.users[0].iconURL)
+                    .opacity(!inputHome.isShowHomeTopNavigation &&
+                             inputHome.homeTabIndex == 0 &&
+                             inputImage.homeHeaderURL != nil
+                             ? 0.0 : 1.0)
+            }
 
             ManageCustomizeSideMenu(inputManage: $inputManage, isOpen: $inputHome.isShowManageCustomSideMenu)
                 .offset(x: getRect().width, y: -40)
                 .offset(x: inputHome.isShowManageCustomSideMenu ? -170 : 50)
                 .opacity(inputHome.homeTabIndex == 2 ? 1.0 : 0.0)
 
-            if rootItemVM.items.count != 0 {
+            if inputHome.isShowItemDetail {
                 ShowsItemDetail(itemVM: rootItemVM,
                                 inputHome: $inputHome,
                                 item: rootItemVM.items[inputHome.actionItemIndex])
-                .opacity(inputHome.isShowItemDetail ? 1.0 : 0.0)
             }
 
             // sideMenu_background...
@@ -230,24 +237,29 @@ struct HomeTabView: View {
         // convert UIImage ⇨ base64String...
         .onChange(of: inputHome.selectCaptureImage) { newImage in
 
-            guard let base64StringImage = newImage?.toBase64String() else {
-                inputHome.showErrorFetchImage.toggle()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                    inputHome.showErrorFetchImage.toggle()
-                }
-                return
-            }
-
             switch inputHome.updateImageStatus {
             case .item:
                 print("別のブランチでInputHomeにactionItemIndexが格納されているため、マージ後そちらを使用して更新")
+                Task {
+                    let uploadImage =  await rootItemVM.uploadImage(newImage, uid: userID)
+                    print(uploadImage)
+                    rootItemVM.items[inputHome.actionItemIndex].photoURL = uploadImage.url
+                }
+
             case .icon:
                 guard userVM.users.first != nil else { return }
-                userVM.users[0].iconImage = base64StringImage
-                inputImage.iconImage = userVM.users.first!.iconImage.toImage()
+                Task {
+                    let uploadImage =  await rootItemVM.uploadImage(newImage, uid: userID)
+                    print(uploadImage)
+                    userVM.users[0].iconURL = uploadImage.url
+                }
 
             case .header:
-                guard userVM.users.first != nil else { return }
+                Task {
+                    let uploadImage =  await rootItemVM.uploadImage(newImage, uid: userID)
+                    print(uploadImage)
+                    inputImage.homeHeaderURL = uploadImage.url
+                }
 
             }
         }
@@ -268,12 +280,50 @@ struct HomeTabView: View {
                 print("fetchTagメソッド終わり")
                 await rootItemVM.fetchItem()
                 print("fetchItemメソッド終わり")
-
             }
         }
 
     } // body
 } // View
+
+struct NavigationHeader: View {
+
+    @Binding var inputHome: InputHome
+    let photoURL: URL?
+
+    var body: some View {
+
+            HStack {
+                Button {
+                    withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+                        inputHome.isShowSystemSideMenu.toggle()
+                    }
+                    withAnimation(.easeIn(duration: 0.2)) {
+                        inputHome.sideMenuBackGround.toggle()
+                    }
+                } label: {
+                    CircleIcon(photoURL: photoURL, size: getSafeArea().top - 20)
+                }
+
+                Spacer()
+
+                Button {
+                    inputHome.editItemStatus = .create
+                    inputHome.isPresentedEditItem.toggle()
+                } label: {
+                    Image(systemName: "shippingbox.fill")
+                        .overlay(alignment: .topTrailing) {
+                            Image(systemName: "plus.circle.fill")
+                                .resizable()
+                                .frame(width: 10, height: 10)
+                                .offset(x: 3, y: -3)
+                        }
+                }
+            } // HStack
+            .padding(.horizontal)
+            .offset(y: -getRect().height / 2 + getSafeArea().top)
+    }
+}
 
 struct HomeTabView_Previews: PreviewProvider {
 

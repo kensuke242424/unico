@@ -14,7 +14,6 @@ struct InputLibrary {
     var cardOpacity: CGFloat =  1.0
     var tagFilterItemCards: [Item] = []
     var isShowCardInfomation: Bool = false
-    var isShowHeaderPhotoInfomation: Bool = false
 }
 
 struct InputTime {
@@ -74,7 +73,7 @@ struct LibraryView: View {
 
             VStack {
 
-                homeHeaderPhoto(photo: inputImage.headerImage, userIcon: "cloth_sample1")
+                homeHeaderPhoto(photoURL: inputImage.homeHeaderURL, userIcon: "cloth_sample1")
                 // 時刻レイアウト
                 HStack {
                     VStack(alignment: .leading, spacing: 8) {
@@ -197,7 +196,7 @@ struct LibraryView: View {
                     Text(inputLibrary.selectFilterTag)
                     Text("該当アイテムなし")
                 }
-                .foregroundColor(.white.opacity(0.7))
+                .foregroundColor(.white.opacity(0.4))
                 .offset(x: -UIScreen.main.bounds.width / 4,
                         y: UIScreen.main.bounds.height / 5)
             } else {
@@ -215,29 +214,38 @@ struct LibraryView: View {
     } // body
 
     @ViewBuilder
-    func homeHeaderPhoto(photo: UIImage?, userIcon: String) -> some View {
+    func homeHeaderPhoto(photoURL: URL?, userIcon: String) -> some View {
 
         Group {
-            if let photo = photo {
+            if let photoURL = photoURL {
                 ZStack {
 
                     Rectangle().opacity(0.0001)
                         .frame(width: getRect().width, height: getRect().height * 0.35)
                         .onTapGesture {
                             withAnimation(.easeIn(duration: 0.2)) {
-                                inputLibrary.isShowHeaderPhotoInfomation.toggle()
+                                inputHome.isShowHomeTopNavigation.toggle()
                             }
                         }
                     Group {
                         switch headerImageSize {
                         case .fit:
-                            Image(uiImage: photo)
-                                .resizable()
-                                .scaledToFit()
+                            AsyncImage(url: photoURL) { fitImage in
+                                fitImage
+                                    .resizable()
+                                    .scaledToFit()
+                            } placeholder: {
+                                ProgressView()
+                            }
+
                         case .fill:
-                            Image(uiImage: photo)
-                                .resizable()
-                                .scaledToFill()
+                            AsyncImage(url: photoURL) { fillImage in
+                                fillImage
+                                    .resizable()
+                                    .scaledToFill()
+                            } placeholder: {
+                                ProgressView()
+                            }
                         }
                     }
                     .frame(width: getRect().width, height: getRect().height * 0.35)
@@ -271,10 +279,10 @@ struct LibraryView: View {
             LinearGradient(gradient: Gradient(colors: [.clear, .black.opacity(0.2)]),
                            startPoint: .top, endPoint: .bottom)
             .shadow(radius: 5, x: 0, y: 10)
-            .opacity(inputLibrary.isShowHeaderPhotoInfomation ? 0.4 : 0.0)
+            .opacity(inputHome.isShowHomeTopNavigation ? 0.4 : 0.0)
             .onTapGesture {
                 withAnimation(.easeIn(duration: 0.2)) {
-                    inputLibrary.isShowHeaderPhotoInfomation.toggle()
+                    inputHome.isShowHomeTopNavigation.toggle()
                 }
             }
 
@@ -309,23 +317,7 @@ struct LibraryView: View {
                     .foregroundColor(.white.opacity(0.8))
             } // Menu
             .padding()
-            .opacity(inputLibrary.isShowHeaderPhotoInfomation ? 1.0 : 0.0)
-        } // overlay
-
-        .overlay(alignment: .topLeading) {
-            Button {
-                withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                    inputHome.isShowSystemSideMenu.toggle()
-                }
-                withAnimation(.easeIn(duration: 0.2)) {
-                    inputHome.sideMenuBackGround.toggle()
-                }
-            } label: {
-                CircleIcon(photo: inputImage.iconImage, size: getSafeArea().top - 20)
-            }
-            .padding(.leading)
-            .offset(y: getSafeArea().top)
-            .opacity(inputLibrary.isShowHeaderPhotoInfomation || photo == nil ? 1.0 : 0.0)
+            .opacity(inputHome.isShowHomeTopNavigation ? 1.0 : 0.0)
         } // overlay
 
         // Todo: ホームレイアウトのカスタム
@@ -358,7 +350,7 @@ struct LibraryView: View {
 
                 ForEach(tagFilterItemCards.indices, id: \.self) {index in
 
-                    ShowItemPhoto(photo: tagFilterItemCards[index].photo, size: panelSize)
+                    ShowItemPhoto(photoURL: tagFilterItemCards[index].photoURL, size: panelSize)
 
                         .overlay {
                             if inputLibrary.isShowCardInfomation {

@@ -79,7 +79,7 @@ struct ItemCardRow: View {
             .overlay {
                 VStack {
 
-                    ShowItemPhoto(photo: itemRow.photo, size: itemWidth - 45)
+                    ShowItemPhoto(photoURL: itemRow.photoURL, size: itemWidth - 45)
 
                     Text(itemRow.name)
                         .foregroundColor(.black)

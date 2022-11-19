@@ -165,39 +165,6 @@ struct ManageView: View {
             .navigationBarTitleDisplayMode(.inline)
             .animation(.spring(response: 0.5), value: inputManage.isTagGroup)
 
-            // New item edit...
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        inputHome.editItemStatus = .create
-                        inputHome.isPresentedEditItem.toggle()
-                    } label: {
-                        Image(systemName: "shippingbox.fill")
-                            .overlay(alignment: .topTrailing) {
-                                Image(systemName: "plus.circle.fill")
-                                    .resizable()
-                                    .frame(width: 10, height: 10)
-                                    .offset(x: 3, y: -3)
-                            }
-                    }
-                }
-            }
-            // System Side Menu ...
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button {
-                        withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                            inputHome.isShowSystemSideMenu.toggle()
-                        }
-                        withAnimation(.easeIn(duration: 0.2)) {
-                            inputHome.sideMenuBackGround.toggle()
-                        }
-                    } label: {
-                        CircleIcon(photo: inputImage.iconImage, size: getSafeArea().top - 20)
-                    }
-                }
-            }
-
             // items sort...
             .onChange(of: inputManage.indicatorValueStatus) { _ in
 
@@ -266,7 +233,7 @@ struct ManageView: View {
 
             HStack(alignment: .top, spacing: 20) {
 
-                ShowItemPhoto(photo: item.photo, size: UIScreen.main.bounds.width / 5)
+                ShowItemPhoto(photoURL: item.photoURL, size: UIScreen.main.bounds.width / 5)
                     .onTapGesture {
                         if let actionItemIndex = itemVM.items.firstIndex(of: item) {
                             inputHome.actionItemIndex = actionItemIndex

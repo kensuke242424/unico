@@ -9,19 +9,25 @@ import SwiftUI
 
 struct CircleIcon: View {
 
-    let photo: UIImage?
+    let photoURL: URL?
     let size: CGFloat
 
     var body: some View {
 
         Group {
-            if let photo = photo {
-                Image(uiImage: photo)
-                    .resizable()
-                    .scaledToFill()
+            if let photoURL = photoURL {
+                AsyncImage(url: photoURL) { iconImage in
+                    iconImage
+                        .resizable()
+                        .scaledToFill()
+
+                } placeholder: {
+                    ProgressView()
+                }
             } else {
                 Image(systemName: "person.circle.fill")
                     .resizable()
+                    .scaledToFill()
                     .foregroundColor(.white.opacity(0.7))
             }
         }
@@ -35,6 +41,6 @@ struct CircleIcon: View {
 
 struct CircleIcon_Previews: PreviewProvider {
     static var previews: some View {
-        CircleIcon(photo: UIImage(), size: 35)
+        CircleIcon(photoURL: nil, size: 35)
     }
 }

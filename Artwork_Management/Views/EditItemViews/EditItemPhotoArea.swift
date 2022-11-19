@@ -9,17 +9,30 @@ import SwiftUI
 
 struct EditItemPhotoArea: View {
 
-    let item: Item?
+    @Binding var showImageSheet: Bool
+    let photoURL: URL?
 
     var body: some View {
 
         Color.clear
-            .frame(width: UIScreen.main.bounds.width, height: 350)
+            .frame(width: getRect().width, height: 350)
             .background(.ultraThinMaterial)
             .background {
-                Image("homePhoto_sample")
-                    .resizable()
-                    .scaledToFill()
+                if let photoURL = photoURL {
+                    AsyncImage(url: photoURL) { itemImage in
+                        itemImage
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: getRect().width, height: 350)
+                            .clipped()
+                    } placeholder: {
+                        ProgressView()
+                    }
+                } else {
+                    Image("homePhoto_sample")
+                        .resizable()
+                        .scaledToFill()
+                }
             }
             .overlay {
                 LinearGradient(colors: [.clear, .black.opacity(0.3)], startPoint: .top, endPoint: .bottom)
@@ -29,10 +42,11 @@ struct EditItemPhotoArea: View {
             .overlay {
                 VStack {
 
-                    ShowItemPhoto(photo: item?.photo ?? "", size: 270)
+                    ShowItemPhoto(photoURL: photoURL, size: 270)
                         .overlay(alignment: .bottomTrailing) {
                             Button {
                                 // Todo: アイテム写真追加処理
+                                showImageSheet.toggle()
                             } label: {
                                 Image(systemName: "photo.on.rectangle.angled")
                                     .resizable()
@@ -49,6 +63,6 @@ struct EditItemPhotoArea: View {
 
 struct SelectItemPhotoArea_Previews: PreviewProvider {
     static var previews: some View {
-        EditItemPhotoArea(item: TestItem().testItem)
+        EditItemPhotoArea(showImageSheet: .constant(false), photoURL: nil)
     }
 }

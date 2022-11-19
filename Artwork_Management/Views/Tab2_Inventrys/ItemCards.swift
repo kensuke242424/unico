@@ -22,7 +22,10 @@ struct TagSortCards: View {
     var body: some View {
 
         if itemVM.items == [] {
-            EmptyItemView(inputHome: $inputHome, text: "アイテムが存在しません")
+            VStack {
+                EmptyItemView(inputHome: $inputHome, text: "アイテムが存在しません")
+                Spacer().frame(height: 200)
+            }
 
         } else {
 
@@ -30,7 +33,6 @@ struct TagSortCards: View {
             if inputStock.filterTagIndex == 0 &&
                 inputStock.searchItemNameText == tagVM.tags.first!.tagName ||
                 inputStock.searchItemNameText == "" {
-
 
                 LazyVGrid(columns: columnsV, spacing: 20) {
                     ForEach(itemVM.items) { item in
@@ -102,6 +104,7 @@ struct UpdateTimeSortCards: View {
     var body: some View {
 
         if itemVM.items == [] {
+            
             EmptyItemView(inputHome: $inputHome, text: "アイテムが存在しません")
 
         } else {

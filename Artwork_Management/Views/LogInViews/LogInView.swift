@@ -26,7 +26,7 @@ struct LogInView: View {
 
     @State private var logInNavigationPath: [LogInNavigation] = []
 
-    @State var userID: String = "AAAAAAAAA"
+    @State var userID: String = "sampleUserID"
 
     // テスト用のダミーデータです。
     let testUser: User = TestUser().testUser

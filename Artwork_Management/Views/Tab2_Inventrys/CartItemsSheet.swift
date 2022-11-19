@@ -95,7 +95,7 @@ struct CartItemRow: View {
 
             HStack {
 
-                ShowItemPhoto(photo: itemRow.photo, size: 100)
+                ShowItemPhoto(photoURL: itemRow.photoURL, size: 100)
 
                 Spacer()
 
@@ -187,7 +187,7 @@ struct CartItemRow: View {
                             inputStock.resultCartAmount -= 1
                         }
                     } message: {
-                        Text("かごからアイテムを削除しますか？")
+                        Text("かごから\(itemRow.name)を削除しますか？")
                     }
                 } // VStack
             } // HStack

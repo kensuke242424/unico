@@ -16,7 +16,7 @@ struct Item: Identifiable, Equatable, Hashable, Codable {
     var tag: String
     var name: String
     var detail: String
-    var photo: String
+    var photoURL: URL?
     var cost: Int
     var price: Int
     var amount: Int
@@ -36,7 +36,7 @@ struct TestItem {
     var testItem: Item = Item(tag: "Clothes",
                               name: "カッターシャツ(白)",
                               detail: "シャツ(白)のアイテム紹介テキストです。",
-                              photo: "cloth_sample1",
+                              photoURL: nil,
                               cost: 1000,
                               price: 2800,
                               amount: 0,

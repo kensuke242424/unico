@@ -12,6 +12,14 @@ struct User: Identifiable, Codable {
     var name: String
     var address: String
     var password: String
-    var iconImage: String
-    var joins: [String]
+    var iconURL: URL?
+    var joins: [JoinGroup]
+}
+
+struct JoinGroup: Codable {
+    var id: String
+    var name: String
+    var iconURL: URL?
+    var headerURL: URL?
+    var color: String
 }

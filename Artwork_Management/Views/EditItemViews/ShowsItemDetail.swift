@@ -53,6 +53,7 @@ struct ShowsItemDetail: View {
                                         .font(.title3).foregroundColor(.white)
                                 }
                                 Text("閉じる")
+                                    .foregroundColor(.white)
                             }
                             .offset(y: 50)
 
@@ -70,7 +71,7 @@ struct ShowsItemDetail: View {
                             ScrollView(showsIndicators: false) {
                                 VStack(spacing: 10) {
 
-                                    ShowItemPhoto(photo: item.photo, size: screenSize.width * 0.35)
+                                    ShowItemPhoto(photoURL: item.photoURL, size: screenSize.width * 0.35)
                                         .padding()
                                         .id("top")
 
@@ -125,10 +126,11 @@ struct ShowsItemDetail: View {
 
                                             Button("削除", role: .destructive) {
                                                 inputHome.isShowItemDetail.toggle()
-                                                withAnimation {
-                                                    itemVM.items.removeAll(where: { $0.id == item.id })
-                                                }
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                                                    withAnimation {
+                                                        itemVM.items.removeAll(where: { $0.id == item.id })
+                                                    }
                                                     itemVM.deleteItem(deleteItem: item)
                                                 }
                                             }

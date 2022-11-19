@@ -65,7 +65,7 @@ struct SystemSideMenu: View {
 
                 VStack(alignment: .leading, spacing: 20) {
 
-                    CircleIcon(photo: inputImage.iconImage, size: getRect().width / 3 + 20)
+                    CircleIcon(photoURL: nil, size: getRect().width / 3 + 20)
                         .overlay(alignment: .bottomTrailing) {
                             Button {
                                 inputHome.updateImageStatus = .icon

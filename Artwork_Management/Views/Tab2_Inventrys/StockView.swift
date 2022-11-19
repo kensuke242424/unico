@@ -284,37 +284,6 @@ struct StockView: View {
             .animation(.easeIn(duration: 0.2), value: inputHome.isShowSearchField)
             .navigationTitle("Stock")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button {
-                        withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                            inputHome.isShowSystemSideMenu.toggle()
-                        }
-                        withAnimation(.easeIn(duration: 0.2)) {
-                            inputHome.sideMenuBackGround.toggle()
-                        }
-                    } label: {
-                        CircleIcon(photo: inputImage.iconImage, size: getSafeArea().top - 20)
-                    }
-                }
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        inputHome.editItemStatus = .create
-                        inputHome.isPresentedEditItem.toggle()
-                    } label: {
-                        Image(systemName: "shippingbox.fill")
-                            .overlay(alignment: .topTrailing) {
-                                Image(systemName: "plus.circle.fill")
-                                    .resizable()
-                                    .frame(width: 10, height: 10)
-                                    .offset(x: 3, y: -3)
-                            }
-                    }
-                }
-            }
-
             .onTapGesture { searchFocused = nil }
 
             // NOTE: ディスプレイのカラーモードを検知し、enumを切り替えます。
