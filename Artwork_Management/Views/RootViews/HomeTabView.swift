@@ -312,11 +312,13 @@ struct NavigationHeader: View {
                     inputHome.isPresentedEditItem.toggle()
                 } label: {
                     Image(systemName: "shippingbox.fill")
+                        .resizable()
+                        .frame(width: 20, height: 20)
                         .overlay(alignment: .topTrailing) {
                             Image(systemName: "plus.circle.fill")
                                 .resizable()
                                 .frame(width: 10, height: 10)
-                                .offset(x: 3, y: -3)
+                                .offset(x: 7, y: -7)
                         }
                 }
             } // HStack

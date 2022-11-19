@@ -14,9 +14,11 @@ struct Item: Identifiable, Equatable, Hashable, Codable {
     @ServerTimestamp var createTime: Timestamp?
     @ServerTimestamp var updateTime: Timestamp?
     var tag: String
+    var tagColor: UsedColor
     var name: String
     var detail: String
     var photoURL: URL?
+    var photoPath: String?
     var cost: Int
     var price: Int
     var amount: Int
@@ -34,9 +36,11 @@ enum Mode {
 struct TestItem {
 
     var testItem: Item = Item(tag: "Clothes",
+                              tagColor: .red,
                               name: "カッターシャツ(白)",
                               detail: "シャツ(白)のアイテム紹介テキストです。",
                               photoURL: nil,
+                              photoPath: nil,
                               cost: 1000,
                               price: 2800,
                               amount: 0,

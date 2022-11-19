@@ -14,7 +14,7 @@ class UserViewModel: ObservableObject {
 
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
 
-    @Published var users: [User] = [User(name: "SampleUser", address: "kennsuke242424@gmail.com", password: "ninnzinn2424", iconURL: nil, joins: [])]
+    @Published var users: [User] = [User(name: "SampleUser", address: "kennsuke242424@gmail.com", password: "ninnzinn2424", iconURL: nil, groups: [])]
 
     func addUser(userData: User, groupID: String) {
 
@@ -36,5 +36,5 @@ class UserViewModel: ObservableObject {
 }
 
 struct TestUser {
-    let testUser: User = User(name: "SampleUser", address: "kennsuke242424@gmail.com", password: "ninnzinn2424", iconURL: nil, joins: [])
+    let testUser: User = User(name: "SampleUser", address: "kennsuke242424@gmail.com", password: "ninnzinn2424", iconURL: nil, groups: [])
 }

@@ -13,7 +13,7 @@ struct InputSideMenu {
     var tag: Bool = false
     var help: Bool = false
     var editMode: EditMode = .inactive
-    var selectTag: Tag = Tag(oderIndex: 1, tagName: "", tagColor: "赤")
+    var selectTag: Tag = Tag(oderIndex: 1, tagName: "", tagColor: .red)
 }
 
 struct SystemSideMenu: View {
@@ -162,13 +162,11 @@ struct SystemSideMenu: View {
 
                                             ForEach(Array(tagVM.tags.enumerated()), id: \.offset) { offset, tag in
 
-                                                let fetchUsedColor = tagVM.fetchUsedColor(tagName: tag.tagName)
-
                                                 if tag != tagVM.tags.first! && tag != tagVM.tags.last! {
                                                     HStack {
                                                         Image(systemName: "tag.fill")
                                                             .font(.caption)
-                                                            .foregroundColor(fetchUsedColor.color)
+                                                            .foregroundColor(tag.tagColor.color)
                                                             .opacity(0.6)
 
                                                         Text(tag.tagName)
@@ -188,7 +186,7 @@ struct SystemSideMenu: View {
                                                                 inputTag.tagSideMenuStatus = .update
                                                                 inputSideMenu.selectTag = tag
                                                                 inputTag.newTagNameText = tag.tagName
-                                                                inputTag.selectionSideMenuTagColor = fetchUsedColor
+                                                                inputTag.selectionSideMenuTagColor = tag.tagColor
 
                                                                 withAnimation(.spring(response: 0.3, blendDuration: 1)) {
                                                                     inputHome.isOpenEditTagSideMenu.toggle()

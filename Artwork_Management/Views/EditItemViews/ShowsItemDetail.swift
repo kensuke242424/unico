@@ -146,6 +146,7 @@ struct ShowsItemDetail: View {
 
                                     // NOTE: アイテムの情報が格納羅列されたカスタムViewです
                                     ItemDetailData(item: item)
+                                        .offset(x: -10)
 
                                     Divider().background(.white).opacity(0.5)
                                         .padding()

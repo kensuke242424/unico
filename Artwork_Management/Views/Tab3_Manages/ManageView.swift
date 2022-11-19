@@ -294,7 +294,7 @@ struct ManageView: View {
 
                     IndicatorRow(inputManage: $inputManage,
                                  item: item,
-                                 color: tagVM.fetchUsedColor(tagName: item.tag))
+                                 color: item.tagColor)
 
                     Text(item.name)
                         .font(.caption.bold())

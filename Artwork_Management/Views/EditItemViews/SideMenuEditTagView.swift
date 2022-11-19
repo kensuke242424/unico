@@ -178,7 +178,7 @@ struct SideMenuEditTagView: View {
 
                                 let newTagData = Tag(oderIndex: tagVM.tags.count - 1,
                                                      tagName: inputTag.newTagNameText,
-                                                     tagColor: inputTag.selectionSideMenuTagColor.text)
+                                                     tagColor: inputTag.selectionSideMenuTagColor)
 
                                 // タグをfirestoreに追加
                                 tagVM.addTag(tagData: newTagData, groupID: tagVM.groupID)
@@ -208,7 +208,7 @@ struct SideMenuEditTagView: View {
 
                                 let newTagData = Tag(oderIndex: tagVM.tags.count - 2,
                                                      tagName: inputTag.newTagNameText,
-                                                     tagColor: inputTag.selectionSideMenuTagColor.text)
+                                                     tagColor: inputTag.selectionSideMenuTagColor)
 
                                 // firestoreにタグ更新を保存
                                 tagVM.updateTagData(updateData: newTagData, defaultData: defaultTagData)
@@ -285,7 +285,7 @@ struct SideMenuNewTagView_Previews: PreviewProvider {
             tagVM: TagViewModel(),
             inputHome: .constant(InputHome()),
             inputTag: .constant(InputTagSideMenu()),
-            defaultTag: Tag(oderIndex: 1, tagName: "テストタグ", tagColor: "緑"),
+            defaultTag: Tag(oderIndex: 1, tagName: "テストタグ", tagColor: .green),
             tagSideMenuStatus: .create)
     }
 }

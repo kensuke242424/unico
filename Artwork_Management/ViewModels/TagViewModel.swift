@@ -43,15 +43,15 @@ class TagViewModel: ObservableObject {
                     // 先頭と末尾にタグを追加
                 } catch {
                     print("Error: try snap.data(as: Tag.self, with: .estimate)")
-                    return Tag(oderIndex: 1, tagName: "???", tagColor: "灰")
+                    return Tag(oderIndex: 1, tagName: "???", tagColor: .gray)
                 }
             }
 
             self.tags.sort { $0.oderIndex < $1.oderIndex }
 
             // firestoreからタグのfetch後、ローカル環境にALLと未グループを追加
-            self.tags.insert(Tag(oderIndex: 0, tagName: "ALL", tagColor: "灰"), at: 0)
-            self.tags.append(Tag(oderIndex: self.tags.count, tagName: "未グループ", tagColor: "灰"))
+            self.tags.insert(Tag(oderIndex: 0, tagName: "ALL", tagColor: .gray), at: 0)
+            self.tags.append(Tag(oderIndex: self.tags.count, tagName: "未グループ", tagColor: .gray))
 
             print("fetchTag完了")
 
@@ -131,24 +131,24 @@ class TagViewModel: ObservableObject {
         }
     }
 
-    func fetchUsedColor(tagName: String) -> UsedColor {
-
-        // タグ名からUsedColorを受け取る
-        if let itemRowTag = tags.first(where: { $0.tagName == tagName }) {
-
-            switch itemRowTag.tagColor {
-            case "赤": return .red
-            case "青": return .blue
-            case "黄": return .yellow
-            case "緑": return .green
-            default:
-                return .gray
-            }
-        } else {
-            return .gray
-        }
-
-    } // func castStringIntoColor
+//    func fetchUsedColor(tagName: String) -> UsedColor {
+//
+//        // タグ名からUsedColorを受け取る
+//        if let itemRowTag = tags.first(where: { $0.tagName == tagName }) {
+//
+//            switch itemRowTag.tagColor {
+//            case "赤": return .red
+//            case "青": return .blue
+//            case "黄": return .yellow
+//            case "緑": return .green
+//            default:
+//                return .gray
+//            }
+//        } else {
+//            return .gray
+//        }
+//
+//    } // func castStringIntoColor
 
     deinit {
         print("<<<<<<<<<  TagViewModel_deinit  >>>>>>>>>")

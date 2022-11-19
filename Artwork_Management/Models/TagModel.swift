@@ -13,10 +13,10 @@ struct Tag: Identifiable, Equatable, Codable {
     @DocumentID var id = UUID().uuidString
     var oderIndex: Int
     var tagName: String
-    var tagColor: String
+    var tagColor: UsedColor
 }
 
-enum UsedColor: CaseIterable {
+enum UsedColor: CaseIterable, Codable {
 
     case red
     case blue

@@ -38,6 +38,15 @@ struct EditItemView: View {
     let passItemData: Item?
     let editItemStatus: EditStatus
 
+    var tagColor: UsedColor {
+        let selectTag = tagVM.tags.filter({ $0.tagName == inputEdit.selectionTagName })
+        if let selectTag = selectTag.first {
+            return selectTag.tagColor
+        } else {
+            return .gray
+        }
+    }
+
     @State private var inputEdit: InputEditItem = InputEditItem()
     @State private var inputTag: InputTagSideMenu = InputTagSideMenu()
 
@@ -66,7 +75,8 @@ struct EditItemView: View {
                                    inputEdit: $inputEdit,
                                    isOpenEditTagSideMenu: $inputHome.isOpenEditTagSideMenu,
                                    editItemStatus: editItemStatus,
-                                   passItem: passItemData)
+                                   passItem: passItemData,
+                                   tagColor: tagColor)
 
                     } // VStack(パーツ全体)
                 } // ZStack(View全体)
@@ -138,6 +148,7 @@ struct EditItemView: View {
 
                             // NOTE: テストデータに新規アイテムを保存
                             let itemData = Item(tag: inputEdit.selectionTagName,
+                                                tagColor: tagColor,
                                                 name: inputEdit.editItemName,
                                                 detail: inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "メモなし",
                                                 photoURL: inputEdit.photoURL,
@@ -163,6 +174,7 @@ struct EditItemView: View {
                             // NOTE: アイテムを更新
                             let updateItemData = (Item(createTime: passItemData.createTime,
                                                        tag: inputEdit.selectionTagName,
+                                                       tagColor: tagColor,
                                                        name: inputEdit.editItemName,
                                                        detail: inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "メモなし",
                                                        photoURL: inputEdit.photoURL,
@@ -206,15 +218,7 @@ struct InputForms: View {
     // NOTE: enum「Status」を用いて、「.create」と「.update」とでViewレイアウトを分岐します。
     let editItemStatus: EditStatus
     let passItem: Item?
-
-    var tagColor: Color {
-        let selectTag = tagVM.tags.filter({ $0.tagName == inputEdit.selectionTagName })
-        if let selectTag = selectTag.first {
-            return tagVM.fetchUsedColor(tagName: selectTag.tagName).color
-        } else {
-            return .gray
-        }
-    }
+    let tagColor: UsedColor
 
     @FocusState private var focusedField: EditItemField?
 
@@ -228,8 +232,8 @@ struct InputForms: View {
 
                 HStack {
                     Image(systemName: "tag.fill")
-                        .foregroundColor(tagColor)
-                    Picker("", selection: $inputEdit.selectionTagName) {
+                        .foregroundColor(tagColor.color)
+                    Picker("タグネーム", selection: $inputEdit.selectionTagName) {
 
                         if passItem?.tag == tagVM.tags.last!.tagName {
 
