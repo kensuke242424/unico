@@ -12,11 +12,14 @@ import FirebaseFirestoreSwift
 
 class UserViewModel: ObservableObject {
 
+    init() {
+        print("<<<<<<<<<  UserViewModel_init  >>>>>>>>>")
+    }
+
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
     var uid = "sampleUserID(uid)"
 
     @Published var users: [User] = [User(id :"sampleUserID(uid)", name: "SampleUser", address: "kennsuke242424@gmail.com", password: "ninnzinn2424", iconURL: nil, iconPath: nil, teams: [])]
-
 
     func addUser(userData: User, groupID: String) {
 

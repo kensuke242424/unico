@@ -9,6 +9,10 @@ import Foundation
 
 class TeamViewModel: ObservableObject {
 
+    init() {
+        print("<<<<<<<<<  TeamViewModel_init  >>>>>>>>>")
+    }
+
     var teamID: String = "7gm2urHDCdZGCV9pX9ef"
 
 }

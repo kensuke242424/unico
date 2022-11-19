@@ -24,9 +24,15 @@ struct InputLogIn {
 // ✅ ログイン画面の親Viewです。
 struct LogInView: View {
 
+    @StateObject var teamVM: TeamViewModel = TeamViewModel()
+    @StateObject var userVM: UserViewModel = UserViewModel()
+    @StateObject var itemVM: ItemViewModel = ItemViewModel()
+    @StateObject var tagVM: TagViewModel = TagViewModel()
+
     @State private var logInNavigationPath: [LogInNavigation] = []
 
-    @State var groupID: String = "7gm2urHDCdZGCV9pX9ef"
+    @State private var startFetchContents: Bool = false
+    @State private var isShowProgressView: Bool = false
 
     // テスト用のダミーデータです。
     let testUser: User = TestUser().testUser
@@ -50,18 +56,25 @@ struct LogInView: View {
                     Spacer()
 
                     // ログイン画面のインフォメーション部品のカスタムView
-                    LogInInfomation(logInNavigationPath: $logInNavigationPath,
+                    LogInInfomation(startFetchContents: $startFetchContents,
                                     user: testUser)
 
                     Spacer()
 
                 } // VStack
+
+                if isShowProgressView {
+                    CustomProgressView()
+                }
             } // ZStack
             .navigationDestination(for: LogInNavigation.self) { destination in
 
                 switch destination {
                 case .home:
-                    HomeTabView()
+                    HomeTabView(teamVM: teamVM,
+                                userVM: userVM,
+                                itemVM: itemVM,
+                                tagVM: tagVM)
 
                 case .signUp:
                     FirstSignInView(logInNavigationPath: $logInNavigationPath,
@@ -69,6 +82,19 @@ struct LogInView: View {
                 }
             } // navigationDestination
         } // NavigationStack
+        .onChange(of: startFetchContents) { check in
+            if check {
+                Task {
+                    print("fetch開始")
+                    isShowProgressView = true
+                    await tagVM.fetchTag(teamID: teamVM.teamID)
+                    await itemVM.fetchItem(teamID: teamVM.teamID)
+                    print("fetch終了")
+                    isShowProgressView = false
+                    logInNavigationPath.append(.home)
+                }
+            }
+        }
     } // body
 } // View
 
@@ -78,14 +104,17 @@ struct RogoMark: View {
 
         VStack {
 
-            Image(systemName: "paragraphsign")
+            Image(systemName: "cube.transparent")
                 .resizable()
                 .scaledToFit()
+                .foregroundColor(.white.opacity(0.7))
                 .frame(width: 150, height: 150)
                 .padding()
 
-            Text("ArtWork Manage")
+            Text("unico")
+                .tracking(20)
                 .font(.title3)
+                .foregroundColor(.white.opacity(0.7))
                 .fontWeight(.heavy)
         } // VStack
     } // body
@@ -94,33 +123,42 @@ struct RogoMark: View {
 // ✅ログイン時の入力欄のカスタムViewです。
 struct LogInInfomation: View {
 
-    @Binding var logInNavigationPath: [LogInNavigation]
+    @Binding var startFetchContents: Bool
     let user: User
 
     @State private var input: InputLogIn = InputLogIn()
 
     var body: some View {
 
-        VStack(alignment: .leading) {
+        VStack {
 
             // 入力欄全体
             Group {
 
                 HStack {
                     Text("メールアドレス")
+                        .foregroundColor(.white.opacity(0.7))
 
                     if input.resultAddress == false {
                         Text("※該当するアドレスがありません。")
                             .font(.caption2)
                             .foregroundColor(.red)
                     }
-                } // HStack‚
+                } // HStack
+                .frame(width: getRect().width * 0.7, alignment: .leading)
 
-                TextField("artwork/@gmail.com", text: $input.address)
-                    .padding(.bottom)
+                RoundedRectangle(cornerRadius: 10).foregroundColor(.black.opacity(0.2))
+                    .frame(width: getRect().width * 0.7, height: 30)
+                    .overlay {
+                        TextField("artwork/@gmail.com", text: $input.address)
+                            .foregroundColor(.white)
+                            .padding()
+                    }
+                    .padding(.bottom, 20)
 
                 HStack {
                     Text("パスワード")
+                        .foregroundColor(.white.opacity(0.7))
 
                     if input.resultPassword == false {
                         Text("※パスワードが間違っています。")
@@ -128,27 +166,36 @@ struct LogInInfomation: View {
                             .foregroundColor(.red)
                     } // if
                 } // HStack
+                .frame(width: getRect().width * 0.7, alignment: .leading)
 
-                ZStack {
-                    if input.passHidden {
-                        SecureField("●●●●", text: $input.password)
-                    } else {
-                        TextField("●●●●", text: $input.password)
-                    } // if passHidden
+                RoundedRectangle(cornerRadius: 10).foregroundColor(.black.opacity(0.2))
+                    .frame(width: getRect().width * 0.7, height: 30)
+                    .overlay {
+                        ZStack(alignment: .leading) {
+                            if input.passHidden {
+                                SecureField("●●●●", text: $input.password)
+                                    .foregroundColor(.white)
+                                    .padding()
+                            } else {
+                                TextField("●●●●", text: $input.password)
+                                    .foregroundColor(.white)
+                                    .padding()
+                            } // if passHidden
 
-                    HStack {
-                        Spacer()
+                            HStack {
+                                Spacer()
 
-                        Button {
-                            input.passHidden.toggle()
-                        } label: {
-                            Image(systemName: input.passHidden ? "eye.slash.fill" : "eye.fill")
-                                .foregroundColor(.gray)
-                        } // Button
-                    } // HStack
-                    .padding(.horizontal)
-                } // ZStack
-
+                                Button {
+                                    input.passHidden.toggle()
+                                } label: {
+                                    Image(systemName: input.passHidden ? "eye.slash.fill" : "eye.fill")
+                                        .foregroundColor(.gray)
+                                } // Button
+                            } // HStack
+                            .padding(.horizontal)
+                        } // ZStack
+                    }
+                    .padding(.bottom, 10)
             } // Group(入力欄全体)
             .font(.subheadline)
             .autocapitalization(.none)
@@ -181,26 +228,25 @@ struct LogInInfomation: View {
 
                 // アドレス、パスワードが一致したらログイン、遷移
                 if input.resultAddress, input.resultPassword {
-                    logInNavigationPath.append(.home)
-                    print(logInNavigationPath)
+                    startFetchContents.toggle()
                 }
             }
             .buttonStyle(.borderedProminent)
 
             Group {
                 Button("初めての方はこちら>>") {
-                    logInNavigationPath.append(.signUp)
-                    print(logInNavigationPath)
+
+                    startFetchContents.toggle()
                 }
                 .foregroundColor(.blue)
                 .padding()
 
                 Text("- または -")
                     .padding()
+                    .foregroundColor(.white)
 
                 Button("試しに初めてみる") {
-                    logInNavigationPath.append(.home)
-                    print(logInNavigationPath)
+                    startFetchContents.toggle()
                 }
             } // Group
             .font(.subheadline)

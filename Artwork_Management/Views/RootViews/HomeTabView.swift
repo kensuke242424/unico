@@ -50,10 +50,10 @@ struct InputImage {
 
 struct HomeTabView: View {
 
-    @StateObject var teamVM: TeamViewModel = TeamViewModel()
-    @StateObject var userVM: UserViewModel = UserViewModel()
-    @StateObject var itemVM: ItemViewModel = ItemViewModel()
-    @StateObject var tagVM: TagViewModel = TagViewModel()
+    @StateObject var teamVM: TeamViewModel
+    @StateObject var userVM: UserViewModel
+    @StateObject var itemVM: ItemViewModel
+    @StateObject var tagVM: TagViewModel
     @State private var inputHome: InputHome = InputHome()
     @State private var inputImage: InputImage = InputImage()
     @State private var inputSideMenu: InputSideMenu = InputSideMenu()
@@ -284,12 +284,7 @@ struct HomeTabView: View {
         } // .onChange(cartState)
 
         .onAppear {
-            Task {
-                await tagVM.fetchTag(teamID: teamVM.teamID)
-                print("fetchTagメソッド終わり")
-                await itemVM.fetchItem(teamID: teamVM.teamID)
-                print("fetchItemメソッド終わり")
-            }
+            print("HomeTabView_onAppear")
         }
 
     } // body
@@ -349,7 +344,10 @@ struct HomeTabView_Previews: PreviewProvider {
                    windowScene.flatMap(ResizableSheetCenter.resolve(for:))
                }
 
-        return HomeTabView()
+        return HomeTabView(teamVM: TeamViewModel(),
+                           userVM: UserViewModel(),
+                           itemVM: ItemViewModel(),
+                           tagVM: TagViewModel())
             .environment(\.resizableSheetCenter, resizableSheetCenter)
 
     }

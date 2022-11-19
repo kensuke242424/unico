@@ -24,9 +24,16 @@ class TagViewModel: ObservableObject {
 
         print("fetchTag実行")
 
-        guard let tagsRef = db?.collection("teams/\(teamID)/tags") else { return }
+        guard let tagsRef = db?.collection("teams").document(teamID).collection("tags") else {
+            return
+        }
 
-        tagListener = tagsRef.addSnapshotListener { (snaps, _) in
+        tagListener = tagsRef.addSnapshotListener { (snaps, error) in
+
+            if let error = error {
+                print(error)
+                return
+            }
 
             guard let documents = snaps?.documents else {
                 print("Error: guard let documents = snap?.documents")
@@ -37,8 +44,6 @@ class TagViewModel: ObservableObject {
 
                 do {
                     return try snap.data(as: Tag.self, with: .estimate)
-
-                    // 先頭と末尾にタグを追加
                 } catch {
                     print("Error: try snap.data(as: Tag.self, with: .estimate)")
                     return Tag(oderIndex: 1, tagName: "???", tagColor: .gray)
@@ -50,10 +55,8 @@ class TagViewModel: ObservableObject {
             // firestoreからタグのfetch後、ローカル環境にALLと未グループを追加
             self.tags.insert(Tag(oderIndex: 0, tagName: "ALL", tagColor: .gray), at: 0)
             self.tags.append(Tag(oderIndex: self.tags.count, tagName: "未グループ", tagColor: .gray))
-
-            print("fetchTag完了")
-
         }
+        print("fetchTag終了")
     }
 
     func addTag(tagData: Tag, teamID: String) {

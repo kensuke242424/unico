@@ -9,6 +9,7 @@ import SwiftUI
 import ResizableSheet
 
 struct RootView: View {
+
     var windowScene: UIWindowScene? {
         let scenes = UIApplication.shared.connectedScenes
         let windowScene = scenes.first as? UIWindowScene
