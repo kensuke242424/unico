@@ -11,7 +11,6 @@ enum ButtonStyle {
     case library
     case stock
     case manege
-    case account
 }
 
 class ButtonViewModel: ObservableObject {
@@ -30,20 +29,16 @@ class ButtonViewModel: ObservableObject {
         switch style {
 
         case .library:
-            return ButtonIcon(icon: change ?  "" : "",
-                              badge: change ?  "" : "")
+            return ButtonIcon(icon: change ?  "magnifyingglass" : "magnifyingglass",
+                              badge: change ?  "circlebadge.fill" : "circlebadge.fill")
 
         case .stock:
             return ButtonIcon(icon: change ?  "magnifyingglass" : "magnifyingglass",
-                              badge: change ?  "" : "")
+                              badge: change ?  "circlebadge.fill" : "circlebadge.fill")
 
         case .manege:
-            return ButtonIcon(icon: change ? "shippingbox.fill" : "shippingbox.fill",
-                              badge: change ? "plus.circle.fill" : "plus.circle.fill")
-
-        case .account:
-            return ButtonIcon(icon: change ?  "" : "",
-                              badge: change ?  "" : "")
+            return ButtonIcon(icon: change ? "chart.bar.xaxis" : "chart.bar.xaxis",
+                              badge: change ? "circlebadge.fill" : "circlebadge.fill")
         } // switch
     } // func buttonStyleIcon
 
@@ -61,9 +56,6 @@ class ButtonViewModel: ObservableObject {
             return buttonStyle
         case 2:
             buttonStyle = .manege
-            return buttonStyle
-        case 3:
-            buttonStyle = .account
             return buttonStyle
         default:
             return buttonStyle

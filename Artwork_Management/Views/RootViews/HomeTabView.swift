@@ -8,7 +8,6 @@
 import SwiftUI
 import ResizableSheet
 
-// NOTE: アイテムの「追加」「更新」を管理します
 enum EditStatus {
     case create
     case update
@@ -19,17 +18,20 @@ enum UpdateImageStatus {
 }
 
 struct InputHome {
+    var switchElement: ElementStatus = .stock
     var homeTabIndex: Int = 0
     var actionItemIndex: Int = 0
-    var selectCaptureImage: UIImage? = UIImage()
+    var selectCaptureImage: UIImage = UIImage()
     var itemsInfomationOpacity: CGFloat = 0.0
     var basketInfomationOpacity: CGFloat = 0.0
     var showErrorFetchImage: Bool = false
     var isShowItemDetail: Bool = false
+    var isShowHomeTopNavigation: Bool = false
     var isPresentedEditItem: Bool = false
     var isOpenEditTagSideMenu: Bool = false
     var isShowSearchField: Bool = false
     var isShowSystemSideMenu: Bool = false
+    var isShowManageCustomSideMenu: Bool = false
     var editTagSideMenuBackground: Bool = false
     var sideMenuBackGround: Bool = false
     var isShowSelectImageSheet: Bool = false
@@ -42,19 +44,21 @@ struct InputHome {
 }
 
 struct InputImage {
-    var headerImage: UIImage? = nil
-    var iconImage: UIImage? = nil
-    var itemImage: UIImage? = nil
+    var homeHeaderURL: URL? = nil
+    var userColor: Color = .gray
 }
 
 struct HomeTabView: View {
 
-    @StateObject var userVM = UserViewModel()
-    @StateObject var rootItemVM = ItemViewModel()
+    @StateObject var userVM: UserViewModel = UserViewModel()
+    @StateObject var rootItemVM: ItemViewModel = ItemViewModel()
+    @StateObject var tagVM: TagViewModel = TagViewModel()
     @State private var inputHome: InputHome = InputHome()
     @State private var inputImage: InputImage = InputImage()
     @State private var inputSideMenu: InputSideMenu = InputSideMenu()
     @State private var inputTag: InputTagSideMenu = InputTagSideMenu()
+    @State private var inputManage: InputManageCustomizeSideMenu = InputManageCustomizeSideMenu()
+    @State private var cartAvertOffsetY: CGFloat = 0.0
 
     let userID: String
 
@@ -64,7 +68,9 @@ struct HomeTabView: View {
 
             TabView(selection: $inputHome.homeTabIndex) {
 
-                LibraryView(itemVM: rootItemVM, inputHome: $inputHome,
+                LibraryView(itemVM: rootItemVM,
+                            tagVM: tagVM,
+                            inputHome: $inputHome,
                             inputImage: $inputImage)
                     .tabItem {
                         Image(systemName: "house")
@@ -72,14 +78,22 @@ struct HomeTabView: View {
                     }
                     .tag(0)
 
-                StockView(itemVM: rootItemVM, inputHome: $inputHome, inputImage: $inputImage, userID: userID)
+                StockView(itemVM: rootItemVM,
+                          tagVM: tagVM,
+                          inputHome: $inputHome,
+                          inputImage: $inputImage,
+                          userID: userID)
                     .tabItem {
                         Image(systemName: "shippingbox.fill")
                         Text("inventory")
                     }
                     .tag(1)
 
-                ManageView(itemVM: rootItemVM, inputHome: $inputHome, inputImage: $inputImage)
+                ManageView(itemVM: rootItemVM,
+                           tagVM: tagVM,
+                           inputHome: $inputHome,
+                           inputImage: $inputImage,
+                           inputManage: $inputManage)
                     .tabItem {
                         Image(systemName: "chart.xyaxis.line")
                         Text("Manage")
@@ -88,13 +102,33 @@ struct HomeTabView: View {
 
             } // TabViewここまで
 
-            UsefulButton(inputHome: $inputHome)
+            Group {
 
-            if rootItemVM.items.count != 0 {
+                UsefulButton(inputHome: $inputHome)
+                    .offset(x: UIScreen.main.bounds.width / 3,
+                            y: UIScreen.main.bounds.height / 3 - 5)
+                    .offset(y: cartAvertOffsetY)
+
+                ElementSwitchingPickerView(switchElement: $inputHome.switchElement, tabIndex: $inputHome.homeTabIndex)
+                    .offset(y: getRect().height / 2 - getSafeArea().bottom - 110)
+                    .offset(y: cartAvertOffsetY)
+
+                NavigationHeader(inputHome: $inputHome, photoURL: userVM.users[0].iconURL)
+                    .opacity(!inputHome.isShowHomeTopNavigation &&
+                             inputHome.homeTabIndex == 0 &&
+                             inputImage.homeHeaderURL != nil
+                             ? 0.0 : 1.0)
+            }
+
+            ManageCustomizeSideMenu(inputManage: $inputManage, isOpen: $inputHome.isShowManageCustomSideMenu)
+                .offset(x: getRect().width, y: -40)
+                .offset(x: inputHome.isShowManageCustomSideMenu ? -170 : 50)
+                .opacity(inputHome.homeTabIndex == 2 ? 1.0 : 0.0)
+
+            if inputHome.isShowItemDetail {
                 ShowsItemDetail(itemVM: rootItemVM,
                                 inputHome: $inputHome,
                                 item: rootItemVM.items[inputHome.actionItemIndex])
-                .opacity(inputHome.isShowItemDetail ? 1.0 : 0.0)
             }
 
             // sideMenu_background...
@@ -111,6 +145,7 @@ struct HomeTabView: View {
                 }
 
             SystemSideMenu(itemVM: rootItemVM,
+                           tagVM: tagVM,
                            inputHome: $inputHome,
                            inputImage: $inputImage,
                            inputTag: $inputTag,
@@ -120,7 +155,8 @@ struct HomeTabView: View {
             // sideMenu_background...
             Color.black
                 .ignoresSafeArea()
-                .opacity(inputHome.editTagSideMenuBackground ? 0.4 : 0)
+                .background(.ultraThinMaterial)
+                .opacity(inputHome.editTagSideMenuBackground ? 0.7 : 0)
                 .onTapGesture {
                     withAnimation(.spring(response: 0.4, blendDuration: 1)) {
                         inputHome.editTagSideMenuBackground.toggle()
@@ -131,8 +167,12 @@ struct HomeTabView: View {
                 }
 
             // Open TagSideMenu...
-            SideMenuEditTagView(itemVM: rootItemVM, inputHome: $inputHome, inputTag: $inputTag,
-                                defaultTag: inputTag.tagSideMenuStatus == .create ? nil : inputSideMenu.selectTag, tagSideMenuStatus: inputTag.tagSideMenuStatus)
+            SideMenuEditTagView(itemVM: rootItemVM,
+                                tagVM: tagVM,
+                                inputHome: $inputHome,
+                                inputTag: $inputTag,
+                                defaultTag: inputTag.tagSideMenuStatus == .create ? nil : inputSideMenu.selectTag,
+                                tagSideMenuStatus: inputTag.tagSideMenuStatus)
             .offset(x: inputHome.isOpenEditTagSideMenu ? UIScreen.main.bounds.width / 2 - 25 : UIScreen.main.bounds.width + 10)
 
             VStack {
@@ -178,6 +218,7 @@ struct HomeTabView: View {
 
         .sheet(isPresented: $inputHome.isPresentedEditItem) {
             EditItemView(itemVM: rootItemVM,
+                         tagVM: tagVM,
                          inputHome: $inputHome,
                          inputImage: $inputImage,
                          userID: userID,
@@ -196,43 +237,95 @@ struct HomeTabView: View {
         // convert UIImage ⇨ base64String...
         .onChange(of: inputHome.selectCaptureImage) { newImage in
 
-            guard let base64StringImage = newImage?.toBase64String() else {
-                inputHome.showErrorFetchImage.toggle()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                    inputHome.showErrorFetchImage.toggle()
-                }
-                return
-            }
-
             switch inputHome.updateImageStatus {
             case .item:
                 print("別のブランチでInputHomeにactionItemIndexが格納されているため、マージ後そちらを使用して更新")
+                Task {
+                    let uploadImage =  await rootItemVM.uploadImage(newImage, uid: userID)
+                    print(uploadImage)
+                    rootItemVM.items[inputHome.actionItemIndex].photoURL = uploadImage.url
+                }
+
             case .icon:
                 guard userVM.users.first != nil else { return }
-                userVM.users[0].iconImage = base64StringImage
-                inputImage.iconImage = userVM.users.first!.iconImage.toImage()
+                Task {
+                    let uploadImage =  await rootItemVM.uploadImage(newImage, uid: userID)
+                    print(uploadImage)
+                    userVM.users[0].iconURL = uploadImage.url
+                }
 
             case .header:
-                guard userVM.users.first != nil else { return }
-                userVM.users[0].headerImage = base64StringImage
-                inputImage.headerImage = userVM.users.first!.headerImage.toImage()
+                Task {
+                    let uploadImage =  await rootItemVM.uploadImage(newImage, uid: userID)
+                    print(uploadImage)
+                    inputImage.homeHeaderURL = uploadImage.url
+                }
 
             }
         }
 
+        .onChange(of: inputHome.cartHalfSheet) { _ in
+            withAnimation(.easeOut(duration: 0.3)) {
+                switch inputHome.cartHalfSheet {
+                case .hidden: cartAvertOffsetY = 0.0
+                case .medium: cartAvertOffsetY = -60.0
+                case .large: cartAvertOffsetY = -60.0
+                }
+            }
+        } // .onChange(cartState)
+
         .onAppear {
-            // fetch itemData
-            rootItemVM.fetchItem(userID: userID)
-            rootItemVM.resetAmount()
-            guard userVM.users.first != nil else { return }
-            inputImage.headerImage = userVM.users.first!.headerImage.toImage()
+            Task {
+                await tagVM.fetchTag(groupID: tagVM.groupID)
+                print("fetchTagメソッド終わり")
+                await rootItemVM.fetchItem()
+                print("fetchItemメソッド終わり")
+            }
         }
-        .onDisappear {
-            print("MessageView_Disappear.")
-            rootItemVM.listener?.remove()
-        }
+
     } // body
 } // View
+
+struct NavigationHeader: View {
+
+    @Binding var inputHome: InputHome
+    let photoURL: URL?
+
+    var body: some View {
+
+            HStack {
+                Button {
+                    withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+                        inputHome.isShowSystemSideMenu.toggle()
+                    }
+                    withAnimation(.easeIn(duration: 0.2)) {
+                        inputHome.sideMenuBackGround.toggle()
+                    }
+                } label: {
+                    CircleIcon(photoURL: photoURL, size: getSafeArea().top - 20)
+                }
+
+                Spacer()
+
+                Button {
+                    inputHome.editItemStatus = .create
+                    inputHome.isPresentedEditItem.toggle()
+                } label: {
+                    Image(systemName: "shippingbox.fill")
+                        .resizable()
+                        .frame(width: 20, height: 20)
+                        .overlay(alignment: .topTrailing) {
+                            Image(systemName: "plus.circle.fill")
+                                .resizable()
+                                .frame(width: 10, height: 10)
+                                .offset(x: 7, y: -7)
+                        }
+                }
+            } // HStack
+            .padding(.horizontal)
+            .offset(y: -getRect().height / 2 + getSafeArea().top)
+    }
+}
 
 struct HomeTabView_Previews: PreviewProvider {
 

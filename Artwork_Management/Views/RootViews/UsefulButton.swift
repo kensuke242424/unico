@@ -14,7 +14,6 @@ struct UsefulButton: View {
 
     @Binding var inputHome: InputHome
 
-    @State private var offsetY: CGFloat = 0.0
     @State private var opacity: CGFloat = 0.0
     @State private var change: Bool = false
     @State private var buttonStyle: ButtonStyle = .stock
@@ -37,34 +36,19 @@ struct UsefulButton: View {
 
             case .manege:
                 print("manege画面ボタンアクション実行")
-                inputHome.editItemStatus = .create
-                inputHome.isPresentedEditItem.toggle()
-
-            case .account:
-                print("account画面ボタンアクション実行")
+                withAnimation(.spring(response: 0.4, blendDuration: 1)) {
+                    inputHome.isShowManageCustomSideMenu.toggle()
+                }
             } // switch
 
         } label: {
 
             // ✅カスタムView
-            ButtonStyleView(buttonIcon: buttonIcon, buttonStyle: buttonStyle)
+            ButtonStyleView(inputHome: $inputHome, buttonIcon: buttonIcon, buttonStyle: buttonStyle)
 
         } // Button
-        .offset(x: UIScreen.main.bounds.width / 3 - 5,
-                y: UIScreen.main.bounds.height / 3 - 10)
-        .offset(y: offsetY)
         .opacity(opacity)
         .animation(.easeIn(duration: 0.1), value: opacity)
-
-        .onChange(of: inputHome.cartHalfSheet) { _ in
-            withAnimation(.easeOut(duration: 0.3)) {
-                switch inputHome.cartHalfSheet {
-                case .hidden: offsetY = 0.0
-                case .medium: offsetY = -60.0
-                case .large: offsetY = -60.0
-                }
-            }
-        } // .onChange(cartState)
 
         .onChange(of: inputHome.homeTabIndex) { newIndex in
             buttonStyle = buttonVM.buttonStyleChenged(tabIndex: newIndex)
@@ -81,6 +65,7 @@ struct UsefulButton: View {
 
 struct ButtonStyleView: View {
 
+    @Binding var inputHome: InputHome
     let buttonIcon: ButtonIcon
     let buttonStyle: ButtonStyle
 
@@ -103,6 +88,8 @@ struct ButtonStyleView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 35, height: 35)
+                        .opacity(inputHome.homeTabIndex == 2 && inputHome.isShowManageCustomSideMenu ? 0.3 : 1.0)
+                        .opacity(inputHome.homeTabIndex == 1 && inputHome.isShowSearchField ? 0.3 : 1.0)
                         .shadow(radius: 10, x: 3, y: 5)
 
                     // アイコン右上に付くバッジ
@@ -110,8 +97,15 @@ struct ButtonStyleView: View {
                             Image(systemName: buttonIcon.badge)
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 18, height: 18)
+                                .frame(width: 14, height: 14)
+                                .foregroundColor(.green)
+                                .overlay {
+                                    Circle()
+                                        .stroke(Color.yellow, lineWidth: 1)
+//                                        .blur(radius: 10)
+                                }
                                 .offset(x: 10, y: -10)
+                                .opacity(inputHome.homeTabIndex == 2 && inputHome.isShowManageCustomSideMenu ? 0.8 : 0.0)
                         } // overlay
 
                         .overlay {

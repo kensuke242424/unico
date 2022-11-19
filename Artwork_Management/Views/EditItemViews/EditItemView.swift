@@ -9,9 +9,9 @@ import SwiftUI
 
 struct InputEditItem {
 
+    var captureImage: UIImage = UIImage()
     var selectionTagName: String = ""
-    var selectionTagColor: UsedColor = .red
-    var photoURL: String = ""  // Todo: 写真取り込み機能追加後使用
+    var photoURL: URL? = nil
     var editItemName: String = ""
     var editItemInventory: String = ""
     var editItemCost: String = ""
@@ -23,11 +23,13 @@ struct InputEditItem {
     var disableButton: Bool = true
     var offset: CGFloat = 0
     var isCheckedFocuseDetail: Bool = false
+    var isShowItemImageSelectSheet: Bool = false
 }
 
 struct EditItemView: View {
 
     @StateObject var itemVM: ItemViewModel
+    @StateObject var tagVM: TagViewModel
     @Binding var inputHome: InputHome
     @Binding var inputImage: InputImage
 
@@ -35,6 +37,15 @@ struct EditItemView: View {
     let itemIndex: Int
     let passItemData: Item?
     let editItemStatus: EditStatus
+
+    var tagColor: UsedColor {
+        let selectTag = tagVM.tags.filter({ $0.tagName == inputEdit.selectionTagName })
+        if let selectTag = selectTag.first {
+            return selectTag.tagColor
+        } else {
+            return .gray
+        }
+    }
 
     @State private var inputEdit: InputEditItem = InputEditItem()
     @State private var inputTag: InputTagSideMenu = InputTagSideMenu()
@@ -56,13 +67,16 @@ struct EditItemView: View {
                         .offset(y: 340)
                     VStack {
                         // ✅カスタムView 写真ゾーン
-                        EditItemPhotoArea(item: passItemData)
+                        EditItemPhotoArea(showImageSheet: $inputEdit.isShowItemImageSelectSheet,
+                                          photoURL: inputEdit.photoURL)
 
                         InputForms(itemVM: itemVM,
+                                   tagVM: tagVM,
                                    inputEdit: $inputEdit,
                                    isOpenEditTagSideMenu: $inputHome.isOpenEditTagSideMenu,
                                    editItemStatus: editItemStatus,
-                                   passItem: passItemData)
+                                   passItem: passItemData,
+                                   tagColor: tagColor)
 
                     } // VStack(パーツ全体)
                 } // ZStack(View全体)
@@ -70,14 +84,10 @@ struct EditItemView: View {
 
             } // ScrollView
 
-            .onChange(of: inputEdit.selectionTagName) { selection in
-
-                // NOTE: 選択されたタグネームと紐づいたタグカラーを取り出し、selectionTagColorに格納します。
-                let searchedTagColor = itemVM.searchSelectTagColor(selectTagName: selection,
-                                                                   tags: itemVM.tags)
-                withAnimation(.easeIn(duration: 0.25)) {
-                    inputEdit.selectionTagColor = searchedTagColor
-                }
+            .sheet(isPresented: $inputEdit.isShowItemImageSelectSheet) {
+                PHPickerView(captureImage: $inputEdit.captureImage,
+                             isShowSheet: $inputEdit.isShowItemImageSelectSheet,
+                             isShowError: $inputHome.showErrorFetchImage)
             }
 
             .onChange(of: inputEdit.editItemName) { newValue in
@@ -91,6 +101,15 @@ struct EditItemView: View {
                 }
             } // onChange(ボタンdisable分岐)
 
+            .onChange(of: inputEdit.captureImage) { newImage in
+
+                Task {
+                    let uploadImage =  await itemVM.uploadImage(newImage, uid: userID)
+                    print(uploadImage)
+                    inputEdit.photoURL = uploadImage.url
+                }
+            }
+
             // NOTE: updateitemView呼び出し時に、親Viewから受け取ったアイテム情報を各入力欄に格納します。
             .onAppear {
 
@@ -98,7 +117,7 @@ struct EditItemView: View {
                 if let passItemData = passItemData {
 
                     inputEdit.selectionTagName = passItemData.tag
-                    inputEdit.photoURL = passItemData.photo
+                    inputEdit.photoURL = passItemData.photoURL
                     inputEdit.editItemName = passItemData.name
                     inputEdit.editItemInventory = String(passItemData.inventory)
                     inputEdit.editItemCost = String(passItemData.cost)
@@ -110,7 +129,7 @@ struct EditItemView: View {
 
                 } else {
                     // tags[0]には"ALL"があるため、一つ飛ばして[1]を初期値として代入
-                    inputEdit.selectionTagName = itemVM.tags[1].tagName
+                    inputEdit.selectionTagName = tagVM.tags[1].tagName
                 }
 
             } // onAppear
@@ -127,21 +146,19 @@ struct EditItemView: View {
 
                         case .create:
 
-                            guard let inputPrice = Int(inputEdit.editItemPrice) else { return }
-                            guard let inputInventory = Int(inputEdit.editItemInventory) else { return }
-
                             // NOTE: テストデータに新規アイテムを保存
-                            let itemData = (Item(tag: inputEdit.selectionTagName,
-                                                 name: inputEdit.editItemName,
-                                                 detail: inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "メモなし",
-                                                 photo: "", // Todo: 写真取り込み実装後、変更
-                                                 cost: 0,
-                                                 price: inputPrice,
-                                                 amount: 0,
-                                                 sales: 0,
-                                                 inventory: inputInventory,
-                                                 totalAmount: 0,
-                                                 totalInventory: inputInventory))
+                            let itemData = Item(tag: inputEdit.selectionTagName,
+                                                tagColor: tagColor,
+                                                name: inputEdit.editItemName,
+                                                detail: inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "メモなし",
+                                                photoURL: inputEdit.photoURL,
+                                                cost: 0,
+                                                price: Int(inputEdit.editItemPrice) ?? 0,
+                                                amount: 0,
+                                                sales: 0,
+                                                inventory: Int(inputEdit.editItemInventory) ??  0,
+                                                totalAmount: 0,
+                                                totalInventory: Int(inputEdit.editItemInventory) ?? 0)
 
                             // Firestoreにコーダブル保存
                             itemVM.addItem(itemData: itemData, tag: inputEdit.selectionTagName, userID: userID)
@@ -152,21 +169,19 @@ struct EditItemView: View {
 
                             guard let passItemData = passItemData else { return }
                             guard let defaultDataID = passItemData.id else { return }
-                            guard let editPrice = Int(inputEdit.editItemPrice) else { return }
-                            guard let editSales = Int(inputEdit.editItemSales) else { return }
-                            guard let editCost = Int(inputEdit.editItemCost) else { return }
-                            guard let editInventory = Int(inputEdit.editItemInventory) else { return }
+                            let editInventory = Int(inputEdit.editItemInventory) ?? 0
 
                             // NOTE: アイテムを更新
                             let updateItemData = (Item(createTime: passItemData.createTime,
                                                        tag: inputEdit.selectionTagName,
+                                                       tagColor: tagColor,
                                                        name: inputEdit.editItemName,
                                                        detail: inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "メモなし",
-                                                       photo: inputEdit.photoURL != "" ? inputEdit.photoURL : "", // Todo: 写真取り込み実装後、変更
-                                                       cost: editCost,
-                                                       price: editPrice,
+                                                       photoURL: inputEdit.photoURL,
+                                                       cost: Int(inputEdit.editItemCost) ?? 0,
+                                                       price: Int(inputEdit.editItemPrice) ?? 0,
                                                        amount: 0,
-                                                       sales: editSales,
+                                                       sales: Int(inputEdit.editItemSales) ?? 0,
                                                        inventory: editInventory,
                                                        totalAmount: passItemData.totalAmount,
                                                        totalInventory: passItemData.inventory < editInventory ?
@@ -196,12 +211,14 @@ struct InputForms: View {
     }
 
     @StateObject var itemVM: ItemViewModel
+    @StateObject var tagVM: TagViewModel
     @Binding var inputEdit: InputEditItem
     @Binding var isOpenEditTagSideMenu: Bool
 
     // NOTE: enum「Status」を用いて、「.create」と「.update」とでViewレイアウトを分岐します。
     let editItemStatus: EditStatus
     let passItem: Item?
+    let tagColor: UsedColor
 
     @FocusState private var focusedField: EditItemField?
 
@@ -215,21 +232,21 @@ struct InputForms: View {
 
                 HStack {
                     Image(systemName: "tag.fill")
-                        .foregroundColor(inputEdit.selectionTagColor.color)
-                    Picker("", selection: $inputEdit.selectionTagName) {
+                        .foregroundColor(tagColor.color)
+                    Picker("タグネーム", selection: $inputEdit.selectionTagName) {
 
-                        if passItem?.tag == itemVM.tags.last!.tagName {
+                        if passItem?.tag == tagVM.tags.last!.tagName {
 
-                            ForEach(itemVM.tags) { tag in
-                                if tag != itemVM.tags.first! {
+                            ForEach(tagVM.tags) { tag in
+                                if tag != tagVM.tags.first! {
                                     Text(tag.tagName).tag(tag.tagName)
                                 }
                             }
 
                         } else {
 
-                            ForEach(itemVM.tags) { tag in
-                                if tag != itemVM.tags.first! && tag != itemVM.tags.last! {
+                            ForEach(tagVM.tags) { tag in
+                                if tag != tagVM.tags.first! && tag != tagVM.tags.last! {
                                     Text(tag.tagName).tag(tag.tagName)
                                 }
                             }
@@ -338,7 +355,7 @@ struct InputForms: View {
 
         } // VStack(入力フォーム全体)
         .padding(.vertical, 20)
-        .padding(.horizontal, 20)
+        .padding(.horizontal, 40)
         .onTapGesture { focusedField = nil }
     }
 }
@@ -352,6 +369,7 @@ private struct OffsetPreferenceKey: PreferenceKey, Equatable {
 struct EditItemView_Previews: PreviewProvider {
     static var previews: some View {
         EditItemView(itemVM: ItemViewModel(),
+                     tagVM: TagViewModel(),
                      inputHome: .constant(InputHome()),
                      inputImage: .constant(InputImage()),
                      userID: "AAAAAAAAAAAA",

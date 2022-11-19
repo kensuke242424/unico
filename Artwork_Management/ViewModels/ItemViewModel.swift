@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseStorage
 import FirebaseFirestore
 import FirebaseFirestoreSwift
 
@@ -16,26 +17,20 @@ class ItemViewModel: ObservableObject {
     var listener: ListenerRegistration?
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
 
-    // NOTE: アイテム、タグのテストデータです
-     @Published var items: [Item] = []
+    var groupID: String = "7gm2urHDCdZGCV9pX9ef"
 
-    @Published var tags: [Tag] =
-    [
-        Tag(tagName: "ALL", tagColor: .gray),
-        Tag(tagName: "Clothes", tagColor: .red),
-        Tag(tagName: "Shoes", tagColor: .blue),
-        Tag(tagName: "タオル", tagColor: .blue),
-        Tag(tagName: "Goods", tagColor: .yellow),
-        Tag(tagName: "未グループ", tagColor: .gray)
-    ]
+    @Published var items: [Item] = []
 
-    func fetchItem(userID: String) {
+    func fetchItem() async {
 
         print("fetchItem実行")
 
-        guard db != nil else { return }
+        guard let itemsRef = db?.collection("groups").document(groupID).collection("items") else {
+            print("error: guard let tagsRef")
+            return
+        }
 
-        listener = db!.collection("items").addSnapshotListener { (snap, _) in
+        listener = itemsRef.addSnapshotListener { (snap, _) in
 
             guard let documents = snap?.documents else {
                 print("Error: guard let documents = snap?.documents")
@@ -56,10 +51,13 @@ class ItemViewModel: ObservableObject {
 
         print("addItem実行")
 
-        guard db != nil else { return }
+        guard let itemsRef = db?.collection("groups").document(groupID).collection("items") else {
+            print("error: guard let tagsRef")
+            return
+        }
 
         do {
-            _ = try db!.collection("items").addDocument(from: itemData)
+            _ = try itemsRef.addDocument(from: itemData)
         } catch {
             print("Error: try db!.collection(collectionID).addDocument(from: itemData)")
         }
@@ -70,11 +68,16 @@ class ItemViewModel: ObservableObject {
 
         print("updateItem実行")
 
-        guard  let reference = db?.collection("items").document(defaultDataID) else { print("Error: guard  let reference"); return }
+        print(defaultDataID)
+
+        guard let updateItemRef = db?.collection("groups").document(groupID).collection("items").document(defaultDataID) else {
+            print("error: guard let tagsRef")
+            return
+        }
 
         do {
 
-            try reference.setData(from: updateData)
+            try updateItemRef.setData(from: updateData)
 
         } catch {
             print("updateItem失敗")
@@ -82,8 +85,38 @@ class ItemViewModel: ObservableObject {
         print("updateItem完了")
     }
 
+    func deleteItem(deleteItem: Item) {
+
+        guard let itemID = deleteItem.id else { return }
+        guard let itemRef = db?.collection("groups").document(groupID).collection("items").document(itemID) else {
+            print("error: deleteItem_guard let ItemRef")
+            return
+        }
+
+        itemRef.delete()
+    }
+
+    func uploadImage(_ image: UIImage, uid: String) async -> (url: URL?, filePath: String?) {
+
+        guard let imageData = image.jpegData(compressionQuality: 0.8) else {
+            return (url: nil, filePath: nil)
+        }
+
+        do {
+            let storage = Storage.storage()
+            let reference = storage.reference()
+            let filePath = "\(uid)/images/\(Date()).jpeg"
+            let imageRef = reference.child(filePath)
+            _ = try await imageRef.putDataAsync(imageData)
+            let url = try await imageRef.downloadURL()
+
+            return (url: url, filePath: filePath)
+        } catch {
+            return (url: nil, filePath: nil)
+        }
+    }
+
     func resetAmount() {
-        print("resetAmount実行")
 
         guard let reference = db?.collection("items") else { print("Error: guard db != nil"); return }
 
@@ -110,7 +143,10 @@ class ItemViewModel: ObservableObject {
 
         print("updateCommerse実行")
 
-        guard let reference = db?.collection("items") else { print("Error: guard db != nil"); return }
+        guard let itemsRef = db?.collection("groups").document(groupID).collection("items") else {
+            print("error: guard let tagsRef")
+            return
+        }
 
         for item in items where item.amount != 0 {
 
@@ -128,7 +164,7 @@ class ItemViewModel: ObservableObject {
             item.amount = 0
 
             do {
-                try reference.document(itemID).setData(from: item)
+                try itemsRef.document(itemID).setData(from: item)
             } catch {
                 print("Error: 「\(item.name)」try reference.document(itemID).setData(from: item)")
             }
@@ -136,70 +172,77 @@ class ItemViewModel: ObservableObject {
         print("updateCommerse完了")
     }
 
-    func itemsSort(sort: SortType, items: [Item]) -> [Item] {
+    func itemsUpDownOderSort() {
 
-        print("＝＝＝＝＝＝＝＝itemsSortメソッド実行＝＝＝＝＝＝＝＝＝＝")
-
-        // NOTE: 更新可能なvar値として再格納しています
-        var varItems = items
-
-        switch sort {
-
-        case .salesUp:
-            varItems.sort { $0.sales > $1.sales }
-        case .salesDown:
-            varItems.sort { $0.sales < $1.sales }
-        case .createAtUp:
-            print("createAtUp ⇨ Timestampが格納され次第、実装します。")
-        case .updateAtUp:
-            print("updateAtUp ⇨ Timestampが格納され次第、実装します。")
-        case .start:
-            print("起動時の初期値です")
-        }
-
-        return varItems
+        items.reverse()
     }
 
-    func searchSelectTagColor(selectTagName: String, tags: [Tag]) -> UsedColor {
+    func itemsValueSort(order: UpDownOrder, status: IndicatorValueStatus) {
 
-        let filterTag = tags.filter { $0.tagName == selectTagName }
+        switch order {
 
-        if let firstFilterTag = filterTag.first {
+        case .up:
 
-            return firstFilterTag.tagColor
+            switch status {
+            case .stock:
+                items.sort(by: { $0.inventory > $1.inventory })
+            case .price:
+                items.sort(by: { $0.price > $1.price })
+            case .sales:
+                items.sort(by: { $0.sales > $1.sales })
+            }
 
-        } else {
-            return.gray
+        case .down:
+
+            switch status {
+            case .stock:
+                items.sort(by: { $0.inventory < $1.inventory })
+            case .price:
+                items.sort(by: { $0.price < $1.price })
+            case .sales:
+                items.sort(by: { $0.sales < $1.sales })
+            }
         }
-    } // func castStringIntoColor
+    }
 
-    func updateTagsData(itemVM: ItemViewModel,
-                        defaultTag: Tag,
-                        newTagName: String,
-                        newTagColor: UsedColor) {
+    func itemsNameSort(order: UpDownOrder) {
 
-        for (index, tagData) in itemVM.tags.enumerated()
-        where tagData.tagName == defaultTag.tagName {
+        switch order {
 
-            itemVM.tags[index] = Tag(tagName: newTagName,
-                                     tagColor: newTagColor)
+        case .up:
+            items.sort(by: { $0.name > $1.name })
 
-        } // for where
-    } // func updateTagsData
+        case .down:
+            items.sort(by: { $0.name < $1.name })
+        }
+    }
 
-    func updateItemsTagData(itemVM: ItemViewModel,
-                            defaultTag: Tag,
-                            newTagName: String,
-                            newTagColorString: String) {
+    func itemsCreateTimeSort(order: UpDownOrder) {
 
-        // NOTE: アイテムデータ内の更新対象タグを取り出して、同じタググループアイテムをまとめて更新します。
-        for (index, itemData) in itemVM.items.enumerated()
-        where itemData.tag == defaultTag.tagName {
+        switch order {
+        case .up:
+            items.sort { before, after in
+                before.createTime!.dateValue() > after.createTime!.dateValue() ? true : false
+            }
+        case .down:
+            items.sort { before, after in
+                before.createTime!.dateValue() < after.createTime!.dateValue() ? true : false
+            }
+        }
+    }
 
-            itemVM.items[index].tag = newTagName
-
-        } // for where
-    } // func updateItemsTagData
+    func itemsUpdateTimeSort(order: UpDownOrder) {
+        switch order {
+        case .up:
+            items.sort { before, after in
+                before.updateTime!.dateValue() > after.updateTime!.dateValue() ? true : false
+            }
+        case .down:
+            items.sort { before, after in
+                before.updateTime!.dateValue() < after.updateTime!.dateValue() ? true : false
+            }
+        }
+    }
 
     deinit {
 
@@ -208,18 +251,3 @@ class ItemViewModel: ObservableObject {
     }
 
 } // class
-
-struct TestItem {
-
-    var testItem: Item = Item(tag: "Clothes",
-                              name: "カッターシャツ(白)",
-                              detail: "シャツ(白)のアイテム紹介テキストです。",
-                              photo: "cloth_sample1",
-                              cost: 1000,
-                              price: 2800,
-                              amount: 0,
-                              sales: 128000,
-                              inventory: 2,
-                              totalAmount: 120,
-                              totalInventory: 200)
-}

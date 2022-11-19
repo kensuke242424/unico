@@ -24,6 +24,7 @@ struct SideMenuEditTagView: View {
     }
 
     @StateObject var itemVM: ItemViewModel
+    @StateObject var tagVM: TagViewModel
     @Binding var inputHome: InputHome
     @Binding var inputTag: InputTagSideMenu
     let defaultTag: Tag?
@@ -41,8 +42,8 @@ struct SideMenuEditTagView: View {
             .overlay {
 
                 RoundedRectangle(cornerRadius: 20)
+                    .background(.ultraThinMaterial).clipShape(RoundedRectangle(cornerRadius: 20))
                     .foregroundColor(Color.customDarkGray2).opacity(0.9)
-                    .blur(radius: 10)
                     .frame(width: screenSize.width, height: screenSize.height * 0.65)
                     .onTapGesture { focusedField = nil }
                     .overlay(alignment: .bottomLeading) {
@@ -159,24 +160,28 @@ struct SideMenuEditTagView: View {
                             .lineLimit(1)
                             .padding(.bottom)
 
-                        IndicatorRow(salesValue: 170000,
-                                     tagColor: inputTag.selectionSideMenuTagColor)
+                        Rectangle()
+                            .foregroundColor(inputTag.selectionSideMenuTagColor.color).opacity(0.5)
+                            .frame(width: 200, height: 15, alignment: .leading)
 
                         Button {
+                            print(tagSideMenuStatus)
                             switch inputTag.tagSideMenuStatus {
 
                             case .create:
                                 // NOTE: 既存のタグと重複していないかを確認します。重複していればアラート表示
-                                if itemVM.tags.contains(where: { $0.tagName == inputTag.newTagNameText }) {
+                                if tagVM.tags.contains(where: { $0.tagName == inputTag.newTagNameText }) {
                                     print(".create エラー inputTag.newTagNameText: \(inputTag.newTagNameText)")
                                     inputTag.overlapTagNameAlert.toggle()
                                     return
                                 }
-                                // 新規タグデータを追加、配列の2番目に保存(at: 1) 0は"ALL"タグ
-                                withAnimation {
-                                    itemVM.tags.insert(Tag(tagName: inputTag.newTagNameText,
-                                                           tagColor: inputTag.selectionSideMenuTagColor), at: 1)
-                                }
+
+                                let newTagData = Tag(oderIndex: tagVM.tags.count - 1,
+                                                     tagName: inputTag.newTagNameText,
+                                                     tagColor: inputTag.selectionSideMenuTagColor)
+
+                                // タグをfirestoreに追加
+                                tagVM.addTag(tagData: newTagData, groupID: tagVM.groupID)
 
                                 withAnimation(.easeIn(duration: 0.2)) {
                                     inputHome.isOpenEditTagSideMenu.toggle()
@@ -188,30 +193,25 @@ struct SideMenuEditTagView: View {
 
                             case .update:
 
-                                guard let unwrappedDefaultTag = defaultTag else {
+                                guard let defaultTagData = defaultTag else {
                                     print("更新対象タグの取得エラー！！")
                                     return
                                 }
 
-                                if unwrappedDefaultTag.tagName != inputTag.newTagNameText {
-                                    if itemVM.tags.contains(where: { $0.tagName == inputTag.newTagNameText }) {
+                                if defaultTagData.tagName != inputTag.newTagNameText {
+                                    if tagVM.tags.contains(where: { $0.tagName == inputTag.newTagNameText }) {
                                         print(".create タグネーム重複 inputTag.newTagNameText: \(inputTag.newTagNameText)")
                                         inputTag.overlapTagNameAlert.toggle()
                                         return
                                     }
                                 }
 
-                                // メソッド: 更新内容を受け取って、itemVM.tagsの対象タグデータを更新するメソッドです。
-                                itemVM.updateTagsData(itemVM: itemVM,
-                                                      defaultTag: unwrappedDefaultTag,
-                                                      newTagName: inputTag.newTagNameText,
-                                                      newTagColor: inputTag.selectionSideMenuTagColor)
+                                let newTagData = Tag(oderIndex: tagVM.tags.count - 2,
+                                                     tagName: inputTag.newTagNameText,
+                                                     tagColor: inputTag.selectionSideMenuTagColor)
 
-                                // メソッド: 更新内容を受け取って、itemVM.itemsの対象タグデータを更新するメソッドです。
-                                itemVM.updateItemsTagData(itemVM: itemVM,
-                                                          defaultTag: unwrappedDefaultTag,
-                                                          newTagName: inputTag.newTagNameText,
-                                                          newTagColorString: inputTag.selectionSideMenuTagColor.text)
+                                // firestoreにタグ更新を保存
+                                tagVM.updateTagData(updateData: newTagData, defaultData: defaultTagData)
 
                                 withAnimation(.easeIn(duration: 0.2)) {
                                     inputHome.isOpenEditTagSideMenu.toggle()
@@ -282,9 +282,10 @@ struct SideMenuNewTagView_Previews: PreviewProvider {
     static var previews: some View {
         SideMenuEditTagView(
             itemVM: ItemViewModel(),
+            tagVM: TagViewModel(),
             inputHome: .constant(InputHome()),
             inputTag: .constant(InputTagSideMenu()),
-            defaultTag: Tag(tagName: "テストタグ", tagColor: .green),
+            defaultTag: Tag(oderIndex: 1, tagName: "テストタグ", tagColor: .green),
             tagSideMenuStatus: .create)
     }
 }

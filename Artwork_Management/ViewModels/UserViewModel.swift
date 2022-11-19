@@ -6,16 +6,35 @@
 //
 
 import SwiftUI
+import FirebaseStorage
+import FirebaseFirestore
+import FirebaseFirestoreSwift
 
 class UserViewModel: ObservableObject {
 
-    @Published var users: [User] = [User(name: "User_Name", address: "kennsuke242424@gmail.com", password: "ninnzinn2424", iconImage: "", headerImage: "")]
+    var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
 
-//    var headerImage: UIImage? = users[0].headerImage.toImage()
+    @Published var users: [User] = [User(name: "SampleUser", address: "kennsuke242424@gmail.com", password: "ninnzinn2424", iconURL: nil, groups: [])]
 
+    func addUser(userData: User, groupID: String) {
+
+        print("addUser実行")
+
+        guard let itemsRef = db?.collection("users") else {
+            print("error: guard let tagsRef")
+            return
+        }
+
+        do {
+            _ = try itemsRef.addDocument(from: userData)
+        } catch {
+            print("Error: try db!.collection(collectionID).addDocument(from: itemData)")
+        }
+        print("addUser完了")
+    }
 
 }
 
 struct TestUser {
-    let testUser: User = User(name: "User_Name", address: "kennsuke242424@gmail.com", password: "ninnzinn2424", iconImage: "", headerImage: "")
+    let testUser: User = User(name: "SampleUser", address: "kennsuke242424@gmail.com", password: "ninnzinn2424", iconURL: nil, groups: [])
 }

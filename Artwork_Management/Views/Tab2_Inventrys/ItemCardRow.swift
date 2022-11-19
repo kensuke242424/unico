@@ -21,6 +21,16 @@ struct ItemCardRow: View {
     @State private var cardCount: Int =  0
     @State private var itemSold: Bool = false
 
+    var cardElement: (value: Int, icon: Image) {
+
+        switch inputHome.switchElement {
+        case .stock:
+            return (value: itemRow.inventory, icon: Image(systemName: "shippingbox.fill"))
+        case .price:
+            return (value: itemRow.price, icon: Image(systemName: "yensign.circle.fill"))
+        }
+    }
+
     var body: some View {
 
         RoundedRectangle(cornerRadius: 10)
@@ -69,7 +79,7 @@ struct ItemCardRow: View {
             .overlay {
                 VStack {
 
-                    ShowItemPhoto(photo: itemRow.photo, size: itemWidth - 45)
+                    ShowItemPhoto(photoURL: itemRow.photoURL, size: itemWidth - 45)
 
                     Text(itemRow.name)
                         .foregroundColor(.black)
@@ -82,9 +92,16 @@ struct ItemCardRow: View {
                     Spacer()
 
                     HStack(alignment: .bottom) {
-                        Text("¥")
-                            .foregroundColor(.black)
-                        Text(String(itemRow.price))
+                        if inputHome.switchElement == .stock {
+                            cardElement.icon
+                                .foregroundColor(.black.opacity(0.7))
+                        } else {
+                            Text("¥")
+                                .foregroundColor(.black.opacity(0.7))
+                        }
+
+                        Text(cardElement.value == 0 && inputHome.switchElement == .price ?
+                             "-" : String(cardElement.value))
                             .font(.title3)
                             .fontWeight(.heavy)
                             .foregroundColor(.black)

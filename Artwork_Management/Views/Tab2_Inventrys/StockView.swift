@@ -24,6 +24,7 @@ struct StockView: View {
 
     @Environment(\.colorScheme) var colorScheme
     @StateObject var itemVM: ItemViewModel
+    @StateObject var tagVM: TagViewModel
     @Binding var inputHome: InputHome
     @Binding var inputImage: InputImage
     let userID: String
@@ -42,6 +43,9 @@ struct StockView: View {
 
                         // NOTE: アイテム要素全体のロケーション
                         ScrollView {
+
+                            Spacer().frame(height: 60)
+
                             TagTitle(title: "最近更新したアイテム", font: .title3)
                                 .foregroundColor(.white)
                                 .opacity(0.8)
@@ -60,16 +64,16 @@ struct StockView: View {
                                 .background(.gray)
                                 .padding([.horizontal, .bottom])
 
-                            Text(itemVM.tags[inputStock.filterTagIndex].tagName)
+                            Text(tagVM.tags[inputStock.filterTagIndex].tagName)
                                 .foregroundColor(.white)
                                 .font(.system(size: 20, weight: .bold))
-                                .frame(width: 100, height: 40)
+                                .frame(width: 150, height: 40)
                                 .padding()
 
                             // NOTE: サイドタグバーの枠フレームおよび、前後のタグインフォメーションを表示します。
                                 .overlay {
                                     SideTagBarOverlay(inputStock: $inputStock,
-                                                      tags: $itemVM.tags)
+                                                      tags: $tagVM.tags)
                                 } // overlay
                                 .id("search")
 
@@ -86,7 +90,7 @@ struct StockView: View {
                             HStack(spacing: 50) {
                                 Text(inputStock.filterTagIndex == 0 ?
                                      "- \(inputStock.searchItemNameText) -" :
-                                        "- \(itemVM.tags[inputStock.filterTagIndex].tagName) -")
+                                        "- \(tagVM.tags[inputStock.filterTagIndex].tagName) -")
                                 .font(.title.bold())
                                 .foregroundColor(.white)
                                 .shadow(radius: 3, x: 4, y: 6)
@@ -96,7 +100,7 @@ struct StockView: View {
                                 if !inputStock.searchItemNameText.isEmpty, inputStock.searchItemNameText != "ALL" {
                                     Button {
                                         inputStock.searchItemNameText = inputHome.isShowSearchField ? "" : "ALL"
-                                        itemVM.tags[0].tagName = inputHome.isShowSearchField ? "検索" : "ALL"
+                                        tagVM.tags[0].tagName = inputHome.isShowSearchField ? "検索" : "ALL"
                                     } label: {
                                         RoundedRectangle(cornerRadius: 10)
                                             .foregroundColor(.gray)
@@ -113,9 +117,10 @@ struct StockView: View {
                             .padding([.leading, .vertical])
 
                             TagSortCards(itemVM: itemVM,
+                                         tagVM: tagVM,
                                          inputHome: $inputHome,
                                          inputStock: $inputStock,
-                                         selectFilterTag: itemVM.tags[inputStock.filterTagIndex].tagName)
+                                         selectFilterTag: tagVM.tags[inputStock.filterTagIndex].tagName)
 
                         } // ScrollView (アイテムロケーション)
 
@@ -154,13 +159,13 @@ struct StockView: View {
                     if newValue == true {
                         if inputStock.searchItemNameText == "ALL" {
                             inputStock.searchItemNameText = ""
-                            itemVM.tags[0].tagName = "検索"
+                            tagVM.tags[0].tagName = "検索"
                         }
                     }
                     if newValue == false {
                         if inputStock.searchItemNameText == "" {
                             inputStock.searchItemNameText = "ALL"
-                            itemVM.tags[0].tagName = "ALL"
+                            tagVM.tags[0].tagName = "ALL"
                         }
                     }
 
@@ -279,21 +284,6 @@ struct StockView: View {
             .animation(.easeIn(duration: 0.2), value: inputHome.isShowSearchField)
             .navigationTitle("Stock")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button {
-                        withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                            inputHome.isShowSystemSideMenu.toggle()
-                        }
-                        withAnimation(.easeIn(duration: 0.2)) {
-                            inputHome.sideMenuBackGround.toggle()
-                        }
-                    } label: {
-                        CircleIcon(photo: inputImage.iconImage, size: getSafeArea().top - 20)
-                    }
-                }
-            }
-
             .onTapGesture { searchFocused = nil }
 
             // NOTE: ディスプレイのカラーモードを検知し、enumを切り替えます。
@@ -330,7 +320,8 @@ struct SideTagBarOverlay: View {
                         HStack {
                             Text("<")
                             Text("\(tags[inputStock.filterTagIndex - 1].tagName)")
-                                .frame(width: 60)
+                                .font(.subheadline)
+                                .frame(width: 80, alignment: .leading)
                                 .lineLimit(1)
                         } // HStack
                         .onTapGesture { inputStock.filterTagIndex -= 1 }
@@ -341,14 +332,15 @@ struct SideTagBarOverlay: View {
                     if inputStock.filterTagIndex + 1 < tags.count {
                         HStack {
                             Text("\(tags[inputStock.filterTagIndex + 1].tagName)")
-                                .frame(width: 60)
+                                .font(.subheadline)
+                                .frame(width: 80, alignment: .trailing)
                                 .lineLimit(1)
                             Text(">")
                         } // HStack
                         .onTapGesture { inputStock.filterTagIndex += 1 }
                     }
                 } // HStack
-                .foregroundColor(.white)
+                .foregroundColor(.white.opacity(0.6))
                 .padding(.horizontal, 20)
 
             } // overlay(サイドタグ情報)
@@ -367,7 +359,8 @@ struct StockView_Previews: PreviewProvider {
         }
 
         return StockView(itemVM: ItemViewModel(),
-                             inputHome: .constant(InputHome()),
+                         tagVM: TagViewModel(),
+                         inputHome: .constant(InputHome()),
                          inputImage: .constant(InputImage()),
                          userID: ""
         )

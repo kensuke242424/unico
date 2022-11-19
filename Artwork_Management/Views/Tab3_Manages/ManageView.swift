@@ -7,32 +7,14 @@
 
 import SwiftUI
 
-// NOTE: アイテムのソートタイプを管理します
-enum SortType {
-    case salesUp, salesDown, updateAtUp, createAtUp, start
-}
-
-// NOTE: アイテムのタググループ有無を管理します
-enum TagGroup {
-    case on // swiftlint:disable:this identifier_name
-    case off
-}
-
 struct ManageView: View {
 
     @StateObject var itemVM: ItemViewModel
+    @StateObject var tagVM: TagViewModel
 
-    // NOTE: 新規アイテム追加Viewの発現を管理します
     @Binding var inputHome: InputHome
     @Binding var inputImage: InputImage
-
-    struct InputManage {
-        var tagGroup: TagGroup = .on
-        var sortType: SortType = .start
-        var isTagGroup: Bool = true
-    }
-
-    @State private var inputManage: InputManage = InputManage()
+    @Binding var inputManage: InputManageCustomizeSideMenu
 
     var body: some View {
 
@@ -47,94 +29,133 @@ struct ManageView: View {
 
                         case true:
 
-                            // タグの要素数の分リストを作成
-                            ForEach(itemVM.tags) { tagRow in
+                            if itemVM.items == [] {
 
-                                // firstには"ALL", lastには"タグ無し"
-                                if tagRow != itemVM.tags.first! && tagRow != itemVM.tags.last! {
+                                EmptyItemView(inputHome: $inputHome, text: "アイテムが存在しません")
 
-                                    HStack {
-                                        Text(tagRow.tagName)
-                                            .foregroundColor(.white)
-                                            .font(.title.bold())
-                                            .shadow(radius: 2, x: 4, y: 6)
-                                            .padding(.vertical)
+                            } else {
+                                Spacer().frame(height: 60)
+                                // タグの要素数の分リストを作成
+                                ForEach(tagVM.tags) { tagRow in
 
-                                    }
+                                    // firstには"ALL", lastには"未グループ"
+                                    if tagRow != tagVM.tags.first! && tagRow != tagVM.tags.last! {
 
-                                    Spacer(minLength: 0)
+                                        HStack {
+                                            Text(tagRow.tagName)
+                                                .foregroundColor(.white)
+                                                .font(.title2.bold())
+                                                .shadow(radius: 2, x: 4, y: 6)
+                                                .padding(.vertical)
+                                        }
 
-                                    LinearGradient(gradient: Gradient(colors: [.gray, .clear]),
-                                                               startPoint: .leading, endPoint: .trailing)
-                                        .frame(height: 1)
-                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        Spacer(minLength: 0)
 
-                                    if itemVM.items.contains(where: {$0.tag == tagRow.tagName}) {
+                                        GradientLine(color1: .gray, color2: .clear)
+                                            .padding(.bottom)
 
-                                        VStack {
-                                            ForEach(itemVM.items) { item in
+                                        if itemVM.items.contains(where: {$0.tag == tagRow.tagName}) {
 
-                                                if item.tag == tagRow.tagName {
-                                                    manageListRow(item: item)
+                                            VStack {
+                                                ForEach(itemVM.items) { item in
+
+                                                    if item.tag == tagRow.tagName {
+                                                        manageListRow(item: item)
+                                                    }
                                                 }
+                                                Spacer().frame(height: 20)
+
+                                                HStack(alignment: .bottom) {
+                                                    Spacer()
+                                                    Text("\(tagRow.tagName)  合計 ¥ ")
+                                                        .font(.caption)
+
+                                                    Text(String(tagGroupTotalSales(items: itemVM.items,
+                                                                                   tag: tagRow.tagName,
+                                                                                   group: inputManage.isTagGroup)))
+                                                    .font(.subheadline.bold())
+                                                }
+                                                .frame(alignment: .trailing)
+                                                .foregroundColor(.white.opacity(0.6))
+                                                .overlay(alignment: .bottomTrailing) {
+                                                    GradientLine(color1: .clear, color2: .white).opacity(0.3)
+                                                        .offset(y: 7)
+                                                }
+                                                .padding(.vertical)
+                                                .padding(.bottom, 40)
                                             }
-                                            Color.clear
-                                                .frame(height: 20)
-                                        }
 
-                                    } else {
-                                        Text("タグに該当するアイテムはありません")
-                                            .font(.subheadline)
-                                            .foregroundColor(.white).opacity(0.6)
-                                            .frame(height: 100)
+                                        } else {
+                                            Text("タグに該当するアイテムはありません")
+                                                .font(.subheadline)
+                                                .foregroundColor(.white).opacity(0.6)
+                                                .frame(height: 100)
+                                        }
                                     }
-                                }
-                            } // ForEach itemVM.tags
+                                } // ForEach tagVM.tags
 
-                            // "タグ無し"タグのついたアイテムが存在した場合
-                            if itemVM.items.contains(where: {$0.tag == (itemVM.tags.last!.tagName)}) {
-                                Text(itemVM.tags.last!.tagName)
-                                    .foregroundColor(.white)
-                                    .font(.title2.bold())
-                                    .shadow(radius: 2, x: 4, y: 6)
-                                    .padding(.vertical)
+                                // "未グループ"タグのついたアイテムが存在した場合
+                                if itemVM.items.contains(where: {$0.tag == (tagVM.tags.last!.tagName)}) {
+                                    Text(tagVM.tags.last!.tagName)
+                                        .foregroundColor(.white)
+                                        .font(.title2.bold())
+                                        .shadow(radius: 2, x: 4, y: 6)
+                                        .padding(.vertical)
 
-                                LinearGradient(gradient: Gradient(colors: [.gray, .clear]),
-                                                           startPoint: .leading, endPoint: .trailing)
-                                    .frame(height: 1)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    GradientLine(color1: .gray, color2: .clear)
 
-                                    ForEach(itemVM.items) { item in
+                                        ForEach(itemVM.items) { item in
 
-                                        if item.tag == "\(itemVM.tags.last!.tagName)" {
-                                            manageListRow(item: item)
-                                        }
-                                    } // ForEach item
-                            } // if
+                                            if item.tag == "\(tagVM.tags.last!.tagName)" {
+                                                manageListRow(item: item)
+                                            }
+                                        } // ForEach item
+                                } // if
+                                Spacer().frame(height: 300)
+                            }
 
                         case false:
 
-                            Text(itemVM.tags[0].tagName)
+                            Spacer().frame(height: 60)
+
+                            Text(tagVM.tags.first!.tagName)
                                 .font(.largeTitle.bold())
                                 .foregroundColor(.white)
                                 .shadow(radius: 2, x: 4, y: 6)
                                 .padding(.vertical)
 
-                            Spacer(minLength: 0)
-
-                            LinearGradient(gradient: Gradient(colors: [.gray, .clear]),
-                                                       startPoint: .leading, endPoint: .trailing)
-                                .frame(height: 1)
-                                .frame(maxWidth: .infinity, alignment: .leading)
+                            GradientLine(color1: .gray, color2: .clear)
 
                             ForEach(itemVM.items) { item in
 
                                 manageListRow(item: item)
 
-                            } // case .groupOff
+                            }
+
+                            HStack(alignment: .bottom) {
+                                Spacer()
+                                Text("\(tagVM.tags.first!.tagName)  合計 ¥ ")
+                                    .font(.caption)
+
+                                Text(String(tagGroupTotalSales(items: itemVM.items,
+                                                               tag: tagVM.tags.first!.tagName,
+                                                               group: inputManage.isTagGroup)))
+                                .font(.subheadline.bold())
+                            }
+                            .frame(alignment: .trailing)
+                            .foregroundColor(.white.opacity(0.6))
+                            .overlay(alignment: .bottomTrailing) {
+                                GradientLine(color1: .clear, color2: .white).opacity(0.3)
+                                    .offset(y: 7)
+                            }
+                            .padding(.vertical)
+                            .padding(.bottom, 40)
+
+                            Spacer().frame(height: 250)
+
                         } // switch tagGroup
                     } // VStack
-                    .padding(.leading)
+                    .padding(.horizontal)
 
                 } // ScrollView
             } // ZStack
@@ -143,149 +164,175 @@ struct ManageView: View {
             .navigationTitle("Manage")
             .navigationBarTitleDisplayMode(.inline)
             .animation(.spring(response: 0.5), value: inputManage.isTagGroup)
-            // sort Menu...
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Menu {
 
-                        Toggle(isOn: $inputManage.isTagGroup) {
-                            HStack {
-                                Image(systemName: inputManage.isTagGroup ? "tag.fill" : "tag.slash")
-                                    .resizable()
-                                    .foregroundColor(inputManage.isTagGroup ? .green : .gray)
-                                Text("タググループ")
-                            }
-                        }
+            // items sort...
+            .onChange(of: inputManage.indicatorValueStatus) { _ in
 
-                        Menu("並び替え") {
-                            Button {
-                                inputManage.sortType = .salesUp
-                                itemVM.items = itemVM.itemsSort(sort: inputManage.sortType, items: itemVM.items)
-                            } label: {
-                                if inputManage.sortType == .salesUp {
-                                    Text("売り上げ(↑)　　 ✔︎")
-                                } else {
-                                    Text("売り上げ(↑)")
-                                }
-                            }
-                            Button {
-                                inputManage.sortType = .salesDown
-                                itemVM.items = itemVM.itemsSort(sort: inputManage.sortType, items: itemVM.items)
-                            } label: {
-                                if inputManage.sortType == .salesDown {
-                                    Text("売り上げ(↓)　　 ✔︎")
-                                } else {
-                                    Text("売り上げ(↓)")
-                                }
-                            }
-                            Button {
-                                inputManage.sortType = .updateAtUp
-                                itemVM.items = itemVM.itemsSort(sort: inputManage.sortType, items: itemVM.items)
-                            } label: {
-                                if inputManage.sortType == .updateAtUp {
-                                    Text("最終更新日　　　✔︎")
-                                } else {
-                                    Text("最終更新日")
-                                }
-                            }
-                            Button {
-                                inputManage.sortType = .createAtUp
-                                itemVM.items = itemVM.itemsSort(sort: inputManage.sortType, items: itemVM.items)
-                            } label: {
-                                if inputManage.sortType == .createAtUp {
-                                    Text("追加日　　　✔︎")
-                                } else {
-                                    Text("追加日")
-                                }
-                            }
-                        } // 並び替えオプション
-
-                    } label: {
-                        Image(systemName: "list.bullet.indent")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 30, height: 30)
+                if inputManage.sortType == .value {
+                    withAnimation(.spring(response: 0.7)) {
+                        itemVM.itemsValueSort(order: inputManage.upDownOrder, status: inputManage.indicatorValueStatus)
                     }
                 }
             }
-            // System Side Menu ...
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button {
-                        withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                            inputHome.isShowSystemSideMenu.toggle()
-                        }
-                        withAnimation(.easeIn(duration: 0.2)) {
-                            inputHome.sideMenuBackGround.toggle()
-                        }
-                    } label: {
-                        CircleIcon(photo: inputImage.iconImage, size: getSafeArea().top - 20)
+            .onChange(of: inputManage.sortType) { _ in
+
+                switch inputManage.sortType {
+                case .value:
+                    withAnimation(.spring(response: 0.7)) {
+                        itemVM.itemsValueSort(order: inputManage.upDownOrder, status: inputManage.indicatorValueStatus)
+                    }
+                case .name:
+                    withAnimation(.spring(response: 0.7)) {
+                        itemVM.itemsNameSort(order: inputManage.upDownOrder)
+                    }
+                case .createTime:
+                    withAnimation(.spring(response: 0.7)) {
+                        itemVM.itemsCreateTimeSort(order: inputManage.upDownOrder)
+                    }
+                case .updateTime:
+                    withAnimation(.spring(response: 0.7)) {
+                        itemVM.itemsUpdateTimeSort(order: inputManage.upDownOrder)
                     }
                 }
             }
+            .onChange(of: inputManage.upDownOrder) { _ in
+                withAnimation(.spring(response: 0.7)) {
+                    itemVM.itemsUpDownOderSort()
+                }
+            }
+
+            .onAppear {
+                switch inputManage.sortType {
+                case .value:
+                    withAnimation(.spring(response: 0.7)) {
+                        itemVM.itemsValueSort(order: inputManage.upDownOrder, status: inputManage.indicatorValueStatus)
+                    }
+                case .name:
+                    withAnimation(.spring(response: 0.7)) {
+                        itemVM.itemsNameSort(order: inputManage.upDownOrder)
+                    }
+                case .createTime:
+                    withAnimation(.spring(response: 0.7)) {
+                        itemVM.itemsCreateTimeSort(order: inputManage.upDownOrder)
+                    }
+                case .updateTime:
+                    withAnimation(.spring(response: 0.7)) {
+                        itemVM.itemsUpdateTimeSort(order: inputManage.upDownOrder)
+                    }
+                }
+            }
+
         } // NavigationView
     } // body
 
+    // Manage List Row...
     @ViewBuilder
     func manageListRow(item: Item) -> some View {
 
-        VStack(alignment: .leading, spacing: 20) {
+        VStack {
 
-            HStack(spacing: 20) {
+            HStack(alignment: .top, spacing: 20) {
 
-                ShowItemPhoto(photo: item.photo, size: UIScreen.main.bounds.width / 5)
+                ShowItemPhoto(photoURL: item.photoURL, size: UIScreen.main.bounds.width / 5)
                     .onTapGesture {
-                        print("画像タップ")
-                    }
-
-                VStack(alignment: .leading, spacing: 10) {
-                    HStack(spacing: 40) {
-                        Text("¥ \(item.sales)")
-                            .foregroundColor(.white)
-                            .opacity(0.8)
-                            .font(.subheadline.bold())
-                        Button {
-
-                            if let actionItemIndex = itemVM.items.firstIndex(of: item) {
-                                inputHome.actionItemIndex = actionItemIndex
-                                withAnimation(.easeIn(duration: 0.15)) {
-                                    inputHome.isShowItemDetail.toggle()
-                                }
-                            } else {
-                                print("インデックス取得失敗")
+                        if let actionItemIndex = itemVM.items.firstIndex(of: item) {
+                            inputHome.actionItemIndex = actionItemIndex
+                            withAnimation(.easeIn(duration: 0.15)) {
+                                inputHome.isShowItemDetail.toggle()
                             }
-
-                        } label: {
-                            Image(systemName: "info.circle.fill")
-                                .foregroundColor(.gray)
-                                .opacity(0.7)
-
-                        } // Button
-                    } // HStack
-
-                    if let itemRowTag = itemVM.tags.first(where: { $0.tagName == item.tag }) {
-
-                        IndicatorRow(salesValue: item.sales, tagColor: itemRowTag.tagColor)
-
-                    } else {
-
-                        IndicatorRow(salesValue: item.sales, tagColor: .gray)
-
+                        } else {
+                            print("インデックス取得失敗")
+                        }
                     }
+
+                VStack(alignment: .leading, spacing: 13) {
+
+                    HStack {
+
+                        Group {
+                            Text(inputManage.indicatorValueStatus.text)
+                            inputManage.indicatorValueStatus.icon
+                                .offset(x: -5)
+                        }
+                        .font(.caption).opacity(0.5)
+                        .foregroundColor(.white)
+
+                        Group {
+                            switch inputManage.indicatorValueStatus {
+                            case .stock:
+                                Text(String(item.inventory))
+                            case .price:
+                                Text(item.price != 0 ? String(item.price) : "-")
+                            case .sales:
+                                Text(item.sales != 0 ? String(item.sales) : "-")
+                            }
+                        }
+                        .font(.subheadline.bold()).opacity(0.7)
+                        .foregroundColor(.white)
+                        .frame(width: 90, alignment: .leading)
+                    }
+                    .overlay(alignment: .trailing) {
+                        HStack {
+                            inputHome.switchElement.icon.font(.caption).opacity(0.5)
+
+                            switch inputHome.switchElement {
+                            case .stock:
+                                Text(" \(item.inventory)")
+                            case .price:
+                                Text(item.price != 0 ? " \(item.price)" : " -")
+                            }
+                        }
+                        .padding(5)
+                        .font(.caption.bold()).opacity(0.7)
+                        .foregroundColor(.white)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 20)
+                                .foregroundColor(.black.opacity(0.2))
+                        }
+                        .offset(x: 80)
+                    }
+
+                    IndicatorRow(inputManage: $inputManage,
+                                 item: item,
+                                 color: item.tagColor)
 
                     Text(item.name)
                         .font(.caption.bold())
-                        .foregroundColor(.gray)
+                        .foregroundColor(.white.opacity(0.7))
+                        .offset(y: 10)
                 } // VStack
                 Spacer()
             } // HStack
         } // VStack
-        .padding(.top)
-    } // リストレイアウト
+        .padding(.vertical)
+    }
+
+    private func tagGroupTotalSales(items: [Item], tag: String, group: Bool) -> Int {
+
+        var itemsSales = 0
+
+        if group {
+            for item in items.filter({ $0.tag.contains(tag)}) {
+                itemsSales += item.sales
+            }
+            return itemsSales
+
+        } else {
+            for item in items {
+                itemsSales += item.sales
+            }
+            return itemsSales
+        }
+    }
+
 } // View
 
 struct ManageView_Previews: PreviewProvider {
     static var previews: some View {
-        ManageView(itemVM: ItemViewModel(), inputHome: .constant(InputHome()), inputImage: .constant(InputImage()))
+        ManageView(itemVM: ItemViewModel(),
+                   tagVM: TagViewModel(),
+                   inputHome: .constant(InputHome()),
+                   inputImage: .constant(InputImage()),
+                   inputManage: .constant(InputManageCustomizeSideMenu()))
     }
 }

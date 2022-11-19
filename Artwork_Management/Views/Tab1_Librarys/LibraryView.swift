@@ -14,7 +14,6 @@ struct InputLibrary {
     var cardOpacity: CGFloat =  1.0
     var tagFilterItemCards: [Item] = []
     var isShowCardInfomation: Bool = false
-    var isShowHeaderPhotoInfomation: Bool = false
 }
 
 struct InputTime {
@@ -46,6 +45,7 @@ struct LibraryView: View {
     }
 
     @StateObject var itemVM: ItemViewModel
+    @StateObject var tagVM: TagViewModel
     @Binding var inputHome: InputHome
     @Binding var inputImage: InputImage
 
@@ -53,6 +53,15 @@ struct LibraryView: View {
     @State private var inputLibrary: InputLibrary = InputLibrary()
     @State private var inputTime: InputTime = InputTime()
     @State private var headerImageSize: HeaderImageSize = .fit
+
+    var tagFilterItemCards: [Item] {
+
+        if inputLibrary.selectFilterTag == tagVM.tags.first!.tagName {
+            return itemVM.items
+        } else {
+            return itemVM .items.filter({ $0.tag == inputLibrary.selectFilterTag })
+        }
+    }
 
     var body: some View {
 
@@ -64,7 +73,7 @@ struct LibraryView: View {
 
             VStack {
 
-                homeHeaderPhoto(photo: inputImage.headerImage, userIcon: "cloth_sample1")
+                homeHeaderPhoto(photoURL: inputImage.homeHeaderURL, userIcon: "cloth_sample1")
                 // 時刻レイアウト
                 HStack {
                     VStack(alignment: .leading, spacing: 8) {
@@ -149,31 +158,22 @@ struct LibraryView: View {
                 .opacity(0.08)
 
             Menu {
-                ForEach(itemVM.tags) { tag in
+                ForEach(tagVM.tags) { tag in
 
-                    if tag != itemVM.tags.last! {
+                    if tag != tagVM.tags.last! {
                         Button {
                             inputLibrary.selectFilterTag = tag.tagName
                         } label: {
-                            if inputLibrary.selectFilterTag == tag.tagName {
-                                Text("\(tag.tagName)　　 ✔︎")
-                            } else {
-                                Text(tag.tagName)
-                            }
+                            Text(inputLibrary.selectFilterTag == tag.tagName ? "\(tag.tagName)　　 ✔︎" : tag.tagName)
                         }
 
                     } else {
-                        if itemVM.items.contains(where: {$0.tag == (itemVM.tags.last!.tagName)}) {
+                        if itemVM.items.contains(where: {$0.tag == (tagVM.tags.last!.tagName)}) {
                             Button {
                                 inputLibrary.selectFilterTag = tag.tagName
                             } label: {
-                                if inputLibrary.selectFilterTag == tag.tagName {
-                                    Text("\(tag.tagName)　　 ✔︎")
-                                } else {
-                                    Text(tag.tagName)
-                                }
+                                Text(inputLibrary.selectFilterTag == tag.tagName ? "\(tag.tagName)　　 ✔︎" : tag.tagName)
                             }
-
                         }
                     }
 
@@ -187,58 +187,65 @@ struct LibraryView: View {
             .offset(x: -UIScreen.main.bounds.width / 2.5,
                     y: UIScreen.main.bounds.height / 11)
 
-            homeItemPhotoPanel()
-                .ignoresSafeArea()
-                .offset(x: -UIScreen.main.bounds.width / 10,
-                        y: UIScreen.main.bounds.height / 4)
-
+            if itemVM.items == [] {
+                EmptyItemView(inputHome: $inputHome, text: "")
+                    .offset(x: -UIScreen.main.bounds.width / 4,
+                            y: UIScreen.main.bounds.height / 5)
+            } else if tagFilterItemCards == [] {
+                VStack(spacing: 10) {
+                    Text(inputLibrary.selectFilterTag)
+                    Text("該当アイテムなし")
+                }
+                .foregroundColor(.white.opacity(0.4))
+                .offset(x: -UIScreen.main.bounds.width / 4,
+                        y: UIScreen.main.bounds.height / 5)
+            } else {
+                homeItemPhotoPanel(items: tagFilterItemCards)
+                    .ignoresSafeArea()
+                    .offset(x: -UIScreen.main.bounds.width / 10,
+                            y: UIScreen.main.bounds.height / 4)
+            }
         } // ZStack
 
-
-        .onChange(of: itemVM.items) { _ in
-            if inputLibrary.selectFilterTag == "ALL" {
-                inputLibrary.tagFilterItemCards = itemVM.items
-                inputLibrary.homeCardsIndex =  0
-                return
-            }
-            inputLibrary.tagFilterItemCards = itemVM.items.filter({ $0.tag == inputLibrary.selectFilterTag })
+        .onChange(of: inputLibrary.selectFilterTag) { _ in
             inputLibrary.homeCardsIndex =  0
         } // .onChange
 
-        .onAppear {
-
-            if inputLibrary.selectFilterTag == "ALL" {
-                inputLibrary.tagFilterItemCards = itemVM.items
-            } else {
-                inputLibrary.tagFilterItemCards = itemVM.items.filter({ $0.tag == inputLibrary.selectFilterTag })
-            }
-        } // .onAppear
     } // body
 
     @ViewBuilder
-    func homeHeaderPhoto(photo: UIImage?, userIcon: String) -> some View {
+    func homeHeaderPhoto(photoURL: URL?, userIcon: String) -> some View {
 
         Group {
-            if let photo = photo {
+            if let photoURL = photoURL {
                 ZStack {
 
                     Rectangle().opacity(0.0001)
                         .frame(width: getRect().width, height: getRect().height * 0.35)
                         .onTapGesture {
                             withAnimation(.easeIn(duration: 0.2)) {
-                                inputLibrary.isShowHeaderPhotoInfomation.toggle()
+                                inputHome.isShowHomeTopNavigation.toggle()
                             }
                         }
                     Group {
                         switch headerImageSize {
                         case .fit:
-                            Image(uiImage: photo)
-                                .resizable()
-                                .scaledToFit()
+                            AsyncImage(url: photoURL) { fitImage in
+                                fitImage
+                                    .resizable()
+                                    .scaledToFit()
+                            } placeholder: {
+                                ProgressView()
+                            }
+
                         case .fill:
-                            Image(uiImage: photo)
-                                .resizable()
-                                .scaledToFill()
+                            AsyncImage(url: photoURL) { fillImage in
+                                fillImage
+                                    .resizable()
+                                    .scaledToFill()
+                            } placeholder: {
+                                ProgressView()
+                            }
                         }
                     }
                     .frame(width: getRect().width, height: getRect().height * 0.35)
@@ -272,10 +279,10 @@ struct LibraryView: View {
             LinearGradient(gradient: Gradient(colors: [.clear, .black.opacity(0.2)]),
                            startPoint: .top, endPoint: .bottom)
             .shadow(radius: 5, x: 0, y: 10)
-            .opacity(inputLibrary.isShowHeaderPhotoInfomation ? 0.4 : 0.0)
+            .opacity(inputHome.isShowHomeTopNavigation ? 0.4 : 0.0)
             .onTapGesture {
                 withAnimation(.easeIn(duration: 0.2)) {
-                    inputLibrary.isShowHeaderPhotoInfomation.toggle()
+                    inputHome.isShowHomeTopNavigation.toggle()
                 }
             }
 
@@ -310,23 +317,7 @@ struct LibraryView: View {
                     .foregroundColor(.white.opacity(0.8))
             } // Menu
             .padding()
-            .opacity(inputLibrary.isShowHeaderPhotoInfomation ? 1.0 : 0.0)
-        } // overlay
-
-        .overlay(alignment: .topLeading) {
-            Button {
-                withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                    inputHome.isShowSystemSideMenu.toggle()
-                }
-                withAnimation(.easeIn(duration: 0.2)) {
-                    inputHome.sideMenuBackGround.toggle()
-                }
-            } label: {
-                CircleIcon(photo: inputImage.iconImage, size: getSafeArea().top - 20)
-            }
-            .padding(.leading)
-            .offset(y: getSafeArea().top)
-            .opacity(inputLibrary.isShowHeaderPhotoInfomation || photo == nil ? 1.0 : 0.0)
+            .opacity(inputHome.isShowHomeTopNavigation ? 1.0 : 0.0)
         } // overlay
 
         // Todo: ホームレイアウトのカスタム
@@ -349,7 +340,7 @@ struct LibraryView: View {
         .ignoresSafeArea()
     } // homeHeaderPhoto
 
-    func homeItemPhotoPanel() -> some View {
+    func homeItemPhotoPanel(items: [Item]) -> some View {
         GeometryReader { bodyView in
 
             let libraryItemPadding: CGFloat = 200
@@ -357,49 +348,51 @@ struct LibraryView: View {
 
             LazyHStack(spacing: libraryItemPadding) {
 
-                ForEach(inputLibrary.tagFilterItemCards.indices, id: \.self) {index in
+                ForEach(tagFilterItemCards.indices, id: \.self) {index in
 
-                    ShowItemPhoto(photo: inputLibrary.tagFilterItemCards[index].photo, size: panelSize)
-                            .overlay {
-                                if inputLibrary.isShowCardInfomation {
-                                    LinearGradient(gradient: Gradient(colors: [.clear, .black.opacity(0.4)]),
-                                                   startPoint: .top, endPoint: .bottom)
-                                }
+                    ShowItemPhoto(photoURL: tagFilterItemCards[index].photoURL, size: panelSize)
+
+                        .overlay {
+                            if inputLibrary.isShowCardInfomation {
+                                LinearGradient(gradient: Gradient(colors: [.clear, .black.opacity(0.4)]),
+                                               startPoint: .top, endPoint: .bottom)
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
                             }
-                            .overlay(alignment: .bottomTrailing) {
-                                if inputLibrary.isShowCardInfomation {
-                                    Text(inputLibrary.tagFilterItemCards[index].name)
-                                        .font(.footnote).foregroundColor(.white).opacity(0.7)
-                                        .tracking(2)
-                                        .lineLimit(1)
-                                }
+                        }
+                        .overlay(alignment: .bottomTrailing) {
+                            if inputLibrary.isShowCardInfomation {
+                                Text(tagFilterItemCards[index].name)
+                                    .font(.footnote).foregroundColor(.white).opacity(0.7)
+                                    .tracking(2)
+                                    .lineLimit(1)
                             }
-                            .overlay(alignment: .topTrailing) {
-                                if inputLibrary.isShowCardInfomation {
-                                    Button {
-                                        if let cardRowIndex =
-                                            itemVM.items.firstIndex(where: { $0.id == inputLibrary.tagFilterItemCards[index].id }) {
+                        }
+                        .overlay(alignment: .topTrailing) {
+                            if inputLibrary.isShowCardInfomation {
+                                Button {
+                                    if let cardRowIndex =
+                                        itemVM.items.firstIndex(where: { $0.id == tagFilterItemCards[index].id }) {
 
-                                            inputHome.actionItemIndex = cardRowIndex
+                                        inputHome.actionItemIndex = cardRowIndex
 
-                                            withAnimation(.easeIn(duration: 0.15)) {
-                                                inputHome.isShowItemDetail.toggle()
-                                            }
-                                        } else {
-                                            print("LibraryCardIndexの取得エラー")
+                                        withAnimation(.easeIn(duration: 0.15)) {
+                                            inputHome.isShowItemDetail.toggle()
                                         }
-                                    } label: {
-                                        Image(systemName: "info.circle.fill")
-                                            .resizable().scaledToFit().frame(width: 20)
-                                            .foregroundColor(.white)
-                                    } // Button
-                                } // if
-                            } // overlay
-                            .opacity(inputLibrary.cardOpacity)
-                            .shadow(radius: 4, x: 5, y: 5)
-                            .frame(width: bodyView.size.width * 0.7, height: 40)
-                            .animation(.easeIn(duration: 0.2), value: inputLibrary.isShowCardInfomation)
-                            .onTapGesture { inputLibrary.isShowCardInfomation.toggle() }
+                                    } else {
+                                        print("LibraryCardIndexの取得エラー")
+                                    }
+                                } label: {
+                                    Image(systemName: "info.circle.fill")
+                                        .resizable().scaledToFit().frame(width: 20)
+                                        .foregroundColor(.white)
+                                } // Button
+                            } // if
+                        } // overlay
+                        .opacity(inputLibrary.cardOpacity)
+                        .shadow(radius: 4, x: 5, y: 5)
+                        .frame(width: bodyView.size.width * 0.7, height: 40)
+                        .animation(.easeIn(duration: 0.2), value: inputLibrary.isShowCardInfomation)
+                        .onTapGesture { inputLibrary.isShowCardInfomation.toggle() }
                 } // ForEach
             } // LazyHStack
             .padding()
@@ -413,7 +406,7 @@ struct LibraryView: View {
                         // 先頭・末尾ではスクロールする必要がないので、画面幅の1/5までドラッグで制御する
                         if inputLibrary.homeCardsIndex == 0, value.translation.width > 0 {
                             state = value.translation.width / 5
-                        } else if inputLibrary.homeCardsIndex == (inputLibrary.tagFilterItemCards.count - 1), value.translation.width < 0 {
+                        } else if inputLibrary.homeCardsIndex == (tagFilterItemCards.count - 1), value.translation.width < 0 {
                             state = value.translation.width / 5
                         } else {
                             state = value.translation.width
@@ -436,8 +429,8 @@ struct LibraryView: View {
                         }
                         if newIndex < 0 {
                             newIndex = 0
-                        } else if newIndex > (inputLibrary.tagFilterItemCards.count - 1) {
-                            newIndex = inputLibrary.tagFilterItemCards.count - 1
+                        } else if newIndex > (tagFilterItemCards.count - 1) {
+                            newIndex = tagFilterItemCards.count - 1
                         }
                         inputLibrary.homeCardsIndex = newIndex
 
@@ -457,6 +450,7 @@ struct LibraryView: View {
 struct LibraryView_Previews: PreviewProvider {
     static var previews: some View {
         LibraryView(itemVM: ItemViewModel(),
+                    tagVM: TagViewModel(),
                     inputHome: .constant(InputHome()),
                     inputImage: .constant(InputImage()))
     }

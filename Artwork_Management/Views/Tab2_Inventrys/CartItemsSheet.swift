@@ -95,7 +95,7 @@ struct CartItemRow: View {
 
             HStack {
 
-                ShowItemPhoto(photo: itemRow.photo, size: 100)
+                ShowItemPhoto(photoURL: itemRow.photoURL, size: 100)
 
                 Spacer()
 
@@ -111,7 +111,7 @@ struct CartItemRow: View {
                         HStack(alignment: .bottom) {
                             Text("¥")
                                 .foregroundColor(.black)
-                            Text(String(itemRow.price))
+                            Text(itemRow.price != 0 ? String(itemRow.price) : "-")
                                 .foregroundColor(.black)
                                 .font(.title3)
                                 .fontWeight(.heavy)
@@ -187,7 +187,7 @@ struct CartItemRow: View {
                             inputStock.resultCartAmount -= 1
                         }
                     } message: {
-                        Text("かごからアイテムを削除しますか？")
+                        Text("かごから\(itemRow.name)を削除しますか？")
                     }
                 } // VStack
             } // HStack

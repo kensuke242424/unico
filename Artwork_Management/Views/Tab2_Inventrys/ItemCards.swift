@@ -11,6 +11,7 @@ import SwiftUI
 struct TagSortCards: View {
 
     @StateObject var itemVM: ItemViewModel
+    @StateObject var tagVM: TagViewModel
 
     @Binding var inputHome: InputHome
     @Binding var inputStock: InputStock
@@ -20,49 +21,58 @@ struct TagSortCards: View {
 
     var body: some View {
 
-        // NOTE: タグインデックス「0」 && searthItemTextが 「tags.first」 or  ""
-        if inputStock.filterTagIndex == 0 &&
-            inputStock.searchItemNameText == itemVM.tags.first!.tagName ||
-            inputStock.searchItemNameText == "" {
-
-            LazyVGrid(columns: columnsV, spacing: 20) {
-                ForEach(itemVM.items) { item in
-
-                    ItemCardRow(itemVM: itemVM,
-                                inputHome: $inputHome,
-                                inputStock: $inputStock,
-                                itemRow: item)
-                }
+        if itemVM.items == [] {
+            VStack {
+                EmptyItemView(inputHome: $inputHome, text: "アイテムが存在しません")
+                Spacer().frame(height: 200)
             }
-            .padding(.horizontal, 10)
-            Spacer().frame(height: 300)
 
-        // NOTE: itemVM.items.「item.name」「item.tag」の中に一つでも検索条件が当てはまったら
-        } else if itemVM.items.contains(where: { $0.name.contains(inputStock.searchItemNameText) }) ||
-                    itemVM.items.contains(where: { $0.tag.contains(selectFilterTag) }) {
+        } else {
 
-            LazyVGrid(columns: columnsV, spacing: 20) {
-                ForEach(itemVM.items) { item in
+            // NOTE: タグインデックス「0」 && searthItemTextが 「tags.first」 or  ""
+            if inputStock.filterTagIndex == 0 &&
+                inputStock.searchItemNameText == tagVM.tags.first!.tagName ||
+                inputStock.searchItemNameText == "" {
 
-                    if item.name.contains(inputStock.searchItemNameText) ||
-                        item.tag.contains(inputStock.searchItemNameText) ||
-                        item.tag.contains(selectFilterTag) {
+                LazyVGrid(columns: columnsV, spacing: 20) {
+                    ForEach(itemVM.items) { item in
+
                         ItemCardRow(itemVM: itemVM,
                                     inputHome: $inputHome,
                                     inputStock: $inputStock,
                                     itemRow: item)
                     }
                 }
-            }
-            .padding(.horizontal, 10)
-            Spacer().frame(height: 200)
+                .padding(.horizontal, 10)
+                Spacer().frame(height: 300)
 
-        } else {
-            Text(inputStock.filterTagIndex == 0 ? "検索に該当するアイテムはありません" : "タグに該当するアイテムはありません")
-                .font(.subheadline)
-                .foregroundColor(.white).opacity(0.6)
-                .frame(height: 200)
-            Spacer().frame(height: 300)
+                // NOTE: itemVM.items.「item.name」「item.tag」の中に一つでも検索条件が当てはまったら
+            } else if itemVM.items.contains(where: { $0.name.contains(inputStock.searchItemNameText) }) ||
+                        itemVM.items.contains(where: { $0.tag.contains(selectFilterTag) }) {
+
+                LazyVGrid(columns: columnsV, spacing: 20) {
+                    ForEach(itemVM.items) { item in
+
+                        if item.name.contains(inputStock.searchItemNameText) ||
+                            item.tag.contains(inputStock.searchItemNameText) ||
+                            item.tag.contains(selectFilterTag) {
+                            ItemCardRow(itemVM: itemVM,
+                                        inputHome: $inputHome,
+                                        inputStock: $inputStock,
+                                        itemRow: item)
+                        }
+                    }
+                }
+                .padding(.horizontal, 10)
+                Spacer().frame(height: 200)
+
+            } else {
+                Text(inputStock.filterTagIndex == 0 ? "検索に該当するアイテムはありません" : "タグに該当するアイテムはありません")
+                    .font(.subheadline)
+                    .foregroundColor(.white).opacity(0.6)
+                    .frame(height: 200)
+                Spacer().frame(height: 300)
+            }
         }
 
     } // body
@@ -79,22 +89,41 @@ struct UpdateTimeSortCards: View {
     // アイテムのディテールを指定します。
     let columnsH: [GridItem] = Array(repeating: .init(.flexible()), count: 1)
 
+    var updateTimeSortItems: [Item] {
+
+        let sortItems: [Item] = itemVM.items.sorted { before, after in
+
+            return before.updateTime!.dateValue() > after.updateTime!.dateValue() ? true : false
+        }
+
+        let prefixItems = sortItems.prefix(10)
+
+        return Array(prefixItems)
+    }
+
     var body: some View {
 
-        ScrollView(.horizontal) {
-            LazyHGrid(rows: columnsH, spacing: 20) {
-                ForEach(itemVM.items) { item in
+        if itemVM.items == [] {
+            
+            EmptyItemView(inputHome: $inputHome, text: "アイテムが存在しません")
 
-                    ItemCardRow(itemVM: itemVM,
-                                inputHome: $inputHome,
-                                inputStock: $inputStock,
-                                itemRow: item)
+        } else {
 
-                } // ForEach
-            } // LazyHGrid
-            .padding()
+            ScrollView(.horizontal) {
+                LazyHGrid(rows: columnsH, spacing: 20) {
+                    ForEach(updateTimeSortItems) { item in
+
+                        ItemCardRow(itemVM: itemVM,
+                                    inputHome: $inputHome,
+                                    inputStock: $inputStock,
+                                    itemRow: item)
+
+                    } // ForEach
+                } // LazyHGrid
+                .padding()
+            }
+            .frame(height: getRect().height / 4 + 50)
         }
-        .frame(height: 246)
     } // body
 } // View
 
@@ -117,6 +146,7 @@ struct TagCards_Previews: PreviewProvider {
             TagTitle(title: "アイテム", font: .title)
             // ✅カスタムView: アイテムを表示します。(縦スクロール)
             TagSortCards(itemVM: ItemViewModel(),
+                         tagVM: TagViewModel(),
                          inputHome: .constant(InputHome()),
                          inputStock: .constant(InputStock()),
                          selectFilterTag: "Album")
