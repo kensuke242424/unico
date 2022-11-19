@@ -23,18 +23,4 @@ struct JoinMember: Codable {
     var memberUID: String
     var name: String
     var iconURL: URL?
-    var iconPath: String?
-    var headerURL: URL?
-    var headerPath: String?
-    var settingColor: MemberColor
-}
-
-// ユーザそれぞれが個々に選ぶアプリ全体のカラー
-enum MemberColor: CaseIterable, Codable {
-    case red
-    case blue
-    case yellow
-    case orange
-    case pink
-    case gray
 }

@@ -30,7 +30,7 @@ struct ShowsItemDetail: View {
 
         ZStack {
 
-            Color(.black).opacity(0.4)
+            Color(.black).opacity(0.7)
                 .background(.ultraThinMaterial).opacity(0.95)
                 .ignoresSafeArea()
                 .onTapGesture {

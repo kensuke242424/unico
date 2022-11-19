@@ -15,12 +15,23 @@ struct User: Identifiable, Codable {
     var password: String
     var iconURL: URL?
     var iconPath: String?
-    var teams: [JoinTeam]
+    var joins: [JoinTeam]
 }
 
 struct JoinTeam: Codable {
-    var groupID: String
+    var teamID: String
     var name: String
     var headerURL: URL?
-    var color: String
+    var headerPath: String?
+    var settingColor: MemberColor
+}
+
+// Todo: ユーザそれぞれが個々に選ぶアプリ全体のカラー
+enum MemberColor: CaseIterable, Codable {
+    case red
+    case blue
+    case yellow
+    case orange
+    case pink
+    case gray
 }
