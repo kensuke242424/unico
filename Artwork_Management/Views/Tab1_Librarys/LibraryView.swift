@@ -44,6 +44,8 @@ struct LibraryView: View {
         case fit, fill
     }
 
+    @StateObject var teamVM: TeamViewModel
+    @StateObject var userVM: UserViewModel
     @StateObject var itemVM: ItemViewModel
     @StateObject var tagVM: TagViewModel
     @Binding var inputHome: InputHome
@@ -106,7 +108,7 @@ struct LibraryView: View {
                     inputTime.nowDate = Date()
                 }
 
-                // ユーザ情報一覧
+                // チーム情報一覧
                 HStack {
                     Spacer()
 
@@ -449,7 +451,9 @@ struct LibraryView: View {
 
 struct LibraryView_Previews: PreviewProvider {
     static var previews: some View {
-        LibraryView(itemVM: ItemViewModel(),
+        LibraryView(teamVM: TeamViewModel(),
+                    userVM: UserViewModel(),
+                    itemVM: ItemViewModel(),
                     tagVM: TagViewModel(),
                     inputHome: .constant(InputHome()),
                     inputImage: .constant(InputImage()))

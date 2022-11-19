@@ -17,15 +17,13 @@ class ItemViewModel: ObservableObject {
     var listener: ListenerRegistration?
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
 
-    var groupID: String = "7gm2urHDCdZGCV9pX9ef"
-
     @Published var items: [Item] = []
 
-    func fetchItem() async {
+    func fetchItem(teamID: String) async {
 
         print("fetchItem実行")
 
-        guard let itemsRef = db?.collection("groups").document(groupID).collection("items") else {
+        guard let itemsRef = db?.collection("teams").document(teamID).collection("items") else {
             print("error: guard let tagsRef")
             return
         }
@@ -47,11 +45,11 @@ class ItemViewModel: ObservableObject {
         print("fetchItem完了")
     }
 
-    func addItem(itemData: Item, tag: String, userID: String) {
+    func addItem(itemData: Item, tag: String, teamID: String) {
 
         print("addItem実行")
 
-        guard let itemsRef = db?.collection("groups").document(groupID).collection("items") else {
+        guard let itemsRef = db?.collection("teams").document(teamID).collection("items") else {
             print("error: guard let tagsRef")
             return
         }
@@ -64,13 +62,13 @@ class ItemViewModel: ObservableObject {
         print("addItem完了")
     }
 
-    func updateItem(updateData: Item, defaultDataID: String) {
+    func updateItem(updateData: Item, defaultDataID: String, teamID: String) {
 
         print("updateItem実行")
 
         print(defaultDataID)
 
-        guard let updateItemRef = db?.collection("groups").document(groupID).collection("items").document(defaultDataID) else {
+        guard let updateItemRef = db?.collection("teams").document(teamID).collection("items").document(defaultDataID) else {
             print("error: guard let tagsRef")
             return
         }
@@ -85,10 +83,10 @@ class ItemViewModel: ObservableObject {
         print("updateItem完了")
     }
 
-    func deleteItem(deleteItem: Item) {
+    func deleteItem(deleteItem: Item, teamID: String) {
 
         guard let itemID = deleteItem.id else { return }
-        guard let itemRef = db?.collection("groups").document(groupID).collection("items").document(itemID) else {
+        guard let itemRef = db?.collection("teams").document(teamID).collection("items").document(itemID) else {
             print("error: deleteItem_guard let ItemRef")
             return
         }
@@ -96,7 +94,7 @@ class ItemViewModel: ObservableObject {
         itemRef.delete()
     }
 
-    func uploadImage(_ image: UIImage, uid: String) async -> (url: URL?, filePath: String?) {
+    func uploadImage(_ image: UIImage) async -> (url: URL?, filePath: String?) {
 
         guard let imageData = image.jpegData(compressionQuality: 0.8) else {
             return (url: nil, filePath: nil)
@@ -105,7 +103,7 @@ class ItemViewModel: ObservableObject {
         do {
             let storage = Storage.storage()
             let reference = storage.reference()
-            let filePath = "\(uid)/images/\(Date()).jpeg"
+            let filePath = "images/\(Date()).jpeg"
             let imageRef = reference.child(filePath)
             _ = try await imageRef.putDataAsync(imageData)
             let url = try await imageRef.downloadURL()
@@ -118,32 +116,17 @@ class ItemViewModel: ObservableObject {
 
     func resetAmount() {
 
-        guard let reference = db?.collection("items") else { print("Error: guard db != nil"); return }
-
         for index in items.indices where items[index].amount != 0 {
-
-            guard let itemID = items[index].id else {
-                print("Error: 「\(items[index].name)」 guard let = item.id")
-                continue
-            }
-
             items[index].amount = 0
-
-            do {
-                try reference.document(itemID).setData(from: items[index])
-
-            } catch {
-                print("Error: 「\(items[index].name)」try reference.document(itemID).setData(from: item)")
-            }
         }
         print("resetAmount完了")
     }
 
-    func updateCommerseItems() {
+    func updateCommerseItems(teamID: String) {
 
         print("updateCommerse実行")
 
-        guard let itemsRef = db?.collection("groups").document(groupID).collection("items") else {
+        guard let itemsRef = db?.collection("teams").document(teamID).collection("items") else {
             print("error: guard let tagsRef")
             return
         }

@@ -14,7 +14,7 @@ struct CommerceSheet: View {
     @StateObject var itemVM: ItemViewModel
     @Binding var inputHome: InputHome
     @Binding var inputStock: InputStock
-    let userID: String
+    let teamID: String
 
     @State private var commerceButtonDisable: Bool = false
     @State private var commerceButtonOpacity: CGFloat =  1.0
@@ -72,7 +72,7 @@ struct CommerceSheet: View {
                 Button(
                     action: {
 
-                        itemVM.updateCommerseItems()
+                        itemVM.updateCommerseItems(teamID: teamID)
                         inputStock.resultCartPrice = 0
                         inputStock.resultCartAmount = 0
                         inputHome.doCommerce = true

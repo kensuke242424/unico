@@ -32,6 +32,7 @@ struct SideMenuEditTagView: View {
     @FocusState var focusedField: EditTagField?
 
     let screenSize = UIScreen.main.bounds
+    let teamID: String
 
     var body: some View {
 
@@ -181,7 +182,7 @@ struct SideMenuEditTagView: View {
                                                      tagColor: inputTag.selectionSideMenuTagColor)
 
                                 // タグをfirestoreに追加
-                                tagVM.addTag(tagData: newTagData, groupID: tagVM.groupID)
+                                tagVM.addTag(tagData: newTagData, teamID: teamID)
 
                                 withAnimation(.easeIn(duration: 0.2)) {
                                     inputHome.isOpenEditTagSideMenu.toggle()
@@ -211,7 +212,7 @@ struct SideMenuEditTagView: View {
                                                      tagColor: inputTag.selectionSideMenuTagColor)
 
                                 // firestoreにタグ更新を保存
-                                tagVM.updateTagData(updateData: newTagData, defaultData: defaultTagData)
+                                tagVM.updateTagData(updateData: newTagData, defaultData: defaultTagData, teamID: teamID)
 
                                 withAnimation(.easeIn(duration: 0.2)) {
                                     inputHome.isOpenEditTagSideMenu.toggle()
@@ -286,6 +287,7 @@ struct SideMenuNewTagView_Previews: PreviewProvider {
             inputHome: .constant(InputHome()),
             inputTag: .constant(InputTagSideMenu()),
             defaultTag: Tag(oderIndex: 1, tagName: "テストタグ", tagColor: .green),
-            tagSideMenuStatus: .create)
+            tagSideMenuStatus: .create,
+            teamID: "")
     }
 }

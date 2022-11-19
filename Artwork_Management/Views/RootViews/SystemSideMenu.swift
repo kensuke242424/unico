@@ -20,6 +20,8 @@ struct SystemSideMenu: View {
 
     @Environment(\.colorScheme) var colorScheme: ColorScheme
 
+    @StateObject var teamVM: TeamViewModel
+    @StateObject var userVM: UserViewModel
     @StateObject var itemVM: ItemViewModel
     @StateObject var tagVM: TagViewModel
 
@@ -314,7 +316,7 @@ struct SystemSideMenu: View {
         // NOTE: ローカルのタグ順番操作をfirestoreに保存
         .onChange(of: inputSideMenu.editMode) { newEdit in
             if newEdit == .inactive {
-                tagVM.updateOderTagIndex()
+                tagVM.updateOderTagIndex(teamID: teamVM.teamID)
             }
         }
 
@@ -373,7 +375,7 @@ struct SystemSideMenu: View {
 
             for tagIndex in offsets {
                 print(tagIndex)
-                tagVM.deleteTag(deleteTag: tagVM.tags[tagIndex])
+                tagVM.deleteTag(deleteTag: tagVM.tags[tagIndex], teamID: teamVM.teamID)
             }
         }
 

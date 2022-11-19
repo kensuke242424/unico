@@ -26,7 +26,7 @@ struct LogInView: View {
 
     @State private var logInNavigationPath: [LogInNavigation] = []
 
-    @State var userID: String = "sampleUserID"
+    @State var groupID: String = "7gm2urHDCdZGCV9pX9ef"
 
     // テスト用のダミーデータです。
     let testUser: User = TestUser().testUser
@@ -61,12 +61,11 @@ struct LogInView: View {
 
                 switch destination {
                 case .home:
-                    HomeTabView(userID: userID)
+                    HomeTabView()
 
                 case .signUp:
                     FirstSignInView(logInNavigationPath: $logInNavigationPath,
-                                    testUser: testUser,
-                                    userID: $userID)
+                                    testUser: testUser)
                 }
             } // navigationDestination
         } // NavigationStack

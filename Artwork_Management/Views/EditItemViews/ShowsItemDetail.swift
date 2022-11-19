@@ -13,6 +13,7 @@ struct ShowsItemDetail: View {
 
     @Binding var inputHome: InputHome
     let item: Item
+    let teamID: String
 
     struct InputItemDetail {
         var opacity: Double = 0
@@ -131,7 +132,7 @@ struct ShowsItemDetail: View {
                                                     withAnimation {
                                                         itemVM.items.removeAll(where: { $0.id == item.id })
                                                     }
-                                                    itemVM.deleteItem(deleteItem: item)
+                                                    itemVM.deleteItem(deleteItem: item, teamID: teamID)
                                                 }
                                             }
                                             .foregroundColor(.red)
@@ -203,6 +204,7 @@ struct ShowsItemDetail_Previews: PreviewProvider {
     static var previews: some View {
         ShowsItemDetail(itemVM: ItemViewModel(),
                         inputHome: .constant(InputHome()),
-                        item: TestItem().testItem)
+                        item: TestItem().testItem,
+                        teamID: "")
     }
 }

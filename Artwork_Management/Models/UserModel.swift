@@ -9,18 +9,18 @@ import FirebaseFirestore
 import FirebaseFirestoreSwift
 
 struct User: Identifiable, Codable {
-    @DocumentID var id: String? = UUID().uuidString
+    var id: String
     var name: String
     var address: String
     var password: String
     var iconURL: URL?
-    var groups: [JoinGroup]
+    var iconPath: String?
+    var teams: [JoinTeam]
 }
 
-struct JoinGroup: Codable {
+struct JoinTeam: Codable {
     var groupID: String
     var name: String
-    var iconURL: URL?
     var headerURL: URL?
     var color: String
 }

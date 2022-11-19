@@ -8,13 +8,15 @@
 import FirebaseFirestore
 import FirebaseFirestoreSwift
 
-struct Group: Codable {
+struct Team: Identifiable, Codable {
     @DocumentID var id: String? = UUID().uuidString
     var name: String
-    var members: [Member]
+    var iconURL: URL?
+    var iconPath: String?
+    var members: [JoinMember]
 }
 
-struct Member: Codable {
+struct JoinMember: Codable {
     var memberID: String
     var name: String
     var iconURL: URL?

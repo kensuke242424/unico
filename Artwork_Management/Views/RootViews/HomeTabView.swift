@@ -50,8 +50,9 @@ struct InputImage {
 
 struct HomeTabView: View {
 
+    @StateObject var teamVM: TeamViewModel = TeamViewModel()
     @StateObject var userVM: UserViewModel = UserViewModel()
-    @StateObject var rootItemVM: ItemViewModel = ItemViewModel()
+    @StateObject var itemVM: ItemViewModel = ItemViewModel()
     @StateObject var tagVM: TagViewModel = TagViewModel()
     @State private var inputHome: InputHome = InputHome()
     @State private var inputImage: InputImage = InputImage()
@@ -60,15 +61,15 @@ struct HomeTabView: View {
     @State private var inputManage: InputManageCustomizeSideMenu = InputManageCustomizeSideMenu()
     @State private var cartAvertOffsetY: CGFloat = 0.0
 
-    let userID: String
-
     var body: some View {
 
         ZStack {
 
             TabView(selection: $inputHome.homeTabIndex) {
 
-                LibraryView(itemVM: rootItemVM,
+                LibraryView(teamVM: teamVM,
+                            userVM: userVM,
+                            itemVM: itemVM,
                             tagVM: tagVM,
                             inputHome: $inputHome,
                             inputImage: $inputImage)
@@ -78,18 +79,21 @@ struct HomeTabView: View {
                     }
                     .tag(0)
 
-                StockView(itemVM: rootItemVM,
+                StockView(teamVM: teamVM,
+                          userVM: userVM,
+                          itemVM: itemVM,
                           tagVM: tagVM,
                           inputHome: $inputHome,
-                          inputImage: $inputImage,
-                          userID: userID)
+                          inputImage: $inputImage)
                     .tabItem {
                         Image(systemName: "shippingbox.fill")
                         Text("inventory")
                     }
                     .tag(1)
 
-                ManageView(itemVM: rootItemVM,
+                ManageView(teamVM: teamVM,
+                           userVM: userVM,
+                           itemVM: itemVM,
                            tagVM: tagVM,
                            inputHome: $inputHome,
                            inputImage: $inputImage,
@@ -126,9 +130,10 @@ struct HomeTabView: View {
                 .opacity(inputHome.homeTabIndex == 2 ? 1.0 : 0.0)
 
             if inputHome.isShowItemDetail {
-                ShowsItemDetail(itemVM: rootItemVM,
+                ShowsItemDetail(itemVM: itemVM,
                                 inputHome: $inputHome,
-                                item: rootItemVM.items[inputHome.actionItemIndex])
+                                item: itemVM.items[inputHome.actionItemIndex],
+                                teamID: teamVM.teamID)
             }
 
             // sideMenu_background...
@@ -144,7 +149,9 @@ struct HomeTabView: View {
                     }
                 }
 
-            SystemSideMenu(itemVM: rootItemVM,
+            SystemSideMenu(teamVM: teamVM,
+                           userVM: userVM,
+                           itemVM: itemVM,
                            tagVM: tagVM,
                            inputHome: $inputHome,
                            inputImage: $inputImage,
@@ -167,12 +174,13 @@ struct HomeTabView: View {
                 }
 
             // Open TagSideMenu...
-            SideMenuEditTagView(itemVM: rootItemVM,
+            SideMenuEditTagView(itemVM: itemVM,
                                 tagVM: tagVM,
                                 inputHome: $inputHome,
                                 inputTag: $inputTag,
                                 defaultTag: inputTag.tagSideMenuStatus == .create ? nil : inputSideMenu.selectTag,
-                                tagSideMenuStatus: inputTag.tagSideMenuStatus)
+                                tagSideMenuStatus: inputTag.tagSideMenuStatus,
+                                teamID: teamVM.teamID)
             .offset(x: inputHome.isOpenEditTagSideMenu ? UIScreen.main.bounds.width / 2 - 25 : UIScreen.main.bounds.width + 10)
 
             VStack {
@@ -217,14 +225,15 @@ struct HomeTabView: View {
         .navigationBarBackButtonHidden()
 
         .sheet(isPresented: $inputHome.isPresentedEditItem) {
-            EditItemView(itemVM: rootItemVM,
+            EditItemView(teamVM: teamVM,
+                         userVM: userVM,
+                         itemVM: itemVM,
                          tagVM: tagVM,
                          inputHome: $inputHome,
                          inputImage: $inputImage,
-                         userID: userID,
                          itemIndex: inputHome.actionItemIndex,
                          passItemData: inputHome.editItemStatus == .create ?
-                         nil : rootItemVM.items[inputHome.actionItemIndex],
+                         nil : itemVM.items[inputHome.actionItemIndex],
                          editItemStatus: inputHome.editItemStatus)
         }
 
@@ -241,22 +250,22 @@ struct HomeTabView: View {
             case .item:
                 print("別のブランチでInputHomeにactionItemIndexが格納されているため、マージ後そちらを使用して更新")
                 Task {
-                    let uploadImage =  await rootItemVM.uploadImage(newImage, uid: userID)
+                    let uploadImage =  await itemVM.uploadImage(newImage)
                     print(uploadImage)
-                    rootItemVM.items[inputHome.actionItemIndex].photoURL = uploadImage.url
+                    itemVM.items[inputHome.actionItemIndex].photoURL = uploadImage.url
                 }
 
             case .icon:
                 guard userVM.users.first != nil else { return }
                 Task {
-                    let uploadImage =  await rootItemVM.uploadImage(newImage, uid: userID)
+                    let uploadImage =  await itemVM.uploadImage(newImage)
                     print(uploadImage)
                     userVM.users[0].iconURL = uploadImage.url
                 }
 
             case .header:
                 Task {
-                    let uploadImage =  await rootItemVM.uploadImage(newImage, uid: userID)
+                    let uploadImage =  await itemVM.uploadImage(newImage)
                     print(uploadImage)
                     inputImage.homeHeaderURL = uploadImage.url
                 }
@@ -276,9 +285,9 @@ struct HomeTabView: View {
 
         .onAppear {
             Task {
-                await tagVM.fetchTag(groupID: tagVM.groupID)
+                await tagVM.fetchTag(teamID: teamVM.teamID)
                 print("fetchTagメソッド終わり")
-                await rootItemVM.fetchItem()
+                await itemVM.fetchItem(teamID: teamVM.teamID)
                 print("fetchItemメソッド終わり")
             }
         }
@@ -340,7 +349,7 @@ struct HomeTabView_Previews: PreviewProvider {
                    windowScene.flatMap(ResizableSheetCenter.resolve(for:))
                }
 
-        return HomeTabView(userID: "AAAAAAAAAAAA")
+        return HomeTabView()
             .environment(\.resizableSheetCenter, resizableSheetCenter)
 
     }

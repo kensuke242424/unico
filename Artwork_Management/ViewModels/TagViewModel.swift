@@ -15,18 +15,16 @@ class TagViewModel: ObservableObject {
         print("<<<<<<<<<  TagViewModel_init  >>>>>>>>>")
     }
 
-    var groupID: String = "7gm2urHDCdZGCV9pX9ef"
-
     var tagListener: ListenerRegistration?
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
 
     @Published var tags: [Tag] = []
 
-    func fetchTag(groupID: String) async {
+    func fetchTag(teamID: String) async {
 
         print("fetchTag実行")
 
-        guard let tagsRef = db?.collection("groups/\(groupID)/tags") else { return }
+        guard let tagsRef = db?.collection("teams/\(teamID)/tags") else { return }
 
         tagListener = tagsRef.addSnapshotListener { (snaps, _) in
 
@@ -58,8 +56,8 @@ class TagViewModel: ObservableObject {
         }
     }
 
-    func addTag(tagData: Tag, groupID: String) {
-        guard let tagsRef = db?.collection("groups/\(groupID)/tags") else { return }
+    func addTag(tagData: Tag, teamID: String) {
+        guard let tagsRef = db?.collection("teams/\(teamID)/tags") else { return }
         do {
             _ = try tagsRef.addDocument(from: tagData)
         } catch {
@@ -67,9 +65,9 @@ class TagViewModel: ObservableObject {
         }
     }
 
-    func updateOderTagIndex() {
+    func updateOderTagIndex(teamID: String) {
 
-        guard let tagsRef = db?.collection("groups/\(groupID)/tags") else { return }
+        guard let tagsRef = db?.collection("teams/\(teamID)/tags") else { return }
 
         for (index, tag) in tags.enumerated() {
             if index == 0 && index == tags.count - 1 { continue }
@@ -79,11 +77,11 @@ class TagViewModel: ObservableObject {
         }
     }
 
-    func updateTagData(updateData: Tag, defaultData: Tag) {
+    func updateTagData(updateData: Tag, defaultData: Tag, teamID: String) {
 
         guard let defaultDataID = defaultData.id else { return }
-        guard let updateTagRef = db?.collection("groups/\(groupID)/tags").document(defaultDataID) else { return }
-        guard let updateItemsRef = db?.collection("groups/\(groupID)/items") else { return }
+        guard let updateTagRef = db?.collection("teams/\(teamID)/tags").document(defaultDataID) else { return }
+        guard let updateItemsRef = db?.collection("teams/\(teamID)/items") else { return }
 
         do {
             try updateTagRef.setData(from: updateData)
@@ -109,11 +107,11 @@ class TagViewModel: ObservableObject {
 
     }
 
-    func deleteTag(deleteTag: Tag) {
+    func deleteTag(deleteTag: Tag, teamID: String) {
 
         guard let tagID = deleteTag.id else { return }
-        guard let tagRef = db?.collection("groups/\(groupID)/tags").document(tagID) else { return }
-        guard let itemsRef = db?.collection("groups/\(groupID)/items") else { return }
+        guard let tagRef = db?.collection("teams/\(teamID)/tags").document(tagID) else { return }
+        guard let itemsRef = db?.collection("teams/\(teamID)/items") else { return }
 
         itemsRef.whereField("tag", isEqualTo: deleteTag.tagName).getDocuments { (snaps, error) in
 
@@ -130,25 +128,6 @@ class TagViewModel: ObservableObject {
             }
         }
     }
-
-//    func fetchUsedColor(tagName: String) -> UsedColor {
-//
-//        // タグ名からUsedColorを受け取る
-//        if let itemRowTag = tags.first(where: { $0.tagName == tagName }) {
-//
-//            switch itemRowTag.tagColor {
-//            case "赤": return .red
-//            case "青": return .blue
-//            case "黄": return .yellow
-//            case "緑": return .green
-//            default:
-//                return .gray
-//            }
-//        } else {
-//            return .gray
-//        }
-//
-//    } // func castStringIntoColor
 
     deinit {
         print("<<<<<<<<<  TagViewModel_deinit  >>>>>>>>>")

@@ -13,8 +13,6 @@ struct FirstSignInView: View {
     // テスト用のデータ
     let testUser: User
 
-    @Binding var userID: String
-
     var body: some View {
 
         ZStack {
@@ -144,7 +142,6 @@ struct FirstLogInView_Previews: PreviewProvider {
     static var previews: some View {
 
         FirstSignInView(logInNavigationPath: .constant([]),
-                        testUser: TestUser().testUser,
-                        userID: .constant("AAAAAAAAAAAA"))
+                        testUser: TestUser().testUser)
     }
 }

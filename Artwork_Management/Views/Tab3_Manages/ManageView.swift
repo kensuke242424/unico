@@ -9,6 +9,8 @@ import SwiftUI
 
 struct ManageView: View {
 
+    @StateObject var teamVM: TeamViewModel
+    @StateObject var userVM: UserViewModel
     @StateObject var itemVM: ItemViewModel
     @StateObject var tagVM: TagViewModel
 
@@ -329,7 +331,9 @@ struct ManageView: View {
 
 struct ManageView_Previews: PreviewProvider {
     static var previews: some View {
-        ManageView(itemVM: ItemViewModel(),
+        ManageView(teamVM: TeamViewModel(),
+                   userVM: UserViewModel(),
+                   itemVM: ItemViewModel(),
                    tagVM: TagViewModel(),
                    inputHome: .constant(InputHome()),
                    inputImage: .constant(InputImage()),

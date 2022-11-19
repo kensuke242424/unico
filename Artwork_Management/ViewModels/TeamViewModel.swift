@@ -7,6 +7,8 @@
 
 import Foundation
 
-class LogInViewModel: ObservableObject {
+class TeamViewModel: ObservableObject {
+
+    var teamID: String = "7gm2urHDCdZGCV9pX9ef"
 
 }

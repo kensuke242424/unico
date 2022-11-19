@@ -28,12 +28,13 @@ struct InputEditItem {
 
 struct EditItemView: View {
 
+    @StateObject var teamVM: TeamViewModel
+    @StateObject var userVM: UserViewModel
     @StateObject var itemVM: ItemViewModel
     @StateObject var tagVM: TagViewModel
     @Binding var inputHome: InputHome
     @Binding var inputImage: InputImage
 
-    let userID: String // Todo: ユーザID取得次第、引数で受け取る
     let itemIndex: Int
     let passItemData: Item?
     let editItemStatus: EditStatus
@@ -104,7 +105,7 @@ struct EditItemView: View {
             .onChange(of: inputEdit.captureImage) { newImage in
 
                 Task {
-                    let uploadImage =  await itemVM.uploadImage(newImage, uid: userID)
+                    let uploadImage =  await itemVM.uploadImage(newImage)
                     print(uploadImage)
                     inputEdit.photoURL = uploadImage.url
                 }
@@ -161,7 +162,7 @@ struct EditItemView: View {
                                                 totalInventory: Int(inputEdit.editItemInventory) ?? 0)
 
                             // Firestoreにコーダブル保存
-                            itemVM.addItem(itemData: itemData, tag: inputEdit.selectionTagName, userID: userID)
+                            itemVM.addItem(itemData: itemData, tag: inputEdit.selectionTagName, teamID: teamVM.teamID)
 
                             inputHome.isPresentedEditItem.toggle()
 
@@ -188,7 +189,7 @@ struct EditItemView: View {
                                                        passItemData.totalInventory + (editInventory - passItemData.inventory) :
                                                         passItemData.totalInventory - (passItemData.inventory - editInventory) ))
 
-                            itemVM.updateItem(updateData: updateItemData, defaultDataID: defaultDataID)
+                            itemVM.updateItem(updateData: updateItemData, defaultDataID: defaultDataID, teamID: teamVM.teamID)
 
                             inputHome.isPresentedEditItem.toggle()
 
@@ -368,11 +369,12 @@ private struct OffsetPreferenceKey: PreferenceKey, Equatable {
 
 struct EditItemView_Previews: PreviewProvider {
     static var previews: some View {
-        EditItemView(itemVM: ItemViewModel(),
+        EditItemView(teamVM: TeamViewModel(),
+                     userVM: UserViewModel(),
+                     itemVM: ItemViewModel(),
                      tagVM: TagViewModel(),
                      inputHome: .constant(InputHome()),
                      inputImage: .constant(InputImage()),
-                     userID: "AAAAAAAAAAAA",
                      itemIndex: 0,
                      passItemData: TestItem().testItem,
                      editItemStatus: .update

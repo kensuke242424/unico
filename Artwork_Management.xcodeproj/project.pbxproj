@@ -62,8 +62,8 @@
 		E0CF7EF428DF385800735142 /* ItemCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0CF7EF328DF385800735142 /* ItemCards.swift */; };
 		E0CF7EF628DF6E6F00735142 /* AccountIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0CF7EF528DF6E6F00735142 /* AccountIconView.swift */; };
 		E0CF7EF828DF7BFA00735142 /* SystemListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0CF7EF728DF7BFA00735142 /* SystemListView.swift */; };
-		E0DE335029288D07008C7147 /* GroupModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0DE334F29288D07008C7147 /* GroupModel.swift */; };
-		E0DE98D828E2DBB800471AB4 /* LogInViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0DE98D728E2DBB800471AB4 /* LogInViewModel.swift */; };
+		E0DE335029288D07008C7147 /* TeamModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0DE334F29288D07008C7147 /* TeamModel.swift */; };
+		E0DE98D828E2DBB800471AB4 /* TeamViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0DE98D728E2DBB800471AB4 /* TeamViewModel.swift */; };
 		E0DEF2EA291A99280088A9FC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E0DEF2E9291A99280088A9FC /* GoogleService-Info.plist */; };
 		E0F78FC42919F06D00A95CD1 /* DateFormatterExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0F78FC32919F06D00A95CD1 /* DateFormatterExtension.swift */; };
 /* End PBXBuildFile section */
@@ -121,9 +121,9 @@
 		E0CF7EF328DF385800735142 /* ItemCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemCards.swift; sourceTree = "<group>"; };
 		E0CF7EF528DF6E6F00735142 /* AccountIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountIconView.swift; sourceTree = "<group>"; };
 		E0CF7EF728DF7BFA00735142 /* SystemListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemListView.swift; sourceTree = "<group>"; };
-		E0DE334F29288D07008C7147 /* GroupModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupModel.swift; sourceTree = "<group>"; };
+		E0DE334F29288D07008C7147 /* TeamModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamModel.swift; sourceTree = "<group>"; };
 		E0DE98D528E2D85E00471AB4 /* LogInCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogInCheckView.swift; sourceTree = "<group>"; };
-		E0DE98D728E2DBB800471AB4 /* LogInViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogInViewModel.swift; sourceTree = "<group>"; };
+		E0DE98D728E2DBB800471AB4 /* TeamViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamViewModel.swift; sourceTree = "<group>"; };
 		E0DEF2E9291A99280088A9FC /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		E0F78FC32919F06D00A95CD1 /* DateFormatterExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFormatterExtension.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -237,7 +237,7 @@
 		E08F273328DDB3C400329C5E /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
-				E0DE98D728E2DBB800471AB4 /* LogInViewModel.swift */,
+				E0DE98D728E2DBB800471AB4 /* TeamViewModel.swift */,
 				E01AA3A629177A76000FCD37 /* UserViewModel.swift */,
 				E0CF7EF128DF166700735142 /* ItemViewModel.swift */,
 				E01E1391291F961A0001F2DA /* TagViewModel.swift */,
@@ -249,7 +249,7 @@
 		E08F273428DDB3CA00329C5E /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				E0DE334F29288D07008C7147 /* GroupModel.swift */,
+				E0DE334F29288D07008C7147 /* TeamModel.swift */,
 				E0CC79B528E761EA00CE0B19 /* UserModel.swift */,
 				E0CF7EEF28DF152D00735142 /* ItemModel.swift */,
 				E01AA3A22916C674000FCD37 /* TagModel.swift */,
@@ -476,7 +476,7 @@
 				E08F272528DDA08E00329C5E /* Artwork_ManagementApp.swift in Sources */,
 				E0F78FC42919F06D00A95CD1 /* DateFormatterExtension.swift in Sources */,
 				E09F09C528ED5DEA00D07669 /* SideMenuEditTagView.swift in Sources */,
-				E0DE335029288D07008C7147 /* GroupModel.swift in Sources */,
+				E0DE335029288D07008C7147 /* TeamModel.swift in Sources */,
 				E01E1392291F961A0001F2DA /* TagViewModel.swift in Sources */,
 				E0796ADD28F5F2830094E50C /* CartItemsSheet.swift in Sources */,
 				E094F10028E20F1000D3C845 /* LogInView.swift in Sources */,
@@ -495,7 +495,7 @@
 				E09F09CE28F146DB00D07669 /* EditItemView.swift in Sources */,
 				E0CF7EEC28DEEED700735142 /* LibraryListView.swift in Sources */,
 				E0A7DE50290DAB40008C3F3F /* BlurView.swift in Sources */,
-				E0DE98D828E2DBB800471AB4 /* LogInViewModel.swift in Sources */,
+				E0DE98D828E2DBB800471AB4 /* TeamViewModel.swift in Sources */,
 				E0CC79B828E7811500CE0B19 /* ItemDetailData.swift in Sources */,
 				E09F09C928EE3B4900D07669 /* UsefulButton.swift in Sources */,
 			);

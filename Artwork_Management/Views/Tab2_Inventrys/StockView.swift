@@ -23,11 +23,12 @@ struct StockView: View {
     }
 
     @Environment(\.colorScheme) var colorScheme
+    @StateObject var teamVM: TeamViewModel
+    @StateObject var userVM: UserViewModel
     @StateObject var itemVM: ItemViewModel
     @StateObject var tagVM: TagViewModel
     @Binding var inputHome: InputHome
     @Binding var inputImage: InputImage
-    let userID: String
 
     @FocusState var searchFocused: SearchFocus?
     @GestureState private var dragOffset: CGFloat = 0
@@ -268,7 +269,7 @@ struct StockView: View {
                     CommerceSheet(itemVM: itemVM,
                                   inputHome: $inputHome,
                                   inputStock: $inputStock,
-                                  userID: userID)
+                                  teamID: teamVM.teamID)
 
                 } // builder.content
                 .supportedState([.medium])
@@ -358,11 +359,12 @@ struct StockView_Previews: PreviewProvider {
             windowScene.flatMap(ResizableSheetCenter.resolve(for:))
         }
 
-        return StockView(itemVM: ItemViewModel(),
+        return StockView(teamVM: TeamViewModel(),
+                         userVM: UserViewModel(),
+                         itemVM: ItemViewModel(),
                          tagVM: TagViewModel(),
                          inputHome: .constant(InputHome()),
-                         inputImage: .constant(InputImage()),
-                         userID: ""
+                         inputImage: .constant(InputImage())
         )
         .environment(\.resizableSheetCenter, resizableSheetCenter)
     }
