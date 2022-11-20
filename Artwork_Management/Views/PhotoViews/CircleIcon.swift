@@ -22,7 +22,11 @@ struct CircleIcon: View {
                         .scaledToFill()
 
                 } placeholder: {
-                    ProgressView()
+                    ZStack {
+                        ProgressView()
+                        Circle().foregroundColor(.black.opacity(0.1))
+                            .frame(width: size, height: size)
+                    }
                 }
             } else {
                 Image(systemName: "person.circle.fill")

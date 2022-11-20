@@ -114,6 +114,21 @@ class ItemViewModel: ObservableObject {
         }
     }
 
+    func deleteImage(path: String) async {
+
+        let storage = Storage.storage()
+        let reference = storage.reference()
+        let imageRef = reference.child(path)
+
+        imageRef.delete { error in
+            if let error = error {
+                print(error)
+            } else {
+                print("imageRef.delete succsess!")
+            }
+        }
+    }
+
     func resetAmount() {
 
         for index in items.indices where items[index].amount != 0 {

@@ -104,7 +104,7 @@ struct UpdateTimeSortCards: View {
     var body: some View {
 
         if itemVM.items == [] {
-            
+
             EmptyItemView(inputHome: $inputHome, text: "アイテムが存在しません")
 
         } else {

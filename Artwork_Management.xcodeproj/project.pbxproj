@@ -35,7 +35,6 @@
 		E08F273C28DDB61A00329C5E /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E08F273B28DDB61A00329C5E /* LibraryView.swift */; };
 		E08F273E28DDB65F00329C5E /* HomeTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E08F273D28DDB65F00329C5E /* HomeTabView.swift */; };
 		E094F10028E20F1000D3C845 /* LogInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E094F0FF28E20F1000D3C845 /* LogInView.swift */; };
-		E094F10228E21EBA00D3C845 /* FirstSignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E094F10128E21EBA00D3C845 /* FirstSignInView.swift */; };
 		E099CD2D291B395E00057543 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = E099CD2C291B395E00057543 /* FirebaseAuth */; };
 		E099CD2F291B395E00057543 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = E099CD2E291B395E00057543 /* FirebaseFirestore */; };
 		E099CD31291B395E00057543 /* FirebaseFirestoreSwift in Frameworks */ = {isa = PBXBuildFile; productRef = E099CD30291B395E00057543 /* FirebaseFirestoreSwift */; };
@@ -99,7 +98,6 @@
 		E08F273B28DDB61A00329C5E /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
 		E08F273D28DDB65F00329C5E /* HomeTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTabView.swift; sourceTree = "<group>"; };
 		E094F0FF28E20F1000D3C845 /* LogInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogInView.swift; sourceTree = "<group>"; };
-		E094F10128E21EBA00D3C845 /* FirstSignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstSignInView.swift; sourceTree = "<group>"; };
 		E09F09BB28EAF33500D07669 /* FocusedLineRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusedLineRow.swift; sourceTree = "<group>"; };
 		E09F09C428ED5DEA00D07669 /* SideMenuEditTagView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideMenuEditTagView.swift; sourceTree = "<group>"; };
 		E09F09C628EE266500D07669 /* InputFormTitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputFormTitle.swift; sourceTree = "<group>"; };
@@ -306,7 +304,6 @@
 			isa = PBXGroup;
 			children = (
 				E094F0FF28E20F1000D3C845 /* LogInView.swift */,
-				E094F10128E21EBA00D3C845 /* FirstSignInView.swift */,
 				E0DE98D528E2D85E00471AB4 /* LogInCheckView.swift */,
 			);
 			path = LogInViews;
@@ -467,7 +464,6 @@
 				E09F09CB28EFEA8700D07669 /* EditItemPhotoArea.swift in Sources */,
 				E0796AD328F46CC90094E50C /* ItemCardRow.swift in Sources */,
 				E08F273628DDB48100329C5E /* StockView.swift in Sources */,
-				E094F10228E21EBA00D3C845 /* FirstSignInView.swift in Sources */,
 				E0CF7EF228DF166700735142 /* ItemViewModel.swift in Sources */,
 				E0CF7EF028DF152D00735142 /* ItemModel.swift in Sources */,
 				E0CB9DCB2913964F00D95C54 /* ViewExtension.swift in Sources */,
