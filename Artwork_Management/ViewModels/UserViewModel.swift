@@ -18,12 +18,58 @@ class UserViewModel: ObservableObject {
     }
 
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
-    var uid = "sampleUserID(uid)"
 
-    @Published var users: [User] = [User(id: "sampleUserID(uid)", name: "SampleUser", address: "kennsuke242424@gmail.com",
-                                         password: "ninnzinn2424", iconURL: nil, iconPath: nil, joins: [])]
+    @Published var users: [User] = []
+    var uid = ""
+    var signInError = ""
+    var signUpError = ""
 
-    func addUser(userData: User, groupID: String) {
+    func signInAndGetUid(email: String, password: String) async -> String? {
+        do {
+            let result = try await Auth.auth().signIn(withEmail: email, password: password)
+            let uid = result.user.uid
+            print("signInAndGetUid成功_uid：\(uid)")
+            return uid
+        } catch {
+             let errorCode = AuthErrorCode.Code(rawValue: error._code)
+            switch errorCode {
+            case .invalidEmail:
+                signInError = "メールアドレスの形式が正しくありません"
+            case .emailAlreadyInUse:
+                signInError = "このメールアドレスは既に登録されています"
+            case .weakPassword:
+                signInError = "パスワードは６文字以上で入力してください"
+            default:
+                signInError = "予期せぬエラーが発生しました。"
+            }
+            return nil
+        }
+    }
+
+    func signUpAndGetUid(email: String, password: String) async -> String? {
+        do {
+            let result = try await Auth.auth().createUser(withEmail: email, password: password)
+            let uid = result.user.uid
+            print("signUpAndGetUid成功_uid：\(uid)")
+            return uid
+        } catch {
+            let errorCode = AuthErrorCode.Code(rawValue: error._code)
+
+            switch errorCode {
+            case .invalidEmail:
+                signUpError = "メールアドレスの形式が正しくありません"
+            case .emailAlreadyInUse:
+                signUpError = "このメールアドレスは既に登録されています"
+            case .weakPassword:
+                signUpError = "パスワードは６文字以上で入力してください"
+            default:
+                signUpError = "予期せぬエラーが発生しました。"
+            }
+            return nil
+        }
+    }
+
+    func addUser(userData: User) {
 
         print("addUser実行")
 
@@ -39,7 +85,6 @@ class UserViewModel: ObservableObject {
         }
         print("addUser完了")
     }
-
 }
 
 struct TestUser {
