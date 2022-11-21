@@ -51,18 +51,13 @@ struct InputLogIn {
 // ✅ ログイン画面の親Viewです。
 struct LogInView: View {
 
-    @StateObject var teamVM: TeamViewModel = TeamViewModel()
-    @StateObject var userVM: UserViewModel = UserViewModel()
-    @StateObject var itemVM: ItemViewModel = ItemViewModel()
-    @StateObject var tagVM: TagViewModel = TagViewModel()
+    @StateObject var logInVM: LogInViewModel = LogInViewModel()
 
     @State private var logInNavigationPath: [Navigation] = []
     @State private var inputLogIn: InputLogIn = InputLogIn()
+    @State private var createFaseLineImprove: CGFloat = 0.0
 
-    @FocusState private var createFocused: CreateFocused?
-
-    // テスト用のダミーデータです。
-    let testUser: User = TestUser().testUser
+    @FocusState private var createNameFocused: CreateFocused?
 
     var body: some View {
 
@@ -73,13 +68,7 @@ struct LogInView: View {
                 LinearGradient(gradient: Gradient(colors: [.customDarkGray1, .customLightGray1]),
                                startPoint: .top, endPoint: .bottom)
                 .ignoresSafeArea()
-                .onTapGesture { createFocused = nil }
-
-                RogoMark()
-                    .scaleEffect(inputLogIn.firstSelect == .signAp ? 0.4 : 1.0)
-                    .offset(y: inputLogIn.firstSelect == .signAp ? -getRect().height / 2.5 : -getRect().height / 4)
-                    .offset(x: inputLogIn.firstSelect == .signAp ? getRect().width / 3 : 0)
-                    .opacity(inputLogIn.firstSelect == .signAp ? 0.5 : 1.0)
+                .onTapGesture { createNameFocused = nil }
 
                 Group {
                     if let iconURL = inputLogIn.uploadImageData.url {
@@ -94,6 +83,12 @@ struct LogInView: View {
                 .opacity(inputLogIn.createAccount == .fase2 || inputLogIn.createAccount == .fase3 ? 1.0 : 0.0)
                 .onTapGesture { inputLogIn.isShowPickerView.toggle() }
 
+                RogoMark()
+                    .scaleEffect(inputLogIn.firstSelect == .signAp ? 0.4 : 1.0)
+                    .offset(y: inputLogIn.firstSelect == .signAp ? -getRect().height / 2.5 : -getRect().height / 4)
+                    .offset(x: inputLogIn.firstSelect == .signAp ? getRect().width / 3 : 0)
+                    .opacity(inputLogIn.firstSelect == .signAp ? 0.5 : 1.0)
+
                 firstSelectButtons()
                     .offset(y: getRect().height / 8)
                     .opacity(inputLogIn.firstSelect == .start ? 1.0 : 0.0)
@@ -101,12 +96,15 @@ struct LogInView: View {
                 if inputLogIn.firstSelect == .logIn {
                     VStack {
                         signInTitle(title: "ログイン")
+                            .padding(.bottom)
 
                         ZStack {
                             logInSelectButtons()
                                 .opacity(inputLogIn.selectSignInType == .mailAddress ? 0.0 : 1.0)
-                            MailAddressInfomation(teamVM: teamVM, userVM: userVM, inputLogIn: $inputLogIn)
-                                .opacity(inputLogIn.selectSignInType == .mailAddress ? 1.0 : 0.0)
+                            if inputLogIn.selectSignInType == .mailAddress {
+                                MailAddressInfomation(logInVM: logInVM, inputLogIn: $inputLogIn)
+                                    .opacity(inputLogIn.selectSignInType == .mailAddress ? 1.0 : 0.0)
+                            }
                         }
                     }
                     .offset(y: getRect().height / 10)
@@ -117,14 +115,10 @@ struct LogInView: View {
                     createAccountViews()
                 }
 
-                if inputLogIn.isShowProgressView {
-                    CustomProgressView()
-                }
-
                 // Back Button...
                 if inputLogIn.firstSelect != .start {
                     Button {
-                        withAnimation(.easeIn(duration: 0.3)) {
+                        withAnimation(.spring(response: 0.5)) {
 
                             if inputLogIn.selectSignInType == .mailAddress {
                                 inputLogIn.selectSignInType = .start
@@ -153,21 +147,50 @@ struct LogInView: View {
 
                         }
                     } label: {
-                        Text("<<戻る")
+                        Text("< 戻る")
                             .foregroundColor(.white.opacity(0.7))
                     }
                     .offset(y: getRect().height / 3)
                 }
+
+                if inputLogIn.firstSelect == .signAp {
+                    createFaseLine()
+                        .offset(y: -getRect().height / 3 + 30)
+                        .padding(.bottom)
+                }
+
+                // Home Back...
+                if inputLogIn.firstSelect != .start {
+                    Button {
+                        withAnimation(.spring(response: 0.5)) {
+                            inputLogIn.selectSignInType = .start
+                            inputLogIn.firstSelect = .start
+                            inputLogIn.createAccount = .start
+                            inputLogIn.createAccountTitle = false
+                            inputLogIn.createAccountContents = false
+                            if inputLogIn.createUserNameText == "名無し" { inputLogIn.createUserNameText = "" }
+                        }
+                    } label: {
+                        HStack {
+                            Text("<<")
+                            Image(systemName: "house.fill")
+                        }
+                    }
+                    .foregroundColor(.white.opacity(0.5))
+                    .offset(x: -getRect().width / 2 + 40, y: getRect().height / 2 - 60 )
+                }
+
+                // ProgressView...
+                if inputLogIn.isShowProgressView {
+                    CustomProgressView()
+                }
+
             } // ZStack
             .navigationDestination(for: Navigation.self) { destination in
 
                 switch destination {
                 case .home:
-                    HomeTabView(teamVM: teamVM,
-                                userVM: userVM,
-                                itemVM: itemVM,
-                                tagVM: tagVM)
-
+                    Text("")
                 }
             } // navigationDestination
         } // NavigationStack
@@ -175,27 +198,34 @@ struct LogInView: View {
         .onChange(of: inputLogIn.captureImage) { newImage in
             Task {
                 if let path = inputLogIn.uploadImageData.filePath {
-                    await itemVM.deleteImage(path: path)
+                    await logInVM.deleteImage(path: path)
                     print("以前の画像削除")
                 }
 
-                await inputLogIn.uploadImageData = itemVM.uploadImage(newImage)
+                await inputLogIn.uploadImageData = logInVM.uploadImage(newImage)
                 print("新規画像登録")
+            }
+        }
+
+        .onChange(of: inputLogIn.createAccount) { newFase in
+            withAnimation(.spring(response: 1.0)) {
+                switch newFase {
+                case .start:
+                    createFaseLineImprove = 0
+                case .fase1:
+                    createFaseLineImprove = 0
+                case .fase2:
+                    createFaseLineImprove = 100
+                case .fase3:
+                    createFaseLineImprove = 200
+                }
             }
         }
 
         // LogIn Sucsess fetch Data...
         .onChange(of: inputLogIn.startFetchContents) { check in
             if check {
-                Task {
-                    print("fetch開始")
-                    inputLogIn.isShowProgressView = true
-                    await tagVM.fetchTag(teamID: teamVM.teamID)
-                    await itemVM.fetchItem(teamID: teamVM.teamID)
-                    print("fetch終了")
-                    inputLogIn.isShowProgressView = false
-                    logInNavigationPath.append(.home)
-                }
+                logInNavigationPath.append(.home)
             }
         }
 
@@ -361,22 +391,31 @@ struct LogInView: View {
                 case .start: Text("")
 
                 case .fase1:
-                    if let iconURL = inputLogIn.uploadImageData.url {
-                        CircleIcon(photoURL: iconURL, size: 150)
-                            .onTapGesture { inputLogIn.isShowPickerView.toggle() }
-                    } else {
-                        Image(systemName: "photo.circle.fill").resizable().scaledToFit()
-                            .foregroundColor(.white.opacity(0.5)).frame(width: 150)
-                            .onTapGesture { inputLogIn.isShowPickerView.toggle() }
+
+                    Group {
+                        if let iconURL = inputLogIn.uploadImageData.url {
+                            CircleIcon(photoURL: iconURL, size: 150)
+                        } else {
+                            Image(systemName: "photo.circle.fill").resizable().scaledToFit()
+                                .foregroundColor(.white.opacity(0.5)).frame(width: 150)
+                        }
                     }
+                    .onTapGesture { inputLogIn.isShowPickerView.toggle() }
+                    .overlay(alignment: .top) {
+                        Text("ユーザ情報は後から変更できます。").font(.caption)
+                        .foregroundColor(.white.opacity(0.3))
+                        .frame(width: 200)
+                        .offset(y: -30)
+                    }
+
                     TextField("", text: $inputLogIn.createUserNameText)
                         .frame(width: 230)
-                        .focused($createFocused, equals: .check)
+                        .focused($createNameFocused, equals: .check)
                         .textInputAutocapitalization(.never)
                         .multilineTextAlignment(.center)
                         .background {
                             ZStack {
-                                Text(createFocused == nil && inputLogIn.createUserNameText.isEmpty ? "ユーザネーム" : "")
+                                Text(createNameFocused == nil && inputLogIn.createUserNameText.isEmpty ? "ユーザネーム" : "")
                                     .foregroundColor(.white.opacity(0.2))
                                 Rectangle().foregroundColor(.white.opacity(0.3)).frame(height: 1)
                                     .offset(y: 20)
@@ -402,19 +441,20 @@ struct LogInView: View {
                     }
                     .buttonStyle(.borderedProminent)
 
-                    Text("ユーザ情報はいつでも変更できます。").font(.caption)
-                        .foregroundColor(.white.opacity(0.6))
-
                 case .fase2:
-                    signInTitle(title: inputLogIn.selectSignInType != .mailAddress ? "新規登録" : "メールアドレス登録")
 
-                    ZStack {
-                        logInSelectButtons()
-                            .opacity(inputLogIn.selectSignInType == .mailAddress ? 0.0 : 1.0)
-                        if inputLogIn.selectSignInType == .mailAddress {
-                            MailAddressInfomation(teamVM: teamVM, userVM: userVM, inputLogIn: $inputLogIn)
-                                .opacity(inputLogIn.selectSignInType == .mailAddress ? 1.0 : 0.0)
+                    VStack {
+                        signInTitle(title: inputLogIn.selectSignInType != .mailAddress ? "新規登録" : "メールアドレス登録")
+
+                        ZStack {
+                            logInSelectButtons()
+                                .opacity(inputLogIn.selectSignInType == .mailAddress ? 0.0 : 1.0)
+                            if inputLogIn.selectSignInType == .mailAddress {
+                                MailAddressInfomation(logInVM: logInVM, inputLogIn: $inputLogIn)
+                                    .opacity(inputLogIn.selectSignInType == .mailAddress ? 1.0 : 0.0)
+                            }
                         }
+                        .offset(y: 50)
                     }
 
                 case .fase3:
@@ -424,6 +464,38 @@ struct LogInView: View {
             .opacity(inputLogIn.createAccountContents ? 1.0 : 0.0)
 
         } // VStack
+    }
+    // create fase line...
+    func createFaseLine() -> some View {
+        Rectangle()
+            .frame(width: 200, height: 1, alignment: .leading)
+            .overlay(alignment: .leading) {
+                Rectangle()
+                    .frame(width: createFaseLineImprove, height: 1)
+                    .foregroundColor(.green)
+            }
+
+            .overlay(alignment: .leading) {
+                Circle().frame(width: 12, height: 12)
+                    .foregroundColor(inputLogIn.createAccount != .fase1 ? .green : .white)
+                    .scaleEffect(inputLogIn.createAccount == .fase1 && inputLogIn.createAccountContents ? 1.5 : 1.0)
+            }
+
+            .overlay {
+                Circle().frame(width: 12, height: 12)
+                    .foregroundColor(inputLogIn.createAccount != .fase1 &&
+                                     inputLogIn.createAccount != .fase2 ? .green : .white)
+                    .scaleEffect(inputLogIn.createAccount == .fase2 && inputLogIn.createAccountContents ? 1.5 : 1.0)
+
+            }
+
+            .overlay(alignment: .trailing) {
+                Circle().frame(width: 12, height: 12)
+                    .foregroundColor(inputLogIn.createAccount != .fase1 &&
+                                     inputLogIn.createAccount != .fase2 &&
+                                     inputLogIn.createAccount != .fase3 ? .green : .white)
+                    .scaleEffect(inputLogIn.createAccount == .fase3 && inputLogIn.createAccountContents ? 1.5 : 1.0)
+            }
     }
 
 } // View
@@ -474,212 +546,224 @@ struct MailAddressInfomation: View {
         }
     }
 
-    @StateObject var teamVM: TeamViewModel
-    @StateObject var userVM: UserViewModel
+    @StateObject var logInVM: LogInViewModel
     @Binding var inputLogIn: InputLogIn
 
     @State private var addressHidden: Bool = false
     @State private var passwordHidden: Bool = false
-    @State private var passwordCountError: Bool = false
-    @State private var passwordConfirmHidden: Bool = false
-    @State private var passwordConfirmError: Bool = false
+    @State private var passwordCount6Lower: Bool = false
+    @State private var passwordConfirmIsEmpty: Bool = false
+    @State private var passwordConfirmDifference: Bool = false
     @State private var disabledButton: Bool = false
+    @State private var checkResult: Bool = false
     @State private var addressCheck: AddressCheck = .stop
-    @State private var signUperrorMessage: String = ""
+    @State private var signUpErrorMessage: String = ""
+
+    @FocusState private var createAccountFocused: CreateFocused?
 
     var body: some View {
 
-        VStack(spacing: 25) {
+        ZStack {
 
-            // 入力欄全体
-            Group {
+            Color.white.opacity(0.001).frame(width: getRect().width, height: getRect().height / 3)
+                .onTapGesture { createAccountFocused = nil }
 
-                // Mail address...
-                VStack {
-                    HStack {
-                        Text("メールアドレス")
-                            .foregroundColor(.white.opacity(0.7))
+            VStack(spacing: 25) {
 
-                        if addressHidden {
-                            Text("※アドレスが未入力です").font(.caption).foregroundColor(.red.opacity(0.7))
-                        }
-                    }
-                    .frame(width: getRect().width * 0.7, alignment: .leading)
+                // 入力欄全体
+                Group {
 
-                    RoundedRectangle(cornerRadius: 10).foregroundColor(.black.opacity(0.2))
-                        .frame(width: getRect().width * 0.7, height: 30)
-                        .overlay {
-                            TextField("unico@gmail.com", text: $inputLogIn.address)
-                                .foregroundColor(.white)
-                                .padding()
-                        }
-                }
-
-                // Password...
-                VStack {
-                    HStack {
-                        Text("パスワード")
-                            .foregroundColor(.white.opacity(0.7))
-                        if passwordHidden {
-                            Text("※パスワードが未入力です").font(.caption).foregroundColor(.red.opacity(0.7))
-                        } else if passwordCountError {
-                            Text("※パスワードは6文字以上必要です").font(.caption).foregroundColor(.red.opacity(0.7))
-                        } else {
-                            Text("(※8文字以上)").font(.caption).foregroundColor(.white.opacity(0.4))
-                        }
-                    }
-                    .frame(width: getRect().width * 0.7, alignment: .leading)
-
-                    RoundedRectangle(cornerRadius: 10).foregroundColor(.black.opacity(0.2))
-                        .frame(width: getRect().width * 0.7, height: 30)
-                        .overlay {
-                            ZStack(alignment: .leading) {
-                                if inputLogIn.passHidden {
-                                    SecureField("●●●●●●●●", text: $inputLogIn.password)
-                                        .foregroundColor(.white)
-                                        .padding()
-                                } else {
-                                    TextField("●●●●●●●●", text: $inputLogIn.password)
-                                        .foregroundColor(.white)
-                                        .padding()
-                                } // if passHidden
-
-                                HStack {
-                                    Spacer()
-
-                                    Button {
-                                        inputLogIn.passHidden.toggle()
-                                    } label: {
-                                        Image(systemName: inputLogIn.passHidden ? "eye.slash.fill" : "eye.fill")
-                                            .foregroundColor(.gray)
-                                    } // Button
-                                } // HStack
-                            } // ZStack
-                        }
-                }
-                // Password確認...
-                if inputLogIn.firstSelect == .signAp {
+                    // Mail address...
                     VStack {
                         HStack {
-                            Text("パスワード確認")
+                            Text("メールアドレス")
                                 .foregroundColor(.white.opacity(0.7))
-                            if passwordConfirmError {
-                                Text("※パスワードが一致しません").font(.caption).foregroundColor(.red.opacity(0.7))
+                            if addressHidden {
+                                Text("※アドレスが未入力です").font(.caption).foregroundColor(.red.opacity(0.7))
                             }
                         }
                         .frame(width: getRect().width * 0.7, alignment: .leading)
 
-                        RoundedRectangle(cornerRadius: 10).foregroundColor(.black.opacity(0.2))
+                        TextField("unico@gmail.com", text: $inputLogIn.address)
+                            .foregroundColor(.white)
+                            .focused($createAccountFocused, equals: .check)
+                            .padding()
                             .frame(width: getRect().width * 0.7, height: 30)
-                            .overlay {
-                                ZStack(alignment: .leading) {
-                                    if inputLogIn.passHidden {
-                                        SecureField("●●●●●●●●", text: $inputLogIn.passwordConfirm)
-                                            .foregroundColor(.white)
-                                            .padding()
-                                    } else {
-                                        TextField("●●●●●●●●", text: $inputLogIn.passwordConfirm)
-                                            .foregroundColor(.white)
-                                            .padding()
-                                    }
-
-                                    HStack {
-                                        Spacer()
-
-                                        Button {
-                                            inputLogIn.passHiddenConfirm.toggle()
-                                        } label: {
-                                            Image(systemName: inputLogIn.passHiddenConfirm ? "eye.slash.fill" : "eye.fill")
-                                                .foregroundColor(.gray)
-                                        } // Button
-                                    } // HStack
-                                } // ZStack
-                            }
+                            .background(RoundedRectangle(cornerRadius: 10).foregroundColor(.black.opacity(0.2)).frame(height: 30))
                     }
-                }
-            } // Group(入力欄全体)
-            .font(.subheadline)
-            .autocapitalization(.none)
-            .keyboardType(.emailAddress)
-            .padding(.horizontal, 25)
 
-            Button(inputLogIn.firstSelect == .logIn ? "ログイン" : "ユーザ登録") {
+                    // Password...
+                    VStack {
+                        HStack {
+                            Text("パスワード")
+                                .foregroundColor(.white.opacity(0.7))
+                            if passwordHidden {
+                                Text("※パスワードが未入力です").font(.caption).foregroundColor(.red.opacity(0.7))
+                            } else if passwordCount6Lower {
+                                Text("※パスワードは6文字以上必要です").font(.caption).foregroundColor(.red.opacity(0.7))
+                            } else {
+                                Text("(※8文字以上)").font(.caption).foregroundColor(.white.opacity(0.4))
+                            }
+                        }
+                        .frame(width: getRect().width * 0.7, alignment: .leading)
 
-                addressHidden = false
-                passwordHidden = false
-                passwordCountError = false
-                passwordConfirmHidden = false
-                passwordConfirmError = false
-                signUperrorMessage = ""
+                        Group {
+                            if inputLogIn.passHidden {
+                                SecureField("●●●●●●●●", text: $inputLogIn.password)
+                            } else {
+                                TextField("●●●●●●●●", text: $inputLogIn.password)
+                            }
+                        }
+                        .foregroundColor(.white)
+                        .focused($createAccountFocused, equals: .check)
+                        .padding()
+                        .frame(width: getRect().width * 0.7, height: 30)
+                        .background(RoundedRectangle(cornerRadius: 10).foregroundColor(.black.opacity(0.2)).frame(height: 30))
+                        .overlay(alignment: .trailing) {
+                            Button {
+                                inputLogIn.passHidden.toggle()
+                            } label: {
+                                Image(systemName: inputLogIn.passHidden ? "eye.slash.fill" : "eye.fill")
+                                    .foregroundColor(.gray)
+                            } // Button
+                        }
+                    }
+                    // Password確認...
+                    if inputLogIn.firstSelect == .signAp {
+                        VStack {
+                            HStack {
+                                Text("パスワード確認")
+                                    .foregroundColor(.white.opacity(0.7))
+                                if passwordConfirmDifference {
+                                    Text("※パスワードが一致しません").font(.caption).foregroundColor(.red.opacity(0.7))
+                                }
+                            }
+                            .frame(width: getRect().width * 0.7, alignment: .leading)
 
-                addressCheck = .start
+                            Group {
+                                if inputLogIn.passHidden {
+                                    SecureField("●●●●●●●●", text: $inputLogIn.passwordConfirm)
+                                } else {
+                                    TextField("●●●●●●●●", text: $inputLogIn.passwordConfirm)
+                                }
+                            }
+                            .foregroundColor(.white)
+                            .focused($createAccountFocused, equals: .check)
+                            .padding()
+                            .frame(width: getRect().width * 0.7, height: 30)
+                            .background(RoundedRectangle(cornerRadius: 10).foregroundColor(.black.opacity(0.2)).frame(height: 30))
+                            .overlay(alignment: .trailing) {
+                                Button {
+                                    inputLogIn.passHidden.toggle()
+                                } label: {
+                                    Image(systemName: inputLogIn.passHidden ? "eye.slash.fill" : "eye.fill")
+                                        .foregroundColor(.gray)
+                                } // Button
+                            }
+                        }
+                    }
+                } // Group(入力欄全体)
+                .font(.subheadline)
+                .autocapitalization(.none)
+                .keyboardType(.emailAddress)
+                .padding(.horizontal, 25)
 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                Button(inputLogIn.firstSelect == .logIn ? "ログイン" : "ユーザ登録") {
+
+                    addressHidden = false
+                    passwordHidden = false
+                    passwordCount6Lower = false
+                    passwordConfirmIsEmpty = false
+                    passwordConfirmDifference = false
+                    logInVM.logInErrorMessage = ""
+
+                    addressCheck = .start
+
                     if inputLogIn.address.isEmpty { addressHidden.toggle() }
                     if inputLogIn.password.isEmpty { passwordHidden.toggle() }
-                    if inputLogIn.password.count < 6 { passwordCountError.toggle() }
-                    if inputLogIn.passwordConfirm.isEmpty { passwordConfirmHidden.toggle() }
-                    if inputLogIn.password != inputLogIn.passwordConfirm { passwordConfirmError.toggle() }
+                    if inputLogIn.password.count < 6 { passwordCount6Lower.toggle() }
+                    if inputLogIn.passwordConfirm.isEmpty { passwordConfirmIsEmpty.toggle() }
+                    if inputLogIn.password != inputLogIn.passwordConfirm { passwordConfirmDifference.toggle() }
 
-                    if addressHidden || passwordHidden || passwordCountError || passwordConfirmHidden || passwordConfirmError {
+                    if addressHidden || passwordHidden || passwordCount6Lower || passwordConfirmIsEmpty || passwordConfirmDifference {
                         print("ユーザ登録記入欄に不備あり")
                         addressCheck = .failure
                         return
+
                     } else {
+
                         switch inputLogIn.firstSelect {
                         case .start: return
+
                         case .signAp:
                             Task {
-                                let uid: String? = await userVM.signUpAndGetUid(email: inputLogIn.address, password: inputLogIn.password)
-
-                                if let uid = uid {
-                                    let userData = User(id: uid,
-                                                        name: inputLogIn.createUserNameText,
-                                                        address: inputLogIn.address,
-                                                        password: inputLogIn.password,
-                                                        iconURL: inputLogIn.uploadImageData.url,
-                                                        iconPath: inputLogIn.uploadImageData.filePath,
-                                                        joins: [])
-                                    userVM.addUser(userData: userData)
-                                    withAnimation(.spring(response: 0.5)) {
-                                        addressCheck = .succsess
-                                    }
+                                checkResult = await logInVM.signUp(email: inputLogIn.address, password: inputLogIn.password)
+                                if checkResult {
+                                    // サインアップ成功
+                                    withAnimation(.spring(response: 0.5)) { addressCheck = .succsess }
                                 } else {
-                                    print("uidがnilです")
-                                    withAnimation(.spring(response: 0.5)) {
-                                        addressCheck = .failure
-                                    }
+                                    // サインアップ失敗
+                                    withAnimation(.spring(response: 0.5)) { addressCheck = .failure }
                                 }
                             }
 
                         case .logIn:
-                            inputLogIn.startFetchContents.toggle()
+                            Task {
+                                checkResult = await logInVM.signIn(email: inputLogIn.address, password: inputLogIn.password)
+                                if checkResult {
+                                    // ログイン成功
+                                    withAnimation(.spring(response: 0.5)) { addressCheck = .succsess }
+                                } else {
+                                    // ログイン失敗
+                                    withAnimation(.spring(response: 0.5)) { addressCheck = .failure }
+                                }
+                            }
                         }
                     }
                 }
-            }
-            .buttonStyle(.borderedProminent)
-            .disabled(addressCheck == .start ? true : false)
-            .overlay(alignment: .top) {
-                HStack {
-                    if addressCheck == .start {
-                        ProgressView().frame(width: 10, height: 10)
-                    } else {
-                        addressCheck.icon.foregroundColor(addressCheck == .failure ? .red : .green)
+                .buttonStyle(.borderedProminent)
+                .disabled(addressCheck == .start ? true : false)
+                .overlay(alignment: .top) {
+                    HStack {
+                        if addressCheck == .start {
+                            ProgressView().frame(width: 10, height: 10)
+                        } else {
+                            addressCheck.icon.foregroundColor(addressCheck == .failure ? .red : .green)
+                        }
+                        Text(addressCheck.text).foregroundColor(.white.opacity(0.5))
                     }
-                    Text(addressCheck.text).foregroundColor(.white.opacity(0.5))
+                    .font(.caption)
+                    .offset(y: -30)
                 }
-                .font(.caption)
-                .offset(y: -30)
+                .overlay(alignment: .bottomTrailing) {
+                    Button("やり直す") {
+                        addressHidden = false
+                        passwordHidden = false
+                        passwordCount6Lower = false
+                        passwordConfirmIsEmpty = false
+                        passwordConfirmDifference = false
+                        logInVM.logInErrorMessage = ""
+
+                        addressCheck = .stop
+                    }
+                    .overlay(alignment: .bottom) {(Rectangle().frame(height: 1)) }
+                    .font(.caption)
+                    .foregroundColor(.white)
+                    .offset(x: 100)
+                    .opacity(addressCheck == .failure ? 1.0 : 0.0)
+                }
+                .padding(.top, 20)
+
+                Text(logInVM.logInErrorMessage).font(.subheadline)
+                    .foregroundColor(.red).opacity(0.8)
+
+            } // VStack
+
+            .onDisappear {
+                logInVM.logInErrorMessage = ""
             }
-            .padding(.top, 20)
-
-            Text(signUperrorMessage).font(.subheadline).foregroundColor(.red.opacity(0.8))
-
-        }.padding() // VStack
-
+        }
     } // body
-
 } // View
 
 struct LogInView_Previews: PreviewProvider {
