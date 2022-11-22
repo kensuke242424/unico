@@ -18,6 +18,8 @@
 		E01E1392291F961A0001F2DA /* TagViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E01E1391291F961A0001F2DA /* TagViewModel.swift */; };
 		E01E13942920EE850001F2DA /* EmptyItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E01E13932920EE840001F2DA /* EmptyItemView.swift */; };
 		E0455FDE292B2B83004F677D /* LogInViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0455FDD292B2B83004F677D /* LogInViewModel.swift */; };
+		E0455FE0292BBB75004F677D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E0455FDF292BBB74004F677D /* GoogleService-Info.plist */; };
+		E0455FE2292C5B1C004F677D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0455FE1292C5B1C004F677D /* ContentView.swift */; };
 		E04ACF4128E6DD600054A6C4 /* ShowsItemDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04ACF4028E6DD600054A6C4 /* ShowsItemDetail.swift */; };
 		E04ACF4328E73C660054A6C4 /* IndicatorRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04ACF4228E73C660054A6C4 /* IndicatorRow.swift */; };
 		E05130E228F341620092FE46 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E05130E128F341610092FE46 /* RootView.swift */; };
@@ -65,7 +67,6 @@
 		E0DE335029288D07008C7147 /* TeamModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0DE334F29288D07008C7147 /* TeamModel.swift */; };
 		E0DE33522928F48D008C7147 /* CustomProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0DE33512928F48D008C7147 /* CustomProgressView.swift */; };
 		E0DE98D828E2DBB800471AB4 /* TeamViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0DE98D728E2DBB800471AB4 /* TeamViewModel.swift */; };
-		E0DEF2EA291A99280088A9FC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E0DEF2E9291A99280088A9FC /* GoogleService-Info.plist */; };
 		E0F78FC42919F06D00A95CD1 /* DateFormatterExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0F78FC32919F06D00A95CD1 /* DateFormatterExtension.swift */; };
 /* End PBXBuildFile section */
 
@@ -81,6 +82,8 @@
 		E01E1391291F961A0001F2DA /* TagViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagViewModel.swift; sourceTree = "<group>"; };
 		E01E13932920EE840001F2DA /* EmptyItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyItemView.swift; sourceTree = "<group>"; };
 		E0455FDD292B2B83004F677D /* LogInViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogInViewModel.swift; sourceTree = "<group>"; };
+		E0455FDF292BBB74004F677D /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		E0455FE1292C5B1C004F677D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		E04ACF4028E6DD600054A6C4 /* ShowsItemDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowsItemDetail.swift; sourceTree = "<group>"; };
 		E04ACF4228E73C660054A6C4 /* IndicatorRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndicatorRow.swift; sourceTree = "<group>"; };
 		E05130E128F341610092FE46 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
@@ -126,7 +129,6 @@
 		E0DE33512928F48D008C7147 /* CustomProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomProgressView.swift; sourceTree = "<group>"; };
 		E0DE98D528E2D85E00471AB4 /* LogInCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogInCheckView.swift; sourceTree = "<group>"; };
 		E0DE98D728E2DBB800471AB4 /* TeamViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamViewModel.swift; sourceTree = "<group>"; };
-		E0DEF2E9291A99280088A9FC /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		E0F78FC32919F06D00A95CD1 /* DateFormatterExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFormatterExtension.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -170,6 +172,7 @@
 			isa = PBXGroup;
 			children = (
 				E05130E128F341610092FE46 /* RootView.swift */,
+				E0455FE1292C5B1C004F677D /* ContentView.swift */,
 				E08F273D28DDB65F00329C5E /* HomeTabView.swift */,
 				E0A7DE4F290DAB40008C3F3F /* BlurView.swift */,
 				E09F09C828EE3B4900D07669 /* UsefulButton.swift */,
@@ -201,7 +204,7 @@
 			isa = PBXGroup;
 			children = (
 				E08F272428DDA08E00329C5E /* Artwork_ManagementApp.swift */,
-				E0DEF2E9291A99280088A9FC /* GoogleService-Info.plist */,
+				E0455FDF292BBB74004F677D /* GoogleService-Info.plist */,
 				E08F273228DDB3B200329C5E /* Views */,
 				E08F273328DDB3C400329C5E /* ViewModels */,
 				E08F273428DDB3CA00329C5E /* Models */,
@@ -417,7 +420,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E08F272C28DDA09000329C5E /* Preview Assets.xcassets in Resources */,
-				E0DEF2EA291A99280088A9FC /* GoogleService-Info.plist in Resources */,
+				E0455FE0292BBB75004F677D /* GoogleService-Info.plist in Resources */,
 				E08F272928DDA09000329C5E /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -453,6 +456,7 @@
 				E09F09C728EE266600D07669 /* InputFormTitle.swift in Sources */,
 				E0CF7EF828DF7BFA00735142 /* SystemListView.swift in Sources */,
 				E04ACF4128E6DD600054A6C4 /* ShowsItemDetail.swift in Sources */,
+				E0455FE2292C5B1C004F677D /* ContentView.swift in Sources */,
 				E01AA3A32916C674000FCD37 /* TagModel.swift in Sources */,
 				E08F273C28DDB61A00329C5E /* LibraryView.swift in Sources */,
 				E01AA3A9291780DD000FCD37 /* UIImageExtension.swift in Sources */,
@@ -644,7 +648,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.-gmail.kennsuke242424ios.Artwork-Management";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.-gmail.kennsuke242424.unico";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -675,7 +679,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.-gmail.kennsuke242424ios.Artwork-Management";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.-gmail.kennsuke242424.unico";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;

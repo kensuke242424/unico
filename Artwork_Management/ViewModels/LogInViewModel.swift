@@ -21,7 +21,7 @@ class LogInViewModel: ObservableObject {
 
     var logInErrorMessage: String = ""
 
-    func signIn(email: String, password: String) async -> Bool {
+    func SignIn(email: String, password: String) async -> Bool {
 
         logInErrorMessage = ""
 
@@ -33,14 +33,13 @@ class LogInViewModel: ObservableObject {
         } catch {
              let errorCode = AuthErrorCode.Code(rawValue: error._code)
             switch errorCode {
-            case .invalidEmail:
-                logInErrorMessage = "メールアドレスの形式が正しくありません"
-            case .emailAlreadyInUse:
-                logInErrorMessage = "このメールアドレスは既に登録されています"
-            case .weakPassword:
-                logInErrorMessage = "パスワードは６文字以上で入力してください"
-            default:
-                logInErrorMessage = "予期せぬエラーが発生しました。"
+            case .invalidEmail: logInErrorMessage = "メールアドレスの形式が正しくありません"
+            case .wrongPassword: logInErrorMessage = "入力したパスワードでサインインできません"
+            case .emailAlreadyInUse: logInErrorMessage = "このメールアドレスは既に登録されています"
+            case .weakPassword: logInErrorMessage = "パスワードは６文字以上で入力してください"
+            case .userNotFound: logInErrorMessage = "入力情報のユーザは見つかりませんでした"
+            case .userDisabled: logInErrorMessage = "このアカウントは無効です"
+            default: logInErrorMessage = "予期せぬエラーが発生しました。"
             }
             return false
         }
@@ -59,16 +58,27 @@ class LogInViewModel: ObservableObject {
             let errorCode = AuthErrorCode.Code(rawValue: error._code)
 
             switch errorCode {
-            case .invalidEmail:
-                logInErrorMessage = "メールアドレスの形式が正しくありません"
-            case .emailAlreadyInUse:
-                logInErrorMessage = "このメールアドレスは既に登録されています"
-            case .weakPassword:
-                logInErrorMessage = "パスワードは６文字以上で入力してください"
-            default:
-                logInErrorMessage = "予期せぬエラーが発生しました。"
+            case .invalidEmail: logInErrorMessage = "メールアドレスの形式が正しくありません"
+            case .emailAlreadyInUse: logInErrorMessage = "このメールアドレスは既に登録されています"
+            case .weakPassword: logInErrorMessage = "パスワードは６文字以上で入力してください"
+            case .userNotFound: logInErrorMessage = "入力情報のユーザは見つかりませんでした"
+            case .userDisabled: logInErrorMessage = "このアカウントは無効です"
+            default: logInErrorMessage = "予期せぬエラーが発生しました。"
             }
             return false
+        }
+    }
+
+    func passwordUpdate(email: String) {
+
+        Auth.auth().sendPasswordReset(withEmail: email) { [weak self] error in
+            guard let self = self else { return }
+            if error ==  nil {
+                print("パスワード変更メール送信完了")
+            } else {
+                print("パスワード変更メール送信失敗")
+                self.logInErrorMessage = "パスワード変更メール送信失敗"
+            }
         }
     }
 
