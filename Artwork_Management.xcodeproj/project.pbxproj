@@ -19,7 +19,11 @@
 		E01E13942920EE850001F2DA /* EmptyItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E01E13932920EE840001F2DA /* EmptyItemView.swift */; };
 		E0455FDE292B2B83004F677D /* LogInViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0455FDD292B2B83004F677D /* LogInViewModel.swift */; };
 		E0455FE0292BBB75004F677D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E0455FDF292BBB74004F677D /* GoogleService-Info.plist */; };
-		E0455FE2292C5B1C004F677D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0455FE1292C5B1C004F677D /* ContentView.swift */; };
+		E0455FE2292C5B1C004F677D /* StandByView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0455FE1292C5B1C004F677D /* StandByView.swift */; };
+		E0455FE4292C8EF0004F677D /* BounceAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0455FE3292C8EF0004F677D /* BounceAnimationView.swift */; };
+		E0455FE6292CA002004F677D /* ColorCubeRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0455FE5292CA001004F677D /* ColorCubeRow.swift */; };
+		E0455FE8292CCB39004F677D /* HashableExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0455FE7292CCB39004F677D /* HashableExtension.swift */; };
+		E0455FEA292D1947004F677D /* GradientBackbround.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0455FE9292D1947004F677D /* GradientBackbround.swift */; };
 		E04ACF4128E6DD600054A6C4 /* ShowsItemDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04ACF4028E6DD600054A6C4 /* ShowsItemDetail.swift */; };
 		E04ACF4328E73C660054A6C4 /* IndicatorRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04ACF4228E73C660054A6C4 /* IndicatorRow.swift */; };
 		E05130E228F341620092FE46 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E05130E128F341610092FE46 /* RootView.swift */; };
@@ -83,7 +87,11 @@
 		E01E13932920EE840001F2DA /* EmptyItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyItemView.swift; sourceTree = "<group>"; };
 		E0455FDD292B2B83004F677D /* LogInViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogInViewModel.swift; sourceTree = "<group>"; };
 		E0455FDF292BBB74004F677D /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		E0455FE1292C5B1C004F677D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		E0455FE1292C5B1C004F677D /* StandByView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandByView.swift; sourceTree = "<group>"; };
+		E0455FE3292C8EF0004F677D /* BounceAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BounceAnimationView.swift; sourceTree = "<group>"; };
+		E0455FE5292CA001004F677D /* ColorCubeRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorCubeRow.swift; sourceTree = "<group>"; };
+		E0455FE7292CCB39004F677D /* HashableExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HashableExtension.swift; sourceTree = "<group>"; };
+		E0455FE9292D1947004F677D /* GradientBackbround.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientBackbround.swift; sourceTree = "<group>"; };
 		E04ACF4028E6DD600054A6C4 /* ShowsItemDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowsItemDetail.swift; sourceTree = "<group>"; };
 		E04ACF4228E73C660054A6C4 /* IndicatorRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndicatorRow.swift; sourceTree = "<group>"; };
 		E05130E128F341610092FE46 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
@@ -164,6 +172,7 @@
 				E01AA3A8291780DD000FCD37 /* UIImageExtension.swift */,
 				E01AA3AA291780ED000FCD37 /* StringExtension.swift */,
 				E01AA3AC2917AD4C000FCD37 /* ViewExtension.swift */,
+				E0455FE7292CCB39004F677D /* HashableExtension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -172,7 +181,6 @@
 			isa = PBXGroup;
 			children = (
 				E05130E128F341610092FE46 /* RootView.swift */,
-				E0455FE1292C5B1C004F677D /* ContentView.swift */,
 				E08F273D28DDB65F00329C5E /* HomeTabView.swift */,
 				E0A7DE4F290DAB40008C3F3F /* BlurView.swift */,
 				E09F09C828EE3B4900D07669 /* UsefulButton.swift */,
@@ -310,6 +318,7 @@
 			isa = PBXGroup;
 			children = (
 				E094F0FF28E20F1000D3C845 /* LogInView.swift */,
+				E0455FE1292C5B1C004F677D /* StandByView.swift */,
 				E0DE98D528E2D85E00471AB4 /* LogInCheckView.swift */,
 			);
 			path = LogInViews;
@@ -345,6 +354,9 @@
 			children = (
 				E0B328902923AD9D00E94BC3 /* GradientLine.swift */,
 				E0DE33512928F48D008C7147 /* CustomProgressView.swift */,
+				E0455FE3292C8EF0004F677D /* BounceAnimationView.swift */,
+				E0455FE5292CA001004F677D /* ColorCubeRow.swift */,
+				E0455FE9292D1947004F677D /* GradientBackbround.swift */,
 			);
 			path = ViewParts;
 			sourceTree = "<group>";
@@ -455,8 +467,9 @@
 			files = (
 				E09F09C728EE266600D07669 /* InputFormTitle.swift in Sources */,
 				E0CF7EF828DF7BFA00735142 /* SystemListView.swift in Sources */,
+				E0455FE6292CA002004F677D /* ColorCubeRow.swift in Sources */,
 				E04ACF4128E6DD600054A6C4 /* ShowsItemDetail.swift in Sources */,
-				E0455FE2292C5B1C004F677D /* ContentView.swift in Sources */,
+				E0455FE2292C5B1C004F677D /* StandByView.swift in Sources */,
 				E01AA3A32916C674000FCD37 /* TagModel.swift in Sources */,
 				E08F273C28DDB61A00329C5E /* LibraryView.swift in Sources */,
 				E01AA3A9291780DD000FCD37 /* UIImageExtension.swift in Sources */,
@@ -466,6 +479,7 @@
 				E0796AD728F485850094E50C /* ButtonViewModel.swift in Sources */,
 				E04ACF4328E73C660054A6C4 /* IndicatorRow.swift in Sources */,
 				E09F09BC28EAF33500D07669 /* FocusedLineRow.swift in Sources */,
+				E0455FEA292D1947004F677D /* GradientBackbround.swift in Sources */,
 				E0B328932924A42100E94BC3 /* ManageCustomizeSideMenu.swift in Sources */,
 				E0B3288C2921577F00E94BC3 /* ElementSwitchingPickerView.swift in Sources */,
 				E09F09CB28EFEA8700D07669 /* EditItemPhotoArea.swift in Sources */,
@@ -475,6 +489,7 @@
 				E0CF7EF028DF152D00735142 /* ItemModel.swift in Sources */,
 				E0CB9DCB2913964F00D95C54 /* ViewExtension.swift in Sources */,
 				E0A7DE4E290C289A008C3F3F /* CircleIcon.swift in Sources */,
+				E0455FE8292CCB39004F677D /* HashableExtension.swift in Sources */,
 				E0796AE328F6D77A0094E50C /* CommerceSheet.swift in Sources */,
 				E0A7DE4B290B9E0A008C3F3F /* ShowItemPhoto.swift in Sources */,
 				E08F273E28DDB65F00329C5E /* HomeTabView.swift in Sources */,
@@ -498,6 +513,7 @@
 				E08F273A28DDB53700329C5E /* SystemView.swift in Sources */,
 				E0CC79B628E761EA00CE0B19 /* UserModel.swift in Sources */,
 				E0A36452290A37A600B30A14 /* CustomArcShape.swift in Sources */,
+				E0455FE4292C8EF0004F677D /* BounceAnimationView.swift in Sources */,
 				E01AA3A729177A76000FCD37 /* UserViewModel.swift in Sources */,
 				E0CF7EF628DF6E6F00735142 /* AccountIconView.swift in Sources */,
 				E09F09CE28F146DB00D07669 /* EditItemView.swift in Sources */,

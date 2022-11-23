@@ -25,6 +25,7 @@ struct InputHome {
     var itemsInfomationOpacity: CGFloat = 0.0
     var basketInfomationOpacity: CGFloat = 0.0
     var showErrorFetchImage: Bool = false
+    var isShowProgress: Bool = false
     var isShowItemDetail: Bool = false
     var isShowHomeTopNavigation: Bool = false
     var isPresentedEditItem: Bool = false
@@ -50,6 +51,7 @@ struct InputImage {
 
 struct HomeTabView: View {
 
+    @Binding var rootNavigation: RootNavigation
     @StateObject var teamVM: TeamViewModel
     @StateObject var userVM: UserViewModel
     @StateObject var itemVM: ItemViewModel
@@ -122,12 +124,16 @@ struct HomeTabView: View {
                              inputHome.homeTabIndex == 0 &&
                              inputImage.homeHeaderURL != nil
                              ? 0.0 : 1.0)
+                    .offset(y: -getRect().height / 2 + getSafeArea().top + 15)
+                    .padding(.horizontal, 20)
             }
 
-            ManageCustomizeSideMenu(inputManage: $inputManage, isOpen: $inputHome.isShowManageCustomSideMenu)
-                .offset(x: getRect().width, y: -40)
-                .offset(x: inputHome.isShowManageCustomSideMenu ? -170 : 50)
-                .opacity(inputHome.homeTabIndex == 2 ? 1.0 : 0.0)
+            if inputHome.homeTabIndex == 2 {
+                ManageCustomizeSideMenu(inputManage: $inputManage, isOpen: $inputHome.isShowManageCustomSideMenu)
+                    .offset(x: getRect().width, y: -40)
+                    .offset(x: inputHome.isShowManageCustomSideMenu ? -170 : 50)
+                    .opacity(inputHome.homeTabIndex == 2 ? 1.0 : 0.0)
+            }
 
             if inputHome.isShowItemDetail {
                 ShowsItemDetail(itemVM: itemVM,
@@ -153,6 +159,7 @@ struct HomeTabView: View {
                            userVM: userVM,
                            itemVM: itemVM,
                            tagVM: tagVM,
+                           rootNavigation: $rootNavigation,
                            inputHome: $inputHome,
                            inputImage: $inputImage,
                            inputTag: $inputTag,
@@ -218,7 +225,11 @@ struct HomeTabView: View {
             }
             .offset(y: 80)
 
+            if inputHome.isShowProgress {
+                CustomProgressView()
+            }
         } // ZStack
+        .ignoresSafeArea()
         .animation(.easeIn(duration: 0.2), value: inputHome.itemsInfomationOpacity)
         .animation(.easeIn(duration: 0.2), value: inputHome.basketInfomationOpacity)
         .animation(.easeIn(duration: 0.2), value: inputHome.showErrorFetchImage)
@@ -282,11 +293,6 @@ struct HomeTabView: View {
                 }
             }
         } // .onChange(cartState)
-
-        .onAppear {
-            print("HomeTabView_onAppear")
-        }
-
     } // body
 } // View
 
@@ -297,37 +303,36 @@ struct NavigationHeader: View {
 
     var body: some View {
 
-            HStack {
-                Button {
-                    withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                        inputHome.isShowSystemSideMenu.toggle()
-                    }
-                    withAnimation(.easeIn(duration: 0.2)) {
-                        inputHome.sideMenuBackGround.toggle()
-                    }
-                } label: {
-                    CircleIcon(photoURL: photoURL, size: getSafeArea().top - 20)
+        HStack(alignment: .bottom) {
+            Button {
+                withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+                    inputHome.isShowSystemSideMenu.toggle()
                 }
-
-                Spacer()
-
-                Button {
-                    inputHome.editItemStatus = .create
-                    inputHome.isPresentedEditItem.toggle()
-                } label: {
-                    Image(systemName: "shippingbox.fill")
-                        .resizable()
-                        .frame(width: 20, height: 20)
-                        .overlay(alignment: .topTrailing) {
-                            Image(systemName: "plus.circle.fill")
-                                .resizable()
-                                .frame(width: 10, height: 10)
-                                .offset(x: 7, y: -7)
-                        }
+                withAnimation(.easeIn(duration: 0.2)) {
+                    inputHome.sideMenuBackGround.toggle()
                 }
-            } // HStack
-            .padding(.horizontal)
-            .offset(y: -getRect().height / 2 + getSafeArea().top)
+            } label: {
+                CircleIcon(photoURL: photoURL, size: getSafeArea().top - 20)
+            }
+
+            Spacer()
+
+            Button {
+                inputHome.editItemStatus = .create
+                inputHome.isPresentedEditItem.toggle()
+            } label: {
+                Image(systemName: "shippingbox.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 25)
+                    .overlay(alignment: .topTrailing) {
+                        Image(systemName: "plus.circle.fill")
+                            .resizable()
+                            .frame(width: 10, height: 10)
+                            .offset(x: 7, y: -7)
+                    }
+            }
+        } // HStack
     }
 }
 
@@ -344,7 +349,8 @@ struct HomeTabView_Previews: PreviewProvider {
                    windowScene.flatMap(ResizableSheetCenter.resolve(for:))
                }
 
-        return HomeTabView(teamVM: TeamViewModel(),
+        return HomeTabView(rootNavigation: .constant(.home),
+                           teamVM: TeamViewModel(),
                            userVM: UserViewModel(),
                            itemVM: ItemViewModel(),
                            tagVM: TagViewModel())

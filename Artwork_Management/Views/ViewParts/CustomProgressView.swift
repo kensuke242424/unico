@@ -17,8 +17,9 @@ struct CustomProgressView: View {
                 .foregroundColor(colorScheme == ColorScheme.light ? .white : .black)
                 .opacity(0.3)
                 .ignoresSafeArea()
-            VStack {
-                ProgressView("Loading...")
+            VStack(spacing: 30) {
+                ProgressView()
+                BounceAnimationView(text: "Loading...", startTime: 0.4)
             }
         }
     }

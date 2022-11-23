@@ -74,153 +74,144 @@ struct InputLogIn {
 // ✅ ログイン画面の親Viewです。
 struct LogInView: View {
 
+    @Binding var rootNavigation: RootNavigation
     @StateObject var logInVM: LogInViewModel = LogInViewModel()
 
     @State private var logInNavigationPath: [Navigation] = []
     @State private var inputLogIn: InputLogIn = InputLogIn()
+    @State private var selectMemberColor: MemberColor = .gray
     @State private var createFaseLineImprove: CGFloat = 0.0
 
     @FocusState private var createNameFocused: CreateFocused?
 
     var body: some View {
 
-        NavigationStack(path: $logInNavigationPath) {
+        ZStack {
 
-            ZStack {
+            GradientBackbround(color1: selectMemberColor.color1,
+                               color2: selectMemberColor.colorAccent)
+            .onTapGesture { createNameFocused = nil }
 
-                LinearGradient(gradient: Gradient(colors: [.customDarkGray1, .customLightGray1]),
-                               startPoint: .top, endPoint: .bottom)
-                .ignoresSafeArea()
-                .onTapGesture { createNameFocused = nil }
-
-                Group {
-                    if let iconURL = inputLogIn.uploadImageData.url {
-                        CircleIcon(photoURL: iconURL, size: 60)
-                    } else {
-                        Image(systemName: "person.circle.fill").resizable().scaledToFit()
-                            .foregroundColor(.white.opacity(0.5)).frame(width: 60)
-                    }
+            Group {
+                if let iconURL = inputLogIn.uploadImageData.url {
+                    CircleIcon(photoURL: iconURL, size: 60)
+                } else {
+                    Image(systemName: "person.circle.fill").resizable().scaledToFit()
+                        .foregroundColor(.white.opacity(0.5)).frame(width: 60)
                 }
-                .offset(x: -getRect().width / 3, y: -getRect().height / 2.5)
-                .offset(x: inputLogIn.createAccount == .fase2 || inputLogIn.createAccount == .fase3 ? 0 : 30)
-                .opacity(inputLogIn.createAccount == .fase2 || inputLogIn.createAccount == .fase3 ? 1.0 : 0.0)
-                .onTapGesture { inputLogIn.isShowPickerView.toggle() }
+            }
+            .offset(x: -getRect().width / 3, y: -getRect().height / 2.5)
+            .offset(x: inputLogIn.createAccount == .fase2 || inputLogIn.createAccount == .fase3 ? 0 : 30)
+            .opacity(inputLogIn.createAccount == .fase2 || inputLogIn.createAccount == .fase3 ? 1.0 : 0.0)
+            .onTapGesture { inputLogIn.isShowPickerView.toggle() }
 
-                RogoMark()
-                    .scaleEffect(inputLogIn.firstSelect == .signAp ? 0.4 : 1.0)
-                    .offset(y: inputLogIn.firstSelect == .signAp ? -getRect().height / 2.5 : -getRect().height / 4)
-                    .offset(x: inputLogIn.firstSelect == .signAp ? getRect().width / 3 : 0)
-                    .opacity(inputLogIn.firstSelect == .signAp ? 0.5 : 1.0)
+            RogoMark()
+                .scaleEffect(inputLogIn.firstSelect == .signAp ? 0.4 : 1.0)
+                .offset(y: inputLogIn.firstSelect == .signAp ? -getRect().height / 2.5 : -getRect().height / 4)
+                .offset(x: inputLogIn.firstSelect == .signAp ? getRect().width / 3 : 0)
+                .opacity(inputLogIn.firstSelect == .signAp ? 0.5 : 1.0)
 
-                firstSelectButtons()
-                    .offset(y: getRect().height / 8)
-                    .opacity(inputLogIn.firstSelect == .start ? 1.0 : 0.0)
+            firstSelectButtons()
+                .offset(y: getRect().height / 8)
+                .opacity(inputLogIn.firstSelect == .start ? 1.0 : 0.0)
 
-                if inputLogIn.firstSelect == .logIn {
-                    VStack {
-                        signInTitle(title: "ログイン")
-                            .padding(.bottom)
-
-                        ZStack {
-                            logInSelectButtons()
-                                .opacity(inputLogIn.selectSignInType == .mailAddress ? 0.0 : 1.0)
-                            if inputLogIn.selectSignInType == .mailAddress {
-                                MailAddressInfomation(logInVM: logInVM, inputLogIn: $inputLogIn)
-                                    .opacity(inputLogIn.selectSignInType == .mailAddress ? 1.0 : 0.0)
-                            }
-                        }
-                    }
-                    .offset(y: getRect().height / 10)
-                    .opacity(inputLogIn.firstSelect == .logIn ? 1.0 : 0.0)
-                }
-
-                if inputLogIn.createAccount != .start {
-                    createAccountViews()
-                }
-
-                // Back Button...
-                if inputLogIn.firstSelect != .start {
-                    Button {
-                        withAnimation(.spring(response: 0.5)) {
-
-                            if inputLogIn.selectSignInType == .mailAddress {
-                                inputLogIn.selectSignInType = .start
-                                return
-                            }
-
-                            switch inputLogIn.firstSelect {
-                            case .start: print("")
-                            case .logIn: inputLogIn.firstSelect = .start
-                            case .signAp: print("")
-                            }
-
-                            switch inputLogIn.createAccount {
-                            case .start: print("")
-                            case .fase1:
-                                inputLogIn.firstSelect = .start
-                                inputLogIn.createAccount = .start
-                                inputLogIn.createAccountTitle = false
-                                inputLogIn.createAccountContents = false
-                            case .fase2:
-                                if inputLogIn.createUserNameText == "名無し" { inputLogIn.createUserNameText = "" }
-                                inputLogIn.createAccount = .fase1
-                            case .fase3:
-                                inputLogIn.createAccount = .fase2
-                            }
-
-                        }
-                    } label: {
-                        Text("< 戻る")
-                            .foregroundColor(.white.opacity(0.7))
-                    }
-                    .disabled(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .succsess ? true : false)
-                    .opacity(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .succsess ? 0.2 : 1.0)
-                    .offset(y: getRect().height / 3)
-                }
-
-                if inputLogIn.firstSelect == .signAp {
-                    createAccountIndicator()
-                        .offset(y: -getRect().height / 3 + 30)
+            if inputLogIn.firstSelect == .logIn {
+                VStack {
+                    signInTitle(title: "ログイン")
                         .padding(.bottom)
-                }
 
-                // Home Back...
-                if inputLogIn.firstSelect != .start {
-                    Button {
-                        withAnimation(.spring(response: 1.0)) {
+                    ZStack {
+                        logInSelectButtons()
+                            .opacity(inputLogIn.selectSignInType == .mailAddress ? 0.0 : 1.0)
+                        if inputLogIn.selectSignInType == .mailAddress {
+                            MailAddressInfomation(logInVM: logInVM, inputLogIn: $inputLogIn)
+                                .opacity(inputLogIn.selectSignInType == .mailAddress ? 1.0 : 0.0)
+                        }
+                    }
+                }
+                .offset(y: getRect().height / 10)
+                .opacity(inputLogIn.firstSelect == .logIn ? 1.0 : 0.0)
+            }
+
+            if inputLogIn.createAccount != .start {
+                createAccountViews()
+            }
+
+            // Back Button...
+            if inputLogIn.firstSelect != .start {
+                Button {
+                    withAnimation(.spring(response: 0.5)) {
+
+                        if inputLogIn.selectSignInType == .mailAddress {
                             inputLogIn.selectSignInType = .start
+                            return
+                        }
+
+                        switch inputLogIn.firstSelect {
+                        case .start: print("")
+                        case .logIn: inputLogIn.firstSelect = .start
+                        case .signAp: print("")
+                        }
+
+                        switch inputLogIn.createAccount {
+                        case .start: print("")
+                        case .fase1:
                             inputLogIn.firstSelect = .start
                             inputLogIn.createAccount = .start
                             inputLogIn.createAccountTitle = false
                             inputLogIn.createAccountContents = false
+                        case .fase2:
                             if inputLogIn.createUserNameText == "名無し" { inputLogIn.createUserNameText = "" }
+                            inputLogIn.createAccount = .fase1
+                        case .fase3:
+                            inputLogIn.createAccount = .fase2
                         }
-                    } label: {
-                        HStack {
-                            Text("<<")
-                            Image(systemName: "house.fill")
-                        }
+
                     }
-                    .disabled(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .succsess ? true : false)
-                    .opacity(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .succsess ? 0.2 : 1.0)
-                    .foregroundColor(.white.opacity(0.5))
-                    .offset(x: -getRect().width / 2 + 40, y: getRect().height / 2 - 60 )
+                } label: {
+                    Text("< 戻る")
+                        .foregroundColor(.white.opacity(0.7))
                 }
+                .disabled(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .succsess ? true : false)
+                .opacity(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .succsess ? 0.2 : 1.0)
+                .offset(y: getRect().height / 3)
+            }
 
-                // ProgressView...
-                if inputLogIn.isShowProgressView {
-                    CustomProgressView()
+            if inputLogIn.firstSelect == .signAp {
+                createAccountIndicator()
+                    .offset(y: -getRect().height / 3 + 30)
+                    .padding(.bottom)
+            }
+
+            // Home Back...
+            if inputLogIn.firstSelect != .start {
+                Button {
+                    withAnimation(.spring(response: 1.0)) {
+                        inputLogIn.selectSignInType = .start
+                        inputLogIn.firstSelect = .start
+                        inputLogIn.createAccount = .start
+                        inputLogIn.createAccountTitle = false
+                        inputLogIn.createAccountContents = false
+                        if inputLogIn.createUserNameText == "名無し" { inputLogIn.createUserNameText = "" }
+                    }
+                } label: {
+                    HStack {
+                        Text("<<")
+                        Image(systemName: "house.fill")
+                    }
                 }
+                .disabled(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .succsess ? true : false)
+                .opacity(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .succsess ? 0.2 : 1.0)
+                .foregroundColor(.white.opacity(0.5))
+                .offset(x: -getRect().width / 2 + 40, y: getRect().height / 2 - 60 )
+            }
 
-            } // ZStack
-            .navigationDestination(for: Navigation.self) { destination in
+            // ProgressView...
+            if inputLogIn.isShowProgressView {
+                CustomProgressView()
+            }
 
-                switch destination {
-                case .home:
-                    Text("")
-                }
-            } // navigationDestination
-        } // NavigationStack
+        } // ZStack
 
         .onChange(of: inputLogIn.captureImage) { newImage in
             Task {
@@ -255,7 +246,9 @@ struct LogInView: View {
             if check == .succsess {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                     // RootViewへ移動
-                    logInNavigationPath.append(.home)
+                    withAnimation(.spring(response: 0.5)) {
+                        rootNavigation = .fetch
+                    }
                 }
             }
         }
@@ -295,7 +288,7 @@ struct LogInView: View {
                     RoundedRectangle(cornerRadius: 15)
                         .foregroundColor(.black.opacity(0.1))
                         .frame(width: 250, height: 60)
-                        .background(.ultraThinMaterial)
+                        .background(BlurView(style: .systemMaterialDark))
                         .clipShape(RoundedRectangle(cornerRadius: 15))
                         .shadow(radius: 10, x: 5, y: 5)
                     Text("ログイン")
@@ -325,7 +318,7 @@ struct LogInView: View {
                     RoundedRectangle(cornerRadius: 15)
                         .foregroundColor(.black.opacity(0.1))
                         .frame(width: 250, height: 60)
-                        .background(.ultraThinMaterial)
+                        .background(BlurView(style: .systemMaterialDark))
                         .clipShape(RoundedRectangle(cornerRadius: 15))
                         .shadow(radius: 10, x: 5, y: 5)
                     Text("いいえ、初めてです")
@@ -500,10 +493,11 @@ struct LogInView: View {
     // create fase line...
     func createAccountIndicator() -> some View {
         Rectangle()
-            .frame(width: 200, height: 1, alignment: .leading)
+            .frame(width: 200, height: 2, alignment: .leading)
+            .foregroundColor(.white)
             .overlay(alignment: .leading) {
                 Rectangle()
-                    .frame(width: createFaseLineImprove, height: 1)
+                    .frame(width: createFaseLineImprove, height: 2)
                     .foregroundColor(.green)
             }
 
@@ -586,7 +580,6 @@ struct MailAddressInfomation: View {
     @State private var passwordConfirmIsEmpty: Bool = false
     @State private var passwordConfirmDifference: Bool = false
     @State private var disabledButton: Bool = false
-    @State private var checkResult: Bool = false
     @State private var signUpErrorMessage: String = ""
 
     @FocusState private var createAccountFocused: CreateFocused?
@@ -733,8 +726,12 @@ struct MailAddressInfomation: View {
 
                         case .signAp:
                             Task {
-                                checkResult = await logInVM.signUp(email: inputLogIn.address, password: inputLogIn.password)
-                                if checkResult {
+                                let checkSignUp = await logInVM.signUp(email: inputLogIn.address,
+                                                                       password: inputLogIn.password)
+                                let checkAddUser = await logInVM.addUser(name: inputLogIn.createUserNameText,
+                                                                     address: inputLogIn.address,
+                                                                     password: inputLogIn.password)
+                                if checkSignUp, checkAddUser {
                                     // サインアップ成功
                                     withAnimation(.spring(response: 0.5)) { inputLogIn.addressCheck = .succsess }
                                 } else {
@@ -745,8 +742,9 @@ struct MailAddressInfomation: View {
 
                         case .logIn:
                             Task {
-                                checkResult = await logInVM.SignIn(email: inputLogIn.address, password: inputLogIn.password)
-                                if checkResult {
+                                let checkSignIn = await logInVM.SignIn(email: inputLogIn.address,
+                                                                       password: inputLogIn.password)
+                                if checkSignIn {
                                     // ログイン成功
                                     withAnimation(.spring(response: 0.5)) { inputLogIn.addressCheck = .succsess }
                                 } else {
@@ -815,6 +813,6 @@ struct MailAddressInfomation: View {
 
 struct LogInView_Previews: PreviewProvider {
     static var previews: some View {
-        LogInView()
+        LogInView(rootNavigation: .constant(.logIn))
     }
 }

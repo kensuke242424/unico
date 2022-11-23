@@ -19,9 +19,19 @@ class UserViewModel: ObservableObject {
 
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
 
-    @Published var users: [User] = []
+    @Published var users: [User] = [User(id: "sampleUserID(uid)", name: "SampleUser", address: "kennsuke242424@gmail.com",
+                                         password: "ninnzinn2424", iconURL: nil, iconPath: nil, joins: [])]
     var uid = ""
 
+    func logOut() -> Bool {
+        do {
+            try Auth.auth().signOut()
+            return true
+        } catch let signOutError as NSError {
+            print("Error signing out: %@", signOutError)
+            return false
+        }
+    }
 }
 
 struct TestUser {

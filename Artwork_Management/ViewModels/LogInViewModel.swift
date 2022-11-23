@@ -82,21 +82,25 @@ class LogInViewModel: ObservableObject {
         }
     }
 
-    func addUser(userData: User) {
+    func addUser(name: String, address: String?, password: String?) async -> Bool {
 
         print("addUser実行")
 
-        guard let itemsRef = db?.collection("users") else {
-            print("error: guard let tagsRef")
-            return
+        guard let itemsRef = db?.collection("users"), let uid = Auth.auth().currentUser?.uid else {
+            print("error: guard let itemsRef = db?.collection(users), let uid = Auth.auth().currentUser?.uid")
+            return false
         }
+
+        let userData = User(id: uid, name: name, address: address, password: password, joins: [])
 
         do {
             _ = try itemsRef.addDocument(from: userData)
         } catch {
             print("Error: try db!.collection(collectionID).addDocument(from: itemData)")
+            return false
         }
         print("addUser完了")
+        return true
     }
 
     func uploadImage(_ image: UIImage) async -> (url: URL?, filePath: String?) {

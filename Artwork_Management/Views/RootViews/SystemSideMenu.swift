@@ -25,6 +25,7 @@ struct SystemSideMenu: View {
     @StateObject var itemVM: ItemViewModel
     @StateObject var tagVM: TagViewModel
 
+    @Binding var rootNavigation: RootNavigation
     @Binding var inputHome: InputHome
     @Binding var inputImage: InputImage
     @Binding var inputTag: InputTagSideMenu
@@ -249,9 +250,26 @@ struct SystemSideMenu: View {
                                         Label("QRコード招待", systemImage: "qrcode")
                                         .onTapGesture {  }
 
+                                        Label("ログアウト", systemImage: "figure.wave")
+                                            .onTapGesture {
+                                                inputHome.isShowProgress.toggle()
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                                    if userVM.logOut() {
+                                                        print("ログアウト成功")
+                                                        inputHome.isShowProgress.toggle()
+                                                        withAnimation(.easeIn(duration: 0.5)) {
+                                                            rootNavigation = .logIn
+                                                        }
+                                                    } else {
+                                                        inputHome.isShowProgress.toggle()
+                                                        print("ログアウト失敗")
+                                                    }
+                                                }
+                                            }
+
                                     } // VStack
                                     .foregroundColor(.white)
-                                    .frame(width: 210, height: 120, alignment: .topLeading)
+                                    .frame(width: 210, height: 180, alignment: .topLeading)
                                     .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
                                     .offset(x: 20, y: 30)
                                 }
@@ -319,10 +337,8 @@ struct SystemSideMenu: View {
                 tagVM.updateOderTagIndex(teamID: teamVM.teamID)
             }
         }
-
         .clipShape(SideMenuShape())
         .contentShape(SideMenuShape())
-
         .background(
 
             SideMenuShape()
