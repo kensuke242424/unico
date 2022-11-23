@@ -100,7 +100,7 @@ struct LogInView: View {
                         .foregroundColor(.white.opacity(0.5)).frame(width: 60)
                 }
             }
-            .offset(x: -getRect().width / 3, y: -getRect().height / 2.5)
+            .offset(x: -getRect().width / 3, y: -getRect().height / 2.5 - 5)
             .offset(x: inputLogIn.createAccount == .fase3 || inputLogIn.createAccount == .fase3 ? 0 : 30)
             .opacity(inputLogIn.createAccount == .fase3 || inputLogIn.createAccount == .fase3 ? 1.0 : 0.0)
             .onTapGesture { inputLogIn.isShowPickerView.toggle() }
@@ -123,8 +123,11 @@ struct LogInView: View {
                     ZStack {
                         logInSelectButtons()
                             .opacity(inputLogIn.selectSignInType == .mailAddress ? 0.0 : 1.0)
+
                         if inputLogIn.selectSignInType == .mailAddress {
-                            MailAddressInfomation(logInVM: logInVM, inputLogIn: $inputLogIn)
+                            MailAddressInfomation(logInVM: logInVM,
+                                                  inputLogIn: $inputLogIn,
+                                                  rootNavigation: $rootNavigation)
                                 .opacity(inputLogIn.selectSignInType == .mailAddress ? 1.0 : 0.0)
                         }
                     }
@@ -135,7 +138,6 @@ struct LogInView: View {
 
             if inputLogIn.createAccount != .start {
                 createAccountViews()
-                    .offset(y: inputLogIn.createAccount == .fase3 && inputLogIn.selectSignInType != .mailAddress ? -20 : 0)
             }
 
             // Back Button...
@@ -244,16 +246,16 @@ struct LogInView: View {
         }
 
         // LogIn Sucsess fetch Data...
-        .onChange(of: inputLogIn.addressCheck) { check in
-            if check == .succsess {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    // RootViewへ移動
-                    withAnimation(.spring(response: 0.5)) {
-                        rootNavigation = .fetch
-                    }
-                }
-            }
-        }
+//        .onChange(of: inputLogIn.addressCheck) { check in
+//            if check == .succsess {
+//                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+//                    // RootViewへ移動
+//                    withAnimation(.spring(response: 0.5)) {
+//                        rootNavigation = .fetch
+//                    }
+//                }
+//            }
+//        }
 
         .sheet(isPresented: $inputLogIn.isShowPickerView) {
             PHPickerView(captureImage: $inputLogIn.captureImage, isShowSheet: $inputLogIn.isShowPickerView, isShowError: $inputLogIn.captureError)
@@ -509,7 +511,9 @@ struct LogInView: View {
                             logInSelectButtons()
                                 .opacity(inputLogIn.selectSignInType == .mailAddress ? 0.0 : 1.0)
                             if inputLogIn.selectSignInType == .mailAddress {
-                                MailAddressInfomation(logInVM: logInVM, inputLogIn: $inputLogIn)
+                                MailAddressInfomation(logInVM: logInVM,
+                                                      inputLogIn: $inputLogIn,
+                                                      rootNavigation: $rootNavigation)
                                     .opacity(inputLogIn.selectSignInType == .mailAddress ? 1.0 : 0.0)
                             }
                         }
@@ -557,7 +561,6 @@ struct LogInView: View {
                             .opacity(inputLogIn.createAccount == .fase2 && inputLogIn.createAccountContents ? 1.0 : 0.0)
                             .offset(y: -20)
                     }
-
             }
 
             .overlay(alignment: .trailing) {
@@ -604,6 +607,7 @@ struct MailAddressInfomation: View {
 
     @StateObject var logInVM: LogInViewModel
     @Binding var inputLogIn: InputLogIn
+    @Binding var rootNavigation: RootNavigation
 
     @State private var addressHidden: Bool = false
     @State private var passwordHidden: Bool = false
@@ -658,11 +662,16 @@ struct MailAddressInfomation: View {
                             } else {
                                 Text("(※6文字以上)").font(.caption).foregroundColor(.white.opacity(0.4))
                             }
-                            Button {
-                                logInVM.passwordUpdate(email: inputLogIn.address)
-                            } label: {
-                                Text("パスワードを忘れた").font(.caption)
+
+                            if inputLogIn.firstSelect ==  .logIn {
+                                Button {
+//                                    logInVM.passwordUpdate(email: inputLogIn.address)
+                                } label: {
+                                    Text("パスワードを忘れた").font(.caption)
+                                }
+                                .padding(.leading)
                             }
+
                         }
                         .frame(width: getRect().width * 0.7, alignment: .leading)
 
@@ -764,20 +773,27 @@ struct MailAddressInfomation: View {
 
                                 let uid = Auth.auth().currentUser!.uid
 
-                                    let newUserData = User(id: uid,
-                                                        name: inputLogIn.createUserNameText,
-                                                        address: inputLogIn.address,
-                                                        password: inputLogIn.password,
-                                                        iconURL: inputLogIn.uploadImageData.url,
-                                                        iconPath: inputLogIn.uploadImageData.filePath,
-                                                        joins: [])
+                                let newUserData = User(id: uid,
+                                                       name: inputLogIn.createUserNameText,
+                                                       address: inputLogIn.address,
+                                                       password: inputLogIn.password,
+                                                       iconURL: inputLogIn.uploadImageData.url,
+                                                       iconPath: inputLogIn.uploadImageData.filePath,
+                                                       joins: [])
 
-                                    let checkAddUser = await logInVM.addUser(userData: newUserData)
-
+                                let checkAddUser = await logInVM.addUser(userData: newUserData)
 
                                 if checkSignUp, checkAddUser {
                                     // サインアップ成功
                                     withAnimation(.spring(response: 0.5)) { inputLogIn.addressCheck = .succsess }
+
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                                        // RootViewのfetch処理へ移動
+                                        withAnimation(.spring(response: 0.5)) {
+                                            rootNavigation = .fetch
+                                        }
+                                    }
+
                                 } else {
                                     // サインアップ失敗
                                     withAnimation(.spring(response: 0.5)) { inputLogIn.addressCheck = .failure }
@@ -791,6 +807,12 @@ struct MailAddressInfomation: View {
                                 if checkSignIn {
                                     // ログイン成功
                                     withAnimation(.spring(response: 0.5)) { inputLogIn.addressCheck = .succsess }
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                                        // RootViewのfetch処理へ移動
+                                        withAnimation(.spring(response: 0.5)) {
+                                            rootNavigation = .fetch
+                                        }
+                                    }
                                 } else {
                                     // ログイン失敗
                                     withAnimation(.spring(response: 0.5)) { inputLogIn.addressCheck = .failure }

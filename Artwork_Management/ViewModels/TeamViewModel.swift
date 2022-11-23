@@ -33,9 +33,15 @@ class TeamViewModel: ObservableObject {
             return nil
         }
 
+        print(uid)
+
         do {
-            let document = try await usersRef.document(uid).getDocument(as: User.self)
-//            let teamID = document["joins"]
+            let document = try await usersRef.document(uid).getDocument()
+            print("document取得OK")
+            let user = try document.data(as: User.self)
+            print("user取得OK")
+            let joinsData = user.joins
+            print("joinsData: \(joinsData)")
         } catch {
             print("Error: fetchTeam_try await usersRef.document(uid).getDocument(as: User.self)")
             return nil

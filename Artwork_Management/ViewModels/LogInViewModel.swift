@@ -92,7 +92,8 @@ class LogInViewModel: ObservableObject {
         }
 
         do {
-            _ = try usersRef.addDocument(from: userData)
+            // currentUserのuidとドキュメントIDを同じにして保存
+            _ = try usersRef.document(userData.id).setData(from: userData)
         } catch {
             print("Error: try db!.collection(collectionID).addDocument(from: itemData)")
             return false

@@ -19,9 +19,29 @@ class UserViewModel: ObservableObject {
 
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
 
-    @Published var users: [User] = [User(id: "sampleUserID(uid)", name: "SampleUser", address: "kennsuke242424@gmail.com",
-                                         password: "ninnzinn2424", iconURL: nil, iconPath: nil, joins: [])]
+    @Published var users: [User] = []
     var uid = ""
+
+    func fetchUser() async -> Bool {
+
+        guard let uid = Auth.auth().currentUser?.uid,
+              let userRef = db?.collection("users").document(uid) else { return false }
+
+        userRef.getDocument(as: User.self) { result in
+
+            switch result {
+            case .success(let user):
+                self.users.append(user)
+            case .failure(let error):
+                print("fetchUser失敗: \(error)")
+            }
+        }
+        if self.users.isEmpty {
+            return false
+        } else {
+            return true
+        }
+    }
 
     func logOut() -> Bool {
         do {
