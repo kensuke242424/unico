@@ -21,7 +21,7 @@ class LogInViewModel: ObservableObject {
 
     var logInErrorMessage: String = ""
 
-    func SignIn(email: String, password: String) async -> Bool {
+    func signIn(email: String, password: String) async -> Bool {
 
         logInErrorMessage = ""
 
@@ -82,19 +82,17 @@ class LogInViewModel: ObservableObject {
         }
     }
 
-    func addUser(name: String, address: String?, password: String?) async -> Bool {
+    func addUser(userData: User) async -> Bool {
 
         print("addUser実行")
 
-        guard let itemsRef = db?.collection("users"), let uid = Auth.auth().currentUser?.uid else {
+        guard let usersRef = db?.collection("users") else {
             print("error: guard let itemsRef = db?.collection(users), let uid = Auth.auth().currentUser?.uid")
             return false
         }
 
-        let userData = User(id: uid, name: name, address: address, password: password, joins: [])
-
         do {
-            _ = try itemsRef.addDocument(from: userData)
+            _ = try usersRef.addDocument(from: userData)
         } catch {
             print("Error: try db!.collection(collectionID).addDocument(from: itemData)")
             return false

@@ -10,7 +10,7 @@ import SwiftUI
 struct StandByView: View {
 
     private let columnsV: [GridItem] = Array(repeating: .init(.flexible()), count: 4)
-    let memberColor: MemberColor = .gray
+    @State private var memberColor: MemberColor = .gray
 
     var body: some View {
 
@@ -26,9 +26,8 @@ struct StandByView: View {
                 LazyVGrid(columns: columnsV, spacing: 40) {
                     ForEach(0 ..< 4, id: \.self) { index in
                         if let randomColor = MemberColor.allCases.randomElement() {
-                            ColorCubeRow(color1: randomColor.color3,
-                                         color2: randomColor.colorAccent,
-                                         startTime: Double(index) * 0.5)
+                            ColorCubeRow(colorRow: randomColor,
+                                         startTime: Double(index) * 0.5, colorSet: $memberColor)
                         }
                     }
                 }

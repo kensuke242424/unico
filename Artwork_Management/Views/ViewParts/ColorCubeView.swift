@@ -15,9 +15,12 @@ struct ColorCubeView: View {
     var body: some View {
 
         LazyVGrid(columns: columnsV, spacing: 40) {
-            ForEach(MemberColor.allCases, id: \.self) { color in
-                ColorCubeRow(color1: color.color2, color2: color.colorAccent,
-                             startTime: Double(color.index) * 0.5)
+            ForEach(MemberColor.allCases, id: \.self) { colorRow in
+
+                ColorCubeRow(colorRow: colorRow,
+                             startTime: Double(colorRow.index) * 0.5,
+                             colorSet: $colorSet)
+
             }
         }
         .frame(width: getRect().width - 60)
@@ -26,8 +29,9 @@ struct ColorCubeView: View {
 
 struct ColorCubeRow: View {
 
-    let color1: Color
-    let color2: Color
+    let colorRow: MemberColor
+    let startTime: Double
+    @Binding var colorSet: MemberColor
 
     @State var offsetYLoopBounce: CGFloat = -30
     @State var offsetYTapBounce: CGFloat = 0
@@ -37,17 +41,10 @@ struct ColorCubeRow: View {
     @State var tapColorOpacity: CGFloat = 0.0
     @State var loopAngle = Angle(degrees: 0.0)
     @State var tapAngle = Angle(degrees: 0.0)
-    @State var baseTime: Double
     @State var customFont: CustomFont = .avenirNextUltraLight
 
-    let timer = Timer.publish(every: 7, on: .current, in: .common).autoconnect()
+    let timer = Timer.publish(every: 1, on: .current, in: .common).autoconnect()
     let character: Image = Image(systemName: "cube")
-
-    init(color1: Color, color2: Color, startTime: Double) {
-        self.color1 = color1
-        self.color2 = color2
-        self.baseTime = startTime
-    }
 
     var body: some View {
 
@@ -56,12 +53,12 @@ struct ColorCubeRow: View {
             .font(.custom(customFont.font, fixedSize: 50)).opacity(0.7)
             .background {
                 Circle()
-                    .fill(LinearGradient(gradient: Gradient(colors: [color1, color2]),
+                    .fill(LinearGradient(gradient: Gradient(colors: [colorRow.color1, colorRow.colorAccent]),
                                          startPoint: .top, endPoint: .bottom))
                     .frame(width: 37)
                     .overlay {
                         Ellipse()
-                            .stroke(color2, lineWidth: 5)
+                            .stroke(.white, lineWidth: 5)
                             .blur(radius: 3)
                             .frame(width: 40, height: 10)
                             .opacity(tapColorOpacity)
@@ -100,6 +97,11 @@ struct ColorCubeRow: View {
                                dampingFraction: 3.5,
                                blendDuration: 1.5).delay(1.5), value: offsetYTapBounce)
             .onTapGesture {
+
+                withAnimation(.easeIn(duration: 0.8)) {
+                    colorSet = colorRow
+                }
+
                 offsetYTapBounce -= CGFloat(Int.random(in: 5...20))
                 cubeScale = 1.3
                 tapColorScale = 3.0
@@ -119,51 +121,51 @@ struct ColorCubeRow: View {
 
             .onReceive(timer) { _ in
                 // in
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.0 + baseTime) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.0 + startTime) {
                     if offsetYTapBounce < 0 { offsetYTapBounce += 10 }
                     offsetYLoopBounce = -20
                     loopColorScale = 1.2
                     loopAngle = Angle(degrees: 10.0)
                     if offsetYTapBounce < 0 { offsetYTapBounce += 10 }
                 }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0 + baseTime) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0 + startTime) {
                     loopAngle = Angle(degrees: 20.0)
                     if offsetYTapBounce < 0 { offsetYTapBounce += 10 }
                 }
                 // out
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0 + baseTime) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0 + startTime) {
                     offsetYLoopBounce = 0
                     loopAngle = Angle(degrees: 10.0)
                     if offsetYTapBounce < 0 { offsetYTapBounce += 10 }
                     loopColorScale = 1.0
                 }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 3.0 + baseTime) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3.0 + startTime) {
                     loopAngle = Angle(degrees: 0.0)
                     if offsetYTapBounce < 0 { offsetYTapBounce += 10 }
                 }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 4.0 + baseTime) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 4.0 + startTime) {
                     offsetYLoopBounce = -20
                     loopAngle = Angle(degrees: -10.0)
                     if offsetYTapBounce < 0 { offsetYTapBounce += 10 }
                 }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 5.0 + baseTime) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 5.0 + startTime) {
                     loopAngle = Angle(degrees: -20.0)
                     if offsetYTapBounce < 0 { offsetYTapBounce += 10 }
                 }
                 // out
-                DispatchQueue.main.asyncAfter(deadline: .now() + 6.0 + baseTime) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 6.0 + startTime) {
                     offsetYLoopBounce = 0
                     loopAngle = Angle(degrees: -10.0)
                     if offsetYTapBounce < 0 { offsetYTapBounce += 10 }
                 }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 7.0 + baseTime) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 7.0 + startTime) {
                     loopAngle = Angle(degrees: 0.0)
                     if offsetYTapBounce < 0 { offsetYTapBounce += 10 }
                 }
             }
 
             .onAppear {
-                DispatchQueue.main.asyncAfter(deadline: .now() + (0.0 + baseTime)) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + (0.0 + startTime)) {
                     offsetYLoopBounce = 0
                 }
             }

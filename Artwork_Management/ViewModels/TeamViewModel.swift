@@ -5,7 +5,9 @@
 //  Created by 中川賢亮 on 2022/09/27.
 //
 
-import Foundation
+import Firebase
+import FirebaseFirestore
+import FirebaseFirestoreSwift
 
 class TeamViewModel: ObservableObject {
 
@@ -13,6 +15,32 @@ class TeamViewModel: ObservableObject {
         print("<<<<<<<<<  TeamViewModel_init  >>>>>>>>>")
     }
 
+    var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
+
     var teamID: String = "7gm2urHDCdZGCV9pX9ef"
 
+    func fetchTeam() async -> Bool {
+
+        return false
+    }
+
+    // Userのjoinsデータから最終ログイン日が一番最近のチームIDを返す
+    // joins内にチームが存在しなければ、nilを返す
+    func getJoinsTeamID() async -> String? {
+
+        guard let uid = Auth.auth().currentUser?.uid, let usersRef = db?.collection("users") else {
+            print("Error: foinTeamCheck_Auth.guard let uid = auth().currentUser?.uid")
+            return nil
+        }
+
+        do {
+            let document = try await usersRef.document(uid).getDocument(as: User.self)
+//            let teamID = document["joins"]
+        } catch {
+            print("Error: fetchTeam_try await usersRef.document(uid).getDocument(as: User.self)")
+            return nil
+        }
+
+        return nil
+    }
 }

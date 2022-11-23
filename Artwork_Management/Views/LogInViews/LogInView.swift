@@ -101,15 +101,15 @@ struct LogInView: View {
                 }
             }
             .offset(x: -getRect().width / 3, y: -getRect().height / 2.5)
-            .offset(x: inputLogIn.createAccount == .fase2 || inputLogIn.createAccount == .fase3 ? 0 : 30)
-            .opacity(inputLogIn.createAccount == .fase2 || inputLogIn.createAccount == .fase3 ? 1.0 : 0.0)
+            .offset(x: inputLogIn.createAccount == .fase3 || inputLogIn.createAccount == .fase3 ? 0 : 30)
+            .opacity(inputLogIn.createAccount == .fase3 || inputLogIn.createAccount == .fase3 ? 1.0 : 0.0)
             .onTapGesture { inputLogIn.isShowPickerView.toggle() }
 
             RogoMark()
                 .scaleEffect(inputLogIn.firstSelect == .signAp ? 0.4 : 1.0)
                 .offset(y: inputLogIn.firstSelect == .signAp ? -getRect().height / 2.5 : -getRect().height / 4)
                 .offset(x: inputLogIn.firstSelect == .signAp ? getRect().width / 3 : 0)
-                .opacity(inputLogIn.firstSelect == .signAp ? 0.5 : 1.0)
+                .opacity(inputLogIn.firstSelect == .signAp ? 0.4 : 1.0)
 
             firstSelectButtons()
                 .offset(y: getRect().height / 8)
@@ -135,6 +135,7 @@ struct LogInView: View {
 
             if inputLogIn.createAccount != .start {
                 createAccountViews()
+                    .offset(y: inputLogIn.createAccount == .fase3 && inputLogIn.selectSignInType != .mailAddress ? -20 : 0)
             }
 
             // Back Button...
@@ -161,10 +162,11 @@ struct LogInView: View {
                             inputLogIn.createAccountTitle = false
                             inputLogIn.createAccountContents = false
                         case .fase2:
-                            if inputLogIn.createUserNameText == "名無し" { inputLogIn.createUserNameText = "" }
                             inputLogIn.createAccount = .fase1
                         case .fase3:
                             inputLogIn.createAccount = .fase2
+                            if inputLogIn.createUserNameText == "名無し" { inputLogIn.createUserNameText = ""
+                            }
                         }
 
                     }
@@ -303,12 +305,12 @@ struct LogInView: View {
 
                 inputLogIn.createAccount = .fase1
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
-                    withAnimation(.spring(response: 0.5)) {
+                    withAnimation(.spring(response: 1.0)) {
                         inputLogIn.createAccountTitle = true
                     }
                 }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                    withAnimation(.spring(response: 0.5)) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.3) {
+                    withAnimation(.spring(response: 1.0)) {
                         inputLogIn.createAccountContents = true
                     }
                 }
@@ -386,12 +388,20 @@ struct LogInView: View {
                 switch inputLogIn.createAccount {
                 case .start: Text("")
                 case .fase1:
+
                     VStack(spacing: 10) {
-                        Text("unicoへようこそ").tracking(10)
-                        Text("あなたのことを教えてください")
+                        Text("あなたの色は？").tracking(10)
                     }
 
                 case .fase2:
+
+                        VStack(spacing: 10) {
+                            Text("unicoへようこそ").tracking(10)
+                            Text("あなたのことを教えてください")
+                        }
+
+                case .fase3:
+
                     if inputLogIn.selectSignInType != .mailAddress {
                         VStack(spacing: 10) {
                             Text("初めまして、\(inputLogIn.createUserNameText)さん")
@@ -399,12 +409,8 @@ struct LogInView: View {
                         }
                         .frame(width: 250)
                     }
-
-                case .fase3:
-                    Text("ユーザ登録に成功しました！")
-                    Text("最後にチームを選んでください")
                 }
-            }
+            } // Group
             .tracking(5)
             .font(.subheadline).foregroundColor(.white.opacity(0.6))
             .opacity(inputLogIn.createAccountTitle ? 1.0 : 0.0)
@@ -416,12 +422,39 @@ struct LogInView: View {
 
                 case .fase1:
 
+                    ColorCubeView(colorSet: $selectMemberColor)
+                        .padding()
+
+                    Button {
+                        withAnimation(.spring(response: 1.0)) {
+                            inputLogIn.createAccountTitle = false
+                            inputLogIn.createAccountContents = false
+                            inputLogIn.createAccount = .fase2
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                            withAnimation(.spring(response: 0.8)) {
+                                inputLogIn.createAccountTitle = true
+                            }
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                            withAnimation(.spring(response: 0.8)) {
+                                inputLogIn.createAccountContents = true
+                            }
+                        }
+
+                    } label: {
+                        Text("次へ")
+                    }
+                    .buttonStyle(.borderedProminent)
+
+                case .fase2:
+
                     Group {
                         if let iconURL = inputLogIn.uploadImageData.url {
                             CircleIcon(photoURL: iconURL, size: 150)
                         } else {
                             Image(systemName: "photo.circle.fill").resizable().scaledToFit()
-                                .foregroundColor(.white.opacity(0.3)).frame(width: 150)
+                                .foregroundColor(.white.opacity(0.5)).frame(width: 150)
                         }
                     }
                     .onTapGesture { inputLogIn.isShowPickerView.toggle() }
@@ -440,8 +473,8 @@ struct LogInView: View {
                         .multilineTextAlignment(.center)
                         .background {
                             ZStack {
-                                Text(createNameFocused == nil && inputLogIn.createUserNameText.isEmpty ? "ユーザネーム" : "")
-                                    .foregroundColor(.white.opacity(0.2))
+                                Text(createNameFocused == nil && inputLogIn.createUserNameText.isEmpty ? "名前を入力" : "")
+                                    .foregroundColor(.white.opacity(0.3))
                                 Rectangle().foregroundColor(.white.opacity(0.3)).frame(height: 1)
                                     .offset(y: 20)
                             }
@@ -451,10 +484,11 @@ struct LogInView: View {
                         withAnimation(.spring(response: 0.7)) {
                             inputLogIn.createAccountTitle = false
                             inputLogIn.createAccountContents = false
-                            inputLogIn.createAccount = .fase2
+                            inputLogIn.createAccount = .fase3
                         }
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
-                            if inputLogIn.createUserNameText.isEmpty { inputLogIn.createUserNameText = "名無し" }
+                            if inputLogIn.createUserNameText.isEmpty { inputLogIn.createUserNameText = "名無し"
+                            }
                             withAnimation(.spring(response: 0.7)) {
                                 inputLogIn.createAccountTitle = true
                                 inputLogIn.createAccountContents = true
@@ -462,11 +496,11 @@ struct LogInView: View {
                         }
 
                     } label: {
-                        Text("次へ進む")
+                        Text("次へ")
                     }
                     .buttonStyle(.borderedProminent)
 
-                case .fase2:
+                case .fase3:
 
                     VStack {
                         signInTitle(title: inputLogIn.selectSignInType != .mailAddress ? "新規登録" : "メールアドレス登録")
@@ -481,9 +515,6 @@ struct LogInView: View {
                         }
                         .offset(y: 50)
                     }
-
-                case .fase3:
-                    Text("チーム設定画面")
                 }
             }
             .opacity(inputLogIn.createAccountContents ? 1.0 : 0.0)
@@ -728,9 +759,22 @@ struct MailAddressInfomation: View {
                             Task {
                                 let checkSignUp = await logInVM.signUp(email: inputLogIn.address,
                                                                        password: inputLogIn.password)
-                                let checkAddUser = await logInVM.addUser(name: inputLogIn.createUserNameText,
-                                                                     address: inputLogIn.address,
-                                                                     password: inputLogIn.password)
+
+                                if !checkSignUp { inputLogIn.addressCheck = .failure; return }
+
+                                let uid = Auth.auth().currentUser!.uid
+
+                                    let newUserData = User(id: uid,
+                                                        name: inputLogIn.createUserNameText,
+                                                        address: inputLogIn.address,
+                                                        password: inputLogIn.password,
+                                                        iconURL: inputLogIn.uploadImageData.url,
+                                                        iconPath: inputLogIn.uploadImageData.filePath,
+                                                        joins: [])
+
+                                    let checkAddUser = await logInVM.addUser(userData: newUserData)
+
+
                                 if checkSignUp, checkAddUser {
                                     // サインアップ成功
                                     withAnimation(.spring(response: 0.5)) { inputLogIn.addressCheck = .succsess }
@@ -742,7 +786,7 @@ struct MailAddressInfomation: View {
 
                         case .logIn:
                             Task {
-                                let checkSignIn = await logInVM.SignIn(email: inputLogIn.address,
+                                let checkSignIn = await logInVM.signIn(email: inputLogIn.address,
                                                                        password: inputLogIn.password)
                                 if checkSignIn {
                                     // ログイン成功
