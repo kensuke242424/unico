@@ -47,8 +47,16 @@ class UserViewModel: ObservableObject {
             print("Error_fetchUser: try fetch")
         }
     }
-    func getJoinTeamID() async -> String? {
-        
+    // ログインタイムが一番近いチームを取得して、チームIDを返す
+    // チームIDを持っていない(所属チームがない)場合、nilを返す
+    func getFastLogInTeamID() async -> String? {
+
+        if users.isEmpty { return nil }
+        var joinsTeam = users.first!.joins
+        joinsTeam.sort(by: { $0.logInTime!.dateValue() > $1.logInTime!.dateValue() })
+        guard let fastLogInTeam = joinsTeam.first else { return nil }
+
+        return fastLogInTeam.teamID
     }
 }
 

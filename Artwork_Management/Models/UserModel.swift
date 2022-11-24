@@ -25,6 +25,7 @@ struct JoinTeam: Codable {
     var headerURL: URL?
     var headerPath: String?
     var settingColor: MemberColor
+    @ServerTimestamp var logInTime: Timestamp?
 }
 
 struct ImageData: Codable {

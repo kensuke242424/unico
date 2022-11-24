@@ -67,8 +67,16 @@ struct RootView: View {
                 Task {
                     do {
                         try await userVM.fetchUser()
-                        try await tagVM.fetchTag(teamID: teamVM.teamID)
-                        try await itemVM.fetchItem(teamID: teamVM.teamID)
+                        let logInTeamID = await userVM.getFastLogInTeamID()
+                        guard logInTeamID != nil else {
+                            print("チームID無し。チーム作成画面へ遷移")
+                            withAnimation(.spring(response: 1)) {
+                                logInVM.rootNavigation = .join
+                            }
+                            return
+                        }
+                         await tagVM.fetchTag(teamID: teamVM.teamID)
+                         await itemVM.fetchItem(teamID: teamVM.teamID)
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                             withAnimation(.spring(response: 1)) {
                                 logInVM.rootNavigation = .home
