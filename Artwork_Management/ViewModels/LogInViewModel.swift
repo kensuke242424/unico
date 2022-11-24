@@ -17,7 +17,12 @@ class LogInViewModel: ObservableObject {
         print("<<<<<<<<<  LogInViewModel_init  >>>>>>>>>")
     }
 
+    @Published var rootNavigation: RootNavigation = .logIn
+
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
+    var uid: String? {
+        return Auth.auth().currentUser?.uid
+    }
 
     var logInErrorMessage: String = ""
 

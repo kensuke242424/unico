@@ -51,7 +51,7 @@ struct InputImage {
 
 struct HomeTabView: View {
 
-    @Binding var rootNavigation: RootNavigation
+    @StateObject var logInVM: LogInViewModel
     @StateObject var teamVM: TeamViewModel
     @StateObject var userVM: UserViewModel
     @StateObject var itemVM: ItemViewModel
@@ -159,7 +159,7 @@ struct HomeTabView: View {
                            userVM: userVM,
                            itemVM: itemVM,
                            tagVM: tagVM,
-                           rootNavigation: $rootNavigation,
+                           logInVM: logInVM,
                            inputHome: $inputHome,
                            inputImage: $inputImage,
                            inputTag: $inputTag,
@@ -349,7 +349,7 @@ struct HomeTabView_Previews: PreviewProvider {
                    windowScene.flatMap(ResizableSheetCenter.resolve(for:))
                }
 
-        return HomeTabView(rootNavigation: .constant(.home),
+        return HomeTabView(logInVM: LogInViewModel(),
                            teamVM: TeamViewModel(),
                            userVM: UserViewModel(),
                            itemVM: ItemViewModel(),

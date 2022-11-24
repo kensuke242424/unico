@@ -38,13 +38,11 @@ class UserViewModel: ObservableObject {
         self.users.append(user)
     }
 
-    func logOut() -> Bool {
+    func logOut() {
         do {
             try Auth.auth().signOut()
-            return true
         } catch let signOutError as NSError {
             print("Error signing out: %@", signOutError)
-            return false
         }
     }
 }

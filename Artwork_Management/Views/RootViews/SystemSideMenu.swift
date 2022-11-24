@@ -24,8 +24,8 @@ struct SystemSideMenu: View {
     @StateObject var userVM: UserViewModel
     @StateObject var itemVM: ItemViewModel
     @StateObject var tagVM: TagViewModel
+    @StateObject var logInVM: LogInViewModel
 
-    @Binding var rootNavigation: RootNavigation
     @Binding var inputHome: InputHome
     @Binding var inputImage: InputImage
     @Binding var inputTag: InputTagSideMenu
@@ -254,15 +254,11 @@ struct SystemSideMenu: View {
                                             .onTapGesture {
                                                 inputHome.isShowProgress.toggle()
                                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                                    if userVM.logOut() {
-                                                        print("ログアウト成功")
-                                                        inputHome.isShowProgress.toggle()
-                                                        withAnimation(.easeIn(duration: 0.5)) {
-                                                            rootNavigation = .logIn
-                                                        }
-                                                    } else {
-                                                        inputHome.isShowProgress.toggle()
-                                                        print("ログアウト失敗")
+                                                    userVM.logOut()
+                                                    print("ログアウト成功")
+                                                    inputHome.isShowProgress.toggle()
+                                                    withAnimation(.easeIn(duration: 0.5)) {
+                                                        logInVM.rootNavigation = .logIn
                                                     }
                                                 }
                                             }

@@ -75,7 +75,6 @@ struct InputLogIn {
 struct LogInView: View {
 
     @StateObject var logInVM: LogInViewModel
-    @Binding var rootNavigation: RootNavigation
 
     @State private var logInNavigationPath: [Navigation] = []
     @State private var inputLogIn: InputLogIn = InputLogIn()
@@ -126,8 +125,7 @@ struct LogInView: View {
 
                         if inputLogIn.selectSignInType == .mailAddress {
                             MailAddressInfomation(logInVM: logInVM,
-                                                  inputLogIn: $inputLogIn,
-                                                  rootNavigation: $rootNavigation)
+                                                  inputLogIn: $inputLogIn)
                                 .opacity(inputLogIn.selectSignInType == .mailAddress ? 1.0 : 0.0)
                         }
                     }
@@ -512,8 +510,7 @@ struct LogInView: View {
                                 .opacity(inputLogIn.selectSignInType == .mailAddress ? 0.0 : 1.0)
                             if inputLogIn.selectSignInType == .mailAddress {
                                 MailAddressInfomation(logInVM: logInVM,
-                                                      inputLogIn: $inputLogIn,
-                                                      rootNavigation: $rootNavigation)
+                                                      inputLogIn: $inputLogIn)
                                     .opacity(inputLogIn.selectSignInType == .mailAddress ? 1.0 : 0.0)
                             }
                         }
@@ -607,7 +604,6 @@ struct MailAddressInfomation: View {
 
     @StateObject var logInVM: LogInViewModel
     @Binding var inputLogIn: InputLogIn
-    @Binding var rootNavigation: RootNavigation
 
     @State private var addressHidden: Bool = false
     @State private var passwordHidden: Bool = false
@@ -771,9 +767,9 @@ struct MailAddressInfomation: View {
 
                                 if !checkSignUp { inputLogIn.addressCheck = .failure; return }
 
-                                let uid = Auth.auth().currentUser!.uid
+                                print(logInVM.uid)
 
-                                let newUserData = User(id: uid,
+                                let newUserData = User(id: logInVM.uid!,
                                                        name: inputLogIn.createUserNameText,
                                                        address: inputLogIn.address,
                                                        password: inputLogIn.password,
@@ -790,7 +786,7 @@ struct MailAddressInfomation: View {
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                                         // RootViewのfetch処理へ移動
                                         withAnimation(.spring(response: 0.5)) {
-                                            rootNavigation = .fetch
+                                            logInVM.rootNavigation = .fetch
                                         }
                                     }
 
@@ -810,7 +806,7 @@ struct MailAddressInfomation: View {
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                                         // RootViewのfetch処理へ移動
                                         withAnimation(.spring(response: 0.5)) {
-                                            rootNavigation = .fetch
+                                            logInVM.rootNavigation = .fetch
                                         }
                                     }
                                 } else {
@@ -879,8 +875,6 @@ struct MailAddressInfomation: View {
 
 struct LogInView_Previews: PreviewProvider {
     static var previews: some View {
-        LogInView(logInVM: LogInViewModel(),
-                  rootNavigation: .constant(.logIn)
-        )
+        LogInView(logInVM: LogInViewModel())
     }
 }

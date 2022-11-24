@@ -21,7 +21,6 @@ struct RootView: View {
     @StateObject var itemVM: ItemViewModel = ItemViewModel()
     @StateObject var tagVM: TagViewModel = TagViewModel()
 
-    @State private var rootNavigation: RootNavigation = .logIn
     @State private var isShowStandBy: Bool = false
 
     var windowScene: UIWindowScene? {
@@ -37,9 +36,9 @@ struct RootView: View {
     var body: some View {
 
         ZStack {
-            switch rootNavigation {
+            switch logInVM.rootNavigation {
             case .logIn:
-                LogInView(logInVM: logInVM, rootNavigation: $rootNavigation)
+                LogInView(logInVM: logInVM)
 
             case .fetch:
                 StandByView()
@@ -48,7 +47,7 @@ struct RootView: View {
                 CreateAndJoinTeamView()
 
             case .home:
-                HomeTabView(rootNavigation: $rootNavigation,
+                HomeTabView(logInVM: logInVM,
                             teamVM: teamVM,
                             userVM: userVM,
                             itemVM: itemVM,
@@ -62,19 +61,20 @@ struct RootView: View {
         } // ZStack
 
         // Data fetch...
-        .onChange(of: rootNavigation) { _ in
-            if rootNavigation == .fetch {
+        .onChange(of: logInVM.rootNavigation) { _ in
+            print("rootNavigation: \(logInVM.rootNavigation)")
+            if logInVM.rootNavigation == .fetch {
                 Task {
                     guard (try? await userVM.fetchUser()) != nil else {
                         print("fetchUser == nil")
-                        rootNavigation = .logIn
+                        logInVM.rootNavigation = .logIn
                         return
                     }
                     await tagVM.fetchTag(teamID: teamVM.teamID)
                     await itemVM.fetchItem(teamID: teamVM.teamID)
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                         withAnimation(.spring(response: 1)) {
-                            rootNavigation = .home
+                            logInVM.rootNavigation = .home
                         }
                     }
                 }
@@ -84,7 +84,7 @@ struct RootView: View {
         // Auth check...
         .onAppear {
             if Auth.auth().currentUser != nil {
-                rootNavigation = .fetch
+                logInVM.rootNavigation = .fetch
             } else {
 
                 isShowStandBy.toggle()
