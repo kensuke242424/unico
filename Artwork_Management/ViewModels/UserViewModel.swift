@@ -18,25 +18,24 @@ class UserViewModel: ObservableObject {
     }
 
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
+    var uid: String? { return Auth.auth().currentUser?.uid }
 
     @Published var users: [User] = []
-    var uid = ""
+
+    @Published var showAlert = false
+    @Published var userErrorMessage = ""
 
     @MainActor
-    func fetchUser() async -> Bool {
+    func fetchUser() async throws {
 
-        guard let uid = Auth.auth().currentUser?.uid,
-                let userRef = db?.collection("users").document(uid) else { return false }
+        print("fetchUser実行")
 
-        do {
-            let document = try await userRef.getDocument(source: .default)
-            let user = try document.data(as: User.self)
-            self.users.append(user)
-        } catch {
-            print("fetchUser失敗")
-            return false
-        }
-        return true
+        guard let uid = uid else { return }
+        guard let userRef = db?.collection("users").document(uid) else { return }
+
+        let document = try await userRef.getDocument(source: .default)
+        let user = try document.data(as: User.self)
+        self.users.append(user)
     }
 
     func logOut() -> Bool {

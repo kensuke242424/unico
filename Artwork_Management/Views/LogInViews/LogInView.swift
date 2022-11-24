@@ -74,8 +74,8 @@ struct InputLogIn {
 // ✅ ログイン画面の親Viewです。
 struct LogInView: View {
 
+    @StateObject var logInVM: LogInViewModel
     @Binding var rootNavigation: RootNavigation
-    @StateObject var logInVM: LogInViewModel = LogInViewModel()
 
     @State private var logInNavigationPath: [Navigation] = []
     @State private var inputLogIn: InputLogIn = InputLogIn()
@@ -879,6 +879,8 @@ struct MailAddressInfomation: View {
 
 struct LogInView_Previews: PreviewProvider {
     static var previews: some View {
-        LogInView(rootNavigation: .constant(.logIn))
+        LogInView(logInVM: LogInViewModel(),
+                  rootNavigation: .constant(.logIn)
+        )
     }
 }

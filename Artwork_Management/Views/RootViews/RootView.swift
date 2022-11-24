@@ -10,11 +10,12 @@ import Firebase
 import ResizableSheet
 
 enum RootNavigation {
-    case logIn, fetch, home
+    case logIn, fetch, join, home
 }
 
 struct RootView: View {
 
+    @StateObject var logInVM: LogInViewModel = LogInViewModel()
     @StateObject var teamVM: TeamViewModel = TeamViewModel()
     @StateObject var userVM: UserViewModel = UserViewModel()
     @StateObject var itemVM: ItemViewModel = ItemViewModel()
@@ -38,10 +39,13 @@ struct RootView: View {
         ZStack {
             switch rootNavigation {
             case .logIn:
-                LogInView(rootNavigation: $rootNavigation)
+                LogInView(logInVM: logInVM, rootNavigation: $rootNavigation)
 
             case .fetch:
                 StandByView()
+
+            case .join:
+                CreateAndJoinTeamView()
 
             case .home:
                 HomeTabView(rootNavigation: $rootNavigation,
@@ -61,10 +65,11 @@ struct RootView: View {
         .onChange(of: rootNavigation) { _ in
             if rootNavigation == .fetch {
                 Task {
-                    // データフェッチ処理
-                    await userVM.fetchUser()
-                    if userVM.users.isEmpty { rootNavigation = .logIn; return }
-
+                    guard (try? await userVM.fetchUser()) != nil else {
+                        print("fetchUser == nil")
+                        rootNavigation = .logIn
+                        return
+                    }
                     await tagVM.fetchTag(teamID: teamVM.teamID)
                     await itemVM.fetchItem(teamID: teamVM.teamID)
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
