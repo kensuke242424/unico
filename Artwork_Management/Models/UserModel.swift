@@ -27,6 +27,11 @@ struct JoinTeam: Codable {
     var settingColor: MemberColor
 }
 
+struct ImageData: Codable {
+    var url: URL?
+    var path: String?
+}
+
 // ユーザそれぞれが個々に選ぶアプリ全体のカラー
 enum MemberColor: CaseIterable, Codable {
     case red

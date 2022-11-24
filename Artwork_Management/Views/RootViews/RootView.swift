@@ -62,22 +62,23 @@ struct RootView: View {
 
         // Data fetch...
         .onChange(of: logInVM.rootNavigation) { _ in
-            print("rootNavigation: \(logInVM.rootNavigation)")
+            print("LogInVM.rootNavigation: \(logInVM.rootNavigation)")
             if logInVM.rootNavigation == .fetch {
                 Task {
-                    guard (try? await userVM.fetchUser()) != nil else {
-                        print("fetchUser == nil")
-                        logInVM.rootNavigation = .logIn
-                        return
-                    }
-                    await tagVM.fetchTag(teamID: teamVM.teamID)
-                    await itemVM.fetchItem(teamID: teamVM.teamID)
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                        withAnimation(.spring(response: 1)) {
-                            logInVM.rootNavigation = .home
+                    do {
+                        try await userVM.fetchUser()
+                        try await tagVM.fetchTag(teamID: teamVM.teamID)
+                        try await itemVM.fetchItem(teamID: teamVM.teamID)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                            withAnimation(.spring(response: 1)) {
+                                logInVM.rootNavigation = .home
+                            }
                         }
+                    } catch {
+                        print("fecth失敗")
+                        logInVM.rootNavigation = .logIn
                     }
-                }
+                } // Task
             }
         }
 

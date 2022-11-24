@@ -14,6 +14,7 @@ struct InputSideMenu {
     var help: Bool = false
     var editMode: EditMode = .inactive
     var selectTag: Tag = Tag(oderIndex: 1, tagName: "", tagColor: .red)
+    var isShowLogOutAlert: Bool = false
 }
 
 struct SystemSideMenu: View {
@@ -251,23 +252,29 @@ struct SystemSideMenu: View {
                                         .onTapGesture {  }
 
                                         Label("ログアウト", systemImage: "figure.wave")
-                                            .onTapGesture {
-                                                inputHome.isShowProgress.toggle()
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                                    userVM.logOut()
-                                                    print("ログアウト成功")
-                                                    inputHome.isShowProgress.toggle()
-                                                    withAnimation(.easeIn(duration: 0.5)) {
-                                                        logInVM.rootNavigation = .logIn
-                                                    }
-                                                }
-                                            }
+                                            .onTapGesture { inputSideMenu.isShowLogOutAlert.toggle() }
 
                                     } // VStack
                                     .foregroundColor(.white)
                                     .frame(width: 210, height: 180, alignment: .topLeading)
                                     .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
                                     .offset(x: 20, y: 30)
+                                    .alert("確認", isPresented: $inputSideMenu.isShowLogOutAlert) {
+                                        Button("戻る") { inputSideMenu.isShowLogOutAlert.toggle() }
+                                        Button("ログアウト") {
+                                            inputHome.isShowProgress.toggle()
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                                                inputHome.isShowProgress.toggle()
+                                                withAnimation(.easeIn(duration: 0.5)) {
+                                                    logInVM.rootNavigation = .logIn
+                                                    logInVM.logOut()
+                                                    print("ログアウト成功")
+                                                }
+                                            }
+                                        }
+                                    } message: {
+                                        Text("ログイン画面に戻ります。よろしいですか？")
+                                    } // alert
                                 }
                             }
 

@@ -106,6 +106,14 @@ class LogInViewModel: ObservableObject {
         return true
     }
 
+    func logOut() {
+        do {
+            try Auth.auth().signOut()
+        } catch let signOutError as NSError {
+            print("Error signing out: %@", signOutError)
+        }
+    }
+
     func uploadImage(_ image: UIImage) async -> (url: URL?, filePath: String?) {
 
         guard let imageData = image.jpegData(compressionQuality: 0.8) else {

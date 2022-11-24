@@ -11,6 +11,10 @@ import FirebaseStorage
 import FirebaseFirestore
 import FirebaseFirestoreSwift
 
+enum CustomError: Error {
+    case uidEmpty, getUserRef, teamFetch, userFetch, itemFetch, tagFetch
+}
+
 class UserViewModel: ObservableObject {
 
     init() {
@@ -27,23 +31,24 @@ class UserViewModel: ObservableObject {
 
     @MainActor
     func fetchUser() async throws {
+            guard let uid = uid else { throw CustomError.uidEmpty }
+            guard let userRef = db?.collection("users").document(uid) else { throw CustomError.getUserRef }
 
-        print("fetchUser実行")
-
-        guard let uid = uid else { return }
-        guard let userRef = db?.collection("users").document(uid) else { return }
-
-        let document = try await userRef.getDocument(source: .default)
-        let user = try document.data(as: User.self)
-        self.users.append(user)
-    }
-
-    func logOut() {
         do {
-            try Auth.auth().signOut()
-        } catch let signOutError as NSError {
-            print("Error signing out: %@", signOutError)
+            let document = try await userRef.getDocument(source: .default)
+            let user = try document.data(as: User.self)
+            self.users.append(user)
+
+        } catch CustomError.uidEmpty {
+            print("Error_fetchUser: uidEmpty")
+        } catch CustomError.getUserRef {
+            print("Error_fetchUser: getUserRef")
+        } catch {
+            print("Error_fetchUser: try fetch")
         }
+    }
+    func getJoinTeamID() async -> String? {
+        
     }
 }
 

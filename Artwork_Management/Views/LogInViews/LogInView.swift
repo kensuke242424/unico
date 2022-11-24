@@ -481,12 +481,12 @@ struct LogInView: View {
                         }
 
                     Button {
-                        withAnimation(.spring(response: 0.7)) {
+                        withAnimation(.spring(response: 0.9)) {
                             inputLogIn.createAccountTitle = false
                             inputLogIn.createAccountContents = false
                             inputLogIn.createAccount = .fase3
                         }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
                             if inputLogIn.createUserNameText.isEmpty { inputLogIn.createUserNameText = "名無し"
                             }
                             withAnimation(.spring(response: 0.7)) {
