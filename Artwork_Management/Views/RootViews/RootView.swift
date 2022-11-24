@@ -62,13 +62,11 @@ struct RootView: View {
             if rootNavigation == .fetch {
                 Task {
                     // データフェッチ処理
-                    if await !userVM.fetchUser() {
-                        rootNavigation = .logIn
-                        return
-                    }
+                    await userVM.fetchUser()
+                    if userVM.users.isEmpty { rootNavigation = .logIn; return }
+
                     await tagVM.fetchTag(teamID: teamVM.teamID)
                     await itemVM.fetchItem(teamID: teamVM.teamID)
-                    print("チームデータ取得完了")
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                         withAnimation(.spring(response: 1)) {
                             rootNavigation = .home

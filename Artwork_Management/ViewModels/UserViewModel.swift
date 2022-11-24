@@ -22,25 +22,21 @@ class UserViewModel: ObservableObject {
     @Published var users: [User] = []
     var uid = ""
 
+    @MainActor
     func fetchUser() async -> Bool {
 
         guard let uid = Auth.auth().currentUser?.uid,
-              let userRef = db?.collection("users").document(uid) else { return false }
+                let userRef = db?.collection("users").document(uid) else { return false }
 
-        userRef.getDocument(as: User.self) { result in
-
-            switch result {
-            case .success(let user):
-                self.users.append(user)
-            case .failure(let error):
-                print("fetchUser失敗: \(error)")
-            }
-        }
-        if self.users.isEmpty {
+        do {
+            let document = try await userRef.getDocument(source: .default)
+            let user = try document.data(as: User.self)
+            self.users.append(user)
+        } catch {
+            print("fetchUser失敗")
             return false
-        } else {
-            return true
         }
+        return true
     }
 
     func logOut() -> Bool {

@@ -90,7 +90,6 @@ class LogInViewModel: ObservableObject {
             print("error: guard let itemsRef = db?.collection(users), let uid = Auth.auth().currentUser?.uid")
             return false
         }
-
         do {
             // currentUserのuidとドキュメントIDを同じにして保存
             _ = try usersRef.document(userData.id).setData(from: userData)
