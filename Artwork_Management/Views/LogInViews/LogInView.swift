@@ -243,18 +243,6 @@ struct LogInView: View {
             }
         }
 
-        // LogIn Sucsess fetch Data...
-//        .onChange(of: inputLogIn.addressCheck) { check in
-//            if check == .succsess {
-//                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-//                    // RootViewへ移動
-//                    withAnimation(.spring(response: 0.5)) {
-//                        rootNavigation = .fetch
-//                    }
-//                }
-//            }
-//        }
-
         .sheet(isPresented: $inputLogIn.isShowPickerView) {
             PHPickerView(captureImage: $inputLogIn.captureImage, isShowSheet: $inputLogIn.isShowPickerView, isShowError: $inputLogIn.captureError)
         }

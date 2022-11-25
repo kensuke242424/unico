@@ -44,7 +44,9 @@ struct RootView: View {
                 StandByView()
 
             case .join:
-                CreateAndJoinTeamView()
+                CreateAndJoinTeamView(logInVM: logInVM,
+                                      teamVM: teamVM,
+                                      userVM: userVM)
 
             case .home:
                 HomeTabView(logInVM: logInVM,
