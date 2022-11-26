@@ -11,10 +11,18 @@ struct CreateAndJoinTeamView: View {
 
     enum SelectTeamCard {
         case start, join, create
+
+        var background: Color {
+            switch self {
+            case .start: return .userGray1
+            case .join: return .userBlue1
+            case .create: return .userRed1
+            }
+        }
     }
 
     enum SelectTeamFase {
-        case start, fase1, fase2, success
+        case start, fase1, fase2, check, success
     }
 
     @StateObject var logInVM: LogInViewModel
@@ -29,6 +37,7 @@ struct CreateAndJoinTeamView: View {
     @State private var selectTeamCard: SelectTeamCard = .start
     @State private var selectTeamFase: SelectTeamFase = .start
     @State private var customFont: CustomFont = .avenirNextUltraLight
+    @State private var backgroundColor: Color = .userGray1
     @FocusState private var createNameFocused: CreateFocused?
 
     var body: some View {
@@ -37,7 +46,7 @@ struct CreateAndJoinTeamView: View {
 
             Group {
                 BlurView(style: .systemMaterialDark).opacity(0.8)
-                Color.userGray1.opacity(0.6).blur(radius: 20)
+                selectTeamCard.background.opacity(0.6)
                     .onTapGesture {
                         withAnimation(.spring(response: 0.5)) {
                             if selectTeamFase == .fase1 {
@@ -66,97 +75,111 @@ struct CreateAndJoinTeamView: View {
 
                 case .join:
                     VStack(spacing: 10) {
-                        Text("チームに参加する").font(.title3.bold()).opacity(0.7).tracking(10).padding()
+                        Text("チームに参加する").font(.title3.bold()).opacity(0.7).tracking(10)
 
-                        switch selectTeamFase {
+                        Group {
+                            switch selectTeamFase {
 
-                        case .start:
-                            Text("")
+                            case .start:
+                                Text("")
 
-                        case .fase1:
-                            Group {
-                                Text("他のユーザのチームに参加することができます。")
-                                Text("複数人でアイテムの共有、管理が可能です。")
-                                Text("「QRコード」または「ユーザID」を渡して、")
-                                Text("相手チームからのメンバー承認が必要です。")
+                            case .fase1:
+                                VStack(spacing: 10) {
+                                    Text("他のユーザのチームに参加します。")
+                                    Text("複数人でアイテムの共有、管理が可能です。")
+                                    Text("相手チームからのメンバー承認が必要です。")
+                                }
+
+                            case .fase2:
+                                VStack(spacing: 10) {
+                                    Text("「ユーザID」をコピーして相手に渡します。")
+                                    Text("または、QRコードを表示して相手に見せてください。")
+                                    Text("メンバー承認が完了次第、自動でログインを開始します。")
+                                }
+
+                            case .check:
+                                VStack(spacing: 10) {
+
+                                }
+
+                            case .success:
+                                Text("チームが見つかりました。ログインを開始します。")
                             }
-                            .font(.caption).tracking(3).opacity(0.6)
-
-                        case .fase2:
-                            Group {
-                                Text("「ユーザID」をコピーして相手に渡しましょう。")
-                                Text("または、QRコードを表示して相手に見せてください。")
-                                Text("メンバー承認が完了次第、自動でログインを開始します。")
-                            }
-                            .font(.caption).tracking(3).opacity(0.6)
-
-                        case .success:
-                            Text("チームが見つかりました。ログインを開始します。")
-                                .font(.caption).tracking(3).opacity(0.6)
                         }
+                        .font(.caption).tracking(3).opacity(0.6)
+                        .frame(height: 60)
+                        .padding(.top, 20)
                     }
-                    .padding(.bottom, 50)
+                    .padding(.bottom, 40)
 
                 case .create:
 
                     VStack(spacing: 10) {
-                        Text("チームを作る").font(.title3.bold()).opacity(0.7).tracking(10).padding()
+                        Text("チームを作る").font(.title3.bold()).opacity(0.7).tracking(10)
 
-                        switch selectTeamFase {
+                        Group {
+                            switch selectTeamFase {
 
-                        case .start:
-                            Text("")
+                            case .start:
+                                Text("")
 
-                        case .fase1:
-                            Group {
-                                Text("あなたのチームを新しく作成します。")
-                                Text("アイテムの在庫や売上、情報の管理ができます。")
-                                Text("また、チームに他の人を招待することも可能です。")
-                                Text("あなたの素晴らしい活動を応援しています。")
+                            case .fase1:
+                                VStack(spacing: 10) {
+                                    Text("あなたのチームを新しく作成します。")
+                                    Text("アイテムの在庫や売上、情報の管理ができます。")
+                                    Text("また、チームに他の人を招待することも可能です。")
+                                    Text("あなたの素晴らしい活動を応援しています。")
+                                }
+
+                            case .fase2:
+                                VStack(spacing: 10) {
+                                    Text("チーム情報を入力してください。")
+                                    Text("入力が完了したら、チーム生成を開始します。")
+                                }
+
+                            case .check:
+                                Text("")
+
+                            case .success:
+                                VStack(spacing: 10) {
+                                    Text("お疲れ様でした。")
+                                    Text("ログインを開始します。")
+                                }
                             }
-                            .font(.caption).tracking(3).opacity(0.6)
-
-                        case .fase2:
-                            Group {
-                                Text("チーム情報を入力してください。")
-                                Text("入力が完了したら、チーム生成を開始します。")
-                            }
-                            .font(.caption).tracking(3).opacity(0.6)
-
-                        case .success:
-                            Group {
-                                Text("お疲れ様でした。")
-                                Text("ログインを開始します。")
-                            }
-                            .font(.caption).tracking(3).opacity(0.6)
                         }
+                        .font(.caption).tracking(3).opacity(0.6)
+                        .frame(height: 60)
+                        .padding(.top, 20)
                     }
-                    .padding(.bottom, 50)
+                    .padding(.bottom, 40)
                 }
 
                 // create team contents...
+                ZStack {
+                    if selectTeamFase != .success {
+                        HStack(spacing: 15) {
+                            joinCard()
+                            Text("<>")
+                                .font(.title3).foregroundColor(.white)
+                                .opacity(selectTeamCard == .start ? 0.6 : 0.0)
+                            createCard()
+                        }
+                        .opacity(selectTeamFase == .fase1 ? 1.0 : 0.0)
+                        .offset(x: selectTeamFase == .fase1 ? 0 : selectTeamFase == .start ? getRect().width : -getRect().width)
 
-                switch selectTeamFase {
-
-                case .start:
-                    Text("")
-
-                case .fase1:
-                    HStack(spacing: 15) {
-                        joinCard()
-                        Text("<>").font(.title3).foregroundColor(.white)
-                            .opacity(selectTeamCard == .start ? 0.6 : 0.0)
-                        createCard()
+                        Group {
+                            createTeamIconAndName(iconURL: uploadImageData.url)
+                        }
+                        .opacity(selectTeamFase == .fase2 ? 1.0 : 0.0)
+                        .offset(x: selectTeamFase == .fase2 ? 0 : selectTeamFase == .start || selectTeamFase == .fase1 ? getRect().width : -getRect().width)
                     }
+                    if selectTeamFase == .success {
+                        Text("ようこそ、\(userVM.users[0].name)さん")
+                            .tracking(5).opacity(0.6)
+                            .opacity(selectTeamFase == .success ? 1.0 : 0.0)
+                    }
+                } // ZStack
 
-                case .fase2:
-                    createTeamIconAndName(iconURL: uploadImageData.url)
-
-                case .success:
-
-                    Text("ようこそ、\(userVM.users[0].name)さん")
-
-                }
             } // VStack
             .foregroundColor(.white)
             .offset(y: -30)
@@ -168,7 +191,7 @@ struct CreateAndJoinTeamView: View {
                 }
             }
             .buttonStyle(.borderedProminent)
-            .offset(y: getRect().height * 0.33)
+            .offset(y: getRect().height * 0.3)
             .opacity(selectTeamFase == .start || selectTeamFase == .success ? 0.0 : 1.0)
             .opacity(selectTeamCard == .join && selectTeamFase == .fase2 ? 0.0 : 1.0)
             .disabled(selectTeamCard == .start || selectTeamFase == .success ? true : false)
@@ -179,7 +202,7 @@ struct CreateAndJoinTeamView: View {
                 }
             }
             .foregroundColor(.white.opacity(0.7))
-            .offset(y: getRect().height * 0.40)
+            .offset(y: getRect().height * 0.36)
             .opacity(selectTeamFase == .fase2 ? 1.0 : 0.0)
             .disabled(selectTeamFase == .success ? true : false)
 
@@ -194,11 +217,26 @@ struct CreateAndJoinTeamView: View {
                     Image(systemName: "house.fill")
                 }
             }
+            .disabled(selectTeamFase == .success ? true : false)
             .foregroundColor(.white.opacity(0.5))
             .offset(x: -getRect().width / 2 + 40, y: getRect().height / 2 - 60 )
         } // ZStack
+
+        .onChange(of: captureImage) { newImage in
+            Task {
+                if let path = uploadImageData.filePath {
+                    await logInVM.deleteImage(path: path)
+                    uploadImageData.url = nil
+                    print("以前の画像削除")
+                }
+
+                await uploadImageData = logInVM.uploadImage(newImage)
+                print("新規画像登録")
+            }
+        }
+
         .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                 withAnimation(.spring(response: 1.0)) {
                     selectTeamFase = .fase1
                 }
