@@ -75,6 +75,7 @@ struct InputLogIn {
 struct LogInView: View {
 
     @StateObject var logInVM: LogInViewModel
+    @StateObject var teamVM: TeamViewModel
 
     @State private var logInNavigationPath: [Navigation] = []
     @State private var inputLogIn: InputLogIn = InputLogIn()
@@ -104,7 +105,7 @@ struct LogInView: View {
             .opacity(inputLogIn.createAccount == .fase3 || inputLogIn.createAccount == .fase3 ? 1.0 : 0.0)
             .onTapGesture { inputLogIn.isShowPickerView.toggle() }
 
-            RogoMark()
+            LogoMark()
                 .scaleEffect(inputLogIn.firstSelect == .signAp ? 0.4 : 1.0)
                 .offset(y: inputLogIn.firstSelect == .signAp ? -getRect().height / 2.5 : -getRect().height / 4)
                 .offset(x: inputLogIn.firstSelect == .signAp ? getRect().width / 3 : 0)
@@ -287,6 +288,7 @@ struct LogInView: View {
                 }
             }
             Button {
+
                 withAnimation(.easeIn(duration: 1)) {
                     inputLogIn.firstSelect = .signAp
                 }
@@ -566,7 +568,7 @@ struct LogInView: View {
 
 } // View
 
-struct RogoMark: View {
+struct LogoMark: View {
     var body: some View {
 
         VStack {
@@ -755,8 +757,6 @@ struct MailAddressInfomation: View {
 
                                 if !checkSignUp { inputLogIn.addressCheck = .failure; return }
 
-                                print(logInVM.uid)
-
                                 let newUserData = User(id: logInVM.uid!,
                                                        name: inputLogIn.createUserNameText,
                                                        address: inputLogIn.address,
@@ -863,6 +863,6 @@ struct MailAddressInfomation: View {
 
 struct LogInView_Previews: PreviewProvider {
     static var previews: some View {
-        LogInView(logInVM: LogInViewModel())
+        LogInView(logInVM: LogInViewModel(), teamVM: TeamViewModel())
     }
 }

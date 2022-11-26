@@ -19,6 +19,8 @@ class TeamViewModel: ObservableObject {
 
     var teamID: String = "7gm2urHDCdZGCV9pX9ef"
 
+    @Published var isShowCreateAndJoinTeam: Bool = false
+
     func fetchTeam() async -> Bool {
 
         return false

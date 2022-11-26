@@ -38,15 +38,13 @@ struct RootView: View {
         ZStack {
             switch logInVM.rootNavigation {
             case .logIn:
-                LogInView(logInVM: logInVM)
+                LogInView(logInVM: logInVM, teamVM: teamVM)
 
             case .fetch:
                 StandByView()
 
             case .join:
-                CreateAndJoinTeamView(logInVM: logInVM,
-                                      teamVM: teamVM,
-                                      userVM: userVM)
+                Text("")
 
             case .home:
                 HomeTabView(logInVM: logInVM,
@@ -58,7 +56,11 @@ struct RootView: View {
             }
 
             StandByView()
-                .opacity(isShowStandBy ? 1.0 : 0.0)
+                .opacity(isShowStandBy || teamVM.isShowCreateAndJoinTeam ? 1.0 : 0.0)
+
+            if teamVM.isShowCreateAndJoinTeam {
+                CreateAndJoinTeamView(logInVM: logInVM, teamVM: teamVM, userVM: userVM)
+            }
 
         } // ZStack
 
@@ -72,8 +74,11 @@ struct RootView: View {
                         let logInTeamID = await userVM.getFastLogInTeamID()
                         guard logInTeamID != nil else {
                             print("チームID無し。チーム作成画面へ遷移")
-                            withAnimation(.spring(response: 1)) {
-                                logInVM.rootNavigation = .join
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                withAnimation(.spring(response: 1)) {
+                                    logInVM.rootNavigation = .join
+                                    teamVM.isShowCreateAndJoinTeam.toggle()
+                                }
                             }
                             return
                         }
