@@ -10,7 +10,7 @@ import FirebaseFirestoreSwift
 
 // チーム情報
 struct Team: Identifiable, Codable {
-    @DocumentID var id: String? = UUID().uuidString
+    var id: String
     var name: String
     var iconURL: URL?
     var iconPath: String?

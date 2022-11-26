@@ -18,6 +18,7 @@ class TeamViewModel: ObservableObject {
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
 
     var teamID: String = "7gm2urHDCdZGCV9pX9ef"
+    var uid: String? { return Auth.auth().currentUser?.uid }
 
     @Published var isShowCreateAndJoinTeam: Bool = false
 
@@ -50,5 +51,23 @@ class TeamViewModel: ObservableObject {
         }
 
         return nil
+    }
+
+    func addTeamAndGetID(teamData: Team) -> String? {
+        print("addTeamAndGetID実行")
+
+        guard let teamsRef = db?.collection("teams") else {
+            print("error: guard let teamsRef = db?.collection(teams), let uid = uid")
+            return nil
+        }
+
+        do {
+            _ = try teamsRef.document(teamData.id).setData(from: teamData)
+        } catch {
+            print("Error: try db!.collection(collectionID).addDocument(from: itemData)")
+            return nil
+        }
+        print("addTeamAndGetID完了")
+        return teamData.id
     }
 }

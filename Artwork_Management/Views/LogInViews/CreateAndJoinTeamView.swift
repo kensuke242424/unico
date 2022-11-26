@@ -138,7 +138,10 @@ struct CreateAndJoinTeamView: View {
                                 }
 
                             case .check:
-                                Text("")
+                                VStack(spacing: 10) {
+                                    Text("チーム情報を入力してください。")
+                                    Text("入力が完了したら、チーム生成を開始します。")
+                                }
 
                             case .success:
                                 VStack(spacing: 10) {
@@ -187,7 +190,7 @@ struct CreateAndJoinTeamView: View {
 
             Button(selectTeamFase == .fase1 ? "決定して次へ" : "これで始める") {
                 withAnimation(.spring(response: 0.7)) {
-                    selectTeamFase = selectTeamFase == .fase1 ? .fase2 : .success
+                    selectTeamFase = selectTeamFase == .fase1 ? .fase2 : .check
                 }
             }
             .buttonStyle(.borderedProminent)
@@ -232,6 +235,28 @@ struct CreateAndJoinTeamView: View {
 
                 await uploadImageData = logInVM.uploadImage(newImage)
                 print("新規画像登録")
+            }
+        }
+
+        .onChange(of: selectTeamFase) { fase in
+
+            if fase == .check {
+
+                guard let user = userVM.users.first else {
+                    print("user情報が取得できません。チーム追加処理を終了しました。")
+                    return
+                }
+                // チームデータに格納する自身のユーザデータ
+                let joinMember = JoinMember(memberUID: user.id, name: user.name, iconURL: user.iconURL)
+                let id = UUID().uuidString
+
+                let teamData = Team(id: id,
+                                    name: teamName,
+                                    iconURL: uploadImageData.url,
+                                    iconPath: uploadImageData.filePath,
+                                    members: [joinMember])
+
+                teamVM.addTeamAndGetID(teamData: teamData)
             }
         }
 

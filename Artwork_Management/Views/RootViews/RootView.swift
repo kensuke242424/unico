@@ -82,8 +82,8 @@ struct RootView: View {
                             }
                             return
                         }
-                         await tagVM.fetchTag(teamID: teamVM.teamID)
-                         await itemVM.fetchItem(teamID: teamVM.teamID)
+                        await tagVM.fetchTag(teamID: teamVM.teamID)
+                        await itemVM.fetchItem(teamID: teamVM.teamID)
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                             withAnimation(.spring(response: 1)) {
                                 logInVM.rootNavigation = .home
