@@ -21,7 +21,7 @@ struct InputHome {
     var switchElement: ElementStatus = .stock
     var homeTabIndex: Int = 0
     var actionItemIndex: Int = 0
-    var selectCaptureImage: UIImage = UIImage()
+    var selectCaptureImage: UIImage? = nil
     var itemsInfomationOpacity: CGFloat = 0.0
     var basketInfomationOpacity: CGFloat = 0.0
     var showErrorFetchImage: Bool = false
@@ -139,7 +139,7 @@ struct HomeTabView: View {
                 ShowsItemDetail(itemVM: itemVM,
                                 inputHome: $inputHome,
                                 item: itemVM.items[inputHome.actionItemIndex],
-                                teamID: teamVM.teamID)
+                                teamID: teamVM.team.first!.id)
             }
 
             // sideMenu_background...
@@ -187,7 +187,7 @@ struct HomeTabView: View {
                                 inputTag: $inputTag,
                                 defaultTag: inputTag.tagSideMenuStatus == .create ? nil : inputSideMenu.selectTag,
                                 tagSideMenuStatus: inputTag.tagSideMenuStatus,
-                                teamID: teamVM.teamID)
+                                teamID: teamVM.team.first!.id)
             .offset(x: inputHome.isOpenEditTagSideMenu ? UIScreen.main.bounds.width / 2 - 25 : UIScreen.main.bounds.width + 10)
 
             VStack {
@@ -228,6 +228,7 @@ struct HomeTabView: View {
             if inputHome.isShowProgress {
                 CustomProgressView()
             }
+
         } // ZStack
         .ignoresSafeArea()
         .animation(.easeIn(duration: 0.2), value: inputHome.itemsInfomationOpacity)
@@ -254,36 +255,6 @@ struct HomeTabView: View {
                          isShowError: $inputHome.showErrorFetchImage)
         }
 
-        // convert UIImage ⇨ base64String...
-        .onChange(of: inputHome.selectCaptureImage) { newImage in
-
-            switch inputHome.updateImageStatus {
-            case .item:
-                print("別のブランチでInputHomeにactionItemIndexが格納されているため、マージ後そちらを使用して更新")
-                Task {
-                    let uploadImage =  await itemVM.uploadImage(newImage)
-                    print(uploadImage)
-                    itemVM.items[inputHome.actionItemIndex].photoURL = uploadImage.url
-                }
-
-            case .icon:
-                guard userVM.users.first != nil else { return }
-                Task {
-                    let uploadImage =  await itemVM.uploadImage(newImage)
-                    print(uploadImage)
-                    userVM.users[0].iconURL = uploadImage.url
-                }
-
-            case .header:
-                Task {
-                    let uploadImage =  await itemVM.uploadImage(newImage)
-                    print(uploadImage)
-                    inputImage.homeHeaderURL = uploadImage.url
-                }
-
-            }
-        }
-
         .onChange(of: inputHome.cartHalfSheet) { _ in
             withAnimation(.easeOut(duration: 0.3)) {
                 switch inputHome.cartHalfSheet {
@@ -303,7 +274,7 @@ struct NavigationHeader: View {
 
     var body: some View {
 
-        HStack(alignment: .bottom) {
+        HStack {
             Button {
                 withAnimation(.spring(response: 0.3, blendDuration: 1)) {
                     inputHome.isShowSystemSideMenu.toggle()
@@ -312,7 +283,7 @@ struct NavigationHeader: View {
                     inputHome.sideMenuBackGround.toggle()
                 }
             } label: {
-                CircleIcon(photoURL: photoURL, size: getSafeArea().top - 20)
+                AsyncImageCircleIcon(photoURL: photoURL, size: getSafeArea().top - 10)
             }
 
             Spacer()

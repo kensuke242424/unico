@@ -1,13 +1,13 @@
 //
-//  ShowItemPhoto.swift
+//  ShowsItemAsyncImagePhoto.swift
 //  Artwork_Management
 //
-//  Created by 中川賢亮 on 2022/10/28.
+//  Created by 中川賢亮 on 2022/11/27.
 //
 
 import SwiftUI
 
-struct ShowItemPhoto: View {
+struct ShowsItemAsyncImagePhoto: View {
 
     let photoURL: URL?
     let size: CGFloat

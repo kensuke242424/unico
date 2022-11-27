@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct CircleIcon: View {
+struct AsyncImageCircleIcon: View {
 
     let photoURL: URL?
     let size: CGFloat
@@ -45,6 +45,6 @@ struct CircleIcon: View {
 
 struct CircleIcon_Previews: PreviewProvider {
     static var previews: some View {
-        CircleIcon(photoURL: nil, size: 35)
+        AsyncImageCircleIcon(photoURL: nil, size: 35)
     }
 }

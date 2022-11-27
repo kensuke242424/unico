@@ -94,9 +94,9 @@ class ItemViewModel: ObservableObject {
         itemRef.delete()
     }
 
-    func uploadImage(_ image: UIImage) async -> (url: URL?, filePath: String?) {
+    func uploadImage(_ image: UIImage?) async -> (url: URL?, filePath: String?) {
 
-        guard let imageData = image.jpegData(compressionQuality: 0.8) else {
+        guard let imageData = image?.jpegData(compressionQuality: 0.8) else {
             return (url: nil, filePath: nil)
         }
 
@@ -114,7 +114,9 @@ class ItemViewModel: ObservableObject {
         }
     }
 
-    func deleteImage(path: String) async {
+    func deleteImage(path: String?) async {
+
+        guard let path = path else { return }
 
         let storage = Storage.storage()
         let reference = storage.reference()

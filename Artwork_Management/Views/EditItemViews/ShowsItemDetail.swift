@@ -72,7 +72,7 @@ struct ShowsItemDetail: View {
                             ScrollView(showsIndicators: false) {
                                 VStack(spacing: 10) {
 
-                                    ShowItemPhoto(photoURL: item.photoURL, size: screenSize.width * 0.35)
+                                    ShowsItemAsyncImagePhoto(photoURL: item.photoURL, size: screenSize.width * 0.35)
                                         .padding()
                                         .id("top")
 

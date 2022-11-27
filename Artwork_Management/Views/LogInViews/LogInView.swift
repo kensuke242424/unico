@@ -52,7 +52,7 @@ enum AddressCheck {
 
 struct InputLogIn {
     var createUserNameText: String = ""
-    var captureImage: UIImage = UIImage()
+    var captureImage: UIImage? = nil
     var captureError: Bool = false
     var uploadImageData: (url: URL?, filePath: String?) = (url: nil, filePath: nil)
     var address: String = "kennsuke242424@gmail.com"
@@ -69,6 +69,7 @@ struct InputLogIn {
     var selectSignInType: SelectSignInType = .start
     var createAccount: CreateAccount = .start
     var addressCheck: AddressCheck = .stop
+    var selectUserColor: MemberColor = .gray
 }
 
 // ✅ ログイン画面の親Viewです。
@@ -79,7 +80,6 @@ struct LogInView: View {
 
     @State private var logInNavigationPath: [Navigation] = []
     @State private var inputLogIn: InputLogIn = InputLogIn()
-    @State private var selectMemberColor: MemberColor = .gray
     @State private var createFaseLineImprove: CGFloat = 0.0
 
     @FocusState private var createNameFocused: CreateFocused?
@@ -88,13 +88,13 @@ struct LogInView: View {
 
         ZStack {
 
-            GradientBackbround(color1: selectMemberColor.color1,
-                               color2: selectMemberColor.colorAccent)
+            GradientBackbround(color1: inputLogIn.selectUserColor.color1,
+                               color2: inputLogIn.selectUserColor.colorAccent)
             .onTapGesture { createNameFocused = nil }
 
             Group {
-                if let iconURL = inputLogIn.uploadImageData.url {
-                    CircleIcon(photoURL: iconURL, size: 60)
+                if let captureImage = inputLogIn.captureImage {
+                    UIImageCircleIcon(photoImage: captureImage, size: 60)
                 } else {
                     Image(systemName: "person.circle.fill").resizable().scaledToFit()
                         .foregroundColor(.white.opacity(0.5)).frame(width: 60)
@@ -215,19 +215,6 @@ struct LogInView: View {
             }
 
         } // ZStack
-
-        .onChange(of: inputLogIn.captureImage) { newImage in
-            Task {
-                if let path = inputLogIn.uploadImageData.filePath {
-                    await logInVM.deleteImage(path: path)
-                    inputLogIn.uploadImageData.url = nil
-                    print("以前の画像削除")
-                }
-
-                await inputLogIn.uploadImageData = logInVM.uploadImage(newImage)
-                print("新規画像登録")
-            }
-        }
 
         .onChange(of: inputLogIn.createAccount) { newFase in
             withAnimation(.spring(response: 1.0)) {
@@ -412,7 +399,7 @@ struct LogInView: View {
 
                 case .fase1:
 
-                    ColorCubeView(colorSet: $selectMemberColor)
+                    ColorCubeView(colorSet: $inputLogIn.selectUserColor)
                         .padding()
 
                     Button {
@@ -440,8 +427,8 @@ struct LogInView: View {
                 case .fase2:
 
                     Group {
-                        if let iconURL = inputLogIn.uploadImageData.url {
-                            CircleIcon(photoURL: iconURL, size: 150)
+                        if let captureImage = inputLogIn.captureImage {
+                            UIImageCircleIcon(photoImage: captureImage, size: 150)
                         } else {
                             Image(systemName: "photo.circle.fill").resizable().scaledToFit()
                                 .foregroundColor(.white.opacity(0.5)).frame(width: 150)
@@ -754,15 +741,16 @@ struct MailAddressInfomation: View {
                             Task {
                                 let checkSignUp = await logInVM.signUp(email: inputLogIn.address,
                                                                        password: inputLogIn.password)
-
                                 if !checkSignUp { inputLogIn.addressCheck = .failure; return }
 
+                                let uplaodImageData = await  logInVM.uploadImage(inputLogIn.captureImage)
                                 let newUserData = User(id: logInVM.uid!,
                                                        name: inputLogIn.createUserNameText,
                                                        address: inputLogIn.address,
                                                        password: inputLogIn.password,
-                                                       iconURL: inputLogIn.uploadImageData.url,
-                                                       iconPath: inputLogIn.uploadImageData.filePath,
+                                                       iconURL: uplaodImageData.url,
+                                                       iconPath: uplaodImageData.filePath,
+                                                       userColor: inputLogIn.selectUserColor,
                                                        joins: [])
 
                                 let checkAddUser = await logInVM.addUser(userData: newUserData)

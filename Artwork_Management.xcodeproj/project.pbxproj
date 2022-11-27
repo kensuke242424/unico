@@ -54,12 +54,14 @@
 		E09F09CE28F146DB00D07669 /* EditItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09F09CD28F146DB00D07669 /* EditItemView.swift */; };
 		E0A36452290A37A600B30A14 /* CustomArcShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0A36451290A37A600B30A14 /* CustomArcShape.swift */; };
 		E0A3B996292EFCE600209ADC /* CreateAndJoinTeamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0A3B995292EFCE500209ADC /* CreateAndJoinTeamView.swift */; };
-		E0A7DE4B290B9E0A008C3F3F /* ShowItemPhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0A7DE4A290B9E09008C3F3F /* ShowItemPhoto.swift */; };
-		E0A7DE4E290C289A008C3F3F /* CircleIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0A7DE4D290C289A008C3F3F /* CircleIcon.swift */; };
+		E0A7DE4B290B9E0A008C3F3F /* ShowItemUIImagePhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0A7DE4A290B9E09008C3F3F /* ShowItemUIImagePhoto.swift */; };
+		E0A7DE4E290C289A008C3F3F /* AsyncImageCircleIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0A7DE4D290C289A008C3F3F /* AsyncImageCircleIcon.swift */; };
 		E0A7DE50290DAB40008C3F3F /* BlurView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0A7DE4F290DAB40008C3F3F /* BlurView.swift */; };
 		E0B3288C2921577F00E94BC3 /* ElementSwitchingPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0B3288B2921577F00E94BC3 /* ElementSwitchingPickerView.swift */; };
 		E0B328912923AD9D00E94BC3 /* GradientLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0B328902923AD9D00E94BC3 /* GradientLine.swift */; };
 		E0B328932924A42100E94BC3 /* ManageCustomizeSideMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0B328922924A42100E94BC3 /* ManageCustomizeSideMenu.swift */; };
+		E0BE39AD29331218002499C4 /* UIImageCircleIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0BE39AC29331218002499C4 /* UIImageCircleIcon.swift */; };
+		E0BE39AF29335317002499C4 /* ShowsItemAsyncImagePhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0BE39AE29335317002499C4 /* ShowsItemAsyncImagePhoto.swift */; };
 		E0CB9DCB2913964F00D95C54 /* ViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0CB9DCA2913964F00D95C54 /* ViewExtension.swift */; };
 		E0CC79B628E761EA00CE0B19 /* UserModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0CC79B528E761EA00CE0B19 /* UserModel.swift */; };
 		E0CC79B828E7811500CE0B19 /* ItemDetailData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0CC79B728E7811500CE0B19 /* ItemDetailData.swift */; };
@@ -120,12 +122,14 @@
 		E09F09CD28F146DB00D07669 /* EditItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditItemView.swift; sourceTree = "<group>"; };
 		E0A36451290A37A600B30A14 /* CustomArcShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomArcShape.swift; sourceTree = "<group>"; };
 		E0A3B995292EFCE500209ADC /* CreateAndJoinTeamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAndJoinTeamView.swift; sourceTree = "<group>"; };
-		E0A7DE4A290B9E09008C3F3F /* ShowItemPhoto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowItemPhoto.swift; sourceTree = "<group>"; };
-		E0A7DE4D290C289A008C3F3F /* CircleIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleIcon.swift; sourceTree = "<group>"; };
+		E0A7DE4A290B9E09008C3F3F /* ShowItemUIImagePhoto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowItemUIImagePhoto.swift; sourceTree = "<group>"; };
+		E0A7DE4D290C289A008C3F3F /* AsyncImageCircleIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncImageCircleIcon.swift; sourceTree = "<group>"; };
 		E0A7DE4F290DAB40008C3F3F /* BlurView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurView.swift; sourceTree = "<group>"; };
 		E0B3288B2921577F00E94BC3 /* ElementSwitchingPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElementSwitchingPickerView.swift; sourceTree = "<group>"; };
 		E0B328902923AD9D00E94BC3 /* GradientLine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientLine.swift; sourceTree = "<group>"; };
 		E0B328922924A42100E94BC3 /* ManageCustomizeSideMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageCustomizeSideMenu.swift; sourceTree = "<group>"; };
+		E0BE39AC29331218002499C4 /* UIImageCircleIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageCircleIcon.swift; sourceTree = "<group>"; };
+		E0BE39AE29335317002499C4 /* ShowsItemAsyncImagePhoto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowsItemAsyncImagePhoto.swift; sourceTree = "<group>"; };
 		E0CB9DCA2913964F00D95C54 /* ViewExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewExtension.swift; sourceTree = "<group>"; };
 		E0CC79B528E761EA00CE0B19 /* UserModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserModel.swift; sourceTree = "<group>"; };
 		E0CC79B728E7811500CE0B19 /* ItemDetailData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemDetailData.swift; sourceTree = "<group>"; };
@@ -343,8 +347,10 @@
 		E0A7DE4C290C2811008C3F3F /* PhotoViews */ = {
 			isa = PBXGroup;
 			children = (
-				E0A7DE4A290B9E09008C3F3F /* ShowItemPhoto.swift */,
-				E0A7DE4D290C289A008C3F3F /* CircleIcon.swift */,
+				E0A7DE4A290B9E09008C3F3F /* ShowItemUIImagePhoto.swift */,
+				E0BE39AE29335317002499C4 /* ShowsItemAsyncImagePhoto.swift */,
+				E0A7DE4D290C289A008C3F3F /* AsyncImageCircleIcon.swift */,
+				E0BE39AC29331218002499C4 /* UIImageCircleIcon.swift */,
 				E01AA3A429176FE7000FCD37 /* PHPickerView.swift */,
 			);
 			path = PhotoViews;
@@ -479,6 +485,7 @@
 				E08F273828DDB51600329C5E /* ManageView.swift in Sources */,
 				E01AA3A529176FE7000FCD37 /* PHPickerView.swift in Sources */,
 				E01AA3AB291780ED000FCD37 /* StringExtension.swift in Sources */,
+				E0BE39AF29335317002499C4 /* ShowsItemAsyncImagePhoto.swift in Sources */,
 				E0796AD728F485850094E50C /* ButtonViewModel.swift in Sources */,
 				E04ACF4328E73C660054A6C4 /* IndicatorRow.swift in Sources */,
 				E09F09BC28EAF33500D07669 /* FocusedLineRow.swift in Sources */,
@@ -491,10 +498,10 @@
 				E0CF7EF228DF166700735142 /* ItemViewModel.swift in Sources */,
 				E0CF7EF028DF152D00735142 /* ItemModel.swift in Sources */,
 				E0CB9DCB2913964F00D95C54 /* ViewExtension.swift in Sources */,
-				E0A7DE4E290C289A008C3F3F /* CircleIcon.swift in Sources */,
+				E0A7DE4E290C289A008C3F3F /* AsyncImageCircleIcon.swift in Sources */,
 				E0455FE8292CCB39004F677D /* HashableExtension.swift in Sources */,
 				E0796AE328F6D77A0094E50C /* CommerceSheet.swift in Sources */,
-				E0A7DE4B290B9E0A008C3F3F /* ShowItemPhoto.swift in Sources */,
+				E0A7DE4B290B9E0A008C3F3F /* ShowItemUIImagePhoto.swift in Sources */,
 				E08F273E28DDB65F00329C5E /* HomeTabView.swift in Sources */,
 				E0455FDE292B2B83004F677D /* LogInViewModel.swift in Sources */,
 				E0DE33522928F48D008C7147 /* CustomProgressView.swift in Sources */,
@@ -507,6 +514,7 @@
 				E01E1392291F961A0001F2DA /* TagViewModel.swift in Sources */,
 				E0796ADD28F5F2830094E50C /* CartItemsSheet.swift in Sources */,
 				E094F10028E20F1000D3C845 /* LogInView.swift in Sources */,
+				E0BE39AD29331218002499C4 /* UIImageCircleIcon.swift in Sources */,
 				E0003D0328FD3BB0007308B0 /* TagTitle.swift in Sources */,
 				E01E13942920EE850001F2DA /* EmptyItemView.swift in Sources */,
 				E01E1390291D168B0001F2DA /* SystemSideMenu.swift in Sources */,

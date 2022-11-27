@@ -69,21 +69,20 @@ struct SystemSideMenu: View {
 
                 VStack(alignment: .leading, spacing: 20) {
 
-                    CircleIcon(photoURL: nil, size: getRect().width / 3 + 20)
-                        .overlay(alignment: .bottomTrailing) {
-                            Button {
-                                inputHome.updateImageStatus = .icon
-                                inputHome.isShowSelectImageSheet.toggle()
-                            } label: {
-                                Image(systemName: "photo.on.rectangle")
-                                    .foregroundColor(.white.opacity(0.6))
-                                    .offset(x: 10)
+                    AsyncImageCircleIcon(photoURL: teamVM.team[0].iconURL, size: getRect().width / 3 + 20)
+                        .overlay(alignment: .bottom) {
+                            if teamVM.team.first!.name.count < 12 {
+                                Text(teamVM.team.first!.name)
+                                    .font(.title3.bold()).foregroundColor(.white)
+                                    .frame(width: getRect().width * 0.7)
+                                    .offset(y: 35)
                             }
-
                         }
-
-                    Text("Account_Name")
-                        .font(.title3.bold()).foregroundColor(.white)
+                    if teamVM.team.first!.name.count >= 12 {
+                        Text(teamVM.team.first!.name)
+                            .font(.title3.bold()).foregroundColor(.white)
+                            .frame(width: getRect().width * 0.7)
+                    }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
@@ -337,7 +336,7 @@ struct SystemSideMenu: View {
         // NOTE: ローカルのタグ順番操作をfirestoreに保存
         .onChange(of: inputSideMenu.editMode) { newEdit in
             if newEdit == .inactive {
-                tagVM.updateOderTagIndex(teamID: teamVM.teamID)
+                tagVM.updateOderTagIndex(teamID: teamVM.team.first!.id)
             }
         }
         .clipShape(SideMenuShape())
@@ -394,7 +393,7 @@ struct SystemSideMenu: View {
 
             for tagIndex in offsets {
                 print(tagIndex)
-                tagVM.deleteTag(deleteTag: tagVM.tags[tagIndex], teamID: teamVM.teamID)
+                tagVM.deleteTag(deleteTag: tagVM.tags[tagIndex], teamID: teamVM.team.first!.id)
             }
         }
 

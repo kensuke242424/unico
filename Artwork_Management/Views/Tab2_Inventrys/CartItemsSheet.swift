@@ -95,7 +95,7 @@ struct CartItemRow: View {
 
             HStack {
 
-                ShowItemPhoto(photoURL: itemRow.photoURL, size: 100)
+                ShowsItemAsyncImagePhoto(photoURL: itemRow.photoURL, size: 100)
 
                 Spacer()
 

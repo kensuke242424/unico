@@ -114,9 +114,9 @@ class LogInViewModel: ObservableObject {
         }
     }
 
-    func uploadImage(_ image: UIImage) async -> (url: URL?, filePath: String?) {
+    func uploadImage(_ image: UIImage?) async -> (url: URL?, filePath: String?) {
 
-        guard let imageData = image.jpegData(compressionQuality: 0.8) else {
+        guard let imageData = image?.jpegData(compressionQuality: 0.8) else {
             return (url: nil, filePath: nil)
         }
 

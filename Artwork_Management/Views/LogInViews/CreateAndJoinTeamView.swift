@@ -30,7 +30,7 @@ struct CreateAndJoinTeamView: View {
     @StateObject var userVM: UserViewModel
 
     @State private var teamName: String = ""
-    @State private var captureImage: UIImage = UIImage()
+    @State private var captureImage: UIImage? = nil
     @State private var uploadImageData: (url: URL?, filePath: String?) = (nil, nil)
     @State private var isShowPickerView: Bool = false
     @State private var captureError: Bool = false
@@ -189,8 +189,12 @@ struct CreateAndJoinTeamView: View {
             .opacity(selectTeamFase == .start ? 0.0 : 1.0)
 
             Button(selectTeamFase == .fase1 ? "決定して次へ" : "これで始める") {
-                withAnimation(.spring(response: 0.7)) {
-                    selectTeamFase = selectTeamFase == .fase1 ? .fase2 : .check
+                if  selectTeamFase == .fase1 {
+                    withAnimation(.spring(response: 0.7)) {
+                        selectTeamFase = .fase2
+                    }
+                } else if selectTeamFase == .fase2 {
+                    selectTeamFase = .check
                 }
             }
             .buttonStyle(.borderedProminent)
@@ -238,25 +242,50 @@ struct CreateAndJoinTeamView: View {
             }
         }
 
-        .onChange(of: selectTeamFase) { fase in
+        .onChange(of: selectTeamFase) { _ in
 
-            if fase == .check {
+            if selectTeamFase == .check {
 
                 guard let user = userVM.users.first else {
                     print("user情報が取得できません。チーム追加処理を終了しました。")
                     return
                 }
-                // チームデータに格納する自身のユーザデータ
-                let joinMember = JoinMember(memberUID: user.id, name: user.name, iconURL: user.iconURL)
-                let id = UUID().uuidString
+                print("check開始")
+                Task {
+                    do {
+                        // チームデータに格納する自身のユーザデータ
+                        let joinMember = JoinMember(memberUID: user.id, name: user.name, iconURL: user.iconURL)
+                        // teamsに格納する際のドキュメントID
+                        let teamID = UUID().uuidString
+                        //
+                        let teamData = Team(id: teamID,
+                                            name: teamName,
+                                            iconURL: uploadImageData.url,
+                                            iconPath: uploadImageData.filePath,
+                                            members: [joinMember])
+                        let joinTeamData = JoinTeam(teamID: teamID,
+                                                    name: teamName,
+                                                    headerURL: nil,
+                                                    headerPath: nil)
+                        try await teamVM.addTeam(teamData: teamData)
+                        try await userVM.addNewJoinTeam(newJoinTeam: joinTeamData)
 
-                let teamData = Team(id: id,
-                                    name: teamName,
-                                    iconURL: uploadImageData.url,
-                                    iconPath: uploadImageData.filePath,
-                                    members: [joinMember])
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                            selectTeamFase = .success
+                        }
 
-                teamVM.addTeamAndGetID(teamData: teamData)
+                    } catch CustomError.uidEmpty {
+                        print("Error: uidEmpty")
+                    } catch CustomError.getRef {
+                        print("Error: getRef")
+                    } catch CustomError.fetch {
+                        print("Error: fetch")
+                    } catch CustomError.getDocument {
+                        print("Error: getDocument")
+                    } catch {
+                        print("Error")
+                    }
+                }
             }
         }
 
@@ -339,7 +368,7 @@ struct CreateAndJoinTeamView: View {
             VStack(spacing: 40) {
                 Group {
                     if let iconURL = iconURL {
-                        CircleIcon(photoURL: iconURL, size: 150)
+                        AsyncImageCircleIcon(photoURL: iconURL, size: 150)
                     } else {
                         Image(systemName: "photo.circle.fill").resizable().scaledToFit()
                             .foregroundColor(.white.opacity(0.8)).frame(width: 150)

@@ -22,6 +22,10 @@ struct ManageView: View {
 
         NavigationView {
             ZStack {
+
+                GradientBackbround(color1: userVM.users.first!.userColor.color1,
+                                   color2: userVM.users.first!.userColor.colorAccent)
+
                 ScrollView(.vertical) {
 
                     VStack(alignment: .leading) {
@@ -161,8 +165,6 @@ struct ManageView: View {
 
                 } // ScrollView
             } // ZStack
-            .background(LinearGradient(gradient: Gradient(colors: [.customDarkGray1, .customLightGray1]),
-                                       startPoint: .top, endPoint: .bottom))
             .navigationTitle("Manage")
             .navigationBarTitleDisplayMode(.inline)
             .animation(.spring(response: 0.5), value: inputManage.isTagGroup)
@@ -235,7 +237,7 @@ struct ManageView: View {
 
             HStack(alignment: .top, spacing: 20) {
 
-                ShowItemPhoto(photoURL: item.photoURL, size: UIScreen.main.bounds.width / 5)
+                ShowsItemAsyncImagePhoto(photoURL: item.photoURL, size: UIScreen.main.bounds.width / 5)
                     .onTapGesture {
                         if let actionItemIndex = itemVM.items.firstIndex(of: item) {
                             inputHome.actionItemIndex = actionItemIndex

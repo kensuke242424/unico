@@ -10,7 +10,7 @@ import PhotosUI
 
 struct PHPickerView: UIViewControllerRepresentable {
 
-    @Binding var captureImage: UIImage
+    @Binding var captureImage: UIImage?
     @Binding var isShowSheet: Bool
     @Binding var isShowError: Bool
 

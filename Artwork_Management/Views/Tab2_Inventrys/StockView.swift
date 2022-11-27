@@ -40,6 +40,10 @@ struct StockView: View {
         NavigationView {
             ScrollViewReader { scrollProxy in
                 ZStack {
+
+                    GradientBackbround(color1: userVM.users.first!.userColor.color1,
+                                       color2: userVM.users.first!.userColor.colorAccent)
+
                     VStack {
 
                         // NOTE: アイテム要素全体のロケーション
@@ -186,9 +190,6 @@ struct StockView: View {
 
             } // ScrollViewReader
 
-            .background(LinearGradient(gradient: Gradient(colors: [.customDarkGray1,
-                                                                   .customLightGray1]),
-                                       startPoint: .top, endPoint: .bottom))
             // アイテム取引かごのシート画面
             .resizableSheet($inputHome.cartHalfSheet, id: "A") { builder in
                 builder.content { context in
@@ -269,7 +270,7 @@ struct StockView: View {
                     CommerceSheet(itemVM: itemVM,
                                   inputHome: $inputHome,
                                   inputStock: $inputStock,
-                                  teamID: teamVM.teamID)
+                                  teamID: teamVM.team.first!.id)
 
                 } // builder.content
                 .supportedState([.medium])

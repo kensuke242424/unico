@@ -12,7 +12,7 @@ import FirebaseFirestore
 import FirebaseFirestoreSwift
 
 enum CustomError: Error {
-    case uidEmpty, getUserRef, teamFetch, userFetch, itemFetch, tagFetch
+    case uidEmpty, getRef, fetch, setData, updateData, getDocument, photoUrlEmpty
 }
 
 class UserViewModel: ObservableObject {
@@ -32,35 +32,35 @@ class UserViewModel: ObservableObject {
     @MainActor
     func fetchUser() async throws {
             guard let uid = uid else { throw CustomError.uidEmpty }
-            guard let userRef = db?.collection("users").document(uid) else { throw CustomError.getUserRef }
+            guard let userRef = db?.collection("users").document(uid) else { throw CustomError.getRef }
 
         do {
             let document = try await userRef.getDocument(source: .default)
             let user = try document.data(as: User.self)
             self.users.append(user)
 
-        } catch CustomError.uidEmpty {
-            print("Error_fetchUser: uidEmpty")
-        } catch CustomError.getUserRef {
-            print("Error_fetchUser: getUserRef")
         } catch {
-            print("Error_fetchUser: try fetch")
+            throw CustomError.getDocument
         }
     }
-    // ログインタイムが一番近いチームを取得して、チームIDを返す
-    // チームIDを持っていない(所属チームがない)場合、nilを返す
-    func getFastLogInTeamID() async -> String? {
 
-        if users.isEmpty { return nil }
-        var joinsTeam = users.first!.joins
-        joinsTeam.sort(by: { $0.logInTime!.dateValue() > $1.logInTime!.dateValue() })
-        guard let fastLogInTeam = joinsTeam.first else { return nil }
+    func addNewJoinTeam(newJoinTeam: JoinTeam) async throws {
 
-        return fastLogInTeam.teamID
+        guard let uid = uid, var user = users.first else { throw CustomError.uidEmpty }
+        guard let userRef = db?.collection("users").document(uid) else { throw CustomError.getRef }
+
+        user.joins.append(newJoinTeam)
+        user.lastLogIn = newJoinTeam.teamID
+
+        do {
+            try userRef.setData(from: user)
+        } catch {
+            throw CustomError.updateData
+        }
     }
 }
 
 struct TestUser {
     let testUser: User = User(id: "sampleUserID(uid)", name: "SampleUser", address: "kennsuke242424@gmail.com",
-                              password: "ninnzinn2424", iconURL: nil, iconPath: nil, joins: [])
+                              password: "ninnzinn2424", iconURL: nil, iconPath: nil, userColor: .red, joins: [])
 }

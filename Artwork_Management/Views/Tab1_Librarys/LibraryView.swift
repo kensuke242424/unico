@@ -69,9 +69,8 @@ struct LibraryView: View {
 
         ZStack {
 
-            LinearGradient(gradient: Gradient(colors: [.customDarkGray1, .customLightGray1]),
-                           startPoint: .top, endPoint: .bottom)
-            .ignoresSafeArea()
+            GradientBackbround(color1: userVM.users.first!.userColor.color1,
+                               color2: userVM.users.first!.userColor.colorAccent)
 
             VStack {
 
@@ -352,7 +351,7 @@ struct LibraryView: View {
 
                 ForEach(tagFilterItemCards.indices, id: \.self) {index in
 
-                    ShowItemPhoto(photoURL: tagFilterItemCards[index].photoURL, size: panelSize)
+                    ShowsItemAsyncImagePhoto(photoURL: tagFilterItemCards[index].photoURL, size: panelSize)
 
                         .overlay {
                             if inputLibrary.isShowCardInfomation {

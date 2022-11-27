@@ -16,7 +16,9 @@ struct User: Identifiable, Codable {
     var password: String?
     var iconURL: URL?
     var iconPath: String?
+    var userColor: MemberColor
     var joins: [JoinTeam]
+    var lastLogIn: String?
 }
 
 struct JoinTeam: Codable {
@@ -24,8 +26,6 @@ struct JoinTeam: Codable {
     var name: String
     var headerURL: URL?
     var headerPath: String?
-    var settingColor: MemberColor
-    @ServerTimestamp var logInTime: Timestamp?
 }
 
 struct ImageData: Codable {

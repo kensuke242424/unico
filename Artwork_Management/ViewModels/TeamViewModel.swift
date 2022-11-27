@@ -20,11 +20,21 @@ class TeamViewModel: ObservableObject {
     var teamID: String = "7gm2urHDCdZGCV9pX9ef"
     var uid: String? { return Auth.auth().currentUser?.uid }
 
+    @Published var team: [Team] = []
     @Published var isShowCreateAndJoinTeam: Bool = false
 
-    func fetchTeam() async -> Bool {
+    @MainActor
+    func fetchTeam(teamID: String) async throws {
 
-        return false
+        guard let teamRef = db?.collection("teams").document(teamID) else { throw CustomError.getRef  }
+
+        do {
+            let teamDocument = try await teamRef.getDocument()
+            let teamData = try teamDocument.data(as: Team.self)
+            self.team.append(teamData)
+        } catch {
+            throw CustomError.fetch
+        }
     }
 
     // Userのjoinsデータから最終ログイン日が一番最近のチームIDを返す
@@ -40,34 +50,29 @@ class TeamViewModel: ObservableObject {
 
         do {
             let document = try await usersRef.document(uid).getDocument()
-            print("document取得OK")
             let user = try document.data(as: User.self)
-            print("user取得OK")
             let joinsData = user.joins
-            print("joinsData: \(joinsData)")
         } catch {
             print("Error: fetchTeam_try await usersRef.document(uid).getDocument(as: User.self)")
             return nil
         }
-
         return nil
     }
 
-    func addTeamAndGetID(teamData: Team) -> String? {
+    func addTeam(teamData: Team) async throws {
         print("addTeamAndGetID実行")
 
         guard let teamsRef = db?.collection("teams") else {
-            print("error: guard let teamsRef = db?.collection(teams), let uid = uid")
-            return nil
+            print("error: guard let teamsRef = db?.collection(teams)")
+            throw CustomError.getRef
         }
 
         do {
             _ = try teamsRef.document(teamData.id).setData(from: teamData)
         } catch {
             print("Error: try db!.collection(collectionID).addDocument(from: itemData)")
-            return nil
+            throw CustomError.setData
         }
         print("addTeamAndGetID完了")
-        return teamData.id
     }
 }

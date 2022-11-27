@@ -9,9 +9,10 @@ import SwiftUI
 
 struct InputEditItem {
 
-    var captureImage: UIImage = UIImage()
+    var captureImage: UIImage? = nil
     var selectionTagName: String = ""
     var photoURL: URL? = nil
+    var photoPath: String? = nil
     var editItemName: String = ""
     var editItemInventory: String = ""
     var editItemCost: String = ""
@@ -61,14 +62,14 @@ struct EditItemView: View {
                     Color.customDarkGray1
                         .ignoresSafeArea()
                         .overlay {
-                            LinearGradient(gradient: Gradient(colors:
-                                                                [.clear, .customLightGray1]),
+                            LinearGradient(gradient: Gradient(colors:[.clear, .customLightGray1]),
                                                        startPoint: .top, endPoint: .bottom)
                         }
                         .offset(y: 340)
                     VStack {
                         // ✅カスタムView 写真ゾーン
                         EditItemPhotoArea(showImageSheet: $inputEdit.isShowItemImageSelectSheet,
+                                          photoImage: inputEdit.captureImage,
                                           photoURL: inputEdit.photoURL)
 
                         InputForms(itemVM: itemVM,
@@ -102,15 +103,6 @@ struct EditItemView: View {
                 }
             } // onChange(ボタンdisable分岐)
 
-            .onChange(of: inputEdit.captureImage) { newImage in
-
-                Task {
-                    let uploadImage =  await itemVM.uploadImage(newImage)
-                    print(uploadImage)
-                    inputEdit.photoURL = uploadImage.url
-                }
-            }
-
             // NOTE: updateitemView呼び出し時に、親Viewから受け取ったアイテム情報を各入力欄に格納します。
             .onAppear {
 
@@ -119,6 +111,7 @@ struct EditItemView: View {
 
                     inputEdit.selectionTagName = passItemData.tag
                     inputEdit.photoURL = passItemData.photoURL
+                    inputEdit.photoPath = passItemData.photoPath
                     inputEdit.editItemName = passItemData.name
                     inputEdit.editItemInventory = String(passItemData.inventory)
                     inputEdit.editItemCost = String(passItemData.cost)
@@ -146,52 +139,65 @@ struct EditItemView: View {
                         switch editItemStatus {
 
                         case .create:
+                            Task {
+                                let uploadImage =  await itemVM.uploadImage(inputEdit.captureImage)
+                                let itemData = Item(tag: inputEdit.selectionTagName,
+                                                    tagColor: tagColor,
+                                                    name: inputEdit.editItemName,
+                                                    detail: inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "メモなし",
+                                                    photoURL: uploadImage.url,
+                                                    photoPath: uploadImage.filePath,
+                                                    cost: 0,
+                                                    price: Int(inputEdit.editItemPrice) ?? 0,
+                                                    amount: 0,
+                                                    sales: 0,
+                                                    inventory: Int(inputEdit.editItemInventory) ??  0,
+                                                    totalAmount: 0,
+                                                    totalInventory: Int(inputEdit.editItemInventory) ?? 0)
 
-                            // NOTE: テストデータに新規アイテムを保存
-                            let itemData = Item(tag: inputEdit.selectionTagName,
-                                                tagColor: tagColor,
-                                                name: inputEdit.editItemName,
-                                                detail: inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "メモなし",
-                                                photoURL: inputEdit.photoURL,
-                                                cost: 0,
-                                                price: Int(inputEdit.editItemPrice) ?? 0,
-                                                amount: 0,
-                                                sales: 0,
-                                                inventory: Int(inputEdit.editItemInventory) ??  0,
-                                                totalAmount: 0,
-                                                totalInventory: Int(inputEdit.editItemInventory) ?? 0)
+                                // Firestoreにコーダブル保存
+                                itemVM.addItem(itemData: itemData, tag: inputEdit.selectionTagName, teamID: teamVM.team[0].id)
 
-                            // Firestoreにコーダブル保存
-                            itemVM.addItem(itemData: itemData, tag: inputEdit.selectionTagName, teamID: teamVM.teamID)
-
-                            inputHome.isPresentedEditItem.toggle()
+                                inputHome.isPresentedEditItem.toggle()
+                            }
 
                         case .update:
 
-                            guard let passItemData = passItemData else { return }
-                            guard let defaultDataID = passItemData.id else { return }
-                            let editInventory = Int(inputEdit.editItemInventory) ?? 0
+                            Task {
+                                guard let passItemData = passItemData else { return }
+                                guard let defaultDataID = passItemData.id else { return }
+                                let editInventory = Int(inputEdit.editItemInventory) ?? 0
 
-                            // NOTE: アイテムを更新
-                            let updateItemData = (Item(createTime: passItemData.createTime,
-                                                       tag: inputEdit.selectionTagName,
-                                                       tagColor: tagColor,
-                                                       name: inputEdit.editItemName,
-                                                       detail: inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "メモなし",
-                                                       photoURL: inputEdit.photoURL,
-                                                       cost: Int(inputEdit.editItemCost) ?? 0,
-                                                       price: Int(inputEdit.editItemPrice) ?? 0,
-                                                       amount: 0,
-                                                       sales: Int(inputEdit.editItemSales) ?? 0,
-                                                       inventory: editInventory,
-                                                       totalAmount: passItemData.totalAmount,
-                                                       totalInventory: passItemData.inventory < editInventory ?
-                                                       passItemData.totalInventory + (editInventory - passItemData.inventory) :
-                                                        passItemData.totalInventory - (passItemData.inventory - editInventory) ))
+                                // captureImageに新しい画像があれば、元の画像データを更新
+                                if let captureImage = inputEdit.captureImage {
+                                    await itemVM.deleteImage(path: inputEdit.photoPath)
+                                    let newImageData =  await itemVM.uploadImage(captureImage)
+                                    inputEdit.photoURL = newImageData.url
+                                    inputEdit.photoPath = newImageData.filePath
+                                }
 
-                            itemVM.updateItem(updateData: updateItemData, defaultDataID: defaultDataID, teamID: teamVM.teamID)
+                                // NOTE: アイテムを更新
+                                let updateItemData = (Item(createTime: passItemData.createTime,
+                                                           tag: inputEdit.selectionTagName,
+                                                           tagColor: tagColor,
+                                                           name: inputEdit.editItemName,
+                                                           detail: inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "メモなし",
+                                                           photoURL: inputEdit.photoURL,
+                                                           photoPath: inputEdit.photoPath,
+                                                           cost: Int(inputEdit.editItemCost) ?? 0,
+                                                           price: Int(inputEdit.editItemPrice) ?? 0,
+                                                           amount: 0,
+                                                           sales: Int(inputEdit.editItemSales) ?? 0,
+                                                           inventory: editInventory,
+                                                           totalAmount: passItemData.totalAmount,
+                                                           totalInventory: passItemData.inventory < editInventory ?
+                                                           passItemData.totalInventory + (editInventory - passItemData.inventory) :
+                                                            passItemData.totalInventory - (passItemData.inventory - editInventory) ))
 
-                            inputHome.isPresentedEditItem.toggle()
+                                itemVM.updateItem(updateData: updateItemData, defaultDataID: defaultDataID, teamID: teamVM.team[0].id)
+
+                                inputHome.isPresentedEditItem.toggle()
+                            }
 
                         } // switch editItemStatus(データ追加、更新)
                     } label: {

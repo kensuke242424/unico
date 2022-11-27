@@ -71,9 +71,8 @@ struct RootView: View {
                 Task {
                     do {
                         try await userVM.fetchUser()
-                        let logInTeamID = await userVM.getFastLogInTeamID()
-                        guard logInTeamID != nil else {
-                            print("チームID無し。チーム作成画面へ遷移")
+                        if userVM.users[0].joins.isEmpty {
+                            print("参加チーム無し。チーム作成画面へ遷移")
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                 withAnimation(.spring(response: 1)) {
                                     logInVM.rootNavigation = .join
@@ -82,16 +81,30 @@ struct RootView: View {
                             }
                             return
                         }
-                        await tagVM.fetchTag(teamID: teamVM.teamID)
-                        await itemVM.fetchItem(teamID: teamVM.teamID)
+                        guard let lastLogInTeamID = userVM.users[0].lastLogIn else { return }
+                        try await teamVM.fetchTeam(teamID: lastLogInTeamID)
+                        await tagVM.fetchTag(teamID: lastLogInTeamID)
+                        await itemVM.fetchItem(teamID: lastLogInTeamID)
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                             withAnimation(.spring(response: 1)) {
                                 logInVM.rootNavigation = .home
                             }
                         }
+                    } catch CustomError.uidEmpty {
+                        print("Error: uidEmpty")
+                        withAnimation(.spring(response: 1)) { logInVM.rootNavigation = .logIn }
+                    } catch CustomError.getRef {
+                        print("Error: getRef")
+                        withAnimation(.spring(response: 1)) { logInVM.rootNavigation = .logIn }
+                    } catch CustomError.fetch {
+                        print("Error: fetch")
+                        withAnimation(.spring(response: 1)) { logInVM.rootNavigation = .logIn }
+                    } catch CustomError.getDocument {
+                        print("Error: getDocument")
+                        withAnimation(.spring(response: 1)) { logInVM.rootNavigation = .logIn }
                     } catch {
-                        print("fecth失敗")
-                        logInVM.rootNavigation = .logIn
+                        print("Error")
+                        withAnimation(.spring(response: 1)) { logInVM.rootNavigation = .logIn }
                     }
                 } // Task
             }
