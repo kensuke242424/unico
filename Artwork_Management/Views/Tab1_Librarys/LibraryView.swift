@@ -12,7 +12,6 @@ struct InputLibrary {
     var homeCardsIndex: Int = 0
     var libraryCardIndex: Int = 0
     var cardOpacity: CGFloat =  1.0
-    var tagFilterItemCards: [Item] = []
     var isShowCardInfomation: Bool = false
 }
 
@@ -57,13 +56,14 @@ struct LibraryView: View {
     @State private var headerImageSize: HeaderImageSize = .fit
 
     var tagFilterItemCards: [Item] {
-
         if inputLibrary.selectFilterTag == tagVM.tags.first!.tagName {
             return itemVM.items
         } else {
             return itemVM .items.filter({ $0.tag == inputLibrary.selectFilterTag })
         }
     }
+
+    
 
     var body: some View {
 

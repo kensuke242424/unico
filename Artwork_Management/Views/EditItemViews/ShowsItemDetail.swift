@@ -132,7 +132,10 @@ struct ShowsItemDetail: View {
                                                     withAnimation {
                                                         itemVM.items.removeAll(where: { $0.id == item.id })
                                                     }
-                                                    itemVM.deleteItem(deleteItem: item, teamID: teamID)
+                                                    Task {
+                                                        await itemVM.deleteImage(path: item.photoPath)
+                                                        itemVM.deleteItem(deleteItem: item, teamID: teamID)
+                                                    }
                                                 }
                                             }
                                             .foregroundColor(.red)
