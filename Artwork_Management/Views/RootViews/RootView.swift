@@ -71,6 +71,7 @@ struct RootView: View {
                 Task {
                     do {
                         try await userVM.fetchUser()
+                        print(userVM.users)
                         if userVM.users[0].joins.isEmpty {
                             print("参加チーム無し。チーム作成画面へ遷移")
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {

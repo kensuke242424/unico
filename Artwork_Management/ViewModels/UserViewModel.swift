@@ -35,6 +35,7 @@ class UserViewModel: ObservableObject {
             guard let userRef = db?.collection("users").document(uid) else { throw CustomError.getRef }
 
         do {
+            users = []
             let document = try await userRef.getDocument(source: .default)
             let user = try document.data(as: User.self)
             self.users.append(user)

@@ -63,8 +63,6 @@ struct LibraryView: View {
         }
     }
 
-    
-
     var body: some View {
 
         ZStack {

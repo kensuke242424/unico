@@ -29,6 +29,7 @@ class TeamViewModel: ObservableObject {
         guard let teamRef = db?.collection("teams").document(teamID) else { throw CustomError.getRef  }
 
         do {
+            team = []
             let teamDocument = try await teamRef.getDocument()
             let teamData = try teamDocument.data(as: Team.self)
             self.team.append(teamData)
