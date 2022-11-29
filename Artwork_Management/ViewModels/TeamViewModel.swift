@@ -33,31 +33,10 @@ class TeamViewModel: ObservableObject {
             let teamDocument = try await teamRef.getDocument()
             let teamData = try teamDocument.data(as: Team.self)
             self.team.append(teamData)
+            print("fetchTeam: \(team)")
         } catch {
             throw CustomError.fetch
         }
-    }
-
-    // Userのjoinsデータから最終ログイン日が一番最近のチームIDを返す
-    // joins内にチームが存在しなければ、nilを返す
-    func getJoinsTeamID() async -> String? {
-
-        guard let uid = Auth.auth().currentUser?.uid, let usersRef = db?.collection("users") else {
-            print("Error: foinTeamCheck_Auth.guard let uid = auth().currentUser?.uid")
-            return nil
-        }
-
-        print(uid)
-
-        do {
-            let document = try await usersRef.document(uid).getDocument()
-            let user = try document.data(as: User.self)
-            let joinsData = user.joins
-        } catch {
-            print("Error: fetchTeam_try await usersRef.document(uid).getDocument(as: User.self)")
-            return nil
-        }
-        return nil
     }
 
     func addTeam(teamData: Team) async throws {
@@ -75,5 +54,38 @@ class TeamViewModel: ObservableObject {
             throw CustomError.setData
         }
         print("addTeamAndGetID完了")
+    }
+
+    func updateTeamHeaderImage(data: (url: URL?, filePath: String?)) async throws {
+
+        guard var team = team.first else { throw CustomError.teamEmpty }
+        guard let teamRef = db?.collection("teams").document(team.id) else { throw CustomError.getDocument }
+
+        print("storage保存に必要なデータ取得おけ")
+        do {
+            team.headerURL = data.url
+            team.headerPath = data.filePath
+            try teamRef.setData(from: team)
+            print("storageにヘッダー画像保存成功")
+            try await getTeamHeaderImage(teamID: team.id)
+            print("新規ヘッダー画像取得成功")
+        } catch {
+            print("ヘッダーの保存に失敗")
+        }
+    }
+
+    @MainActor
+    func getTeamHeaderImage(teamID: String) async throws {
+
+        guard let teamRef = db?.collection("teams").document(teamID) else { throw CustomError.getRef  }
+
+        do {
+            let teamDocument = try await teamRef.getDocument()
+            let teamData = try teamDocument.data(as: Team.self)
+            self.team[0].headerURL = teamData.headerURL
+            self.team[0].headerPath = teamData.headerPath
+        } catch {
+            throw CustomError.fetch
+        }
     }
 }

@@ -12,7 +12,7 @@ import FirebaseFirestore
 import FirebaseFirestoreSwift
 
 enum CustomError: Error {
-    case uidEmpty, getRef, fetch, setData, updateData, getDocument, photoUrlEmpty
+    case uidEmpty, getRef, fetch, setData, updateData, getDocument, photoUrlEmpty, teamEmpty
 }
 
 class UserViewModel: ObservableObject {

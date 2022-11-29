@@ -9,10 +9,13 @@ import SwiftUI
 
 struct InputLibrary {
     var selectFilterTag: String = "ALL"
+    var captureImage: UIImage? = nil
     var homeCardsIndex: Int = 0
     var libraryCardIndex: Int = 0
     var cardOpacity: CGFloat =  1.0
     var isShowCardInfomation: Bool = false
+    var isShowSelectImageSheet: Bool = false
+    var showErrorFetchImage: Bool = false
 }
 
 struct InputTime {
@@ -72,7 +75,7 @@ struct LibraryView: View {
 
             VStack {
 
-                homeHeaderPhoto(photoURL: inputImage.homeHeaderURL, userIcon: "cloth_sample1")
+                homeHeaderPhoto(photoURL: teamVM.team.first!.headerURL)
                 // 時刻レイアウト
                 HStack {
                     VStack(alignment: .leading, spacing: 8) {
@@ -205,6 +208,28 @@ struct LibraryView: View {
                             y: UIScreen.main.bounds.height / 4)
             }
         } // ZStack
+        .onChange(of: inputLibrary.captureImage) { newHeaderImage in
+            print("bbb")
+            Task {
+                do {
+                    await itemVM.deleteImage(path: teamVM.team.first!.headerPath)
+                    let uploadImageData = await itemVM.uploadImage(newHeaderImage)
+                    try await teamVM.updateTeamHeaderImage(data: uploadImageData)
+                } catch CustomError.fetch {
+                    print("Error: fetch")
+                } catch CustomError.getDocument {
+                    print("Error: getDocument")
+                } catch CustomError.teamEmpty {
+                    print("Error: teamEmpty")
+                }
+            }
+        }
+
+        .sheet(isPresented: $inputLibrary.isShowSelectImageSheet) {
+            PHPickerView(captureImage: $inputLibrary.captureImage,
+                         isShowSheet: $inputLibrary.isShowSelectImageSheet,
+                         isShowError: $inputLibrary.showErrorFetchImage)
+        }
 
         .onChange(of: inputLibrary.selectFilterTag) { _ in
             inputLibrary.homeCardsIndex =  0
@@ -213,7 +238,7 @@ struct LibraryView: View {
     } // body
 
     @ViewBuilder
-    func homeHeaderPhoto(photoURL: URL?, userIcon: String) -> some View {
+    func homeHeaderPhoto(photoURL: URL?) -> some View {
 
         Group {
             if let photoURL = photoURL {
@@ -262,7 +287,7 @@ struct LibraryView: View {
                     Button {
                         // Todo: 画像変更処理
                         inputHome.updateImageStatus = .header
-                        inputHome.isShowSelectImageSheet.toggle()
+                        inputLibrary.isShowSelectImageSheet.toggle()
                     } label: {
                         Image(systemName: "photo.on.rectangle.angled")
                             .foregroundColor(.white.opacity(0.8))
@@ -305,7 +330,7 @@ struct LibraryView: View {
 
                 Button {
                     inputHome.updateImageStatus = .header
-                    inputHome.isShowSelectImageSheet.toggle()
+                    inputLibrary.isShowSelectImageSheet.toggle()
                 } label: {
                     Label("写真を選択", systemImage: "photo")
                 }

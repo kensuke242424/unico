@@ -139,14 +139,20 @@ struct CreateAndJoinTeamView: View {
 
                             case .check:
                                 VStack(spacing: 10) {
-                                    Text("チーム情報を入力してください。")
-                                    Text("入力が完了したら、チーム生成を開始します。")
+                                    if selectTeamFase == .check {
+                                        Text("チーム作成中...")
+                                        ProgressView()
+                                    } else {
+                                        Text("チーム情報を入力してください。")
+                                        Text("入力が完了したら、チーム生成を開始します。")
+                                    }
+
                                 }
 
                             case .success:
                                 VStack(spacing: 10) {
                                     Text("お疲れ様でした。")
-                                    Text("ログインを開始します。")
+                                    Text("チームへのログインを開始します。")
                                 }
                             }
                         }
@@ -171,14 +177,17 @@ struct CreateAndJoinTeamView: View {
                         .offset(x: selectTeamFase == .fase1 ? 0 : selectTeamFase == .start ? getRect().width : -getRect().width)
 
                         Group {
-                            createTeamIconAndName(iconURL: uploadImageData.url)
+                            createTeamIconAndName(captureImage: captureImage)
                         }
-                        .opacity(selectTeamFase == .fase2 ? 1.0 : 0.0)
-                        .offset(x: selectTeamFase == .fase2 ? 0 : selectTeamFase == .start || selectTeamFase == .fase1 ? getRect().width : -getRect().width)
+                        .opacity(selectTeamFase == .fase2 || selectTeamFase == .check ? 1.0 : 0.0)
+                        .offset(x: selectTeamFase == .fase2 || selectTeamFase == .check ? 0 :
+                                    selectTeamFase == .start || selectTeamFase == .fase1 ? getRect().width :
+                                    -getRect().width)
                     }
                     if selectTeamFase == .success {
-                        Text("ようこそ、\(userVM.users[0].name)さん")
-                            .tracking(5).opacity(0.6)
+
+                        Text("unicoへようこそ")
+                            .tracking(7).opacity(0.6)
                             .opacity(selectTeamFase == .success ? 1.0 : 0.0)
                     }
                 } // ZStack
@@ -194,7 +203,9 @@ struct CreateAndJoinTeamView: View {
                         selectTeamFase = .fase2
                     }
                 } else if selectTeamFase == .fase2 {
-                    selectTeamFase = .check
+                    withAnimation(.spring(response: 0.5)) {
+                        selectTeamFase = .check
+                    }
                 }
             }
             .buttonStyle(.borderedProminent)
@@ -229,19 +240,6 @@ struct CreateAndJoinTeamView: View {
             .offset(x: -getRect().width / 2 + 40, y: getRect().height / 2 - 60 )
         } // ZStack
 
-        .onChange(of: captureImage) { newImage in
-            Task {
-                if let path = uploadImageData.filePath {
-                    await logInVM.deleteImage(path: path)
-                    uploadImageData.url = nil
-                    print("以前の画像削除")
-                }
-
-                await uploadImageData = logInVM.uploadImage(newImage)
-                print("新規画像登録")
-            }
-        }
-
         .onChange(of: selectTeamFase) { _ in
 
             if selectTeamFase == .check {
@@ -253,11 +251,12 @@ struct CreateAndJoinTeamView: View {
                 print("check開始")
                 Task {
                     do {
-                        // チームデータに格納する自身のユーザデータ
+                        if teamName.isEmpty { teamName = "No Name" }
+                        // チームデータに格納するログインユーザのユーザデータ
                         let joinMember = JoinMember(memberUID: user.id, name: user.name, iconURL: user.iconURL)
                         // teamsに格納する際のドキュメントID
                         let teamID = UUID().uuidString
-                        //
+                        await uploadImageData = logInVM.uploadImage(captureImage)
                         let teamData = Team(id: teamID,
                                             name: teamName,
                                             iconURL: uploadImageData.url,
@@ -265,13 +264,20 @@ struct CreateAndJoinTeamView: View {
                                             members: [joinMember])
                         let joinTeamData = JoinTeam(teamID: teamID,
                                                     name: teamName,
-                                                    headerURL: nil,
-                                                    headerPath: nil)
+                                                    iconURL: uploadImageData.url)
                         try await teamVM.addTeam(teamData: teamData)
                         try await userVM.addNewJoinTeam(newJoinTeam: joinTeamData)
 
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                            selectTeamFase = .success
+                            withAnimation(.spring(response: 1)) {
+                                selectTeamFase = .success
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                withAnimation(.spring(response: 1)) {
+                                    teamVM.isShowCreateAndJoinTeam.toggle()
+                                    logInVM.rootNavigation = .fetch
+                                }
+                            }
                         }
 
                     } catch CustomError.uidEmpty {
@@ -363,15 +369,15 @@ struct CreateAndJoinTeamView: View {
         }
     }
 
-    func createTeamIconAndName(iconURL: URL?) -> some View {
+    func createTeamIconAndName(captureImage: UIImage?) -> some View {
         Group {
             VStack(spacing: 40) {
                 Group {
-                    if let iconURL = iconURL {
-                        AsyncImageCircleIcon(photoURL: iconURL, size: 150)
+                    if let captureImage = captureImage {
+                        UIImageCircleIcon(photoImage: captureImage, size: 150)
                     } else {
                         Image(systemName: "photo.circle.fill").resizable().scaledToFit()
-                            .foregroundColor(.white.opacity(0.8)).frame(width: 150)
+                            .foregroundColor(.white.opacity(0.5)).frame(width: 150)
                     }
                 }
                 .onTapGesture { isShowPickerView.toggle() }

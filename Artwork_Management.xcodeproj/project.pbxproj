@@ -188,6 +188,7 @@
 			children = (
 				E05130E128F341610092FE46 /* RootView.swift */,
 				E08F273D28DDB65F00329C5E /* HomeTabView.swift */,
+				E0455FE1292C5B1C004F677D /* StandByView.swift */,
 				E01E138F291D168B0001F2DA /* SystemSideMenu.swift */,
 				E0B3288B2921577F00E94BC3 /* ElementSwitchingPickerView.swift */,
 				E0B328922924A42100E94BC3 /* ManageCustomizeSideMenu.swift */,
@@ -322,7 +323,6 @@
 			isa = PBXGroup;
 			children = (
 				E094F0FF28E20F1000D3C845 /* LogInView.swift */,
-				E0455FE1292C5B1C004F677D /* StandByView.swift */,
 				E0DE98D528E2D85E00471AB4 /* LogInCheckView.swift */,
 				E0A3B995292EFCE500209ADC /* CreateAndJoinTeamView.swift */,
 			);

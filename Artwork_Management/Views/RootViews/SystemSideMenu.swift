@@ -264,10 +264,11 @@ struct SystemSideMenu: View {
                                             inputHome.isShowProgress.toggle()
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                                                 inputHome.isShowProgress.toggle()
-                                                withAnimation(.easeIn(duration: 0.5)) {
-                                                    logInVM.rootNavigation = .logIn
-                                                    logInVM.logOut()
-                                                    print("ログアウト成功")
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                                    withAnimation(.easeIn(duration: 0.5)) {
+                                                        logInVM.rootNavigation = .logIn
+                                                        logInVM.logOut()
+                                                    }
                                                 }
                                             }
                                         }

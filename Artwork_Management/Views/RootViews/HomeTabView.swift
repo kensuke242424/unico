@@ -45,7 +45,6 @@ struct InputHome {
 }
 
 struct InputImage {
-    var homeHeaderURL: URL? = nil
     var userColor: Color = .gray
 }
 
@@ -122,7 +121,7 @@ struct HomeTabView: View {
                 NavigationHeader(inputHome: $inputHome, photoURL: userVM.users[0].iconURL)
                     .opacity(!inputHome.isShowHomeTopNavigation &&
                              inputHome.homeTabIndex == 0 &&
-                             inputImage.homeHeaderURL != nil
+                             teamVM.team.first!.headerURL != nil
                              ? 0.0 : 1.0)
                     .offset(y: -getRect().height / 2 + getSafeArea().top + 15)
                     .padding(.horizontal, 20)

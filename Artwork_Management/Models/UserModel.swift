@@ -24,8 +24,7 @@ struct User: Identifiable, Codable {
 struct JoinTeam: Codable {
     var teamID: String
     var name: String
-    var headerURL: URL?
-    var headerPath: String?
+    var iconURL: URL?
 }
 
 struct ImageData: Codable {

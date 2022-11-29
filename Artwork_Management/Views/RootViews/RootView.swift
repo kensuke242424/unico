@@ -44,7 +44,8 @@ struct RootView: View {
                 StandByView()
 
             case .join:
-                Text("")
+                StandByView()
+                CreateAndJoinTeamView(logInVM: logInVM, teamVM: teamVM, userVM: userVM)
 
             case .home:
                 HomeTabView(logInVM: logInVM,
@@ -56,11 +57,7 @@ struct RootView: View {
             }
 
             StandByView()
-                .opacity(isShowStandBy || teamVM.isShowCreateAndJoinTeam ? 1.0 : 0.0)
-
-            if teamVM.isShowCreateAndJoinTeam {
-                CreateAndJoinTeamView(logInVM: logInVM, teamVM: teamVM, userVM: userVM)
-            }
+                .opacity(isShowStandBy ? 1.0 : 0.0)
 
         } // ZStack
 
@@ -115,8 +112,9 @@ struct RootView: View {
         .onAppear {
             if Auth.auth().currentUser != nil {
                 logInVM.rootNavigation = .fetch
+                print("currentUser != nil")
             } else {
-
+                print("currentUser == nil")
                 isShowStandBy.toggle()
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {

@@ -401,6 +401,7 @@ struct LogInView: View {
 
                     ColorCubeView(colorSet: $inputLogIn.selectUserColor)
                         .padding()
+                        .offset(y: 20)
 
                     Button {
                         withAnimation(.spring(response: 1.0)) {
@@ -423,6 +424,7 @@ struct LogInView: View {
                         Text("次へ")
                     }
                     .buttonStyle(.borderedProminent)
+                    .offset(y: 20)
 
                 case .fase2:
 
@@ -635,16 +637,6 @@ struct MailAddressInfomation: View {
                             } else {
                                 Text("(※6文字以上)").font(.caption).foregroundColor(.white.opacity(0.4))
                             }
-
-                            if inputLogIn.firstSelect ==  .logIn {
-                                Button {
-//                                    logInVM.passwordUpdate(email: inputLogIn.address)
-                                } label: {
-                                    Text("パスワードを忘れた").font(.caption)
-                                }
-                                .padding(.leading)
-                            }
-
                         }
                         .frame(width: getRect().width * 0.7, alignment: .leading)
 
@@ -719,6 +711,7 @@ struct MailAddressInfomation: View {
                     logInVM.logInErrorMessage = ""
 
                     inputLogIn.addressCheck = .start
+                    createAccountFocused = nil
 
                     if inputLogIn.address.isEmpty { addressHidden.toggle() }
                     if inputLogIn.password.isEmpty { passwordHidden.toggle() }

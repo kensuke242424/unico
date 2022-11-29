@@ -26,24 +26,22 @@ struct PHPickerView: UIViewControllerRepresentable {
 
             guard let result = results.first else {
                 print("Error: guard let result = results.first")
-                self.parent.isShowSheet = false
+                self.parent.isShowSheet.toggle()
                 return
             }
 
             result.itemProvider.loadObject(ofClass: UIImage.self) { (image, _) in
                 if let unwrapImage = image as? UIImage {
                     print("PHPickerView_UIImage取得成功: \(unwrapImage)")
-
                     self.parent.captureImage = unwrapImage
                 } else {
                     print("Error: image as? UIImage")
-                    self.parent.isShowError.toggle()
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                         self.parent.isShowError.toggle()
                     }
                 }
             }
-            parent.isShowSheet = false
+            self.parent.isShowSheet.toggle()
         } // func picker
     } // Coordinator
 
