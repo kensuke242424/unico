@@ -40,7 +40,7 @@ struct SystemSideMenu: View {
             // Blur View...
             BlurView(style: .systemUltraThinMaterialDark)
 
-            Color.customDarkGray1
+            userVM.users.first!.userColor.color1
                 .opacity(0.7)
                 .blur(radius: 15)
                 .overlay(alignment: .topLeading) {
