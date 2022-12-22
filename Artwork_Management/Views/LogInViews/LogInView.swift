@@ -460,6 +460,7 @@ struct LogInView: View {
                         }
 
                     Button {
+
                         withAnimation(.spring(response: 0.9)) {
                             inputLogIn.createAccountTitle = false
                             inputLogIn.createAccountContents = false
@@ -473,7 +474,6 @@ struct LogInView: View {
                                 inputLogIn.createAccountContents = true
                             }
                         }
-
                     } label: {
                         Text("次へ")
                     }
