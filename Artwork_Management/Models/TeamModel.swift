@@ -21,7 +21,7 @@ struct Team: Identifiable, Codable {
 
 // Team構造体が保持するメンバー一人分の情報
 // Homeのヘッダー、セットカラーはユーザ個々に設定可能
-struct JoinMember: Codable {
+struct JoinMember: Hashable, Codable {
     var memberUID: String
     var name: String
     var iconURL: URL?

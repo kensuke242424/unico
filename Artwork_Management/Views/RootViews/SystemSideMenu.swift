@@ -70,6 +70,10 @@ struct SystemSideMenu: View {
                 VStack(alignment: .leading, spacing: 20) {
 
                     AsyncImageCircleIcon(photoURL: teamVM.team[0].iconURL, size: getRect().width / 3 + 20)
+                        .overlay(alignment: .bottomTrailing) {
+                            AsyncImageCircleIcon(photoURL: userVM.users[0].iconURL, size: getRect().width / 6)
+                                .offset(x: getRect().width / 4 - 10)
+                        }
                         .overlay(alignment: .bottom) {
                             if teamVM.team.first!.name.count < 12 {
                                 Text(teamVM.team.first!.name)
@@ -390,19 +394,19 @@ struct SystemSideMenu: View {
 
     } // body
 
-        func rowRemove(offsets: IndexSet) {
+    func rowRemove(offsets: IndexSet) {
 
-            for tagIndex in offsets {
-                print(tagIndex)
-                tagVM.deleteTag(deleteTag: tagVM.tags[tagIndex], teamID: teamVM.team.first!.id)
-            }
+        for tagIndex in offsets {
+            print(tagIndex)
+            tagVM.deleteTag(deleteTag: tagVM.tags[tagIndex], teamID: teamVM.team.first!.id)
         }
+    }
 
-        func rowReplace(_ from: IndexSet, _ to: Int) {
-            withAnimation(.spring()) {
-                tagVM.tags.move(fromOffsets: from, toOffset: to)
-            }
+    func rowReplace(_ from: IndexSet, _ to: Int) {
+        withAnimation(.spring()) {
+            tagVM.tags.move(fromOffsets: from, toOffset: to)
         }
+    }
 
 }
 
