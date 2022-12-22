@@ -133,16 +133,14 @@ struct LibraryView: View {
                                 Text("\(itemVM.items.count) item")
                             }
                             .font(.footnote)
-                            HStack {
-                                ForEach(0...2, id: \.self) { _ in
-                                    Image(systemName: "person.crop.circle.fill")
-                                }
-                            }
+                            .opacity(0.5)
+
+                            // Team members Icon...
+                            teamMembersIcon(members: teamVM.team[0].members)
                         }
                         .offset(x: 20, y: 35)
                         .tracking(5)
                         .foregroundColor(.white)
-                        .opacity(0.5)
                     } // ZStack
                 } // HStack
                 .offset(y: -30)
@@ -207,6 +205,7 @@ struct LibraryView: View {
                     .offset(x: -UIScreen.main.bounds.width / 10,
                             y: UIScreen.main.bounds.height / 4)
             }
+
         } // ZStack
         .onChange(of: inputLibrary.captureImage) { newHeaderImage in
             print("bbb")
@@ -468,6 +467,27 @@ struct LibraryView: View {
                        value: dragOffset)
         } // Geometry
     } // homeItemPhotoPanel
+
+    func teamMembersIcon(members: [JoinMember]) -> some View {
+
+        Group {
+            if members.count <= 2 {
+                HStack {
+                    ForEach(members, id: \.self) { member in
+                        AsyncImageCircleIcon(photoURL: member.iconURL, size: 30)
+                    }
+                }
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack {
+                        ForEach(members, id: \.self) { member in
+                            AsyncImageCircleIcon(photoURL: member.iconURL, size: 30)
+                        }
+                    }
+                }.frame(width: 80)
+            }
+        } // Group
+    } // teamMembersIcon
 
 } // View
 
