@@ -9,6 +9,7 @@ import SwiftUI
 
 struct InputSideMenu {
     var account: Bool = false
+    var team: Bool = false
     var item: Bool = false
     var tag: Bool = false
     var help: Bool = false
@@ -70,6 +71,13 @@ struct SystemSideMenu: View {
                 VStack(alignment: .leading, spacing: 20) {
 
                     AsyncImageCircleIcon(photoURL: teamVM.team[0].iconURL, size: getRect().width / 3 + 20)
+                        .overlay(alignment: .topTrailing) {
+                            Image(systemName: "person.3.fill")
+                                .frame(width: 30, height: 30)
+                                .foregroundColor(.white)
+                                .offset(x: 30)
+                        }
+
                         .overlay(alignment: .bottomTrailing) {
                             AsyncImageCircleIcon(photoURL: userVM.users[0].iconURL, size: getRect().width / 6)
                                 .offset(x: getRect().width / 4 - 10)
@@ -248,10 +256,7 @@ struct SystemSideMenu: View {
 
                                     VStack(alignment: .leading, spacing: 40) {
 
-                                        Label("ユーザ設定", systemImage: "person.crop.circle.fill")
-                                        .onTapGesture {  }
-
-                                        Label("QRコード招待", systemImage: "qrcode")
+                                        Label("ユーザ情報変更", systemImage: "person.text.rectangle")
                                         .onTapGesture {  }
 
                                         Label("ログアウト", systemImage: "figure.wave")
@@ -259,6 +264,50 @@ struct SystemSideMenu: View {
 
                                     } // VStack
                                     .foregroundColor(.white)
+                                    // メニュー一つ分のheight = コンテンツ数 * 60
+                                    .frame(width: 210, height: 120, alignment: .topLeading)
+                                    .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
+                                    .offset(x: 20, y: 30)
+                                    .alert("確認", isPresented: $inputSideMenu.isShowLogOutAlert) {
+                                        Button("戻る") { inputSideMenu.isShowLogOutAlert.toggle() }
+                                        Button("ログアウト") {
+                                            inputHome.isShowProgress.toggle()
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                                                inputHome.isShowProgress.toggle()
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                                    withAnimation(.easeIn(duration: 0.5)) {
+                                                        logInVM.rootNavigation = .logIn
+                                                        logInVM.logOut()
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    } message: {
+                                        Text("ログイン画面に戻ります。よろしいですか？")
+                                    } // alert
+                                }
+                            }
+
+                            VStack(alignment: .leading) {
+
+                                SideMenuButton(open: $inputSideMenu.team, title: "チーム", image: "person.2")
+
+                                if inputSideMenu.team {
+
+                                    VStack(alignment: .leading, spacing: 40) {
+
+                                        Label("チーム情報変更", systemImage: "person.2.fill")
+                                        .onTapGesture {  }
+
+                                        Label("メンバー招待", systemImage: "person.wave.2.fill")
+                                        .onTapGesture {  }
+
+                                        Label("新規チーム作成", systemImage: "person.2.crop.square.stack.fill")
+                                        .onTapGesture {  }
+
+                                    } // VStack
+                                    .foregroundColor(.white)
+                                    // メニュー一つ分のheight = コンテンツ数 * 60
                                     .frame(width: 210, height: 180, alignment: .topLeading)
                                     .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
                                     .offset(x: 20, y: 30)
@@ -308,6 +357,7 @@ struct SystemSideMenu: View {
 
                                     } // VStack
                                     .foregroundColor(.white)
+                                    // メニュー一つ分のheight = コンテンツ数 * 60
                                     .frame(width: 210, height: 120, alignment: .topLeading)
                                     .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
                                     .offset(x: 20, y: 30)

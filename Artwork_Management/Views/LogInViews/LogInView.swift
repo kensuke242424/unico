@@ -447,6 +447,7 @@ struct LogInView: View {
 
                     TextField("", text: $inputLogIn.createUserNameText)
                         .frame(width: 230)
+                        .foregroundColor(.white)
                         .focused($createNameFocused, equals: .check)
                         .textInputAutocapitalization(.never)
                         .multilineTextAlignment(.center)

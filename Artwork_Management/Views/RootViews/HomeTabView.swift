@@ -27,7 +27,7 @@ struct InputHome {
     var showErrorFetchImage: Bool = false
     var isShowProgress: Bool = false
     var isShowItemDetail: Bool = false
-    var isShowHomeTopNavigation: Bool = false
+    var isShowHomeTopNavigation: Bool = true
     var isPresentedEditItem: Bool = false
     var isOpenEditTagSideMenu: Bool = false
     var isShowSearchField: Bool = false
