@@ -72,10 +72,21 @@ struct SystemSideMenu: View {
 
                     AsyncImageCircleIcon(photoURL: teamVM.team[0].iconURL, size: getRect().width / 3 + 20)
                         .overlay(alignment: .topTrailing) {
-                            Image(systemName: "person.3.fill")
-                                .frame(width: 30, height: 30)
-                                .foregroundColor(.white)
-                                .offset(x: 30)
+                            Button {
+                                // チーム一覧のハーフモーダル
+                            } label: {
+                                Circle()
+                                    .foregroundColor(userVM.users.first!.userColor.color3)
+                                    .frame(width: 40, height: 40)
+                                    .shadow(radius: 5, x: 5, y: 5)
+                                    .overlay {
+                                        Image(systemName: "person.2.crop.square.stack")
+                                            .resizable()
+                                            .frame(width: 20, height: 20)
+                                            .foregroundColor(.white)
+                                    }
+                            }
+                            .offset(x: 40, y: -10)
                         }
 
                         .overlay(alignment: .bottomTrailing) {
@@ -296,7 +307,7 @@ struct SystemSideMenu: View {
 
                                     VStack(alignment: .leading, spacing: 40) {
 
-                                        Label("チーム情報変更", systemImage: "person.2.fill")
+                                        Label("チーム情報変更", systemImage: "person.text.rectangle.fill")
                                         .onTapGesture {  }
 
                                         Label("メンバー招待", systemImage: "person.wave.2.fill")
