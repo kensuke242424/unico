@@ -30,6 +30,8 @@ struct InputHome {
     var isShowHomeTopNavigation: Bool = true
     var isPresentedEditItem: Bool = false
     var isOpenEditTagSideMenu: Bool = false
+    // Task: チーム切り替えハーフシートモーダルの作成
+    var isOpenChangedTeamSheet: Bool = false
     var isShowSearchField: Bool = false
     var isShowSystemSideMenu: Bool = false
     var isShowManageCustomSideMenu: Bool = false
