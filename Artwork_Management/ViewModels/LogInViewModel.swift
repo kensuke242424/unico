@@ -8,6 +8,7 @@
 import SwiftUI
 import FirebaseAuth
 import AuthenticationServices
+import CryptoKit
 import FirebaseStorage
 import FirebaseFirestore
 import FirebaseFirestoreSwift
@@ -25,20 +26,55 @@ class LogInViewModel: ObservableObject {
         return Auth.auth().currentUser?.uid
     }
 
+    // sign in with Appleにてサインイン時に生成されるランダム文字列「ノンス」
+    fileprivate var currentNonce: String?
+
     var logInErrorMessage: String = ""
+
+    var isShowLogInErrorAlert: Bool = false
     var logInErrorAlertMessage: String = ""
 
     func handleSignInWithAppleRequest(_ request: ASAuthorizationAppleIDRequest) {
         request.requestedScopes = [.fullName, .email]
         let nonce = randomNonceString()
-        let currentNonce = nonce
+        currentNonce = nonce
         // sha256 ⇨ 256文字のハッシュ関数を生成し暗号化。サインイン認証時に照らし合わせる
-        // 元となる文字列の文字数に関係なく256文字が生成される。変換された文字列は元の文字に復元することはできない
+        // 元となる文字列の文字数に関係なく256文字が生成される。この値はサインイン処理のたびに異なる値を照らし合わせる。
         request.nonce = sha256(nonce)
     }
 
     func handleSignInWithAppleCompletion(_ result: Result<ASAuthorization, Error>) {
+        if case .failure(let failure) = result {
+            logInErrorAlertMessage = failure.localizedDescription
+            isShowLogInErrorAlert.toggle()
+        }
+        else if case .success(let success) = result {
+            if let appleIDCredential = success.credential as? ASAuthorizationAppleIDCredential {
+                guard let nonce = currentNonce else {
+                    fatalError("fatalError: handleSignInWithAppleCompletion_currentNonceの値が存在しません。")
+                }
+                guard let appleIDToken = appleIDCredential.identityToken else {
+                    print("Unable to fetch identify token。識別トークンをフェッチできません。")
+                    return
+                }
+                guard let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
+                    print("Unable to serialise token string from data: \(appleIDToken.debugDescription). データからトークン文字列をシリアライズできません。")
+                    return
+                }
 
+                let credential = OAuthProvider.credential(withProviderID: "apple.com",
+                                                          idToken: idTokenString,
+                                                          rawNonce: nonce)
+
+                Task {
+                    do {
+                         _ = try await Auth.auth().signIn(with: credential)
+                    } catch {
+                        print("Error authenticating: \(error.localizedDescription)")
+                    }
+                }
+            }
+        }
     }
 
     // Adapted from https://auth0.com/docs/api-auth/tutorials/nonce#generate-a-cryptographically-random-nonce
@@ -74,6 +110,19 @@ class LogInViewModel: ObservableObject {
       }
 
       return result
+    }
+
+    // サインイン要求で nonce の SHA256 ハッシュを送信すると、Apple はそれを応答で変更せずに渡します。
+    // Firebase は、元のノンスをハッシュし、それを Apple から渡された値と比較することで、応答を検証します。
+    @available(iOS 13, *)
+    private func sha256(_ input: String) -> String {
+      let inputData = Data(input.utf8)
+      let hashedData = SHA256.hash(data: inputData)
+      let hashString = hashedData.compactMap {
+        String(format: "%02x", $0)
+      }.joined()
+
+      return hashString
     }
 
     func signIn(email: String, password: String) async -> Bool {
