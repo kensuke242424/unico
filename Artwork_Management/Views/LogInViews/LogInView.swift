@@ -7,6 +7,7 @@
 
 import SwiftUI
 import FirebaseAuth
+import AuthenticationServices
 
 enum Navigation: Hashable {
     case home
@@ -312,36 +313,6 @@ struct LogInView: View {
 
             Button {
                 withAnimation(.easeIn(duration: 0.3)) {
-                    inputLogIn.selectSignInType = .apple
-                }
-            } label: {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 15)
-                        .foregroundColor(.black.opacity(0.8))
-                        .frame(width: 250, height: 50)
-                        .shadow(radius: 10, x: 5, y: 5)
-                    Text("Appleアカウント")
-                        .tracking(2)
-                        .foregroundColor(.white)
-                }
-            }
-            Button {
-                withAnimation(.easeIn(duration: 1)) {
-                    inputLogIn.selectSignInType = .google
-                }
-            } label: {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 15)
-                        .foregroundColor(.white.opacity(0.8))
-                        .frame(width: 250, height: 50)
-                        .shadow(radius: 10, x: 5, y: 5)
-                    Text("Googleアカウント")
-                        .tracking(2)
-                        .foregroundColor(.black)
-                }
-            }
-            Button {
-                withAnimation(.easeIn(duration: 0.3)) {
                     inputLogIn.selectSignInType = .mailAddress
                 }
             } label: {
@@ -355,6 +326,53 @@ struct LogInView: View {
                         .foregroundColor(.white)
                 }
             }
+
+//            Button {
+//                withAnimation(.easeIn(duration: 0.3)) {
+//                    inputLogIn.selectSignInType = .apple
+//                }
+//            } label: {
+//                ZStack {
+//                    RoundedRectangle(cornerRadius: 15)
+//                        .foregroundColor(.black.opacity(0.8))
+//                        .frame(width: 250, height: 50)
+//                        .shadow(radius: 10, x: 5, y: 5)
+//                    Text("Appleアカウント")
+//                        .tracking(2)
+//                        .foregroundColor(.white)
+//                }
+//            }
+//            Button {
+//                withAnimation(.easeIn(duration: 1)) {
+//                    inputLogIn.selectSignInType = .google
+//                }
+//            } label: {
+//                ZStack {
+//                    RoundedRectangle(cornerRadius: 15)
+//                        .foregroundColor(.white.opacity(0.8))
+//                        .frame(width: 250, height: 50)
+//                        .shadow(radius: 10, x: 5, y: 5)
+//                    Text("Googleアカウント")
+//                        .tracking(2)
+//                        .foregroundColor(.black)
+//                }
+//            }
+
+            Text("または")
+                .foregroundColor(.white).opacity(0.7)
+                .tracking(2)
+
+            // Sign In With Apple...
+            SignInWithAppleButton(.signIn) { request in
+                logInVM.handleSignInWithAppleRequest(request)
+            } onCompletion: { result in
+                logInVM.handleSignInWithAppleCompletion(result)
+            }
+            .signInWithAppleButtonStyle(.black)
+            .frame(width: 250, height: 50)
+            .cornerRadius(8)
+            .shadow(radius: 10, x: 5, y: 5)
+
         }
     }
     func createAccountViews() -> some View {
