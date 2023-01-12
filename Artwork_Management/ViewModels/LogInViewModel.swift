@@ -43,6 +43,7 @@ class LogInViewModel: ObservableObject {
         request.nonce = sha256(nonce)
     }
 
+    @MainActor
     func handleSignInWithAppleCompletion(_ result: Result<ASAuthorization, Error>) {
         if case .failure(let failure) = result {
             logInErrorAlertMessage = failure.localizedDescription
@@ -186,9 +187,9 @@ class LogInViewModel: ObservableObject {
         }
     }
 
-    func addUser(userData: User) async -> Bool {
+    func addUserMailAdress(userData: User) async -> Bool {
 
-        print("addUser実行")
+        print("addUserMailAdress実行")
 
         guard let usersRef = db?.collection("users") else {
             print("error: guard let itemsRef = db?.collection(users), let uid = Auth.auth().currentUser?.uid")
@@ -201,7 +202,7 @@ class LogInViewModel: ObservableObject {
             print("Error: try db!.collection(collectionID).addDocument(from: itemData)")
             return false
         }
-        print("addUser完了")
+        print("addUserMailAdress完了")
         return true
     }
 
