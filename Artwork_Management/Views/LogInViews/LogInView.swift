@@ -235,6 +235,22 @@ struct LogInView: View {
             }
         }
 
+        .onChange(of: logInVM.successCreateAccount) { success in
+            print("logInVM.successCreateAccount更新を検知")
+            if !success { return }
+            Task {
+                let addUserFirestoreCheck: Bool = await logInVM.addUserSignInWithApple(name: inputLogIn.createUserNameText, password: inputLogIn.password,
+                                                                                       imageData: inputLogIn.captureImage, color: inputLogIn.selectUserColor)
+                if addUserFirestoreCheck {
+                    withAnimation(.spring(response: 0.5)) {
+                        logInVM.rootNavigation = .fetch
+                    }
+                } else {
+                    print("addUserCheck_false")
+                }
+            }
+        }
+
         .sheet(isPresented: $inputLogIn.isShowPickerView) {
             PHPickerView(captureImage: $inputLogIn.captureImage, isShowSheet: $inputLogIn.isShowPickerView, isShowError: $inputLogIn.captureError)
         }
@@ -319,41 +335,8 @@ struct LogInView: View {
                 inputLogIn.selectSignInType = .apple
                 logInVM.handleSignInWithAppleRequest(request)
             } onCompletion: { result in
-
                 logInVM.handleSignInWithAppleCompletion(result)
-//                Auth.auth().addStateDidChangeListener { auth, user in
-//                    if user !=  nil {
-//                        print("addStateDidChangeListener監視_サインイン⭕️")
-//                        print(Auth.auth().currentUser)
-//                        let uplaodImageData = await  logInVM.uploadImage(inputLogIn.captureImage)
-//                        let newUserData = User(id: logInVM.uid!,
-//                                               name: inputLogIn.createUserNameText,
-//                                               address: inputLogIn.address,
-//                                               password: inputLogIn.password,
-//                                               iconURL: uplaodImageData.url,
-//                                               iconPath: uplaodImageData.filePath,
-//                                               userColor: inputLogIn.selectUserColor,
-//                                               joins: [])
-//                        let checkAddUser = await logInVM.addUserMailAdress(userData: newUserData)
-//                        if checkAddUser {
-//                            // サインアップ成功
-//                            withAnimation(.spring(response: 0.5)) { inputLogIn.addressCheck = .succsess }
-//
-//                            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-//                                // RootViewのfetch処理へ移動
-//                                withAnimation(.spring(response: 0.5)) {
-//                                    logInVM.rootNavigation = .fetch
-//                                }
-//                            }
-//
-//                        }
-//                    }
-//                    else {
-//                        // サインアップ失敗
-//                        print("addStateDidChangeListener監視_サインイン❌")
-//                        withAnimation(.spring(response: 0.5)) { inputLogIn.addressCheck = .failure }
-//                    }
-//                }
+                logInVM.currentUserCheck()
             }
             .signInWithAppleButtonStyle(.black)
             .frame(width: 250, height: 50)
@@ -599,28 +582,6 @@ struct LogInView: View {
 
 } // View
 
-struct LogoMark: View {
-    var body: some View {
-
-        VStack {
-
-            Image(systemName: "cube.transparent")
-                .resizable()
-                .scaledToFit()
-                .foregroundColor(.white.opacity(0.7))
-                .frame(width: 150, height: 150)
-                .padding()
-
-            Text("unico")
-                .tracking(25)
-                .font(.title3)
-                .foregroundColor(.white.opacity(0.6))
-                .fontWeight(.heavy)
-                .offset(x: 10)
-        } // VStack
-    } // body
-} // View
-
 struct MailAddressInfomation: View {
 
     @StateObject var logInVM: LogInViewModel
@@ -774,6 +735,7 @@ struct MailAddressInfomation: View {
 
                         case .signAp:
                             Task {
+                                // メールアドレスを用いてユーザを登録する
                                 let checkSignUp = await logInVM.signUp(email: inputLogIn.address,
                                                                        password: inputLogIn.password)
                                 if !checkSignUp { inputLogIn.addressCheck = .failure; return }

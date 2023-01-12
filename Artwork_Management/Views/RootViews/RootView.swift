@@ -110,12 +110,11 @@ struct RootView: View {
 
         // Auth check...
         .onAppear {
-            logInVM.logOut()
             if Auth.auth().currentUser != nil {
                 logInVM.rootNavigation = .fetch
-                print("currentUser != nil")
+                print("RootView_onAppear_currentUser != nil")
             } else {
-                print("currentUser == nil")
+                print("RootView_onAppear_currentUser == nil")
                 isShowStandBy.toggle()
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {

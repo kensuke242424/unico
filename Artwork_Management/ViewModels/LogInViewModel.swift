@@ -20,6 +20,8 @@ class LogInViewModel: ObservableObject {
     }
 
     @Published var rootNavigation: RootNavigation = .logIn
+    @Published var successCreateAccount: Bool = false
+    @Published var isShowLogInErrorAlert: Bool = false
 
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
     var uid: String? {
@@ -30,8 +32,6 @@ class LogInViewModel: ObservableObject {
     fileprivate var currentNonce: String?
 
     var logInErrorMessage: String = ""
-
-    var isShowLogInErrorAlert: Bool = false
     var logInErrorAlertMessage: String = ""
 
     func handleSignInWithAppleRequest(_ request: ASAuthorizationAppleIDRequest) {
@@ -184,6 +184,55 @@ class LogInViewModel: ObservableObject {
                 print("パスワード変更メール送信失敗")
                 self.logInErrorMessage = "パスワード変更メール送信失敗"
             }
+        }
+    }
+
+    func currentUserCheck() {
+        Auth.auth().addStateDidChangeListener { auth, user in
+            if user != nil {
+                print("currentUserCheck_サインイン⭕️")
+                print(user)
+                self.successCreateAccount.toggle()
+                print(self.successCreateAccount)
+            }
+            else {
+                // サインアップ失敗
+                print("currentUserCheck_サインイン❌")
+                print(user)
+            }
+        }
+    }
+
+    func addUserSignInWithApple(name: String, password: String?, imageData: UIImage?, color: MemberColor) async -> Bool {
+
+        print("addUserSignInWithApple実行")
+
+        guard let usersRef = db?.collection("users") else {
+            print("error: guard let itemsRef = db?.collection(users), let uid = Auth.auth().currentUser?.uid")
+            return false
+        }
+
+        guard let currentUser = Auth.auth().currentUser else {
+            print("Error: guard let currentUser")
+            return false
+        }
+
+        let uplaodImageData = await  self.uploadImage(imageData)
+        let newUserData = User(id: currentUser.uid,
+                               name: name,
+                               address: currentUser.email,
+                               password: password,
+                               iconURL: uplaodImageData.url,
+                               iconPath: uplaodImageData.filePath,
+                               userColor: color,
+                               joins: [])
+        do {
+            // currentUserのuidとドキュメントIDを同じにして保存
+            _ = try usersRef.document(newUserData.id).setData(from: newUserData)
+            return true
+        } catch {
+            print("Error: try usersRef.document(newUserData.id).setData(from: newUserData)")
+            return false
         }
     }
 

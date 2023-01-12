@@ -75,6 +75,7 @@
 		E0DE33522928F48D008C7147 /* CustomProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0DE33512928F48D008C7147 /* CustomProgressView.swift */; };
 		E0DE98D828E2DBB800471AB4 /* TeamViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0DE98D728E2DBB800471AB4 /* TeamViewModel.swift */; };
 		E0F78FC42919F06D00A95CD1 /* DateFormatterExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0F78FC32919F06D00A95CD1 /* DateFormatterExtension.swift */; };
+		E0FCADA429708B9800BA6A75 /* LogoMark.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0FCADA329708B9800BA6A75 /* LogoMark.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -145,6 +146,7 @@
 		E0DE98D728E2DBB800471AB4 /* TeamViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamViewModel.swift; sourceTree = "<group>"; };
 		E0F78FC32919F06D00A95CD1 /* DateFormatterExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFormatterExtension.swift; sourceTree = "<group>"; };
 		E0FCADA2296F289A00BA6A75 /* Artwork_Management.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Artwork_Management.entitlements; sourceTree = "<group>"; };
+		E0FCADA329708B9800BA6A75 /* LogoMark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogoMark.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -327,6 +329,7 @@
 				E094F0FF28E20F1000D3C845 /* LogInView.swift */,
 				E0DE98D528E2D85E00471AB4 /* LogInCheckView.swift */,
 				E0A3B995292EFCE500209ADC /* CreateAndJoinTeamView.swift */,
+				E0FCADA329708B9800BA6A75 /* LogoMark.swift */,
 			);
 			path = LogInViews;
 			sourceTree = "<group>";
@@ -483,6 +486,7 @@
 				E0455FE2292C5B1C004F677D /* StandByView.swift in Sources */,
 				E01AA3A32916C674000FCD37 /* TagModel.swift in Sources */,
 				E08F273C28DDB61A00329C5E /* LibraryView.swift in Sources */,
+				E0FCADA429708B9800BA6A75 /* LogoMark.swift in Sources */,
 				E01AA3A9291780DD000FCD37 /* UIImageExtension.swift in Sources */,
 				E08F273828DDB51600329C5E /* ManageView.swift in Sources */,
 				E01AA3A529176FE7000FCD37 /* PHPickerView.swift in Sources */,
