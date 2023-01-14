@@ -74,7 +74,8 @@ struct InputLogIn {
 }
 
 // ✅ ログイン画面の親Viewです。
-struct LogInView: View {
+
+struct LogInView: View { // swiftlint:disable:this type_body_length
 
     @StateObject var logInVM: LogInViewModel
     @StateObject var teamVM: TeamViewModel
@@ -221,34 +222,30 @@ struct LogInView: View {
         .onChange(of: inputLogIn.createAccount) { newFase in
             withAnimation(.spring(response: 1.0)) {
                 switch newFase {
-                case .start:
-                    createFaseLineImprove = 0
-                case .fase1:
-                    createFaseLineImprove = 0
-                case .fase2:
-                    createFaseLineImprove = 100
-                case .fase3:
-                    createFaseLineImprove = 200
-                case .success:
-                    createFaseLineImprove = 200
+                case .start: createFaseLineImprove = 0
+                case .fase1: createFaseLineImprove = 0
+                case .fase2: createFaseLineImprove = 100
+                case .fase3: createFaseLineImprove = 200
+                case .success: createFaseLineImprove = 200
                 }
             }
         }
 
-        .onChange(of: logInVM.successCreateAccount) { success in
+        // currentUserを監視するリスナーによってサインインが検知されたら、各項目ごとに次のフェーズへ移行
+        .onChange(of: logInVM.successSignInAccount) { success in
             print("logInVM.successCreateAccount更新を検知")
             if !success { return }
-            Task {
-                let addUserFirestoreCheck: Bool = await logInVM.addUserSignInWithApple(name: inputLogIn.createUserNameText, password: inputLogIn.password,
-                                                                                       imageData: inputLogIn.captureImage, color: inputLogIn.selectUserColor)
-                if addUserFirestoreCheck {
-                    withAnimation(.spring(response: 0.5)) {
-                        logInVM.rootNavigation = .fetch
-                    }
-                } else {
-                    print("addUserCheck_false")
+            switch inputLogIn.firstSelect {
+            case .start: print("none.")
+            case .logIn: withAnimation(.spring(response: 0.5)) { logInVM.rootNavigation = .fetch }
+            case .signAp:
+                Task {
+                    let addUserFirestoreCheck: Bool = await logInVM.addUserSignInWithApple(name: inputLogIn.createUserNameText, password: inputLogIn.password,
+                                                                                           imageData: inputLogIn.captureImage, color: inputLogIn.selectUserColor)
+                    if addUserFirestoreCheck { withAnimation(.spring(response: 0.5)) { logInVM.rootNavigation = .fetch } }
                 }
             }
+
         }
 
         .sheet(isPresented: $inputLogIn.isShowPickerView) {
@@ -336,7 +333,6 @@ struct LogInView: View {
                 logInVM.handleSignInWithAppleRequest(request)
             } onCompletion: { result in
                 logInVM.handleSignInWithAppleCompletion(result)
-                logInVM.currentUserCheck()
             }
             .signInWithAppleButtonStyle(.black)
             .frame(width: 250, height: 50)
