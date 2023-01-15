@@ -5,8 +5,11 @@
 //  Created by 中川賢亮 on 2022/11/21.
 //
 
+import Foundation
 import SwiftUI
 import FirebaseAuth
+import AuthenticationServices
+import CryptoKit
 import FirebaseStorage
 import FirebaseFirestore
 import FirebaseFirestoreSwift
@@ -18,13 +21,119 @@ class LogInViewModel: ObservableObject {
     }
 
     @Published var rootNavigation: RootNavigation = .logIn
+    @Published var successSignInAccount: Bool = false
+    @Published var isShowLogInErrorAlert: Bool = false
 
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
     var uid: String? {
         return Auth.auth().currentUser?.uid
     }
 
+    // sign in with Appleにてサインイン時に生成されるランダム文字列「ノンス」
+    fileprivate var currentNonce: String?
+
     var logInErrorMessage: String = ""
+    var logInErrorAlertMessage: String = ""
+
+    func handleSignInWithAppleRequest(_ request: ASAuthorizationAppleIDRequest) {
+        request.requestedScopes = [.fullName, .email]
+        let nonce = randomNonceString()
+        currentNonce = nonce
+        // sha256 ⇨ 256文字のハッシュ関数を生成し暗号化。サインイン認証時に照らし合わせる
+        // 元となる文字列の文字数に関係なく256文字が生成される。この値はサインイン処理のたびに異なる値を照らし合わせる。
+        request.nonce = sha256(nonce)
+    }
+
+    @MainActor
+    func handleSignInWithAppleCompletion(_ result: Result<ASAuthorization, Error>) {
+        if case .failure(let failure) = result {
+            logInErrorAlertMessage = failure.localizedDescription
+            isShowLogInErrorAlert.toggle()
+        }
+        else if case .success(let success) = result {
+            // ASAuthorizationAppleIDCredential: AppleID認証が成功した結果として得られる資格情報。
+            if let appleIDCredential = success.credential as? ASAuthorizationAppleIDCredential {
+                guard let nonce = currentNonce else {
+                    fatalError("fatalError: handleSignInWithAppleCompletion_currentNonceの値が存在しません。")
+                }
+                // 「email」「fullName」はAppleIDでの初回ログイン時の場合のみ取得できる。
+                print("userIdentifier:\(appleIDCredential.user)")
+                print("identityToken:\(String(describing: appleIDCredential.identityToken))")
+                print("fullName:\(String(describing: appleIDCredential.fullName))")
+                print("email:\(String(describing: appleIDCredential.email))")
+                print("authorizationCode:\(String(describing: appleIDCredential.authorizationCode))")
+                guard let appleIDToken = appleIDCredential.identityToken else {
+                    print("Unable to fetch identify token。識別トークンをフェッチできません。")
+                    return
+                }
+                guard let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
+                    print("Unable to serialise token string from data: \(appleIDToken.debugDescription). データからトークン文字列をシリアライズできません。")
+                    return
+                }
+                print("idTokenString:\(idTokenString)")
+                let credential = OAuthProvider.credential(withProviderID: "apple.com",
+                                                          idToken: idTokenString,
+                                                          rawNonce: nonce)
+
+                Task {
+                    do {
+                         _ = try await Auth.auth().signIn(with: credential)
+                        self.currentUserCheck()
+                    } catch {
+                        print("Error authenticating: \(error.localizedDescription)")
+                    }
+                }
+            }
+        }
+    }
+
+    // Adapted from https://auth0.com/docs/api-auth/tutorials/nonce#generate-a-cryptographically-random-nonce
+    private func randomNonceString(length: Int = 32) -> String {
+      precondition(length > 0)
+      let charset: [Character] =
+        Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
+      var result = ""
+      var remainingLength = length
+
+      while remainingLength > 0 {
+        let randoms: [UInt8] = (0 ..< 16).map { _ in
+          var random: UInt8 = 0
+          let errorCode = SecRandomCopyBytes(kSecRandomDefault, 1, &random)
+          if errorCode != errSecSuccess {
+            fatalError(
+              "Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(errorCode)"
+            )
+          }
+          return random
+        }
+
+        randoms.forEach { random in
+          if remainingLength == 0 {
+            return
+          }
+
+          if random < charset.count {
+            result.append(charset[Int(random)])
+            remainingLength -= 1
+          }
+        }
+      }
+
+      return result
+    }
+
+    // サインイン要求で nonce の SHA256 ハッシュを送信すると、Apple はそれを応答で変更せずに渡します。
+    // Firebase は、元のノンスをハッシュし、それを Apple から渡された値と比較することで、応答を検証します。
+    @available(iOS 13, *)
+    private func sha256(_ input: String) -> String {
+      let inputData = Data(input.utf8)
+      let hashedData = SHA256.hash(data: inputData)
+      let hashString = hashedData.compactMap {
+        String(format: "%02x", $0)
+      }.joined()
+
+      return hashString
+    }
 
     func signIn(email: String, password: String) async -> Bool {
 
@@ -87,9 +196,59 @@ class LogInViewModel: ObservableObject {
         }
     }
 
-    func addUser(userData: User) async -> Bool {
+    func currentUserCheck() {
+        Auth.auth().addStateDidChangeListener { auth, user in
+            if user != nil {
+                print("currentUserCheck_サインイン⭕️")
+                print(user)
+                self.successSignInAccount = true
+                print("successSignInAccount: \(self.successSignInAccount)")
+            }
+            else {
+                // サインアップ失敗
+                print("currentUserCheck_サインイン❌")
+                print(user)
+                self.successSignInAccount = false
+            }
+        }
+    }
 
-        print("addUser実行")
+    func addUserSignInWithApple(name: String, password: String?, imageData: UIImage?, color: MemberColor) async -> Bool {
+
+        print("addUserSignInWithApple実行")
+
+        guard let usersRef = db?.collection("users") else {
+            print("error: guard let itemsRef = db?.collection(users), let uid = Auth.auth().currentUser?.uid")
+            return false
+        }
+
+        guard let currentUser = Auth.auth().currentUser else {
+            print("Error: guard let currentUser")
+            return false
+        }
+
+        let uplaodImageData = await  self.uploadImage(imageData)
+        let newUserData = User(id: currentUser.uid,
+                               name: name,
+                               address: currentUser.email,
+                               password: password,
+                               iconURL: uplaodImageData.url,
+                               iconPath: uplaodImageData.filePath,
+                               userColor: color,
+                               joins: [])
+        do {
+            // currentUserのuidとドキュメントIDを同じにして保存
+            _ = try usersRef.document(newUserData.id).setData(from: newUserData)
+            return true
+        } catch {
+            print("Error: try usersRef.document(newUserData.id).setData(from: newUserData)")
+            return false
+        }
+    }
+
+    func addUserMailAdress(userData: User) async -> Bool {
+
+        print("addUserMailAdress実行")
 
         guard let usersRef = db?.collection("users") else {
             print("error: guard let itemsRef = db?.collection(users), let uid = Auth.auth().currentUser?.uid")
@@ -102,7 +261,7 @@ class LogInViewModel: ObservableObject {
             print("Error: try db!.collection(collectionID).addDocument(from: itemData)")
             return false
         }
-        print("addUser完了")
+        print("addUserMailAdress完了")
         return true
     }
 

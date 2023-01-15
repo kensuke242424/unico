@@ -7,6 +7,7 @@
 
 import SwiftUI
 import FirebaseAuth
+import AuthenticationServices
 
 enum Navigation: Hashable {
     case home
@@ -21,7 +22,7 @@ enum SelectSignInType {
 }
 
 enum CreateAccount {
-    case start, fase1, fase2, fase3
+    case start, fase1, fase2, fase3, success
 }
 
 enum CreateFocused {
@@ -55,9 +56,9 @@ struct InputLogIn {
     var captureImage: UIImage? = nil
     var captureError: Bool = false
     var uploadImageData: (url: URL?, filePath: String?) = (url: nil, filePath: nil)
-    var address: String = "kennsuke242424@gmail.com"
-    var password: String = "ninnzinn2424"
-    var passwordConfirm: String = "ninnzinn2424"
+    var address: String = ""
+    var password: String = ""
+    var passwordConfirm: String = ""
     var passHidden: Bool = true
     var passHiddenConfirm: Bool = true
     var createAccountTitle: Bool = false
@@ -73,7 +74,8 @@ struct InputLogIn {
 }
 
 // ✅ ログイン画面の親Viewです。
-struct LogInView: View {
+
+struct LogInView: View { // swiftlint:disable:this type_body_length
 
     @StateObject var logInVM: LogInViewModel
     @StateObject var teamVM: TeamViewModel
@@ -168,6 +170,7 @@ struct LogInView: View {
                             inputLogIn.createAccount = .fase2
                             if inputLogIn.createUserNameText == "名無し" { inputLogIn.createUserNameText = ""
                             }
+                        case .success: print("")
                         }
 
                     }
@@ -219,16 +222,30 @@ struct LogInView: View {
         .onChange(of: inputLogIn.createAccount) { newFase in
             withAnimation(.spring(response: 1.0)) {
                 switch newFase {
-                case .start:
-                    createFaseLineImprove = 0
-                case .fase1:
-                    createFaseLineImprove = 0
-                case .fase2:
-                    createFaseLineImprove = 100
-                case .fase3:
-                    createFaseLineImprove = 200
+                case .start: createFaseLineImprove = 0
+                case .fase1: createFaseLineImprove = 0
+                case .fase2: createFaseLineImprove = 100
+                case .fase3: createFaseLineImprove = 200
+                case .success: createFaseLineImprove = 200
                 }
             }
+        }
+
+        // currentUserを監視するリスナーによってサインインが検知されたら、各項目ごとに次のフェーズへ移行
+        .onChange(of: logInVM.successSignInAccount) { success in
+            print("logInVM.successCreateAccount更新を検知")
+            if !success { return }
+            switch inputLogIn.firstSelect {
+            case .start: print("none.")
+            case .logIn: withAnimation(.spring(response: 0.5)) { logInVM.rootNavigation = .fetch }
+            case .signAp:
+                Task {
+                    let addUserFirestoreCheck: Bool = await logInVM.addUserSignInWithApple(name: inputLogIn.createUserNameText, password: inputLogIn.password,
+                                                                                           imageData: inputLogIn.captureImage, color: inputLogIn.selectUserColor)
+                    if addUserFirestoreCheck { withAnimation(.spring(response: 0.5)) { logInVM.rootNavigation = .fetch } }
+                }
+            }
+
         }
 
         .sheet(isPresented: $inputLogIn.isShowPickerView) {
@@ -310,36 +327,22 @@ struct LogInView: View {
     func logInSelectButtons() -> some View {
         VStack(spacing: 15) {
 
-            Button {
-                withAnimation(.easeIn(duration: 0.3)) {
-                    inputLogIn.selectSignInType = .apple
-                }
-            } label: {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 15)
-                        .foregroundColor(.black.opacity(0.8))
-                        .frame(width: 250, height: 50)
-                        .shadow(radius: 10, x: 5, y: 5)
-                    Text("Appleアカウント")
-                        .tracking(2)
-                        .foregroundColor(.white)
-                }
+            // Sign In With Apple...
+            SignInWithAppleButton(.signIn) { request in
+                inputLogIn.selectSignInType = .apple
+                logInVM.handleSignInWithAppleRequest(request)
+            } onCompletion: { result in
+                logInVM.handleSignInWithAppleCompletion(result)
             }
-            Button {
-                withAnimation(.easeIn(duration: 1)) {
-                    inputLogIn.selectSignInType = .google
-                }
-            } label: {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 15)
-                        .foregroundColor(.white.opacity(0.8))
-                        .frame(width: 250, height: 50)
-                        .shadow(radius: 10, x: 5, y: 5)
-                    Text("Googleアカウント")
-                        .tracking(2)
-                        .foregroundColor(.black)
-                }
-            }
+            .signInWithAppleButtonStyle(.black)
+            .frame(width: 250, height: 50)
+            .cornerRadius(8)
+            .shadow(radius: 10, x: 5, y: 5)
+
+            Text("または")
+                .foregroundColor(.white).opacity(0.7)
+                .tracking(2)
+
             Button {
                 withAnimation(.easeIn(duration: 0.3)) {
                     inputLogIn.selectSignInType = .mailAddress
@@ -367,7 +370,9 @@ struct LogInView: View {
                 case .fase1:
 
                     VStack(spacing: 10) {
-                        Text("あなたの色は？").tracking(10)
+                        Text("あなたの色は？")
+                            .tracking(10)
+
                     }
 
                 case .fase2:
@@ -386,6 +391,11 @@ struct LogInView: View {
                         }
                         .frame(width: 250)
                     }
+                case .success:
+                    VStack(spacing: 10) {
+                        Text("アカウント登録が完了しました！")
+                            .frame(width: 250)
+                    }
                 }
             } // Group
             .tracking(5)
@@ -399,9 +409,17 @@ struct LogInView: View {
 
                 case .fase1:
 
-                    ColorCubeView(colorSet: $inputLogIn.selectUserColor)
-                        .padding()
-                        .offset(y: 20)
+                    VStack {
+                        Label("Tap!", systemImage: "hand.tap.fill")
+                            .foregroundColor(.white)
+                            .opacity(inputLogIn.createAccountContents ? 0.5 : 0.0)
+                            .tracking(3)
+                            .offset(y: -10)
+
+                        ColorCubeView(colorSet: $inputLogIn.selectUserColor)
+                            .padding()
+                    }
+                    .offset(y: 20)
 
                     Button {
                         withAnimation(.spring(response: 1.0)) {
@@ -496,6 +514,8 @@ struct LogInView: View {
                         }
                         .offset(y: 50)
                     }
+                case .success:
+                    EmptyView()
                 }
             }
             .opacity(inputLogIn.createAccountContents ? 1.0 : 0.0)
@@ -556,28 +576,6 @@ struct LogInView: View {
             }
     }
 
-} // View
-
-struct LogoMark: View {
-    var body: some View {
-
-        VStack {
-
-            Image(systemName: "cube.transparent")
-                .resizable()
-                .scaledToFit()
-                .foregroundColor(.white.opacity(0.7))
-                .frame(width: 150, height: 150)
-                .padding()
-
-            Text("unico")
-                .tracking(25)
-                .font(.title3)
-                .foregroundColor(.white.opacity(0.6))
-                .fontWeight(.heavy)
-                .offset(x: 10)
-        } // VStack
-    } // body
 } // View
 
 struct MailAddressInfomation: View {
@@ -733,6 +731,7 @@ struct MailAddressInfomation: View {
 
                         case .signAp:
                             Task {
+                                // メールアドレスを用いてユーザを登録する
                                 let checkSignUp = await logInVM.signUp(email: inputLogIn.address,
                                                                        password: inputLogIn.password)
                                 if !checkSignUp { inputLogIn.addressCheck = .failure; return }
@@ -747,7 +746,7 @@ struct MailAddressInfomation: View {
                                                        userColor: inputLogIn.selectUserColor,
                                                        joins: [])
 
-                                let checkAddUser = await logInVM.addUser(userData: newUserData)
+                                let checkAddUser = await logInVM.addUserMailAdress(userData: newUserData)
 
                                 if checkSignUp, checkAddUser {
                                     // サインアップ成功
