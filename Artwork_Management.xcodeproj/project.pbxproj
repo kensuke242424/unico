@@ -329,7 +329,6 @@
 				E094F0FF28E20F1000D3C845 /* LogInView.swift */,
 				E0DE98D528E2D85E00471AB4 /* LogInCheckView.swift */,
 				E0A3B995292EFCE500209ADC /* CreateAndJoinTeamView.swift */,
-				E0FCADA329708B9800BA6A75 /* LogoMark.swift */,
 			);
 			path = LogInViews;
 			sourceTree = "<group>";
@@ -371,6 +370,7 @@
 				E0455FE9292D1947004F677D /* GradientBackbround.swift */,
 				E0A7DE4F290DAB40008C3F3F /* BlurView.swift */,
 				E09F09C828EE3B4900D07669 /* UsefulButton.swift */,
+				E0FCADA329708B9800BA6A75 /* LogoMark.swift */,
 			);
 			path = ViewParts;
 			sourceTree = "<group>";

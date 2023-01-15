@@ -92,9 +92,10 @@ struct CreateAndJoinTeamView: View {
 
                             case .fase2:
                                 VStack(spacing: 10) {
-                                    Text("「ユーザID」をコピーして相手に渡します。")
-                                    Text("または、QRコードを表示して相手に見せてください。")
-                                    Text("メンバー承認が完了次第、自動でログインを開始します。")
+                                    Text("以下の方法でチームからの承認を受けてください。")
+                                        .padding(.bottom, 5)
+                                    Text("1. QRコードを相手に読み込んでもらう。")
+                                    Text("2. ユーザIDをコピーして相手に渡す。")
                                 }
 
                             case .check:
@@ -103,7 +104,10 @@ struct CreateAndJoinTeamView: View {
                                 }
 
                             case .success:
-                                Text("チームが見つかりました。ログインを開始します。")
+                                VStack(spacing: 10) {
+                                    Text("参加チームが見つかりました。")
+                                    Text("ログインを開始します。")
+                                }
                             }
                         }
                         .font(.caption).tracking(3).opacity(0.6)
@@ -128,7 +132,6 @@ struct CreateAndJoinTeamView: View {
                                     Text("あなたのチームを新しく作成します。")
                                     Text("アイテムの在庫や売上、情報の管理ができます。")
                                     Text("また、チームに他の人を招待することも可能です。")
-                                    Text("あなたの素晴らしい活動を応援しています。")
                                 }
 
                             case .fase2:
@@ -146,13 +149,12 @@ struct CreateAndJoinTeamView: View {
                                         Text("チーム情報を入力してください。")
                                         Text("入力が完了したら、チーム生成を開始します。")
                                     }
-
                                 }
 
                             case .success:
                                 VStack(spacing: 10) {
-                                    Text("お疲れ様でした。")
-                                    Text("チームへのログインを開始します。")
+                                    Text("チームの作成が完了しました。")
+                                    Text("ログインを開始します。")
                                 }
                             }
                         }
