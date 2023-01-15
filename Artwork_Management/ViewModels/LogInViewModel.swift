@@ -5,6 +5,7 @@
 //  Created by 中川賢亮 on 2022/11/21.
 //
 
+import Foundation
 import SwiftUI
 import FirebaseAuth
 import AuthenticationServices
@@ -50,6 +51,7 @@ class LogInViewModel: ObservableObject {
             isShowLogInErrorAlert.toggle()
         }
         else if case .success(let success) = result {
+            // ASAuthorizationAppleIDCredential: AppleID認証が成功した結果として得られる資格情報。
             if let appleIDCredential = success.credential as? ASAuthorizationAppleIDCredential {
                 guard let nonce = currentNonce else {
                     fatalError("fatalError: handleSignInWithAppleCompletion_currentNonceの値が存在しません。")
@@ -60,7 +62,6 @@ class LogInViewModel: ObservableObject {
                 print("fullName:\(String(describing: appleIDCredential.fullName))")
                 print("email:\(String(describing: appleIDCredential.email))")
                 print("authorizationCode:\(String(describing: appleIDCredential.authorizationCode))")
-                print("identityToken: \(String(describing: appleIDCredential.identityToken))")
                 guard let appleIDToken = appleIDCredential.identityToken else {
                     print("Unable to fetch identify token。識別トークンをフェッチできません。")
                     return
@@ -69,7 +70,7 @@ class LogInViewModel: ObservableObject {
                     print("Unable to serialise token string from data: \(appleIDToken.debugDescription). データからトークン文字列をシリアライズできません。")
                     return
                 }
-
+                print("idTokenString:\(idTokenString)")
                 let credential = OAuthProvider.credential(withProviderID: "apple.com",
                                                           idToken: idTokenString,
                                                           rawNonce: nonce)
