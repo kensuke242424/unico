@@ -10,7 +10,7 @@ import AVFoundation
 
 class QRReader: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate, ObservableObject {
 
-    @Published var qrData: String = ""
+    @Published var captureQRData: String = ""
     @Published var isdetectQR: Bool = false
 
     // カメラ用のAVsessionインスタンス作成
@@ -75,8 +75,8 @@ class QRReader: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate, Observab
     }
 }
 
-//MARK: - AVCaptureMetadataOutputObjectsDelegate
-extension QRReader:AVCaptureMetadataOutputObjectsDelegate {
+// MARK: - AVCaptureMetadataOutputObjectsDelegate
+extension QRReader: AVCaptureMetadataOutputObjectsDelegate {
 
     func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
 
@@ -90,11 +90,11 @@ extension QRReader:AVCaptureMetadataOutputObjectsDelegate {
             // QRの中身： metadata.stringValue
             guard let data = metadata.stringValue else { return }
             isdetectQR = true
-            qrData = data
-            print("読み取りvalue：",data)
-            //一旦停止
+            captureQRData = data
+            print("読み取りvalue： \(data)" )
+            // 一旦停止
             stopSession()
-            //AVsession.stopRunning()
+            // AVsession.stopRunning()
         }
     }
 }

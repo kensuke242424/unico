@@ -28,12 +28,14 @@ struct CreateAndJoinTeamView: View {
     @StateObject var logInVM: LogInViewModel
     @StateObject var teamVM: TeamViewModel
     @StateObject var userVM: UserViewModel
+    @StateObject var qrReader: QRReader = QRReader()
 
     @State private var teamName: String = ""
     @State private var captureImage: UIImage?
     @State private var userQRCodeImage: UIImage?
     @State private var uploadImageData: (url: URL?, filePath: String?)
     @State private var isShowPickerView: Bool = false
+    @State private var isShowQRReader: Bool = false
     @State private var captureError: Bool = false
     @State private var selectedTeamCard: SelectedTeamCard = .start
     @State private var selectTeamFase: SelectTeamFase = .start
@@ -195,6 +197,7 @@ struct CreateAndJoinTeamView: View {
                                         Image(uiImage: userQRCodeImage)
                                             .resizable()
                                             .frame(width: 200, height: 200)
+                                            .padding(.top, 20)
                                     } else {
                                         ZStack {
                                             RoundedRectangle(cornerRadius: 5)
@@ -206,22 +209,22 @@ struct CreateAndJoinTeamView: View {
                                                 Image(systemName: "goforward")
                                                     .foregroundColor(.white)
                                             }
-                                        }
+                                        }.padding(.top, 20)
 
                                     }
 
-                                    ZStack {
-                                        RoundedRectangle(cornerRadius: 3)
-                                            .foregroundColor(.black)
-                                            .padding(.horizontal, 40)
-                                            .overlay(alignment: .bottom) {
-                                                Text("長押しでコピー").opacity(0.4).tracking(4)
-                                                    .font(.subheadline)
-                                                    .offset(y: 30)
-                                            }
-                                        Text(userVM.uid ?? "ユーザIDが見つかりません")
-                                            .textSelection(.enabled)
-                                            .padding(8)
+                                    VStack {
+                                        Text("あなたのユーザID")
+                                            .opacity(0.6).tracking(4)
+                                            .font(.subheadline)
+                                        ZStack {
+                                            RoundedRectangle(cornerRadius: 3)
+                                                .foregroundColor(.black)
+                                                .padding(.horizontal, 40)
+                                            Text(userVM.uid ?? "ユーザIDが見つかりません")
+                                                .textSelection(.enabled)
+                                                .padding(8)
+                                        }
                                     }
                                 }
                             }
@@ -341,6 +344,13 @@ struct CreateAndJoinTeamView: View {
                 }
             }
         }
+        // QRコードが読み取れたらカメラを閉じる
+        .onChange(of: qrReader.isdetectQR) { detect in
+            if detect {
+                isShowQRReader.toggle()
+                qrReader.isdetectQR.toggle()
+            }
+        }
 
         .onAppear {
             // currentUserのuidをQRコードに変換
@@ -353,6 +363,10 @@ struct CreateAndJoinTeamView: View {
         }
         .sheet(isPresented: $isShowPickerView) {
             PHPickerView(captureImage: $captureImage, isShowSheet: $isShowPickerView, isShowError: $captureError)
+        }
+        // QRコードを読み取るためのカメラView
+        .sheet(isPresented: $isShowQRReader) {
+            QRReaderView(caLayer: qrReader.videoPreviewLayer)
         }
     }
 

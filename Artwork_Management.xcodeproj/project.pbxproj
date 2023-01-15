@@ -63,6 +63,8 @@
 		E0BE39AD29331218002499C4 /* UIImageCircleIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0BE39AC29331218002499C4 /* UIImageCircleIcon.swift */; };
 		E0BE39AF29335317002499C4 /* ShowsItemAsyncImagePhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0BE39AE29335317002499C4 /* ShowsItemAsyncImagePhoto.swift */; };
 		E0BFE1C629745AEB005481CA /* QRReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0BFE1C529745AEB005481CA /* QRReader.swift */; };
+		E0BFE1C929746B06005481CA /* QRReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0BFE1C829746B06005481CA /* QRReaderView.swift */; };
+		E0BFE1CC297473C7005481CA /* TestQRReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0BFE1CB297473C7005481CA /* TestQRReaderView.swift */; };
 		E0CB9DCB2913964F00D95C54 /* ViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0CB9DCA2913964F00D95C54 /* ViewExtension.swift */; };
 		E0CC79B628E761EA00CE0B19 /* UserModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0CC79B528E761EA00CE0B19 /* UserModel.swift */; };
 		E0CC79B828E7811500CE0B19 /* ItemDetailData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0CC79B728E7811500CE0B19 /* ItemDetailData.swift */; };
@@ -133,6 +135,9 @@
 		E0BE39AC29331218002499C4 /* UIImageCircleIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageCircleIcon.swift; sourceTree = "<group>"; };
 		E0BE39AE29335317002499C4 /* ShowsItemAsyncImagePhoto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowsItemAsyncImagePhoto.swift; sourceTree = "<group>"; };
 		E0BFE1C529745AEB005481CA /* QRReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRReader.swift; sourceTree = "<group>"; };
+		E0BFE1C829746B06005481CA /* QRReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRReaderView.swift; sourceTree = "<group>"; };
+		E0BFE1CA29747188005481CA /* Artwork-Management-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Artwork-Management-Info.plist"; sourceTree = SOURCE_ROOT; };
+		E0BFE1CB297473C7005481CA /* TestQRReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestQRReaderView.swift; sourceTree = "<group>"; };
 		E0CB9DCA2913964F00D95C54 /* ViewExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewExtension.swift; sourceTree = "<group>"; };
 		E0CC79B528E761EA00CE0B19 /* UserModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserModel.swift; sourceTree = "<group>"; };
 		E0CC79B728E7811500CE0B19 /* ItemDetailData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemDetailData.swift; sourceTree = "<group>"; };
@@ -221,6 +226,7 @@
 		E08F272328DDA08E00329C5E /* Artwork_Management */ = {
 			isa = PBXGroup;
 			children = (
+				E0BFE1CA29747188005481CA /* Artwork-Management-Info.plist */,
 				E0FCADA2296F289A00BA6A75 /* Artwork_Management.entitlements */,
 				E08F272428DDA08E00329C5E /* Artwork_ManagementApp.swift */,
 				E0455FDF292BBB74004F677D /* GoogleService-Info.plist */,
@@ -244,6 +250,7 @@
 		E08F273228DDB3B200329C5E /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				E0BFE1C729746AC1005481CA /* QRReaders */,
 				E05FE94328F71BE400263F98 /* Extensions */,
 				E0B3288F2923AD7600E94BC3 /* ViewParts */,
 				E094F0FE28E20BB800D3C845 /* LogInViews */,
@@ -267,7 +274,6 @@
 				E01E1391291F961A0001F2DA /* TagViewModel.swift */,
 				E0CF7EF128DF166700735142 /* ItemViewModel.swift */,
 				E0796AD628F485850094E50C /* ButtonViewModel.swift */,
-				E0BFE1C529745AEB005481CA /* QRReader.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -376,6 +382,16 @@
 				E0FCADA329708B9800BA6A75 /* LogoMark.swift */,
 			);
 			path = ViewParts;
+			sourceTree = "<group>";
+		};
+		E0BFE1C729746AC1005481CA /* QRReaders */ = {
+			isa = PBXGroup;
+			children = (
+				E0BFE1C529745AEB005481CA /* QRReader.swift */,
+				E0BFE1C829746B06005481CA /* QRReaderView.swift */,
+				E0BFE1CB297473C7005481CA /* TestQRReaderView.swift */,
+			);
+			path = QRReaders;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -497,6 +513,7 @@
 				E01AA3AB291780ED000FCD37 /* StringExtension.swift in Sources */,
 				E0BE39AF29335317002499C4 /* ShowsItemAsyncImagePhoto.swift in Sources */,
 				E0796AD728F485850094E50C /* ButtonViewModel.swift in Sources */,
+				E0BFE1C929746B06005481CA /* QRReaderView.swift in Sources */,
 				E04ACF4328E73C660054A6C4 /* IndicatorRow.swift in Sources */,
 				E09F09BC28EAF33500D07669 /* FocusedLineRow.swift in Sources */,
 				E0455FEA292D1947004F677D /* GradientBackbround.swift in Sources */,
@@ -515,6 +532,7 @@
 				E08F273E28DDB65F00329C5E /* HomeTabView.swift in Sources */,
 				E0455FDE292B2B83004F677D /* LogInViewModel.swift in Sources */,
 				E0DE33522928F48D008C7147 /* CustomProgressView.swift in Sources */,
+				E0BFE1CC297473C7005481CA /* TestQRReaderView.swift in Sources */,
 				E05130E228F341620092FE46 /* RootView.swift in Sources */,
 				E08F272528DDA08E00329C5E /* Artwork_ManagementApp.swift in Sources */,
 				E0F78FC42919F06D00A95CD1 /* DateFormatterExtension.swift in Sources */,
@@ -677,6 +695,8 @@
 				DEVELOPMENT_TEAM = H999WST5QF;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Artwork-Management-Info.plist";
+				INFOPLIST_KEY_NSCameraUsageDescription = "QRCodeを読み取るために使用します。";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -709,6 +729,8 @@
 				DEVELOPMENT_TEAM = H999WST5QF;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Artwork-Management-Info.plist";
+				INFOPLIST_KEY_NSCameraUsageDescription = "QRCodeを読み取るために使用します。";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
