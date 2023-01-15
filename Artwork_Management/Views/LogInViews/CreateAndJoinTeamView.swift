@@ -9,7 +9,7 @@ import SwiftUI
 
 struct CreateAndJoinTeamView: View {
 
-    enum SelectTeamCard {
+    enum SelectedTeamCard {
         case start, join, create
 
         var background: Color {
@@ -30,11 +30,12 @@ struct CreateAndJoinTeamView: View {
     @StateObject var userVM: UserViewModel
 
     @State private var teamName: String = ""
-    @State private var captureImage: UIImage? = nil
-    @State private var uploadImageData: (url: URL?, filePath: String?) = (nil, nil)
+    @State private var captureImage: UIImage?
+    @State private var userQRCodeImage: UIImage?
+    @State private var uploadImageData: (url: URL?, filePath: String?)
     @State private var isShowPickerView: Bool = false
     @State private var captureError: Bool = false
-    @State private var selectTeamCard: SelectTeamCard = .start
+    @State private var selectedTeamCard: SelectedTeamCard = .start
     @State private var selectTeamFase: SelectTeamFase = .start
     @State private var customFont: CustomFont = .avenirNextUltraLight
     @State private var backgroundColor: Color = .userGray1
@@ -46,11 +47,11 @@ struct CreateAndJoinTeamView: View {
 
             Group {
                 BlurView(style: .systemMaterialDark).opacity(0.8)
-                selectTeamCard.background.opacity(0.6)
+                selectedTeamCard.background.opacity(0.6)
                     .onTapGesture {
                         withAnimation(.spring(response: 0.5)) {
                             if selectTeamFase == .fase1 {
-                                selectTeamCard = .start
+                                selectedTeamCard = .start
                             } else if selectTeamFase == .fase2 {
                                 createNameFocused = nil
                             }
@@ -64,7 +65,7 @@ struct CreateAndJoinTeamView: View {
 
             VStack(spacing: 30) {
 
-                switch selectTeamCard {
+                switch selectedTeamCard {
 
                 case .start:
                     VStack(spacing: 50) {
@@ -93,9 +94,12 @@ struct CreateAndJoinTeamView: View {
                             case .fase2:
                                 VStack(spacing: 10) {
                                     Text("以下の方法でチームからの承認を受けてください。")
-                                        .padding(.bottom, 5)
-                                    Text("1. QRコードを相手に読み込んでもらう。")
-                                    Text("2. ユーザIDをコピーして相手に渡す。")
+                                        .padding(.bottom, 8)
+                                    VStack(alignment: .leading, spacing: 10) {
+                                        Text("方法1: QRコードを相手に読み込んでもらう。")
+                                        Text("方法2: ユーザIDをコピーして相手に渡す。")
+                                    }
+                                    .fontWeight(.bold)
                                 }
 
                             case .check:
@@ -166,28 +170,69 @@ struct CreateAndJoinTeamView: View {
                 }
 
                 // create team contents...
+                // faseによってoffsetを更新するサイドスライドアニメーション
                 ZStack {
-                    if selectTeamFase != .success {
+                    if selectTeamFase == .start || selectTeamFase == .fase1 || selectTeamFase == .fase2 {
                         HStack(spacing: 15) {
                             joinCard()
                             Text("<>")
                                 .font(.title3).foregroundColor(.white)
-                                .opacity(selectTeamCard == .start ? 0.6 : 0.0)
+                                .opacity(selectedTeamCard == .start ? 0.6 : 0.0)
                             createCard()
                         }
                         .opacity(selectTeamFase == .fase1 ? 1.0 : 0.0)
                         .offset(x: selectTeamFase == .fase1 ? 0 : selectTeamFase == .start ? getRect().width : -getRect().width)
 
                         Group {
-                            createTeamIconAndName(captureImage: captureImage)
+                            switch selectedTeamCard {
+                            case .start:
+                                EmptyView()
+                            case .create:
+                                createTeamIconAndName(captureImage: captureImage)
+                            case .join:
+                                VStack(spacing: 40) {
+                                    if let userQRCodeImage {
+                                        Image(uiImage: userQRCodeImage)
+                                            .resizable()
+                                            .frame(width: 200, height: 200)
+                                    } else {
+                                        ZStack {
+                                            RoundedRectangle(cornerRadius: 5)
+                                                .frame(width: 200, height: 200)
+                                                .foregroundColor(.black.opacity(0.8))
+                                            Button {
+                                                userQRCodeImage = logInVM.generateUserQRCode(with: userVM.uid ?? "")
+                                            } label: {
+                                                Image(systemName: "goforward")
+                                                    .foregroundColor(.white)
+                                            }
+                                        }
+
+                                    }
+
+                                    ZStack {
+                                        RoundedRectangle(cornerRadius: 3)
+                                            .foregroundColor(.black)
+                                            .padding(.horizontal, 40)
+                                            .overlay(alignment: .bottom) {
+                                                Text("長押しでコピー").opacity(0.4).tracking(4)
+                                                    .font(.subheadline)
+                                                    .offset(y: 30)
+                                            }
+                                        Text(userVM.uid ?? "ユーザIDが見つかりません")
+                                            .textSelection(.enabled)
+                                            .padding(8)
+                                    }
+                                }
+                            }
                         }
+                        .frame(height: 220)
                         .opacity(selectTeamFase == .fase2 || selectTeamFase == .check ? 1.0 : 0.0)
                         .offset(x: selectTeamFase == .fase2 || selectTeamFase == .check ? 0 :
-                                    selectTeamFase == .start || selectTeamFase == .fase1 ? getRect().width :
-                                    -getRect().width)
+                                    selectTeamFase == .start || selectTeamFase == .fase1 ? getRect().width : -getRect().width)
                     }
-                    if selectTeamFase == .success {
 
+                    if selectTeamFase == .success {
                         Text("unicoへようこそ")
                             .tracking(7).opacity(0.6)
                             .opacity(selectTeamFase == .success ? 1.0 : 0.0)
@@ -213,8 +258,8 @@ struct CreateAndJoinTeamView: View {
             .buttonStyle(.borderedProminent)
             .offset(y: getRect().height * 0.3)
             .opacity(selectTeamFase == .start || selectTeamFase == .success ? 0.0 : 1.0)
-            .opacity(selectTeamCard == .join && selectTeamFase == .fase2 ? 0.0 : 1.0)
-            .disabled(selectTeamCard == .start || selectTeamFase == .success ? true : false)
+            .opacity(selectedTeamCard == .join && selectTeamFase == .fase2 ? 0.0 : 1.0)
+            .disabled(selectedTeamCard == .start || selectTeamFase == .success ? true : false)
 
             Button("<戻る") {
                 withAnimation(.spring(response: 0.7)) {
@@ -298,6 +343,8 @@ struct CreateAndJoinTeamView: View {
         }
 
         .onAppear {
+            // currentUserのuidをQRコードに変換
+            userQRCodeImage = logInVM.generateUserQRCode(with: userVM.uid ?? "")
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                 withAnimation(.spring(response: 1.0)) {
                     selectTeamFase = .fase1
@@ -335,12 +382,12 @@ struct CreateAndJoinTeamView: View {
         }
         .clipShape(RoundedRectangle(cornerRadius: 10))
         .frame(width: getRect().width * 0.4, height: getRect().height * 0.25)
-        .scaleEffect(selectTeamCard == .join ? 1.4 : selectTeamCard == .create ? 0.8 : 1.0)
-        .offset(x: selectTeamCard == .join ? 30 : 0)
-        .opacity(selectTeamCard == .join ? 1.0 : selectTeamCard == .start ? 0.8 : 0.2)
+        .scaleEffect(selectedTeamCard == .join ? 1.4 : selectedTeamCard == .create ? 0.8 : 1.0)
+        .offset(x: selectedTeamCard == .join ? 30 : 0)
+        .opacity(selectedTeamCard == .join ? 1.0 : selectedTeamCard == .start ? 0.8 : 0.2)
         .onTapGesture {
             withAnimation(.spring(response: 0.5)) {
-                selectTeamCard = selectTeamCard == .start || selectTeamCard == .create ? .join : .start
+                selectedTeamCard = selectedTeamCard == .start || selectedTeamCard == .create ? .join : .start
             }
         }
     }
@@ -361,12 +408,12 @@ struct CreateAndJoinTeamView: View {
         }
         .clipShape(RoundedRectangle(cornerRadius: 10))
         .frame(width: getRect().width * 0.4, height: getRect().height * 0.25)
-        .scaleEffect(selectTeamCard == .create ? 1.4 : selectTeamCard == .join ? 0.8 : 1.0)
-        .offset(x: selectTeamCard == .create ? -30 : 0)
-        .opacity(selectTeamCard == .create ? 1.0 : selectTeamCard == .start ? 0.8 : 0.2)
+        .scaleEffect(selectedTeamCard == .create ? 1.4 : selectedTeamCard == .join ? 0.8 : 1.0)
+        .offset(x: selectedTeamCard == .create ? -30 : 0)
+        .opacity(selectedTeamCard == .create ? 1.0 : selectedTeamCard == .start ? 0.8 : 0.2)
         .onTapGesture {
             withAnimation(.spring(response: 0.5)) {
-                selectTeamCard = selectTeamCard == .start || selectTeamCard == .join ? .create : .start
+                selectedTeamCard = selectedTeamCard == .start || selectedTeamCard == .join ? .create : .start
             }
         }
     }

@@ -307,4 +307,30 @@ class LogInViewModel: ObservableObject {
             }
         }
     }
+
+    func generateUserQRCode(with inputText: String) -> UIImage? {
+        guard let qrFilter = CIFilter(name: "CIQRCodeGenerator")
+        else { return nil }
+
+        let inputData = inputText.data(using: .utf8)
+        qrFilter.setValue(inputData, forKey: "inputMessage")
+        // 誤り訂正レベルをHに指定
+        // 誤り訂正レベルとは: 生成時に崩れたQRコードを自力で修正する機能のレベル。レベルが高いほどデータは重くなる
+        qrFilter.setValue("H", forKey: "inputCorrectionLevel")
+
+        guard let ciImage = qrFilter.outputImage
+        else { return nil }
+
+        // CIImageは小さい為、任意のサイズに拡大
+        let sizeTransform = CGAffineTransform(scaleX: 10, y: 10)
+        let scaledCIImage = ciImage.transformed(by: sizeTransform)
+
+        let context = CIContext()
+        // CIImageだとSwiftUIのImageでは表示されない為、CGImageに変換
+        guard let cgImage = context.createCGImage(scaledCIImage,
+                                                  from: scaledCIImage.extent)
+        else { return nil }
+
+        return UIImage(cgImage: cgImage)
+    }
 }

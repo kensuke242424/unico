@@ -62,6 +62,7 @@
 		E0B328932924A42100E94BC3 /* ManageCustomizeSideMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0B328922924A42100E94BC3 /* ManageCustomizeSideMenu.swift */; };
 		E0BE39AD29331218002499C4 /* UIImageCircleIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0BE39AC29331218002499C4 /* UIImageCircleIcon.swift */; };
 		E0BE39AF29335317002499C4 /* ShowsItemAsyncImagePhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0BE39AE29335317002499C4 /* ShowsItemAsyncImagePhoto.swift */; };
+		E0BFE1C629745AEB005481CA /* QRReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0BFE1C529745AEB005481CA /* QRReader.swift */; };
 		E0CB9DCB2913964F00D95C54 /* ViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0CB9DCA2913964F00D95C54 /* ViewExtension.swift */; };
 		E0CC79B628E761EA00CE0B19 /* UserModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0CC79B528E761EA00CE0B19 /* UserModel.swift */; };
 		E0CC79B828E7811500CE0B19 /* ItemDetailData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0CC79B728E7811500CE0B19 /* ItemDetailData.swift */; };
@@ -131,6 +132,7 @@
 		E0B328922924A42100E94BC3 /* ManageCustomizeSideMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageCustomizeSideMenu.swift; sourceTree = "<group>"; };
 		E0BE39AC29331218002499C4 /* UIImageCircleIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageCircleIcon.swift; sourceTree = "<group>"; };
 		E0BE39AE29335317002499C4 /* ShowsItemAsyncImagePhoto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowsItemAsyncImagePhoto.swift; sourceTree = "<group>"; };
+		E0BFE1C529745AEB005481CA /* QRReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRReader.swift; sourceTree = "<group>"; };
 		E0CB9DCA2913964F00D95C54 /* ViewExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewExtension.swift; sourceTree = "<group>"; };
 		E0CC79B528E761EA00CE0B19 /* UserModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserModel.swift; sourceTree = "<group>"; };
 		E0CC79B728E7811500CE0B19 /* ItemDetailData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemDetailData.swift; sourceTree = "<group>"; };
@@ -265,6 +267,7 @@
 				E01E1391291F961A0001F2DA /* TagViewModel.swift */,
 				E0CF7EF128DF166700735142 /* ItemViewModel.swift */,
 				E0796AD628F485850094E50C /* ButtonViewModel.swift */,
+				E0BFE1C529745AEB005481CA /* QRReader.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -482,6 +485,7 @@
 				E09F09C728EE266600D07669 /* InputFormTitle.swift in Sources */,
 				E0CF7EF828DF7BFA00735142 /* SystemListView.swift in Sources */,
 				E0455FE6292CA002004F677D /* ColorCubeView.swift in Sources */,
+				E0BFE1C629745AEB005481CA /* QRReader.swift in Sources */,
 				E04ACF4128E6DD600054A6C4 /* ShowsItemDetail.swift in Sources */,
 				E0455FE2292C5B1C004F677D /* StandByView.swift in Sources */,
 				E01AA3A32916C674000FCD37 /* TagModel.swift in Sources */,
