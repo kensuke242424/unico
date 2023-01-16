@@ -64,7 +64,6 @@
 		E0BE39AF29335317002499C4 /* ShowsItemAsyncImagePhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0BE39AE29335317002499C4 /* ShowsItemAsyncImagePhoto.swift */; };
 		E0BFE1C629745AEB005481CA /* QRReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0BFE1C529745AEB005481CA /* QRReader.swift */; };
 		E0BFE1C929746B06005481CA /* QRReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0BFE1C829746B06005481CA /* QRReaderView.swift */; };
-		E0BFE1CC297473C7005481CA /* TestQRReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0BFE1CB297473C7005481CA /* TestQRReaderView.swift */; };
 		E0CB9DCB2913964F00D95C54 /* ViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0CB9DCA2913964F00D95C54 /* ViewExtension.swift */; };
 		E0CC79B628E761EA00CE0B19 /* UserModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0CC79B528E761EA00CE0B19 /* UserModel.swift */; };
 		E0CC79B828E7811500CE0B19 /* ItemDetailData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0CC79B728E7811500CE0B19 /* ItemDetailData.swift */; };
@@ -137,7 +136,6 @@
 		E0BFE1C529745AEB005481CA /* QRReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRReader.swift; sourceTree = "<group>"; };
 		E0BFE1C829746B06005481CA /* QRReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRReaderView.swift; sourceTree = "<group>"; };
 		E0BFE1CA29747188005481CA /* Artwork-Management-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Artwork-Management-Info.plist"; sourceTree = SOURCE_ROOT; };
-		E0BFE1CB297473C7005481CA /* TestQRReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestQRReaderView.swift; sourceTree = "<group>"; };
 		E0CB9DCA2913964F00D95C54 /* ViewExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewExtension.swift; sourceTree = "<group>"; };
 		E0CC79B528E761EA00CE0B19 /* UserModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserModel.swift; sourceTree = "<group>"; };
 		E0CC79B728E7811500CE0B19 /* ItemDetailData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemDetailData.swift; sourceTree = "<group>"; };
@@ -389,7 +387,6 @@
 			children = (
 				E0BFE1C529745AEB005481CA /* QRReader.swift */,
 				E0BFE1C829746B06005481CA /* QRReaderView.swift */,
-				E0BFE1CB297473C7005481CA /* TestQRReaderView.swift */,
 			);
 			path = QRReaders;
 			sourceTree = "<group>";
@@ -532,7 +529,6 @@
 				E08F273E28DDB65F00329C5E /* HomeTabView.swift in Sources */,
 				E0455FDE292B2B83004F677D /* LogInViewModel.swift in Sources */,
 				E0DE33522928F48D008C7147 /* CustomProgressView.swift in Sources */,
-				E0BFE1CC297473C7005481CA /* TestQRReaderView.swift in Sources */,
 				E05130E228F341620092FE46 /* RootView.swift in Sources */,
 				E08F272528DDA08E00329C5E /* Artwork_ManagementApp.swift in Sources */,
 				E0F78FC42919F06D00A95CD1 /* DateFormatterExtension.swift in Sources */,
