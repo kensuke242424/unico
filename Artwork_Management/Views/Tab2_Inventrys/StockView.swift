@@ -41,8 +41,8 @@ struct StockView: View {
             ScrollViewReader { scrollProxy in
                 ZStack {
 
-                    GradientBackbround(color1: userVM.users.first!.userColor.color1,
-                                       color2: userVM.users.first!.userColor.colorAccent)
+                    GradientBackbround(color1: userVM.user!.userColor.color1,
+                                       color2: userVM.user!.userColor.colorAccent)
 
                     VStack {
 

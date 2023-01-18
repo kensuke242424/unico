@@ -120,7 +120,7 @@ struct HomeTabView: View {
                     .offset(y: getRect().height / 2 - getSafeArea().bottom - 110)
                     .offset(y: cartAvertOffsetY)
 
-                NavigationHeader(inputHome: $inputHome, photoURL: userVM.users[0].iconURL)
+                NavigationHeader(inputHome: $inputHome, photoURL: userVM.user!.iconURL)
                     .opacity(!inputHome.isShowHomeTopNavigation &&
                              inputHome.homeTabIndex == 0 &&
                              teamVM.team!.headerURL != nil

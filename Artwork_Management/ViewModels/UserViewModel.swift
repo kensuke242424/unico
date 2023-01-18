@@ -21,33 +21,52 @@ class UserViewModel: ObservableObject {
         print("<<<<<<<<<  UserViewModel_init  >>>>>>>>>")
     }
 
+    var listener: ListenerRegistration?
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
     var uid: String? { return Auth.auth().currentUser?.uid }
 
-    @Published var users: [User] = []
+    @Published var user: User?
 
     @Published var showAlert = false
     @Published var userErrorMessage = ""
 
     @MainActor
     func fetchUser() async throws {
-            guard let uid = uid else { throw CustomError.uidEmpty }
-            guard let userRef = db?.collection("users").document(uid) else { throw CustomError.getRef }
+        guard let uid = uid else { throw CustomError.uidEmpty }
+        guard let userRef = db?.collection("users").document(uid) else { throw CustomError.getRef }
 
         do {
-            users = []
             let document = try await userRef.getDocument(source: .default)
             let user = try document.data(as: User.self)
-            self.users.append(user)
+            self.user = user
 
         } catch {
             throw CustomError.getDocument
         }
+
+        // ✅リスナーによるフェッチver.
+        // firebaseのリスナー機能が非同期に対応していない？リスナーによる完了を待たずに他のフェッチ処理が進んでしまうためクラッシュする。現在使えない
+//        guard let uid = uid else { throw CustomError.uidEmpty }
+//        guard let userRef = db?.collection("users").document(uid) else { throw CustomError.getRef }
+//
+//        listener = userRef.addSnapshotListener { snap, error in
+//            guard let snap else {
+//                print("Error: fetchUser_\(error!)")
+//                return
+//            }
+//            do {
+//                let userData = try snap.data(as: User.self)
+//                self.user = userData
+//            } catch {
+//                print("")
+//                return
+//            }
+//        }
     }
 
     func addNewJoinTeam(newJoinTeam: JoinTeam) async throws {
 
-        guard let uid = uid, var user = users.first else { throw CustomError.uidEmpty }
+        guard let uid = uid, var user = user else { throw CustomError.uidEmpty }
         guard let userRef = db?.collection("users").document(uid) else { throw CustomError.getRef }
 
         user.joins.append(newJoinTeam)
@@ -58,6 +77,10 @@ class UserViewModel: ObservableObject {
         } catch {
             throw CustomError.updateData
         }
+    }
+
+    deinit {
+        listener?.remove()
     }
 }
 

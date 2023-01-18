@@ -292,7 +292,7 @@ struct CreateAndJoinTeamView: View {
 
             if selectTeamFase == .check {
 
-                guard let user = userVM.users.first else {
+                guard let user = userVM.user else {
                     print("user情報が取得できません。チーム追加処理を終了しました。")
                     return
                 }

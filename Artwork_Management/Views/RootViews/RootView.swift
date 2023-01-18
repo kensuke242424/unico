@@ -72,8 +72,8 @@ struct RootView: View {
                 Task {
                     do {
                         try await userVM.fetchUser()
-                        print(userVM.users)
-                        if userVM.users[0].joins.isEmpty {
+                        print("userVM.user: \(userVM.user)")
+                        if userVM.user!.joins.isEmpty {
                             print("参加チーム無し。チーム作成画面へ遷移")
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                 withAnimation(.spring(response: 1)) {
@@ -83,7 +83,7 @@ struct RootView: View {
                             }
                             return
                         }
-                        guard let lastLogInTeamID = userVM.users[0].lastLogIn else { return }
+                        guard let lastLogInTeamID = userVM.user!.lastLogIn else { return }
                         try await teamVM.fetchTeam(teamID: lastLogInTeamID)
                         await tagVM.fetchTag(teamID: lastLogInTeamID)
                         await itemVM.fetchItem(teamID: lastLogInTeamID)

@@ -41,7 +41,7 @@ struct SystemSideMenu: View {
             // Blur View...
             BlurView(style: .systemUltraThinMaterialDark)
 
-            userVM.users.first!.userColor.color1
+            userVM.user!.userColor.color1
                 .opacity(0.7)
                 .blur(radius: 15)
                 .overlay(alignment: .topLeading) {
@@ -76,7 +76,7 @@ struct SystemSideMenu: View {
                                 // チーム一覧のハーフモーダル
                             } label: {
                                 Circle()
-                                    .foregroundColor(userVM.users.first!.userColor.color3)
+                                    .foregroundColor(userVM.user!.userColor.color3)
                                     .frame(width: 40, height: 40)
                                     .shadow(radius: 5, x: 5, y: 5)
                                     .overlay {
@@ -90,7 +90,7 @@ struct SystemSideMenu: View {
                         }
 
                         .overlay(alignment: .bottomTrailing) {
-                            AsyncImageCircleIcon(photoURL: userVM.users[0].iconURL, size: getRect().width / 6)
+                            AsyncImageCircleIcon(photoURL: userVM.user!.iconURL, size: getRect().width / 6)
                                 .offset(x: getRect().width / 4 - 10)
                         }
                         .overlay(alignment: .bottom) {
