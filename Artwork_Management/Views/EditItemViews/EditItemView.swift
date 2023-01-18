@@ -62,7 +62,7 @@ struct EditItemView: View {
                     Color.customDarkGray1
                         .ignoresSafeArea()
                         .overlay {
-                            LinearGradient(gradient: Gradient(colors:[.clear, .customLightGray1]),
+                            LinearGradient(gradient: Gradient(colors: [.clear, .customLightGray1]),
                                                        startPoint: .top, endPoint: .bottom)
                         }
                         .offset(y: 340)
@@ -156,7 +156,7 @@ struct EditItemView: View {
                                                     totalInventory: Int(inputEdit.editItemInventory) ?? 0)
 
                                 // Firestoreにコーダブル保存
-                                itemVM.addItem(itemData: itemData, tag: inputEdit.selectionTagName, teamID: teamVM.team[0].id)
+                                itemVM.addItem(itemData: itemData, tag: inputEdit.selectionTagName, teamID: teamVM.team!.id)
 
                                 inputHome.isPresentedEditItem.toggle()
                             }
@@ -194,7 +194,7 @@ struct EditItemView: View {
                                                            passItemData.totalInventory + (editInventory - passItemData.inventory) :
                                                             passItemData.totalInventory - (passItemData.inventory - editInventory) ))
 
-                                itemVM.updateItem(updateData: updateItemData, defaultDataID: defaultDataID, teamID: teamVM.team[0].id)
+                                itemVM.updateItem(updateData: updateItemData, defaultDataID: defaultDataID, teamID: teamVM.team!.id)
 
                                 inputHome.isPresentedEditItem.toggle()
                             }

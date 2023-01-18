@@ -73,6 +73,10 @@ class QRReader: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate, Observab
         if !AVsession.isRunning { return }
         AVsession.stopRunning()
     }
+
+    deinit {
+        print("QRReader_deinit")
+    }
 }
 
 // MARK: - AVCaptureMetadataOutputObjectsDelegate

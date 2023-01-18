@@ -270,7 +270,7 @@ struct StockView: View {
                     CommerceSheet(itemVM: itemVM,
                                   inputHome: $inputHome,
                                   inputStock: $inputStock,
-                                  teamID: teamVM.team.first!.id)
+                                  teamID: teamVM.team!.id)
 
                 } // builder.content
                 .supportedState([.medium])

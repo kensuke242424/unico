@@ -70,7 +70,7 @@ struct SystemSideMenu: View {
 
                 VStack(alignment: .leading, spacing: 20) {
 
-                    AsyncImageCircleIcon(photoURL: teamVM.team[0].iconURL, size: getRect().width / 3 + 20)
+                    AsyncImageCircleIcon(photoURL: teamVM.team!.iconURL, size: getRect().width / 3 + 20)
                         .overlay(alignment: .topTrailing) {
                             Button {
                                 // チーム一覧のハーフモーダル
@@ -94,15 +94,15 @@ struct SystemSideMenu: View {
                                 .offset(x: getRect().width / 4 - 10)
                         }
                         .overlay(alignment: .bottom) {
-                            if teamVM.team.first!.name.count < 12 {
-                                Text(teamVM.team.first!.name)
+                            if teamVM.team!.name.count < 12 {
+                                Text(teamVM.team!.name)
                                     .font(.title3.bold()).foregroundColor(.white)
                                     .frame(width: getRect().width * 0.7)
                                     .offset(y: 35)
                             }
                         }
-                    if teamVM.team.first!.name.count >= 12 {
-                        Text(teamVM.team.first!.name)
+                    if teamVM.team!.name.count >= 12 {
+                        Text(teamVM.team!.name)
                             .font(.title3.bold()).foregroundColor(.white)
                             .frame(width: getRect().width * 0.7)
                     }
@@ -308,13 +308,17 @@ struct SystemSideMenu: View {
                                     VStack(alignment: .leading, spacing: 40) {
 
                                         Label("チーム情報変更", systemImage: "person.text.rectangle.fill")
-                                        .onTapGesture {  }
+                                            .onTapGesture {  }
 
                                         Label("メンバー招待", systemImage: "person.wave.2.fill")
-                                        .onTapGesture {  }
+                                            .onTapGesture {
+                                                withAnimation(.spring(response: 0.5, blendDuration: 1)) {
+                                                    teamVM.isShowSearchedNewUserJoinTeam.toggle()
+                                                }
+                                            }
 
                                         Label("新規チーム作成", systemImage: "person.2.crop.square.stack.fill")
-                                        .onTapGesture {  }
+                                            .onTapGesture {  }
 
                                     } // VStack
                                     .foregroundColor(.white)
@@ -388,12 +392,14 @@ struct SystemSideMenu: View {
                 }
             } // VStack
             .offset(y: UIScreen.main.bounds.height / 12)
+
         } // ZStack
         .onChange(of: inputHome.isShowSystemSideMenu) { newValue in
             if !newValue {
                 inputSideMenu.item = false
                 inputSideMenu.tag = false
                 inputSideMenu.account = false
+                inputSideMenu.team = false
                 inputSideMenu.help = false
                 inputSideMenu.editMode = .inactive
             }
@@ -402,7 +408,7 @@ struct SystemSideMenu: View {
         // NOTE: ローカルのタグ順番操作をfirestoreに保存
         .onChange(of: inputSideMenu.editMode) { newEdit in
             if newEdit == .inactive {
-                tagVM.updateOderTagIndex(teamID: teamVM.team.first!.id)
+                tagVM.updateOderTagIndex(teamID: teamVM.team!.id)
             }
         }
         .clipShape(SideMenuShape())
@@ -459,7 +465,7 @@ struct SystemSideMenu: View {
 
         for tagIndex in offsets {
             print(tagIndex)
-            tagVM.deleteTag(deleteTag: tagVM.tags[tagIndex], teamID: teamVM.team.first!.id)
+            tagVM.deleteTag(deleteTag: tagVM.tags[tagIndex], teamID: teamVM.team!.id)
         }
     }
 

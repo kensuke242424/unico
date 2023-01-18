@@ -123,7 +123,7 @@ struct HomeTabView: View {
                 NavigationHeader(inputHome: $inputHome, photoURL: userVM.users[0].iconURL)
                     .opacity(!inputHome.isShowHomeTopNavigation &&
                              inputHome.homeTabIndex == 0 &&
-                             teamVM.team.first!.headerURL != nil
+                             teamVM.team!.headerURL != nil
                              ? 0.0 : 1.0)
                     .offset(y: -getRect().height / 2 + getSafeArea().top + 15)
                     .padding(.horizontal, 20)
@@ -140,7 +140,7 @@ struct HomeTabView: View {
                 ShowsItemDetail(itemVM: itemVM,
                                 inputHome: $inputHome,
                                 item: itemVM.items[inputHome.actionItemIndex],
-                                teamID: teamVM.team.first!.id)
+                                teamID: teamVM.team!.id)
             }
 
             // sideMenu_background...
@@ -188,7 +188,7 @@ struct HomeTabView: View {
                                 inputTag: $inputTag,
                                 defaultTag: inputTag.tagSideMenuStatus == .create ? nil : inputSideMenu.selectTag,
                                 tagSideMenuStatus: inputTag.tagSideMenuStatus,
-                                teamID: teamVM.team.first!.id)
+                                teamID: teamVM.team!.id)
             .offset(x: inputHome.isOpenEditTagSideMenu ? UIScreen.main.bounds.width / 2 - 25 : UIScreen.main.bounds.width + 10)
 
             VStack {

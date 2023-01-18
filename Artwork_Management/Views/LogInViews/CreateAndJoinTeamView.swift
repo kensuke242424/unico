@@ -28,14 +28,12 @@ struct CreateAndJoinTeamView: View {
     @StateObject var logInVM: LogInViewModel
     @StateObject var teamVM: TeamViewModel
     @StateObject var userVM: UserViewModel
-    @StateObject var qrReader: QRReader = QRReader()
 
     @State private var teamName: String = ""
     @State private var captureImage: UIImage?
     @State private var userQRCodeImage: UIImage?
     @State private var uploadImageData: (url: URL?, filePath: String?)
     @State private var isShowPickerView: Bool = false
-    @State private var isShowQRReader: Bool = false
     @State private var captureError: Bool = false
     @State private var selectedTeamCard: SelectedTeamCard = .start
     @State private var selectTeamFase: SelectTeamFase = .start
@@ -344,13 +342,6 @@ struct CreateAndJoinTeamView: View {
                 }
             }
         }
-        // QRコードが読み取れたらカメラを閉じる
-        .onChange(of: qrReader.isdetectQR) { detect in
-            if detect {
-                isShowQRReader.toggle()
-                qrReader.isdetectQR.toggle()
-            }
-        }
 
         .onAppear {
             // currentUserのuidをQRコードに変換
@@ -364,10 +355,7 @@ struct CreateAndJoinTeamView: View {
         .sheet(isPresented: $isShowPickerView) {
             PHPickerView(captureImage: $captureImage, isShowSheet: $isShowPickerView, isShowError: $captureError)
         }
-        // QRコードを読み取るためのカメラView
-        .sheet(isPresented: $isShowQRReader) {
-            QRReaderView(caLayer: qrReader.videoPreviewLayer)
-        }
+       
     }
 
     @ViewBuilder

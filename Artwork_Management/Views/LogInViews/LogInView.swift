@@ -240,7 +240,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             case .logIn: withAnimation(.spring(response: 0.5)) { logInVM.rootNavigation = .fetch }
             case .signAp:
                 Task {
-                    let addUserFirestoreCheck: Bool = await logInVM.addUserSignInWithApple(name: inputLogIn.createUserNameText, password: inputLogIn.password,
+                    let addUserFirestoreCheck = await logInVM.addUserSignInWithApple(name: inputLogIn.createUserNameText, password: inputLogIn.password,
                                                                                            imageData: inputLogIn.captureImage, color: inputLogIn.selectUserColor)
                     if addUserFirestoreCheck { withAnimation(.spring(response: 0.5)) { logInVM.rootNavigation = .fetch } }
                 }
