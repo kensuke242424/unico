@@ -32,6 +32,7 @@ struct CreateAndJoinTeamView: View {
     @State private var teamName: String = ""
     @State private var captureImage: UIImage?
     @State private var userQRCodeImage: UIImage?
+    @State private var joinedTeamData: JoinTeam?
     @State private var uploadImageData: (url: URL?, filePath: String?)
     @State private var isShowPickerView: Bool = false
     @State private var captureError: Bool = false
@@ -109,7 +110,7 @@ struct CreateAndJoinTeamView: View {
 
                             case .success:
                                 VStack(spacing: 10) {
-                                    Text("参加チームが見つかりました。")
+                                    Text("チームからの承認を受けました。")
                                     Text("ログインを開始します。")
                                 }
                             }
@@ -190,38 +191,40 @@ struct CreateAndJoinTeamView: View {
                             case .create:
                                 createTeamIconAndName(captureImage: captureImage)
                             case .join:
-                                VStack(spacing: 40) {
-                                    if let userQRCodeImage {
-                                        Image(uiImage: userQRCodeImage)
-                                            .resizable()
-                                            .frame(width: 200, height: 200)
-                                            .padding(.top, 20)
-                                    } else {
-                                        ZStack {
-                                            RoundedRectangle(cornerRadius: 5)
+                                if selectTeamFase != .success {
+                                    VStack(spacing: 40) {
+                                        if let userQRCodeImage {
+                                            Image(uiImage: userQRCodeImage)
+                                                .resizable()
                                                 .frame(width: 200, height: 200)
-                                                .foregroundColor(.black.opacity(0.8))
-                                            Button {
-                                                userQRCodeImage = logInVM.generateUserQRCode(with: userVM.uid ?? "")
-                                            } label: {
-                                                Image(systemName: "goforward")
-                                                    .foregroundColor(.white)
+                                                .padding(.top, 20)
+                                        } else {
+                                            ZStack {
+                                                RoundedRectangle(cornerRadius: 5)
+                                                    .frame(width: 200, height: 200)
+                                                    .foregroundColor(.black.opacity(0.8))
+                                                Button {
+                                                    userQRCodeImage = logInVM.generateUserQRCode(with: userVM.uid ?? "")
+                                                } label: {
+                                                    Image(systemName: "goforward")
+                                                        .foregroundColor(.white)
+                                                }
+                                            }.padding(.top, 20)
+
+                                        }
+
+                                        VStack {
+                                            Text("あなたのユーザID")
+                                                .opacity(0.6).tracking(4)
+                                                .font(.subheadline)
+                                            ZStack {
+                                                RoundedRectangle(cornerRadius: 3)
+                                                    .foregroundColor(.black)
+                                                    .padding(.horizontal, 40)
+                                                Text(userVM.uid ?? "ユーザIDが見つかりません")
+                                                    .textSelection(.enabled)
+                                                    .padding(8)
                                             }
-                                        }.padding(.top, 20)
-
-                                    }
-
-                                    VStack {
-                                        Text("あなたのユーザID")
-                                            .opacity(0.6).tracking(4)
-                                            .font(.subheadline)
-                                        ZStack {
-                                            RoundedRectangle(cornerRadius: 3)
-                                                .foregroundColor(.black)
-                                                .padding(.horizontal, 40)
-                                            Text(userVM.uid ?? "ユーザIDが見つかりません")
-                                                .textSelection(.enabled)
-                                                .padding(8)
                                         }
                                     }
                                 }
@@ -234,9 +237,8 @@ struct CreateAndJoinTeamView: View {
                     }
 
                     if selectTeamFase == .success {
-                        Text("unicoへようこそ")
-                            .tracking(7).opacity(0.6)
-                            .opacity(selectTeamFase == .success ? 1.0 : 0.0)
+                        joinedTeamIconAndName(url: joinedTeamData!.iconURL, name: joinedTeamData!.name)
+//                            .opacity(selectTeamFase == .success ? 1.0 : 0.0)
                     }
                 } // ZStack
 
@@ -289,9 +291,20 @@ struct CreateAndJoinTeamView: View {
             .offset(x: -getRect().width / 2 + 40, y: getRect().height / 2 - 60 )
         } // ZStack
 
-        .onChange(of: userVM.user) { user in
-            print("=========joinsの更新を検知=========")
-            print(user)
+        // 「チームに参加」により、相手から承認を受け、チーム情報を受け取ることでリスナーが変更を検知し、作動する
+        // 受け取ったチームの情報をもとに、ログインを行う
+        .onChange(of: userVM.updatedUser) { _ in
+            print("=========user情報の更新を検知=========")
+            if selectedTeamCard == .join {
+                guard let user = userVM.user else { return }
+                for joinTeam in user.joins where joinTeam.teamID == user.lastLogIn {
+                    self.joinedTeamData = joinTeam
+                }
+                withAnimation(.spring(response: 1.5, blendDuration: 1)) { selectTeamFase = .success }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                    withAnimation(.spring(response: 0.5)) { logInVM.rootNavigation = .fetch }
+                }
+            }
         }
 
         .onChange(of: selectTeamFase) { _ in
@@ -457,6 +470,25 @@ struct CreateAndJoinTeamView: View {
                                 .offset(y: 20)
                         }
                     }
+            }
+        }
+    }
+
+    func joinedTeamIconAndName(url photoURL: URL?, name teamName: String) -> some View {
+        Group {
+            VStack(spacing: 40) {
+                Group {
+                    if let photoURL {
+                        AsyncImageCircleIcon(photoURL: photoURL, size: 150)
+                    } else {
+                        Image(systemName: "person.2.fill").resizable().scaledToFit()
+                            .foregroundColor(.white.opacity(0.5)).frame(width: 150)
+                    }
+                }
+
+                Text(teamName)
+                    .foregroundColor(.white)
+                    .tracking(5)
             }
         }
     }

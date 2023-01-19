@@ -29,6 +29,7 @@ class UserViewModel: ObservableObject {
     @Published var canUserFetchedListener: Bool?
     @Published var showAlert = false
     @Published var userErrorMessage = ""
+    @Published var updatedUser: Bool = false
 
     @MainActor
     func fetchUser() async throws {
@@ -60,6 +61,9 @@ class UserViewModel: ObservableObject {
                     let userData = try snap.data(as: User.self)
                     self.user = userData
                     print("userRealtimeListenerによりチームデータを更新")
+                    DispatchQueue.main.async {
+                        self.updatedUser.toggle()
+                    }
                 } catch {
                     print("userRealtimeListener_Error: try snap?.data(as: User.self)")
                 }
