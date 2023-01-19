@@ -76,7 +76,7 @@
 		E0DE335029288D07008C7147 /* TeamModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0DE334F29288D07008C7147 /* TeamModel.swift */; };
 		E0DE33522928F48D008C7147 /* CustomProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0DE33512928F48D008C7147 /* CustomProgressView.swift */; };
 		E0DE98D828E2DBB800471AB4 /* TeamViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0DE98D728E2DBB800471AB4 /* TeamViewModel.swift */; };
-		E0F0180E2975A9E10063C96B /* JoinUserCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0F0180D2975A9E10063C96B /* JoinUserCheckView.swift */; };
+		E0F0180E2975A9E10063C96B /* JoinUserDetectCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0F0180D2975A9E10063C96B /* JoinUserDetectCheckView.swift */; };
 		E0F78FC42919F06D00A95CD1 /* DateFormatterExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0F78FC32919F06D00A95CD1 /* DateFormatterExtension.swift */; };
 		E0FCADA429708B9800BA6A75 /* LogoMark.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0FCADA329708B9800BA6A75 /* LogoMark.swift */; };
 /* End PBXBuildFile section */
@@ -150,7 +150,7 @@
 		E0DE33512928F48D008C7147 /* CustomProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomProgressView.swift; sourceTree = "<group>"; };
 		E0DE98D528E2D85E00471AB4 /* LogInCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogInCheckView.swift; sourceTree = "<group>"; };
 		E0DE98D728E2DBB800471AB4 /* TeamViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamViewModel.swift; sourceTree = "<group>"; };
-		E0F0180D2975A9E10063C96B /* JoinUserCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinUserCheckView.swift; sourceTree = "<group>"; };
+		E0F0180D2975A9E10063C96B /* JoinUserDetectCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinUserDetectCheckView.swift; sourceTree = "<group>"; };
 		E0F78FC32919F06D00A95CD1 /* DateFormatterExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFormatterExtension.swift; sourceTree = "<group>"; };
 		E0FCADA2296F289A00BA6A75 /* Artwork_Management.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Artwork_Management.entitlements; sourceTree = "<group>"; };
 		E0FCADA329708B9800BA6A75 /* LogoMark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogoMark.swift; sourceTree = "<group>"; };
@@ -200,7 +200,6 @@
 				E08F273D28DDB65F00329C5E /* HomeTabView.swift */,
 				E0455FE1292C5B1C004F677D /* StandByView.swift */,
 				E01E138F291D168B0001F2DA /* SystemSideMenu.swift */,
-				E0F0180D2975A9E10063C96B /* JoinUserCheckView.swift */,
 				E0B3288B2921577F00E94BC3 /* ElementSwitchingPickerView.swift */,
 				E0B328922924A42100E94BC3 /* ManageCustomizeSideMenu.swift */,
 			);
@@ -339,6 +338,7 @@
 				E094F0FF28E20F1000D3C845 /* LogInView.swift */,
 				E0DE98D528E2D85E00471AB4 /* LogInCheckView.swift */,
 				E0A3B995292EFCE500209ADC /* CreateAndJoinTeamView.swift */,
+				E0F0180D2975A9E10063C96B /* JoinUserDetectCheckView.swift */,
 			);
 			path = LogInViews;
 			sourceTree = "<group>";
@@ -524,7 +524,7 @@
 				E08F273628DDB48100329C5E /* StockView.swift in Sources */,
 				E0CF7EF228DF166700735142 /* ItemViewModel.swift in Sources */,
 				E0CF7EF028DF152D00735142 /* ItemModel.swift in Sources */,
-				E0F0180E2975A9E10063C96B /* JoinUserCheckView.swift in Sources */,
+				E0F0180E2975A9E10063C96B /* JoinUserDetectCheckView.swift in Sources */,
 				E0CB9DCB2913964F00D95C54 /* ViewExtension.swift in Sources */,
 				E0A7DE4E290C289A008C3F3F /* AsyncImageCircleIcon.swift in Sources */,
 				E0455FE8292CCB39004F677D /* HashableExtension.swift in Sources */,

@@ -105,6 +105,24 @@ class TeamViewModel: ObservableObject {
         }
     }
 
+    func addTeamIDToJoinedUser(to toUID: String) async throws {
+
+        guard let toUserRef = db?.collection("users").document(toUID) else { throw CustomError.getDocument }
+        do {
+            let toUserDocument = try await toUserRef.getDocument()
+            var toUserData = try toUserDocument.data(as: User.self)
+            let teamData = JoinTeam(teamID: team!.id, name: team!.name, iconURL: team!.iconURL)
+
+            toUserData.joins.append(teamData)
+            toUserData.lastLogIn = team!.id
+
+            _ = try toUserRef.setData(from: toUserData)
+
+        } catch {
+            throw CustomError.addTeamIDToJoinedUser
+        }
+    }
+
     func updateTeamHeaderImage(data: (url: URL?, filePath: String?)) async throws {
 
         guard var team else { throw CustomError.teamEmpty }

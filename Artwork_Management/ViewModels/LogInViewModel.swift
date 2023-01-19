@@ -57,11 +57,11 @@ class LogInViewModel: ObservableObject {
                     fatalError("fatalError: handleSignInWithAppleCompletion_currentNonceの値が存在しません。")
                 }
                 // 「email」「fullName」はAppleIDでの初回ログイン時の場合のみ取得できる。
-                print("userIdentifier:\(appleIDCredential.user)")
-                print("identityToken:\(String(describing: appleIDCredential.identityToken))")
-                print("fullName:\(String(describing: appleIDCredential.fullName))")
-                print("email:\(String(describing: appleIDCredential.email))")
-                print("authorizationCode:\(String(describing: appleIDCredential.authorizationCode))")
+//                print("userIdentifier:\(appleIDCredential.user)")
+//                print("identityToken:\(String(describing: appleIDCredential.identityToken))")
+//                print("fullName:\(String(describing: appleIDCredential.fullName))")
+//                print("email:\(String(describing: appleIDCredential.email))")
+//                print("authorizationCode:\(String(describing: appleIDCredential.authorizationCode))")
                 guard let appleIDToken = appleIDCredential.identityToken else {
                     print("Unable to fetch identify token。識別トークンをフェッチできません。")
                     return

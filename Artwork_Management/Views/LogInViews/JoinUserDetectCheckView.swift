@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct JoinUserCheckView: View {
+struct JoinUserDetectCheckView: View {
 
     enum JoinUserCheckFase {
         case start, check, agree
@@ -266,6 +266,7 @@ struct JoinUserCheckView: View {
                             Task {
                                 do {
                                     _ = try await teamVM.addNewTeamMember(data: detectedUser!)
+                                    _ = try await teamVM.addTeamIDToJoinedUser(to: detectedUser!.id)
                                     withAnimation(.spring(response: 0.8, blendDuration: 1)) { isAgreed.toggle() }
                                     hapticSuccessNotification()
 
@@ -306,6 +307,6 @@ struct JoinUserCheckView: View {
 
 struct JoinUserCheckView_Previews: PreviewProvider {
     static var previews: some View {
-        JoinUserCheckView(teamVM: TeamViewModel())
+        JoinUserDetectCheckView(teamVM: TeamViewModel())
     }
 }

@@ -12,7 +12,7 @@ import FirebaseFirestore
 import FirebaseFirestoreSwift
 
 enum CustomError: Error {
-    case uidEmpty, getRef, fetch, setData, updateData, getDocument, photoUrlEmpty, teamEmpty, getDetectUser, inputTextEmpty, memberDuplication
+    case uidEmpty, getRef, fetch, setData, updateData, getDocument, photoUrlEmpty, teamEmpty, getDetectUser, inputTextEmpty, memberDuplication, addTeamIDToJoinedUser
 }
 
 class UserViewModel: ObservableObject {
@@ -26,42 +26,45 @@ class UserViewModel: ObservableObject {
     var uid: String? { return Auth.auth().currentUser?.uid }
 
     @Published var user: User?
-
+    @Published var canUserFetchedListener: Bool?
     @Published var showAlert = false
     @Published var userErrorMessage = ""
 
     @MainActor
     func fetchUser() async throws {
-        guard let uid = uid else { throw CustomError.uidEmpty }
-        guard let userRef = db?.collection("users").document(uid) else { throw CustomError.getRef }
-
-        do {
-            let document = try await userRef.getDocument(source: .default)
-            let user = try document.data(as: User.self)
-            self.user = user
-
-        } catch {
-            throw CustomError.getDocument
-        }
-
-        // ✅リスナーによるフェッチver.
-        // firebaseのリスナー機能が非同期に対応していない？リスナーによる完了を待たずに他のフェッチ処理が進んでしまうためクラッシュする。現在使えない
 //        guard let uid = uid else { throw CustomError.uidEmpty }
 //        guard let userRef = db?.collection("users").document(uid) else { throw CustomError.getRef }
 //
-//        listener = userRef.addSnapshotListener { snap, error in
-//            guard let snap else {
-//                print("Error: fetchUser_\(error!)")
-//                return
-//            }
-//            do {
-//                let userData = try snap.data(as: User.self)
-//                self.user = userData
-//            } catch {
-//                print("")
-//                return
-//            }
+//        do {
+//            let document = try await userRef.getDocument(source: .default)
+//            let user = try document.data(as: User.self)
+//            self.user = user
+//
+//        } catch {
+//            throw CustomError.getDocument
 //        }
+
+        // ✅リスナーによるフェッチver.
+        // firebaseのリスナー機能が非同期に対応していない？リスナーによる完了を待たずに他のフェッチ処理が進んでしまうためクラッシュする。現在使えない
+        guard let uid = uid else { throw CustomError.uidEmpty }
+        guard let userRef = db?.collection("users").document(uid) else { throw CustomError.getRef }
+
+        listener = userRef.addSnapshotListener { snap, error in
+            guard let snap else {
+                print("Error: fetchUser_\(error!)")
+                return
+            }
+            do {
+                let userData = try snap.data(as: User.self)
+                self.user = userData
+                print("fetchUser_更新をリスナーで検知")
+                self.canUserFetchedListener = true
+            } catch {
+                print("Error: try snap.data(as: User.self)")
+                self.canUserFetchedListener = false
+                return
+            }
+        }
     }
 
     func addNewJoinTeam(newJoinTeam: JoinTeam) async throws {

@@ -57,7 +57,7 @@ struct RootView: View {
             }
 
             // チームに他のユーザを招待するView
-            JoinUserCheckView(teamVM: teamVM)
+            JoinUserDetectCheckView(teamVM: teamVM)
                 .opacity(teamVM.isShowSearchedNewUserJoinTeam ? 1.0 : 0.0)
 
             StandByView()
@@ -65,14 +65,42 @@ struct RootView: View {
 
         } // ZStack
 
-        // Data fetch...
-        .onChange(of: logInVM.rootNavigation) { _ in
+        // user fetch...
+        .onChange(of: logInVM.rootNavigation) { navigation in
             print("LogInVM.rootNavigation: \(logInVM.rootNavigation)")
-            if logInVM.rootNavigation == .fetch {
+            if navigation == .fetch {
                 Task {
                     do {
                         try await userVM.fetchUser()
                         print("userVM.user: \(userVM.user)")
+
+                    } catch CustomError.uidEmpty {
+                        print("Error: uidEmpty")
+                        withAnimation(.spring(response: 1)) { logInVM.rootNavigation = .logIn }
+                    } catch CustomError.getRef {
+                        print("Error: getRef")
+                        withAnimation(.spring(response: 1)) { logInVM.rootNavigation = .logIn }
+                    } catch CustomError.fetch {
+                        print("Error: fetch")
+                        withAnimation(.spring(response: 1)) { logInVM.rootNavigation = .logIn }
+                    } catch CustomError.getDocument {
+                        print("Error: getDocument")
+                        withAnimation(.spring(response: 1)) { logInVM.rootNavigation = .logIn }
+                    } catch {
+                        print("Error")
+                        withAnimation(.spring(response: 1)) { logInVM.rootNavigation = .logIn }
+                    }
+                } // Task
+            }
+        }
+
+        // ユーザのフェッチがリスナーにより検知されたら、残りのデータをフェッチ開始
+        .onChange(of: userVM.canUserFetchedListener) { canUserFetched in
+            print("userVM.canUserFetched: \(canUserFetched)")
+            if canUserFetched == nil { return }
+            if canUserFetched! {
+                Task {
+                    do {
                         if userVM.user!.joins.isEmpty {
                             print("参加チーム無し。チーム作成画面へ遷移")
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -89,6 +117,7 @@ struct RootView: View {
                         await itemVM.fetchItem(teamID: lastLogInTeamID)
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                             withAnimation(.spring(response: 1)) {
+                                userVM.canUserFetchedListener = nil
                                 logInVM.rootNavigation = .home
                             }
                         }
@@ -108,7 +137,10 @@ struct RootView: View {
                         print("Error")
                         withAnimation(.spring(response: 1)) { logInVM.rootNavigation = .logIn }
                     }
-                } // Task
+                }
+            } else {
+                // ユーザデータのリスナーが失敗したら、ログイン画面へ
+                withAnimation(.spring(response: 1)) { logInVM.rootNavigation = .logIn }
             }
         }
 

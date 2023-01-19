@@ -9,7 +9,15 @@ import SwiftUI
 import FirebaseFirestore
 import FirebaseFirestoreSwift
 
-struct User: Identifiable, Codable {
+// Equatableメソッド
+extension User {
+    static func == (lhs: User, rhs: User) -> Bool {
+        return lhs.id == rhs.id
+    }
+}
+
+struct User: Identifiable, Codable, Equatable {
+
     var id: String
     var name: String
     var address: String?

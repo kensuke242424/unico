@@ -275,6 +275,7 @@ struct CreateAndJoinTeamView: View {
             Button {
                 withAnimation(.spring(response: 1.0)) {
                     logInVM.rootNavigation = .logIn
+                    logInVM.logOut()
                     teamVM.isShowCreateAndJoinTeam.toggle()
                 }
             } label: {
@@ -287,6 +288,11 @@ struct CreateAndJoinTeamView: View {
             .foregroundColor(.white.opacity(0.5))
             .offset(x: -getRect().width / 2 + 40, y: getRect().height / 2 - 60 )
         } // ZStack
+
+        .onChange(of: userVM.user) { user in
+            print("=========joinsの更新を検知=========")
+            print(user)
+        }
 
         .onChange(of: selectTeamFase) { _ in
 
@@ -355,7 +361,6 @@ struct CreateAndJoinTeamView: View {
         .sheet(isPresented: $isShowPickerView) {
             PHPickerView(captureImage: $captureImage, isShowSheet: $isShowPickerView, isShowError: $captureError)
         }
-       
     }
 
     @ViewBuilder
