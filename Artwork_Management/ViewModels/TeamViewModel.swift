@@ -17,8 +17,6 @@ class TeamViewModel: ObservableObject {
 
     var listener: ListenerRegistration?
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
-
-    var teamID: String = "7gm2urHDCdZGCV9pX9ef"
     var uid: String? { return Auth.auth().currentUser?.uid }
 
     @Published var team: Team?
@@ -32,29 +30,38 @@ class TeamViewModel: ObservableObject {
 
         guard let teamRef = db?.collection("teams").document(teamID) else { throw CustomError.getRef  }
 
+        do {
+            let teamDocument = try await teamRef.getDocument()
+            let teamData = try teamDocument.data(as: Team.self)
+            self.team =  teamData
+        } catch {
+            throw CustomError.fetch
+        }
+    }
+
+    func teamRealtimeListener() async throws {
+
+        guard let teamID = team?.id else { throw CustomError.teamEmpty }
+        guard let teamRef = db?.collection("teams").document(teamID) else { throw CustomError.getRef  }
+
         listener = teamRef.addSnapshotListener { snap, error in
-            guard let snap else {
-                print("Error: Teamfetching document: \(error!)")
-                return
-            }
-            do {
-                let teamData = try snap.data(as: Team.self)
-                self.team = teamData
-                print("fetchTeam success. currentTeam: \(teamData)")
-            } catch {
-                print("Error: try snap.data(as: Team.self)")
+            if let error {
+                print("teamRealtimeListener失敗: \(error.localizedDescription)")
+            } else {
+                guard let snap else {
+                    print("teamRealtimeListener_Error: snapがnilです")
+                    return
+                }
+                print("teamRealtimeListener開始")
+                do {
+                    let teamData = try snap.data(as: Team.self)
+                    self.team = teamData
+                    print("teamRealtimeListenerによりチームデータを更新")
+                } catch {
+                    print("teamRealtimeListener_Error: try snap?.data(as: Team.self)")
+                }
             }
         }
-
-//        do {
-//            team = []
-//            let teamDocument = try await teamRef.getDocument()
-//            let teamData = try teamDocument.data(as: Team.self)
-//            self.team.append(teamData)
-//            print("fetchTeam: \(team)")
-//        } catch {
-//            throw CustomError.fetch
-//        }
     }
 
     func addTeam(teamData: Team) async throws {
