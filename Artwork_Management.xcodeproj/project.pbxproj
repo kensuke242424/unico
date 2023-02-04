@@ -41,6 +41,7 @@
 		E08F273A28DDB53700329C5E /* SystemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E08F273928DDB53700329C5E /* SystemView.swift */; };
 		E08F273C28DDB61A00329C5E /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E08F273B28DDB61A00329C5E /* LibraryView.swift */; };
 		E08F273E28DDB65F00329C5E /* HomeTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E08F273D28DDB65F00329C5E /* HomeTabView.swift */; };
+		E094B78A298EB84200A2E33C /* UpdateTeamDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E094B789298EB84200A2E33C /* UpdateTeamDataView.swift */; };
 		E094F10028E20F1000D3C845 /* LogInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E094F0FF28E20F1000D3C845 /* LogInView.swift */; };
 		E099CD2D291B395E00057543 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = E099CD2C291B395E00057543 /* FirebaseAuth */; };
 		E099CD2F291B395E00057543 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = E099CD2E291B395E00057543 /* FirebaseFirestore */; };
@@ -117,6 +118,7 @@
 		E08F273928DDB53700329C5E /* SystemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemView.swift; sourceTree = "<group>"; };
 		E08F273B28DDB61A00329C5E /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
 		E08F273D28DDB65F00329C5E /* HomeTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTabView.swift; sourceTree = "<group>"; };
+		E094B789298EB84200A2E33C /* UpdateTeamDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateTeamDataView.swift; sourceTree = "<group>"; };
 		E094F0FF28E20F1000D3C845 /* LogInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogInView.swift; sourceTree = "<group>"; };
 		E09F09BB28EAF33500D07669 /* FocusedLineRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusedLineRow.swift; sourceTree = "<group>"; };
 		E09F09C428ED5DEA00D07669 /* SideMenuEditTagView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideMenuEditTagView.swift; sourceTree = "<group>"; };
@@ -250,6 +252,7 @@
 		E08F273228DDB3B200329C5E /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				E094B788298EB7C700A2E33C /* UpdateUserAndTeamViews */,
 				E05FE94328F71BE400263F98 /* Extensions */,
 				E0B3288F2923AD7600E94BC3 /* ViewParts */,
 				E0BFE1C729746AC1005481CA /* QRReaders */,
@@ -330,6 +333,14 @@
 				E0CF7EF528DF6E6F00735142 /* AccountIconView.swift */,
 			);
 			path = Tab4_Accounts;
+			sourceTree = "<group>";
+		};
+		E094B788298EB7C700A2E33C /* UpdateUserAndTeamViews */ = {
+			isa = PBXGroup;
+			children = (
+				E094B789298EB84200A2E33C /* UpdateTeamDataView.swift */,
+			);
+			path = UpdateUserAndTeamViews;
 			sourceTree = "<group>";
 		};
 		E094F0FE28E20BB800D3C845 /* LogInViews */ = {
@@ -527,6 +538,7 @@
 				E0F0180E2975A9E10063C96B /* JoinUserDetectCheckView.swift in Sources */,
 				E0CB9DCB2913964F00D95C54 /* ViewExtension.swift in Sources */,
 				E0A7DE4E290C289A008C3F3F /* AsyncImageCircleIcon.swift in Sources */,
+				E094B78A298EB84200A2E33C /* UpdateTeamDataView.swift in Sources */,
 				E0455FE8292CCB39004F677D /* HashableExtension.swift in Sources */,
 				E0796AE328F6D77A0094E50C /* CommerceSheet.swift in Sources */,
 				E0A7DE4B290B9E0A008C3F3F /* ShowItemUIImagePhoto.swift in Sources */,
