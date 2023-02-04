@@ -161,7 +161,6 @@ struct SystemSideMenu: View {
                                         }
 
                                         Button {
-                                            print("タグ追加ボタンタップ")
                                             inputTag.tagSideMenuStatus = .create
 
                                             withAnimation(.spring(response: 0.3, blendDuration: 1)) {
@@ -258,47 +257,7 @@ struct SystemSideMenu: View {
                                 } // if inputSideMenu.tag...
                             }
 
-                            // Account Menu...
-                            VStack(alignment: .leading) {
-
-                                SideMenuButton(open: $inputSideMenu.account, title: "アカウント", image: "person")
-
-                                if inputSideMenu.account {
-
-                                    VStack(alignment: .leading, spacing: 40) {
-
-                                        Label("ユーザ情報変更", systemImage: "person.text.rectangle")
-                                        .onTapGesture {  }
-
-                                        Label("ログアウト", systemImage: "figure.wave")
-                                            .onTapGesture { inputSideMenu.isShowLogOutAlert.toggle() }
-
-                                    } // VStack
-                                    .foregroundColor(.white)
-                                    // メニュー一つ分のheight = コンテンツ数 * 60
-                                    .frame(width: 210, height: 120, alignment: .topLeading)
-                                    .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
-                                    .offset(x: 20, y: 30)
-                                    .alert("確認", isPresented: $inputSideMenu.isShowLogOutAlert) {
-                                        Button("戻る") { inputSideMenu.isShowLogOutAlert.toggle() }
-                                        Button("ログアウト") {
-                                            inputHome.isShowProgress.toggle()
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                                                inputHome.isShowProgress.toggle()
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                                    withAnimation(.easeIn(duration: 0.5)) {
-                                                        logInVM.rootNavigation = .logIn
-                                                        logInVM.logOut()
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    } message: {
-                                        Text("ログイン画面に戻ります。よろしいですか？")
-                                    } // alert
-                                }
-                            }
-
+                            // Team menu...
                             VStack(alignment: .leading) {
 
                                 SideMenuButton(open: $inputSideMenu.team, title: "チーム", image: "person.2")
@@ -324,6 +283,30 @@ struct SystemSideMenu: View {
                                     .foregroundColor(.white)
                                     // メニュー一つ分のheight = コンテンツ数 * 60
                                     .frame(width: 210, height: 180, alignment: .topLeading)
+                                    .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
+                                    .offset(x: 20, y: 30)
+                                }
+                            }
+
+                            // Account Menu...
+                            VStack(alignment: .leading) {
+
+                                SideMenuButton(open: $inputSideMenu.account, title: "アカウント", image: "person")
+
+                                if inputSideMenu.account {
+
+                                    VStack(alignment: .leading, spacing: 40) {
+
+                                        Label("ユーザ情報変更", systemImage: "person.text.rectangle")
+                                        .onTapGesture {  }
+
+                                        Label("ログアウト", systemImage: "figure.wave")
+                                            .onTapGesture { inputSideMenu.isShowLogOutAlert.toggle() }
+
+                                    } // VStack
+                                    .foregroundColor(.white)
+                                    // メニュー一つ分のheight = コンテンツ数 * 60
+                                    .frame(width: 210, height: 120, alignment: .topLeading)
                                     .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
                                     .offset(x: 20, y: 30)
                                     .alert("確認", isPresented: $inputSideMenu.isShowLogOutAlert) {
