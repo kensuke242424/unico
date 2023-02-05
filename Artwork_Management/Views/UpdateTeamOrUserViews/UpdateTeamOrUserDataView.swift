@@ -57,7 +57,6 @@ struct UpdateTeamOrUserDataView: View {
                     Text(selectedUpdate == .user ?
                          "ユーザ情報を入力してください。" : "チーム情報を入力してください。")
                         .padding(.bottom, 8)
-
                 }
                 .font(.caption).tracking(3).opacity(0.7)
                 .foregroundColor(.white)
@@ -91,6 +90,11 @@ struct UpdateTeamOrUserDataView: View {
 
                 Button("保存する") {
 
+                    Task {
+                        let iconData = await teamVM.uploadTeamImageData(inputUpdate.captureImage)
+                        try await teamVM.updateTeamNameAndIcon(name: inputUpdate.nameText, data: iconData)
+                        await teamVM.deleteTeamImageData(path: teamVM.team?.iconPath)
+                    }
                 }
                 .padding(.top)
                 .buttonStyle(.borderedProminent)
@@ -115,32 +119,21 @@ struct UpdateTeamOrUserDataView: View {
             switch selectedUpdate {
             case .start:
                 print("")
-            case .user:
-                let teamIcon = getUIImageByUrl(url: teamVM.team?.iconURL)
-                let teamName = teamVM.team?.name ?? ""
-                inputUpdate.captureImage = teamIcon
-                inputUpdate.nameText = teamName
 
-            case .team:
-                let userIcon = getUIImageByUrl(url: userVM.user?.iconURL)
+            case .user:
+                let userIcon = userVM.getUIImageByUrl(url: userVM.user?.iconURL)
                 let userName = userVM.user?.name ?? ""
                 inputUpdate.captureImage = userIcon
                 inputUpdate.nameText = userName
+
+            case .team:
+                let teamIcon = teamVM.getUIImageByUrl(url: teamVM.team?.iconURL)
+                let teamName = teamVM.team?.name ?? ""
+                inputUpdate.captureImage = teamIcon
+                inputUpdate.nameText = teamName
             }
         }
     } // body
-
-    func getUIImageByUrl(url: URL?) -> UIImage? {
-        guard let url else { return nil }
-        do {
-            let data = try Data(contentsOf: url)
-            return UIImage(data: data)!
-        } catch let err {
-            print("Error : \(err.localizedDescription)")
-            return nil
-        }
-    }
-
 } // View
 
 struct UpdateTeamDataView_Previews: PreviewProvider {

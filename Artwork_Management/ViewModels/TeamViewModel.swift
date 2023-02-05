@@ -5,8 +5,10 @@
 //  Created by 中川賢亮 on 2022/09/27.
 //
 
+import SwiftUI
 import Firebase
 import FirebaseFirestore
+import FirebaseStorage
 import FirebaseFirestoreSwift
 
 class TeamViewModel: ObservableObject {
@@ -130,6 +132,43 @@ class TeamViewModel: ObservableObject {
         }
     }
 
+    func uploadTeamImageData(_ image: UIImage?) async -> (url: URL?, filePath: String?) {
+
+        guard let imageData = image?.jpegData(compressionQuality: 0.8) else {
+            return (url: nil, filePath: nil)
+        }
+
+        do {
+            let storage = Storage.storage()
+            let reference = storage.reference()
+            let filePath = "images/\(team!.id)/\(Date()).jpeg"
+            let imageRef = reference.child(filePath)
+            _ = try await imageRef.putDataAsync(imageData)
+            let url = try await imageRef.downloadURL()
+
+            return (url: url, filePath: filePath)
+        } catch {
+            return (url: nil, filePath: nil)
+        }
+    }
+
+    func deleteTeamImageData(path: String?) async {
+
+        guard let path = path else { return }
+
+        let storage = Storage.storage()
+        let reference = storage.reference()
+        let imageRef = reference.child(path)
+
+        imageRef.delete { error in
+            if let error = error {
+                print(error)
+            } else {
+                print("imageRef.delete succsess!")
+            }
+        }
+    }
+
     func updateTeamHeaderImage(data: (url: URL?, filePath: String?)) async throws {
 
         guard var team else { throw CustomError.teamEmpty }
@@ -145,6 +184,33 @@ class TeamViewModel: ObservableObject {
             print("新規ヘッダー画像取得成功")
         } catch {
             print("ヘッダーの保存に失敗")
+        }
+    }
+
+    func updateTeamNameAndIcon(name updateName: String, data iconData: (url: URL?, filePath: String?)) async throws {
+
+        guard var team else { throw CustomError.teamEmpty }
+        guard let teamRef = db?.collection("teams").document(team.id) else { throw CustomError.getDocument }
+
+        do {
+            team.name = updateName
+            team.iconURL = iconData.url
+            team.iconPath = iconData.filePath
+
+            _ = try teamRef.setData(from: team)
+        } catch {
+            print("error: updateTeamNameAndIcon_do_try_catch")
+        }
+    }
+
+    func getUIImageByUrl(url: URL?) -> UIImage? {
+        guard let url else { return nil }
+        do {
+            let data = try Data(contentsOf: url)
+            return UIImage(data: data)!
+        } catch let err {
+            print("Error : \(err.localizedDescription)")
+            return nil
         }
     }
 

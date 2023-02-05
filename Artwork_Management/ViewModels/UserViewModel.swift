@@ -86,6 +86,17 @@ class UserViewModel: ObservableObject {
         }
     }
 
+    func getUIImageByUrl(url: URL?) -> UIImage? {
+        guard let url else { return nil }
+        do {
+            let data = try Data(contentsOf: url)
+            return UIImage(data: data)!
+        } catch let err {
+            print("Error : \(err.localizedDescription)")
+            return nil
+        }
+    }
+
     deinit {
         listener?.remove()
     }
