@@ -7,14 +7,14 @@
 
 import SwiftUI
 
+enum SelectedUpdateData {
+    case start, user, team
+}
+
 struct UpdateTeamOrUserDataView: View {
 
     enum UpdateTeamFocused {
         case check
-    }
-
-    enum SelectedUpdateData {
-        case user, team
     }
 
     struct InputUpdateUserOrTeam {
@@ -24,7 +24,7 @@ struct UpdateTeamOrUserDataView: View {
         var captureError: Bool = false
     }
 
-    var selectedUpdate: SelectedUpdateData
+    @Binding var selectedUpdate: SelectedUpdateData
     @StateObject var userVM: UserViewModel
     @StateObject var teamVM: TeamViewModel
     @FocusState var updateTeamfocused: UpdateTeamFocused?
@@ -96,11 +96,9 @@ struct UpdateTeamOrUserDataView: View {
                 .buttonStyle(.borderedProminent)
 
                 Button {
-//                    withAnimation(.spring(response: 0.5, blendDuration: 1)) {
-//                        teamVM.isShowSearchedNewUserJoinTeam.toggle()
-//                    }
+                    withAnimation(.spring(response: 0.5)) { selectedUpdate = .start }
                 } label: {
-                    Label("閉じる", systemImage: "multiply.circle.fill")
+                    Label("キャンセル", systemImage: "multiply.circle.fill")
                         .foregroundColor(.white).opacity(0.7)
                 }
                 .offset(y: 30)
@@ -115,6 +113,8 @@ struct UpdateTeamOrUserDataView: View {
 
         .onAppear {
             switch selectedUpdate {
+            case .start:
+                print("")
             case .user:
                 let teamIcon = getUIImageByUrl(url: teamVM.team?.iconURL)
                 let teamName = teamVM.team?.name ?? ""
@@ -145,7 +145,7 @@ struct UpdateTeamOrUserDataView: View {
 
 struct UpdateTeamDataView_Previews: PreviewProvider {
     static var previews: some View {
-        UpdateTeamOrUserDataView(selectedUpdate: .user,
+        UpdateTeamOrUserDataView(selectedUpdate: .constant(.user),
                            userVM: UserViewModel(),
                            teamVM: TeamViewModel())
     }

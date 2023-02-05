@@ -267,7 +267,9 @@ struct SystemSideMenu: View {
                                     VStack(alignment: .leading, spacing: 40) {
 
                                         Label("チーム情報変更", systemImage: "person.text.rectangle.fill")
-                                            .onTapGesture {  }
+                                            .onTapGesture {
+                                                withAnimation(.spring(response: 0.5)) { inputHome.selectedUpdateData = .team }
+                                            }
 
                                         Label("メンバー招待", systemImage: "person.wave.2.fill")
                                             .onTapGesture {
@@ -298,7 +300,9 @@ struct SystemSideMenu: View {
                                     VStack(alignment: .leading, spacing: 40) {
 
                                         Label("ユーザ情報変更", systemImage: "person.text.rectangle")
-                                        .onTapGesture {  }
+                                            .onTapGesture {
+                                                withAnimation(.spring(response: 0.5)) { inputHome.selectedUpdateData = .user }
+                                            }
 
                                         Label("ログアウト", systemImage: "figure.wave")
                                             .onTapGesture { inputSideMenu.isShowLogOutAlert.toggle() }

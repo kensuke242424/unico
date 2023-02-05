@@ -41,6 +41,7 @@ struct InputHome {
     var doCommerce: Bool = false
     var doItemEdit: Bool = false
     var editItemStatus: EditStatus = .create
+    var selectedUpdateData: SelectedUpdateData = .start
     var updateImageStatus: UpdateImageStatus = .item
     var cartHalfSheet: ResizableSheetState = .hidden
     var commerceHalfSheet: ResizableSheetState = .hidden
@@ -143,53 +144,63 @@ struct HomeTabView: View {
                                 teamID: teamVM.team!.id)
             }
 
-            // sideMenu_background...
-            Color.black
-                .ignoresSafeArea()
-                .opacity(inputHome.sideMenuBackGround ? 0.4 : 0)
-                .onTapGesture {
-                    withAnimation(.spring(response: 0.4, blendDuration: 1)) {
-                        inputHome.isShowSystemSideMenu.toggle()
+            // side menu contents...
+            Group {
+
+                // sideMenu_background...
+                Color.black
+                    .ignoresSafeArea()
+                    .opacity(inputHome.sideMenuBackGround ? 0.4 : 0)
+                    .onTapGesture {
+                        withAnimation(.spring(response: 0.4, blendDuration: 1)) {
+                            inputHome.isShowSystemSideMenu.toggle()
+                        }
+                        withAnimation(.easeIn(duration: 0.2)) {
+                            inputHome.sideMenuBackGround.toggle()
+                        }
                     }
-                    withAnimation(.easeIn(duration: 0.2)) {
-                        inputHome.sideMenuBackGround.toggle()
-                    }
+
+                SystemSideMenu(teamVM: teamVM,
+                               userVM: userVM,
+                               itemVM: itemVM,
+                               tagVM: tagVM,
+                               logInVM: logInVM,
+                               inputHome: $inputHome,
+                               inputImage: $inputImage,
+                               inputTag: $inputTag,
+                               inputSideMenu: $inputSideMenu)
+                    .offset(x: inputHome.isShowSystemSideMenu ? 0 : -UIScreen.main.bounds.width)
+
+                if inputHome.selectedUpdateData != .start {
+                    UpdateTeamOrUserDataView(selectedUpdate: $inputHome.selectedUpdateData,
+                                             userVM: userVM,
+                                             teamVM: teamVM)
                 }
 
-            SystemSideMenu(teamVM: teamVM,
-                           userVM: userVM,
-                           itemVM: itemVM,
-                           tagVM: tagVM,
-                           logInVM: logInVM,
-                           inputHome: $inputHome,
-                           inputImage: $inputImage,
-                           inputTag: $inputTag,
-                           inputSideMenu: $inputSideMenu)
-                .offset(x: inputHome.isShowSystemSideMenu ? 0 : -UIScreen.main.bounds.width)
-
-            // sideMenu_background...
-            Color.black
-                .ignoresSafeArea()
-                .background(.ultraThinMaterial)
-                .opacity(inputHome.editTagSideMenuBackground ? 0.7 : 0)
-                .onTapGesture {
-                    withAnimation(.spring(response: 0.4, blendDuration: 1)) {
-                        inputHome.editTagSideMenuBackground.toggle()
+                // sideMenu_background...
+                Color.black
+                    .ignoresSafeArea()
+                    .background(.ultraThinMaterial)
+                    .opacity(inputHome.editTagSideMenuBackground ? 0.7 : 0)
+                    .onTapGesture {
+                        withAnimation(.spring(response: 0.4, blendDuration: 1)) {
+                            inputHome.editTagSideMenuBackground.toggle()
+                        }
+                        withAnimation(.easeIn(duration: 0.2)) {
+                            inputHome.isOpenEditTagSideMenu.toggle()
+                        }
                     }
-                    withAnimation(.easeIn(duration: 0.2)) {
-                        inputHome.isOpenEditTagSideMenu.toggle()
-                    }
-                }
 
-            // Open TagSideMenu...
-            SideMenuEditTagView(itemVM: itemVM,
-                                tagVM: tagVM,
-                                inputHome: $inputHome,
-                                inputTag: $inputTag,
-                                defaultTag: inputTag.tagSideMenuStatus == .create ? nil : inputSideMenu.selectTag,
-                                tagSideMenuStatus: inputTag.tagSideMenuStatus,
-                                teamID: teamVM.team!.id)
-            .offset(x: inputHome.isOpenEditTagSideMenu ? UIScreen.main.bounds.width / 2 - 25 : UIScreen.main.bounds.width + 10)
+                // Open TagSideMenu...
+                SideMenuEditTagView(itemVM: itemVM,
+                                    tagVM: tagVM,
+                                    inputHome: $inputHome,
+                                    inputTag: $inputTag,
+                                    defaultTag: inputTag.tagSideMenuStatus == .create ? nil : inputSideMenu.selectTag,
+                                    tagSideMenuStatus: inputTag.tagSideMenuStatus,
+                                    teamID: teamVM.team!.id)
+                .offset(x: inputHome.isOpenEditTagSideMenu ? UIScreen.main.bounds.width / 2 - 25 : UIScreen.main.bounds.width + 10)
+            }
 
             VStack {
 
