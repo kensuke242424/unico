@@ -171,11 +171,10 @@ struct HomeTabView: View {
                                inputSideMenu: $inputSideMenu)
                     .offset(x: inputHome.isShowSystemSideMenu ? 0 : -UIScreen.main.bounds.width)
 
-                if inputHome.selectedUpdateData != .start {
-                    UpdateTeamOrUserDataView(selectedUpdate: $inputHome.selectedUpdateData,
-                                             userVM: userVM,
-                                             teamVM: teamVM)
-                }
+                UpdateTeamOrUserDataView(selectedUpdate: $inputHome.selectedUpdateData,
+                                         userVM: userVM,
+                                         teamVM: teamVM)
+                .opacity(inputHome.selectedUpdateData == .start ? 0.0 : 1.0)
 
                 // sideMenu_background...
                 Color.black

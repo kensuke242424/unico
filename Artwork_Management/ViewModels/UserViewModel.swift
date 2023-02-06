@@ -12,7 +12,7 @@ import FirebaseFirestore
 import FirebaseFirestoreSwift
 
 enum CustomError: Error {
-    case uidEmpty, getRef, fetch, setData, updateData, getDocument, photoUrlEmpty, teamEmpty, getDetectUser, inputTextEmpty, memberDuplication, addTeamIDToJoinedUser
+    case uidEmpty, getRef, fetch, setData, updateData, getDocument, photoUrlEmpty, userEmpty, teamEmpty, getDetectUser, inputTextEmpty, memberDuplication, addTeamIDToJoinedUser
 }
 
 class UserViewModel: ObservableObject {
@@ -86,14 +86,65 @@ class UserViewModel: ObservableObject {
         }
     }
 
-    func getUIImageByUrl(url: URL?) -> UIImage? {
-        guard let url else { return nil }
+    func uploadUserImageData(_ image: UIImage?) async -> (url: URL?, filePath: String?) {
+
+        guard let imageData = image?.jpegData(compressionQuality: 0.8) else {
+            return (url: nil, filePath: nil)
+        }
+        guard var user else { return (url: nil, filePath: nil) }
+
         do {
-            let data = try Data(contentsOf: url)
-            return UIImage(data: data)!
-        } catch let err {
-            print("Error : \(err.localizedDescription)")
-            return nil
+            let storage = Storage.storage()
+            let reference = storage.reference()
+            let filePath = "users/\(user.id)/\(Date()).jpeg"
+            let imageRef = reference.child(filePath)
+            _ = try await imageRef.putDataAsync(imageData)
+            let url = try await imageRef.downloadURL()
+
+            return (url: url, filePath: filePath)
+        } catch {
+            return (url: nil, filePath: nil)
+        }
+    }
+
+    func updateUserNameAndIcon(name updateName: String, data iconData: (url: URL?, filePath: String?)) async throws {
+
+        // 取得アイコンデータurlがnilだったら処理終了
+        guard iconData.url != nil else { return }
+        guard var user else { throw CustomError.userEmpty }
+        guard let userRef = db?.collection("users").document(user.id) else { throw CustomError.getDocument }
+
+        do {
+            // 更新前の元々のアイコンパスを保持しておく。更新成功が確認できてから前データを削除する
+            let defaultIconPath = user.iconPath
+            user.name = updateName
+            user.iconURL = iconData.url
+            user.iconPath = iconData.filePath
+
+            _ = try userRef.setData(from: user)
+            // ⬆︎のsetDataが成功したら、前のアイコンデータをfirestorageから削除
+            await deleteUserImageData(path: defaultIconPath)
+        } catch {
+            // アイコンデータ更新失敗のため、保存予定だったアイコンデータをfirestorageから削除
+            await deleteUserImageData(path: iconData.filePath)
+            print("error: updateTeamNameAndIcon_do_try_catch")
+        }
+    }
+
+    func deleteUserImageData(path: String?) async {
+
+        guard let path = path else { return }
+
+        let storage = Storage.storage()
+        let reference = storage.reference()
+        let imageRef = reference.child(path)
+
+        imageRef.delete { error in
+            if let error = error {
+                print(error)
+            } else {
+                print("imageRef.delete succsess!")
+            }
         }
     }
 

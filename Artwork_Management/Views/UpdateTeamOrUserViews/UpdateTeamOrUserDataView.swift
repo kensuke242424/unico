@@ -37,7 +37,7 @@ struct UpdateTeamOrUserDataView: View {
 
             Color(.black).opacity(0.7)
                 .background(.ultraThinMaterial).opacity(0.9)
-                .ignoresSafeArea()
+//                .ignoresSafeArea()
                 .onTapGesture {
                     updateTeamfocused = nil
                 }
@@ -90,17 +90,31 @@ struct UpdateTeamOrUserDataView: View {
 
                 Button("保存する") {
 
-                    Task {
-                        let iconData = await teamVM.uploadTeamImageData(inputUpdate.captureImage)
-                        try await teamVM.updateTeamNameAndIcon(name: inputUpdate.nameText, data: iconData)
-                        await teamVM.deleteTeamImageData(path: teamVM.team?.iconPath)
+                    switch selectedUpdate {
+                    case .start:
+                        print("")
+
+                    case .user:
+                        Task {
+                            let iconData = await userVM.uploadUserImageData(inputUpdate.captureImage)
+                            try await userVM.updateUserNameAndIcon(name: inputUpdate.nameText, data: iconData)
+                        }
+
+                    case .team:
+                        Task {
+                            let iconData = await teamVM.uploadTeamImageData(inputUpdate.captureImage)
+                            try await teamVM.updateTeamNameAndIcon(name: inputUpdate.nameText, data: iconData)
+                        }
                     }
+                    // 編集画面を閉じる
+                    hapticSuccessNotification()
+                    withAnimation(.spring(response: 0.3)) { selectedUpdate = .start }
                 }
                 .padding(.top)
                 .buttonStyle(.borderedProminent)
 
                 Button {
-                    withAnimation(.spring(response: 0.5)) { selectedUpdate = .start }
+                    withAnimation(.spring(response: 0.3)) { selectedUpdate = .start }
                 } label: {
                     Label("キャンセル", systemImage: "multiply.circle.fill")
                         .foregroundColor(.white).opacity(0.7)
@@ -115,25 +129,41 @@ struct UpdateTeamOrUserDataView: View {
             }
         } // ZStack
 
-        .onAppear {
-            switch selectedUpdate {
+        .onChange(of: selectedUpdate) { select in
+            switch select {
             case .start:
                 print("")
 
             case .user:
-                let userIcon = userVM.getUIImageByUrl(url: userVM.user?.iconURL)
+                inputUpdate.captureImage = nil
                 let userName = userVM.user?.name ?? ""
-                inputUpdate.captureImage = userIcon
                 inputUpdate.nameText = userName
+                getUIImageByUrl(url: userVM.user?.iconURL)
 
             case .team:
-                let teamIcon = teamVM.getUIImageByUrl(url: teamVM.team?.iconURL)
+                inputUpdate.captureImage = nil
                 let teamName = teamVM.team?.name ?? ""
-                inputUpdate.captureImage = teamIcon
                 inputUpdate.nameText = teamName
+                getUIImageByUrl(url: teamVM.team?.iconURL)
             }
         }
     } // body
+
+    // 編集画面表示時に、元アイコンのUIImageをurlから取得
+    func getUIImageByUrl(url: URL?) {
+        guard let url else { return }
+        DispatchQueue.global().async {
+            do {
+                let data = try Data(contentsOf: url)
+                inputUpdate.captureImage = UIImage(data: data)
+                print("teamIconのurl->UIImage成功")
+
+            } catch let err {
+                print("Error : \(err.localizedDescription)")
+            }
+        }
+    }
+
 } // View
 
 struct UpdateTeamDataView_Previews: PreviewProvider {

@@ -141,7 +141,7 @@ class TeamViewModel: ObservableObject {
         do {
             let storage = Storage.storage()
             let reference = storage.reference()
-            let filePath = "images/\(team!.id)/\(Date()).jpeg"
+            let filePath = "teams/\(team!.id)/\(Date()).jpeg"
             let imageRef = reference.child(filePath)
             _ = try await imageRef.putDataAsync(imageData)
             let url = try await imageRef.downloadURL()
@@ -189,29 +189,43 @@ class TeamViewModel: ObservableObject {
 
     func updateTeamNameAndIcon(name updateName: String, data iconData: (url: URL?, filePath: String?)) async throws {
 
+        // 取得アイコンデータurlがnilだったら処理終了
+        guard iconData.url != nil else { return }
         guard var team else { throw CustomError.teamEmpty }
         guard let teamRef = db?.collection("teams").document(team.id) else { throw CustomError.getDocument }
 
         do {
+            // 更新前の元々のアイコンパスを保持しておく。更新成功が確認できてから前データを削除する
+            let defaultIconPath = team.iconPath
             team.name = updateName
             team.iconURL = iconData.url
             team.iconPath = iconData.filePath
 
             _ = try teamRef.setData(from: team)
+            // ⬆︎のsetDataが成功したら、前のアイコンデータをfirestorageから削除
+            await deleteTeamImageData(path: defaultIconPath)
         } catch {
+            // アイコンデータ更新失敗のため、保存予定だったアイコンデータをfirestorageから削除
+            await deleteTeamImageData(path: iconData.filePath)
             print("error: updateTeamNameAndIcon_do_try_catch")
         }
     }
 
     func getUIImageByUrl(url: URL?) -> UIImage? {
         guard let url else { return nil }
-        do {
-            let data = try Data(contentsOf: url)
-            return UIImage(data: data)!
-        } catch let err {
-            print("Error : \(err.localizedDescription)")
-            return nil
+        var iamge: UIImage?
+        DispatchQueue.global().async {
+            do {
+                let data = try Data(contentsOf: url)
+                iamge = UIImage(data: data)
+                print("teamIconのurl->UIImage成功")
+
+            } catch let err {
+                print("Error : \(err.localizedDescription)")
+            }
         }
+        print("imageの返却")
+        return iamge
     }
 
     @MainActor

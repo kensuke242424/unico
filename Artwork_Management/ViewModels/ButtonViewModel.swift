@@ -5,7 +5,7 @@
 //  Created by 中川賢亮 on 2022/10/11.
 //
 
-import Foundation
+import SwiftUI
 
 enum ButtonStyle {
     case library
@@ -61,5 +61,17 @@ class ButtonViewModel: ObservableObject {
             return buttonStyle
         }
     } // func buttonStyleChenged
+}
 
+// デバイスの振動によるフィードバック
+public func hapticSuccessNotification() {
+        let g = UINotificationFeedbackGenerator()
+        g.prepare()
+        g.notificationOccurred(.success)
+    }
+
+public func hapticErrorNotification() {
+    let generator = UINotificationFeedbackGenerator()
+    generator.prepare()
+    generator.notificationOccurred(.error)
 }

@@ -161,19 +161,6 @@ struct JoinUserDetectCheckView: View {
         }
     } // body
 
-    // デバイスの振動によるフィードバック
-    private func hapticSuccessNotification() {
-            let g = UINotificationFeedbackGenerator()
-            g.prepare()
-            g.notificationOccurred(.success)
-        }
-
-        private func hapticErrorNotification() {
-            let generator = UINotificationFeedbackGenerator()
-            generator.prepare()
-            generator.notificationOccurred(.error)
-        }
-
     func startFaseView() -> some View {
 
         VStack(spacing: 50) {
