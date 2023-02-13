@@ -93,7 +93,7 @@ struct RootView: View {
                         try await teamVM.fetchTeam(teamID: lastLogInTeamID)
                         await tagVM.fetchTag(teamID: lastLogInTeamID)
                         await itemVM.fetchItem(teamID: lastLogInTeamID)
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.3) {
                             withAnimation(.spring(response: 1)) {
                                 userVM.canUserFetchedListener = nil
                                 logInVM.rootNavigation = .home
@@ -115,6 +115,9 @@ struct RootView: View {
                     } catch CustomError.getDocument {
                         print("Error: getDocument")
                         withAnimation(.spring(response: 1)) { logInVM.rootNavigation = .logIn }
+                    } catch CustomError.getUserDocument {
+                        print("Error: getUserDocument")
+                        withAnimation(.spring(response: 1)) { logInVM.rootNavigation = .logIn }
                     } catch {
                         print("Error")
                         withAnimation(.spring(response: 1)) { logInVM.rootNavigation = .logIn }
@@ -123,42 +126,11 @@ struct RootView: View {
             }
         }
 
-        // ユーザのフェッチがリスナーにより検知されたら、残りのデータをフェッチ開始
-//        .onChange(of: userVM.canUserFetchedListener) { canUserFetched in
-//            print("userVM.canUserFetched: \(canUserFetched)")
-//            if canUserFetched == nil { return }
-//            if canUserFetched! {
-//                Task {
-//                    do {
-//
-//                    } catch CustomError.uidEmpty {
-//                        print("Error: uidEmpty")
-//                        withAnimation(.spring(response: 1)) { logInVM.rootNavigation = .logIn }
-//                    } catch CustomError.getRef {
-//                        print("Error: getRef")
-//                        withAnimation(.spring(response: 1)) { logInVM.rootNavigation = .logIn }
-//                    } catch CustomError.fetch {
-//                        print("Error: fetch")
-//                        withAnimation(.spring(response: 1)) { logInVM.rootNavigation = .logIn }
-//                    } catch CustomError.getDocument {
-//                        print("Error: getDocument")
-//                        withAnimation(.spring(response: 1)) { logInVM.rootNavigation = .logIn }
-//                    } catch {
-//                        print("Error")
-//                        withAnimation(.spring(response: 1)) { logInVM.rootNavigation = .logIn }
-//                    }
-//                }
-//            } else {
-//                // ユーザデータのリスナーが失敗したら、ログイン画面へ
-//                withAnimation(.spring(response: 1)) { logInVM.rootNavigation = .logIn }
-//            }
-//        }
-
         // Auth check...
         .onAppear {
             if Auth.auth().currentUser != nil {
-                logInVM.rootNavigation = .fetch
                 print("RootView_onAppear_currentUser != nil")
+                logInVM.rootNavigation = .fetch
             } else {
                 print("RootView_onAppear_currentUser == nil")
                 isShowStandBy.toggle()

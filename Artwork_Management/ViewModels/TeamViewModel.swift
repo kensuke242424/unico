@@ -211,6 +211,19 @@ class TeamViewModel: ObservableObject {
         }
     }
 
+    func updateTeamJoinMemberData(name updateName: String, data iconData: (url: URL?, filePath: String?)) async throws {
+        guard let teamID = team?.id else { throw CustomError.teamEmpty }
+        guard let teamRef = db?.collection("teams").document(teamID) else { throw CustomError.getRef }
+
+        do {
+            let teamDocument = try await teamRef.getDocument()
+            let teamData = try teamDocument.data(as: Team.self)
+            self.team =  teamData
+        } catch {
+            throw CustomError.fetch
+        }
+    }
+
     func getUIImageByUrl(url: URL?) -> UIImage? {
         guard let url else { return nil }
         var iamge: UIImage?

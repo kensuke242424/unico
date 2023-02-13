@@ -56,12 +56,6 @@ class LogInViewModel: ObservableObject {
                 guard let nonce = currentNonce else {
                     fatalError("fatalError: handleSignInWithAppleCompletion_currentNonceの値が存在しません。")
                 }
-                // 「email」「fullName」はAppleIDでの初回ログイン時の場合のみ取得できる。
-//                print("userIdentifier:\(appleIDCredential.user)")
-//                print("identityToken:\(String(describing: appleIDCredential.identityToken))")
-//                print("fullName:\(String(describing: appleIDCredential.fullName))")
-//                print("email:\(String(describing: appleIDCredential.email))")
-//                print("authorizationCode:\(String(describing: appleIDCredential.authorizationCode))")
                 guard let appleIDToken = appleIDCredential.identityToken else {
                     print("Unable to fetch identify token。識別トークンをフェッチできません。")
                     return
@@ -70,11 +64,10 @@ class LogInViewModel: ObservableObject {
                     print("Unable to serialise token string from data: \(appleIDToken.debugDescription). データからトークン文字列をシリアライズできません。")
                     return
                 }
-                print("idTokenString:\(idTokenString)")
+
                 let credential = OAuthProvider.credential(withProviderID: "apple.com",
                                                           idToken: idTokenString,
                                                           rawNonce: nonce)
-
                 Task {
                     do {
                          _ = try await Auth.auth().signIn(with: credential)
@@ -200,14 +193,14 @@ class LogInViewModel: ObservableObject {
         Auth.auth().addStateDidChangeListener { auth, user in
             if user != nil {
                 print("currentUserCheck_サインイン⭕️")
-                print(user)
+                print("uid: \(self.uid)")
                 self.successSignInAccount = true
                 print("successSignInAccount: \(self.successSignInAccount)")
             }
             else {
                 // サインアップ失敗
                 print("currentUserCheck_サインイン❌")
-                print(user)
+                print("uid: \(self.uid)")
                 self.successSignInAccount = false
             }
         }

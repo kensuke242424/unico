@@ -237,7 +237,7 @@ struct CreateAndJoinTeamView: View {
                     }
 
                     if selectTeamFase == .success {
-                        joinedTeamIconAndName(url: joinedTeamData!.iconURL, name: joinedTeamData!.name)
+                        joinedTeamIconAndName(url: joinedTeamData?.iconURL, name: joinedTeamData?.name)
 //                            .opacity(selectTeamFase == .success ? 1.0 : 0.0)
                     }
                 } // ZStack
@@ -474,7 +474,7 @@ struct CreateAndJoinTeamView: View {
         }
     }
 
-    func joinedTeamIconAndName(url photoURL: URL?, name teamName: String) -> some View {
+    func joinedTeamIconAndName(url photoURL: URL?, name teamName: String?) -> some View {
         Group {
             VStack(spacing: 40) {
                 Group {
@@ -486,7 +486,7 @@ struct CreateAndJoinTeamView: View {
                     }
                 }
 
-                Text(teamName)
+                Text(teamName ?? "No Name")
                     .foregroundColor(.white)
                     .tracking(5)
             }

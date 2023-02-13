@@ -12,7 +12,7 @@ import FirebaseFirestore
 import FirebaseFirestoreSwift
 
 enum CustomError: Error {
-    case uidEmpty, getRef, fetch, setData, updateData, getDocument, photoUrlEmpty, userEmpty, teamEmpty, getDetectUser, inputTextEmpty, memberDuplication, addTeamIDToJoinedUser
+    case uidEmpty, getRef, fetch, setData, updateData, getDocument,getUserDocument, photoUrlEmpty, userEmpty, teamEmpty, getDetectUser, inputTextEmpty, memberDuplication, addTeamIDToJoinedUser
 }
 
 class UserViewModel: ObservableObject {
@@ -41,7 +41,7 @@ class UserViewModel: ObservableObject {
             let user = try document.data(as: User.self)
             self.user = user
         } catch {
-            throw CustomError.getDocument
+            throw CustomError.getUserDocument
         }
     }
 
