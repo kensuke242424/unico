@@ -110,7 +110,7 @@ class UserViewModel: ObservableObject {
     func updateUserNameAndIcon(name updateName: String, data iconData: (url: URL?, filePath: String?)) async throws {
 
         // 取得アイコンデータurlがnilだったら処理終了
-        guard iconData.url != nil else { return }
+//        guard iconData.url != nil else { return }
         guard var user else { throw CustomError.userEmpty }
         guard let userRef = db?.collection("users").document(user.id) else { throw CustomError.getDocument }
 

@@ -90,14 +90,23 @@ struct UpdateTeamOrUserDataView: View {
 
                 Button("保存する") {
 
+                    guard let team = teamVM.team else { return }
+                    guard let user = userVM.user else { return }
+
                     switch selectedUpdate {
+
                     case .start:
                         print("")
 
                     case .user:
                         Task {
+                            // アイコンデータのアップロード保存
                             let iconData = await userVM.uploadUserImageData(inputUpdate.captureImage)
+                            // ユーザの名前とアイコンデータを更新
                             try await userVM.updateUserNameAndIcon(name: inputUpdate.nameText, data: iconData)
+                            // ユーザが保持している各チームのメンバーデータ(JoinMember)を更新
+                            let updateMemberData = JoinMember(memberUID: user.id, name: inputUpdate.nameText, iconURL: iconData.url)
+                            try await teamVM.updateTeamJoinMemberData(data: updateMemberData, joins: user.joins)
                         }
 
                     case .team:

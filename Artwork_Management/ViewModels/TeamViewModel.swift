@@ -213,29 +213,33 @@ class TeamViewModel: ObservableObject {
 
     func updateTeamJoinMemberData(data updateMemberData: JoinMember, joins joinsTeam: [JoinTeam]) async throws {
 
-        var joinsTeamID: [String]  = []
-        // 参加チームのidを配列で取得
+        var joinsTeamID: [String] = []
+        // ユーザが参加している各チームのid文字列データを配列に格納(whereFieldクエリで使う)
         for joinTeam in joinsTeam {
             joinsTeamID.append(joinTeam.teamID)
         }
 
         guard let joinTeamRefs = db?.collection("teams")
-            .whereField("id", arrayContainsAny: joinsTeamID) else { throw CustomError.getRef }
+            .whereField("id", in: joinsTeamID) else { throw CustomError.getRef }
 
         do {
             let snapshot = try await joinTeamRefs.getDocuments()
-            snapshot.documents.compactMap { teamDocument in
+
+            for teamDocument in snapshot.documents {
 
                 do {
-                    _ = try teamDocument.data(as: Team.self)
-                }
-                catch {
+                    var teamData = try teamDocument.data(as: Team.self)
 
+                    for (index, teamMember) in teamData.members.enumerated() where teamMember.memberUID == uid {
+                        // チーム内の対象メンバーデータを更新
+                        teamData.members[index] = updateMemberData
+                        // 更新対象チームの更新用リファレンスを生成
+                        guard let teamRef = db?.collection("teams").document(teamData.id) else { throw CustomError.getRef }
+                        // リファレンスをもとにsetDataを実行
+                        try teamRef.setData(from: teamData)
+                    }
                 }
             }
-        }
-        catch {
-            throw CustomError.getDocument
         }
     }
 
