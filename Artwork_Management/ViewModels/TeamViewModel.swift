@@ -211,16 +211,31 @@ class TeamViewModel: ObservableObject {
         }
     }
 
-    func updateTeamJoinMemberData(name updateName: String, data iconData: (url: URL?, filePath: String?)) async throws {
-        guard let teamID = team?.id else { throw CustomError.teamEmpty }
-        guard let teamRef = db?.collection("teams").document(teamID) else { throw CustomError.getRef }
+    func updateTeamJoinMemberData(data updateMemberData: JoinMember, joins joinsTeam: [JoinTeam]) async throws {
+
+        var joinsTeamID: [String]  = []
+        // 参加チームのidを配列で取得
+        for joinTeam in joinsTeam {
+            joinsTeamID.append(joinTeam.teamID)
+        }
+
+        guard let joinTeamRefs = db?.collection("teams")
+            .whereField("id", arrayContainsAny: joinsTeamID) else { throw CustomError.getRef }
 
         do {
-            let teamDocument = try await teamRef.getDocument()
-            let teamData = try teamDocument.data(as: Team.self)
-            self.team =  teamData
-        } catch {
-            throw CustomError.fetch
+            let snapshot = try await joinTeamRefs.getDocuments()
+            snapshot.documents.compactMap { teamDocument in
+
+                do {
+                    _ = try teamDocument.data(as: Team.self)
+                }
+                catch {
+
+                }
+            }
+        }
+        catch {
+            throw CustomError.getDocument
         }
     }
 
