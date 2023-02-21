@@ -29,7 +29,7 @@ struct CreateAndJoinTeamView: View {
     @StateObject var teamVM: TeamViewModel
     @StateObject var userVM: UserViewModel
 
-    @State private var teamName: String = ""
+    @State private var inputTeamName: String = ""
     @State private var captureImage: UIImage?
     @State private var userQRCodeImage: UIImage?
     @State private var joinedTeamData: JoinTeam?
@@ -318,19 +318,19 @@ struct CreateAndJoinTeamView: View {
                 print("check開始")
                 Task {
                     do {
-                        if teamName.isEmpty { teamName = "No Name" }
+                        if inputTeamName.isEmpty { inputTeamName = "No Name" }
                         // チームデータに格納するログインユーザのユーザデータ
                         let joinMember = JoinMember(memberUID: user.id, name: user.name, iconURL: user.iconURL)
                         // teamsに格納する際のドキュメントID
                         let teamID = UUID().uuidString
                         await uploadImageData = logInVM.uploadImage(captureImage)
                         let teamData = Team(id: teamID,
-                                            name: teamName,
+                                            name: inputTeamName,
                                             iconURL: uploadImageData.url,
                                             iconPath: uploadImageData.filePath,
                                             members: [joinMember])
                         let joinTeamData = JoinTeam(teamID: teamID,
-                                                    name: teamName,
+                                                    name: inputTeamName,
                                                     iconURL: uploadImageData.url)
                         try await teamVM.addTeam(teamData: teamData)
                         try await userVM.addNewJoinTeam(newJoinTeam: joinTeamData)
@@ -457,14 +457,14 @@ struct CreateAndJoinTeamView: View {
                     .offset(y: -30)
                 }
 
-                TextField("", text: $teamName)
+                TextField("", text: $inputTeamName)
                     .frame(width: 230)
                     .focused($createNameFocused, equals: .check)
                     .textInputAutocapitalization(.never)
                     .multilineTextAlignment(.center)
                     .background {
                         ZStack {
-                            Text(createNameFocused == nil && teamName.isEmpty ? "チーム名を入力" : "")
+                            Text(createNameFocused == nil && inputTeamName.isEmpty ? "チーム名を入力" : "")
                                 .foregroundColor(.white.opacity(0.3))
                             Rectangle().foregroundColor(.white.opacity(0.3)).frame(height: 1)
                                 .offset(y: 20)

@@ -130,6 +130,40 @@ class UserViewModel: ObservableObject {
             print("error: updateTeamNameAndIcon_do_try_catch")
         }
     }
+    
+    func updateUserJoinTeamData(data updateTeamData: JoinTeam, members joinMembers: [JoinMember]) async throws {
+
+        var joinMembersID: [String] = []
+        // チームに所属している各メンバーのid文字列データを配列に格納(whereFieldクエリで使う)
+        for member in joinMembers {
+            joinMembersID.append(member.memberUID)
+        }
+
+        // 所属メンバーのid配列を使ってクエリを叩く
+        guard let joinMemberRefs = db?.collection("users")
+            .whereField("id", in: joinMembersID) else { throw CustomError.getRef }
+
+        do {
+            let snapshot = try await joinMemberRefs.getDocuments()
+
+            for memberDocument in snapshot.documents {
+
+                do {
+                    var memberData = try memberDocument.data(as: User.self)
+
+                    // ユーザのjoins配列からアップデート対象のチームを検出する
+                    for (index, joinTeam) in memberData.joins.enumerated() where joinTeam.teamID == updateTeamData.teamID {
+                        // ユーザ内の対象チームデータを更新
+                        memberData.joins[index] = updateTeamData
+                        // 更新後のユーザデータを再保存するためのリファレンスを取得
+                        guard let teamRef = db?.collection("users").document(memberData.id) else { throw CustomError.getRef }
+                        // リファレンスをもとにsetDataを実行
+                        try teamRef.setData(from: memberData)
+                    }
+                }
+            }
+        }
+    }
 
     func deleteUserImageData(path: String?) async {
 

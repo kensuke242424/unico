@@ -219,6 +219,7 @@ class TeamViewModel: ObservableObject {
             joinsTeamID.append(joinTeam.teamID)
         }
 
+        // ユーザが所属している各チームのid配列を使ってクエリを叩く
         guard let joinTeamRefs = db?.collection("teams")
             .whereField("id", in: joinsTeamID) else { throw CustomError.getRef }
 
@@ -230,6 +231,7 @@ class TeamViewModel: ObservableObject {
                 do {
                     var teamData = try teamDocument.data(as: Team.self)
 
+                    // チームのmembers配列からcurrentのユーザメンバーデータを検出する
                     for (index, teamMember) in teamData.members.enumerated() where teamMember.memberUID == uid {
                         // チーム内の対象メンバーデータを更新
                         teamData.members[index] = updateMemberData
