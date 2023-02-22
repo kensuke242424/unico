@@ -30,14 +30,14 @@ enum CreateFocused {
 }
 
 enum AddressCheck {
-    case stop, start, failure, succsess
+    case stop, start, failure, success
 
     var icon: Image {
         switch self {
         case .stop: return Image(systemName: "")
         case .start: return Image(systemName: "")
         case .failure: return Image(systemName: "multiply.circle.fill")
-        case .succsess: return Image(systemName: "checkmark.seal.fill")
+        case .success: return Image(systemName: "checkmark.seal.fill")
         }
     }
 
@@ -46,7 +46,7 @@ enum AddressCheck {
         case .stop: return ""
         case .start: return "check..."
         case .failure: return "failure!!"
-        case .succsess: return "succsess!!"
+        case .success: return "succsess!!"
         }
     }
 }
@@ -66,6 +66,7 @@ struct InputLogIn {
     var startFetchContents: Bool = false
     var isShowProgressView: Bool = false
     var isShowPickerView: Bool = false
+    var isShowGoBackLogInAlert: Bool = false
     var firstSelect: FirstSelect = .start
     var selectSignInType: SelectSignInType = .start
     var createAccount: CreateAccount = .start
@@ -178,8 +179,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     Text("< 戻る")
                         .foregroundColor(.white.opacity(0.7))
                 }
-                .disabled(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .succsess ? true : false)
-                .opacity(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .succsess ? 0.2 : 1.0)
+                .disabled(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .success ? true : false)
+                .opacity(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .success ? 0.2 : 1.0)
                 .offset(y: getRect().height / 3)
             }
 
@@ -192,24 +193,59 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             // Home Back...
             if inputLogIn.firstSelect != .start {
                 Button {
-                    withAnimation(.spring(response: 1.0)) {
-                        inputLogIn.selectSignInType = .start
-                        inputLogIn.firstSelect = .start
-                        inputLogIn.createAccount = .start
-                        inputLogIn.createAccountTitle = false
-                        inputLogIn.createAccountContents = false
-                        if inputLogIn.createUserNameText == "名無し" { inputLogIn.createUserNameText = "" }
-                    }
+                    inputLogIn.isShowGoBackLogInAlert.toggle()
                 } label: {
                     HStack {
                         Text("<<")
                         Image(systemName: "house.fill")
                     }
                 }
-                .disabled(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .succsess ? true : false)
-                .opacity(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .succsess ? 0.2 : 1.0)
+                .disabled(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .success ? true : false)
+                .opacity(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .success ? 0.2 : 1.0)
+                .opacity(inputLogIn.createAccount == .start ||
+                         inputLogIn.createAccount == .fase1 ||
+                         inputLogIn.createAccount == .success ? 0.0 : 1.0)
                 .foregroundColor(.white.opacity(0.5))
                 .offset(x: -getRect().width / 2 + 40, y: getRect().height / 2 - 60 )
+                .alert("確認", isPresented: $inputLogIn.isShowGoBackLogInAlert) {
+
+                    Button {
+                        inputLogIn.isShowGoBackLogInAlert.toggle()
+                    } label: {
+                        Text("いいえ")
+                    }
+
+                    Button {
+                        withAnimation(.spring(response: 0.7)) {
+                            inputLogIn.selectSignInType = .start
+                            inputLogIn.firstSelect = .start
+                            inputLogIn.createAccount = .start
+                            inputLogIn.createAccountTitle = false
+                            inputLogIn.createAccountContents = false
+                            if inputLogIn.createUserNameText == "名無し" { inputLogIn.createUserNameText = "" }
+                        }
+                        
+                    } label: {
+                        Text("はい")
+                    }
+                } message: {
+                    Text("ログイン画面に戻ります。よろしいですか？")
+                } // alert
+                
+                // Anonymous Started button...
+                Button {
+                    // Open navigate tab srideView...
+                } label: {
+                    HStack {
+                        Text("始めてみる")
+                        Text(">>")
+                    }
+                    .font(.subheadline).tracking(2).opacity(0.8)
+                }
+                .disabled(inputLogIn.createAccount == .success ? true : false)
+                .foregroundColor(.white.opacity(0.6))
+                .opacity(inputLogIn.createAccount == .success || inputLogIn.createAccountContents == false ? 0.0 : 1.0)
+                .offset(x: getRect().width / 2 - 80, y: getRect().height / 2 - 60 )
             }
 
             // ProgressView...
@@ -750,7 +786,7 @@ struct MailAddressInfomation: View {
 
                                 if checkSignUp, checkAddUser {
                                     // サインアップ成功
-                                    withAnimation(.spring(response: 0.5)) { inputLogIn.addressCheck = .succsess }
+                                    withAnimation(.spring(response: 0.5)) { inputLogIn.addressCheck = .success }
 
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                                         // RootViewのfetch処理へ移動
@@ -771,7 +807,7 @@ struct MailAddressInfomation: View {
                                                                        password: inputLogIn.password)
                                 if checkSignIn {
                                     // ログイン成功
-                                    withAnimation(.spring(response: 0.5)) { inputLogIn.addressCheck = .succsess }
+                                    withAnimation(.spring(response: 0.5)) { inputLogIn.addressCheck = .success }
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                                         // RootViewのfetch処理へ移動
                                         withAnimation(.spring(response: 0.5)) {
@@ -787,7 +823,7 @@ struct MailAddressInfomation: View {
                     }
                 }
                 .buttonStyle(.borderedProminent)
-                .disabled(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .succsess ? true : false)
+                .disabled(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .success ? true : false)
                 .overlay(alignment: .top) {
                     HStack {
                         if inputLogIn.addressCheck == .start {
@@ -820,11 +856,11 @@ struct MailAddressInfomation: View {
                 .padding(.top, 20)
 
                 Text(inputLogIn.addressCheck == .failure ? logInVM.logInErrorMessage :
-                        inputLogIn.addressCheck == .succsess ? inputLogIn.firstSelect == .logIn ?
+                        inputLogIn.addressCheck == .success ? inputLogIn.firstSelect == .logIn ?
                      "ログインに成功しました！"  : "ユーザ登録が完了しました！" : "")
                     .font(.subheadline).fontWeight(.bold)
                     .foregroundColor(inputLogIn.addressCheck == .failure ? .red : .white).opacity(0.8)
-                    .opacity(inputLogIn.addressCheck == .failure || inputLogIn.addressCheck == .succsess ? 1.0 : 0.0)
+                    .opacity(inputLogIn.addressCheck == .failure || inputLogIn.addressCheck == .success ? 1.0 : 0.0)
                     .frame(height: 20)
 
             } // VStack
