@@ -91,7 +91,7 @@ class UserViewModel: ObservableObject {
         guard let imageData = image?.jpegData(compressionQuality: 0.8) else {
             return (url: nil, filePath: nil)
         }
-        guard var user else { return (url: nil, filePath: nil) }
+        guard let user else { return (url: nil, filePath: nil) }
 
         do {
             let storage = Storage.storage()

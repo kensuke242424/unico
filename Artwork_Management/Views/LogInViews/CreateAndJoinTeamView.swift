@@ -35,6 +35,7 @@ struct CreateAndJoinTeamView: View {
     @State private var joinedTeamData: JoinTeam?
     @State private var uploadImageData: (url: URL?, filePath: String?)
     @State private var isShowPickerView: Bool = false
+    @State private var isShowGoBackLogInAlert: Bool = false
     @State private var captureError: Bool = false
     @State private var selectedTeamCard: SelectedTeamCard = .start
     @State private var selectTeamFase: SelectTeamFase = .start
@@ -274,12 +275,9 @@ struct CreateAndJoinTeamView: View {
             .opacity(selectTeamFase == .fase2 ? 1.0 : 0.0)
             .disabled(selectTeamFase == .success ? true : false)
 
+            // Go back login flow Button...
             Button {
-                withAnimation(.spring(response: 1.0)) {
-                    logInVM.rootNavigation = .logIn
-                    logInVM.logOut()
-                    teamVM.isShowCreateAndJoinTeam.toggle()
-                }
+                isShowGoBackLogInAlert.toggle()
             } label: {
                 HStack {
                     Text("<<")
@@ -288,7 +286,44 @@ struct CreateAndJoinTeamView: View {
             }
             .disabled(selectTeamFase == .success ? true : false)
             .foregroundColor(.white.opacity(0.5))
+            .opacity(selectTeamFase == .start ? 0.0 : 1.0)
             .offset(x: -getRect().width / 2 + 40, y: getRect().height / 2 - 60 )
+            .alert("確認", isPresented: $isShowGoBackLogInAlert) {
+
+                Button {
+                    teamVM.isShowCreateAndJoinTeam.toggle()
+                } label: {
+                    Text("いいえ")
+                }
+
+                Button {
+                    withAnimation(.spring(response: 1.0)) {
+                        logInVM.rootNavigation = .logIn
+                        teamVM.isShowCreateAndJoinTeam.toggle()
+                    }
+                    logInVM.logOut()
+                    
+                } label: {
+                    Text("はい")
+                }
+            } message: {
+                Text("ログイン画面に戻ります。よろしいですか？")
+            } // alert
+            
+            // Getting Started button...
+            Button {
+                // tabView?
+            } label: {
+                HStack {
+                    Text("あとで決める")
+                    Text(">>")
+                }
+                .font(.subheadline).tracking(2).opacity(0.8)
+            }
+            .disabled(selectTeamFase == .success ? true : false)
+            .foregroundColor(.white.opacity(0.6))
+            .opacity(selectTeamFase == .start ? 0.0 : 1.0)
+            .offset(x: getRect().width / 2 - 80, y: getRect().height / 2 - 60 )
         } // ZStack
 
         // 「チームに参加」により、相手から承認を受け、チーム情報を受け取ることでリスナーが変更を検知し、作動する
