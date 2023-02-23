@@ -23,7 +23,7 @@ class TeamViewModel: ObservableObject {
 
     @Published var team: Team?
     @Published var isShowCreateAndJoinTeam: Bool = false
-    @Published var isShowSearchedNewUserJoinTeam: Bool = false
+    @Published var isShowSearchedNewMemberJoinTeam: Bool = false
     @Published var showErrorAlert = false
     @Published var alertMessage = ""
 

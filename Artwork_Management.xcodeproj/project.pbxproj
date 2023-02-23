@@ -174,6 +174,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		BEAB502C29A7C5E300ECCB4F /* PageTabNavigateViews */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = PageTabNavigateViews;
+			sourceTree = "<group>";
+		};
 		E02FB03F291671B900F72E1A /* Recovered References */ = {
 			isa = PBXGroup;
 			children = (
@@ -252,6 +259,7 @@
 		E08F273228DDB3B200329C5E /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				BEAB502C29A7C5E300ECCB4F /* PageTabNavigateViews */,
 				E094B788298EB7C700A2E33C /* UpdateTeamOrUserViews */,
 				E05FE94328F71BE400263F98 /* Extensions */,
 				E0B3288F2923AD7600E94BC3 /* ViewParts */,

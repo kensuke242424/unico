@@ -105,7 +105,7 @@ struct JoinUserDetectCheckView: View {
                 Button {
                     qrReader.stopSession()
                     withAnimation(.spring(response: 0.5, blendDuration: 1)) {
-                        teamVM.isShowSearchedNewUserJoinTeam.toggle()
+                        teamVM.isShowSearchedNewMemberJoinTeam.toggle()
                     }
                 } label: {
                     Label("閉じる", systemImage: "multiply.circle.fill")
@@ -259,7 +259,7 @@ struct JoinUserDetectCheckView: View {
 
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                                         withAnimation(.spring(response: 0.5, blendDuration: 1)) {
-                                            teamVM.isShowSearchedNewUserJoinTeam.toggle()
+                                            teamVM.isShowSearchedNewMemberJoinTeam.toggle()
                                         }
                                     }
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {

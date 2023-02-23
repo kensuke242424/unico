@@ -274,7 +274,7 @@ struct SystemSideMenu: View {
                                         Label("メンバー招待", systemImage: "person.wave.2.fill")
                                             .onTapGesture {
                                                 withAnimation(.spring(response: 0.5, blendDuration: 1)) {
-                                                    teamVM.isShowSearchedNewUserJoinTeam.toggle()
+                                                    teamVM.isShowSearchedNewMemberJoinTeam.toggle()
                                                 }
                                             }
 

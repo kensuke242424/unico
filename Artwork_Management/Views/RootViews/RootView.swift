@@ -58,7 +58,7 @@ struct RootView: View {
 
             // チームに他のユーザを招待するView
             JoinUserDetectCheckView(teamVM: teamVM)
-                .opacity(teamVM.isShowSearchedNewUserJoinTeam ? 1.0 : 0.0)
+                .opacity(teamVM.isShowSearchedNewMemberJoinTeam ? 1.0 : 0.0)
 
             StandByView()
                 .opacity(isShowStandBy ? 1.0 : 0.0)
