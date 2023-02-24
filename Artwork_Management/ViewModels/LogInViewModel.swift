@@ -128,7 +128,7 @@ class LogInViewModel: ObservableObject {
       return hashString
     }
 
-    func signIn(email: String, password: String) async -> Bool {
+    func signInEmailAdress(email: String, password: String) async -> Bool {
 
         logInErrorMessage = ""
 
@@ -152,7 +152,7 @@ class LogInViewModel: ObservableObject {
         }
     }
 
-    func signUp(email: String, password: String) async -> Bool {
+    func signUpEmailAdress(email: String, password: String) async -> Bool {
 
         logInErrorMessage = ""
 

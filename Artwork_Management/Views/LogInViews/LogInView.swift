@@ -768,7 +768,7 @@ struct MailAddressInfomation: View {
                         case .signAp:
                             Task {
                                 // メールアドレスを用いてユーザを登録する
-                                let checkSignUp = await logInVM.signUp(email: inputLogIn.address,
+                                let checkSignUp = await logInVM.signUpEmailAdress(email: inputLogIn.address,
                                                                        password: inputLogIn.password)
                                 if !checkSignUp { inputLogIn.addressCheck = .failure; return }
 
@@ -803,7 +803,7 @@ struct MailAddressInfomation: View {
 
                         case .logIn:
                             Task {
-                                let checkSignIn = await logInVM.signIn(email: inputLogIn.address,
+                                let checkSignIn = await logInVM.signInEmailAdress(email: inputLogIn.address,
                                                                        password: inputLogIn.password)
                                 if checkSignIn {
                                     // ログイン成功
