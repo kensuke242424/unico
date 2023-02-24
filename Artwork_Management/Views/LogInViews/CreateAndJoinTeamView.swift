@@ -312,7 +312,8 @@ struct CreateAndJoinTeamView: View {
             
             // Getting Started button...
             Button {
-                // tabView?
+                // todo: navigateTabView?
+                
             } label: {
                 HStack {
                     Text("あとで決める")

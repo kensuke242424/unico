@@ -235,6 +235,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 // Anonymous Started button...
                 Button {
                     // Open navigate tab srideView...
+                    logInVM.signInAnonymously()
                 } label: {
                     HStack {
                         Text("始めてみる")
