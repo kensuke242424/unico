@@ -34,6 +34,24 @@ class LogInViewModel: ObservableObject {
 
     var logInErrorMessage: String = ""
     var logInErrorAlertMessage: String = ""
+    
+    func signInAnonymously() {
+        
+        Auth.auth().signInAnonymously { (authResult, error) in
+            
+            if let error = error {
+                print(error.localizedDescription)
+                print("AnonymousSignIn_failure")
+                return
+            }
+            if let user = authResult?.user {
+                print("\(user.displayName ?? "No displayName")")
+                print("isAnonymousSignIn: \(user.isAnonymous)")
+            } else {
+                print("isAnonymous_authResult ... guard")
+            }
+        }
+    }
 
     func handleSignInWithAppleRequest(_ request: ASAuthorizationAppleIDRequest) {
         request.requestedScopes = [.fullName, .email]
@@ -80,7 +98,6 @@ class LogInViewModel: ObservableObject {
         }
     }
 
-    // Adapted from https://auth0.com/docs/api-auth/tutorials/nonce#generate-a-cryptographically-random-nonce
     private func randomNonceString(length: Int = 32) -> String {
       precondition(length > 0)
       let charset: [Character] =
