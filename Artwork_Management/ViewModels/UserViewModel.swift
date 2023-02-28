@@ -19,6 +19,7 @@ class UserViewModel: ObservableObject {
 
     init() {
         print("<<<<<<<<<  UserViewModel_init  >>>>>>>>>")
+        isAnonymousCheck()
     }
 
     var listener: ListenerRegistration?
@@ -46,15 +47,15 @@ class UserViewModel: ObservableObject {
         }
     }
     
-    func isAnonymousCheck() -> Bool {
+    func isAnonymousCheck() {
         print("userVM_isAnonymousCheck実行")
         
         if let user = Auth.auth().currentUser, user.isAnonymous {
             print("currentUser: Not anonymous user")
-            return true
+            self.isAnonymous = true
         } else {
             print("currentUser: Anonymous user")
-            return false
+            self.isAnonymous = false
         }
     }
 

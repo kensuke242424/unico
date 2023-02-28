@@ -414,7 +414,6 @@ struct CreateAndJoinTeamView: View {
     }
 
     @ViewBuilder
-
     func joinCard() -> some View {
         ZStack {
             BlurView(style: .systemUltraThinMaterialDark)
