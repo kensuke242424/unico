@@ -25,6 +25,10 @@ enum CreateAccountFase {
     case start, fase1, fase2, fase3, success
 }
 
+enum LogInViewShowType {
+    case full, sheet
+}
+
 enum CreateFocused {
     case check
 }
@@ -80,6 +84,9 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
 
     @StateObject var logInVM: LogInViewModel
     @StateObject var teamVM: TeamViewModel
+    
+    // ログインViewがフル表示かシート表示か
+    var showType: LogInViewShowType
 
     @State private var logInNavigationPath: [Navigation] = []
     @State private var inputLogIn: InputLogIn = InputLogIn()
@@ -889,6 +896,6 @@ struct MailAddressInfomation: View {
 
 struct LogInView_Previews: PreviewProvider {
     static var previews: some View {
-        LogInView(logInVM: LogInViewModel(), teamVM: TeamViewModel())
+        LogInView(logInVM: LogInViewModel(), teamVM: TeamViewModel(), showType: .full)
     }
 }

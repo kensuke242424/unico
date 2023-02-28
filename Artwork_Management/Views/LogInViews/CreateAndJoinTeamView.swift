@@ -411,7 +411,7 @@ struct CreateAndJoinTeamView: View {
             }
         }
         .sheet(isPresented: $isShowSignUpSheetView) {
-            LogInView(logInVM: logInVM, teamVM: teamVM)
+            LogInView(logInVM: logInVM, teamVM: teamVM, showType: .sheet)
         }
         .sheet(isPresented: $isShowPickerView) {
             PHPickerView(captureImage: $captureImage, isShowSheet: $isShowPickerView, isShowError: $captureError)
