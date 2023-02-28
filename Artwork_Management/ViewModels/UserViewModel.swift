@@ -28,7 +28,7 @@ class UserViewModel: ObservableObject {
 
     @Published var user: User?
     @Published var canUserFetchedListener: Bool?
-    @Published var isAnonymous: Bool?
+    @Published var isAnonymous: Bool = false
     @Published var showAlert = false
     @Published var userErrorMessage = ""
     @Published var updatedUser: Bool = false

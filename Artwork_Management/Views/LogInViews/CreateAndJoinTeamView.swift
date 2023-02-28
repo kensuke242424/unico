@@ -264,6 +264,7 @@ struct CreateAndJoinTeamView: View {
             .opacity(selectTeamFase == .start || selectTeamFase == .success ? 0.0 : 1.0)
             .opacity(selectedTeamCard == .join && selectTeamFase == .fase2 ? 0.0 : 1.0)
             .disabled(selectedTeamCard == .start || selectTeamFase == .success ? true : false)
+            .disabled(selectedTeamCard == .join && userVM.isAnonymous ? true : false)
 
             Button("<戻る") {
                 withAnimation(.spring(response: 0.7)) {
@@ -434,6 +435,22 @@ struct CreateAndJoinTeamView: View {
                         cubeRow(color1: .userYellow2, color2: .userYellowAccent).opacity(0.3)
                             .offset(x: 25, y: -12)
                     }
+            }
+            
+            if userVM.isAnonymous {
+                RoundedRectangle(cornerRadius: 10)
+                    .foregroundColor(.black)
+                    .opacity(selectedTeamCard == .join ? 0.7 : 0.3)
+                    .frame(width: getRect().width * 0.4, height: getRect().height * 0.25)
+                
+                VStack(spacing: 5) {
+                    Text("ユーザー登録が")
+                    Text("必要です")
+                }
+                .foregroundColor(.white)
+                .font(.subheadline).tracking(5)
+                .opacity(selectedTeamCard == .join ? 0.6 : 0.0)
+                
             }
         }
         .clipShape(RoundedRectangle(cornerRadius: 10))
