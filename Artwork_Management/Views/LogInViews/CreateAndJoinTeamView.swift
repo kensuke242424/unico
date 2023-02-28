@@ -176,11 +176,11 @@ struct CreateAndJoinTeamView: View {
                 ZStack {
                     if selectTeamFase == .start || selectTeamFase == .fase1 || selectTeamFase == .fase2 {
                         HStack(spacing: 15) {
-                            joinCard()
+                            joinTeamCardView()
                             Text("<>")
                                 .font(.title3).foregroundColor(.white)
                                 .opacity(selectedTeamCard == .start ? 0.6 : 0.0)
-                            createCard()
+                            createTeamCardView()
                         }
                         .opacity(selectTeamFase == .fase1 ? 1.0 : 0.0)
                         .offset(x: selectTeamFase == .fase1 ? 0 : selectTeamFase == .start ? getRect().width : -getRect().width)
@@ -415,7 +415,7 @@ struct CreateAndJoinTeamView: View {
     }
 
     @ViewBuilder
-    func joinCard() -> some View {
+    func joinTeamCardView() -> some View {
         ZStack {
             BlurView(style: .systemUltraThinMaterialDark)
             Color.userBlue1
@@ -465,7 +465,7 @@ struct CreateAndJoinTeamView: View {
         }
     }
 
-    func createCard() -> some View {
+    func createTeamCardView() -> some View {
         ZStack {
             BlurView(style: .systemUltraThinMaterialDark)
             Color.userRed1
