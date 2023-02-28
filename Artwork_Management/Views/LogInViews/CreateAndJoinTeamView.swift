@@ -35,6 +35,7 @@ struct CreateAndJoinTeamView: View {
     @State private var joinedTeamData: JoinTeam?
     @State private var uploadImageData: (url: URL?, filePath: String?)
     @State private var isShowPickerView: Bool = false
+    @State private var isShowSignUpSheetView: Bool = false
     @State private var isShowGoBackLogInAlert: Bool = false
     @State private var captureError: Bool = false
     @State private var selectedTeamCard: SelectedTeamCard = .start
@@ -409,6 +410,9 @@ struct CreateAndJoinTeamView: View {
                 }
             }
         }
+        .sheet(isPresented: $isShowSignUpSheetView) {
+            LogInView(logInVM: logInVM, teamVM: teamVM)
+        }
         .sheet(isPresented: $isShowPickerView) {
             PHPickerView(captureImage: $captureImage, isShowSheet: $isShowPickerView, isShowError: $captureError)
         }
@@ -440,16 +444,30 @@ struct CreateAndJoinTeamView: View {
             if userVM.isAnonymous {
                 RoundedRectangle(cornerRadius: 10)
                     .foregroundColor(.black)
-                    .opacity(selectedTeamCard == .join ? 0.7 : 0.3)
+                    .opacity(selectedTeamCard == .join ? 0.8 : 0.3)
                     .frame(width: getRect().width * 0.4, height: getRect().height * 0.25)
                 
                 VStack(spacing: 5) {
-                    Text("ユーザー登録が")
-                    Text("必要です")
+                    
+                    Group {
+                        Text("ユーザ登録が")
+                        Text("必要です")
+                    }
+                    .foregroundColor(.white)
+                    .font(.footnote).tracking(4)
+                    .opacity(selectedTeamCard == .join ? 0.6 : 0.0)
+                    
+                    
+                    Button("ユーザ登録") {
+                        isShowSignUpSheetView.toggle()
+                    }
+                    .offset(y: 30)
+                    .frame(width: 130)
+                    .buttonStyle(.borderedProminent)
+                    .font(.footnote).tracking(2)
+                    .opacity(selectedTeamCard == .join ? 1.0 : 0.0)
                 }
-                .foregroundColor(.white)
-                .font(.subheadline).tracking(5)
-                .opacity(selectedTeamCard == .join ? 0.6 : 0.0)
+                
                 
             }
         }
