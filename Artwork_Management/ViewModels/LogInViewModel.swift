@@ -41,14 +41,13 @@ class LogInViewModel: ObservableObject {
             
             if let error = error {
                 print(error.localizedDescription)
-                print("AnonymousSignIn_failure")
+                print("AnonymousSignIn_error")
+                self.isShowLogInErrorAlert.toggle()
                 return
             }
             if let user = authResult?.user {
                 print("\(user.displayName ?? "No displayName")")
                 print("isAnonymousSignIn: \(user.isAnonymous)")
-            } else {
-                print("isAnonymous_authResult ... guard")
             }
         }
     }
@@ -89,7 +88,7 @@ class LogInViewModel: ObservableObject {
                 Task {
                     do {
                          _ = try await Auth.auth().signIn(with: credential)
-                        self.currentUserCheck()
+                        self.currentUserCheckListener()
                     } catch {
                         print("Error authenticating: \(error.localizedDescription)")
                     }
@@ -206,7 +205,7 @@ class LogInViewModel: ObservableObject {
         }
     }
 
-    func currentUserCheck() {
+    func currentUserCheckListener() {
         Auth.auth().addStateDidChangeListener { auth, user in
             if user != nil {
                 print("currentUserCheck_サインイン⭕️")
@@ -223,7 +222,7 @@ class LogInViewModel: ObservableObject {
         }
     }
 
-    func addUserSignInWithApple(name: String, password: String?, imageData: UIImage?, color: MemberColor) async -> Bool {
+    func addNewUserSetData(name: String, password: String?, imageData: UIImage?, color: MemberColor) async -> Bool {
 
         print("addUserSignInWithApple実行")
 
@@ -267,7 +266,8 @@ class LogInViewModel: ObservableObject {
         do {
             // currentUserのuidとドキュメントIDを同じにして保存
             _ = try usersRef.document(userData.id).setData(from: userData)
-        } catch {
+        }
+        catch {
             print("Error: try db!.collection(collectionID).addDocument(from: itemData)")
             return false
         }

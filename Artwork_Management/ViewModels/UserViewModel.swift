@@ -12,7 +12,7 @@ import FirebaseFirestore
 import FirebaseFirestoreSwift
 
 enum CustomError: Error {
-    case uidEmpty, getRef, fetch, setData, updateData, getDocument,getUserDocument, photoUrlEmpty, userEmpty, teamEmpty, getDetectUser, inputTextEmpty, memberDuplication, addTeamIDToJoinedUser
+    case uidEmpty, getRef, fetch, setData, updateData, getDocument,getUserDocument, photoUrlEmpty, userEmpty, teamEmpty, getDetectUser, inputTextEmpty, memberDuplication, addTeamIDToJoinedUser, createAnonymous
 }
 
 class UserViewModel: ObservableObject {
@@ -27,6 +27,7 @@ class UserViewModel: ObservableObject {
 
     @Published var user: User?
     @Published var canUserFetchedListener: Bool?
+    @Published var isAnonymous: Bool?
     @Published var showAlert = false
     @Published var userErrorMessage = ""
     @Published var updatedUser: Bool = false
@@ -42,6 +43,18 @@ class UserViewModel: ObservableObject {
             self.user = user
         } catch {
             throw CustomError.getUserDocument
+        }
+    }
+    
+    func isAnonymousCheck() -> Bool {
+        print("userVM_isAnonymousCheck実行")
+        
+        if let user = Auth.auth().currentUser, user.isAnonymous {
+            print("currentUser: Not anonymous user")
+            return true
+        } else {
+            print("currentUser: Anonymous user")
+            return false
         }
     }
 

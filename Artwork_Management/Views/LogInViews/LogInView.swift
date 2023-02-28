@@ -235,7 +235,11 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 // Anonymous Started button...
                 Button {
                     // Open navigate tab srideView...
-                    logInVM.signInAnonymously()
+                    Task {
+                        logInVM.signInAnonymously()
+                        logInVM.currentUserCheckListener()
+                    }
+                    
                 } label: {
                     HStack {
                         Text("始めてみる")
@@ -269,17 +273,21 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         }
 
         // currentUserを監視するリスナーによってサインインが検知されたら、各項目ごとに次のフェーズへ移行
-        .onChange(of: logInVM.successSignInAccount) { success in
+        .onChange(of: logInVM.successSignInAccount) { signInCheck in
             print("logInVM.successCreateAccount更新を検知")
-            if !success { return }
+            if !signInCheck { return }
             switch inputLogIn.firstSelect {
-            case .start: print("none.")
+            case .start: print("")
             case .logIn: withAnimation(.spring(response: 0.5)) { logInVM.rootNavigation = .fetch }
             case .signAp:
                 Task {
-                    let addUserFirestoreCheck = await logInVM.addUserSignInWithApple(name: inputLogIn.createUserNameText, password: inputLogIn.password,
-                                                                                           imageData: inputLogIn.captureImage, color: inputLogIn.selectUserColor)
-                    if addUserFirestoreCheck { withAnimation(.spring(response: 0.5)) { logInVM.rootNavigation = .fetch } }
+                    let addUserFirestoreCheck = await logInVM.addNewUserSetData(name: inputLogIn.createUserNameText,
+                                                                                     password: inputLogIn.password,
+                                                                                     imageData: inputLogIn.captureImage,
+                                                                                     color: inputLogIn.selectUserColor)
+                    if addUserFirestoreCheck {
+                        withAnimation(.spring(response: 0.5)) { logInVM.rootNavigation = .fetch }
+                    }
                 }
             }
 
