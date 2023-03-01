@@ -326,7 +326,7 @@ struct CreateAndJoinTeamView: View {
             }
             .disabled(selectTeamFase == .success ? true : false)
             .foregroundColor(.white.opacity(0.6))
-            .opacity(selectTeamFase == .start ? 0.0 : 1.0)
+            .opacity(selectTeamFase == .start || selectTeamFase == .fase1 ? 0.0 : 1.0)
             .offset(x: getRect().width / 2 - 80, y: getRect().height / 2 - 60 )
         } // ZStack
 
