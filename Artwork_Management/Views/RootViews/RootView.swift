@@ -38,7 +38,7 @@ struct RootView: View {
         ZStack {
             switch logInVM.rootNavigation {
             case .logIn:
-                LogInView(logInVM: logInVM, teamVM: teamVM, logInViewShowType: .full)
+                LogInView(logInVM: logInVM, teamVM: teamVM)
 
             case .fetch:
                 StandByView()
