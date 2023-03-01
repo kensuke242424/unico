@@ -448,25 +448,13 @@ struct CreateAndJoinTeamView: View {
                     .frame(width: getRect().width * 0.4, height: getRect().height * 0.25)
                 
                 VStack(spacing: 5) {
-                    
-                    Group {
-                        Text("ユーザ登録が")
-                        Text("必要です")
-                    }
-                    .foregroundColor(.white)
-                    .font(.footnote).tracking(4)
-                    .opacity(selectedTeamCard == .join ? 0.6 : 0.0)
-                    
-                    
-                    Button("ユーザ登録") {
-                        isShowSignUpSheetView.toggle()
-                    }
-                    .offset(y: 30)
-                    .frame(width: 130)
-                    .buttonStyle(.borderedProminent)
-                    .font(.footnote).tracking(2)
-                    .opacity(selectedTeamCard == .join ? 1.0 : 0.0)
+                    Text("この機能は")
+                    Text("ユーザ登録が")
+                    Text("必要です")
                 }
+                .foregroundColor(.white)
+                .font(.footnote).tracking(4)
+                .opacity(selectedTeamCard == .join ? 0.6 : 0.0)
                 
                 
             }
