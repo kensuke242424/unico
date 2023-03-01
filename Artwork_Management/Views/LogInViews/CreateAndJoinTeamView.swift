@@ -469,6 +469,13 @@ struct CreateAndJoinTeamView: View {
                 selectedTeamCard = selectedTeamCard == .start || selectedTeamCard == .create ? .join : .start
             }
         }
+        .overlay(alignment: .top) {
+            Text("参加する")
+                .foregroundColor(.white)
+                .font(.headline).tracking(8)
+                .offset(y: -30)
+                .opacity(selectedTeamCard == .start ? 0.7 : 0.0)
+        }
     }
 
     func createTeamCardView() -> some View {
@@ -494,6 +501,13 @@ struct CreateAndJoinTeamView: View {
             withAnimation(.spring(response: 0.5)) {
                 selectedTeamCard = selectedTeamCard == .start || selectedTeamCard == .join ? .create : .start
             }
+        }
+        .overlay(alignment: .top) {
+            Text("作る")
+                .foregroundColor(.white)
+                .font(.headline).tracking(8)
+                .offset(y: -30)
+                .opacity(selectedTeamCard == .start ? 0.7 : 0.0)
         }
     }
 
