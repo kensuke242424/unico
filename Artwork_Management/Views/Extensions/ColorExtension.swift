@@ -70,5 +70,7 @@ extension Color {
     static let userBrawnAccent = Color("userBrawnAccent")
 
     static let customSoldOutTagColor = Color("customSoldOutTagColor")
+    
+    static let customHalfSheetBackgroundColor = Color("customHalfSheetBackgroundColor")
 
 }
