@@ -181,7 +181,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 }
                 .disabled(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .success ? true : false)
                 .opacity(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .success ? 0.2 : 1.0)
-                .opacity(inputLogIn.createAccountFase == .fase1 ? 0.0 : 1.0)
+                .opacity(inputLogIn.createAccountFase == .fase1 && !inputLogIn.createAccountContents ? 0.0 : 1.0)
                 .offset(y: getRect().height / 3)
             }
             
