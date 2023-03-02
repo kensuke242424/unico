@@ -31,7 +31,7 @@ enum CreateFocused {
 
 enum AddressCheck {
     case stop, start, failure, success
-
+    
     var icon: Image {
         switch self {
         case .stop: return Image(systemName: "")
@@ -40,7 +40,7 @@ enum AddressCheck {
         case .success: return Image(systemName: "checkmark.seal.fill")
         }
     }
-
+    
     var text: String {
         switch self {
         case .stop: return ""
@@ -77,18 +77,18 @@ struct InputLogIn {
 // ✅ ログイン画面の親Viewです。
 
 struct LogInView: View { // swiftlint:disable:this type_body_length
-
+    
     @StateObject var logInVM: LogInViewModel
     @StateObject var teamVM: TeamViewModel
-
+    
     @State private var logInNavigationPath: [Navigation] = []
     @State private var inputLogIn: InputLogIn = InputLogIn()
     @State private var createFaseLineImprove: CGFloat = 0.0
-
+    
     @FocusState private var createNameFocused: CreateFocused?
-
+    
     var body: some View {
-
+        
         ZStack {
             
             GradientBackbround(color1: inputLogIn.selectUserColor.color1,
@@ -263,7 +263,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         .sheet(isPresented: $inputLogIn.isShowPickerView) {
             PHPickerView(captureImage: $inputLogIn.captureImage, isShowSheet: $inputLogIn.isShowPickerView, isShowError: $inputLogIn.captureError)
         }
-
+        
         .onChange(of: inputLogIn.createAccountFase) { newFase in
             withAnimation(.spring(response: 1.0)) {
                 switch newFase {
@@ -275,7 +275,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 }
             }
         }
-
+        
         // currentUserを監視するリスナーによってサインインが検知されたら、各項目ごとに次のフェーズへ移行
         .onChange(of: logInVM.successSignInAccount) { signInCheck in
             print("logInVM.successCreateAccount更新を検知")
@@ -286,18 +286,18 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             case .signAp:
                 Task {
                     let addUserFirestoreCheck = await logInVM.addNewUserSetData(name: inputLogIn.createUserNameText,
-                                                                                     password: inputLogIn.password,
-                                                                                     imageData: inputLogIn.captureImage,
-                                                                                     color: inputLogIn.selectUserColor)
+                                                                                password: inputLogIn.password,
+                                                                                imageData: inputLogIn.captureImage,
+                                                                                color: inputLogIn.selectUserColor)
                     if addUserFirestoreCheck {
                         withAnimation(.spring(response: 0.5)) { logInVM.rootNavigation = .fetch }
                     }
                 }
             }
-
+            
         }
     } // body
-
+    
     @ViewBuilder
     func signInTitle(title: String) -> some View {
         HStack {
@@ -311,14 +311,14 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         }
     }
     func firstSelectButtons() -> some View {
-
+        
         VStack(spacing: 20) {
             Text("アカウントをお持ちですか？")
                 .tracking(10)
                 .font(.subheadline)
                 .foregroundColor(.white.opacity(0.5))
                 .padding(.bottom, 40)
-
+            
             Button {
                 withAnimation(.easeIn(duration: 0.3)) {
                     inputLogIn.firstSelect = .logIn
@@ -337,11 +337,11 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 }
             }
             Button {
-
+                
                 withAnimation(.easeIn(duration: 1)) {
                     inputLogIn.firstSelect = .signAp
                 }
-
+                
                 inputLogIn.createAccountFase = .fase1
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
                     withAnimation(.spring(response: 1.0)) {
@@ -353,7 +353,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         inputLogIn.createAccountShowContents = true
                     }
                 }
-
+                
             } label: {
                 ZStack {
                     RoundedRectangle(cornerRadius: 15)
@@ -371,7 +371,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
     }
     func logInSelectButtons() -> some View {
         VStack(spacing: 15) {
-
+            
             // Sign In With Apple...
             SignInWithAppleButton(.signIn) { request in
                 inputLogIn.selectSignInType = .apple
@@ -383,11 +383,11 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             .frame(width: 250, height: 50)
             .cornerRadius(8)
             .shadow(radius: 10, x: 5, y: 5)
-
+            
             Text("または")
                 .foregroundColor(.white).opacity(0.7)
                 .tracking(2)
-
+            
             Button {
                 withAnimation(.easeIn(duration: 0.3)) {
                     inputLogIn.selectSignInType = .mailAddress
@@ -406,36 +406,36 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         }
     }
     func createAccountViews() -> some View {
-
+        
         VStack(spacing: 50) {
-
+            
             Group {
                 switch inputLogIn.createAccountFase {
                 case .start: Text("")
                 case .fase1:
-
+                    
                     VStack(spacing: 10) {
                         Text("あなたの色は？")
                             .tracking(10)
-
+                        
                     }
-
+                    
                 case .fase2:
-
-                        VStack(spacing: 10) {
-                            Text("unicoへようこそ").tracking(10)
-                            Text("あなたのことを教えてください")
-                        }
-
+                    
+                    VStack(spacing: 10) {
+                        Text("unicoへようこそ").tracking(10)
+                        Text("あなたのことを教えてください")
+                    }
+                    
                 case .fase3:
-
-//                    if inputLogIn.selectSignInType != .mailAddress {
-                        VStack(spacing: 10) {
-                            Text("初めまして、\(inputLogIn.createUserNameText)さん")
-                            Text("どちらから登録しますか？")
-                        }
-                        .frame(width: 250)
-//                    }
+                    
+                    //                    if inputLogIn.selectSignInType != .mailAddress {
+                    VStack(spacing: 10) {
+                        Text("初めまして、\(inputLogIn.createUserNameText)さん")
+                        Text("どちらから登録しますか？")
+                    }
+                    .frame(width: 250)
+                    //                    }
                 case .success:
                     VStack(spacing: 10) {
                         Text("アカウント登録が完了しました！")
@@ -446,26 +446,26 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             .tracking(5)
             .font(.subheadline).foregroundColor(.white.opacity(0.6))
             .opacity(inputLogIn.createAccountTitle ? 1.0 : 0.0)
-
+            
             Group {
                 switch inputLogIn.createAccountFase {
-
+                    
                 case .start: Text("")
-
+                    
                 case .fase1:
-
+                    
                     VStack {
                         Label("Tap!", systemImage: "hand.tap.fill")
                             .foregroundColor(.white)
                             .opacity(inputLogIn.createAccountShowContents ? 0.5 : 0.0)
                             .tracking(3)
                             .offset(y: -10)
-
+                        
                         ColorCubeView(colorSet: $inputLogIn.selectUserColor)
                             .padding()
                     }
                     .offset(y: 20)
-
+                    
                     Button {
                         withAnimation(.spring(response: 1.0)) {
                             inputLogIn.createAccountTitle = false
@@ -482,15 +482,15 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                 inputLogIn.createAccountShowContents = true
                             }
                         }
-
+                        
                     } label: {
                         Text("次へ")
                     }
                     .buttonStyle(.borderedProminent)
                     .offset(y: 20)
-
+                    
                 case .fase2:
-
+                    
                     Group {
                         if let captureImage = inputLogIn.captureImage {
                             UIImageCircleIcon(photoImage: captureImage, size: 150)
@@ -502,12 +502,12 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     .onTapGesture { inputLogIn.isShowPickerView.toggle() }
                     .overlay(alignment: .top) {
                         Text("ユーザ情報は後から変更できます。").font(.caption)
-                        .foregroundColor(.white.opacity(0.3))
-                        .frame(width: 200)
-                        .offset(y: -30)
+                            .foregroundColor(.white.opacity(0.3))
+                            .frame(width: 200)
+                            .offset(y: -30)
                     }
                     .offset(y: 20)
-
+                    
                     TextField("", text: $inputLogIn.createUserNameText)
                         .frame(width: 230)
                         .foregroundColor(.white)
@@ -522,9 +522,9 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                     .offset(y: 20)
                             }
                         }
-
+                    
                     Button {
-
+                        
                         withAnimation(.spring(response: 0.9)) {
                             inputLogIn.createAccountTitle = false
                             inputLogIn.createAccountShowContents = false
@@ -542,29 +542,19 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         Text("次へ")
                     }
                     .buttonStyle(.borderedProminent)
-
+                    
                 case .fase3:
-
-                    VStack {
-                        signInTitle(title: inputLogIn.selectSignInType != .mailAddress ? "新規登録" : "メールアドレス登録")
-
-                        ZStack {
-                            logInSelectButtons()
-//                                .opacity(inputLogIn.selectSignInType == .mailAddress ? 0.0 : 1.0)
-//                            if inputLogIn.selectSignInType == .mailAddress {
-//                                MailAddressInfomation(logInVM: logInVM,
-//                                                      inputLogIn: $inputLogIn)
-//                                .opacity(inputLogIn.selectSignInType == .mailAddress ? 1.0 : 0.0)
-//                            }
-                        }
-//                        .offset(y: 50)
+                    
+                    VStack(spacing: 30) {
+                        signInTitle(title: "新規登録")
+                        logInSelectButtons()
                     }
                 case .success:
                     EmptyView()
                 }
             }
             .opacity(inputLogIn.createAccountShowContents ? 1.0 : 0.0)
-
+            
         } // VStack
     }
     // create fase line...
@@ -577,7 +567,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     .frame(width: createFaseLineImprove, height: 2)
                     .foregroundColor(.green)
             }
-
+        
             .overlay(alignment: .leading) {
                 Circle().frame(width: 12, height: 12)
                     .foregroundColor(inputLogIn.createAccountFase != .fase1 ? .green : .white)
@@ -590,7 +580,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             .offset(y: -20)
                     }
             }
-
+        
             .overlay {
                 Circle().frame(width: 12, height: 12)
                     .foregroundColor(inputLogIn.createAccountFase != .fase1 &&
@@ -604,7 +594,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             .offset(y: -20)
                     }
             }
-
+        
             .overlay(alignment: .trailing) {
                 Circle().frame(width: 12, height: 12)
                     .foregroundColor(inputLogIn.createAccountFase != .fase1 &&
@@ -620,14 +610,14 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     }
             }
     }
-
+    
 } // View
 
 struct MailAddressInfomation: View {
-
+    
     @StateObject var logInVM: LogInViewModel
     @Binding var inputLogIn: InputLogIn
-
+    
     @State private var addressHidden: Bool = false
     @State private var passwordHidden: Bool = false
     @State private var passwordCount6Lower: Bool = false
@@ -635,21 +625,21 @@ struct MailAddressInfomation: View {
     @State private var passwordConfirmDifference: Bool = false
     @State private var disabledButton: Bool = false
     @State private var signUpErrorMessage: String = ""
-
+    
     @FocusState private var createAccountFocused: CreateFocused?
-
+    
     var body: some View {
-
+        
         ZStack {
-
+            
             Color.white.opacity(0.001).frame(width: getRect().width, height: getRect().height / 3)
                 .onTapGesture { createAccountFocused = nil }
-
+            
             VStack(spacing: 25) {
-
+                
                 // 入力欄全体
                 Group {
-
+                    
                     // Mail address...
                     VStack {
                         HStack {
@@ -660,7 +650,7 @@ struct MailAddressInfomation: View {
                             }
                         }
                         .frame(width: getRect().width * 0.7, alignment: .leading)
-
+                        
                         TextField("unico@gmail.com", text: $inputLogIn.address)
                             .foregroundColor(.white)
                             .focused($createAccountFocused, equals: .check)
@@ -668,7 +658,7 @@ struct MailAddressInfomation: View {
                             .frame(width: getRect().width * 0.7, height: 30)
                             .background(RoundedRectangle(cornerRadius: 10).foregroundColor(.black.opacity(0.2)).frame(height: 30))
                     }
-
+                    
                     // Password...
                     VStack {
                         HStack {
@@ -683,7 +673,7 @@ struct MailAddressInfomation: View {
                             }
                         }
                         .frame(width: getRect().width * 0.7, alignment: .leading)
-
+                        
                         Group {
                             if inputLogIn.passHidden {
                                 SecureField("●●●●●●●●", text: $inputLogIn.password)
@@ -716,7 +706,7 @@ struct MailAddressInfomation: View {
                                 }
                             }
                             .frame(width: getRect().width * 0.7, alignment: .leading)
-
+                            
                             Group {
                                 if inputLogIn.passHidden {
                                     SecureField("●●●●●●●●", text: $inputLogIn.passwordConfirm)
@@ -744,43 +734,43 @@ struct MailAddressInfomation: View {
                 .autocapitalization(.none)
                 .keyboardType(.emailAddress)
                 .padding(.horizontal, 25)
-
+                
                 Button(inputLogIn.firstSelect == .logIn ? "ログイン" : "ユーザ登録") {
-
+                    
                     addressHidden = false
                     passwordHidden = false
                     passwordCount6Lower = false
                     passwordConfirmIsEmpty = false
                     passwordConfirmDifference = false
                     logInVM.logInErrorMessage = ""
-
+                    
                     inputLogIn.addressCheck = .start
                     createAccountFocused = nil
-
+                    
                     if inputLogIn.address.isEmpty { addressHidden.toggle() }
                     if inputLogIn.password.isEmpty { passwordHidden.toggle() }
                     if inputLogIn.firstSelect == .signAp && inputLogIn.passwordConfirm.isEmpty { passwordConfirmIsEmpty.toggle() }
                     if inputLogIn.firstSelect == .signAp && inputLogIn.password != inputLogIn.passwordConfirm { passwordConfirmDifference.toggle() }
-
+                    
                     if addressHidden || passwordHidden || passwordCount6Lower || passwordConfirmIsEmpty || passwordConfirmDifference {
                         print("ユーザ登録記入欄に不備あり")
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                             withAnimation(.spring(response: 0.5)) { inputLogIn.addressCheck = .failure }
                         }
                         return
-
+                        
                     } else {
-
+                        
                         switch inputLogIn.firstSelect {
                         case .start: return
-
+                            
                         case .signAp:
                             Task {
                                 // メールアドレスを用いてユーザを登録する
                                 let checkSignUp = await logInVM.signUpEmailAdress(email: inputLogIn.address,
-                                                                       password: inputLogIn.password)
+                                                                                  password: inputLogIn.password)
                                 if !checkSignUp { inputLogIn.addressCheck = .failure; return }
-
+                                
                                 let uplaodImageData = await  logInVM.uploadImage(inputLogIn.captureImage)
                                 let newUserData = User(id: logInVM.uid!,
                                                        name: inputLogIn.createUserNameText,
@@ -790,30 +780,30 @@ struct MailAddressInfomation: View {
                                                        iconPath: uplaodImageData.filePath,
                                                        userColor: inputLogIn.selectUserColor,
                                                        joins: [])
-
+                                
                                 let checkAddUser = await logInVM.addUserMailAdress(userData: newUserData)
-
+                                
                                 if checkSignUp, checkAddUser {
                                     // サインアップ成功
                                     withAnimation(.spring(response: 0.5)) { inputLogIn.addressCheck = .success }
-
+                                    
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                                         // RootViewのfetch処理へ移動
                                         withAnimation(.spring(response: 0.5)) {
                                             logInVM.rootNavigation = .fetch
                                         }
                                     }
-
+                                    
                                 } else {
                                     // サインアップ失敗
                                     withAnimation(.spring(response: 0.5)) { inputLogIn.addressCheck = .failure }
                                 }
                             }
-
+                            
                         case .logIn:
                             Task {
                                 let checkSignIn = await logInVM.signInEmailAdress(email: inputLogIn.address,
-                                                                       password: inputLogIn.password)
+                                                                                  password: inputLogIn.password)
                                 if checkSignIn {
                                     // ログイン成功
                                     withAnimation(.spring(response: 0.5)) { inputLogIn.addressCheck = .success }
@@ -853,7 +843,7 @@ struct MailAddressInfomation: View {
                         passwordConfirmIsEmpty = false
                         passwordConfirmDifference = false
                         logInVM.logInErrorMessage = ""
-
+                        
                         inputLogIn.addressCheck = .stop
                     }
                     .overlay(alignment: .bottom) {(Rectangle().frame(height: 1)) }
@@ -863,17 +853,17 @@ struct MailAddressInfomation: View {
                     .opacity(inputLogIn.addressCheck == .failure ? 1.0 : 0.0)
                 }
                 .padding(.top, 20)
-
+                
                 Text(inputLogIn.addressCheck == .failure ? logInVM.logInErrorMessage :
                         inputLogIn.addressCheck == .success ? inputLogIn.firstSelect == .logIn ?
                      "ログインに成功しました！"  : "ユーザ登録が完了しました！" : "")
-                    .font(.subheadline).fontWeight(.bold)
-                    .foregroundColor(inputLogIn.addressCheck == .failure ? .red : .white).opacity(0.8)
-                    .opacity(inputLogIn.addressCheck == .failure || inputLogIn.addressCheck == .success ? 1.0 : 0.0)
-                    .frame(height: 20)
-
+                .font(.subheadline).fontWeight(.bold)
+                .foregroundColor(inputLogIn.addressCheck == .failure ? .red : .white).opacity(0.8)
+                .opacity(inputLogIn.addressCheck == .failure || inputLogIn.addressCheck == .success ? 1.0 : 0.0)
+                .frame(height: 20)
+                
             } // VStack
-
+            
             .onDisappear {
                 addressHidden = false
                 passwordHidden = false
