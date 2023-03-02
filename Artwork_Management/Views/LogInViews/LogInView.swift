@@ -62,7 +62,7 @@ struct InputLogIn {
     var passHidden: Bool = true
     var passHiddenConfirm: Bool = true
     var createAccountTitle: Bool = false
-    var createAccountContents: Bool = false
+    var createAccountShowContents: Bool = false
     var startFetchContents: Bool = false
     var isShowProgressView: Bool = false
     var isShowPickerView: Bool = false
@@ -164,7 +164,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             inputLogIn.firstSelect = .start
                             inputLogIn.createAccountFase = .start
                             inputLogIn.createAccountTitle = false
-                            inputLogIn.createAccountContents = false
+                            inputLogIn.createAccountShowContents = false
                         case .fase2:
                             inputLogIn.createAccountFase = .fase1
                         case .fase3:
@@ -181,7 +181,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 }
                 .disabled(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .success ? true : false)
                 .opacity(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .success ? 0.2 : 1.0)
-                .opacity(inputLogIn.createAccountFase == .fase1 && !inputLogIn.createAccountContents ? 0.0 : 1.0)
+                .opacity(inputLogIn.createAccountFase == .fase1 && !inputLogIn.createAccountShowContents ? 0.0 : 1.0)
                 .offset(y: getRect().height / 3)
             }
             
@@ -222,7 +222,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             inputLogIn.firstSelect = .start
                             inputLogIn.createAccountFase = .start
                             inputLogIn.createAccountTitle = false
-                            inputLogIn.createAccountContents = false
+                            inputLogIn.createAccountShowContents = false
                             if inputLogIn.createUserNameText == "名無し" { inputLogIn.createUserNameText = "" }
                         }
                         
@@ -250,7 +250,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 }
                 .disabled(inputLogIn.createAccountFase == .success ? true : false)
                 .foregroundColor(.white.opacity(0.6))
-                .opacity(inputLogIn.createAccountFase == .success || inputLogIn.createAccountContents == false ? 0.0 : 1.0)
+                .opacity(inputLogIn.createAccountFase == .success || inputLogIn.createAccountShowContents == false ? 0.0 : 1.0)
                 .offset(x: getRect().width / 2 - 80, y: getRect().height / 2 - 60 )
             }
             
@@ -350,7 +350,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.3) {
                     withAnimation(.spring(response: 1.0)) {
-                        inputLogIn.createAccountContents = true
+                        inputLogIn.createAccountShowContents = true
                     }
                 }
 
@@ -457,7 +457,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     VStack {
                         Label("Tap!", systemImage: "hand.tap.fill")
                             .foregroundColor(.white)
-                            .opacity(inputLogIn.createAccountContents ? 0.5 : 0.0)
+                            .opacity(inputLogIn.createAccountShowContents ? 0.5 : 0.0)
                             .tracking(3)
                             .offset(y: -10)
 
@@ -469,7 +469,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     Button {
                         withAnimation(.spring(response: 1.0)) {
                             inputLogIn.createAccountTitle = false
-                            inputLogIn.createAccountContents = false
+                            inputLogIn.createAccountShowContents = false
                             inputLogIn.createAccountFase = .fase2
                         }
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
@@ -479,7 +479,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         }
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                             withAnimation(.spring(response: 0.8)) {
-                                inputLogIn.createAccountContents = true
+                                inputLogIn.createAccountShowContents = true
                             }
                         }
 
@@ -527,7 +527,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
 
                         withAnimation(.spring(response: 0.9)) {
                             inputLogIn.createAccountTitle = false
-                            inputLogIn.createAccountContents = false
+                            inputLogIn.createAccountShowContents = false
                             inputLogIn.createAccountFase = .fase3
                         }
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
@@ -535,7 +535,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             }
                             withAnimation(.spring(response: 0.7)) {
                                 inputLogIn.createAccountTitle = true
-                                inputLogIn.createAccountContents = true
+                                inputLogIn.createAccountShowContents = true
                             }
                         }
                     } label: {
@@ -563,7 +563,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     EmptyView()
                 }
             }
-            .opacity(inputLogIn.createAccountContents ? 1.0 : 0.0)
+            .opacity(inputLogIn.createAccountShowContents ? 1.0 : 0.0)
 
         } // VStack
     }
@@ -581,12 +581,12 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             .overlay(alignment: .leading) {
                 Circle().frame(width: 12, height: 12)
                     .foregroundColor(inputLogIn.createAccountFase != .fase1 ? .green : .white)
-                    .scaleEffect(inputLogIn.createAccountFase == .fase1 && inputLogIn.createAccountContents ? 1.5 : 1.0)
+                    .scaleEffect(inputLogIn.createAccountFase == .fase1 && inputLogIn.createAccountShowContents ? 1.5 : 1.0)
                     .overlay(alignment: .top) {
                         Text("Check!")
                             .font(.caption2).foregroundColor(.white.opacity(0.5))
                             .frame(width: 50)
-                            .opacity(inputLogIn.createAccountFase == .fase1 && inputLogIn.createAccountContents ? 1.0 : 0.0)
+                            .opacity(inputLogIn.createAccountFase == .fase1 && inputLogIn.createAccountShowContents ? 1.0 : 0.0)
                             .offset(y: -20)
                     }
             }
@@ -595,12 +595,12 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 Circle().frame(width: 12, height: 12)
                     .foregroundColor(inputLogIn.createAccountFase != .fase1 &&
                                      inputLogIn.createAccountFase != .fase2 ? .green : .white)
-                    .scaleEffect(inputLogIn.createAccountFase == .fase2 && inputLogIn.createAccountContents ? 1.5 : 1.0)
+                    .scaleEffect(inputLogIn.createAccountFase == .fase2 && inputLogIn.createAccountShowContents ? 1.5 : 1.0)
                     .overlay(alignment: .top) {
                         Text("Check!")
                             .font(.caption2).foregroundColor(.white.opacity(0.5))
                             .frame(width: 50)
-                            .opacity(inputLogIn.createAccountFase == .fase2 && inputLogIn.createAccountContents ? 1.0 : 0.0)
+                            .opacity(inputLogIn.createAccountFase == .fase2 && inputLogIn.createAccountShowContents ? 1.0 : 0.0)
                             .offset(y: -20)
                     }
             }
@@ -610,12 +610,12 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     .foregroundColor(inputLogIn.createAccountFase != .fase1 &&
                                      inputLogIn.createAccountFase != .fase2 &&
                                      inputLogIn.createAccountFase != .fase3 ? .green : .white)
-                    .scaleEffect(inputLogIn.createAccountFase == .fase3 && inputLogIn.createAccountContents ? 1.5 : 1.0)
+                    .scaleEffect(inputLogIn.createAccountFase == .fase3 && inputLogIn.createAccountShowContents ? 1.5 : 1.0)
                     .overlay(alignment: .top) {
                         Text("Check!")
                             .font(.caption2).foregroundColor(.white.opacity(0.5))
                             .frame(width: 50)
-                            .opacity(inputLogIn.createAccountFase == .fase3 && inputLogIn.createAccountContents ? 1.0 : 0.0)
+                            .opacity(inputLogIn.createAccountFase == .fase3 && inputLogIn.createAccountShowContents ? 1.0 : 0.0)
                             .offset(y: -20)
                     }
             }
