@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import ResizableSheet
 import FirebaseAuth
 import AuthenticationServices
 
@@ -66,6 +67,7 @@ struct InputLogIn {
     var startFetchContents: Bool = false
     var isShowProgressView: Bool = false
     var isShowPickerView: Bool = false
+    var isShowResizableSheetMailAdress: ResizableSheetState = .hidden
     var isShowGoBackLogInAlert: Bool = false
     var firstSelect: FirstSelect = .start
     var selectSignInType: SelectSignInType = .start
@@ -185,6 +187,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 .offset(y: getRect().height / 3)
             }
             
+            // アカウント登録の進捗を表すインジケーター
             if inputLogIn.firstSelect == .signAp {
                 createAccountIndicator()
                     .offset(y: -getRect().height / 3 + 30)
@@ -263,6 +266,21 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         .sheet(isPresented: $inputLogIn.isShowPickerView) {
             PHPickerView(captureImage: $inputLogIn.captureImage, isShowSheet: $inputLogIn.isShowPickerView, isShowError: $inputLogIn.captureError)
         }
+        // メールアドレス入力用のハーフシート
+        .resizableSheet($inputLogIn.isShowResizableSheetMailAdress, id: "C") {builder in
+            builder.content { _ in
+
+                Text("メールアドレス打ち込み場所")
+
+            } // builder.content
+            .supportedState([.hidden, .medium])
+            .sheetBackground { _ in
+                Color.white
+            }
+//            .background { _ in
+//                EmptyView()
+//            }
+        } // .resizableSheet
         
         .onChange(of: inputLogIn.createAccountFase) { newFase in
             withAnimation(.spring(response: 1.0)) {
@@ -389,9 +407,12 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 .tracking(2)
             
             Button {
-                withAnimation(.easeIn(duration: 0.3)) {
-                    inputLogIn.selectSignInType = .mailAddress
-                }
+                inputLogIn.isShowResizableSheetMailAdress = .medium
+                print(inputLogIn.isShowResizableSheetMailAdress)
+//                withAnimation(.easeIn(duration: 0.3)) {
+//                    inputLogIn.selectSignInType = .mailAddress
+//                    
+//                }
             } label: {
                 ZStack {
                     RoundedRectangle(cornerRadius: 15)

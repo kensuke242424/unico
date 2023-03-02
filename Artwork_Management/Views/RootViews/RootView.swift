@@ -39,6 +39,7 @@ struct RootView: View {
             switch logInVM.rootNavigation {
             case .logIn:
                 LogInView(logInVM: logInVM, teamVM: teamVM)
+                    .environment(\.resizableSheetCenter, resizableSheetCenter)
 
             case .fetch:
                 StandByView()
