@@ -71,6 +71,9 @@ struct InputLogIn {
     var isShowProgressView: Bool = false
     var isShowPickerView: Bool = false
     var isShowGoBackLogInAlert: Bool = false
+    var showHalfSheet: Bool = false
+    var showSheetBackground: Bool = false
+    var halfSheetOffsetY: CGFloat = UIScreen.main.bounds.height / 2
     var firstSelect: FirstSelect = .start
     var selectSignInType: SelectSignInType = .start
     var createAccountFase: CreateAccountFase = .start
@@ -81,6 +84,8 @@ struct InputLogIn {
 // ✅ ログイン画面の親Viewです。
 
 struct LogInView: View { // swiftlint:disable:this type_body_length
+    
+    @Environment(\.colorScheme) var colorScheme: ColorScheme
     
     @StateObject var logInVM: LogInViewModel
     @StateObject var teamVM: TeamViewModel
@@ -119,150 +124,154 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 .offset(x: inputLogIn.firstSelect == .signAp ? getRect().width / 3 : 0)
                 .opacity(inputLogIn.firstSelect == .signAp ? 0.4 : 1.0)
             
-            firstSelectButtons()
-                .offset(y: getRect().height / 8)
-                .opacity(inputLogIn.firstSelect == .start ? 1.0 : 0.0)
-            
-            if inputLogIn.firstSelect == .logIn {
-                VStack {
-                    signInTitle(title: "ログイン")
+            /// ログインフロー全体的なコンテンツをまとめたGroup
+            /// View数が多いとコンパイルが通らないため現状こうしている
+            Group {
+                
+                // 起動時最初のログイン画面で表示される「ログイン」「いえ、初めてです」ボタン
+                firstSelectButtons()
+                    .offset(y: getRect().height / 8)
+                    .opacity(inputLogIn.firstSelect == .start ? 1.0 : 0.0)
+                
+                // ログイン画面最初のページで「ログイン」を選んだ時のコンテンツView
+                if inputLogIn.firstSelect == .logIn {
+                    VStack {
+                        signInTitle(title: "ログイン")
+                            .padding(.bottom)
+                        
+                        ZStack {
+                            logInSelectButtons()
+                        }
+                    }
+                    .offset(y: getRect().height / 10)
+                    .opacity(inputLogIn.firstSelect == .logIn ? 1.0 : 0.0)
+                }
+                
+                // アカウント登録フローで用いるコンテンツ全体のView
+                if inputLogIn.createAccountFase != .start {
+                    createAccountViews()
+                }
+                
+                // アカウント登録の進捗を表すインジケーター
+                if inputLogIn.firstSelect == .signAp {
+                    createAccountIndicator()
+                        .offset(y: -getRect().height / 3 + 30)
                         .padding(.bottom)
-                    
-                    ZStack {
-                        logInSelectButtons()
-                            .opacity(inputLogIn.selectSignInType == .mailAddress ? 0.0 : 1.0)
-                        
-//                        if inputLogIn.selectSignInType == .mailAddress {
-//                            InputAddressAndPasswordField(logInVM: logInVM,
-//                                                  inputLogIn: $inputLogIn)
-//                            .opacity(inputLogIn.selectSignInType == .mailAddress ? 1.0 : 0.0)
-//                        }
-                    }
                 }
-                .offset(y: getRect().height / 10)
-                .opacity(inputLogIn.firstSelect == .logIn ? 1.0 : 0.0)
-            }
-            
-            if inputLogIn.createAccountFase != .start {
-                createAccountViews()
-            }
-            
-            // Back Button...
-            if inputLogIn.firstSelect != .start {
-                Button {
-                    withAnimation(.spring(response: 0.5)) {
-                        
-                        if inputLogIn.selectSignInType == .mailAddress {
-                            inputLogIn.selectSignInType = .start
-                            return
-                        }
-                        
-                        switch inputLogIn.firstSelect {
-                        case .start: print("")
-                        case .logIn: inputLogIn.firstSelect = .start
-                        case .signAp: print("")
-                        }
-                        
-                        switch inputLogIn.createAccountFase {
-                        case .start: print("")
-                        case .fase1:
-                            inputLogIn.firstSelect = .start
-                            inputLogIn.createAccountFase = .start
-                            inputLogIn.createAccountTitle = false
-                            inputLogIn.createAccountShowContents = false
-                        case .fase2:
-                            inputLogIn.createAccountFase = .fase1
-                        case .fase3:
-                            inputLogIn.createAccountFase = .fase2
-                            if inputLogIn.createUserNameText == "名無し" { inputLogIn.createUserNameText = ""
+                
+                // アカウント登録フロー時、前のフェーズに戻るボタン
+                if inputLogIn.firstSelect != .start {
+                    Button {
+                        withAnimation(.spring(response: 0.5)) {
+                            
+                            if inputLogIn.selectSignInType == .mailAddress {
+                                inputLogIn.selectSignInType = .start
+                                return
                             }
-                        case .success: print("")
+                            
+                            switch inputLogIn.firstSelect {
+                            case .start: print("")
+                            case .logIn: inputLogIn.firstSelect = .start
+                            case .signAp: print("")
+                            }
+                            
+                            switch inputLogIn.createAccountFase {
+                            case .start: print("")
+                            case .fase1:
+                                inputLogIn.firstSelect = .start
+                                inputLogIn.createAccountFase = .start
+                                inputLogIn.createAccountTitle = false
+                                inputLogIn.createAccountShowContents = false
+                            case .fase2:
+                                inputLogIn.createAccountFase = .fase1
+                            case .fase3:
+                                inputLogIn.createAccountFase = .fase2
+                                if inputLogIn.createUserNameText == "名無し" { inputLogIn.createUserNameText = ""
+                                }
+                            case .success: print("")
+                            }
+                            
                         }
-                        
+                    } label: {
+                        Text("< 戻る")
+                            .foregroundColor(.white.opacity(0.7))
                     }
-                } label: {
-                    Text("< 戻る")
-                        .foregroundColor(.white.opacity(0.7))
+                    .disabled(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .success ? true : false)
+                    .opacity(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .success ? 0.2 : 1.0)
+                    .opacity(inputLogIn.createAccountFase == .fase1 && !inputLogIn.createAccountShowContents ? 0.0 : 1.0)
+                    .offset(y: getRect().height / 3)
                 }
-                .disabled(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .success ? true : false)
-                .opacity(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .success ? 0.2 : 1.0)
-                .opacity(inputLogIn.createAccountFase == .fase1 && !inputLogIn.createAccountShowContents ? 0.0 : 1.0)
-                .offset(y: getRect().height / 3)
-            }
-            
-            // アカウント登録の進捗を表すインジケーター
-            if inputLogIn.firstSelect == .signAp {
-                createAccountIndicator()
-                    .offset(y: -getRect().height / 3 + 30)
-                    .padding(.bottom)
-            }
-            
-            // Home Back...
-            if inputLogIn.firstSelect != .start {
-                Button {
-                    inputLogIn.isShowGoBackLogInAlert.toggle()
-                } label: {
-                    HStack {
-                        Text("<<")
-                        Image(systemName: "house.fill")
-                    }
-                }
-                .disabled(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .success ? true : false)
-                .opacity(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .success ? 0.2 : 1.0)
-                .opacity(inputLogIn.createAccountFase == .start ||
-                         inputLogIn.createAccountFase == .fase1 ||
-                         inputLogIn.createAccountFase == .success ? 0.0 : 1.0)
-                .foregroundColor(.white.opacity(0.5))
-                .offset(x: -getRect().width / 2 + 40, y: getRect().height / 2 - 60 )
-                .alert("確認", isPresented: $inputLogIn.isShowGoBackLogInAlert) {
-                    
+                
+                // ログイン画面最初のページまで戻るボタン
+                if inputLogIn.firstSelect != .start {
                     Button {
                         inputLogIn.isShowGoBackLogInAlert.toggle()
                     } label: {
-                        Text("いいえ")
+                        HStack {
+                            Text("<<")
+                            Image(systemName: "house.fill")
+                        }
                     }
-                    
-                    Button {
-                        withAnimation(.spring(response: 0.7)) {
-                            inputLogIn.selectSignInType = .start
-                            inputLogIn.firstSelect = .start
-                            inputLogIn.createAccountFase = .start
-                            inputLogIn.createAccountTitle = false
-                            inputLogIn.createAccountShowContents = false
-                            if inputLogIn.createUserNameText == "名無し" { inputLogIn.createUserNameText = "" }
+                    .disabled(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .success ? true : false)
+                    .opacity(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .success ? 0.2 : 1.0)
+                    .opacity(inputLogIn.createAccountFase == .start ||
+                             inputLogIn.createAccountFase == .fase1 ||
+                             inputLogIn.createAccountFase == .success ? 0.0 : 1.0)
+                    .foregroundColor(.white.opacity(0.5))
+                    .offset(x: -getRect().width / 2 + 40, y: getRect().height / 2 - 60 )
+                    .alert("確認", isPresented: $inputLogIn.isShowGoBackLogInAlert) {
+                        
+                        Button {
+                            inputLogIn.isShowGoBackLogInAlert.toggle()
+                        } label: {
+                            Text("いいえ")
                         }
                         
-                    } label: {
-                        Text("はい")
-                    }
-                } message: {
-                    Text("ログイン画面に戻ります。よろしいですか？")
-                } // alert
-                
-                // Anonymous Started button...
-                Button {
-                    // Open navigate tab srideView...
-                    Task {
-                        logInVM.signInAnonymously()
-                        logInVM.currentUserCheckListener()
-                    }
+                        Button {
+                            withAnimation(.spring(response: 0.7)) {
+                                inputLogIn.selectSignInType = .start
+                                inputLogIn.firstSelect = .start
+                                inputLogIn.createAccountFase = .start
+                                inputLogIn.createAccountTitle = false
+                                inputLogIn.createAccountShowContents = false
+                                if inputLogIn.createUserNameText == "名無し" { inputLogIn.createUserNameText = "" }
+                            }
+                            
+                        } label: {
+                            Text("はい")
+                        }
+                    } message: {
+                        Text("ログイン画面に戻ります。よろしいですか？")
+                    } // alert
                     
-                } label: {
-                    HStack {
-                        Text("始めてみる")
-                        Text(">>")
+                    // Anonymous Started button...
+                    Button {
+                        // Open navigate tab srideView...
+                        Task {
+                            logInVM.signInAnonymously()
+                            logInVM.currentUserCheckListener()
+                        }
+                    } label: {
+                        HStack {
+                            Text("始めてみる")
+                            Text(">>")
+                        }
+                        .font(.subheadline).tracking(2).opacity(0.8)
                     }
-                    .font(.subheadline).tracking(2).opacity(0.8)
+                    .disabled(inputLogIn.createAccountFase == .success ? true : false)
+                    .foregroundColor(.white.opacity(0.6))
+                    .opacity(inputLogIn.createAccountFase == .success || inputLogIn.createAccountShowContents == false ? 0.0 : 1.0)
+                    .offset(x: getRect().width / 2 - 80, y: getRect().height / 2 - 60 )
                 }
-                .disabled(inputLogIn.createAccountFase == .success ? true : false)
-                .foregroundColor(.white.opacity(0.6))
-                .opacity(inputLogIn.createAccountFase == .success || inputLogIn.createAccountShowContents == false ? 0.0 : 1.0)
-                .offset(x: getRect().width / 2 - 80, y: getRect().height / 2 - 60 )
-            }
-            
-            // ProgressView...
-            if inputLogIn.isShowProgressView {
-                CustomProgressView()
+                
+                // メールアドレス登録選択時に出現するアドレス入力ハーフシートView
+                inputAdressHalfSheet()
+                
+                // 処理中を表すプログレスView
+                if inputLogIn.isShowProgressView {
+                    CustomProgressView()
+                }
+                
             }
             
         } // ZStack
@@ -296,12 +305,14 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                                                                 imageData: inputLogIn.captureImage,
                                                                                 color: inputLogIn.selectUserColor)
                     if addUserFirestoreCheck {
-                        withAnimation(.spring(response: 0.5)) { logInVM.rootNavigation = .fetch }
+                        withAnimation(.spring(response: 0.5)) {
+                            logInVM.rootNavigation = .fetch
+                        }
                     }
                 }
             }
-            
         }
+        
     } // body
     
     @ViewBuilder
@@ -395,8 +406,13 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 .tracking(2)
             
             Button {
-                withAnimation(.easeIn(duration: 0.3)) {
-//                    inputLogIn.selectSignInType = .mailAddress
+                withAnimation(.easeIn(duration: 0.25)) {
+                    inputLogIn.showSheetBackground.toggle()
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                    withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
+                        inputLogIn.showHalfSheet.toggle()
+                    }
                 }
             } label: {
                 ZStack {
@@ -563,7 +579,29 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             
         } // VStack
     }
-    // create fase line...
+    func inputAdressHalfSheet() -> some View {
+        VStack {
+            Spacer()
+            RoundedRectangle(cornerRadius: 40)
+                .frame(width: UIScreen.main.bounds.width,
+                       height: UIScreen.main.bounds.height / 2.5)
+                .foregroundColor(colorScheme == .light ? .customHalfSheetForgroundLight : .customHalfSheetForgroundDark)
+        }
+        .ignoresSafeArea()
+        .offset(y: inputLogIn.showHalfSheet ? 0 : inputLogIn.halfSheetOffsetY)
+        .background {
+            Color.black.opacity(inputLogIn.showSheetBackground ? 0.7 : 0.0)
+                .ignoresSafeArea()
+                .onTapGesture {
+                    withAnimation(.easeOut(duration: 0.25)) {
+                        inputLogIn.showHalfSheet.toggle()
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                        inputLogIn.showSheetBackground.toggle()
+                    }
+                }
+        }
+    }
     func createAccountIndicator() -> some View {
         Rectangle()
             .frame(width: 200, height: 2, alignment: .leading)

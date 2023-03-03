@@ -71,6 +71,9 @@ extension Color {
 
     static let customSoldOutTagColor = Color("customSoldOutTagColor")
     
-    static let customHalfSheetBackgroundColor = Color("customHalfSheetBackgroundColor")
+    static let customHalfSheetForgroundLight = Color("customHalfSheetForgroundLight")
+    static let customHalfSheetForgroundDark = Color("customHalfSheetForgroundDark")
+    static let customHalfSheetContentsBackgroundLight = Color("customHalfSheetContentsBackgroundLight")
+    static let customHalfSheetContentsBackgroundDark = Color("customHalfSheetContentsBackgroundDark")
 
 }
