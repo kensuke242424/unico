@@ -73,6 +73,7 @@ struct InputLogIn {
     var isShowGoBackLogInAlert: Bool = false
     var showHalfSheet: Bool = false
     var showSheetBackground: Bool = false
+    var sendAddressButtonDisabled: Bool = true
     var halfSheetOffsetY: CGFloat = UIScreen.main.bounds.height / 2
     var firstSelect: FirstSelect = .start
     var selectSignInType: SelectSignInType = .start
@@ -583,9 +584,83 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         VStack {
             Spacer()
             RoundedRectangle(cornerRadius: 40)
-                .frame(width: UIScreen.main.bounds.width,
-                       height: UIScreen.main.bounds.height / 2.5)
+                .frame(width: getRect().width, height: getRect().height / 2.2)
                 .foregroundColor(colorScheme == .light ? .customHalfSheetForgroundLight : .customHalfSheetForgroundDark)
+                .overlay {
+                    VStack {
+                        HStack {
+                            Text("Mail Adress")
+                                .font(.title2).fontWeight(.bold)
+                            
+                            Spacer()
+                            
+                            Button {
+                                withAnimation(.easeOut(duration: 0.25)) {
+                                    inputLogIn.showHalfSheet.toggle()
+                                }
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                                    inputLogIn.showSheetBackground.toggle()
+                                }
+                            } label: {
+                                Circle()
+                                    .frame(width: 30, height: 30)
+                                    .foregroundColor(.gray.opacity(0.2))
+                                    .overlay {
+                                        Image(systemName: "xmark")
+                                            .resizable()
+                                            .fontWeight(.medium)
+                                            .foregroundColor(.primary.opacity(0.7))
+                                            .frame(width: 10, height: 10)
+                                    }
+                            }
+                        }
+                        .padding([.top, .horizontal], 20)
+                        
+                        Spacer()
+                        
+                        Image(systemName: "envelope.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .opacity(0.2)
+                            .frame(width: 50)
+                            .padding(.bottom)
+                        
+                        Group {
+                            Text("メールアドレスを入力してください。")
+                            Text("入力アドレス宛に本人確認メールを送ります。")
+                        }
+                        .font(.subheadline)
+                        .opacity(0.8)
+                        .tracking(1)
+                        
+                        TextField("メールアドレスを入力", text: $inputLogIn.address)
+                            .foregroundColor(.white)
+                            .padding()
+                            .frame(width: getRect().width * 0.8, height: 30)
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .foregroundColor(colorScheme == .dark ? .gray.opacity(0.2) : .white)
+                                    .frame(height: 30)
+                            )
+                            .padding(20)
+                            .onChange(of: inputLogIn.address) { newValue in
+                                if newValue.isEmpty {
+                                    inputLogIn.sendAddressButtonDisabled = true
+                                } else {
+                                    inputLogIn.sendAddressButtonDisabled = false
+                                }
+                            }
+                        
+                        Button("メールを送信") {
+                            // 本登録メールを送るアクション
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .disabled(inputLogIn.sendAddressButtonDisabled)
+                        .padding(.bottom)
+                        
+                        Spacer()
+                    }
+                }
         }
         .ignoresSafeArea()
         .offset(y: inputLogIn.showHalfSheet ? 0 : inputLogIn.halfSheetOffsetY)
