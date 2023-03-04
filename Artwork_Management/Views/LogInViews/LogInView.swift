@@ -276,6 +276,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             }
             
         } // ZStack
+        .ignoresSafeArea(.keyboard, edges: inputLogIn.showHalfSheet ? .bottom : .top)
         .sheet(isPresented: $inputLogIn.isShowPickerView) {
             PHPickerView(captureImage: $inputLogIn.captureImage, isShowSheet: $inputLogIn.isShowPickerView, isShowError: $inputLogIn.captureError)
         }
