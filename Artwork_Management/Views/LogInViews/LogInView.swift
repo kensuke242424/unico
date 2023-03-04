@@ -34,12 +34,12 @@ enum InputAddressFocused {
 }
 
 enum AddressCheck {
-    case stop, start, failure, success
+    case start, check, failure, success
     
     var icon: Image {
         switch self {
-        case .stop: return Image(systemName: "")
         case .start: return Image(systemName: "")
+        case .check: return Image(systemName: "")
         case .failure: return Image(systemName: "multiply.circle.fill")
         case .success: return Image(systemName: "checkmark.seal.fill")
         }
@@ -47,10 +47,20 @@ enum AddressCheck {
     
     var checkText: String {
         switch self {
-        case .stop: return ""
-        case .start: return "check..."
+        case .start: return ""
+        case .check: return "check..."
         case .failure: return "failure!!"
         case .success: return "succsess!!"
+        }
+    }
+    
+    var messageText: (String, String) {
+        switch self {
+        case .start: return ("入力したアドレスをチェックしています...", "")
+        case .check: return ("メールアドレスを入力してください。",
+                             "入力したアドレスに、本人確認メールを送ります。")
+        case .failure: return ("メール送信に失敗しました。", "もう一度試してみてください。")
+        case .success: return ("入力アドレスにメールを送信しました！", "届いたメールからサインインしてください。")
         }
     }
 }
@@ -79,7 +89,7 @@ struct InputLogIn {
     var firstSelect: FirstSelect = .start
     var selectSignInType: SelectSignInType = .start
     var createAccountFase: CreateAccountFase = .start
-    var addressCheck: AddressCheck = .stop
+    var addressCheck: AddressCheck = .start
     var selectUserColor: MemberColor = .gray
 }
 
@@ -973,7 +983,7 @@ struct InputAddressAndPasswordField: View {
                         passwordConfirmDifference = false
                         logInVM.logInErrorMessage = ""
                         
-                        inputLogIn.addressCheck = .stop
+                        inputLogIn.addressCheck = .start
                     }
                     .overlay(alignment: .bottom) {(Rectangle().frame(height: 1)) }
                     .font(.caption)
@@ -1000,7 +1010,7 @@ struct InputAddressAndPasswordField: View {
                 passwordConfirmIsEmpty = false
                 passwordConfirmDifference = false
                 logInVM.logInErrorMessage = ""
-                inputLogIn.addressCheck = .stop
+                inputLogIn.addressCheck = .start
             }
         }
     } // body
