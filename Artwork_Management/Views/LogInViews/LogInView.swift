@@ -36,12 +36,21 @@ enum InputAddressFocused {
 enum AddressCheck {
     case start, check, failure, success
     
-    var icon: Image {
+    var checkIcon: Image {
         switch self {
         case .start: return Image(systemName: "")
         case .check: return Image(systemName: "")
         case .failure: return Image(systemName: "multiply.circle.fill")
         case .success: return Image(systemName: "checkmark.seal.fill")
+        }
+    }
+    
+    var humanIconBadge: Image {
+        switch self {
+        case .start: return Image(systemName: "")
+        case .check: return Image(systemName: "")
+        case .failure: return Image(systemName: "xmark.circle.fill")
+        case .success: return Image(systemName: "checkmark.circle.fill")
         }
     }
     
@@ -59,7 +68,7 @@ enum AddressCheck {
         case .start: return ("メールアドレスを入力してください。",
                              "入力したアドレスに、本人確認メールを送ります。")
         case .check: return ("メールアドレスをチェックしています...", "")
-        case .failure: return ("メール送信に失敗しました。", "もう一度試してみてください。")
+        case .failure: return ("メール送信が正しくできませんでした。", "アドレスを確認して、再度試してみてください。")
         case .success: return ("入力アドレスにメールを送信しました！", "届いたメールからサインインしてください。")
         }
     }
@@ -593,7 +602,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         VStack {
             Spacer()
             RoundedRectangle(cornerRadius: 40)
-                .frame(width: getRect().width, height: getRect().height / 2.2)
+                .frame(width: getRect().width, height: getRect().height / 2)
                 .foregroundColor(colorScheme == .light ? .customHalfSheetForgroundLight : .customHalfSheetForgroundDark)
                 .onTapGesture { showKyboard = nil }
                 .overlay {
@@ -610,6 +619,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                 }
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                                     inputLogIn.showSheetBackground.toggle()
+                                    inputLogIn.addressCheck = .start
                                 }
                             } label: {
                                 Circle()
@@ -623,6 +633,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                             .frame(width: 10, height: 10)
                                     }
                             }
+                            .disabled(inputLogIn.addressCheck == .check ? true : false)
+                            .opacity(inputLogIn.addressCheck == .check ? 0.3 : 1.0)
                         }
                         .padding([.top, .horizontal], 20)
                         
@@ -630,21 +642,27 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         
                         HStack(spacing: 30) {
                             
-                                Image(systemName: "envelope.fill")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 30)
-                                    .opacity(0.7)
-                                Image(systemName: "arrowshape.turn.up.right.fill")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 20)
-                                    .opacity(0.4)
-                                Image(systemName: "person.fill")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 40)
-                                    .opacity(0.7)
+                            Image(systemName: "envelope.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 30)
+                                .opacity(0.7)
+                            Image(systemName: "arrowshape.turn.up.right.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 20)
+                                .opacity(0.4)
+                            Image(systemName: inputLogIn.addressCheck == .success ? "person.fill.checkmark" : "person.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 40)
+                                .opacity(inputLogIn.addressCheck == .check ? 0.4 :
+                                            inputLogIn.addressCheck == .success ? 1.0 :
+                                            inputLogIn.addressCheck == .failure ? 0.2 :
+                                            0.6)
+                                .scaleEffect(inputLogIn.addressCheck == .success ? 1.3 : 1.0)
+                                .scaleEffect(inputLogIn.addressCheck == .check ? 0.9 : 1.0)
+                                
                         }
                         .padding(.bottom)
                         
@@ -674,16 +692,55 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                     inputLogIn.sendAddressButtonDisabled = false
                                 }
                             }
-
+                        
+                        // アドレス認証を再度行うボタン
+                        if inputLogIn.addressCheck == .success || inputLogIn.addressCheck == .failure {
+                            Button("もう一度送る") {
+                                withAnimation(.easeInOut(duration: 0.3)) {
+                                    inputLogIn.addressCheck = .check
+                                }
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                    withAnimation(.easeInOut(duration: 0.3)) {
+                                        inputLogIn.addressCheck = .failure
+                                    }
+                                }
+                            }
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 20)
+                            .buttonStyle(.borderedProminent)
+                        }
+                        
                         Button("メールを送信") {
                             withAnimation(.easeInOut(duration: 0.3)) {
                                 inputLogIn.addressCheck = .check
                             }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                withAnimation(.easeInOut(duration: 0.3)) {
+                                    inputLogIn.addressCheck = .success
+                                }
+                            }
                         }
                         .buttonStyle(.borderedProminent)
                         .disabled(inputLogIn.sendAddressButtonDisabled)
-                        .padding(.bottom)
-                        
+                        .opacity(inputLogIn.addressCheck == .start ? 1.0 : 0.0)
+                        .overlay {
+                            HStack(spacing: 10) {
+                                if inputLogIn.addressCheck == .check {
+                                    ProgressView()
+                                } else {
+                                    inputLogIn.addressCheck.checkIcon
+                                        .foregroundColor(inputLogIn.addressCheck == .failure ? .red : .green)
+                                }
+                                Text(inputLogIn.addressCheck.checkText)
+                                    .font(.title3)
+                                    .tracking(5)
+                                    .opacity(0.5)
+                                    .fontWeight(.semibold)
+                            }
+                            .frame(width: 200)
+                            .opacity(inputLogIn.addressCheck != .start ? 1.0 : 0.0)
+                        }
+                        .padding(.top, 30)
                         Spacer()
                     }
                 }
@@ -968,7 +1025,7 @@ struct InputAddressAndPasswordField: View {
                         if inputLogIn.addressCheck == .start {
                             ProgressView().frame(width: 10, height: 10)
                         } else {
-                            inputLogIn.addressCheck.icon.foregroundColor(inputLogIn.addressCheck == .failure ? .red : .green)
+                            inputLogIn.addressCheck.checkIcon.foregroundColor(inputLogIn.addressCheck == .failure ? .red : .green)
                         }
                         Text(inputLogIn.addressCheck.checkText).foregroundColor(.white.opacity(0.5))
                     }
