@@ -54,11 +54,11 @@ enum AddressCheck {
         }
     }
     
-    var messageText: (String, String) {
+    var messageText: (text1: String, text2: String) {
         switch self {
-        case .start: return ("入力したアドレスをチェックしています...", "")
-        case .check: return ("メールアドレスを入力してください。",
+        case .start: return ("メールアドレスを入力してください。",
                              "入力したアドレスに、本人確認メールを送ります。")
+        case .check: return ("メールアドレスをチェックしています...", "")
         case .failure: return ("メール送信に失敗しました。", "もう一度試してみてください。")
         case .success: return ("入力アドレスにメールを送信しました！", "届いたメールからサインインしてください。")
         }
@@ -649,14 +649,13 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         .padding(.bottom)
                         
                         Group {
-                            Text("メールアドレスを入力してください。")
-                            Text("入力アドレス宛に本人確認メールを送ります。")
+                            Text(inputLogIn.addressCheck.messageText.text1)
+                            Text(inputLogIn.addressCheck.messageText.text2)
                         }
                         .font(.subheadline)
                         .tracking(1)
                         
                         TextField("メールアドレスを入力", text: $inputLogIn.address)
-//                            .foregroundColor(.white)
                             .focused($showKyboard, equals: .check)
                             .autocapitalization(.none)
                             .padding()
@@ -677,7 +676,9 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             }
 
                         Button("メールを送信") {
-                            // 本登録メールを送るアクション
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                inputLogIn.addressCheck = .check
+                            }
                         }
                         .buttonStyle(.borderedProminent)
                         .disabled(inputLogIn.sendAddressButtonDisabled)
