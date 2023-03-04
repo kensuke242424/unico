@@ -25,7 +25,7 @@ enum CreateAccountFase {
     case start, fase1, fase2, fase3, success
 }
 
-enum CreateFocused {
+enum ShowKyboard {
     case check
 }
 
@@ -45,7 +45,7 @@ enum AddressCheck {
         }
     }
     
-    var text: String {
+    var checkText: String {
         switch self {
         case .stop: return ""
         case .start: return "check..."
@@ -73,8 +73,9 @@ struct InputLogIn {
     var isShowGoBackLogInAlert: Bool = false
     var showHalfSheet: Bool = false
     var showSheetBackground: Bool = false
+    var keyboardOffset: CGFloat = 0.0
+    var showHalfSheetOffset: CGFloat = UIScreen.main.bounds.height / 2
     var sendAddressButtonDisabled: Bool = true
-    var halfSheetOffsetY: CGFloat = UIScreen.main.bounds.height / 2
     var firstSelect: FirstSelect = .start
     var selectSignInType: SelectSignInType = .start
     var createAccountFase: CreateAccountFase = .start
@@ -95,8 +96,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
     @State private var inputLogIn: InputLogIn = InputLogIn()
     @State private var createFaseLineImprove: CGFloat = 0.0
     
-    @FocusState private var createNameFocused: CreateFocused?
-    @FocusState private var inputAdressFocused: InputAddressFocused?
+    @FocusState private var showKyboard: ShowKyboard?
     
     var body: some View {
         
@@ -104,7 +104,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             
             GradientBackbround(color1: inputLogIn.selectUserColor.color1,
                                color2: inputLogIn.selectUserColor.colorAccent)
-            .onTapGesture { createNameFocused = nil }
+            .onTapGesture { showKyboard = nil }
             
             Group {
                 if let captureImage = inputLogIn.captureImage {
@@ -276,11 +276,9 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             }
             
         } // ZStack
-        .ignoresSafeArea(.keyboard, edges: inputLogIn.showHalfSheet ? .bottom : .top)
         .sheet(isPresented: $inputLogIn.isShowPickerView) {
             PHPickerView(captureImage: $inputLogIn.captureImage, isShowSheet: $inputLogIn.isShowPickerView, isShowError: $inputLogIn.captureError)
         }
-        
         .onChange(of: inputLogIn.createAccountFase) { newFase in
             withAnimation(.spring(response: 1.0)) {
                 switch newFase {
@@ -535,12 +533,12 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     TextField("", text: $inputLogIn.createUserNameText)
                         .frame(width: 230)
                         .foregroundColor(.white)
-                        .focused($createNameFocused, equals: .check)
+                        .focused($showKyboard, equals: .check)
                         .textInputAutocapitalization(.never)
                         .multilineTextAlignment(.center)
                         .background {
                             ZStack {
-                                Text(createNameFocused == nil && inputLogIn.createUserNameText.isEmpty ? "名前を入力" : "")
+                                Text(showKyboard == nil && inputLogIn.createUserNameText.isEmpty ? "名前を入力" : "")
                                     .foregroundColor(.white.opacity(0.3))
                                 Rectangle().foregroundColor(.white.opacity(0.3)).frame(height: 1)
                                     .offset(y: 20)
@@ -587,6 +585,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             RoundedRectangle(cornerRadius: 40)
                 .frame(width: getRect().width, height: getRect().height / 2.2)
                 .foregroundColor(colorScheme == .light ? .customHalfSheetForgroundLight : .customHalfSheetForgroundDark)
+                .onTapGesture { showKyboard = nil }
                 .overlay {
                     VStack {
                         HStack {
@@ -596,7 +595,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             Spacer()
                             
                             Button {
-                                withAnimation(.easeOut(duration: 0.25)) {
+                                withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
                                     inputLogIn.showHalfSheet.toggle()
                                 }
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
@@ -619,29 +618,44 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         
                         Spacer()
                         
-                        Image(systemName: "envelope.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .opacity(0.2)
-                            .frame(width: 50)
-                            .padding(.bottom)
+                        HStack(spacing: 30) {
+                            
+                                Image(systemName: "envelope.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 30)
+                                    .opacity(0.7)
+                                Image(systemName: "arrowshape.turn.up.right.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 20)
+                                    .opacity(0.4)
+                                Image(systemName: "person.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 40)
+                                    .opacity(0.7)
+                        }
+                        .padding(.bottom)
                         
                         Group {
                             Text("メールアドレスを入力してください。")
                             Text("入力アドレス宛に本人確認メールを送ります。")
                         }
                         .font(.subheadline)
-                        .opacity(0.8)
                         .tracking(1)
                         
                         TextField("メールアドレスを入力", text: $inputLogIn.address)
-                            .foregroundColor(.white)
+//                            .foregroundColor(.white)
+                            .focused($showKyboard, equals: .check)
+                            .autocapitalization(.none)
                             .padding()
                             .frame(width: getRect().width * 0.8, height: 30)
                             .background(
                                 RoundedRectangle(cornerRadius: 10)
                                     .foregroundColor(colorScheme == .dark ? .gray.opacity(0.2) : .white)
                                     .frame(height: 30)
+                                    .shadow(color: showKyboard == .check ? .blue : .clear, radius: 3)
                             )
                             .padding(20)
                             .onChange(of: inputLogIn.address) { newValue in
@@ -651,7 +665,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                     inputLogIn.sendAddressButtonDisabled = false
                                 }
                             }
-                        
+
                         Button("メールを送信") {
                             // 本登録メールを送るアクション
                         }
@@ -663,18 +677,13 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     }
                 }
         }
-        .ignoresSafeArea()
-        .offset(y: inputLogIn.showHalfSheet ? 0 : inputLogIn.halfSheetOffsetY)
+        .offset(y: inputLogIn.showHalfSheet ? 0 : getRect().height / 2)
+        .offset(y: getSafeArea().bottom)
         .background {
             Color.black.opacity(inputLogIn.showSheetBackground ? 0.7 : 0.0)
                 .ignoresSafeArea()
                 .onTapGesture {
-                    withAnimation(.easeOut(duration: 0.25)) {
-                        inputLogIn.showHalfSheet.toggle()
-                    }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                        inputLogIn.showSheetBackground.toggle()
-                    }
+                    showKyboard = nil
                 }
         }
     }
@@ -746,7 +755,7 @@ struct InputAddressAndPasswordField: View {
     @State private var disabledButton: Bool = false
     @State private var signUpErrorMessage: String = ""
     
-    @FocusState private var createAccountFocused: CreateFocused?
+    @FocusState private var createAccountFocused: ShowKyboard?
     
     var body: some View {
         
@@ -950,7 +959,7 @@ struct InputAddressAndPasswordField: View {
                         } else {
                             inputLogIn.addressCheck.icon.foregroundColor(inputLogIn.addressCheck == .failure ? .red : .green)
                         }
-                        Text(inputLogIn.addressCheck.text).foregroundColor(.white.opacity(0.5))
+                        Text(inputLogIn.addressCheck.checkText).foregroundColor(.white.opacity(0.5))
                     }
                     .font(.caption)
                     .offset(y: -30)
