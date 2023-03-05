@@ -69,7 +69,7 @@ enum AddressCheck {
                              "入力したアドレスに、本人確認メールを送ります。")
         case .check: return ("メールアドレスをチェックしています...", "")
         case .failure: return ("メールの送信ができませんでした。", "アドレスを確認して、再度試してみてください。")
-        case .success: return ("入力アドレスにメールを送信しました！", "届いたメールからサインインしてください。")
+        case .success: return ("入力アドレスに認証メールを送信しました！", "届いたメールからサインインしてください。")
         }
     }
 }
@@ -217,8 +217,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         Text("< 戻る")
                             .foregroundColor(.white.opacity(0.7))
                     }
-                    .disabled(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .success ? true : false)
-                    .opacity(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .success ? 0.2 : 1.0)
+                    .disabled(inputLogIn.addressCheck == .success ? true : false)
+                    .opacity(inputLogIn.addressCheck == .success ? 0.2 : 1.0)
                     .opacity(inputLogIn.createAccountFase == .fase1 && !inputLogIn.createAccountShowContents ? 0.0 : 1.0)
                     .offset(y: getRect().height / 3)
                 }
@@ -609,7 +609,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 .overlay {
                     VStack {
                         HStack {
-                            Text("Mail Adress")
+                            Text("Mail Address")
                                 .font(.title2).fontWeight(.bold)
                             
                             Spacer()
@@ -655,12 +655,12 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         .frame(width: 300, height: 30)
                         .opacity(inputLogIn.addressCheck != .start ? 1.0 : 0.0)
                         
-                        HStack(spacing: 30) {
+                        HStack(spacing: 35) {
                             
                             Image(systemName: "envelope.fill")
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 30)
+                                .frame(width: 35)
                                 .scaleEffect(inputLogIn.addressCheck == .check ? 1.0 :
                                                 inputLogIn.addressCheck == .success ? 1.4 :
                                                 1.0)
@@ -693,7 +693,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                 Image(systemName: "person.fill")
                                     .resizable()
                                     .scaledToFit()
-                                    .frame(width: 30)
+                                    .frame(width: 35)
                                     .opacity(inputLogIn.addressCheck == .check ? 0.4 :
                                                 inputLogIn.addressCheck == .failure ? 0.2 :
                                                 0.8)
@@ -711,7 +711,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             }
                         }
                         
-                        VStack {
+                        VStack(spacing: 5) {
                             Text(inputLogIn.addressCheck.messageText.text1)
                             Text(inputLogIn.addressCheck.messageText.text2)
                         }
@@ -742,7 +742,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             }
                         
                         // アドレス認証を行うボタン
-                        Button(inputLogIn.addressCheck == .start ? "メールを送信" : "もう一度送る") {
+                        Button(inputLogIn.addressCheck == .start ||
+                               inputLogIn.addressCheck == .check ? "メールを送信" : "もう一度送る") {
                             
                             withAnimation(.easeInOut(duration: 0.3)) {
                                 inputLogIn.addressCheck = .check
