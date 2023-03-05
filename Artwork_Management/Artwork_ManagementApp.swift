@@ -20,6 +20,14 @@ struct ArtworkManagementApp: App {
             FirebaseApp.configure()
             return true
         }
+        
+        func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+            guard let incomingURL = userActivity.webpageURL else { return false }
+            let linkHandled = DynamicLinks.dynamicLinks().handleUniversalLink(incomingURL) { dynamicLink, error in
+                // リンクが処理された時に呼び出されるコードをここに実装する
+            }
+            return linkHandled
+        }
     }
 
     var body: some Scene {

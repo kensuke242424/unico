@@ -750,6 +750,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             }
                             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                                 withAnimation(.easeInOut(duration: 0.8)) {
+                                    // 入力アドレス宛にディープリンク付きメールを送信する
+                                    logInVM.sendSignInLink(email: inputLogIn.address)
                                     inputLogIn.addressCheck = .success
                                 }
                             }

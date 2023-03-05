@@ -282,6 +282,30 @@ class LogInViewModel: ObservableObject {
             print("Error signing out: %@", signOutError)
         }
     }
+    
+    // ダイナミックリンクによってメールアドレス認証でのサインインをするため、ユーザにメールを送信するメソッド
+    func sendSignInLink(email: String) {
+        
+        let actionCodeSettings = ActionCodeSettings()
+        actionCodeSettings.url = URL(string: "https://unicoaddress.page.link/?link=https://unico-cc222.firebaseapp.com&isi=1663765686&ibi=com.-gmail.kennsuke242424.unico")
+        actionCodeSettings.handleCodeInApp = true
+        actionCodeSettings.handleCodeInApp = true
+        actionCodeSettings.setIOSBundleID(Bundle.main.bundleIdentifier!)
+        actionCodeSettings.setAndroidPackageName("com.example.android",
+                                                 installIfNotAvailable: false, minimumVersion: "12")
+        
+        Auth.auth().sendSignInLink(toEmail: email, actionCodeSettings: actionCodeSettings) { error in
+            if let error = error {
+                print("Failed to send sign in link: \(error.localizedDescription)")
+                return
+            }
+            print("Sign in link sent successfully.")
+            // ディープリンク送信時に入力されたアドレスを保存しておく
+            // リンクから再度アプリに戻ってきた後の処理で、リンクから飛んできたアドレスと保存アドレスの差分がないかチェック
+            //
+//            UserDefaults.standard.set(email, forKey: "Email")
+        }
+    }
 
     func uploadImage(_ image: UIImage?) async -> (url: URL?, filePath: String?) {
 
