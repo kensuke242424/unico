@@ -666,12 +666,15 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         }
                         .padding(.bottom)
                         
-                        Group {
+                        VStack {
                             Text(inputLogIn.addressCheck.messageText.text1)
                             Text(inputLogIn.addressCheck.messageText.text2)
                         }
                         .font(.subheadline)
                         .tracking(1)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 40)
+                        
                         
                         TextField("メールアドレスを入力", text: $inputLogIn.address)
                             .focused($showKyboard, equals: .check)
@@ -694,7 +697,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             }
                         
                         // アドレス認証を再度行うボタン
-                        if inputLogIn.addressCheck == .success || inputLogIn.addressCheck == .failure {
+                        
                             Button("もう一度送る") {
                                 withAnimation(.easeInOut(duration: 0.3)) {
                                     inputLogIn.addressCheck = .check
@@ -705,10 +708,13 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                     }
                                 }
                             }
+                            .buttonStyle(.borderedProminent)
                             .frame(maxWidth: .infinity)
                             .frame(height: 20)
-                            .buttonStyle(.borderedProminent)
-                        }
+                            .opacity(inputLogIn.addressCheck == .success ||
+                                     inputLogIn.addressCheck == .failure ? 1.0 : 0.0)
+                            
+                        
                         
                         Button("メールを送信") {
                             withAnimation(.easeInOut(duration: 0.3)) {
@@ -737,10 +743,10 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                     .opacity(0.5)
                                     .fontWeight(.semibold)
                             }
-                            .frame(width: 200)
+                            .frame(width: 300)
                             .opacity(inputLogIn.addressCheck != .start ? 1.0 : 0.0)
                         }
-                        .padding(.top, 30)
+                        .padding(.top, 20)
                         Spacer()
                     }
                 }
