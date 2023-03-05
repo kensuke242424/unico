@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		BE41783D29B4535800434CFC /* AnimationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE41783C29B4535800434CFC /* AnimationExtension.swift */; };
+		BE41784029B4AB3100434CFC /* FirebaseDynamicLinks in Frameworks */ = {isa = PBXBuildFile; productRef = BE41783F29B4AB3100434CFC /* FirebaseDynamicLinks */; };
+		BE41784229B4AB7E00434CFC /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = BE41784129B4AB7E00434CFC /* FirebaseAnalytics */; };
 		BEAB502E29A7C6D400ECCB4F /* PageTabNavigateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAB502D29A7C6D400ECCB4F /* PageTabNavigateView.swift */; };
 		E0003D0328FD3BB0007308B0 /* TagTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0003D0228FD3BB0007308B0 /* TagTitle.swift */; };
 		E01AA3A129167F02000FCD37 /* ResizableSheet in Frameworks */ = {isa = PBXBuildFile; productRef = E01AA3A029167F02000FCD37 /* ResizableSheet */; };
@@ -167,17 +169,26 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BE41784229B4AB7E00434CFC /* FirebaseAnalytics in Frameworks */,
 				E01AA3A129167F02000FCD37 /* ResizableSheet in Frameworks */,
 				E099CD2D291B395E00057543 /* FirebaseAuth in Frameworks */,
 				E099CD2F291B395E00057543 /* FirebaseFirestore in Frameworks */,
 				E099CD33291B395E00057543 /* FirebaseStorage in Frameworks */,
 				E099CD31291B395E00057543 /* FirebaseFirestoreSwift in Frameworks */,
+				BE41784029B4AB3100434CFC /* FirebaseDynamicLinks in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		BE41783E29B4AB3100434CFC /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		BEAB502C29A7C5E300ECCB4F /* PageTabNavigateViews */ = {
 			isa = PBXGroup;
 			children = (
@@ -227,6 +238,7 @@
 				E08F272328DDA08E00329C5E /* Artwork_Management */,
 				E08F272228DDA08E00329C5E /* Products */,
 				E02FB03F291671B900F72E1A /* Recovered References */,
+				BE41783E29B4AB3100434CFC /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -442,6 +454,8 @@
 				E099CD2E291B395E00057543 /* FirebaseFirestore */,
 				E099CD30291B395E00057543 /* FirebaseFirestoreSwift */,
 				E099CD32291B395E00057543 /* FirebaseStorage */,
+				BE41783F29B4AB3100434CFC /* FirebaseDynamicLinks */,
+				BE41784129B4AB7E00434CFC /* FirebaseAnalytics */,
 			);
 			productName = Artwork_Management;
 			productReference = E08F272128DDA08E00329C5E /* Artwork_Management.app */;
@@ -819,6 +833,16 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		BE41783F29B4AB3100434CFC /* FirebaseDynamicLinks */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E099CD2B291B395E00057543 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseDynamicLinks;
+		};
+		BE41784129B4AB7E00434CFC /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E099CD2B291B395E00057543 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
 		E01AA3A029167F02000FCD37 /* ResizableSheet */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = E01AA39F29167F02000FCD37 /* XCRemoteSwiftPackageReference "ResizableSheet" */;
