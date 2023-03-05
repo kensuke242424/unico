@@ -93,6 +93,7 @@ struct InputLogIn {
     var showHalfSheet: Bool = false
     var showSheetBackground: Bool = false
     var keyboardOffset: CGFloat = 0.0
+    var repeatAnimation: Bool = false
     var showHalfSheetOffset: CGFloat = UIScreen.main.bounds.height / 2
     var sendAddressButtonDisabled: Bool = true
     var firstSelect: FirstSelect = .start
@@ -646,25 +647,45 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 30)
-                                .opacity(0.7)
-                            Image(systemName: "arrowshape.turn.up.right.fill")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 20)
-                                .opacity(0.4)
-                            Image(systemName: inputLogIn.addressCheck == .success ? "person.fill.checkmark" : "person.fill")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 40)
+                                .scaleEffect(inputLogIn.addressCheck == .check ? 0.8 :
+                                                inputLogIn.addressCheck == .success ? 1.4 :
+                                                1.0)
                                 .opacity(inputLogIn.addressCheck == .check ? 0.4 :
+                                            inputLogIn.addressCheck == .failure ? 0.7 :
                                             inputLogIn.addressCheck == .success ? 1.0 :
-                                            inputLogIn.addressCheck == .failure ? 0.2 :
                                             0.6)
-                                .scaleEffect(inputLogIn.addressCheck == .success ? 1.3 : 1.0)
-                                .scaleEffect(inputLogIn.addressCheck == .check ? 0.9 : 1.0)
-                                
+                            
+                            if inputLogIn.addressCheck != .success {
+                                Image(systemName: "arrowshape.turn.up.right.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 20)
+                                    .opacity(0.4)
+                                    .scaleEffect(inputLogIn.repeatAnimation ? 1.3 : 1.0)
+                                    .animation(.default.repeat(while: inputLogIn.repeatAnimation),
+                                               value: inputLogIn.repeatAnimation)
+                            }
+                            
+                            if inputLogIn.addressCheck != .success {
+                                Image(systemName: inputLogIn.addressCheck == .success ? "person.fill.checkmark" : "person.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 40)
+                                    .opacity(inputLogIn.addressCheck == .check ? 0.4 :
+                                                inputLogIn.addressCheck == .failure ? 0.2 :
+                                                0.6)
+                                    .scaleEffect(inputLogIn.addressCheck == .success ? 1.3 : 1.0)
+                                    .scaleEffect(inputLogIn.addressCheck == .check ? 0.8 : 1.0)
+                            }
                         }
                         .padding(.bottom)
+                        .onChange(of: inputLogIn.addressCheck) { newValue in
+                            if newValue == .check {
+                                inputLogIn.repeatAnimation = true
+                            } else {
+                                inputLogIn.repeatAnimation = false
+                            }
+                        }
                         
                         VStack {
                             Text(inputLogIn.addressCheck.messageText.text1)
@@ -721,7 +742,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                 inputLogIn.addressCheck = .check
                             }
                             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                withAnimation(.easeInOut(duration: 0.3)) {
+                                withAnimation(.easeInOut(duration: 0.8)) {
                                     inputLogIn.addressCheck = .success
                                 }
                             }
