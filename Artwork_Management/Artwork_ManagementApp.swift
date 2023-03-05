@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Firebase
+import FirebaseDynamicLinks
 
 @main
 struct ArtworkManagementApp: App {
