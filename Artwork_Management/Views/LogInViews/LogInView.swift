@@ -68,7 +68,7 @@ enum AddressCheck {
         case .start: return ("メールアドレスを入力してください。",
                              "入力したアドレスに、本人確認メールを送ります。")
         case .check: return ("メールアドレスをチェックしています...", "")
-        case .failure: return ("メール送信が正しくできませんでした。", "アドレスを確認して、再度試してみてください。")
+        case .failure: return ("メールの送信ができませんでした。", "アドレスを確認して、再度試してみてください。")
         case .success: return ("入力アドレスにメールを送信しました！", "届いたメールからサインインしてください。")
         }
     }
@@ -629,7 +629,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                     .overlay {
                                         Image(systemName: "xmark")
                                             .resizable()
-                                            .fontWeight(.medium)
+                                            .fontWeight(.semibold)
                                             .foregroundColor(.primary.opacity(0.7))
                                             .frame(width: 10, height: 10)
                                     }
@@ -637,9 +637,23 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             .disabled(inputLogIn.addressCheck == .check ? true : false)
                             .opacity(inputLogIn.addressCheck == .check ? 0.3 : 1.0)
                         }
-                        .padding([.top, .horizontal], 20)
+                        .padding([.horizontal, .top], 20)
+                        .padding(.bottom, 10)
                         
-                        Spacer()
+                        HStack(spacing: 10) {
+                            if inputLogIn.addressCheck == .check {
+                                ProgressView()
+                            } else {
+                                inputLogIn.addressCheck.checkIcon
+                                    .foregroundColor(inputLogIn.addressCheck == .failure ? .red : .green)
+                            }
+                            Text(inputLogIn.addressCheck.checkText)
+                                .tracking(5)
+                                .opacity(0.5)
+                                .fontWeight(.semibold)
+                        }
+                        .frame(width: 300, height: 30)
+                        .opacity(inputLogIn.addressCheck != .start ? 1.0 : 0.0)
                         
                         HStack(spacing: 30) {
                             
@@ -647,38 +661,48 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 30)
-                                .scaleEffect(inputLogIn.addressCheck == .check ? 0.8 :
+                                .scaleEffect(inputLogIn.addressCheck == .check ? 1.0 :
                                                 inputLogIn.addressCheck == .success ? 1.4 :
                                                 1.0)
-                                .opacity(inputLogIn.addressCheck == .check ? 0.4 :
-                                            inputLogIn.addressCheck == .failure ? 0.7 :
+                                .opacity(inputLogIn.addressCheck == .check ? 0.8 :
+                                            inputLogIn.addressCheck == .failure ? 0.8 :
                                             inputLogIn.addressCheck == .success ? 1.0 :
-                                            0.6)
+                                            0.8)
+                                .overlay(alignment: .topTrailing) {
+                                    Image(systemName: "questionmark")
+                                        .font(.subheadline)
+                                        .fontWeight(.semibold)
+                                        .opacity(inputLogIn.addressCheck == .failure ? 0.5 : 0.0)
+                                        .offset(x: 15, y: -15)
+                                }
                             
                             if inputLogIn.addressCheck != .success {
                                 Image(systemName: "arrowshape.turn.up.right.fill")
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 20)
-                                    .opacity(0.4)
+                                    .opacity(inputLogIn.addressCheck == .check ? 1.0 :
+                                                inputLogIn.addressCheck == .failure ? 0.2 :
+                                                0.4)
                                     .scaleEffect(inputLogIn.repeatAnimation ? 1.3 : 1.0)
                                     .animation(.default.repeat(while: inputLogIn.repeatAnimation),
                                                value: inputLogIn.repeatAnimation)
                             }
                             
                             if inputLogIn.addressCheck != .success {
-                                Image(systemName: inputLogIn.addressCheck == .success ? "person.fill.checkmark" : "person.fill")
+                                Image(systemName: "person.fill")
                                     .resizable()
                                     .scaledToFit()
-                                    .frame(width: 40)
+                                    .frame(width: 30)
                                     .opacity(inputLogIn.addressCheck == .check ? 0.4 :
                                                 inputLogIn.addressCheck == .failure ? 0.2 :
-                                                0.6)
-                                    .scaleEffect(inputLogIn.addressCheck == .success ? 1.3 : 1.0)
+                                                0.8)
                                     .scaleEffect(inputLogIn.addressCheck == .check ? 0.8 : 1.0)
                             }
                         }
+                        .frame(height: 60)
                         .padding(.bottom)
+                        // リピートスケールアニメーションの発火トリガー
                         .onChange(of: inputLogIn.addressCheck) { newValue in
                             if newValue == .check {
                                 inputLogIn.repeatAnimation = true
@@ -717,27 +741,9 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                 }
                             }
                         
-                        // アドレス認証を再度行うボタン
-                        
-                            Button("もう一度送る") {
-                                withAnimation(.easeInOut(duration: 0.3)) {
-                                    inputLogIn.addressCheck = .check
-                                }
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                    withAnimation(.easeInOut(duration: 0.3)) {
-                                        inputLogIn.addressCheck = .failure
-                                    }
-                                }
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 20)
-                            .opacity(inputLogIn.addressCheck == .success ||
-                                     inputLogIn.addressCheck == .failure ? 1.0 : 0.0)
+                        // アドレス認証を行うボタン
+                        Button(inputLogIn.addressCheck == .start ? "メールを送信" : "もう一度送る") {
                             
-                        
-                        
-                        Button("メールを送信") {
                             withAnimation(.easeInOut(duration: 0.3)) {
                                 inputLogIn.addressCheck = .check
                             }
@@ -749,25 +755,9 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         }
                         .buttonStyle(.borderedProminent)
                         .disabled(inputLogIn.sendAddressButtonDisabled)
-                        .opacity(inputLogIn.addressCheck == .start ? 1.0 : 0.0)
-                        .overlay {
-                            HStack(spacing: 10) {
-                                if inputLogIn.addressCheck == .check {
-                                    ProgressView()
-                                } else {
-                                    inputLogIn.addressCheck.checkIcon
-                                        .foregroundColor(inputLogIn.addressCheck == .failure ? .red : .green)
-                                }
-                                Text(inputLogIn.addressCheck.checkText)
-                                    .font(.title3)
-                                    .tracking(5)
-                                    .opacity(0.5)
-                                    .fontWeight(.semibold)
-                            }
-                            .frame(width: 300)
-                            .opacity(inputLogIn.addressCheck != .start ? 1.0 : 0.0)
-                        }
-                        .padding(.top, 20)
+                        .opacity(inputLogIn.addressCheck == .check ? 0.3 : 1.0)
+                        .padding(.top, 10)
+                        
                         Spacer()
                     }
                 }
