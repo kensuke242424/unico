@@ -287,12 +287,15 @@ class LogInViewModel: ObservableObject {
     func sendSignInLink(email: String) {
         
         let actionCodeSettings = ActionCodeSettings()
-        actionCodeSettings.url = URL(string: "https://unicoaddress.page.link/?link=https://unico-cc222.firebaseapp.com&isi=1663765686&ibi=com.-gmail.kennsuke242424.unico")
+        actionCodeSettings.url = URL(string: "https://unicoaddress.page.link/open")
         actionCodeSettings.handleCodeInApp = true
         actionCodeSettings.handleCodeInApp = true
         actionCodeSettings.setIOSBundleID(Bundle.main.bundleIdentifier!)
         actionCodeSettings.setAndroidPackageName("com.example.android",
                                                  installIfNotAvailable: false, minimumVersion: "12")
+        
+        // TODO: メールリンクの送信上限のため、一時的にここから保存してる
+        UserDefaults.standard.set(email, forKey: "Email")
         
         Auth.auth().sendSignInLink(toEmail: email, actionCodeSettings: actionCodeSettings) { error in
             if let error = error {
@@ -302,8 +305,7 @@ class LogInViewModel: ObservableObject {
             print("Sign in link sent successfully.")
             // ディープリンク送信時に入力されたアドレスを保存しておく
             // リンクから再度アプリに戻ってきた後の処理で、リンクから飛んできたアドレスと保存アドレスの差分がないかチェック
-            //
-//            UserDefaults.standard.set(email, forKey: "Email")
+            UserDefaults.standard.set(email, forKey: "Email")
         }
     }
 

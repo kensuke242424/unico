@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Firebase
+import FirebaseDynamicLinks
 import ResizableSheet
 
 enum RootNavigation {
