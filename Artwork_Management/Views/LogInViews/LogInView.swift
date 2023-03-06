@@ -74,11 +74,12 @@ enum AddressCheck {
     }
 }
 
-enum LogInErrorAlert {
+enum LogInAlert {
     case start
     case sendMailLinkUpperLimit
     case emailImproper
     case alreadyUser
+    case alreadyEmailAddress
     
     var title: String {
         switch self {
@@ -89,6 +90,8 @@ enum LogInErrorAlert {
         case .emailImproper:
             return "エラー"
         case .alreadyUser:
+            return "ログイン"
+        case .alreadyEmailAddress:
             return "ログイン"
         }
     }
@@ -103,6 +106,8 @@ enum LogInErrorAlert {
             return "アドレスの書式が正しくありません。"
         case .alreadyUser:
             return "既にアカウントが存在します。ログインしますか？"
+        case .alreadyEmailAddress:
+            return "入力したアドレスには既にアカウントが存在します。ログインしますか？"
         }
     }
 }
@@ -329,21 +334,36 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             
             
         } // ZStack
+        // ログインフロー全体のアラートを管理
         .alert(logInVM.logInAlertMessage.title, isPresented: $logInVM.isShowLogInErrorAlert) {
 
                 switch logInVM.logInAlertMessage {
                 case .start:
                     EmptyView()
+                    
                 case .emailImproper:
                     Button("OK") { logInVM.isShowLogInErrorAlert.toggle() }
+                    
                 case .sendMailLinkUpperLimit:
                     Button("OK") { logInVM.isShowLogInErrorAlert.toggle() }
+                    
                 case .alreadyUser:
                     Button("戻る") {
                         logInVM.isShowLogInErrorAlert.toggle()
                         logInVM.successSignInAccount = false
                     }
                     Button("ログイン") { withAnimation(.spring(response: 0.5)) { logInVM.rootNavigation = .fetch } }
+                    
+                case .alreadyEmailAddress:
+                    Button("戻る") {
+                        logInVM.isShowLogInErrorAlert.toggle()
+                        logInVM.successSignInAccount = false
+                    }
+                    Button("ログイン") {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            logInVM.currentUserCheckListener()
+                        }
+                    }
                 }
         } message: {
             Text(logInVM.logInAlertMessage.text)
@@ -803,17 +823,19 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         // アドレス認証を行うボタン
                         Button(logInVM.addressCheck == .start ||
                                logInVM.addressCheck == .check ? "メールを送信" : "もう一度送る") {
-                            
-                            withAnimation(.easeInOut(duration: 0.3)) {
-                                logInVM.addressCheck = .check
-                            }
-                            // 入力アドレス宛にディープリンク付きメールを送信する
-                            logInVM.sendSignInLink(email: inputLogIn.address)
+                            // 既に登録したアドレスがないかチェック
+                            logInVM.checkAlreadyEmailAddress(inputLogIn.address)
                         }
                         .buttonStyle(.borderedProminent)
                         .disabled(inputLogIn.sendAddressButtonDisabled)
                         .opacity(logInVM.addressCheck == .check ? 0.3 : 1.0)
                         .padding(.top, 10)
+                        .onChange(of: logInVM.addressCheck) { newValue in
+                            if newValue == .check {
+                                // 入力アドレス宛にディープリンク付きメールを送信する
+                                logInVM.sendSignInLink(email: inputLogIn.address)
+                            }
+                        }
                         
                         Spacer()
                     }

@@ -23,7 +23,7 @@ class LogInViewModel: ObservableObject {
     @Published var rootNavigation: RootNavigation = .logIn
     @Published var successSignInAccount: Bool = false
     @Published var isShowLogInErrorAlert: Bool = false
-    @Published var logInAlertMessage: LogInErrorAlert = .start
+    @Published var logInAlertMessage: LogInAlert = .start
     @Published var addressCheck: AddressCheck = .start
 
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
@@ -88,8 +88,8 @@ class LogInViewModel: ObservableObject {
                                                           rawNonce: nonce)
                 Task {
                     do {
-                        self.currentUserCheckListener()
                          _ = try await Auth.auth().signIn(with: credential)
+                        self.currentUserCheckListener()
                     } catch {
                         print("Error authenticating: \(error.localizedDescription)")
                     }
@@ -206,6 +206,24 @@ class LogInViewModel: ObservableObject {
                 print("currentUserCheck_サインイン❌")
                 print("uid: \(self.uid)")
                 self.successSignInAccount = false
+            }
+        }
+    }
+    
+    // メールアドレスによるサインアップ時に、
+    func checkAlreadyEmailAddress(_ email: String) {
+        Auth.auth().fetchSignInMethods(forEmail: email) { (providers, error) in
+            if let error = error {
+                // エラー処理
+                print("checkAlreadyEmailAddress_Error: \(error.localizedDescription)")
+                return
+            }
+            if let providers = providers, providers.count > 0 {
+                // ユーザーが既に存在する場合の処理
+                self.isShowLogInErrorAlert.toggle()
+                self.logInAlertMessage = .alreadyEmailAddress
+            } else {
+                // ユーザーが存在しない場合の処理
             }
         }
     }
