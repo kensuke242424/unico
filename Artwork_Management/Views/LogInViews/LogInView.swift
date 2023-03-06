@@ -78,6 +78,7 @@ enum LogInErrorAlert {
     case start
     case sendMailLinkUpperLimit
     case emailImproper
+    case alreadyUser
     
     var title: String {
         switch self {
@@ -87,6 +88,8 @@ enum LogInErrorAlert {
             return "送信の上限"
         case .emailImproper:
             return "エラー"
+        case .alreadyUser:
+            return "ログイン"
         }
     }
     
@@ -98,6 +101,8 @@ enum LogInErrorAlert {
             return "認証メールの送信上限に達しました。日にちを置いてアクセスしてください。"
         case .emailImproper:
             return "アドレスの書式が正しくありません。"
+        case .alreadyUser:
+            return "既にアカウントが存在します。ログインしますか？"
         }
     }
 }
@@ -333,6 +338,12 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     Button("OK") { logInVM.isShowLogInErrorAlert.toggle() }
                 case .sendMailLinkUpperLimit:
                     Button("OK") { logInVM.isShowLogInErrorAlert.toggle() }
+                case .alreadyUser:
+                    Button("戻る") {
+                        logInVM.isShowLogInErrorAlert.toggle()
+                        logInVM.successSignInAccount = false
+                    }
+                    Button("ログイン") { withAnimation(.spring(response: 0.5)) { logInVM.rootNavigation = .fetch } }
                 }
         } message: {
             Text(logInVM.logInAlertMessage.text)
@@ -361,6 +372,13 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             case .logIn: withAnimation(.spring(response: 0.5)) { logInVM.rootNavigation = .fetch }
             case .signAp:
                 Task {
+                    let alreadyUser = try await logInVM.checkAlreadyUserDocument()
+                    // もし既にユーザドキュメントが存在した場合は、既存のアカウントへのログインを促す
+                    if alreadyUser {
+                        logInVM.logInAlertMessage = .alreadyUser
+                        logInVM.isShowLogInErrorAlert.toggle()
+                        return
+                    }
                     let addUserFirestoreCheck = await logInVM.addNewUserSetData(name: inputLogIn.createUserNameText,
                                                                                 password: inputLogIn.password,
                                                                                 imageData: inputLogIn.captureImage,

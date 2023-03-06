@@ -209,6 +209,17 @@ class LogInViewModel: ObservableObject {
             }
         }
     }
+    
+    func checkAlreadyUserDocument() async throws -> Bool {
+        guard let uid = uid else { throw CustomError.uidEmpty }
+        if let _ = db?.collection("users").document(uid) {
+            print("サインインユーザーには既に作成しているuserドキュメントが存在します")
+            return true
+        } else {
+            print("サインインユーザーに作成しているuserドキュメントは存在しませんでした")
+            return false
+        }
+    }
 
     func addNewUserSetData(name: String, password: String?, imageData: UIImage?, color: MemberColor) async -> Bool {
 
