@@ -23,6 +23,7 @@ class LogInViewModel: ObservableObject {
     @Published var rootNavigation: RootNavigation = .logIn
     @Published var successSignInAccount: Bool = false
     @Published var isShowLogInErrorAlert: Bool = false
+    @Published var logInAlertMessage: LogInErrorAlert = .start
     @Published var addressCheck: AddressCheck = .start
 
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
@@ -305,6 +306,10 @@ class LogInViewModel: ObservableObject {
                 hapticErrorNotification()
                 withAnimation(.easeInOut(duration: 0.3)) {
                     self.addressCheck = .failure
+                    // TODO: エラーアラートのテキストとトリガー処理をまとめられないか？
+                    self.isShowLogInErrorAlert.toggle()
+                    self.logInAlertMessage = .emailImproper
+                    
                 }
                 return
             }

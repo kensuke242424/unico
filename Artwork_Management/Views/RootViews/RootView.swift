@@ -169,24 +169,21 @@ struct RootView: View {
                 }
                 // ダイナミックリンクが有効かチェック
                 // リンクが有効だった場合、メールリンクからのサインインメソッド実行
-                if let dynamicLink {
-                    let defaults = UserDefaults.standard
-                    if let email = defaults.string(forKey: "Email") {
-                        print("アカウント登録するユーザのメールアドレス: \(email)")
-                        // Firebase Authにアカウントの登録
-                        Auth.auth().signIn(withEmail: email, link: incomingURL.absoluteString)
-                        { authResult, error in
-                            if let authResult {
-                                print("ログイン成功")
-                            } else {
-                                print("ログインエラー：", error?.localizedDescription ?? "")
-                            }
+                
+                let defaults = UserDefaults.standard
+                if let email = defaults.string(forKey: "Email") {
+                    print("アカウント登録するユーザのメールアドレス: \(email)")
+                    // Firebase Authにアカウントの登録
+                    Auth.auth().signIn(withEmail: email, link: incomingURL.absoluteString)
+                    { authResult, error in
+                        if let error {
+                            print("ログインエラー：", error.localizedDescription)
+                            return
                         }
-                    } else {
-                        print("if let email == nil")
+                        print("ログイン成功")
                     }
                 } else {
-                    print("if let dynamicLink == nil")
+                    print("if let email == nil")
                 }
             }
             if linkHandled {

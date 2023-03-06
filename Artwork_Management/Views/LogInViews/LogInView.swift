@@ -74,6 +74,42 @@ enum AddressCheck {
     }
 }
 
+enum LogInErrorAlert {
+    case start
+    case sendMailLinkUpperLimit
+    case emailImproper
+    
+    var title: String {
+        switch self {
+        case .start:
+            return ""
+        case .sendMailLinkUpperLimit:
+            return "送信の上限"
+        case .emailImproper:
+            return "エラー"
+        }
+    }
+    
+    var text: String {
+        switch self {
+        case .start:
+            return ""
+        case .sendMailLinkUpperLimit:
+            return "認証メールの送信上限に達しました。日にちを置いてアクセスしてください。"
+        case .emailImproper:
+            return "アドレスの書式が正しくありません。確認後に、再度試してみてください。"
+        }
+    }
+    
+    var present: Bool {
+        switch self {
+        case .start: return false
+        case .emailImproper: return true
+        case .sendMailLinkUpperLimit: return true
+        }
+    }
+}
+
 struct InputLogIn {
     var createUserNameText: String = ""
     var captureImage: UIImage? = nil
@@ -287,14 +323,28 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 // メールアドレス登録選択時に出現するアドレス入力ハーフシートView
                 inputAdressHalfSheet()
                 
-                // 処理中を表すプログレスView
+//                // 処理中を表すプログレスView
                 if inputLogIn.isShowProgressView {
                     CustomProgressView()
                 }
                 
             }
             
+            
         } // ZStack
+        .alert(logInVM.logInAlertMessage.title, isPresented: $logInVM.isShowLogInErrorAlert) {
+
+                switch logInVM.logInAlertMessage {
+                case .start:
+                    EmptyView()
+                case .emailImproper:
+                    Button("OK") { logInVM.isShowLogInErrorAlert.toggle() }
+                case .sendMailLinkUpperLimit:
+                    Button("OK") { logInVM.isShowLogInErrorAlert.toggle() }
+                }
+        } message: {
+            Text(logInVM.logInAlertMessage.text)
+        }
         .sheet(isPresented: $inputLogIn.isShowPickerView) {
             PHPickerView(captureImage: $inputLogIn.captureImage, isShowSheet: $inputLogIn.isShowPickerView, isShowError: $inputLogIn.captureError)
         }
