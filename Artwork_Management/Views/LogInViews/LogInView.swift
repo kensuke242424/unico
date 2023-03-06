@@ -97,15 +97,7 @@ enum LogInErrorAlert {
         case .sendMailLinkUpperLimit:
             return "認証メールの送信上限に達しました。日にちを置いてアクセスしてください。"
         case .emailImproper:
-            return "アドレスの書式が正しくありません。確認後に、再度試してみてください。"
-        }
-    }
-    
-    var present: Bool {
-        switch self {
-        case .start: return false
-        case .emailImproper: return true
-        case .sendMailLinkUpperLimit: return true
+            return "アドレスの書式が正しくありません。"
         }
     }
 }

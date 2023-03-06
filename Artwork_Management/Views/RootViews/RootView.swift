@@ -180,7 +180,10 @@ struct RootView: View {
                             print("ログインエラー：", error.localizedDescription)
                             return
                         }
-                        print("ログイン成功")
+                        // メールリンクからのサインイン成功時の処理
+                        if let authResult {
+                            print("ログイン成功")
+                        }
                     }
                 } else {
                     print("if let email == nil")

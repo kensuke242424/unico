@@ -67,7 +67,6 @@ class LogInViewModel: ObservableObject {
     func handleSignInWithAppleCompletion(_ result: Result<ASAuthorization, Error>) {
         if case .failure(let failure) = result {
             logInErrorAlertMessage = failure.localizedDescription
-            isShowLogInErrorAlert.toggle()
         }
         else if case .success(let success) = result {
             // ASAuthorizationAppleIDCredential: AppleID認証が成功した結果として得られる資格情報。
@@ -89,8 +88,8 @@ class LogInViewModel: ObservableObject {
                                                           rawNonce: nonce)
                 Task {
                     do {
-                         _ = try await Auth.auth().signIn(with: credential)
                         self.currentUserCheckListener()
+                         _ = try await Auth.auth().signIn(with: credential)
                     } catch {
                         print("Error authenticating: \(error.localizedDescription)")
                     }
@@ -194,19 +193,6 @@ class LogInViewModel: ObservableObject {
         }
     }
 
-    func passwordUpdate(email: String) {
-
-        Auth.auth().sendPasswordReset(withEmail: email) { [weak self] error in
-            guard let self = self else { return }
-            if error ==  nil {
-                print("パスワード変更メール送信完了")
-            } else {
-                print("パスワード変更メール送信失敗")
-                self.logInErrorMessage = "パスワード変更メール送信失敗"
-            }
-        }
-    }
-
     func currentUserCheckListener() {
         Auth.auth().addStateDidChangeListener { auth, user in
             if user != nil {
@@ -307,8 +293,8 @@ class LogInViewModel: ObservableObject {
                 withAnimation(.easeInOut(duration: 0.3)) {
                     self.addressCheck = .failure
                     // TODO: エラーアラートのテキストとトリガー処理をまとめられないか？
-                    self.isShowLogInErrorAlert.toggle()
-                    self.logInAlertMessage = .emailImproper
+//                    self.isShowLogInErrorAlert.toggle()
+//                    self.logInAlertMessage = .emailImproper
                     
                 }
                 return
