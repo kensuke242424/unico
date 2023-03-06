@@ -23,6 +23,7 @@ class LogInViewModel: ObservableObject {
     @Published var rootNavigation: RootNavigation = .logIn
     @Published var successSignInAccount: Bool = false
     @Published var isShowLogInErrorAlert: Bool = false
+    @Published var addressCheck: AddressCheck = .start
 
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
     var uid: String? {
@@ -286,6 +287,10 @@ class LogInViewModel: ObservableObject {
     // ダイナミックリンクによってメールアドレス認証でのサインインをするため、ユーザにメールを送信するメソッド
     func sendSignInLink(email: String) {
         
+        withAnimation(.easeInOut(duration: 0.3)) {
+            self.addressCheck = .check
+        }
+        
         let actionCodeSettings = ActionCodeSettings()
         actionCodeSettings.url = URL(string: "https://unicoaddress.page.link/open")
         actionCodeSettings.handleCodeInApp = true
@@ -294,18 +299,25 @@ class LogInViewModel: ObservableObject {
         actionCodeSettings.setAndroidPackageName("com.example.android",
                                                  installIfNotAvailable: false, minimumVersion: "12")
         
-        // TODO: メールリンクの送信上限のため、一時的にここから保存してる
-        UserDefaults.standard.set(email, forKey: "Email")
-        
         Auth.auth().sendSignInLink(toEmail: email, actionCodeSettings: actionCodeSettings) { error in
             if let error = error {
                 print("Failed to send sign in link: \(error.localizedDescription)")
+                hapticErrorNotification()
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    self.addressCheck = .failure
+                }
                 return
             }
             print("Sign in link sent successfully.")
+            hapticSuccessNotification()
             // ディープリンク送信時に入力されたアドレスを保存しておく
             // リンクから再度アプリに戻ってきた後の処理で、リンクから飛んできたアドレスと保存アドレスの差分がないかチェック
             UserDefaults.standard.set(email, forKey: "Email")
+            
+            withAnimation(.easeInOut(duration: 0.8)) {
+                // 入力アドレス宛にディープリンク付きメールを送信する
+                self.addressCheck = .success
+            }
         }
     }
 

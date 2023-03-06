@@ -23,6 +23,7 @@ struct RootView: View {
     @StateObject var tagVM: TagViewModel = TagViewModel()
 
     @State private var isShowStandBy: Bool = false
+    @State private var showLogInAlert: Bool = false
 
     var windowScene: UIWindowScene? {
         let scenes = UIApplication.shared.connectedScenes
@@ -66,6 +67,16 @@ struct RootView: View {
                 .opacity(isShowStandBy ? 1.0 : 0.0)
 
         } // ZStack
+        .alert("確認", isPresented: $showLogInAlert) {
+            
+            Button {
+                
+            } label: {
+                Text("OK")
+            }
+        } message: {
+            Text("ログイン画面に戻ります。よろしいですか？")
+        } // alert
 
         // fetch...
         .onChange(of: logInVM.rootNavigation) { navigation in
@@ -143,6 +154,47 @@ struct RootView: View {
                         isShowStandBy.toggle()
                     }
                 }
+            }
+        }
+        .onOpenURL { url in
+            // handle the URL that must be opened
+            // メールリンクからのログイン時、遷移リンクURLを検知して受け取る
+            let incomingURL = url
+            print("Incoming URL is: \(incomingURL)")
+            // 受け取ったメールリンクURLを使ってダイナミックリンクを生成
+            let linkHandled = DynamicLinks.dynamicLinks().handleUniversalLink(incomingURL) { (dynamicLink, error) in
+                guard error == nil else {
+                    print("Error found!: \(error!.localizedDescription)")
+                    return
+                }
+                // ダイナミックリンクが有効かチェック
+                // リンクが有効だった場合、メールリンクからのサインインメソッド実行
+                if let dynamicLink {
+                    let defaults = UserDefaults.standard
+                    if let email = defaults.string(forKey: "Email") {
+                        print("アカウント登録するユーザのメールアドレス: \(email)")
+                        // Firebase Authにアカウントの登録
+                        Auth.auth().signIn(withEmail: email, link: incomingURL.absoluteString)
+                        { authResult, error in
+                            if let authResult {
+                                print("ログイン成功")
+                            } else {
+                                print("ログインエラー：", error?.localizedDescription ?? "")
+                            }
+                        }
+                    } else {
+                        print("if let email == nil")
+                    }
+                } else {
+                    print("if let dynamicLink == nil")
+                }
+            }
+            if linkHandled {
+                print("Link Handled")
+                return
+            } else {
+                print("NO linkHandled")
+                return
             }
         }
     } // body

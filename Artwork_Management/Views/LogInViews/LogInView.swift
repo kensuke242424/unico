@@ -65,11 +65,11 @@ enum AddressCheck {
     
     var messageText: (text1: String, text2: String) {
         switch self {
-        case .start: return ("メールアドレスを入力してください。",
-                             "入力したアドレスに、本人確認メールを送ります。")
+        case .start: return ("入力したアドレスに認証メールを送ります。",
+                             "メール内のリンクからログインしてください。")
         case .check: return ("メールアドレスをチェックしています...", "")
-        case .failure: return ("メールの送信ができませんでした。", "アドレスを確認して、再度試してみてください。")
-        case .success: return ("入力アドレスに認証メールを送信しました！", "届いたメールからサインインしてください。")
+        case .failure: return ("認証メールの送信に失敗しました。", "アドレスを確認して、再度試してみてください。")
+        case .success: return ("認証メールを送信しました！", "メールが届くまで少し時間がかかる場合があります。")
         }
     }
 }
@@ -99,7 +99,6 @@ struct InputLogIn {
     var firstSelect: FirstSelect = .start
     var selectSignInType: SelectSignInType = .start
     var createAccountFase: CreateAccountFase = .start
-    var addressCheck: AddressCheck = .start
     var selectUserColor: MemberColor = .gray
 }
 
@@ -217,8 +216,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         Text("< 戻る")
                             .foregroundColor(.white.opacity(0.7))
                     }
-                    .disabled(inputLogIn.addressCheck == .success ? true : false)
-                    .opacity(inputLogIn.addressCheck == .success ? 0.2 : 1.0)
+                    .disabled(logInVM.addressCheck == .success ? true : false)
+                    .opacity(logInVM.addressCheck == .success ? 0.2 : 1.0)
                     .opacity(inputLogIn.createAccountFase == .fase1 && !inputLogIn.createAccountShowContents ? 0.0 : 1.0)
                     .offset(y: getRect().height / 3)
                 }
@@ -233,8 +232,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             Image(systemName: "house.fill")
                         }
                     }
-                    .disabled(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .success ? true : false)
-                    .opacity(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .success ? 0.2 : 1.0)
+                    .disabled(logInVM.addressCheck == .start || logInVM.addressCheck == .success ? true : false)
+                    .opacity(logInVM.addressCheck == .start || logInVM.addressCheck == .success ? 0.2 : 1.0)
                     .opacity(inputLogIn.createAccountFase == .start ||
                              inputLogIn.createAccountFase == .fase1 ||
                              inputLogIn.createAccountFase == .success ? 0.0 : 1.0)
@@ -620,7 +619,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                 }
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                                     inputLogIn.showSheetBackground.toggle()
-                                    inputLogIn.addressCheck = .start
+                                    logInVM.addressCheck = .start
                                 }
                             } label: {
                                 Circle()
@@ -634,26 +633,26 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                             .frame(width: 10, height: 10)
                                     }
                             }
-                            .disabled(inputLogIn.addressCheck == .check ? true : false)
-                            .opacity(inputLogIn.addressCheck == .check ? 0.3 : 1.0)
+                            .disabled(logInVM.addressCheck == .check ? true : false)
+                            .opacity(logInVM.addressCheck == .check ? 0.3 : 1.0)
                         }
                         .padding([.horizontal, .top], 20)
                         .padding(.bottom, 10)
                         
                         HStack(spacing: 10) {
-                            if inputLogIn.addressCheck == .check {
+                            if logInVM.addressCheck == .check {
                                 ProgressView()
                             } else {
-                                inputLogIn.addressCheck.checkIcon
-                                    .foregroundColor(inputLogIn.addressCheck == .failure ? .red : .green)
+                                logInVM.addressCheck.checkIcon
+                                    .foregroundColor(logInVM.addressCheck == .failure ? .red : .green)
                             }
-                            Text(inputLogIn.addressCheck.checkText)
+                            Text(logInVM.addressCheck.checkText)
                                 .tracking(5)
                                 .opacity(0.5)
                                 .fontWeight(.semibold)
                         }
                         .frame(width: 300, height: 30)
-                        .opacity(inputLogIn.addressCheck != .start ? 1.0 : 0.0)
+                        .opacity(logInVM.addressCheck != .start ? 1.0 : 0.0)
                         
                         HStack(spacing: 35) {
                             
@@ -661,49 +660,49 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 35)
-                                .scaleEffect(inputLogIn.addressCheck == .check ? 1.0 :
-                                                inputLogIn.addressCheck == .success ? 1.4 :
+                                .scaleEffect(logInVM.addressCheck == .check ? 1.0 :
+                                                logInVM.addressCheck == .success ? 1.4 :
                                                 1.0)
-                                .opacity(inputLogIn.addressCheck == .check ? 0.8 :
-                                            inputLogIn.addressCheck == .failure ? 0.8 :
-                                            inputLogIn.addressCheck == .success ? 1.0 :
+                                .opacity(logInVM.addressCheck == .check ? 0.8 :
+                                            logInVM.addressCheck == .failure ? 0.8 :
+                                            logInVM.addressCheck == .success ? 1.0 :
                                             0.8)
                                 .overlay(alignment: .topTrailing) {
                                     Image(systemName: "questionmark")
                                         .font(.subheadline)
                                         .fontWeight(.semibold)
-                                        .opacity(inputLogIn.addressCheck == .failure ? 0.5 : 0.0)
+                                        .opacity(logInVM.addressCheck == .failure ? 0.5 : 0.0)
                                         .offset(x: 15, y: -15)
                                 }
                             
-                            if inputLogIn.addressCheck != .success {
+                            if logInVM.addressCheck != .success {
                                 Image(systemName: "arrowshape.turn.up.right.fill")
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 20)
-                                    .opacity(inputLogIn.addressCheck == .check ? 1.0 :
-                                                inputLogIn.addressCheck == .failure ? 0.2 :
+                                    .opacity(logInVM.addressCheck == .check ? 1.0 :
+                                                logInVM.addressCheck == .failure ? 0.2 :
                                                 0.4)
                                     .scaleEffect(inputLogIn.repeatAnimation ? 1.3 : 1.0)
                                     .animation(.default.repeat(while: inputLogIn.repeatAnimation),
                                                value: inputLogIn.repeatAnimation)
                             }
                             
-                            if inputLogIn.addressCheck != .success {
+                            if logInVM.addressCheck != .success {
                                 Image(systemName: "person.fill")
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 35)
-                                    .opacity(inputLogIn.addressCheck == .check ? 0.4 :
-                                                inputLogIn.addressCheck == .failure ? 0.2 :
+                                    .opacity(logInVM.addressCheck == .check ? 0.4 :
+                                                logInVM.addressCheck == .failure ? 0.2 :
                                                 0.8)
-                                    .scaleEffect(inputLogIn.addressCheck == .check ? 0.8 : 1.0)
+                                    .scaleEffect(logInVM.addressCheck == .check ? 0.8 : 1.0)
                             }
                         }
                         .frame(height: 60)
                         .padding(.bottom)
                         // リピートスケールアニメーションの発火トリガー
-                        .onChange(of: inputLogIn.addressCheck) { newValue in
+                        .onChange(of: logInVM.addressCheck) { newValue in
                             if newValue == .check {
                                 inputLogIn.repeatAnimation = true
                             } else {
@@ -712,8 +711,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         }
                         
                         VStack(spacing: 5) {
-                            Text(inputLogIn.addressCheck.messageText.text1)
-                            Text(inputLogIn.addressCheck.messageText.text2)
+                            Text(logInVM.addressCheck.messageText.text1)
+                            Text(logInVM.addressCheck.messageText.text2)
                         }
                         .font(.subheadline)
                         .tracking(1)
@@ -742,23 +741,18 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             }
                         
                         // アドレス認証を行うボタン
-                        Button(inputLogIn.addressCheck == .start ||
-                               inputLogIn.addressCheck == .check ? "メールを送信" : "もう一度送る") {
+                        Button(logInVM.addressCheck == .start ||
+                               logInVM.addressCheck == .check ? "メールを送信" : "もう一度送る") {
                             
                             withAnimation(.easeInOut(duration: 0.3)) {
-                                inputLogIn.addressCheck = .check
+                                logInVM.addressCheck = .check
                             }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                withAnimation(.easeInOut(duration: 0.8)) {
-                                    // 入力アドレス宛にディープリンク付きメールを送信する
-                                    logInVM.sendSignInLink(email: inputLogIn.address)
-                                    inputLogIn.addressCheck = .success
-                                }
-                            }
+                            // 入力アドレス宛にディープリンク付きメールを送信する
+                            logInVM.sendSignInLink(email: inputLogIn.address)
                         }
                         .buttonStyle(.borderedProminent)
                         .disabled(inputLogIn.sendAddressButtonDisabled)
-                        .opacity(inputLogIn.addressCheck == .check ? 0.3 : 1.0)
+                        .opacity(logInVM.addressCheck == .check ? 0.3 : 1.0)
                         .padding(.top, 10)
                         
                         Spacer()
@@ -862,7 +856,7 @@ struct InputAddressAndPasswordField: View {
                         HStack {
                             Text("メールアドレス")
                                 .foregroundColor(.white.opacity(0.7))
-                            if addressHidden && inputLogIn.addressCheck == .failure {
+                            if addressHidden && logInVM.addressCheck == .failure {
                                 Text("※アドレスが未入力です").font(.caption).foregroundColor(.red.opacity(0.7))
                             }
                         }
@@ -881,9 +875,9 @@ struct InputAddressAndPasswordField: View {
                         HStack {
                             Text("パスワード")
                                 .foregroundColor(.white.opacity(0.7))
-                            if passwordHidden && inputLogIn.addressCheck == .failure {
+                            if passwordHidden && logInVM.addressCheck == .failure {
                                 Text("※パスワードが未入力です").font(.caption).foregroundColor(.red.opacity(0.7))
-                            } else if passwordCount6Lower && inputLogIn.addressCheck == .failure {
+                            } else if passwordCount6Lower && logInVM.addressCheck == .failure {
                                 Text("※パスワードは6文字以上必要です").font(.caption).foregroundColor(.red.opacity(0.7))
                             } else {
                                 Text("(※6文字以上)").font(.caption).foregroundColor(.white.opacity(0.4))
@@ -918,7 +912,7 @@ struct InputAddressAndPasswordField: View {
                             HStack {
                                 Text("パスワード確認")
                                     .foregroundColor(.white.opacity(0.7))
-                                if passwordConfirmDifference && inputLogIn.addressCheck == .failure {
+                                if passwordConfirmDifference && logInVM.addressCheck == .failure {
                                     Text("※パスワードが一致しません").font(.caption).foregroundColor(.red.opacity(0.7))
                                 }
                             }
@@ -961,7 +955,7 @@ struct InputAddressAndPasswordField: View {
                     passwordConfirmDifference = false
                     logInVM.logInErrorMessage = ""
                     
-                    inputLogIn.addressCheck = .start
+                    logInVM.addressCheck = .start
                     createAccountFocused = nil
                     
                     if inputLogIn.address.isEmpty { addressHidden.toggle() }
@@ -972,7 +966,7 @@ struct InputAddressAndPasswordField: View {
                     if addressHidden || passwordHidden || passwordCount6Lower || passwordConfirmIsEmpty || passwordConfirmDifference {
                         print("ユーザ登録記入欄に不備あり")
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                            withAnimation(.spring(response: 0.5)) { inputLogIn.addressCheck = .failure }
+                            withAnimation(.spring(response: 0.5)) { logInVM.addressCheck = .failure }
                         }
                         return
                         
@@ -986,7 +980,7 @@ struct InputAddressAndPasswordField: View {
                                 // メールアドレスを用いてユーザを登録する
                                 let checkSignUp = await logInVM.signUpEmailAdress(email: inputLogIn.address,
                                                                                   password: inputLogIn.password)
-                                if !checkSignUp { inputLogIn.addressCheck = .failure; return }
+                                if !checkSignUp { logInVM.addressCheck = .failure; return }
                                 
                                 let uplaodImageData = await  logInVM.uploadImage(inputLogIn.captureImage)
                                 let newUserData = User(id: logInVM.uid!,
@@ -1002,7 +996,7 @@ struct InputAddressAndPasswordField: View {
                                 
                                 if checkSignUp, checkAddUser {
                                     // サインアップ成功
-                                    withAnimation(.spring(response: 0.5)) { inputLogIn.addressCheck = .success }
+                                    withAnimation(.spring(response: 0.5)) { logInVM.addressCheck = .success }
                                     
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                                         // RootViewのfetch処理へ移動
@@ -1013,7 +1007,7 @@ struct InputAddressAndPasswordField: View {
                                     
                                 } else {
                                     // サインアップ失敗
-                                    withAnimation(.spring(response: 0.5)) { inputLogIn.addressCheck = .failure }
+                                    withAnimation(.spring(response: 0.5)) { logInVM.addressCheck = .failure }
                                 }
                             }
                             
@@ -1023,7 +1017,7 @@ struct InputAddressAndPasswordField: View {
                                                                                   password: inputLogIn.password)
                                 if checkSignIn {
                                     // ログイン成功
-                                    withAnimation(.spring(response: 0.5)) { inputLogIn.addressCheck = .success }
+                                    withAnimation(.spring(response: 0.5)) { logInVM.addressCheck = .success }
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                                         // RootViewのfetch処理へ移動
                                         withAnimation(.spring(response: 0.5)) {
@@ -1032,22 +1026,22 @@ struct InputAddressAndPasswordField: View {
                                     }
                                 } else {
                                     // ログイン失敗
-                                    withAnimation(.spring(response: 0.5)) { inputLogIn.addressCheck = .failure }
+                                    withAnimation(.spring(response: 0.5)) { logInVM.addressCheck = .failure }
                                 }
                             }
                         }
                     }
                 }
                 .buttonStyle(.borderedProminent)
-                .disabled(inputLogIn.addressCheck == .start || inputLogIn.addressCheck == .success ? true : false)
+                .disabled(logInVM.addressCheck == .start || logInVM.addressCheck == .success ? true : false)
                 .overlay(alignment: .top) {
                     HStack {
-                        if inputLogIn.addressCheck == .start {
+                        if logInVM.addressCheck == .start {
                             ProgressView().frame(width: 10, height: 10)
                         } else {
-                            inputLogIn.addressCheck.checkIcon.foregroundColor(inputLogIn.addressCheck == .failure ? .red : .green)
+                            logInVM.addressCheck.checkIcon.foregroundColor(logInVM.addressCheck == .failure ? .red : .green)
                         }
-                        Text(inputLogIn.addressCheck.checkText).foregroundColor(.white.opacity(0.5))
+                        Text(logInVM.addressCheck.checkText).foregroundColor(.white.opacity(0.5))
                     }
                     .font(.caption)
                     .offset(y: -30)
@@ -1061,22 +1055,22 @@ struct InputAddressAndPasswordField: View {
                         passwordConfirmDifference = false
                         logInVM.logInErrorMessage = ""
                         
-                        inputLogIn.addressCheck = .start
+                        logInVM.addressCheck = .start
                     }
                     .overlay(alignment: .bottom) {(Rectangle().frame(height: 1)) }
                     .font(.caption)
                     .foregroundColor(.white)
                     .offset(x: 100)
-                    .opacity(inputLogIn.addressCheck == .failure ? 1.0 : 0.0)
+                    .opacity(logInVM.addressCheck == .failure ? 1.0 : 0.0)
                 }
                 .padding(.top, 20)
                 
-                Text(inputLogIn.addressCheck == .failure ? logInVM.logInErrorMessage :
-                        inputLogIn.addressCheck == .success ? inputLogIn.firstSelect == .logIn ?
+                Text(logInVM.addressCheck == .failure ? logInVM.logInErrorMessage :
+                        logInVM.addressCheck == .success ? inputLogIn.firstSelect == .logIn ?
                      "ログインに成功しました！"  : "ユーザ登録が完了しました！" : "")
                 .font(.subheadline).fontWeight(.bold)
-                .foregroundColor(inputLogIn.addressCheck == .failure ? .red : .white).opacity(0.8)
-                .opacity(inputLogIn.addressCheck == .failure || inputLogIn.addressCheck == .success ? 1.0 : 0.0)
+                .foregroundColor(logInVM.addressCheck == .failure ? .red : .white).opacity(0.8)
+                .opacity(logInVM.addressCheck == .failure || logInVM.addressCheck == .success ? 1.0 : 0.0)
                 .frame(height: 20)
                 
             } // VStack
@@ -1088,7 +1082,7 @@ struct InputAddressAndPasswordField: View {
                 passwordConfirmIsEmpty = false
                 passwordConfirmDifference = false
                 logInVM.logInErrorMessage = ""
-                inputLogIn.addressCheck = .start
+                logInVM.addressCheck = .start
             }
         }
     } // body
