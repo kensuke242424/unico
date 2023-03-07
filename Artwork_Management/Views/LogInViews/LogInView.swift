@@ -308,7 +308,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         // Open navigate tab srideView...
                         Task {
                             logInVM.signInAnonymously()
-                            logInVM.currentUserCheckListener()
+                            logInVM.startCurrentUserListener()
                         }
                     } label: {
                         HStack {

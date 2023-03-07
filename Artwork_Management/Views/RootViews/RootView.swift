@@ -99,7 +99,7 @@ struct RootView: View {
                         print("userVM.user: \(user)")
                         if user.joins.isEmpty {
                             print("参加チーム無し。チーム作成画面へ遷移")
-                            _ = try await userVM.userRealtimeListener()
+//                            _ = try await userVM.userRealtimeListener()
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                 withAnimation(.spring(response: 1)) {
                                     logInVM.rootNavigation = .join
@@ -169,6 +169,7 @@ struct RootView: View {
             }
         }
         .onOpenURL { url in
+            
             // handle the URL that must be opened
             // メールリンクからのログイン時、遷移リンクURLを検知して受け取る
             let incomingURL = url
@@ -181,9 +182,10 @@ struct RootView: View {
                 }
                 // ダイナミックリンクが有効かチェック
                 // リンクが有効だった場合、メールリンクからのサインインメソッド実行
-                // TODO: メールリンクから遷移したら、データのフェッチ開始までProgressViewを表示
+                // TODO: メールリンクから遷移が成功したら、データのフェッチ開始までProgressViewを表示
                 let defaults = UserDefaults.standard
                 if let email = defaults.string(forKey: "Email") {
+                    progress.isShow.toggle()
                     print("アカウント登録するユーザのメールアドレス: \(email)")
                     // Firebase Authにアカウントの登録
                     /// TODO: この時すでにアカウントが存在した場合どのような動きになるか確認する
@@ -192,16 +194,20 @@ struct RootView: View {
                     { authResult, error in
                         if let error {
                             print("ログインエラー：", error.localizedDescription)
+                            progress.isShow.toggle()
                             return
                         }
                         // メールリンクからのサインイン成功時の処理
                         if let authResult {
                             print("メールリンクからのログイン成功")
                             print("currentUser: \(Auth.auth().currentUser)")
+                            
+                            progress.isShow.toggle()
                         }
                     }
                 } else {
-                    print("Error: Auth.auth().signIn(withEmail:")
+                    print("ユーザーデフォルトからのメールアドレス取得失敗: defaults.string(forKey: Email)")
+                    progress.isShow.toggle()
                 }
             }
             if linkHandled {
@@ -209,6 +215,7 @@ struct RootView: View {
                 return
             } else {
                 print("NO linkHandled")
+                progress.isShow.toggle()
                 return
             }
         }

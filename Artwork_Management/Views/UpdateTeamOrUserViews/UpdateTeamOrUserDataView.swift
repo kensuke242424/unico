@@ -37,7 +37,6 @@ struct UpdateTeamOrUserDataView: View {
 
             Color(.black).opacity(0.7)
                 .background(.ultraThinMaterial).opacity(0.9)
-//                .ignoresSafeArea()
                 .onTapGesture {
                     updateTeamfocused = nil
                 }

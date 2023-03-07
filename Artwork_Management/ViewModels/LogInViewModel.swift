@@ -91,7 +91,7 @@ class LogInViewModel: ObservableObject {
                 Task {
                     do {
                          _ = try await Auth.auth().signIn(with: credential)
-                        self.currentUserCheckListener()
+                        self.startCurrentUserListener()
                     } catch {
                         print("Error authenticating: \(error.localizedDescription)")
                     }
@@ -148,7 +148,7 @@ class LogInViewModel: ObservableObject {
         }
     }
 
-    func currentUserCheckListener() {
+    func startCurrentUserListener() {
         print("currentUserCheckListenerスタート")
         Auth.auth().addStateDidChangeListener { auth, user in
             if user != nil {
@@ -298,8 +298,10 @@ class LogInViewModel: ObservableObject {
                 }
                 return
             }
-            print("Sign in link sent successfully.")
+            print("Sign in link sent successfully.") 
             hapticSuccessNotification()
+            self.startCurrentUserListener()
+            
             // ディープリンク送信時に入力されたアドレスを保存しておく
             // リンクから再度アプリに戻ってきた後の処理で、リンクから飛んできたアドレスと保存アドレスの差分がないかチェック
             UserDefaults.standard.set(email, forKey: "Email")
