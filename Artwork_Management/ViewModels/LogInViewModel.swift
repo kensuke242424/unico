@@ -21,8 +21,10 @@ class LogInViewModel: ObservableObject {
     }
 
     @Published var rootNavigation: RootNavigation = .logIn
-    @Published var successSignInAccount: Bool = false
-    @Published var isShowLogInErrorAlert: Bool = false
+    
+    @Published var AlreadyExistsUserDocument: Bool = false
+    @Published var checkCurrentUserExists: Bool = false
+    @Published var isShowLogInFlowAlert: Bool = false
     @Published var logInAlertMessage: LogInAlert = .start
     @Published var addressCheck: AddressCheck = .start
 
@@ -44,7 +46,7 @@ class LogInViewModel: ObservableObject {
             if let error = error {
                 print(error.localizedDescription)
                 print("AnonymousSignIn_error")
-                self.isShowLogInErrorAlert.toggle()
+                self.isShowLogInFlowAlert.toggle()
                 return
             }
             if let user = authResult?.user {
@@ -98,53 +100,6 @@ class LogInViewModel: ObservableObject {
         }
     }
 
-    private func randomNonceString(length: Int = 32) -> String {
-      precondition(length > 0)
-      let charset: [Character] =
-        Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
-      var result = ""
-      var remainingLength = length
-
-      while remainingLength > 0 {
-        let randoms: [UInt8] = (0 ..< 16).map { _ in
-          var random: UInt8 = 0
-          let errorCode = SecRandomCopyBytes(kSecRandomDefault, 1, &random)
-          if errorCode != errSecSuccess {
-            fatalError(
-              "Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(errorCode)"
-            )
-          }
-          return random
-        }
-
-        randoms.forEach { random in
-          if remainingLength == 0 {
-            return
-          }
-
-          if random < charset.count {
-            result.append(charset[Int(random)])
-            remainingLength -= 1
-          }
-        }
-      }
-
-      return result
-    }
-
-    // サインイン要求で nonce の SHA256 ハッシュを送信すると、Apple はそれを応答で変更せずに渡します。
-    // Firebase は、元のノンスをハッシュし、それを Apple から渡された値と比較することで、応答を検証します。
-    @available(iOS 13, *)
-    private func sha256(_ input: String) -> String {
-      let inputData = Data(input.utf8)
-      let hashedData = SHA256.hash(data: inputData)
-      let hashString = hashedData.compactMap {
-        String(format: "%02x", $0)
-      }.joined()
-
-      return hashString
-    }
-
     func signInEmailAdress(email: String, password: String) async -> Bool {
 
         logInErrorMessage = ""
@@ -194,24 +149,27 @@ class LogInViewModel: ObservableObject {
     }
 
     func currentUserCheckListener() {
+        print("currentUserCheckListenerスタート")
         Auth.auth().addStateDidChangeListener { auth, user in
             if user != nil {
                 print("currentUserCheck_サインイン⭕️")
                 print("uid: \(self.uid)")
-                self.successSignInAccount = true
-                print("successSignInAccount: \(self.successSignInAccount)")
+                self.checkCurrentUserExists = true
+                print("successCreatedAccount: \(self.checkCurrentUserExists)")
             }
             else {
-                // サインアップ失敗
+                // サインイン失敗
                 print("currentUserCheck_サインイン❌")
                 print("uid: \(self.uid)")
-                self.successSignInAccount = false
+                self.checkCurrentUserExists = false
             }
         }
     }
     
-    // メールアドレスによるサインアップ時に、
-    func checkAlreadyEmailAddress(_ email: String) {
+    /// メールアドレスによるサインアップ時、既に入力アドレスのアカウント(Auth)が存在した場合、
+    /// アカウントのUserドキュメントが作成されているかチェックする。
+    /// ドキュメントが
+    func checkExistsEmailAddress(_ email: String) {
         Auth.auth().fetchSignInMethods(forEmail: email) { (providers, error) in
             if let error = error {
                 // エラー処理
@@ -220,10 +178,11 @@ class LogInViewModel: ObservableObject {
             }
             if let providers = providers, providers.count > 0 {
                 // ユーザーが既に存在する場合の処理
-                self.isShowLogInErrorAlert.toggle()
-                self.logInAlertMessage = .alreadyEmailAddress
+                self.isShowLogInFlowAlert.toggle()
+                self.logInAlertMessage = .existsEmailAddress
             } else {
                 // ユーザーが存在しない場合の処理
+                
             }
         }
     }
@@ -239,7 +198,7 @@ class LogInViewModel: ObservableObject {
         }
     }
 
-    func addNewUserSetData(name: String, password: String?, imageData: UIImage?, color: MemberColor) async -> Bool {
+    func newUserSetDocument(name: String, password: String?, imageData: UIImage?, color: MemberColor) async -> Bool {
 
         print("addUserSignInWithApple実行")
 
@@ -400,5 +359,52 @@ class LogInViewModel: ObservableObject {
         else { return nil }
 
         return UIImage(cgImage: cgImage)
+    }
+    
+    private func randomNonceString(length: Int = 32) -> String {
+      precondition(length > 0)
+      let charset: [Character] =
+        Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
+      var result = ""
+      var remainingLength = length
+
+      while remainingLength > 0 {
+        let randoms: [UInt8] = (0 ..< 16).map { _ in
+          var random: UInt8 = 0
+          let errorCode = SecRandomCopyBytes(kSecRandomDefault, 1, &random)
+          if errorCode != errSecSuccess {
+            fatalError(
+              "Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(errorCode)"
+            )
+          }
+          return random
+        }
+
+        randoms.forEach { random in
+          if remainingLength == 0 {
+            return
+          }
+
+          if random < charset.count {
+            result.append(charset[Int(random)])
+            remainingLength -= 1
+          }
+        }
+      }
+
+      return result
+    }
+
+    // サインイン要求で nonce の SHA256 ハッシュを送信すると、Apple はそれを応答で変更せずに渡します。
+    // Firebase は、元のノンスをハッシュし、それを Apple から渡された値と比較することで、応答を検証します。
+    @available(iOS 13, *)
+    private func sha256(_ input: String) -> String {
+      let inputData = Data(input.utf8)
+      let hashedData = SHA256.hash(data: inputData)
+      let hashString = hashedData.compactMap {
+        String(format: "%02x", $0)
+      }.joined()
+
+      return hashString
     }
 }

@@ -13,9 +13,10 @@ struct CustomProgressView: View {
 
     var body: some View {
         ZStack {
+            
             Rectangle()
                 .foregroundColor(colorScheme == ColorScheme.light ? .white : .black)
-                .opacity(0.3)
+                .opacity(0.5)
                 .ignoresSafeArea()
             VStack(spacing: 30) {
                 ProgressView()

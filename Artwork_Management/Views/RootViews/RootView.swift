@@ -15,6 +15,8 @@ enum RootNavigation {
 }
 
 struct RootView: View {
+    
+    @EnvironmentObject var progress: ProgressViewModel
 
     @StateObject var logInVM: LogInViewModel = LogInViewModel()
     @StateObject var teamVM: TeamViewModel = TeamViewModel()
@@ -65,6 +67,10 @@ struct RootView: View {
 
             StandByView()
                 .opacity(isShowStandBy ? 1.0 : 0.0)
+            
+            if progress.isShow {
+                CustomProgressView()
+            }
 
         } // ZStack
         .alert("確認", isPresented: $showLogInAlert) {
@@ -118,21 +124,27 @@ struct RootView: View {
 
                     } catch CustomError.uidEmpty {
                         print("Error: uidEmpty")
+                        logInVM.logOut()
                         withAnimation(.spring(response: 1)) { logInVM.rootNavigation = .logIn }
                     } catch CustomError.getRef {
                         print("Error: getRef")
+                        logInVM.logOut()
                         withAnimation(.spring(response: 1)) { logInVM.rootNavigation = .logIn }
                     } catch CustomError.fetch {
                         print("Error: fetch")
+                        logInVM.logOut()
                         withAnimation(.spring(response: 1)) { logInVM.rootNavigation = .logIn }
                     } catch CustomError.getDocument {
                         print("Error: getDocument")
+                        logInVM.logOut()
                         withAnimation(.spring(response: 1)) { logInVM.rootNavigation = .logIn }
                     } catch CustomError.getUserDocument {
                         print("Error: getUserDocument")
+                        logInVM.logOut()
                         withAnimation(.spring(response: 1)) { logInVM.rootNavigation = .logIn }
                     } catch {
                         print("Error")
+                        logInVM.logOut()
                         withAnimation(.spring(response: 1)) { logInVM.rootNavigation = .logIn }
                     }
                 } // Task
@@ -169,11 +181,12 @@ struct RootView: View {
                 }
                 // ダイナミックリンクが有効かチェック
                 // リンクが有効だった場合、メールリンクからのサインインメソッド実行
-                
+                // TODO: メールリンクから遷移したら、フェッチ開始までProgressViewを表示
                 let defaults = UserDefaults.standard
                 if let email = defaults.string(forKey: "Email") {
                     print("アカウント登録するユーザのメールアドレス: \(email)")
                     // Firebase Authにアカウントの登録
+                    // TODO: この時すでにアカウントが存在した場合どのような動きになるか確認する
                     Auth.auth().signIn(withEmail: email, link: incomingURL.absoluteString)
                     { authResult, error in
                         if let error {
@@ -182,7 +195,10 @@ struct RootView: View {
                         }
                         // メールリンクからのサインイン成功時の処理
                         if let authResult {
-                            print("ログイン成功")
+                            print("メールリンクからのログイン成功")
+                            print("currentUser: \(Auth.auth().currentUser)")
+//                            logInVM.currentUserCheckListener()
+                            
                         }
                     }
                 } else {

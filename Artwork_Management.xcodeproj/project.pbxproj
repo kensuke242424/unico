@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BE3CD65B29B72B0700C19442 /* ProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3CD65A29B72B0700C19442 /* ProgressViewModel.swift */; };
 		BE41783D29B4535800434CFC /* AnimationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE41783C29B4535800434CFC /* AnimationExtension.swift */; };
 		BE41784029B4AB3100434CFC /* FirebaseDynamicLinks in Frameworks */ = {isa = PBXBuildFile; productRef = BE41783F29B4AB3100434CFC /* FirebaseDynamicLinks */; };
 		BE41784229B4AB7E00434CFC /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = BE41784129B4AB7E00434CFC /* FirebaseAnalytics */; };
@@ -87,6 +88,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		BE3CD65A29B72B0700C19442 /* ProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressViewModel.swift; sourceTree = "<group>"; };
 		BE41783C29B4535800434CFC /* AnimationExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationExtension.swift; sourceTree = "<group>"; };
 		BEAB502D29A7C6D400ECCB4F /* PageTabNavigateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageTabNavigateView.swift; sourceTree = "<group>"; };
 		E0003D0228FD3BB0007308B0 /* TagTitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagTitle.swift; sourceTree = "<group>"; };
@@ -303,6 +305,7 @@
 				E01E1391291F961A0001F2DA /* TagViewModel.swift */,
 				E0CF7EF128DF166700735142 /* ItemViewModel.swift */,
 				E0796AD628F485850094E50C /* ButtonViewModel.swift */,
+				BE3CD65A29B72B0700C19442 /* ProgressViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -588,6 +591,7 @@
 				E0003D0328FD3BB0007308B0 /* TagTitle.swift in Sources */,
 				E01E13942920EE850001F2DA /* EmptyItemView.swift in Sources */,
 				E01E1390291D168B0001F2DA /* SystemSideMenu.swift in Sources */,
+				BE3CD65B29B72B0700C19442 /* ProgressViewModel.swift in Sources */,
 				E0CF7EF428DF385800735142 /* ItemCards.swift in Sources */,
 				E05FE94528F71BFB00263F98 /* ColorExtension.swift in Sources */,
 				E0B328912923AD9D00E94BC3 /* GradientLine.swift in Sources */,

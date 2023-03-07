@@ -78,8 +78,8 @@ enum LogInAlert {
     case start
     case sendMailLinkUpperLimit
     case emailImproper
-    case alreadyUser
-    case alreadyEmailAddress
+    case existsUserDocument
+    case existsEmailAddress
     
     var title: String {
         switch self {
@@ -89,9 +89,9 @@ enum LogInAlert {
             return "送信の上限"
         case .emailImproper:
             return "エラー"
-        case .alreadyUser:
+        case .existsUserDocument:
             return "ログイン"
-        case .alreadyEmailAddress:
+        case .existsEmailAddress:
             return "ログイン"
         }
     }
@@ -104,9 +104,9 @@ enum LogInAlert {
             return "認証メールの送信上限に達しました。日にちを置いてアクセスしてください。"
         case .emailImproper:
             return "アドレスの書式が正しくありません。"
-        case .alreadyUser:
+        case .existsUserDocument:
             return "既にアカウントが存在します。ログインしますか？"
-        case .alreadyEmailAddress:
+        case .existsEmailAddress:
             return "入力したアドレスには既にアカウントが存在します。ログインしますか？"
         }
     }
@@ -128,7 +128,7 @@ struct InputLogIn {
     var isShowProgressView: Bool = false
     var isShowPickerView: Bool = false
     var isShowGoBackLogInAlert: Bool = false
-    var showHalfSheet: Bool = false
+    var showEmailHalfSheet: Bool = false
     var showSheetBackground: Bool = false
     var keyboardOffset: CGFloat = 0.0
     var repeatAnimation: Bool = false
@@ -335,33 +335,39 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             
         } // ZStack
         // ログインフロー全体のアラートを管理
-        .alert(logInVM.logInAlertMessage.title, isPresented: $logInVM.isShowLogInErrorAlert) {
+        .alert(logInVM.logInAlertMessage.title, isPresented: $logInVM.isShowLogInFlowAlert) {
 
                 switch logInVM.logInAlertMessage {
                 case .start:
                     EmptyView()
                     
                 case .emailImproper:
-                    Button("OK") { logInVM.isShowLogInErrorAlert.toggle() }
+                    Button("OK") { logInVM.isShowLogInFlowAlert.toggle() }
                     
                 case .sendMailLinkUpperLimit:
-                    Button("OK") { logInVM.isShowLogInErrorAlert.toggle() }
+                    Button("OK") { logInVM.isShowLogInFlowAlert.toggle() }
                     
-                case .alreadyUser:
+                case .existsUserDocument:
                     Button("戻る") {
-                        logInVM.isShowLogInErrorAlert.toggle()
-                        logInVM.successSignInAccount = false
+                        logInVM.isShowLogInFlowAlert.toggle()
+                        logInVM.checkCurrentUserExists = false
+                        inputLogIn.firstSelect = .start
                     }
-                    Button("ログイン") { withAnimation(.spring(response: 0.5)) { logInVM.rootNavigation = .fetch } }
+                    Button("ログイン") {
+                        withAnimation(.spring(response: 0.5)) {
+                            inputLogIn.firstSelect = .logIn
+                            logInVM.rootNavigation = .fetch
+                        }
+                    }
                     
-                case .alreadyEmailAddress:
+                case .existsEmailAddress:
                     Button("戻る") {
-                        logInVM.isShowLogInErrorAlert.toggle()
-                        logInVM.successSignInAccount = false
+                        logInVM.isShowLogInFlowAlert.toggle()
+                        logInVM.checkCurrentUserExists = false
                     }
                     Button("ログイン") {
                         withAnimation(.easeInOut(duration: 0.3)) {
-                            logInVM.currentUserCheckListener()
+                            logInVM.rootNavigation = .fetch
                         }
                     }
                 }
@@ -383,32 +389,43 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             }
         }
         
-        // currentUserを監視するリスナーによってサインインが検知されたら、各項目ごとに次のフェーズへ移行
-        .onChange(of: logInVM.successSignInAccount) { signInCheck in
+        // currentUserを監視するリスナーによってサインインが検知されたら、ユーザが選択したサインインフローに分岐して処理
+        // (ログイン or サインアップ)
+        .onChange(of: logInVM.checkCurrentUserExists) { currentCheck in
             print("logInVM.successCreateAccount更新を検知")
-            if !signInCheck { return }
+            if !currentCheck { return }
             switch inputLogIn.firstSelect {
             case .start: print("")
+            // ユーザーがログインを選択していた場合は、フェッチ処理を実行
             case .logIn: withAnimation(.spring(response: 0.5)) { logInVM.rootNavigation = .fetch }
+            
+            // ✅ユーザーがサインアップを選択していた場合は、ユーザードキュメントが既に作られているか確認する必要がある✅
+            // userドキュメントが既にある場合は、新規上書きしてしまうのを防ぐためにsetUserDocumentを止め、アラートに移行する
             case .signAp:
                 Task {
-                    let alreadyUser = try await logInVM.checkAlreadyUserDocument()
-                    // もし既にユーザドキュメントが存在した場合は、既存のアカウントへのログインを促す
-                    if alreadyUser {
-                        logInVM.logInAlertMessage = .alreadyUser
-                        logInVM.isShowLogInErrorAlert.toggle()
+                    // サインアップ実行ユーザに既にuserDocumentが存在するかチェック
+                    let existsUserDocument = try await logInVM.checkAlreadyUserDocument()
+                    // もし既にユーザドキュメントが存在した場合は、setUserDocumentを実行しない
+                    // 既存のドキュメントへのログインを促すアラートを出す
+                    if existsUserDocument {
+                        logInVM.logInAlertMessage = .existsUserDocument
+                        logInVM.isShowLogInFlowAlert.toggle()
                         return
-                    }
-                    let addUserFirestoreCheck = await logInVM.addNewUserSetData(name: inputLogIn.createUserNameText,
-                                                                                password: inputLogIn.password,
-                                                                                imageData: inputLogIn.captureImage,
-                                                                                color: inputLogIn.selectUserColor)
-                    if addUserFirestoreCheck {
-                        withAnimation(.spring(response: 0.5)) {
-                            logInVM.rootNavigation = .fetch
+                    } else {
+                        // userドキュメントが存在しなかった場合は、newUserSetDocumentを実行
+                        let didSetUserDocument = await logInVM.newUserSetDocument(name: inputLogIn.createUserNameText,
+                                                                                    password: inputLogIn.password,
+                                                                                    imageData: inputLogIn.captureImage,
+                                                                                    color: inputLogIn.selectUserColor)
+                        if didSetUserDocument {
+                            withAnimation(.spring(response: 0.5)) {
+                                logInVM.rootNavigation = .fetch
+                            }
+                        } else {
+                            print("didSetUserDocument_Error!! -新規ユーザドキュメントの作成に失敗しました-")
                         }
                     }
-                }
+                } // Task end
             }
         }
         
@@ -510,7 +527,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                     withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
-                        inputLogIn.showHalfSheet.toggle()
+                        inputLogIn.showEmailHalfSheet.toggle()
                     }
                 }
             } label: {
@@ -695,7 +712,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             
                             Button {
                                 withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
-                                    inputLogIn.showHalfSheet.toggle()
+                                    inputLogIn.showEmailHalfSheet.toggle()
                                 }
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                                     inputLogIn.showSheetBackground.toggle()
@@ -824,7 +841,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         Button(logInVM.addressCheck == .start ||
                                logInVM.addressCheck == .check ? "メールを送信" : "もう一度送る") {
                             // 既に登録したアドレスがないかチェック
-                            logInVM.checkAlreadyEmailAddress(inputLogIn.address)
+//                            logInVM.checkExistsEmailAddress(inputLogIn.address)
+                            logInVM.addressCheck = .check
                         }
                         .buttonStyle(.borderedProminent)
                         .disabled(inputLogIn.sendAddressButtonDisabled)
@@ -832,7 +850,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         .padding(.top, 10)
                         .onChange(of: logInVM.addressCheck) { newValue in
                             if newValue == .check {
-                                // 入力アドレス宛にディープリンク付きメールを送信する
+                                // 入力アドレス宛にリンクメールを送信する
                                 logInVM.sendSignInLink(email: inputLogIn.address)
                             }
                         }
@@ -841,7 +859,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     }
                 }
         }
-        .offset(y: inputLogIn.showHalfSheet ? 0 : getRect().height / 2)
+        .offset(y: inputLogIn.showEmailHalfSheet ? 0 : getRect().height / 2)
         .offset(y: getSafeArea().bottom)
         .background {
             Color.black.opacity(inputLogIn.showSheetBackground ? 0.7 : 0.0)
