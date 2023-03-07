@@ -65,11 +65,11 @@ enum AddressCheck {
     
     var messageText: (text1: String, text2: String) {
         switch self {
-        case .start: return ("入力したアドレスに認証メールを送ります。",
-                             "メール内のリンクからログインしてください。")
+        case .start: return ("メールアドレスに本人確認メールを送ります。",
+                             "入力に間違いがないかチェックしてください。")
         case .check: return ("メールアドレスをチェックしています...", "")
         case .failure: return ("認証メールの送信に失敗しました。", "アドレスを確認して、再度試してみてください。")
-        case .success: return ("認証メールを送信しました！", "メールが届くまで少し時間がかかる場合があります。")
+        case .success: return ("認証メールを送信しました！", "メール内のリンクからunicoへアクセスしてください。")
         }
     }
 }
@@ -105,9 +105,9 @@ enum LogInAlert {
         case .emailImproper:
             return "アドレスの書式が正しくありません。"
         case .existsUserDocument:
-            return "既にアカウントが存在します。ログインしますか？"
+            return "あなたのアカウントには以前作成したunicoのデータが存在します。ログインしますか？"
         case .existsEmailAddress:
-            return "入力したアドレスには既にアカウントが存在します。ログインしますか？"
+            return "あなたのアカウントには以前作成したunicoデータが存在します。ログインしますか？"
         }
     }
 }
@@ -145,6 +145,7 @@ struct InputLogIn {
 struct LogInView: View { // swiftlint:disable:this type_body_length
     
     @Environment(\.colorScheme) var colorScheme: ColorScheme
+    @EnvironmentObject var progress: ProgressViewModel
     
     @StateObject var logInVM: LogInViewModel
     @StateObject var teamVM: TeamViewModel
@@ -351,7 +352,6 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     Button("戻る") {
                         logInVM.isShowLogInFlowAlert.toggle()
                         logInVM.checkCurrentUserExists = false
-                        inputLogIn.firstSelect = .start
                     }
                     Button("ログイン") {
                         withAnimation(.spring(response: 0.5)) {
@@ -404,10 +404,11 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             case .signAp:
                 Task {
                     // サインアップ実行ユーザに既にuserDocumentが存在するかチェック
-                    let existsUserDocument = try await logInVM.checkAlreadyUserDocument()
+                    let existsUserDocument = try await logInVM.checkExistsUserDocument()
                     // もし既にユーザドキュメントが存在した場合は、setUserDocumentを実行しない
                     // 既存のドキュメントへのログインを促すアラートを出す
                     if existsUserDocument {
+                        print(".onChange(of: logInVM.checkCurrentUserExists): 既に登録されているuserドキュメントを検知")
                         logInVM.logInAlertMessage = .existsUserDocument
                         logInVM.isShowLogInFlowAlert.toggle()
                         return
@@ -549,31 +550,28 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             
             Group {
                 switch inputLogIn.createAccountFase {
-                case .start: Text("")
-                case .fase1:
+                case .start:
+                    Text("")
                     
+                case .fase1:
                     VStack(spacing: 10) {
                         Text("あなたの色は？")
                             .tracking(10)
-                        
                     }
                     
                 case .fase2:
-                    
                     VStack(spacing: 10) {
                         Text("unicoへようこそ").tracking(10)
                         Text("あなたのことを教えてください")
                     }
                     
                 case .fase3:
-                    
-                    //                    if inputLogIn.selectSignInType != .mailAddress {
                     VStack(spacing: 10) {
                         Text("初めまして、\(inputLogIn.createUserNameText)さん")
                         Text("どちらから登録しますか？")
                     }
                     .frame(width: 250)
-                    //                    }
+
                 case .success:
                     VStack(spacing: 10) {
                         Text("アカウント登録が完了しました！")
@@ -705,8 +703,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 .overlay {
                     VStack {
                         HStack {
-                            Text("Mail Address")
-                                .font(.title2).fontWeight(.bold)
+                            Text(inputLogIn.firstSelect == .logIn ?  "Mail Address  ログイン" : "Mail Address  ユーザー登録")
+                                .font(.title3).fontWeight(.bold)
                             
                             Spacer()
                             
@@ -798,7 +796,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         }
                         .frame(height: 60)
                         .padding(.bottom)
-                        // リピートスケールアニメーションの発火トリガー
+                        // リピートスケールアニメーションの発火トリガー(アドレス入力の.check時に使用)
                         .onChange(of: logInVM.addressCheck) { newValue in
                             if newValue == .check {
                                 inputLogIn.repeatAnimation = true
@@ -838,22 +836,16 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             }
                         
                         // アドレス認証を行うボタン
-                        Button(logInVM.addressCheck == .start ||
-                               logInVM.addressCheck == .check ? "メールを送信" : "もう一度送る") {
-                            // 既に登録したアドレスがないかチェック
-//                            logInVM.checkExistsEmailAddress(inputLogIn.address)
-                            logInVM.addressCheck = .check
+                        Button(logInVM.addressCheck == .start || logInVM.addressCheck == .check ? "メールを送信" : "もう一度送る") {
+                            
+                            withAnimation(.spring(response: 0.3)) { logInVM.addressCheck = .check }
+                            // 入力アドレス宛にリンクメールを送信するメソッド
+                            logInVM.sendSignInLink(email: inputLogIn.address)
                         }
                         .buttonStyle(.borderedProminent)
                         .disabled(inputLogIn.sendAddressButtonDisabled)
                         .opacity(logInVM.addressCheck == .check ? 0.3 : 1.0)
                         .padding(.top, 10)
-                        .onChange(of: logInVM.addressCheck) { newValue in
-                            if newValue == .check {
-                                // 入力アドレス宛にリンクメールを送信する
-                                logInVM.sendSignInLink(email: inputLogIn.address)
-                            }
-                        }
                         
                         Spacer()
                     }

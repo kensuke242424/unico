@@ -181,12 +181,13 @@ struct RootView: View {
                 }
                 // ダイナミックリンクが有効かチェック
                 // リンクが有効だった場合、メールリンクからのサインインメソッド実行
-                // TODO: メールリンクから遷移したら、フェッチ開始までProgressViewを表示
+                // TODO: メールリンクから遷移したら、データのフェッチ開始までProgressViewを表示
                 let defaults = UserDefaults.standard
                 if let email = defaults.string(forKey: "Email") {
                     print("アカウント登録するユーザのメールアドレス: \(email)")
                     // Firebase Authにアカウントの登録
-                    // TODO: この時すでにアカウントが存在した場合どのような動きになるか確認する
+                    /// TODO: この時すでにアカウントが存在した場合どのような動きになるか確認する
+                    ///  ⇨ uidなどのデータはそのまま引き継がれ、サインインの形になった
                     Auth.auth().signIn(withEmail: email, link: incomingURL.absoluteString)
                     { authResult, error in
                         if let error {
@@ -197,12 +198,10 @@ struct RootView: View {
                         if let authResult {
                             print("メールリンクからのログイン成功")
                             print("currentUser: \(Auth.auth().currentUser)")
-//                            logInVM.currentUserCheckListener()
-                            
                         }
                     }
                 } else {
-                    print("if let email == nil")
+                    print("Error: Auth.auth().signIn(withEmail:")
                 }
             }
             if linkHandled {

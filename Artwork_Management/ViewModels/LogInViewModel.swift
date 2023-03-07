@@ -187,10 +187,21 @@ class LogInViewModel: ObservableObject {
         }
     }
     
-    func checkAlreadyUserDocument() async throws -> Bool {
+    func checkExistsUserDocument() async throws -> Bool {
+        print("checkExistsUserDocumentメソッド実行")
         guard let uid = uid else { throw CustomError.uidEmpty }
-        if let _ = db?.collection("users").document(uid) {
-            print("サインインユーザーには既に作成しているuserドキュメントが存在します")
+        if let doc = db?.collection("users").document(uid) {
+            
+            print(doc)
+            do {
+                let document = try await doc.getDocument(source: .default)
+                let user = try document.data(as: User.self)
+                print("サインインユーザーには既に作成しているuserドキュメントが存在します")
+                print("userデータ: \(user)")
+            } catch {
+                print("userデータ取得失敗")
+                return false
+            }
             return true
         } else {
             print("サインインユーザーに作成しているuserドキュメントは存在しませんでした")
