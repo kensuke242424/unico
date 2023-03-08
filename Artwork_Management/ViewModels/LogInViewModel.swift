@@ -105,54 +105,6 @@ class LogInViewModel: ObservableObject {
         }
     }
 
-    func signInEmailAdress(email: String, password: String) async -> Bool {
-
-        logInErrorMessage = ""
-
-        do {
-            let result = try await Auth.auth().signIn(withEmail: email, password: password)
-            let uid = result.user.uid
-            print("signIn成功_uid：\(uid)")
-            return true
-        } catch {
-             let errorCode = AuthErrorCode.Code(rawValue: error._code)
-            switch errorCode {
-            case .invalidEmail: logInErrorMessage = "メールアドレスの形式が正しくありません"
-            case .wrongPassword: logInErrorMessage = "入力したパスワードでサインインできません"
-            case .emailAlreadyInUse: logInErrorMessage = "このメールアドレスは既に登録されています"
-            case .weakPassword: logInErrorMessage = "パスワードは６文字以上で入力してください"
-            case .userNotFound: logInErrorMessage = "入力情報のユーザは見つかりませんでした"
-            case .userDisabled: logInErrorMessage = "このアカウントは無効です"
-            default: logInErrorMessage = "予期せぬエラーが発生しました。"
-            }
-            return false
-        }
-    }
-
-    func signUpEmailAdress(email: String, password: String) async -> Bool {
-
-        logInErrorMessage = ""
-
-        do {
-            let result = try await Auth.auth().createUser(withEmail: email, password: password)
-            let uid = result.user.uid
-            print("signUp成功_uid：\(uid)")
-            return true
-        } catch {
-            let errorCode = AuthErrorCode.Code(rawValue: error._code)
-
-            switch errorCode {
-            case .invalidEmail: logInErrorMessage = "メールアドレスの形式が正しくありません"
-            case .emailAlreadyInUse: logInErrorMessage = "このメールアドレスは既に登録されています"
-            case .weakPassword: logInErrorMessage = "パスワードは６文字以上で入力してください"
-            case .userNotFound: logInErrorMessage = "入力情報のユーザは見つかりませんでした"
-            case .userDisabled: logInErrorMessage = "このアカウントは無効です"
-            default: logInErrorMessage = "予期せぬエラーが発生しました。"
-            }
-            return false
-        }
-    }
-
     func startCurrentUserListener() {
         print("startCurrentUserListenerが実行されました")
         listenerHandle = Auth.auth().addStateDidChangeListener { auth, user in
@@ -173,7 +125,7 @@ class LogInViewModel: ObservableObject {
     
     /// メールアドレスによる"ログイン"時、入力アドレスからAuthの有無を調べる
     /// 存在しなければ、サインアップ操作へと移行するようアラートで知らせる
-    func checkExistsEmailLogInUser(_ email: String) {
+    func existEmailAccountCheck(_ email: String) {
         Auth.auth().fetchSignInMethods(forEmail: email) { (providers, error) in
             if let error = error {
                 // エラー処理
@@ -194,7 +146,7 @@ class LogInViewModel: ObservableObject {
         }
     }
     
-    func checkExistsUserDocument() async throws -> Bool {
+    func existUserDocumentCheck() async throws -> Bool {
         print("checkExistsUserDocumentメソッド実行")
         guard let uid = uid else { throw CustomError.uidEmpty }
         if let doc = db?.collection("users").document(uid) {

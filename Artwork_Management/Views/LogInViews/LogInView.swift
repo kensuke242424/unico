@@ -402,7 +402,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 // userドキュメントが既にある場合は、新規上書きしてしまうのを防ぐためにsetUserDocumentを止め、アラートに移行する
                 Task {
                     // サインアップ実行ユーザに既にuserDocumentが存在するかチェック
-                    let existsUserDocument = try await logInVM.checkExistsUserDocument()
+                    let existsUserDocument = try await logInVM.existUserDocumentCheck()
                     // もし既にユーザドキュメントが存在した場合は、setUserDocumentを実行しない
                     // 既存のドキュメントへのログインを促すアラートを出す
                     if existsUserDocument {
@@ -519,7 +519,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             Text("または")
                 .foregroundColor(.white).opacity(0.7)
                 .tracking(2)
-            
+
             Button {
                 withAnimation(.easeIn(duration: 0.25)) {
                     inputLogIn.showSheetBackground.toggle()
@@ -845,7 +845,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                 
                             case .logIn :
                                 // ここにアドレスからの既存アカウント探知処理
-                                logInVM.checkExistsEmailLogInUser(inputLogIn.address)
+                                logInVM.existEmailAccountCheck(inputLogIn.address)
                                 return
                                 
                             case .signAp:
