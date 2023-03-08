@@ -80,6 +80,7 @@ enum LogInAlert {
     case emailImproper
     case existsUserDocument
     case existEmailAddressAccount
+    case notExistEmailAddressAccount
     case other
     
     var title: String {
@@ -94,6 +95,8 @@ enum LogInAlert {
             return "ログイン"
         case .existEmailAddressAccount:
             return "ログイン"
+        case .notExistEmailAddressAccount:
+            return "アカウント無し"
         case .other:
             return "エラー"
         }
@@ -110,9 +113,11 @@ enum LogInAlert {
         case .existsUserDocument      :
             return "あなたのアカウントには以前作成したunicoのデータが存在します。ログインしますか？"
         case .existEmailAddressAccount:
-            return "あなたのアカウントには以前作成したunicoデータが存在します。ログインしますか？"
+            return "入力したアドレスには以前作成したunicoデータが存在します。ログインしますか？"
+        case .notExistEmailAddressAccount:
+            return "入力したアドレスにアカウントが存在しませんでした。ユーザの新規登録をしてください。"
         case .other                   :
-            return "もう一度試してみてください。"
+            return "処理に失敗しました。もう一度試してみてください。"
         }
     }
 }
@@ -133,11 +138,8 @@ struct InputLogIn {
     var isShowProgressView: Bool = false
     var isShowPickerView: Bool = false
     var isShowGoBackLogInAlert: Bool = false
-    var showEmailHalfSheet: Bool = false
-    var showSheetBackground: Bool = false
     var keyboardOffset: CGFloat = 0.0
     var repeatAnimation: Bool = false
-    var showHalfSheetOffset: CGFloat = UIScreen.main.bounds.height / 2
     var sendAddressButtonDisabled: Bool = true
     var createAccountFase: CreateAccountFase = .start
     var selectUserColor: MemberColor = .gray
@@ -306,13 +308,9 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         Text("ログイン画面に戻ります。よろしいですか？")
                     } // alert
                     
-                    // Anonymous Started button...
+                    
                     Button {
-                        // Open navigate tab srideView...
-                        Task {
-//                            logInVM.startCurrentUserListener()
-                            logInVM.signInAnonymously()
-                        }
+                        logInVM.signInAnonymously()
                     } label: {
                         HStack {
                             Text("今すぐ始める？")
@@ -337,16 +335,20 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
 
             switch logInVM.logInAlertMessage {
                 
-            case .start                   :
+            case .start                      :
                 EmptyView()
                 
-            case .emailImproper           :
-                Button("OK") { logInVM.isShowLogInFlowAlert.toggle() }
+            case .emailImproper              :
+                Button("OK") {
+                    logInVM.isShowLogInFlowAlert.toggle()
+                }
                 
-            case .sendMailLinkUpperLimit  :
-                Button("OK") { logInVM.isShowLogInFlowAlert.toggle() }
+            case .sendMailLinkUpperLimit     :
+                Button("OK") {
+                    logInVM.isShowLogInFlowAlert.toggle()
+                }
                 
-            case .existsUserDocument      :
+            case .existsUserDocument         :
                 Button("戻る") {
                     logInVM.isShowLogInFlowAlert.toggle()
                     logInVM.existsCurrentUserCheck = false
@@ -359,7 +361,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     }
                 }
                 
-            case .existEmailAddressAccount:
+            case .existEmailAddressAccount   :
                 Button("戻る") {
                     logInVM.isShowLogInFlowAlert.toggle()
                     logInVM.existsCurrentUserCheck = false
@@ -371,7 +373,19 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     }
                 }
                 
-            case .other                   :
+            case .notExistEmailAddressAccount:
+                Button("戻る") {
+                    logInVM.isShowLogInFlowAlert.toggle()
+                    logInVM.existsCurrentUserCheck = false
+                    logInVM.logOut()
+                }
+                Button("ユーザ登録") {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        // ユーザ登録フローまで自動で遷移する処理
+                    }
+                }
+                
+            case .other                      :
                 Button("OK") {
                     logInVM.isShowLogInFlowAlert.toggle()
                     logInVM.existsCurrentUserCheck = false
@@ -536,11 +550,11 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
 
             Button {
                 withAnimation(.easeIn(duration: 0.25)) {
-                    inputLogIn.showSheetBackground.toggle()
+                    logInVM.showSheetBackground.toggle()
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                     withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
-                        inputLogIn.showEmailHalfSheet.toggle()
+                        logInVM.showEmailHalfSheet.toggle()
                     }
                 }
             } label: {
@@ -722,10 +736,10 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             
                             Button {
                                 withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
-                                    inputLogIn.showEmailHalfSheet.toggle()
+                                    logInVM.showEmailHalfSheet.toggle()
                                 }
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                                    inputLogIn.showSheetBackground.toggle()
+                                    logInVM.showSheetBackground.toggle()
                                     logInVM.addressSignInFase = .start
                                 }
                             } label: {
@@ -850,7 +864,9 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         // アドレス認証を行うボタン
                         Button(logInVM.addressSignInFase == .start || logInVM.addressSignInFase == .check ? "メールを送信" : "もう一度送る") {
                             
-                            withAnimation(.spring(response: 0.3)) { logInVM.addressSignInFase = .check }
+                            withAnimation(.spring(response: 0.3)) {
+                                logInVM.addressSignInFase = .check
+                            }
                             
                             switch logInVM.selectSignInType {
                                 
@@ -858,13 +874,11 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                 print("処理なし")
                                 
                             case .logIn :
-                                // ここにアドレスからの既存アカウント探知処理
                                 logInVM.existEmailAccountCheck(inputLogIn.address)
-                                return
                                 
                             case .signAp:
-                                // 入力アドレス宛にリンクメールを送信するメソッド
-                                logInVM.sendSignInLink(email: inputLogIn.address)
+                                logInVM.existEmailAccountCheck(inputLogIn.address)
+                                
                             }
                         }
                         .buttonStyle(.borderedProminent)
@@ -876,10 +890,10 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     }
                 }
         }
-        .offset(y: inputLogIn.showEmailHalfSheet ? 0 : getRect().height / 2)
+        .offset(y: logInVM.showEmailHalfSheet ? 0 : getRect().height / 2)
         .offset(y: getSafeArea().bottom)
         .background {
-            Color.black.opacity(inputLogIn.showSheetBackground ? 0.7 : 0.0)
+            Color.black.opacity(logInVM.showSheetBackground ? 0.7 : 0.0)
                 .ignoresSafeArea()
                 .onTapGesture {
                     showKyboard = nil

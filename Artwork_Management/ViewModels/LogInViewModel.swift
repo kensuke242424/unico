@@ -26,6 +26,8 @@ class LogInViewModel: ObservableObject {
     @Published var AlreadyExistsUserDocument: Bool = false
     @Published var existsCurrentUserCheck: Bool = false
     @Published var isShowLogInFlowAlert: Bool = false
+    @Published var showEmailHalfSheet: Bool = false
+    @Published var showSheetBackground: Bool = false
     @Published var selectSignInType: SelectSignInType = .start
     @Published var selectProviderType: SelectProviderType = .start
     @Published var logInAlertMessage: LogInAlert = .start
@@ -123,22 +125,24 @@ class LogInViewModel: ObservableObject {
         }
     }
     
-    /// メールアドレスによるサインインフローを実行した時、入力アドレスからAuthの有無を調べる
-    /// 存在しなければ、サインアップ操作へと移行するようアラートで知らせる
     //  TODO: メソッド名がわかりにくい気がする...
     func existEmailAccountCheck(_ email: String) {
+        
+        /// 受け取ったメールアドレスを使って、Auth内から既存アカウントの有無を調べる
         Auth.auth().fetchSignInMethods(forEmail: email) { (providers, error) in
             
             if let error = error {
-                print("入力アドレスのアカウントが見つかりませんでした")
-                print("checkExistsEmailLogInUser: \(error.localizedDescription)")
-                self.logInAlertMessage = .other
+                // メソッドの実行結果がerrorだった場合の処理
+                print("ERROR: checkExistsEmailLogInUser: \(error.localizedDescription)")
+                self.logInAlertMessage = .emailImproper
                 self.isShowLogInFlowAlert.toggle()
-                return
+                withAnimation(.spring(response: 0.3)) {
+                    self.addressSignInFase = .failure
+                }
             }
-            
+            /// Authの判定後、ユーザが選択したサインインタイプによってさらに処理がスイッチ分岐する
             if let providers = providers, providers.count > 0 {
-                // アカウントが既に存在する場合の処理
+                // アカウントが既に存在していた場合の処理
                 switch self.selectSignInType {
                     
                 case .start :
@@ -151,13 +155,25 @@ class LogInViewModel: ObservableObject {
                     // アカウントが既に存在することをアラートで伝えて、既存データへのログインを促す
                     self.logInAlertMessage = .existEmailAddressAccount
                     self.isShowLogInFlowAlert.toggle()
+                }
+                
+            } else {
+                // アカウントが存在しなかった場合の処理
+                switch self.selectSignInType {
+                    
+                case .start :
+                    print("処理なし")
+                    
+                case .logIn :
+                    // アカウントが存在しないことをアラートで伝えて、ユーザ登録を促す
+                    self.logInAlertMessage = .existEmailAddressAccount
+                    self.isShowLogInFlowAlert.toggle()
+                    self.addressSignInFase = .failure
+
+                case .signAp:
+                    self.sendSignInLink(email: email)
                     
                 }
-                self.isShowLogInFlowAlert.toggle()
-                self.logInAlertMessage = .existEmailAddressAccount
-            } else {
-                // アカウントが存在しない場合の処理
-                
             }
         }
     }
@@ -236,7 +252,9 @@ class LogInViewModel: ObservableObject {
             if let error = error {
                 print("Failed to send sign in link: \(error.localizedDescription)")
                 hapticErrorNotification()
-                withAnimation(.easeInOut(duration: 0.3)) { self.addressSignInFase = .failure }
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    self.addressSignInFase = .failure
+                }
                 return
             }
             print("Sign in link sent successfully.") 
@@ -246,8 +264,7 @@ class LogInViewModel: ObservableObject {
             // リンクから再度アプリに戻ってきた後の処理で、リンクから飛んできたアドレスと保存アドレスの差分がないかチェック
             UserDefaults.standard.set(email, forKey: "Email")
             
-            withAnimation(.easeInOut(duration: 0.8)) {
-                // 入力アドレス宛にディープリンク付きメールを送信する
+            withAnimation(.easeInOut(duration: 0.7)) {
                 self.addressSignInFase = .success
             }
         }
