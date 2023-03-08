@@ -153,7 +153,7 @@ struct RootView: View {
 
         // Auth check...
         .onAppear {
-//            logInVM.logOut()
+            
             if Auth.auth().currentUser != nil {
                 print("RootView_onAppear_currentUser != nil")
                 logInVM.rootNavigation = .fetch

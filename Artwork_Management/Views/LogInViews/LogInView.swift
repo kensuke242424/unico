@@ -307,13 +307,13 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     Button {
                         // Open navigate tab srideView...
                         Task {
+//                            logInVM.startCurrentUserListener()
                             logInVM.signInAnonymously()
-                            logInVM.startCurrentUserListener()
                         }
                     } label: {
                         HStack {
-                            Text("始めてみる")
-                            Text(">>")
+                            Text("今すぐ始める？")
+                            Text(">")
                         }
                         .font(.subheadline).tracking(2).opacity(0.8)
                     }
@@ -325,12 +325,6 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 
                 // メールアドレス登録選択時に出現するアドレス入力ハーフシートView
                 inputAdressHalfSheet()
-                
-//                // 処理中を表すプログレスView
-                if inputLogIn.isShowProgressView {
-                    CustomProgressView()
-                }
-                
             }
             
             
@@ -351,7 +345,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 case .existsUserDocument:
                     Button("戻る") {
                         logInVM.isShowLogInFlowAlert.toggle()
-                        logInVM.checkCurrentUserExists = false
+                        logInVM.existsCurrentUserCheck = false
+                        logInVM.logOut()
                     }
                     Button("ログイン") {
                         withAnimation(.spring(response: 0.5)) {
@@ -363,7 +358,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 case .existsEmailAddress:
                     Button("戻る") {
                         logInVM.isShowLogInFlowAlert.toggle()
-                        logInVM.checkCurrentUserExists = false
+                        logInVM.existsCurrentUserCheck = false
+                        logInVM.logOut()
                     }
                     Button("ログイン") {
                         withAnimation(.easeInOut(duration: 0.3)) {
@@ -391,17 +387,21 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         
         // currentUserを監視するリスナーによってサインインが検知されたら、ユーザが選択したサインインフローに分岐して処理
         // (ログイン or サインアップ)
-        .onChange(of: logInVM.checkCurrentUserExists) { currentCheck in
-            print("logInVM.successCreateAccount更新を検知")
-            if !currentCheck { return }
+        .onChange(of: logInVM.existsCurrentUserCheck) { currentCheck in
+            print("logInVM.checkCurrentUserExists更新を検知")
+            print("checkCurrentUserExists: \(currentCheck)")
+            if !currentCheck {
+                return
+            }
             switch inputLogIn.firstSelect {
+                
             case .start: print("")
-            // ユーザーがログインを選択していた場合は、フェッチ処理を実行
+
             case .logIn: withAnimation(.spring(response: 0.5)) { logInVM.rootNavigation = .fetch }
             
-            // ✅ユーザーがサインアップを選択していた場合は、ユーザードキュメントが既に作られているか確認する必要がある✅
-            // userドキュメントが既にある場合は、新規上書きしてしまうのを防ぐためにsetUserDocumentを止め、アラートに移行する
             case .signAp:
+                // ✅ユーザーがサインアップを選択していた場合は、ユーザードキュメントが既に作られているか確認する必要がある✅
+                // userドキュメントが既にある場合は、新規上書きしてしまうのを防ぐためにsetUserDocumentを止め、アラートに移行する
                 Task {
                     // サインアップ実行ユーザに既にuserDocumentが存在するかチェック
                     let existsUserDocument = try await logInVM.checkExistsUserDocument()

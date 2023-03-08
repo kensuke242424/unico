@@ -18,17 +18,19 @@ class LogInViewModel: ObservableObject {
 
     init() {
         print("<<<<<<<<<  LogInViewModel_init  >>>>>>>>>")
+        self.startCurrentUserListener()
     }
 
     @Published var rootNavigation: RootNavigation = .logIn
     
     @Published var AlreadyExistsUserDocument: Bool = false
-    @Published var checkCurrentUserExists: Bool = false
+    @Published var existsCurrentUserCheck: Bool = false
     @Published var isShowLogInFlowAlert: Bool = false
     @Published var logInAlertMessage: LogInAlert = .start
     @Published var addressCheck: AddressCheck = .start
 
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
+    var listenerHandle: AuthStateDidChangeListenerHandle?
     var uid: String? {
         return Auth.auth().currentUser?.uid
     }
@@ -90,8 +92,9 @@ class LogInViewModel: ObservableObject {
                                                           rawNonce: nonce)
                 Task {
                     do {
+//                        self.startCurrentUserListener()
                          _ = try await Auth.auth().signIn(with: credential)
-                        self.startCurrentUserListener()
+                        print("Sign In With Appleからのアカウント登録完了")
                     } catch {
                         print("Error authenticating: \(error.localizedDescription)")
                     }
@@ -149,19 +152,19 @@ class LogInViewModel: ObservableObject {
     }
 
     func startCurrentUserListener() {
-        print("currentUserCheckListenerスタート")
-        Auth.auth().addStateDidChangeListener { auth, user in
+        print("startCurrentUserListenerが実行されました")
+        listenerHandle = Auth.auth().addStateDidChangeListener { auth, user in
             if user != nil {
                 print("currentUserCheck_サインイン⭕️")
                 print("uid: \(self.uid)")
-                self.checkCurrentUserExists = true
-                print("successCreatedAccount: \(self.checkCurrentUserExists)")
+                self.existsCurrentUserCheck = true
+                print("checkCurrentUserExists: \(self.existsCurrentUserCheck)")
             }
             else {
                 // サインイン失敗
                 print("currentUserCheck_サインイン❌")
                 print("uid: \(self.uid)")
-                self.checkCurrentUserExists = false
+                self.existsCurrentUserCheck = false
             }
         }
     }
@@ -196,13 +199,13 @@ class LogInViewModel: ObservableObject {
             do {
                 let document = try await doc.getDocument(source: .default)
                 let user = try document.data(as: User.self)
-                print("サインインユーザーには既に作成しているuserドキュメントが存在します")
+                print("このアカウントには既に作成しているuserドキュメントが存在します")
                 print("userデータ: \(user)")
+                return true
             } catch {
-                print("userデータ取得失敗")
+                print("このアカウントに既存userDocumentデータはありません。")
                 return false
             }
-            return true
         } else {
             print("サインインユーザーに作成しているuserドキュメントは存在しませんでした")
             return false
@@ -265,8 +268,10 @@ class LogInViewModel: ObservableObject {
     func logOut() {
         do {
             try Auth.auth().signOut()
+            print("ログアウト実行")
         } catch let signOutError as NSError {
             print("Error signing out: %@", signOutError)
+            print("ログアウト失敗")
         }
     }
     
@@ -289,18 +294,12 @@ class LogInViewModel: ObservableObject {
             if let error = error {
                 print("Failed to send sign in link: \(error.localizedDescription)")
                 hapticErrorNotification()
-                withAnimation(.easeInOut(duration: 0.3)) {
-                    self.addressCheck = .failure
-                    // TODO: エラーアラートのテキストとトリガー処理をまとめられないか？
-//                    self.isShowLogInErrorAlert.toggle()
-//                    self.logInAlertMessage = .emailImproper
-                    
-                }
+                withAnimation(.easeInOut(duration: 0.3)) { self.addressCheck = .failure }
                 return
             }
             print("Sign in link sent successfully.") 
             hapticSuccessNotification()
-            self.startCurrentUserListener()
+//            self.startCurrentUserListener()
             
             // ディープリンク送信時に入力されたアドレスを保存しておく
             // リンクから再度アプリに戻ってきた後の処理で、リンクから飛んできたアドレスと保存アドレスの差分がないかチェック
@@ -419,5 +418,11 @@ class LogInViewModel: ObservableObject {
       }.joined()
 
       return hashString
+    }
+    
+    deinit {
+        if let listenerHandle {
+            Auth.auth().removeStateDidChangeListener(listenerHandle)
+        }
     }
 }
