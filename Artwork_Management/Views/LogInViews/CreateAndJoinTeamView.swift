@@ -240,7 +240,6 @@ struct CreateAndJoinTeamView: View {
 
                     if selectTeamFase == .success {
                         joinedTeamIconAndName(url: joinedTeamData?.iconURL, name: joinedTeamData?.name)
-//                            .opacity(selectTeamFase == .success ? 1.0 : 0.0)
                     }
                 } // ZStack
 
@@ -301,6 +300,10 @@ struct CreateAndJoinTeamView: View {
                 Button {
                     withAnimation(.spring(response: 1.0)) {
                         logInVM.rootNavigation = .logIn
+                        logInVM.selectSignInType = .start
+                        logInVM.selectProviderType = .start
+                        logInVM.showEmailSheetBackground = false
+                        logInVM.showEmailHalfSheet = false
                         teamVM.isShowCreateAndJoinTeam.toggle()
                     }
                     logInVM.logOut()

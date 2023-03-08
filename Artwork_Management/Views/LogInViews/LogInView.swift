@@ -34,13 +34,14 @@ enum InputAddressFocused {
 }
 
 enum AddressSignInFase {
-    case start, check, failure, success
+    case start, check, failure, notExist, success
     
     var checkIcon: Image {
         switch self {
         case .start: return Image(systemName: "")
         case .check: return Image(systemName: "")
         case .failure: return Image(systemName: "multiply.circle.fill")
+        case .notExist: return Image(systemName: "multiply.circle.fill")
         case .success: return Image(systemName: "checkmark.seal.fill")
         }
     }
@@ -50,6 +51,7 @@ enum AddressSignInFase {
         case .start: return Image(systemName: "")
         case .check: return Image(systemName: "")
         case .failure: return Image(systemName: "xmark.circle.fill")
+        case .notExist: return Image(systemName: "xmark.circle.fill")
         case .success: return Image(systemName: "checkmark.circle.fill")
         }
     }
@@ -59,17 +61,27 @@ enum AddressSignInFase {
         case .start: return ""
         case .check: return "check..."
         case .failure: return "failure!!"
+        case .notExist: return "not Account!!"
         case .success: return "succsess!!"
         }
     }
     
     var messageText: (text1: String, text2: String) {
         switch self {
-        case .start: return ("メールアドレスに本人確認メールを送ります。",
-                             "入力に間違いがないかチェックしてください。")
-        case .check: return ("メールアドレスをチェックしています...", "")
-        case .failure: return ("認証メールの送信に失敗しました。", "アドレスを確認して、再度試してみてください。")
-        case .success: return ("認証メールを送信しました！", "メール内のリンクからunicoへアクセスしてください。")
+        case .start   : return ("メールアドレスに本人確認メールを送ります。"  ,
+                                "メール内のリンクからunicoへアクセスしてください。")
+            
+        case .check   : return ("メールアドレスをチェックしています..."          ,
+                                ""                                        )
+            
+        case .failure : return ("認証メールの送信に失敗しました。"              ,
+                                "アドレスを確認して、再度試してみてください。"     )
+            
+        case .notExist: return ("このアドレスにはアカウントが存在しませんでした。" ,
+                                ""                                        )
+            
+        case .success : return ("認証メールを送信しました！"                   ,
+                                "※届くまで少し時間がかかる場合があります。"       )
         }
     }
 }
@@ -115,9 +127,9 @@ enum LogInAlert {
         case .existEmailAddressAccount:
             return "入力したアドレスには以前作成したunicoデータが存在します。ログインしますか？"
         case .notExistEmailAddressAccount:
-            return "入力したアドレスにアカウントが存在しませんでした。ユーザの新規登録をしてください。"
+            return "入力したメールアドレスのアカウントは存在しませんでした。ユーザの新規登録をしてください。"
         case .other                   :
-            return "処理に失敗しました。もう一度試してみてください。"
+            return "処理に失敗しました。入力に間違いがないかチェックしてください。"
         }
     }
 }
@@ -331,7 +343,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             
         } // ZStack
         // ログインフロー全体のアラートを管理
-        .alert(logInVM.logInAlertMessage.title, isPresented: $logInVM.isShowLogInFlowAlert) {
+        .alert(logInVM.logInAlertMessage.title,
+               isPresented: $logInVM.isShowLogInFlowAlert) {
 
             switch logInVM.logInAlertMessage {
                 
@@ -339,18 +352,13 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 EmptyView()
                 
             case .emailImproper              :
-                Button("OK") {
-                    logInVM.isShowLogInFlowAlert.toggle()
-                }
+                Button("OK") {}
                 
             case .sendMailLinkUpperLimit     :
-                Button("OK") {
-                    logInVM.isShowLogInFlowAlert.toggle()
-                }
+                Button("OK") {}
                 
             case .existsUserDocument         :
                 Button("戻る") {
-                    logInVM.isShowLogInFlowAlert.toggle()
                     logInVM.existsCurrentUserCheck = false
                     logInVM.logOut()
                 }
@@ -363,34 +371,21 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 
             case .existEmailAddressAccount   :
                 Button("戻る") {
-                    logInVM.isShowLogInFlowAlert.toggle()
                     logInVM.existsCurrentUserCheck = false
                     logInVM.logOut()
                 }
                 Button("ログイン") {
-                    withAnimation(.easeInOut(duration: 0.3)) {
+                    withAnimation(.spring(response: 0.5)) {
                         logInVM.rootNavigation = .fetch
                     }
                 }
                 
             case .notExistEmailAddressAccount:
-                Button("戻る") {
-                    logInVM.isShowLogInFlowAlert.toggle()
-                    logInVM.existsCurrentUserCheck = false
-                    logInVM.logOut()
-                }
-                Button("ユーザ登録") {
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        // ユーザ登録フローまで自動で遷移する処理
-                    }
-                }
+                Button("OK") {}
                 
             case .other                      :
-                Button("OK") {
-                    logInVM.isShowLogInFlowAlert.toggle()
-                    logInVM.existsCurrentUserCheck = false
-                    logInVM.logOut()
-                }
+                Button("OK") {}
+                
             }
                     
         } message: {
@@ -550,7 +545,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
 
             Button {
                 withAnimation(.easeIn(duration: 0.25)) {
-                    logInVM.showSheetBackground.toggle()
+                    logInVM.showEmailSheetBackground.toggle()
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                     withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
@@ -739,7 +734,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                     logInVM.showEmailHalfSheet.toggle()
                                 }
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                                    logInVM.showSheetBackground.toggle()
+                                    logInVM.showEmailSheetBackground.toggle()
                                     logInVM.addressSignInFase = .start
                                 }
                             } label: {
@@ -765,7 +760,9 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                 ProgressView()
                             } else {
                                 logInVM.addressSignInFase.checkIcon
-                                    .foregroundColor(logInVM.addressSignInFase == .failure ? .red : .green)
+                                    .foregroundColor(
+                                        logInVM.addressSignInFase == .failure ||
+                                        logInVM.addressSignInFase == .notExist ? .red : .green)
                             }
                             Text(logInVM.addressSignInFase.checkText)
                                 .tracking(5)
@@ -785,14 +782,16 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                                 logInVM.addressSignInFase == .success ? 1.4 :
                                                 1.0)
                                 .opacity(logInVM.addressSignInFase == .check ? 0.8 :
-                                            logInVM.addressSignInFase == .failure ? 0.8 :
+                                            logInVM.addressSignInFase == .failure ||
+                                            logInVM.addressSignInFase == .notExist ? 0.8 :
                                             logInVM.addressSignInFase == .success ? 1.0 :
                                             0.8)
                                 .overlay(alignment: .topTrailing) {
                                     Image(systemName: "questionmark")
                                         .font(.subheadline)
                                         .fontWeight(.semibold)
-                                        .opacity(logInVM.addressSignInFase == .failure ? 0.5 : 0.0)
+                                        .opacity(logInVM.addressSignInFase == .failure ||
+                                                 logInVM.addressSignInFase == .notExist ? 0.5 : 0.0)
                                         .offset(x: 15, y: -15)
                                 }
                             
@@ -802,7 +801,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                     .scaledToFit()
                                     .frame(width: 20)
                                     .opacity(logInVM.addressSignInFase == .check ? 1.0 :
-                                                logInVM.addressSignInFase == .failure ? 0.2 :
+                                                logInVM.addressSignInFase == .failure ||
+                                                logInVM.addressSignInFase == .notExist ? 0.2 :
                                                 0.4)
                                     .scaleEffect(inputLogIn.repeatAnimation ? 1.3 : 1.0)
                                     .animation(.default.repeat(while: inputLogIn.repeatAnimation),
@@ -815,7 +815,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                     .scaledToFit()
                                     .frame(width: 35)
                                     .opacity(logInVM.addressSignInFase == .check ? 0.4 :
-                                                logInVM.addressSignInFase == .failure ? 0.2 :
+                                                logInVM.addressSignInFase == .failure ||
+                                                logInVM.addressSignInFase == .notExist ? 0.2 :
                                                 0.8)
                                     .scaleEffect(logInVM.addressSignInFase == .check ? 0.8 : 1.0)
                             }
@@ -893,13 +894,14 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         .offset(y: logInVM.showEmailHalfSheet ? 0 : getRect().height / 2)
         .offset(y: getSafeArea().bottom)
         .background {
-            Color.black.opacity(logInVM.showSheetBackground ? 0.7 : 0.0)
+            Color.black.opacity(logInVM.showEmailSheetBackground ? 0.7 : 0.0)
                 .ignoresSafeArea()
                 .onTapGesture {
                     showKyboard = nil
                 }
         }
     }
+    
     func createAccountIndicator() -> some View {
         Rectangle()
             .frame(width: 200, height: 2, alignment: .leading)

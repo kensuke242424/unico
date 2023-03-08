@@ -186,6 +186,11 @@ struct RootView: View {
                 let defaults = UserDefaults.standard
                 if let email = defaults.string(forKey: "Email") {
                     progress.isShow.toggle()
+                    withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
+                        logInVM.showEmailHalfSheet.toggle()
+                        logInVM.showEmailSheetBackground = false
+                    }
+                    
                     print("アカウント登録するユーザのメールアドレス: \(email)")
                     // Firebase Authにアカウントの登録
                     /// TODO: この時すでにアカウントが存在した場合どのような動きになるか確認する
@@ -195,6 +200,7 @@ struct RootView: View {
                         if let error {
                             print("ログインエラー：", error.localizedDescription)
                             progress.isShow.toggle()
+                            // TODO: リンクメールの有効期限が切れていた時、ここに処理が走るみたい。適切なアラート要る
                             return
                         }
                         // メールリンクからのサインイン成功時の処理

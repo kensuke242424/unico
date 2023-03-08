@@ -27,7 +27,7 @@ class LogInViewModel: ObservableObject {
     @Published var existsCurrentUserCheck: Bool = false
     @Published var isShowLogInFlowAlert: Bool = false
     @Published var showEmailHalfSheet: Bool = false
-    @Published var showSheetBackground: Bool = false
+    @Published var showEmailSheetBackground: Bool = false
     @Published var selectSignInType: SelectSignInType = .start
     @Published var selectProviderType: SelectProviderType = .start
     @Published var logInAlertMessage: LogInAlert = .start
@@ -134,11 +134,14 @@ class LogInViewModel: ObservableObject {
             if let error = error {
                 // メソッドの実行結果がerrorだった場合の処理
                 print("ERROR: checkExistsEmailLogInUser: \(error.localizedDescription)")
-                self.logInAlertMessage = .emailImproper
+                self.logInAlertMessage = .other
                 self.isShowLogInFlowAlert.toggle()
+                
+                hapticErrorNotification()
                 withAnimation(.spring(response: 0.3)) {
                     self.addressSignInFase = .failure
                 }
+                return
             }
             /// Authの判定後、ユーザが選択したサインインタイプによってさらに処理がスイッチ分岐する
             if let providers = providers, providers.count > 0 {
@@ -155,6 +158,8 @@ class LogInViewModel: ObservableObject {
                     // アカウントが既に存在することをアラートで伝えて、既存データへのログインを促す
                     self.logInAlertMessage = .existEmailAddressAccount
                     self.isShowLogInFlowAlert.toggle()
+                    
+                    hapticErrorNotification()
                 }
                 
             } else {
@@ -166,9 +171,13 @@ class LogInViewModel: ObservableObject {
                     
                 case .logIn :
                     // アカウントが存在しないことをアラートで伝えて、ユーザ登録を促す
-                    self.logInAlertMessage = .existEmailAddressAccount
+                    self.logInAlertMessage = .notExistEmailAddressAccount
                     self.isShowLogInFlowAlert.toggle()
-                    self.addressSignInFase = .failure
+                    
+                    withAnimation(.spring(response: 0.3)) {
+                        self.addressSignInFase = .notExist
+                    }
+                    hapticErrorNotification()
 
                 case .signAp:
                     self.sendSignInLink(email: email)
