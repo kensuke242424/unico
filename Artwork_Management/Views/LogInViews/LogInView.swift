@@ -13,11 +13,11 @@ enum Navigation: Hashable {
     case home
 }
 
-enum FirstSelect {
+enum SelectSignInType {
     case logIn, signAp, start
 }
 
-enum SelectSignInType {
+enum SelectProviderType {
     case apple, google, mailAddress, trial, start
 }
 
@@ -33,7 +33,7 @@ enum InputAddressFocused {
     case check
 }
 
-enum AddressCheck {
+enum AddressSignInFase {
     case start, check, failure, success
     
     var checkIcon: Image {
@@ -134,8 +134,8 @@ struct InputLogIn {
     var repeatAnimation: Bool = false
     var showHalfSheetOffset: CGFloat = UIScreen.main.bounds.height / 2
     var sendAddressButtonDisabled: Bool = true
-    var firstSelect: FirstSelect = .start
     var selectSignInType: SelectSignInType = .start
+    var selectProviderType: SelectProviderType = .start
     var createAccountFase: CreateAccountFase = .start
     var selectUserColor: MemberColor = .gray
 }
@@ -178,10 +178,10 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             .onTapGesture { inputLogIn.isShowPickerView.toggle() }
             
             LogoMark()
-                .scaleEffect(inputLogIn.firstSelect == .signAp ? 0.4 : 1.0)
-                .offset(y: inputLogIn.firstSelect == .signAp ? -getRect().height / 2.5 : -getRect().height / 4)
-                .offset(x: inputLogIn.firstSelect == .signAp ? getRect().width / 3 : 0)
-                .opacity(inputLogIn.firstSelect == .signAp ? 0.4 : 1.0)
+                .scaleEffect(inputLogIn.selectSignInType == .signAp ? 0.4 : 1.0)
+                .offset(y: inputLogIn.selectSignInType == .signAp ? -getRect().height / 2.5 : -getRect().height / 4)
+                .offset(x: inputLogIn.selectSignInType == .signAp ? getRect().width / 3 : 0)
+                .opacity(inputLogIn.selectSignInType == .signAp ? 0.4 : 1.0)
             
             /// ログインフロー全体的なコンテンツをまとめたGroup
             /// View数が多いとコンパイルが通らないため現状こうしている
@@ -190,10 +190,10 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 // 起動時最初のログイン画面で表示される「ログイン」「いえ、初めてです」ボタン
                 firstSelectButtons()
                     .offset(y: getRect().height / 8)
-                    .opacity(inputLogIn.firstSelect == .start ? 1.0 : 0.0)
+                    .opacity(inputLogIn.selectSignInType == .start ? 1.0 : 0.0)
                 
                 // ログイン画面最初のページで「ログイン」を選んだ時のコンテンツView
-                if inputLogIn.firstSelect == .logIn {
+                if inputLogIn.selectSignInType == .logIn {
                     VStack {
                         signInTitle(title: "ログイン")
                             .padding(.bottom)
@@ -203,7 +203,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         }
                     }
                     .offset(y: getRect().height / 10)
-                    .opacity(inputLogIn.firstSelect == .logIn ? 1.0 : 0.0)
+                    .opacity(inputLogIn.selectSignInType == .logIn ? 1.0 : 0.0)
                 }
                 
                 // アカウント登録フローで用いるコンテンツ全体のView
@@ -212,32 +212,32 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 }
                 
                 // アカウント登録の進捗を表すインジケーター
-                if inputLogIn.firstSelect == .signAp {
+                if inputLogIn.selectSignInType == .signAp {
                     createAccountIndicator()
                         .offset(y: -getRect().height / 3 + 30)
                         .padding(.bottom)
                 }
                 
                 // アカウント登録フロー時、前のフェーズに戻るボタン
-                if inputLogIn.firstSelect != .start {
+                if inputLogIn.selectSignInType != .start {
                     Button {
                         withAnimation(.spring(response: 0.5)) {
                             
-                            if inputLogIn.selectSignInType == .mailAddress {
+                            if inputLogIn.selectProviderType == .mailAddress {
                                 inputLogIn.selectSignInType = .start
                                 return
                             }
                             
-                            switch inputLogIn.firstSelect {
+                            switch inputLogIn.selectSignInType {
                             case .start: print("")
-                            case .logIn: inputLogIn.firstSelect = .start
+                            case .logIn: inputLogIn.selectSignInType = .start
                             case .signAp: print("")
                             }
                             
                             switch inputLogIn.createAccountFase {
                             case .start: print("")
                             case .fase1:
-                                inputLogIn.firstSelect = .start
+                                inputLogIn.selectSignInType = .start
                                 inputLogIn.createAccountFase = .start
                                 inputLogIn.createAccountTitle = false
                                 inputLogIn.createAccountShowContents = false
@@ -262,7 +262,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 }
                 
                 // ログイン画面最初のページまで戻るボタン
-                if inputLogIn.firstSelect != .start {
+                if inputLogIn.selectSignInType != .start {
                     Button {
                         inputLogIn.isShowGoBackLogInAlert.toggle()
                     } label: {
@@ -289,7 +289,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         Button {
                             withAnimation(.spring(response: 0.7)) {
                                 inputLogIn.selectSignInType = .start
-                                inputLogIn.firstSelect = .start
+                                inputLogIn.selectSignInType = .start
                                 inputLogIn.createAccountFase = .start
                                 inputLogIn.createAccountTitle = false
                                 inputLogIn.createAccountShowContents = false
@@ -350,7 +350,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     }
                     Button("ログイン") {
                         withAnimation(.spring(response: 0.5)) {
-                            inputLogIn.firstSelect = .logIn
+                            inputLogIn.selectSignInType = .logIn
                             logInVM.rootNavigation = .fetch
                         }
                     }
@@ -393,7 +393,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             if !currentCheck {
                 return
             }
-            switch inputLogIn.firstSelect {
+            switch inputLogIn.selectSignInType {
                 
             case .start: print("")
 
@@ -455,7 +455,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             
             Button {
                 withAnimation(.easeIn(duration: 0.3)) {
-                    inputLogIn.firstSelect = .logIn
+                    inputLogIn.selectSignInType = .logIn
                 }
             } label: {
                 ZStack {
@@ -473,7 +473,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             Button {
                 
                 withAnimation(.easeIn(duration: 1)) {
-                    inputLogIn.firstSelect = .signAp
+                    inputLogIn.selectSignInType = .signAp
                 }
                 
                 inputLogIn.createAccountFase = .fase1
@@ -508,7 +508,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             
             // Sign In With Apple...
             SignInWithAppleButton(.signIn) { request in
-                inputLogIn.selectSignInType = .apple
+                inputLogIn.selectProviderType = .apple
                 logInVM.handleSignInWithAppleRequest(request)
             } onCompletion: { result in
                 logInVM.handleSignInWithAppleCompletion(result)
@@ -703,7 +703,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 .overlay {
                     VStack {
                         HStack {
-                            Text(inputLogIn.firstSelect == .logIn ?  "Mail Address  ログイン" : "Mail Address  ユーザー登録")
+                            Text(inputLogIn.selectSignInType == .logIn ?  "Mail Address  ログイン" : "Mail Address  ユーザー登録")
                                 .font(.title3).fontWeight(.bold)
                             
                             Spacer()
@@ -839,8 +839,19 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         Button(logInVM.addressCheck == .start || logInVM.addressCheck == .check ? "メールを送信" : "もう一度送る") {
                             
                             withAnimation(.spring(response: 0.3)) { logInVM.addressCheck = .check }
-                            // 入力アドレス宛にリンクメールを送信するメソッド
-                            logInVM.sendSignInLink(email: inputLogIn.address)
+                            
+                            switch inputLogIn.selectSignInType {
+                            case .start :
+                                print("処理なし")
+                                
+                            case .logIn :
+                                // ここにアドレスからの既存アカウント探知処理
+                                return
+                                
+                            case .signAp:
+                                // 入力アドレス宛にリンクメールを送信するメソッド
+                                logInVM.sendSignInLink(email: inputLogIn.address)
+                            }
                         }
                         .buttonStyle(.borderedProminent)
                         .disabled(inputLogIn.sendAddressButtonDisabled)

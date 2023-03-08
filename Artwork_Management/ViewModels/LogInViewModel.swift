@@ -27,7 +27,7 @@ class LogInViewModel: ObservableObject {
     @Published var existsCurrentUserCheck: Bool = false
     @Published var isShowLogInFlowAlert: Bool = false
     @Published var logInAlertMessage: LogInAlert = .start
-    @Published var addressCheck: AddressCheck = .start
+    @Published var addressCheck: AddressSignInFase = .start
 
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
     var listenerHandle: AuthStateDidChangeListenerHandle?
@@ -169,18 +169,20 @@ class LogInViewModel: ObservableObject {
         }
     }
     
-    /// メールアドレスによるサインアップ時、既に入力アドレスのアカウント(Auth)が存在した場合、
-    /// アカウントのUserドキュメントが作成されているかチェックする。
-    /// ドキュメントが
-    func checkExistsEmailAddress(_ email: String) {
+    /// メールアドレスによる"ログイン"時、入力アドレスからAuthの有無を調べる
+    /// 存在しなければ、サインアップ操作へと移行するようアラートで知らせる
+    func checkExistsEmailLogInUser(_ email: String) {
         Auth.auth().fetchSignInMethods(forEmail: email) { (providers, error) in
             if let error = error {
                 // エラー処理
-                print("checkAlreadyEmailAddress_Error: \(error.localizedDescription)")
+                print("入力アドレスのアカウントが見つかりませんでした")
+                print("checkExistsEmailLogInUser: \(error.localizedDescription)")
                 return
             }
             if let providers = providers, providers.count > 0 {
                 // ユーザーが既に存在する場合の処理
+                // ログインフローなら、リンクメールを送る。
+                // サインアップフローなら、本人確認のディープリンクメールを送る。
                 self.isShowLogInFlowAlert.toggle()
                 self.logInAlertMessage = .existsEmailAddress
             } else {
