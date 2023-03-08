@@ -29,7 +29,7 @@ class LogInViewModel: ObservableObject {
     @Published var selectSignInType: SelectSignInType = .start
     @Published var selectProviderType: SelectProviderType = .start
     @Published var logInAlertMessage: LogInAlert = .start
-    @Published var addressCheck: AddressSignInFase = .start
+    @Published var addressSignInFase: AddressSignInFase = .start
 
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
     var listenerHandle: AuthStateDidChangeListenerHandle?
@@ -215,7 +215,7 @@ class LogInViewModel: ObservableObject {
     func sendSignInLink(email: String) {
         
         withAnimation(.easeInOut(duration: 0.3)) {
-            self.addressCheck = .check
+            self.addressSignInFase = .check
         }
         
         let actionCodeSettings = ActionCodeSettings()
@@ -230,20 +230,19 @@ class LogInViewModel: ObservableObject {
             if let error = error {
                 print("Failed to send sign in link: \(error.localizedDescription)")
                 hapticErrorNotification()
-                withAnimation(.easeInOut(duration: 0.3)) { self.addressCheck = .failure }
+                withAnimation(.easeInOut(duration: 0.3)) { self.addressSignInFase = .failure }
                 return
             }
             print("Sign in link sent successfully.") 
             hapticSuccessNotification()
-//            self.startCurrentUserListener()
             
-            // ディープリンク送信時に入力されたアドレスを保存しておく
+            // TODO: ⬇︎の処理まだできてない。どうやってリンク側のアドレスを取得するかまだわかってない。
             // リンクから再度アプリに戻ってきた後の処理で、リンクから飛んできたアドレスと保存アドレスの差分がないかチェック
             UserDefaults.standard.set(email, forKey: "Email")
             
             withAnimation(.easeInOut(duration: 0.8)) {
                 // 入力アドレス宛にディープリンク付きメールを送信する
-                self.addressCheck = .success
+                self.addressSignInFase = .success
             }
         }
     }
