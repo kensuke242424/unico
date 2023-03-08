@@ -134,8 +134,6 @@ struct InputLogIn {
     var repeatAnimation: Bool = false
     var showHalfSheetOffset: CGFloat = UIScreen.main.bounds.height / 2
     var sendAddressButtonDisabled: Bool = true
-    var selectSignInType: SelectSignInType = .start
-    var selectProviderType: SelectProviderType = .start
     var createAccountFase: CreateAccountFase = .start
     var selectUserColor: MemberColor = .gray
 }
@@ -178,10 +176,10 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             .onTapGesture { inputLogIn.isShowPickerView.toggle() }
             
             LogoMark()
-                .scaleEffect(inputLogIn.selectSignInType == .signAp ? 0.4 : 1.0)
-                .offset(y: inputLogIn.selectSignInType == .signAp ? -getRect().height / 2.5 : -getRect().height / 4)
-                .offset(x: inputLogIn.selectSignInType == .signAp ? getRect().width / 3 : 0)
-                .opacity(inputLogIn.selectSignInType == .signAp ? 0.4 : 1.0)
+                .scaleEffect(logInVM.selectSignInType == .signAp ? 0.4 : 1.0)
+                .offset(y: logInVM.selectSignInType == .signAp ? -getRect().height / 2.5 : -getRect().height / 4)
+                .offset(x: logInVM.selectSignInType == .signAp ? getRect().width / 3 : 0)
+                .opacity(logInVM.selectSignInType == .signAp ? 0.4 : 1.0)
             
             /// ログインフロー全体的なコンテンツをまとめたGroup
             /// View数が多いとコンパイルが通らないため現状こうしている
@@ -190,10 +188,10 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 // 起動時最初のログイン画面で表示される「ログイン」「いえ、初めてです」ボタン
                 firstSelectButtons()
                     .offset(y: getRect().height / 8)
-                    .opacity(inputLogIn.selectSignInType == .start ? 1.0 : 0.0)
+                    .opacity(logInVM.selectSignInType == .start ? 1.0 : 0.0)
                 
                 // ログイン画面最初のページで「ログイン」を選んだ時のコンテンツView
-                if inputLogIn.selectSignInType == .logIn {
+                if logInVM.selectSignInType == .logIn {
                     VStack {
                         signInTitle(title: "ログイン")
                             .padding(.bottom)
@@ -203,7 +201,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         }
                     }
                     .offset(y: getRect().height / 10)
-                    .opacity(inputLogIn.selectSignInType == .logIn ? 1.0 : 0.0)
+                    .opacity(logInVM.selectSignInType == .logIn ? 1.0 : 0.0)
                 }
                 
                 // アカウント登録フローで用いるコンテンツ全体のView
@@ -212,32 +210,32 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 }
                 
                 // アカウント登録の進捗を表すインジケーター
-                if inputLogIn.selectSignInType == .signAp {
+                if logInVM.selectSignInType == .signAp {
                     createAccountIndicator()
                         .offset(y: -getRect().height / 3 + 30)
                         .padding(.bottom)
                 }
                 
                 // アカウント登録フロー時、前のフェーズに戻るボタン
-                if inputLogIn.selectSignInType != .start {
+                if logInVM.selectSignInType != .start {
                     Button {
                         withAnimation(.spring(response: 0.5)) {
                             
-                            if inputLogIn.selectProviderType == .mailAddress {
-                                inputLogIn.selectSignInType = .start
+                            if logInVM.selectProviderType == .mailAddress {
+                                logInVM.selectSignInType = .start
                                 return
                             }
                             
-                            switch inputLogIn.selectSignInType {
+                            switch logInVM.selectSignInType {
                             case .start: print("")
-                            case .logIn: inputLogIn.selectSignInType = .start
+                            case .logIn: logInVM.selectSignInType = .start
                             case .signAp: print("")
                             }
                             
                             switch inputLogIn.createAccountFase {
                             case .start: print("")
                             case .fase1:
-                                inputLogIn.selectSignInType = .start
+                                logInVM.selectSignInType = .start
                                 inputLogIn.createAccountFase = .start
                                 inputLogIn.createAccountTitle = false
                                 inputLogIn.createAccountShowContents = false
@@ -262,7 +260,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 }
                 
                 // ログイン画面最初のページまで戻るボタン
-                if inputLogIn.selectSignInType != .start {
+                if logInVM.selectSignInType != .start {
                     Button {
                         inputLogIn.isShowGoBackLogInAlert.toggle()
                     } label: {
@@ -288,8 +286,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         
                         Button {
                             withAnimation(.spring(response: 0.7)) {
-                                inputLogIn.selectSignInType = .start
-                                inputLogIn.selectSignInType = .start
+                                logInVM.selectSignInType = .start
+                                logInVM.selectProviderType = .start
                                 inputLogIn.createAccountFase = .start
                                 inputLogIn.createAccountTitle = false
                                 inputLogIn.createAccountShowContents = false
@@ -350,7 +348,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     }
                     Button("ログイン") {
                         withAnimation(.spring(response: 0.5)) {
-                            inputLogIn.selectSignInType = .logIn
+                            logInVM.selectSignInType = .logIn
                             logInVM.rootNavigation = .fetch
                         }
                     }
@@ -393,7 +391,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             if !currentCheck {
                 return
             }
-            switch inputLogIn.selectSignInType {
+            switch logInVM.selectSignInType {
                 
             case .start: print("")
 
@@ -455,7 +453,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             
             Button {
                 withAnimation(.easeIn(duration: 0.3)) {
-                    inputLogIn.selectSignInType = .logIn
+                    logInVM.selectSignInType = .logIn
                 }
             } label: {
                 ZStack {
@@ -473,7 +471,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             Button {
                 
                 withAnimation(.easeIn(duration: 1)) {
-                    inputLogIn.selectSignInType = .signAp
+                    logInVM.selectSignInType = .signAp
                 }
                 
                 inputLogIn.createAccountFase = .fase1
@@ -508,7 +506,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             
             // Sign In With Apple...
             SignInWithAppleButton(.signIn) { request in
-                inputLogIn.selectProviderType = .apple
+                logInVM.selectProviderType = .apple
                 logInVM.handleSignInWithAppleRequest(request)
             } onCompletion: { result in
                 logInVM.handleSignInWithAppleCompletion(result)
@@ -660,14 +658,14 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         }
                     
                     Button {
-                        
                         withAnimation(.spring(response: 0.9)) {
                             inputLogIn.createAccountTitle = false
                             inputLogIn.createAccountShowContents = false
                             inputLogIn.createAccountFase = .fase3
                         }
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
-                            if inputLogIn.createUserNameText.isEmpty { inputLogIn.createUserNameText = "名無し"
+                            if inputLogIn.createUserNameText.isEmpty {
+                                inputLogIn.createUserNameText = "名無し"
                             }
                             withAnimation(.spring(response: 0.7)) {
                                 inputLogIn.createAccountTitle = true
@@ -703,7 +701,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 .overlay {
                     VStack {
                         HStack {
-                            Text(inputLogIn.selectSignInType == .logIn ?  "Mail Address  ログイン" : "Mail Address  ユーザー登録")
+                            Text(logInVM.selectSignInType == .logIn ?  "Mail Address  ログイン" : "Mail Address  ユーザー登録")
                                 .font(.title3).fontWeight(.bold)
                             
                             Spacer()
@@ -840,12 +838,14 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             
                             withAnimation(.spring(response: 0.3)) { logInVM.addressCheck = .check }
                             
-                            switch inputLogIn.selectSignInType {
+                            switch logInVM.selectSignInType {
+                                
                             case .start :
                                 print("処理なし")
                                 
                             case .logIn :
                                 // ここにアドレスからの既存アカウント探知処理
+                                logInVM.checkExistsEmailLogInUser(inputLogIn.address)
                                 return
                                 
                             case .signAp:

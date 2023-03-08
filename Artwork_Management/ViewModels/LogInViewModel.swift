@@ -26,6 +26,8 @@ class LogInViewModel: ObservableObject {
     @Published var AlreadyExistsUserDocument: Bool = false
     @Published var existsCurrentUserCheck: Bool = false
     @Published var isShowLogInFlowAlert: Bool = false
+    @Published var selectSignInType: SelectSignInType = .start
+    @Published var selectProviderType: SelectProviderType = .start
     @Published var logInAlertMessage: LogInAlert = .start
     @Published var addressCheck: AddressSignInFase = .start
 
