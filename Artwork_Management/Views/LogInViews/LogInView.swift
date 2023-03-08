@@ -79,35 +79,40 @@ enum LogInAlert {
     case sendMailLinkUpperLimit
     case emailImproper
     case existsUserDocument
-    case existsEmailAddress
+    case existEmailAddressAccount
+    case other
     
     var title: String {
         switch self {
-        case .start:
+        case .start                   :
             return ""
-        case .sendMailLinkUpperLimit:
+        case .sendMailLinkUpperLimit  :
             return "送信の上限"
-        case .emailImproper:
+        case .emailImproper           :
             return "エラー"
-        case .existsUserDocument:
+        case .existsUserDocument      :
             return "ログイン"
-        case .existsEmailAddress:
+        case .existEmailAddressAccount:
             return "ログイン"
+        case .other:
+            return "エラー"
         }
     }
     
     var text: String {
         switch self {
-        case .start:
+        case .start                   :
             return ""
-        case .sendMailLinkUpperLimit:
+        case .sendMailLinkUpperLimit  :
             return "認証メールの送信上限に達しました。日にちを置いてアクセスしてください。"
-        case .emailImproper:
+        case .emailImproper           :
             return "アドレスの書式が正しくありません。"
-        case .existsUserDocument:
+        case .existsUserDocument      :
             return "あなたのアカウントには以前作成したunicoのデータが存在します。ログインしますか？"
-        case .existsEmailAddress:
+        case .existEmailAddressAccount:
             return "あなたのアカウントには以前作成したunicoデータが存在します。ログインしますか？"
+        case .other                   :
+            return "もう一度試してみてください。"
         }
     }
 }
@@ -330,41 +335,50 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         // ログインフロー全体のアラートを管理
         .alert(logInVM.logInAlertMessage.title, isPresented: $logInVM.isShowLogInFlowAlert) {
 
-                switch logInVM.logInAlertMessage {
-                case .start:
-                    EmptyView()
-                    
-                case .emailImproper:
-                    Button("OK") { logInVM.isShowLogInFlowAlert.toggle() }
-                    
-                case .sendMailLinkUpperLimit:
-                    Button("OK") { logInVM.isShowLogInFlowAlert.toggle() }
-                    
-                case .existsUserDocument:
-                    Button("戻る") {
-                        logInVM.isShowLogInFlowAlert.toggle()
-                        logInVM.existsCurrentUserCheck = false
-                        logInVM.logOut()
-                    }
-                    Button("ログイン") {
-                        withAnimation(.spring(response: 0.5)) {
-                            logInVM.selectSignInType = .logIn
-                            logInVM.rootNavigation = .fetch
-                        }
-                    }
-                    
-                case .existsEmailAddress:
-                    Button("戻る") {
-                        logInVM.isShowLogInFlowAlert.toggle()
-                        logInVM.existsCurrentUserCheck = false
-                        logInVM.logOut()
-                    }
-                    Button("ログイン") {
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            logInVM.rootNavigation = .fetch
-                        }
+            switch logInVM.logInAlertMessage {
+                
+            case .start                   :
+                EmptyView()
+                
+            case .emailImproper           :
+                Button("OK") { logInVM.isShowLogInFlowAlert.toggle() }
+                
+            case .sendMailLinkUpperLimit  :
+                Button("OK") { logInVM.isShowLogInFlowAlert.toggle() }
+                
+            case .existsUserDocument      :
+                Button("戻る") {
+                    logInVM.isShowLogInFlowAlert.toggle()
+                    logInVM.existsCurrentUserCheck = false
+                    logInVM.logOut()
+                }
+                Button("ログイン") {
+                    withAnimation(.spring(response: 0.5)) {
+                        logInVM.selectSignInType = .logIn
+                        logInVM.rootNavigation = .fetch
                     }
                 }
+                
+            case .existEmailAddressAccount:
+                Button("戻る") {
+                    logInVM.isShowLogInFlowAlert.toggle()
+                    logInVM.existsCurrentUserCheck = false
+                    logInVM.logOut()
+                }
+                Button("ログイン") {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        logInVM.rootNavigation = .fetch
+                    }
+                }
+                
+            case .other                   :
+                Button("OK") {
+                    logInVM.isShowLogInFlowAlert.toggle()
+                    logInVM.existsCurrentUserCheck = false
+                    logInVM.logOut()
+                }
+            }
+                    
         } message: {
             Text(logInVM.logInAlertMessage.text)
         }
@@ -412,7 +426,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         return
                     } else {
                         // userドキュメントが存在しなかった場合は、newUserSetDocumentを実行
-                        let didSetUserDocument = await logInVM.setDocumentSignUpUser(name: inputLogIn.createUserNameText,
+                        let didSetUserDocument = await logInVM.setSignUpUserDocument(name: inputLogIn.createUserNameText,
                                                                                     password: inputLogIn.password,
                                                                                     imageData: inputLogIn.captureImage,
                                                                                     color: inputLogIn.selectUserColor)

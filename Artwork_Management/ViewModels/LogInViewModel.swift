@@ -107,40 +107,56 @@ class LogInViewModel: ObservableObject {
 
     func startCurrentUserListener() {
         print("startCurrentUserListenerが実行されました")
+        
         listenerHandle = Auth.auth().addStateDidChangeListener { auth, user in
             if user != nil {
                 print("currentUserCheck_サインイン⭕️")
-                print("uid: \(self.uid)")
+                print("uid: \(self.uid ?? "アンラップ失敗")")
                 self.existsCurrentUserCheck = true
                 print("checkCurrentUserExists: \(self.existsCurrentUserCheck)")
-            }
-            else {
-                // サインイン失敗
+                
+            } else {
                 print("currentUserCheck_サインイン❌")
-                print("uid: \(self.uid)")
+                print("uid: \(self.uid ?? "nil")")
                 self.existsCurrentUserCheck = false
             }
         }
     }
     
-    /// メールアドレスによる"ログイン"時、入力アドレスからAuthの有無を調べる
+    /// メールアドレスによるサインインフローを実行した時、入力アドレスからAuthの有無を調べる
     /// 存在しなければ、サインアップ操作へと移行するようアラートで知らせる
+    //  TODO: メソッド名がわかりにくい気がする...
     func existEmailAccountCheck(_ email: String) {
         Auth.auth().fetchSignInMethods(forEmail: email) { (providers, error) in
+            
             if let error = error {
-                // エラー処理
                 print("入力アドレスのアカウントが見つかりませんでした")
                 print("checkExistsEmailLogInUser: \(error.localizedDescription)")
+                self.logInAlertMessage = .other
+                self.isShowLogInFlowAlert.toggle()
                 return
             }
+            
             if let providers = providers, providers.count > 0 {
-                // ユーザーが既に存在する場合の処理
-                // ログインフローなら、リンクメールを送る。
-                // サインアップフローなら、本人確認のディープリンクメールを送る。
+                // アカウントが既に存在する場合の処理
+                switch self.selectSignInType {
+                    
+                case .start :
+                    print("処理なし")
+                    
+                case .logIn :
+                    self.sendSignInLink(email: email)
+                    
+                case .signAp:
+                    // アカウントが既に存在することをアラートで伝えて、既存データへのログインを促す
+                    self.logInAlertMessage = .existEmailAddressAccount
+                    self.isShowLogInFlowAlert.toggle()
+                    
+                }
                 self.isShowLogInFlowAlert.toggle()
-                self.logInAlertMessage = .existsEmailAddress
+                self.logInAlertMessage = .existEmailAddressAccount
             } else {
-                // ユーザーが存在しない場合の処理
+                // アカウントが存在しない場合の処理
                 
             }
         }
@@ -168,7 +184,7 @@ class LogInViewModel: ObservableObject {
         }
     }
 
-    func setDocumentSignUpUser(name: String, password: String?, imageData: UIImage?, color: MemberColor) async -> Bool {
+    func setSignUpUserDocument(name: String, password: String?, imageData: UIImage?, color: MemberColor) async -> Bool {
 
         print("addUserSignInWithApple実行")
 
@@ -198,16 +214,6 @@ class LogInViewModel: ObservableObject {
         } catch {
             print("Error: try usersRef.document(newUserData.id).setData(from: newUserData)")
             return false
-        }
-    }
-
-    func logOut() {
-        do {
-            try Auth.auth().signOut()
-            print("ログアウト実行")
-        } catch let signOutError as NSError {
-            print("Error signing out: %@", signOutError)
-            print("ログアウト失敗")
         }
     }
     
@@ -353,6 +359,16 @@ class LogInViewModel: ObservableObject {
       }.joined()
 
       return hashString
+    }
+    
+    func logOut() {
+        do {
+            try Auth.auth().signOut()
+            print("ログアウト実行")
+        } catch let signOutError as NSError {
+            print("Error signing out: %@", signOutError)
+            print("ログアウト失敗")
+        }
     }
     
     deinit {
