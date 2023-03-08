@@ -412,7 +412,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         return
                     } else {
                         // userドキュメントが存在しなかった場合は、newUserSetDocumentを実行
-                        let didSetUserDocument = await logInVM.newUserSetDocument(name: inputLogIn.createUserNameText,
+                        let didSetUserDocument = await logInVM.setDocumentSignUpUser(name: inputLogIn.createUserNameText,
                                                                                     password: inputLogIn.password,
                                                                                     imageData: inputLogIn.captureImage,
                                                                                     color: inputLogIn.selectUserColor)

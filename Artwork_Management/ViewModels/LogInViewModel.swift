@@ -168,7 +168,7 @@ class LogInViewModel: ObservableObject {
         }
     }
 
-    func newUserSetDocument(name: String, password: String?, imageData: UIImage?, color: MemberColor) async -> Bool {
+    func setDocumentSignUpUser(name: String, password: String?, imageData: UIImage?, color: MemberColor) async -> Bool {
 
         print("addUserSignInWithApple実行")
 
@@ -199,26 +199,6 @@ class LogInViewModel: ObservableObject {
             print("Error: try usersRef.document(newUserData.id).setData(from: newUserData)")
             return false
         }
-    }
-
-    func addUserMailAdress(userData: User) async -> Bool {
-
-        print("addUserMailAdress実行")
-
-        guard let usersRef = db?.collection("users") else {
-            print("error: guard let itemsRef = db?.collection(users), let uid = Auth.auth().currentUser?.uid")
-            return false
-        }
-        do {
-            // currentUserのuidとドキュメントIDを同じにして保存
-            _ = try usersRef.document(userData.id).setData(from: userData)
-        }
-        catch {
-            print("Error: try db!.collection(collectionID).addDocument(from: itemData)")
-            return false
-        }
-        print("addUserMailAdress完了")
-        return true
     }
 
     func logOut() {
