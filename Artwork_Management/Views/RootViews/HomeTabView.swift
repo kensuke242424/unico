@@ -67,185 +67,187 @@ struct HomeTabView: View {
 
     var body: some View {
 
-        ZStack {
+        NavigationStack {
+            ZStack {
 
-            TabView(selection: $inputHome.homeTabIndex) {
+                TabView(selection: $inputHome.homeTabIndex) {
 
-                LibraryView(teamVM: teamVM,
-                            userVM: userVM,
-                            itemVM: itemVM,
-                            tagVM: tagVM,
-                            inputHome: $inputHome,
-                            inputImage: $inputImage)
-                    .tabItem {
-                        Image(systemName: "house")
-                        Text("Home")
-                    }
-                    .tag(0)
-
-                StockView(teamVM: teamVM,
-                          userVM: userVM,
-                          itemVM: itemVM,
-                          tagVM: tagVM,
-                          inputHome: $inputHome,
-                          inputImage: $inputImage)
-                    .tabItem {
-                        Image(systemName: "shippingbox.fill")
-                        Text("inventory")
-                    }
-                    .tag(1)
-
-                ManageView(teamVM: teamVM,
-                           userVM: userVM,
-                           itemVM: itemVM,
-                           tagVM: tagVM,
-                           inputHome: $inputHome,
-                           inputImage: $inputImage,
-                           inputManage: $inputManage)
-                    .tabItem {
-                        Image(systemName: "chart.xyaxis.line")
-                        Text("Manage")
-                    }
-                    .tag(2)
-
-            } // TabViewここまで
-
-            Group {
-
-                UsefulButton(inputHome: $inputHome)
-                    .offset(x: UIScreen.main.bounds.width / 3,
-                            y: UIScreen.main.bounds.height / 3 - 5)
-                    .offset(y: cartAvertOffsetY)
-
-                ElementSwitchingPickerView(switchElement: $inputHome.switchElement, tabIndex: $inputHome.homeTabIndex)
-                    .offset(y: getRect().height / 2 - getSafeArea().bottom - 110)
-                    .offset(y: cartAvertOffsetY)
-
-                NavigationHeader(inputHome: $inputHome, photoURL: userVM.user!.iconURL)
-                    .opacity(!inputHome.isShowHomeTopNavigation &&
-                             inputHome.homeTabIndex == 0 &&
-                             teamVM.team!.headerURL != nil
-                             ? 0.0 : 1.0)
-                    .offset(y: -getRect().height / 2 + getSafeArea().top + 15)
-                    .padding(.horizontal, 20)
-            }
-
-            if inputHome.homeTabIndex == 2 {
-                ManageCustomizeSideMenu(inputManage: $inputManage, isOpen: $inputHome.isShowManageCustomSideMenu)
-                    .offset(x: getRect().width, y: -40)
-                    .offset(x: inputHome.isShowManageCustomSideMenu ? -170 : 50)
-                    .opacity(inputHome.homeTabIndex == 2 ? 1.0 : 0.0)
-            }
-
-            if inputHome.isShowItemDetail {
-                ShowsItemDetail(itemVM: itemVM,
+                    LibraryView(teamVM: teamVM,
+                                userVM: userVM,
+                                itemVM: itemVM,
+                                tagVM: tagVM,
                                 inputHome: $inputHome,
-                                item: itemVM.items[inputHome.actionItemIndex],
-                                teamID: teamVM.team!.id)
-            }
-
-            // side menu contents...
-            Group {
-
-                // sideMenu_background...
-                Color.black
-                    .ignoresSafeArea()
-                    .opacity(inputHome.sideMenuBackGround ? 0.4 : 0)
-                    .onTapGesture {
-                        withAnimation(.spring(response: 0.4, blendDuration: 1)) {
-                            inputHome.isShowSystemSideMenu.toggle()
+                                inputImage: $inputImage)
+                        .tabItem {
+                            Image(systemName: "house")
+                            Text("Home")
                         }
-                        withAnimation(.easeIn(duration: 0.2)) {
-                            inputHome.sideMenuBackGround.toggle()
-                        }
-                    }
+                        .tag(0)
 
-                SystemSideMenu(teamVM: teamVM,
+                    StockView(teamVM: teamVM,
+                              userVM: userVM,
+                              itemVM: itemVM,
+                              tagVM: tagVM,
+                              inputHome: $inputHome,
+                              inputImage: $inputImage)
+                        .tabItem {
+                            Image(systemName: "shippingbox.fill")
+                            Text("inventory")
+                        }
+                        .tag(1)
+
+                    ManageView(teamVM: teamVM,
                                userVM: userVM,
                                itemVM: itemVM,
                                tagVM: tagVM,
-                               logInVM: logInVM,
                                inputHome: $inputHome,
                                inputImage: $inputImage,
-                               inputTag: $inputTag,
-                               inputSideMenu: $inputSideMenu)
-                    .offset(x: inputHome.isShowSystemSideMenu ? 0 : -UIScreen.main.bounds.width)
-
-                UpdateTeamOrUserDataView(selectedUpdate: $inputHome.selectedUpdateData,
-                                         userVM: userVM,
-                                         teamVM: teamVM)
-                .opacity(inputHome.selectedUpdateData == .start ? 0.0 : 1.0)
-
-                // sideMenu_background...
-                Color.black
-                    .ignoresSafeArea()
-                    .background(.ultraThinMaterial)
-                    .opacity(inputHome.editTagSideMenuBackground ? 0.7 : 0)
-                    .onTapGesture {
-                        withAnimation(.spring(response: 0.4, blendDuration: 1)) {
-                            inputHome.editTagSideMenuBackground.toggle()
+                               inputManage: $inputManage)
+                        .tabItem {
+                            Image(systemName: "chart.xyaxis.line")
+                            Text("Manage")
                         }
-                        withAnimation(.easeIn(duration: 0.2)) {
-                            inputHome.isOpenEditTagSideMenu.toggle()
-                        }
-                    }
+                        .tag(2)
 
-                // Open TagSideMenu...
-                SideMenuEditTagView(itemVM: itemVM,
-                                    tagVM: tagVM,
+                } // TabViewここまで
+
+                Group {
+
+                    UsefulButton(inputHome: $inputHome)
+                        .offset(x: UIScreen.main.bounds.width / 3,
+                                y: UIScreen.main.bounds.height / 3 - 5)
+                        .offset(y: cartAvertOffsetY)
+
+                    ElementSwitchingPickerView(switchElement: $inputHome.switchElement, tabIndex: $inputHome.homeTabIndex)
+                        .offset(y: getRect().height / 2 - getSafeArea().bottom - 110)
+                        .offset(y: cartAvertOffsetY)
+
+                    NavigationHeader(inputHome: $inputHome, photoURL: userVM.user!.iconURL)
+                        .opacity(!inputHome.isShowHomeTopNavigation &&
+                                 inputHome.homeTabIndex == 0 &&
+                                 teamVM.team!.headerURL != nil
+                                 ? 0.0 : 1.0)
+                        .offset(y: -getRect().height / 2 + getSafeArea().top + 15)
+                        .padding(.horizontal, 20)
+                }
+
+                if inputHome.homeTabIndex == 2 {
+                    ManageCustomizeSideMenu(inputManage: $inputManage, isOpen: $inputHome.isShowManageCustomSideMenu)
+                        .offset(x: getRect().width, y: -40)
+                        .offset(x: inputHome.isShowManageCustomSideMenu ? -170 : 50)
+                        .opacity(inputHome.homeTabIndex == 2 ? 1.0 : 0.0)
+                }
+
+                if inputHome.isShowItemDetail {
+                    ShowsItemDetail(itemVM: itemVM,
                                     inputHome: $inputHome,
-                                    inputTag: $inputTag,
-                                    defaultTag: inputTag.tagSideMenuStatus == .create ? nil : inputSideMenu.selectTag,
-                                    tagSideMenuStatus: inputTag.tagSideMenuStatus,
+                                    item: itemVM.items[inputHome.actionItemIndex],
                                     teamID: teamVM.team!.id)
-                .offset(x: inputHome.isOpenEditTagSideMenu ? UIScreen.main.bounds.width / 2 - 25 : UIScreen.main.bounds.width + 10)
-            }
+                }
 
-            VStack {
+                // side menu contents...
+                Group {
 
-                RoundedRectangle(cornerRadius: 10)
-                    .foregroundColor(.white)
-                    .frame(width: 300, height: 30)
-                    .overlay {
-                        Text("アイテム情報が更新されました。")
-                            .foregroundColor(.black)
-                            .fontWeight(.bold)
-                    }
-                    .opacity(inputHome.itemsInfomationOpacity)
-                RoundedRectangle(cornerRadius: 10)
-                    .foregroundColor(.white)
-                    .frame(width: 300, height: 30)
-                    .overlay {
-                        Text(inputHome.doCommerce ? "カート内の処理が確定しました。" : "カート内がリセットされました。")
-                            .foregroundColor(.black)
-                            .fontWeight(.bold)
-                    }
-                    .opacity(inputHome.basketInfomationOpacity)
+                    // sideMenu_background...
+                    Color.black
+                        .ignoresSafeArea()
+                        .opacity(inputHome.sideMenuBackGround ? 0.4 : 0)
+                        .onTapGesture {
+                            withAnimation(.spring(response: 0.4, blendDuration: 1)) {
+                                inputHome.isShowSystemSideMenu.toggle()
+                            }
+                            withAnimation(.easeIn(duration: 0.2)) {
+                                inputHome.sideMenuBackGround.toggle()
+                            }
+                        }
 
-                RoundedRectangle(cornerRadius: 10)
-                    .foregroundColor(.white)
-                    .frame(width: 300, height: 30)
-                    .overlay {
-                        Text("写真の取得に失敗しました。")
-                            .foregroundColor(.black)
-                            .fontWeight(.bold)
-                    }
-                    .offset(y: 20)
-                    .opacity(inputHome.showErrorFetchImage ? 0.7 : 0.0)
-                Spacer()
-            }
-            .offset(y: 80)
+                    SystemSideMenu(teamVM: teamVM,
+                                   userVM: userVM,
+                                   itemVM: itemVM,
+                                   tagVM: tagVM,
+                                   logInVM: logInVM,
+                                   inputHome: $inputHome,
+                                   inputImage: $inputImage,
+                                   inputTag: $inputTag,
+                                   inputSideMenu: $inputSideMenu)
+                        .offset(x: inputHome.isShowSystemSideMenu ? 0 : -UIScreen.main.bounds.width)
 
-            if inputHome.isShowProgress {
-                CustomProgressView()
-            }
+                    UpdateTeamOrUserDataView(selectedUpdate: $inputHome.selectedUpdateData,
+                                             userVM: userVM,
+                                             teamVM: teamVM)
+                    .opacity(inputHome.selectedUpdateData == .start ? 0.0 : 1.0)
 
-        } // ZStack
+                    // sideMenu_background...
+                    Color.black
+                        .ignoresSafeArea()
+                        .background(.ultraThinMaterial)
+                        .opacity(inputHome.editTagSideMenuBackground ? 0.7 : 0)
+                        .onTapGesture {
+                            withAnimation(.spring(response: 0.4, blendDuration: 1)) {
+                                inputHome.editTagSideMenuBackground.toggle()
+                            }
+                            withAnimation(.easeIn(duration: 0.2)) {
+                                inputHome.isOpenEditTagSideMenu.toggle()
+                            }
+                        }
+
+                    // Open TagSideMenu...
+                    SideMenuEditTagView(itemVM: itemVM,
+                                        tagVM: tagVM,
+                                        inputHome: $inputHome,
+                                        inputTag: $inputTag,
+                                        defaultTag: inputTag.tagSideMenuStatus == .create ? nil : inputSideMenu.selectTag,
+                                        tagSideMenuStatus: inputTag.tagSideMenuStatus,
+                                        teamID: teamVM.team!.id)
+                    .offset(x: inputHome.isOpenEditTagSideMenu ? UIScreen.main.bounds.width / 2 - 25 : UIScreen.main.bounds.width + 10)
+                }
+
+                VStack {
+
+                    RoundedRectangle(cornerRadius: 10)
+                        .foregroundColor(.white)
+                        .frame(width: 300, height: 30)
+                        .overlay {
+                            Text("アイテム情報が更新されました。")
+                                .foregroundColor(.black)
+                                .fontWeight(.bold)
+                        }
+                        .opacity(inputHome.itemsInfomationOpacity)
+                    RoundedRectangle(cornerRadius: 10)
+                        .foregroundColor(.white)
+                        .frame(width: 300, height: 30)
+                        .overlay {
+                            Text(inputHome.doCommerce ? "カート内の処理が確定しました。" : "カート内がリセットされました。")
+                                .foregroundColor(.black)
+                                .fontWeight(.bold)
+                        }
+                        .opacity(inputHome.basketInfomationOpacity)
+
+                    RoundedRectangle(cornerRadius: 10)
+                        .foregroundColor(.white)
+                        .frame(width: 300, height: 30)
+                        .overlay {
+                            Text("写真の取得に失敗しました。")
+                                .foregroundColor(.black)
+                                .fontWeight(.bold)
+                        }
+                        .offset(y: 20)
+                        .opacity(inputHome.showErrorFetchImage ? 0.7 : 0.0)
+                    Spacer()
+                }
+                .offset(y: 80)
+
+                if inputHome.isShowProgress {
+                    CustomProgressView()
+                }
+
+            } // ZStack
+        }
+        
         .ignoresSafeArea()
         .animation(.easeIn(duration: 0.2), value: inputHome.itemsInfomationOpacity)
         .animation(.easeIn(duration: 0.2), value: inputHome.basketInfomationOpacity)
         .animation(.easeIn(duration: 0.2), value: inputHome.showErrorFetchImage)
-        .navigationBarBackButtonHidden()
 
         .sheet(isPresented: $inputHome.isPresentedEditItem) {
             EditItemView(teamVM: teamVM,

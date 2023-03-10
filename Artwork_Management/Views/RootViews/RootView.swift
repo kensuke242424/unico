@@ -73,16 +73,20 @@ struct RootView: View {
             }
 
         } // ZStack
-        .alert("確認", isPresented: $showLogInAlert) {
-            
-            Button {
+        .background {
+            ZStack {
                 
-            } label: {
-                Text("OK")
+                Image("background_1")
+                    .resizable()
+                    .scaledToFill()
+                    .blur(radius: 2)
+                    .ignoresSafeArea()
+                
+                Color(.black).opacity(0.3)
+                    .background(.ultraThinMaterial).opacity(0.45)
+                    .ignoresSafeArea()
             }
-        } message: {
-            Text("ログイン画面に戻ります。よろしいですか？")
-        } // alert
+        }
 
         // fetch...
         .onChange(of: logInVM.rootNavigation) { navigation in

@@ -138,16 +138,10 @@ struct InputLogIn {
     var createUserNameText: String = ""
     var captureImage: UIImage? = nil
     var captureError: Bool = false
-    var uploadImageData: (url: URL?, filePath: String?) = (url: nil, filePath: nil)
     var address: String = ""
     var password: String = ""
-    var passwordConfirm: String = ""
-    var passHidden: Bool = true
-    var passHiddenConfirm: Bool = true
     var createAccountTitle: Bool = false
     var createAccountShowContents: Bool = false
-    var startFetchContents: Bool = false
-    var isShowProgressView: Bool = false
     var isShowPickerView: Bool = false
     var isShowGoBackLogInAlert: Bool = false
     var keyboardOffset: CGFloat = 0.0
@@ -165,7 +159,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
     @EnvironmentObject var progress: ProgressViewModel
     
     @StateObject var logInVM: LogInViewModel
-    @StateObject var teamVM: TeamViewModel
+    @StateObject var teamVM : TeamViewModel
     
     @State private var logInNavigationPath: [Navigation] = []
     @State private var inputLogIn: InputLogIn = InputLogIn()
@@ -177,9 +171,9 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         
         ZStack {
             
-            GradientBackbround(color1: inputLogIn.selectUserColor.color1,
-                               color2: inputLogIn.selectUserColor.colorAccent)
-            .onTapGesture { showKyboard = nil }
+//            GradientBackbround(color1: inputLogIn.selectUserColor.color1,
+//                               color2: inputLogIn.selectUserColor.colorAccent)
+//            .onTapGesture { showKyboard = nil }
             
             Group {
                 if let captureImage = inputLogIn.captureImage {
@@ -372,6 +366,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             case .existEmailAddressAccount   :
                 Button("戻る") {
                     logInVM.existsCurrentUserCheck = false
+                    logInVM.addressSignInFase = .start
                     logInVM.logOut()
                 }
                 Button("ログイン") {
@@ -425,16 +420,13 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 // userドキュメントが既にある場合は、新規上書きしてしまうのを防ぐためにsetUserDocumentを止め、アラートに移行する
                 Task {
                     // サインアップ実行ユーザに既にuserDocumentが存在するかチェック
-                    let existsUserDocument = try await logInVM.existUserDocumentCheck()
-                    // もし既にユーザドキュメントが存在した場合は、setUserDocumentを実行しない
-                    // 既存のドキュメントへのログインを促すアラートを出す
-                    if existsUserDocument {
-                        print(".onChange(of: logInVM.checkCurrentUserExists): 既に登録されているuserドキュメントを検知")
-                        logInVM.logInAlertMessage = .existsUserDocument
-                        logInVM.isShowLogInFlowAlert.toggle()
+                    let existCheckResult = try await logInVM.existUserDocumentCheck()
+                    // もし既にユーザドキュメントが存在した場合は、既存のドキュメントへのログインを促すアラートを出して処理を終了
+                    if existCheckResult == true {
+                        print("既に登録されているuserドキュメントを検知")
                         return
                     } else {
-                        // userドキュメントが存在しなかった場合は、newUserSetDocumentを実行
+                        // userドキュメントが存在しなかった場合は、新規userドキュメントをFirestoreに作成
                         let didSetUserDocument = await logInVM.setSignUpUserDocument(name: inputLogIn.createUserNameText,
                                                                                     password: inputLogIn.password,
                                                                                     imageData: inputLogIn.captureImage,

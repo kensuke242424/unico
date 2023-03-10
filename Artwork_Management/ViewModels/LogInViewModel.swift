@@ -96,7 +96,6 @@ class LogInViewModel: ObservableObject {
                                                           rawNonce: nonce)
                 Task {
                     do {
-//                        self.startCurrentUserListener()
                          _ = try await Auth.auth().signIn(with: credential)
                         print("Sign In With Appleからのアカウント登録完了")
                     } catch {
@@ -198,6 +197,8 @@ class LogInViewModel: ObservableObject {
                 let user = try document.data(as: User.self)
                 print("このアカウントには既に作成しているuserドキュメントが存在します")
                 print("userデータ: \(user)")
+                self.logInAlertMessage = .existsUserDocument
+                self.isShowLogInFlowAlert.toggle()
                 return true
             } catch {
                 print("このアカウントに既存userDocumentデータはありません。")
