@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BE20B04129BADFC90078169B /* AccountSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE20B04029BADFC90078169B /* AccountSetting.swift */; };
+		BE20B04329BAEA170078169B /* CustomBackButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE20B04229BAEA170078169B /* CustomBackButton.swift */; };
 		BE3CD65B29B72B0700C19442 /* ProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3CD65A29B72B0700C19442 /* ProgressViewModel.swift */; };
 		BE41783D29B4535800434CFC /* AnimationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE41783C29B4535800434CFC /* AnimationExtension.swift */; };
 		BE41784029B4AB3100434CFC /* FirebaseDynamicLinks in Frameworks */ = {isa = PBXBuildFile; productRef = BE41783F29B4AB3100434CFC /* FirebaseDynamicLinks */; };
@@ -86,6 +88,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		BE20B04029BADFC90078169B /* AccountSetting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSetting.swift; sourceTree = "<group>"; };
+		BE20B04229BAEA170078169B /* CustomBackButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomBackButton.swift; sourceTree = "<group>"; };
 		BE3CD65A29B72B0700C19442 /* ProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressViewModel.swift; sourceTree = "<group>"; };
 		BE41783C29B4535800434CFC /* AnimationExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationExtension.swift; sourceTree = "<group>"; };
 		BEAB502D29A7C6D400ECCB4F /* PageTabNavigateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageTabNavigateView.swift; sourceTree = "<group>"; };
@@ -354,6 +358,8 @@
 			isa = PBXGroup;
 			children = (
 				E08F273928DDB53700329C5E /* SystemView.swift */,
+				BE20B04029BADFC90078169B /* AccountSetting.swift */,
+				BE20B04229BAEA170078169B /* CustomBackButton.swift */,
 			);
 			path = SystemViews;
 			sourceTree = "<group>";
@@ -555,9 +561,11 @@
 				E09F09BC28EAF33500D07669 /* FocusedLineRow.swift in Sources */,
 				E0455FEA292D1947004F677D /* GradientBackbround.swift in Sources */,
 				E0B328932924A42100E94BC3 /* ManageCustomizeSideMenu.swift in Sources */,
+				BE20B04129BADFC90078169B /* AccountSetting.swift in Sources */,
 				E0B3288C2921577F00E94BC3 /* ElementSwitchingPickerView.swift in Sources */,
 				E09F09CB28EFEA8700D07669 /* EditItemPhotoArea.swift in Sources */,
 				E0796AD328F46CC90094E50C /* ItemCardRow.swift in Sources */,
+				BE20B04329BAEA170078169B /* CustomBackButton.swift in Sources */,
 				E08F273628DDB48100329C5E /* StockView.swift in Sources */,
 				E0CF7EF228DF166700735142 /* ItemViewModel.swift in Sources */,
 				E0CF7EF028DF152D00735142 /* ItemModel.swift in Sources */,

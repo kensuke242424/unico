@@ -24,4 +24,8 @@ extension View {
     func getRect() -> CGRect {
         return UIScreen.main.bounds
     }
+    
+    func customBackButton() -> some View {
+        self.modifier(CustomBackButton()) 
+    }
 }
