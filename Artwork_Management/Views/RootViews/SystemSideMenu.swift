@@ -336,11 +336,17 @@ struct SystemSideMenu: View {
                             // Help Menu...
                             VStack(alignment: .leading) {
 
-                                SideMenuButton(open: $inputSideMenu.help, title: "ヘルプ", image: "questionmark.circle")
+                                SideMenuButton(open: $inputSideMenu.help, title: "システム", image: "gearshape")
 
                                 if inputSideMenu.help {
 
                                     VStack(alignment: .leading, spacing: 40) {
+                                        
+                                        NavigationLink {
+                                            SystemView(itemVM: itemVM)
+                                        } label: {
+                                            Label("システム設定", systemImage: "gearshape.fill")
+                                        }
 
                                         Label("アプリについて", systemImage: "scribble.variable")
                                             .onTapGesture {  }

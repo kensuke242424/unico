@@ -15,13 +15,8 @@ struct SystemView: View {
 
         VStack {
 
-            AccountIconView()
-
-            SystemListView()
-
         } // VStack
-        .background(LinearGradient(gradient: Gradient(colors: [.customDarkGray1, .customLightGray1]),
-                                   startPoint: .top, endPoint: .bottom))
+        
     } // body
 } // View
 
