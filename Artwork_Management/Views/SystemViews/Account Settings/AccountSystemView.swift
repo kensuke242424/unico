@@ -7,9 +7,10 @@
 
 import SwiftUI
 
-struct AccountSetting: View {
+struct AccountSystemView: View {
     
     enum AccountListContents: CaseIterable {
+        
         case addressChange
         case deleteAccount
         
@@ -43,25 +44,35 @@ struct AccountSetting: View {
             }
         }
         
-        @ViewBuilder var content: some View {
-            
-            switch self {
-                
-            case .addressChange:
-                UpdateAddressView()
-                
-            case .deleteAccount:
-                DeleteAccountView()
-            }
-        }
+//        @ViewBuilder var content: some View {
+//
+//            switch self {
+//
+//            case .addressChange:
+//                UpdateAddressView()
+//
+//            case .deleteAccount:
+//                DeleteAccountView(LogInVM: )
+//            }
+//        }
     }
+    
+    @StateObject var logInVM: LogInViewModel
     
     var body: some View {
         VStack {
             ForEach(AccountListContents.allCases, id: \.self) { listRow in
                 
                 NavigationLink {
-                    listRow.content
+                    switch listRow {
+                        
+                    case .addressChange:
+                        UpdateAddressView()
+                        
+                    case .deleteAccount:
+                        DeleteAccountView(logInVM: logInVM)
+                    }
+                    
                 } label: {
                     ListRowView(icon : listRow.icon,
                                 title: listRow.title,
@@ -84,6 +95,6 @@ struct AccountSetting: View {
 
 struct AccountSetting_Previews: PreviewProvider {
     static var previews: some View {
-        AccountSetting()
+        AccountSystemView(logInVM: LogInViewModel())
     }
 }

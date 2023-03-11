@@ -96,35 +96,9 @@ struct SystemView: View {
                 return "アプリのプライバシーポリシーを記載しています。"
             }
         }
-        
-        @ViewBuilder var content: some View {
-            
-            switch self {
-                
-            case .infomation:
-                AccountSetting()
-                
-            case .account:
-                AccountSetting()
-                
-            case .twitter:
-                AccountSetting()
-                
-            case .query:
-                AccountSetting()
-                
-            case .review:
-                AccountSetting()
-                
-            case .rules:
-                AccountSetting()
-                
-            case .privacy:
-                AccountSetting()
-            }
-        }
     }
 
+    @StateObject var logInVM: LogInViewModel
     @StateObject var itemVM: ItemViewModel
 
     var body: some View {
@@ -133,7 +107,29 @@ struct SystemView: View {
             ForEach(SystemListContents.allCases, id: \.self) { listRow in
                 
                 NavigationLink {
-                    listRow.content
+                    switch listRow {
+                        
+                    case .infomation:
+                        EmptyView()
+                        
+                    case .account:
+                        AccountSystemView(logInVM: logInVM)
+                        
+                    case .twitter:
+                        EmptyView()
+                        
+                    case .query:
+                        EmptyView()
+                        
+                    case .review:
+                        EmptyView()
+                        
+                    case .rules:
+                        EmptyView()
+                        
+                    case .privacy:
+                        EmptyView()
+                    }
                 } label: {
                     ListRowView(icon : listRow.icon,
                             title: listRow.title,
@@ -201,6 +197,6 @@ struct ListRowView: View {
 
 struct SystemView_Previews: PreviewProvider {
     static var previews: some View {
-        SystemView(itemVM: ItemViewModel())
+        SystemView(logInVM: LogInViewModel(), itemVM: ItemViewModel())
     }
 }

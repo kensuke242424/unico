@@ -343,7 +343,7 @@ struct SystemSideMenu: View {
                                     VStack(alignment: .leading, spacing: 40) {
                                         
                                         NavigationLink {
-                                            SystemView(itemVM: itemVM)
+                                            SystemView(logInVM: logInVM, itemVM: itemVM)
                                         } label: {
                                             Label("システム設定", systemImage: "gearshape.fill")
                                         }

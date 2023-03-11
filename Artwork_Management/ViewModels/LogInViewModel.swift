@@ -45,6 +45,24 @@ class LogInViewModel: ObservableObject {
     var logInErrorMessage: String = ""
     var logInErrorAlertMessage: String = ""
     
+    func startCurrentUserListener() {
+        print("startCurrentUserListenerが実行されました")
+        
+        listenerHandle = Auth.auth().addStateDidChangeListener { auth, user in
+            if user != nil {
+                print("currentUserCheck_サインイン⭕️")
+                print("uid: \(self.uid ?? "アンラップ失敗")")
+                self.existsCurrentUserCheck = true
+                print("checkCurrentUserExists: \(self.existsCurrentUserCheck)")
+                
+            } else {
+                print("currentUserCheck_サインイン❌")
+                print("uid: \(self.uid ?? "nil")")
+                self.existsCurrentUserCheck = false
+            }
+        }
+    }
+    
     func signInAnonymously() {
         
         Auth.auth().signInAnonymously { (authResult, error) in
@@ -86,10 +104,19 @@ class LogInViewModel: ObservableObject {
                     print("Unable to fetch identify token。識別トークンをフェッチできません。")
                     return
                 }
+                guard let authorizationCode = appleIDCredential.authorizationCode else {
+                    print("Unable to fetch authorizationCode。")
+                    return
+                }
                 guard let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
                     print("Unable to serialise token string from data: \(appleIDToken.debugDescription). データからトークン文字列をシリアライズできません。")
                     return
                 }
+                
+                print("＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝")
+                print("appleIDToken: \(appleIDToken)")
+                print("authorizationCode: \(authorizationCode)")
+                print("＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝")
 
                 let credential = OAuthProvider.credential(withProviderID: "apple.com",
                                                           idToken: idTokenString,
@@ -102,24 +129,6 @@ class LogInViewModel: ObservableObject {
                         print("Error authenticating: \(error.localizedDescription)")
                     }
                 }
-            }
-        }
-    }
-
-    func startCurrentUserListener() {
-        print("startCurrentUserListenerが実行されました")
-        
-        listenerHandle = Auth.auth().addStateDidChangeListener { auth, user in
-            if user != nil {
-                print("currentUserCheck_サインイン⭕️")
-                print("uid: \(self.uid ?? "アンラップ失敗")")
-                self.existsCurrentUserCheck = true
-                print("checkCurrentUserExists: \(self.existsCurrentUserCheck)")
-                
-            } else {
-                print("currentUserCheck_サインイン❌")
-                print("uid: \(self.uid ?? "nil")")
-                self.existsCurrentUserCheck = false
             }
         }
     }
@@ -388,10 +397,119 @@ class LogInViewModel: ObservableObject {
       return hashString
     }
     
+    // --- 🔥アップルサインインアカウントのサインアウト&AppleID連携解除のメソッド🔥  ---
+    func signOutAndDeleteAccount(credencial:  ASAuthorizationAppleIDCredential?) {
+      // Firebase Authenticationからサインアウトする
+      do {
+        try Auth.auth().signOut()
+      } catch let signOutError as NSError {
+        print("Error signing out: %@", signOutError)
+        return
+      }
+
+      // Apple ID の identityToken と authorizationCode を取得する
+        guard let appleIDCredential = credencial else {
+        return
+      }
+
+      let identityToken = String(data: appleIDCredential.identityToken!, encoding: .utf8)!
+      let authorizationCode = String(data: appleIDCredential.authorizationCode!, encoding: .utf8)!
+
+      // identityTokenとauthorizationCodeを使用して、Apple IDとの連携を解除する
+      // （例えば、先ほど紹介したREST APIを呼び出すなど）
+      deleteAccountFromServer(identityToken: identityToken, authorizationCode: authorizationCode)
+    }
+    // アップルサインインデータを削除するために必要な「appleIDToken」「authorizationCode」を保持するASAuthorizationAppleIDCredentialを取得するメソッド
+    func getSignOutWithAppleCredential(_ result: Result<ASAuthorization, Error>) ->  ASAuthorizationAppleIDCredential? {
+        
+        print("getSignOutWithAppleCredentialメソッド実行")
+        
+        // 以下のプロパティ値を返す
+        var credential: ASAuthorizationAppleIDCredential?
+        
+        if case .failure(let failure) = result {
+            logInErrorAlertMessage = failure.localizedDescription
+        }
+        else if case .success(let success) = result {
+            // ASAuthorizationAppleIDCredential: AppleID認証が成功した結果として得られる資格情報。
+            if let appleIDCredential = success.credential as? ASAuthorizationAppleIDCredential {
+                guard let nonce = currentNonce else {
+                    fatalError("fatalError: handleSignInWithAppleCompletion_currentNonceの値が存在しません。")
+                }
+                guard let appleIDToken = appleIDCredential.identityToken else {
+                    print("Unable to fetch identify token。識別トークンをフェッチできません。")
+                    return nil
+                }
+                guard let authorizationCode = appleIDCredential.authorizationCode else {
+                    print("Unable to fetch authorizationCode。")
+                    return nil
+                }
+                
+                print("＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝")
+                print("appleIDToken: \(appleIDToken)")
+                print("authorizationCode: \(authorizationCode)")
+                print("＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝")
+                credential = appleIDCredential
+            }
+        }
+        return credential
+    }
+    
+    func deleteAccountFromServer(identityToken: String, authorizationCode: String) {
+        // 認証用の秘密鍵の読み込み
+        guard let filePath = Bundle.main.path(forResource: "AuthKey_K22AWHD46U", ofType: "p8") else {
+            print("秘密鍵が見つかりません")
+            return
+        }
+        let fileURL = URL(fileURLWithPath: filePath)
+        guard let privateKey = try? String(contentsOf: fileURL).trimmingCharacters(in: .whitespacesAndNewlines) else {
+            print("秘密鍵の読み込みに失敗しました")
+            return
+        }
+
+        // HTTPリクエストの作成
+        let url = URL(string: "https://appleid.apple.com/auth/token")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+
+        // HTTPリクエストのボディに必要な情報を設定
+        let requestBody = "client_id=com.example.app&client_secret=\(privateKey)&code=\(authorizationCode)&grant_type=authorization_code&redirect_uri=https://example.com/callback"
+        request.httpBody = requestBody.data(using: .utf8)
+
+        // HTTPリクエストの送信
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("HTTPリクエストの送信に失敗しました：\(error.localizedDescription)")
+                return
+            }
+            guard let data = data else {
+                print("HTTPレスポンスがありません")
+                return
+            }
+
+            // HTTPレスポンスからトークンを取得
+            guard let responseJson = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
+                  let identityToken = responseJson["id_token"] as? String,
+                  let refreshToken = responseJson["refresh_token"] as? String else {
+                print("レスポンスJSONからトークンの取得に失敗しました")
+                return
+            }
+
+            // identityTokenを使って、Appleからユーザー情報を取得
+            // ...
+
+            // ユーザー情報を使って、アカウントの削除処理を行う
+            // ...
+        }
+        task.resume()
+    }
+
+    
     func logOut() {
         do {
             try Auth.auth().signOut()
-            print("ログアウト実行")
+            print("ログアウト成功")
         } catch let signOutError as NSError {
             print("Error signing out: %@", signOutError)
             print("ログアウト失敗")

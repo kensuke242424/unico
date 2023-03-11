@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		BE20B04129BADFC90078169B /* AccountSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE20B04029BADFC90078169B /* AccountSetting.swift */; };
+		BE20B04129BADFC90078169B /* AccountSystemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE20B04029BADFC90078169B /* AccountSystemView.swift */; };
 		BE20B04329BAEA170078169B /* CustomBackButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE20B04229BAEA170078169B /* CustomBackButton.swift */; };
 		BE20B04629BAEF2F0078169B /* DeleteAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE20B04529BAEF2F0078169B /* DeleteAccountView.swift */; };
 		BE20B04829BAEFDB0078169B /* UpdateAddressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE20B04729BAEFDB0078169B /* UpdateAddressView.swift */; };
@@ -90,7 +90,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		BE20B04029BADFC90078169B /* AccountSetting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSetting.swift; sourceTree = "<group>"; };
+		BE20B04029BADFC90078169B /* AccountSystemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSystemView.swift; sourceTree = "<group>"; };
 		BE20B04229BAEA170078169B /* CustomBackButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomBackButton.swift; sourceTree = "<group>"; };
 		BE20B04529BAEF2F0078169B /* DeleteAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteAccountView.swift; sourceTree = "<group>"; };
 		BE20B04729BAEFDB0078169B /* UpdateAddressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateAddressView.swift; sourceTree = "<group>"; };
@@ -191,7 +191,7 @@
 		BE20B04429BAEF000078169B /* Account Settings */ = {
 			isa = PBXGroup;
 			children = (
-				BE20B04029BADFC90078169B /* AccountSetting.swift */,
+				BE20B04029BADFC90078169B /* AccountSystemView.swift */,
 				BE20B04529BAEF2F0078169B /* DeleteAccountView.swift */,
 				BE20B04729BAEFDB0078169B /* UpdateAddressView.swift */,
 			);
@@ -575,7 +575,7 @@
 				E09F09BC28EAF33500D07669 /* FocusedLineRow.swift in Sources */,
 				E0455FEA292D1947004F677D /* GradientBackbround.swift in Sources */,
 				E0B328932924A42100E94BC3 /* ManageCustomizeSideMenu.swift in Sources */,
-				BE20B04129BADFC90078169B /* AccountSetting.swift in Sources */,
+				BE20B04129BADFC90078169B /* AccountSystemView.swift in Sources */,
 				E0B3288C2921577F00E94BC3 /* ElementSwitchingPickerView.swift in Sources */,
 				E09F09CB28EFEA8700D07669 /* EditItemPhotoArea.swift in Sources */,
 				E0796AD328F46CC90094E50C /* ItemCardRow.swift in Sources */,
