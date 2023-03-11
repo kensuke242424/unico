@@ -26,6 +26,14 @@ extension View {
     }
     
     func customBackButton() -> some View {
-        self.modifier(CustomBackButton()) 
+        self.modifier(CustomBackButton())
+    }
+    
+    func customSystemBackground() -> some View {
+        self
+            .background {
+                Color.userBlue1
+                    .ignoresSafeArea()
+            }
     }
 }

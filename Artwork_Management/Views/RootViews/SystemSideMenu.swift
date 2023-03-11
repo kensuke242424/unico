@@ -348,21 +348,6 @@ struct SystemSideMenu: View {
                                             Label("システム設定", systemImage: "gearshape.fill")
                                         }
 
-                                        Label("アプリについて", systemImage: "scribble.variable")
-                                            .onTapGesture {  }
-
-                                        Label("アプリの評価", systemImage: "star.bubble.fill")
-                                            .onTapGesture {  }
-
-                                        Label("利用規約", systemImage: "network.badge.shield.half.filled")
-                                            .onTapGesture {  }
-
-                                        Label("お問い合わせ", systemImage: "ellipsis.bubble.fill")
-                                            .onTapGesture {  }
-
-                                        Label("プライバシーポリシー", systemImage: "hand.raised.fill")
-                                            .onTapGesture {  }
-
                                     } // VStack
                                     .foregroundColor(.white)
                                     // メニュー一つ分のheight = コンテンツ数 * 60

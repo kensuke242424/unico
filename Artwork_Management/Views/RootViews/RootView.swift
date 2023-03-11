@@ -73,20 +73,20 @@ struct RootView: View {
             }
 
         } // ZStack
-        .background {
-            ZStack {
-                
-                Image("background_1")
-                    .resizable()
-                    .scaledToFill()
-                    .blur(radius: 2)
-                    .ignoresSafeArea()
-                
-                Color(.black).opacity(0.3)
-                    .background(.ultraThinMaterial).opacity(0.45)
-                    .ignoresSafeArea()
-            }
-        }
+//        .background {
+//            ZStack {
+//
+//                Image("background_1")
+//                    .resizable()
+//                    .scaledToFill()
+//                    .blur(radius: 2)
+//                    .ignoresSafeArea()
+//
+//                Color(.black).opacity(0.3)
+//                    .background(.ultraThinMaterial).opacity(0.45)
+//                    .ignoresSafeArea()
+//            }
+//        }
 
         // fetch...
         .onChange(of: logInVM.rootNavigation) { navigation in
@@ -103,7 +103,6 @@ struct RootView: View {
                         print("userVM.user: \(user)")
                         if user.joins.isEmpty {
                             print("参加チーム無し。チーム作成画面へ遷移")
-//                            _ = try await userVM.userRealtimeListener()
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                 withAnimation(.spring(response: 1)) {
                                     logInVM.rootNavigation = .join

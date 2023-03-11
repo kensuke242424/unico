@@ -10,33 +10,117 @@ import SwiftUI
 struct SystemView: View {
     
     enum SystemListContents: CaseIterable {
+        case infomation
         case account
+        case twitter
+        case query
+        case review
+        case rules
+        case privacy
         
         var icon: String {
             switch self {
+                
+            case .infomation:
+                return "cube.transparent"
+                
             case .account:
                 return "person"
+                
+            case .twitter:
+                return ""
+                
+            case .query:
+                return "envelope.open"
+            
+                
+            case .review:
+                return "star.bubble"
+                
+            case .rules:
+                return "network.badge.shield.half.filled"
+                
+            case .privacy:
+                return "hand.raised.fingers.spread"
             }
         }
         
         var title: String {
             switch self {
+                
+            case .infomation:
+                return "お知らせ"
+                
             case .account:
                 return "アカウント"
+                
+            case .twitter:
+                return "公式Twitter"
+                
+            case .query:
+                return "お問い合わせ"
+                
+            case .review:
+                return "アプリへの評価"
+                
+            case .rules:
+                return "利用規約"
+                
+            case .privacy:
+                return "プライバシーポリシー"
             }
         }
         
         var infomation: String {
             switch self {
+                
+            case .infomation:
+                return "アプリのアップデートやお知らせを記載しています。"
+                
             case .account:
-                return "アカウント情報の変更や削除などの操作を行います。"
+                return "アカウント情報の確認や変更、削除を含めた操作を行います。"
+                
+            case .twitter:
+                return "unicoの公式Twitterへ移動します。"
+                
+            case .query:
+                return "アプリご利用についてお問い合わせを行います。"
+                
+            case .review:
+                return "unicoのレビュー評価を行います。"
+                
+            case .rules:
+                return "アプリの利用規約について記載しています。"
+                
+            case .privacy:
+                return "アプリのプライバシーポリシーを記載しています。"
             }
         }
         
-        var content: some View {
+        @ViewBuilder var content: some View {
+            
             switch self {
+                
+            case .infomation:
+                AccountSetting()
+                
             case .account:
-                return AccountSetting()
+                AccountSetting()
+                
+            case .twitter:
+                AccountSetting()
+                
+            case .query:
+                AccountSetting()
+                
+            case .review:
+                AccountSetting()
+                
+            case .rules:
+                AccountSetting()
+                
+            case .privacy:
+                AccountSetting()
             }
         }
     }
@@ -60,11 +144,9 @@ struct SystemView: View {
             Spacer()
             
         } // VStack
-        .background {
-            Color.userBlue1
-                .ignoresSafeArea()
-        }
-        .navigationTitle("設定")
+        .navigationTitle("設定メニュー")
+        .customSystemBackground()
+        .customBackButton()
         
     } // body
 } // View
@@ -80,17 +162,26 @@ struct ListRowView: View {
         VStack {
             
             HStack {
-                Image(systemName: icon)
-                    .font(.title3)
-                    .frame(width: 30)
-                    .opacity(0.5)
+                if self.title == "公式Twitter" {
+                    Image("twitter_logo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 30, height: 20)
+                } else {
+                    Image(systemName: icon)
+                        .font(.title3)
+                        .frame(width: 30, height: 30)
+                }
+                
                 
                 VStack(alignment: .leading) {
                     Text(title)
                         .fontWeight(.semibold)
+                        .padding(.bottom, 1)
                     Text(text)
                         .font(.caption)
                         .opacity(0.5)
+                        .multilineTextAlignment(.leading)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 
@@ -103,7 +194,6 @@ struct ListRowView: View {
             .padding(.horizontal, 15)
         }
         .frame(maxWidth: .infinity)
-        .frame(height: 50)
         .foregroundColor(.white)
         .padding(.vertical, 10)
     }

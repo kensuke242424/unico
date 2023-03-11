@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		BE20B04129BADFC90078169B /* AccountSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE20B04029BADFC90078169B /* AccountSetting.swift */; };
 		BE20B04329BAEA170078169B /* CustomBackButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE20B04229BAEA170078169B /* CustomBackButton.swift */; };
+		BE20B04629BAEF2F0078169B /* DeleteAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE20B04529BAEF2F0078169B /* DeleteAccountView.swift */; };
+		BE20B04829BAEFDB0078169B /* UpdateAddressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE20B04729BAEFDB0078169B /* UpdateAddressView.swift */; };
 		BE3CD65B29B72B0700C19442 /* ProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3CD65A29B72B0700C19442 /* ProgressViewModel.swift */; };
 		BE41783D29B4535800434CFC /* AnimationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE41783C29B4535800434CFC /* AnimationExtension.swift */; };
 		BE41784029B4AB3100434CFC /* FirebaseDynamicLinks in Frameworks */ = {isa = PBXBuildFile; productRef = BE41783F29B4AB3100434CFC /* FirebaseDynamicLinks */; };
@@ -90,6 +92,8 @@
 /* Begin PBXFileReference section */
 		BE20B04029BADFC90078169B /* AccountSetting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSetting.swift; sourceTree = "<group>"; };
 		BE20B04229BAEA170078169B /* CustomBackButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomBackButton.swift; sourceTree = "<group>"; };
+		BE20B04529BAEF2F0078169B /* DeleteAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteAccountView.swift; sourceTree = "<group>"; };
+		BE20B04729BAEFDB0078169B /* UpdateAddressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateAddressView.swift; sourceTree = "<group>"; };
 		BE3CD65A29B72B0700C19442 /* ProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressViewModel.swift; sourceTree = "<group>"; };
 		BE41783C29B4535800434CFC /* AnimationExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationExtension.swift; sourceTree = "<group>"; };
 		BEAB502D29A7C6D400ECCB4F /* PageTabNavigateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageTabNavigateView.swift; sourceTree = "<group>"; };
@@ -184,6 +188,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		BE20B04429BAEF000078169B /* Account Settings */ = {
+			isa = PBXGroup;
+			children = (
+				BE20B04029BADFC90078169B /* AccountSetting.swift */,
+				BE20B04529BAEF2F0078169B /* DeleteAccountView.swift */,
+				BE20B04729BAEFDB0078169B /* UpdateAddressView.swift */,
+			);
+			path = "Account Settings";
+			sourceTree = "<group>";
+		};
 		BE41783E29B4AB3100434CFC /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -283,10 +297,8 @@
 				E094B788298EB7C700A2E33C /* UpdateTeamOrUserViews */,
 				E05FE94328F71BE400263F98 /* Extensions */,
 				E0B3288F2923AD7600E94BC3 /* ViewParts */,
-				E0BFE1C729746AC1005481CA /* QRReaders */,
 				E0796AD828F48D530094E50C /* RootViews */,
 				E094F0FE28E20BB800D3C845 /* LogInViews */,
-				E0A7DE4C290C2811008C3F3F /* PhotoViews */,
 				E09F09BA28EAF2DD00D07669 /* EditItemViews */,
 				E08F273F28DEAD1100329C5E /* Tab1_Librarys */,
 				E08F274028DEAD3B00329C5E /* Tab2_Inventrys */,
@@ -358,8 +370,8 @@
 			isa = PBXGroup;
 			children = (
 				E08F273928DDB53700329C5E /* SystemView.swift */,
-				BE20B04029BADFC90078169B /* AccountSetting.swift */,
 				BE20B04229BAEA170078169B /* CustomBackButton.swift */,
+				BE20B04429BAEF000078169B /* Account Settings */,
 			);
 			path = SystemViews;
 			sourceTree = "<group>";
@@ -413,6 +425,8 @@
 		E0B3288F2923AD7600E94BC3 /* ViewParts */ = {
 			isa = PBXGroup;
 			children = (
+				E0A7DE4C290C2811008C3F3F /* PhotoViews */,
+				E0BFE1C729746AC1005481CA /* QRReaders */,
 				E0B328902923AD9D00E94BC3 /* GradientLine.swift */,
 				E0DE33512928F48D008C7147 /* CustomProgressView.swift */,
 				E0455FE3292C8EF0004F677D /* BounceAnimationView.swift */,
@@ -578,9 +592,11 @@
 				E0A7DE4B290B9E0A008C3F3F /* ShowItemUIImagePhoto.swift in Sources */,
 				E08F273E28DDB65F00329C5E /* HomeTabView.swift in Sources */,
 				E0455FDE292B2B83004F677D /* LogInViewModel.swift in Sources */,
+				BE20B04629BAEF2F0078169B /* DeleteAccountView.swift in Sources */,
 				E0DE33522928F48D008C7147 /* CustomProgressView.swift in Sources */,
 				E05130E228F341620092FE46 /* RootView.swift in Sources */,
 				E08F272528DDA08E00329C5E /* Artwork_ManagementApp.swift in Sources */,
+				BE20B04829BAEFDB0078169B /* UpdateAddressView.swift in Sources */,
 				E0F78FC42919F06D00A95CD1 /* DateFormatterExtension.swift in Sources */,
 				E09F09C528ED5DEA00D07669 /* SideMenuEditTagView.swift in Sources */,
 				E0DE335029288D07008C7147 /* TeamModel.swift in Sources */,
