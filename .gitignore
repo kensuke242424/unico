@@ -6,7 +6,7 @@
 xcuserdata/
 .DS_Store
 GoogleService-Info.plist
-AuthKey_K22AWHD46U.p8
+*.p8
 ## compatibility with Xcode 8 and earlier (ignoring not required starting Xcode 9)
 *.xcscmblueprint
 *.xccheckout
