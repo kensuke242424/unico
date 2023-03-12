@@ -155,7 +155,8 @@ enum Background: CaseIterable {
 
 struct InputLogIn {
     var createUserNameText: String = ""
-    var captureImage: UIImage? = nil
+    var captureUserIconImage: UIImage?
+    var captureBackgroundImage: UIImage?
     var captureError: Bool = false
     var address: String = ""
     var password: String = ""
@@ -194,7 +195,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         ZStack {
             
             Group {
-                if let captureImage = inputLogIn.captureImage {
+                if let captureImage = inputLogIn.captureUserIconImage {
                     UIImageCircleIcon(photoImage: captureImage, size: 60)
                 } else {
                     Image(systemName: "person.circle.fill").resizable().scaledToFit()
@@ -393,7 +394,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             Text(logInVM.logInAlertMessage.text)
         }
         .sheet(isPresented: $inputLogIn.isShowPickerView) {
-            PHPickerView(captureImage: $inputLogIn.captureImage, isShowSheet: $inputLogIn.isShowPickerView, isShowError: $inputLogIn.captureError)
+            PHPickerView(captureImage: $inputLogIn.captureUserIconImage, isShowSheet: $inputLogIn.isShowPickerView, isShowError: $inputLogIn.captureError)
         }
         .background {
             ZStack {
@@ -449,7 +450,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         // userドキュメントが存在しなかった場合は、新規userドキュメントをFirestoreに作成
                         let didSetUserDocument = await logInVM.setSignUpUserDocument(name: inputLogIn.createUserNameText,
                                                                                     password: inputLogIn.password,
-                                                                                    imageData: inputLogIn.captureImage,
+                                                                                    imageData: inputLogIn.captureUserIconImage,
                                                                                     color: inputLogIn.selectUserColor)
                         if didSetUserDocument {
                             withAnimation(.spring(response: 0.5)) {
@@ -720,7 +721,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 case .fase2:
                     
                     Group {
-                        if let captureImage = inputLogIn.captureImage {
+                        if let captureImage = inputLogIn.captureUserIconImage {
                             UIImageCircleIcon(photoImage: captureImage, size: 150)
                         } else {
                             Image(systemName: "photo.circle.fill")
