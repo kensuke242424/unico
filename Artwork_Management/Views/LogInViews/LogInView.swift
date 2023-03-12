@@ -161,6 +161,7 @@ struct InputLogIn {
     var address: String = ""
     var password: String = ""
     var checkBackgroundOpacity: CGFloat = 1.0
+    var checkBackgroundEffect: Bool = false
     var checkBackgroundToggle: Bool = false
     var createAccountTitle: Bool = false
     var createAccountShowContents: Bool = false
@@ -394,19 +395,31 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             Text(logInVM.logInAlertMessage.text)
         }
         .sheet(isPresented: $inputLogIn.isShowPickerView) {
-            PHPickerView(captureImage: $inputLogIn.captureUserIconImage, isShowSheet: $inputLogIn.isShowPickerView, isShowError: $inputLogIn.captureError)
+            // .fase1ならバックグラウンドの画像設定、.fase2ならユーザーアイコンの画像設定
+            if inputLogIn.createAccountFase == .fase1 {
+                PHPickerView(captureImage: $inputLogIn.captureBackgroundImage, isShowSheet: $inputLogIn.isShowPickerView, isShowError: $inputLogIn.captureError)
+            } else if inputLogIn.createAccountFase == .fase2 {
+                PHPickerView(captureImage: $inputLogIn.captureUserIconImage, isShowSheet: $inputLogIn.isShowPickerView, isShowError: $inputLogIn.captureError)
+            }
         }
+        
         .background {
             ZStack {
-
-                Image(inputLogIn.selectBackground.imageName)
-                    .resizable()
-                    .scaledToFill()
-                    .blur(radius: 2)
-                    .ignoresSafeArea()
-
-                Color(.black).opacity(0.3)
-                    .background(.ultraThinMaterial).opacity(0.45)
+                if inputLogIn.selectBackground == .original {
+                    Image(uiImage: inputLogIn.captureBackgroundImage ?? UIImage())
+                        .resizable()
+                        .scaledToFill()
+                        .blur(radius: inputLogIn.checkBackgroundEffect ? 0 : 2)
+                        .ignoresSafeArea()
+                } else {
+                    Image(inputLogIn.selectBackground.imageName)
+                        .resizable()
+                        .scaledToFill()
+                        .blur(radius: inputLogIn.checkBackgroundEffect ? 0 : 2)
+                        .ignoresSafeArea()
+                }
+                Color(.black)
+                    .opacity(inputLogIn.checkBackgroundEffect ? 0.0 : 0.2)
                     .ignoresSafeArea()
             }
         }
@@ -644,17 +657,25 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                 ForEach(Background.allCases, id: \.self) { value in
                                     Group {
                                         if value == .original {
-                                            Image("")
+                                            Image(uiImage: inputLogIn.captureBackgroundImage ?? UIImage())
                                                 .resizable()
-                                                .border(.blue, width: 5)
                                                 .scaledToFill()
+                                                .frame(width: 120, height: 250)
+                                                .border(.blue, width: 1)
+                                                .overlay {
+                                                    Button("写真を挿入") {
+                                                        inputLogIn.isShowPickerView.toggle()
+                                                    }
+                                                    .buttonStyle(.borderedProminent)
+                                                    
+                                                }
                                         } else {
                                             Image(value.imageName)
                                                 .resizable()
                                                 .scaledToFill()
+                                                .frame(width: 120, height: 250)
                                         }
                                     }
-                                    .frame(width: 120, height: 250)
                                     .clipped()
                                     .scaleEffect(inputLogIn.selectBackground == value ? 1.2 : 1.0)
                                     .overlay(alignment: .topTrailing) {
@@ -711,8 +732,10 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         .onChange(of: inputLogIn.checkBackgroundToggle) { newValue in
                             if newValue {
                                 withAnimation(.easeIn(duration: 0.2)) { inputLogIn.checkBackgroundOpacity = 0.0 }
+                                withAnimation(.easeIn(duration: 0.2)) { inputLogIn.checkBackgroundEffect.toggle() }
                             } else {
                                 withAnimation(.easeIn(duration: 0.2)) { inputLogIn.checkBackgroundOpacity = 1.0 }
+                                withAnimation(.easeIn(duration: 0.2)) { inputLogIn.checkBackgroundEffect.toggle() }
                             }
                         }
                     }
