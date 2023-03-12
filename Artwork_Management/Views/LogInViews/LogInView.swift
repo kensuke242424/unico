@@ -159,6 +159,8 @@ struct InputLogIn {
     var captureError: Bool = false
     var address: String = ""
     var password: String = ""
+    var checkBackgroundOpacity: CGFloat = 1.0
+    var checkBackgroundToggle: Bool = false
     var createAccountTitle: Bool = false
     var createAccountShowContents: Bool = false
     var isShowPickerView: Bool = false
@@ -241,6 +243,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 // アカウント登録の進捗を表すインジケーター
                 if logInVM.selectSignInType == .signAp {
                     createAccountIndicator()
+                        .opacity(inputLogIn.checkBackgroundOpacity)
                         .offset(y: -getRect().height / 3 + 30)
                         .padding(.bottom)
                 }
@@ -283,6 +286,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             .foregroundColor(.white.opacity(0.7))
                     }
                     .disabled(logInVM.addressSignInFase == .success ? true : false)
+                    .opacity(inputLogIn.checkBackgroundOpacity)
                     .opacity(logInVM.addressSignInFase == .success ? 0.2 : 1.0)
                     .opacity(inputLogIn.createAccountFase == .fase1 && !inputLogIn.createAccountShowContents ? 0.0 : 1.0)
                     .offset(y: getRect().height / 2 - 100)
@@ -592,7 +596,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     
                 case .fase1:
                     VStack(spacing: 10) {
-                        Text("まずはデザインを決めましょう")
+                        Text("まずはあなたにぴったりの")
+                        Text("デザインを決めましょう")
                     }
                     .tracking(5)
                     .offset(y: 30)
@@ -620,6 +625,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             } // Group
             .tracking(5)
             .font(.subheadline).foregroundColor(.white.opacity(0.8))
+            .opacity(inputLogIn.checkBackgroundOpacity)
             .opacity(inputLogIn.createAccountTitle ? 1.0 : 0.0)
             
             Group {
@@ -671,9 +677,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             }
                             .frame(height: 310)
                         }
-//                        .frame(width: getRect().width - 50)
-                        
-                    }
+                    } // VStack
+                    .opacity(inputLogIn.checkBackgroundOpacity)
                     .offset(y: 20)
                     
                     Button("次へ") {
@@ -694,6 +699,22 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         }
                     }
                     .buttonStyle(.borderedProminent)
+                    .opacity(inputLogIn.checkBackgroundOpacity)
+                    .overlay(alignment: .trailing) {
+                        VStack {
+                            Text("確認する").font(.footnote).offset(x: 15)
+                            Toggle("", isOn: $inputLogIn.checkBackgroundToggle)
+                        }
+                        .frame(width: 80)
+                        .offset(x: 130)
+                        .onChange(of: inputLogIn.checkBackgroundToggle) { newValue in
+                            if newValue {
+                                withAnimation(.easeIn(duration: 0.2)) { inputLogIn.checkBackgroundOpacity = 0.0 }
+                            } else {
+                                withAnimation(.easeIn(duration: 0.2)) { inputLogIn.checkBackgroundOpacity = 1.0 }
+                            }
+                        }
+                    }
                     .offset(y: 20)
                     
                 case .fase2:
