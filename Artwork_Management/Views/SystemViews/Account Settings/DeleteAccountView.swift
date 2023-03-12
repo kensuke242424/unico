@@ -13,14 +13,10 @@ struct DeleteAccountView: View {
     @StateObject var logInVM: LogInViewModel
     var body: some View {
         VStack {
-            // Sign In With Apple...
-//            SignInWithAppleButton(.continue) { request in
-//                logInVM.handleSignInWithAppleRequest(request)
-//            } onCompletion: { result in
-//                let credencial = logInVM.getSignOutWithAppleCredential(result)
-//                logInVM.signOutAndDeleteAccount(credencial: credencial)
-//            }
-//            .buttonStyle(.borderedProminent)
+
+            Button("アカウントを削除") {
+                
+            }
             
         }
         .customSystemBackground()

@@ -134,6 +134,25 @@ enum LogInAlert {
     }
 }
 
+enum Background: CaseIterable {
+    case original, sample1, sample2, sample3, sample4
+    
+    var imageName: String {
+        switch self {
+        case .original:
+            return ""
+        case .sample1:
+            return "background_1"
+        case .sample2:
+            return "background_2"
+        case .sample3:
+            return "background_3"
+        case .sample4:
+            return "background_4"
+        }
+    }
+}
+
 struct InputLogIn {
     var createUserNameText: String = ""
     var captureImage: UIImage? = nil
@@ -149,6 +168,7 @@ struct InputLogIn {
     var sendAddressButtonDisabled: Bool = true
     var createAccountFase: CreateAccountFase = .start
     var selectUserColor: MemberColor = .gray
+    var selectBackground: Background = .sample1
 }
 
 // ✅ ログイン画面の親Viewです。
@@ -170,10 +190,6 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
     var body: some View {
         
         ZStack {
-            
-//            GradientBackbround(color1: inputLogIn.selectUserColor.color1,
-//                               color2: inputLogIn.selectUserColor.colorAccent)
-//            .onTapGesture { showKyboard = nil }
             
             Group {
                 if let captureImage = inputLogIn.captureImage {
@@ -269,7 +285,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     .disabled(logInVM.addressSignInFase == .success ? true : false)
                     .opacity(logInVM.addressSignInFase == .success ? 0.2 : 1.0)
                     .opacity(inputLogIn.createAccountFase == .fase1 && !inputLogIn.createAccountShowContents ? 0.0 : 1.0)
-                    .offset(y: getRect().height / 3)
+                    .offset(y: getRect().height / 2 - 100)
                 }
                 
                 // ログイン画面最初のページまで戻るボタン
@@ -282,8 +298,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             Image(systemName: "house.fill")
                         }
                     }
-                    .disabled(logInVM.addressSignInFase == .start || logInVM.addressSignInFase == .success ? true : false)
-                    .opacity(logInVM.addressSignInFase == .start || logInVM.addressSignInFase == .success ? 0.2 : 1.0)
+                    .disabled(logInVM.addressSignInFase == .success ? true : false)
+                    .opacity(logInVM.addressSignInFase == .success ? 0.2 : 1.0)
                     .opacity(inputLogIn.createAccountFase == .start ||
                              inputLogIn.createAccountFase == .fase1 ||
                              inputLogIn.createAccountFase == .success ? 0.0 : 1.0)
@@ -314,20 +330,6 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         Text("ログイン画面に戻ります。よろしいですか？")
                     } // alert
                     
-                    
-                    Button {
-                        logInVM.signInAnonymously()
-                    } label: {
-                        HStack {
-                            Text("今すぐ始める？")
-                            Text(">")
-                        }
-                        .font(.subheadline).tracking(2).opacity(0.8)
-                    }
-                    .disabled(inputLogIn.createAccountFase == .success ? true : false)
-                    .foregroundColor(.white.opacity(0.6))
-                    .opacity(inputLogIn.createAccountFase == .success || inputLogIn.createAccountShowContents == false ? 0.0 : 1.0)
-                    .offset(x: getRect().width / 2 - 80, y: getRect().height / 2 - 60 )
                 }
                 
                 // メールアドレス登録選択時に出現するアドレス入力ハーフシートView
@@ -388,6 +390,20 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         }
         .sheet(isPresented: $inputLogIn.isShowPickerView) {
             PHPickerView(captureImage: $inputLogIn.captureImage, isShowSheet: $inputLogIn.isShowPickerView, isShowError: $inputLogIn.captureError)
+        }
+        .background {
+            ZStack {
+
+                Image(inputLogIn.selectBackground.imageName)
+                    .resizable()
+                    .scaledToFill()
+                    .blur(radius: 2)
+                    .ignoresSafeArea()
+
+                Color(.black).opacity(0.3)
+                    .background(.ultraThinMaterial).opacity(0.45)
+                    .ignoresSafeArea()
+            }
         }
         .onChange(of: inputLogIn.createAccountFase) { newFase in
             withAnimation(.spring(response: 1.0)) {
@@ -517,24 +533,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         }
     }
     func logInSelectButtons() -> some View {
-        VStack(spacing: 15) {
+        VStack(spacing: 25) {
             
-            // Sign In With Apple...
-            SignInWithAppleButton(.signIn) { request in
-                logInVM.selectProviderType = .apple
-                logInVM.handleSignInWithAppleRequest(request)
-            } onCompletion: { result in
-                logInVM.handleSignInWithAppleCompletion(result)
-            }
-            .signInWithAppleButtonStyle(.black)
-            .frame(width: 250, height: 50)
-            .cornerRadius(8)
-            .shadow(radius: 10, x: 5, y: 5)
-            
-            Text("または")
-                .foregroundColor(.white).opacity(0.7)
-                .tracking(2)
-
             Button {
                 withAnimation(.easeIn(duration: 0.25)) {
                     logInVM.showEmailSheetBackground.toggle()
@@ -547,10 +547,34 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             } label: {
                 ZStack {
                     RoundedRectangle(cornerRadius: 15)
-                        .foregroundColor(.blue.opacity(0.8))
+                        .fill(.blue.gradient)
                         .frame(width: 250, height: 50)
                         .shadow(radius: 10, x: 5, y: 5)
-                    Text("メールアドレス")
+                    Label("メールアドレス", systemImage: "envelope.fill")
+                        .fontWeight(.semibold)
+                        .tracking(2)
+                        .foregroundColor(.white)
+                }
+            }
+            
+            Text("または")
+                .foregroundColor(.white).opacity(0.7)
+                .tracking(2)
+
+            Button {
+                
+                // 匿名ログイン選択時の処理
+                // TODO: アカウント登録によって解放される機能を通知する
+                logInVM.signInAnonymously()
+
+            } label: {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 15)
+                        .fill(.green.gradient)
+                        .frame(width: 250, height: 50)
+                        .shadow(radius: 10, x: 5, y: 5)
+                    Label("匿名でログイン", systemImage: "person.crop.circle.fill")
+                        .fontWeight(.semibold)
                         .tracking(2)
                         .foregroundColor(.white)
                 }
@@ -568,13 +592,15 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     
                 case .fase1:
                     VStack(spacing: 10) {
-                        Text("あなたの色は？")
-                            .tracking(10)
+                        Text("まずはデザインを決めましょう")
                     }
+                    .tracking(5)
+                    .offset(y: 30)
                     
                 case .fase2:
                     VStack(spacing: 10) {
-                        Text("unicoへようこそ").tracking(10)
+                        Text("unicoへようこそ")
+                            .tracking(10)
                         Text("あなたのことを教えてください")
                     }
                     
@@ -593,7 +619,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 }
             } // Group
             .tracking(5)
-            .font(.subheadline).foregroundColor(.white.opacity(0.6))
+            .font(.subheadline).foregroundColor(.white.opacity(0.8))
             .opacity(inputLogIn.createAccountTitle ? 1.0 : 0.0)
             
             Group {
@@ -601,21 +627,56 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     
                 case .start: Text("")
                     
+                // Fase1: 背景写真を選んでもらう
                 case .fase1:
                     
-                    VStack {
-                        Label("Tap!", systemImage: "hand.tap.fill")
-                            .foregroundColor(.white)
-                            .opacity(inputLogIn.createAccountShowContents ? 0.5 : 0.0)
-                            .tracking(3)
-                            .offset(y: -10)
+                    VStack(spacing: 30) {
                         
-                        ColorCubeView(colorSet: $inputLogIn.selectUserColor)
-                            .padding()
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 30) {
+                                ForEach(Background.allCases, id: \.self) { value in
+                                    Group {
+                                        if value == .original {
+                                            Image("")
+                                                .resizable()
+                                                .border(.blue, width: 5)
+                                                .scaledToFill()
+                                        } else {
+                                            Image(value.imageName)
+                                                .resizable()
+                                                .scaledToFill()
+                                        }
+                                    }
+                                    .frame(width: 120, height: 250)
+                                    .clipped()
+                                    .scaleEffect(inputLogIn.selectBackground == value ? 1.2 : 1.0)
+                                    .overlay(alignment: .topTrailing) {
+                                        Image(systemName: "checkmark.seal.fill")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .foregroundColor(.green)
+                                            .frame(width: 30, height: 30)
+                                            .scaleEffect(inputLogIn.selectBackground == value ? 1.0 : 1.2)
+                                            .opacity(inputLogIn.selectBackground == value ? 1.0 : 0.0)
+                                            .offset(x: 20, y: -30)
+                                    }
+                                    .padding(.leading, value == .original ? 40 : 0)
+                                    .padding(.trailing, value == .sample4 ? 40 : 0)
+                                    .onTapGesture {
+                                        withAnimation(.spring(response: 0.5)) {
+                                            inputLogIn.selectBackground = value
+                                        }
+                                    }
+                                }
+                            }
+                            .frame(height: 310)
+                        }
+//                        .frame(width: getRect().width - 50)
+                        
                     }
                     .offset(y: 20)
                     
-                    Button {
+                    Button("次へ") {
                         withAnimation(.spring(response: 1.0)) {
                             inputLogIn.createAccountTitle = false
                             inputLogIn.createAccountShowContents = false
@@ -631,9 +692,6 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                 inputLogIn.createAccountShowContents = true
                             }
                         }
-                        
-                    } label: {
-                        Text("次へ")
                     }
                     .buttonStyle(.borderedProminent)
                     .offset(y: 20)
@@ -644,14 +702,17 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         if let captureImage = inputLogIn.captureImage {
                             UIImageCircleIcon(photoImage: captureImage, size: 150)
                         } else {
-                            Image(systemName: "photo.circle.fill").resizable().scaledToFit()
-                                .foregroundColor(.white.opacity(0.5)).frame(width: 150)
+                            Image(systemName: "photo.circle.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 150)
+                                .foregroundColor(.white)
                         }
                     }
                     .onTapGesture { inputLogIn.isShowPickerView.toggle() }
                     .overlay(alignment: .top) {
                         Text("ユーザ情報は後から変更できます。").font(.caption)
-                            .foregroundColor(.white.opacity(0.3))
+                            .foregroundColor(.white.opacity(0.5))
                             .frame(width: 200)
                             .offset(y: -30)
                     }
@@ -666,8 +727,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         .background {
                             ZStack {
                                 Text(showKyboard == nil && inputLogIn.createUserNameText.isEmpty ? "名前を入力" : "")
-                                    .foregroundColor(.white.opacity(0.3))
-                                Rectangle().foregroundColor(.white.opacity(0.3)).frame(height: 1)
+                                    .foregroundColor(.white.opacity(0.4))
+                                Rectangle().foregroundColor(.white.opacity(0.7)).frame(height: 1)
                                     .offset(y: 20)
                             }
                         }
