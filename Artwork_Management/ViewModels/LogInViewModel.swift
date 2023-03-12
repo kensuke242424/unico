@@ -461,11 +461,15 @@ class LogInViewModel: ObservableObject {
             print("秘密鍵が見つかりません")
             return
         }
+        print("filePath: \(filePath)")
+        
         let fileURL = URL(fileURLWithPath: filePath)
         guard let privateKey = try? String(contentsOf: fileURL).trimmingCharacters(in: .whitespacesAndNewlines) else {
             print("秘密鍵の読み込みに失敗しました")
             return
         }
+        print("fileURL: \(fileURL)")
+        print("privateKey: \(privateKey)")
 
         // HTTPリクエストの作成
         let url = URL(string: "https://appleid.apple.com/auth/token")!
@@ -476,6 +480,7 @@ class LogInViewModel: ObservableObject {
         // HTTPリクエストのボディに必要な情報を設定
         let requestBody = "client_id=com.example.app&client_secret=\(privateKey)&code=\(authorizationCode)&grant_type=authorization_code&redirect_uri=https://example.com/callback"
         request.httpBody = requestBody.data(using: .utf8)
+        print("requestBody: \(requestBody)")
 
         // HTTPリクエストの送信
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
@@ -487,14 +492,31 @@ class LogInViewModel: ObservableObject {
                 print("HTTPレスポンスがありません")
                 return
             }
-
-            // HTTPレスポンスからトークンを取得
-            guard let responseJson = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-                  let identityToken = responseJson["id_token"] as? String,
-                  let refreshToken = responseJson["refresh_token"] as? String else {
-                print("レスポンスJSONからトークンの取得に失敗しました")
+            print("HTTPレスポンスdata: \(data)")
+            
+            // TODO: 一つずつチェック
+            guard let responseJson = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else {
+                print("responseJsonの取得に失敗")
                 return
             }
+            print("responceJson: \(responseJson)") // ✅
+            
+            guard let identityToken_ = responseJson["id_token"] as? String else {
+                print("identityTokenの取得に失敗")
+                return
+            }
+            guard let refreshToken_ = responseJson["refresh_token"] as? String else {
+                print("refreshToken取得に失敗")
+                return
+            }
+
+            // HTTPレスポンスからトークンを取得
+//            guard let responseJson = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
+//                  let identityToken = responseJson["id_token"] as? String,
+//                  let refreshToken = responseJson["refresh_token"] as? String else {
+//                print("レスポンスJSONからトークンの取得に失敗しました")
+//                return
+//            }
 
             // identityTokenを使って、Appleからユーザー情報を取得
             // ...
