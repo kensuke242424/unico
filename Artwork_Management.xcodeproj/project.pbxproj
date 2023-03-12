@@ -12,6 +12,7 @@
 		BE20B04629BAEF2F0078169B /* DeleteAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE20B04529BAEF2F0078169B /* DeleteAccountView.swift */; };
 		BE20B04829BAEFDB0078169B /* UpdateAddressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE20B04729BAEFDB0078169B /* UpdateAddressView.swift */; };
 		BE20B04A29BC565D0078169B /* AuthKey_K22AWHD46U.p8 in Resources */ = {isa = PBXBuildFile; fileRef = BE20B04929BC565D0078169B /* AuthKey_K22AWHD46U.p8 */; };
+		BE20B04C29BD5DD00078169B /* AuthKey_MWXRWWC3VP.p8 in Resources */ = {isa = PBXBuildFile; fileRef = BE20B04B29BD5DD00078169B /* AuthKey_MWXRWWC3VP.p8 */; };
 		BE3CD65B29B72B0700C19442 /* ProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3CD65A29B72B0700C19442 /* ProgressViewModel.swift */; };
 		BE41783D29B4535800434CFC /* AnimationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE41783C29B4535800434CFC /* AnimationExtension.swift */; };
 		BE41784029B4AB3100434CFC /* FirebaseDynamicLinks in Frameworks */ = {isa = PBXBuildFile; productRef = BE41783F29B4AB3100434CFC /* FirebaseDynamicLinks */; };
@@ -96,6 +97,7 @@
 		BE20B04529BAEF2F0078169B /* DeleteAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteAccountView.swift; sourceTree = "<group>"; };
 		BE20B04729BAEFDB0078169B /* UpdateAddressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateAddressView.swift; sourceTree = "<group>"; };
 		BE20B04929BC565D0078169B /* AuthKey_K22AWHD46U.p8 */ = {isa = PBXFileReference; lastKnownFileType = text; name = AuthKey_K22AWHD46U.p8; path = Artwork_Management/AuthKey_K22AWHD46U.p8; sourceTree = "<group>"; };
+		BE20B04B29BD5DD00078169B /* AuthKey_MWXRWWC3VP.p8 */ = {isa = PBXFileReference; lastKnownFileType = text; name = AuthKey_MWXRWWC3VP.p8; path = Artwork_Management/AuthKey_MWXRWWC3VP.p8; sourceTree = "<group>"; };
 		BE3CD65A29B72B0700C19442 /* ProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressViewModel.swift; sourceTree = "<group>"; };
 		BE41783C29B4535800434CFC /* AnimationExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationExtension.swift; sourceTree = "<group>"; };
 		BEAB502D29A7C6D400ECCB4F /* PageTabNavigateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageTabNavigateView.swift; sourceTree = "<group>"; };
@@ -253,6 +255,7 @@
 		E08F271828DDA08E00329C5E = {
 			isa = PBXGroup;
 			children = (
+				BE20B04B29BD5DD00078169B /* AuthKey_MWXRWWC3VP.p8 */,
 				BE20B04929BC565D0078169B /* AuthKey_K22AWHD46U.p8 */,
 				E08F272328DDA08E00329C5E /* Artwork_Management */,
 				E08F272228DDA08E00329C5E /* Products */,
@@ -523,6 +526,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BE20B04C29BD5DD00078169B /* AuthKey_MWXRWWC3VP.p8 in Resources */,
 				BE20B04A29BC565D0078169B /* AuthKey_K22AWHD46U.p8 in Resources */,
 				E08F272C28DDA09000329C5E /* Preview Assets.xcassets in Resources */,
 				E0455FE0292BBB75004F677D /* GoogleService-Info.plist in Resources */,

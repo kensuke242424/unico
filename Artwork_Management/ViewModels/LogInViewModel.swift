@@ -457,7 +457,7 @@ class LogInViewModel: ObservableObject {
     
     func deleteAccountFromServer(identityToken: String, authorizationCode: String) {
         // 認証用の秘密鍵の読み込み
-        guard let filePath = Bundle.main.path(forResource: "AuthKey_K22AWHD46U", ofType: "p8") else {
+        guard let filePath = Bundle.main.path(forResource: "AuthKey_MWXRWWC3VP", ofType: "p8") else {
             print("秘密鍵が見つかりません")
             return
         }

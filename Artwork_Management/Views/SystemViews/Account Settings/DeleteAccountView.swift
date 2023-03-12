@@ -14,13 +14,13 @@ struct DeleteAccountView: View {
     var body: some View {
         VStack {
             // Sign In With Apple...
-            SignInWithAppleButton(.continue) { request in
-                logInVM.handleSignInWithAppleRequest(request)
-            } onCompletion: { result in
-                let credencial = logInVM.getSignOutWithAppleCredential(result)
-                logInVM.signOutAndDeleteAccount(credencial: credencial)
-            }
-            .buttonStyle(.borderedProminent)
+//            SignInWithAppleButton(.continue) { request in
+//                logInVM.handleSignInWithAppleRequest(request)
+//            } onCompletion: { result in
+//                let credencial = logInVM.getSignOutWithAppleCredential(result)
+//                logInVM.signOutAndDeleteAccount(credencial: credencial)
+//            }
+//            .buttonStyle(.borderedProminent)
             
         }
         .customSystemBackground()
