@@ -1013,7 +1013,9 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         
             .overlay(alignment: .leading) {
                 Circle().frame(width: 12, height: 12)
-                    .foregroundColor(inputLogIn.createAccountFase != .fase1 ? .green : .white)
+                    .foregroundColor(inputLogIn.createAccountFase != .fase1 ? .green :
+                                     inputLogIn.createAccountFase == .fase1 &&
+                                     inputLogIn.createAccountShowContents ? .yellow : .white)
                     .scaleEffect(inputLogIn.createAccountFase == .fase1 && inputLogIn.createAccountShowContents ? 1.5 : 1.0)
                     .overlay(alignment: .top) {
                         Text("Check!")
@@ -1027,7 +1029,9 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             .overlay {
                 Circle().frame(width: 12, height: 12)
                     .foregroundColor(inputLogIn.createAccountFase != .fase1 &&
-                                     inputLogIn.createAccountFase != .fase2 ? .green : .white)
+                                     inputLogIn.createAccountFase != .fase2 ? .green :
+                                     inputLogIn.createAccountFase == .fase2 &&
+                                     inputLogIn.createAccountShowContents ? .yellow : .white)
                     .scaleEffect(inputLogIn.createAccountFase == .fase2 && inputLogIn.createAccountShowContents ? 1.5 : 1.0)
                     .overlay(alignment: .top) {
                         Text("Check!")
@@ -1042,7 +1046,9 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 Circle().frame(width: 12, height: 12)
                     .foregroundColor(inputLogIn.createAccountFase != .fase1 &&
                                      inputLogIn.createAccountFase != .fase2 &&
-                                     inputLogIn.createAccountFase != .fase3 ? .green : .white)
+                                     inputLogIn.createAccountFase != .fase3 ? .green :
+                                     inputLogIn.createAccountFase == .fase3 &&
+                                     inputLogIn.createAccountShowContents ? .yellow : .white)
                     .scaleEffect(inputLogIn.createAccountFase == .fase3 && inputLogIn.createAccountShowContents ? 1.5 : 1.0)
                     .overlay(alignment: .top) {
                         Text("Check!")
