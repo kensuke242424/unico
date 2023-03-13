@@ -14,6 +14,7 @@
 		BE20B04A29BC565D0078169B /* AuthKey_K22AWHD46U.p8 in Resources */ = {isa = PBXBuildFile; fileRef = BE20B04929BC565D0078169B /* AuthKey_K22AWHD46U.p8 */; };
 		BE20B04C29BD5DD00078169B /* AuthKey_MWXRWWC3VP.p8 in Resources */ = {isa = PBXBuildFile; fileRef = BE20B04B29BD5DD00078169B /* AuthKey_MWXRWWC3VP.p8 */; };
 		BE24374B29BE3A3F000C2D01 /* UIImageRectIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE24374A29BE3A3F000C2D01 /* UIImageRectIcon.swift */; };
+		BE254F9329BF1104004FE9AE /* UserEntryRecommendationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE254F9229BF1104004FE9AE /* UserEntryRecommendationView.swift */; };
 		BE3CD65B29B72B0700C19442 /* ProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3CD65A29B72B0700C19442 /* ProgressViewModel.swift */; };
 		BE41783D29B4535800434CFC /* AnimationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE41783C29B4535800434CFC /* AnimationExtension.swift */; };
 		BE41784029B4AB3100434CFC /* FirebaseDynamicLinks in Frameworks */ = {isa = PBXBuildFile; productRef = BE41783F29B4AB3100434CFC /* FirebaseDynamicLinks */; };
@@ -100,6 +101,7 @@
 		BE20B04929BC565D0078169B /* AuthKey_K22AWHD46U.p8 */ = {isa = PBXFileReference; lastKnownFileType = text; name = AuthKey_K22AWHD46U.p8; path = Artwork_Management/AuthKey_K22AWHD46U.p8; sourceTree = "<group>"; };
 		BE20B04B29BD5DD00078169B /* AuthKey_MWXRWWC3VP.p8 */ = {isa = PBXFileReference; lastKnownFileType = text; name = AuthKey_MWXRWWC3VP.p8; path = Artwork_Management/AuthKey_MWXRWWC3VP.p8; sourceTree = "<group>"; };
 		BE24374A29BE3A3F000C2D01 /* UIImageRectIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageRectIcon.swift; sourceTree = "<group>"; };
+		BE254F9229BF1104004FE9AE /* UserEntryRecommendationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserEntryRecommendationView.swift; sourceTree = "<group>"; };
 		BE3CD65A29B72B0700C19442 /* ProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressViewModel.swift; sourceTree = "<group>"; };
 		BE41783C29B4535800434CFC /* AnimationExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationExtension.swift; sourceTree = "<group>"; };
 		BEAB502D29A7C6D400ECCB4F /* PageTabNavigateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageTabNavigateView.swift; sourceTree = "<group>"; };
@@ -399,6 +401,7 @@
 				E0DE98D528E2D85E00471AB4 /* LogInCheckView.swift */,
 				E0A3B995292EFCE500209ADC /* CreateAndJoinTeamView.swift */,
 				E0F0180D2975A9E10063C96B /* JoinUserDetectCheckView.swift */,
+				BE254F9229BF1104004FE9AE /* UserEntryRecommendationView.swift */,
 			);
 			path = LogInViews;
 			sourceTree = "<group>";
@@ -620,6 +623,7 @@
 				E0003D0328FD3BB0007308B0 /* TagTitle.swift in Sources */,
 				E01E13942920EE850001F2DA /* EmptyItemView.swift in Sources */,
 				E01E1390291D168B0001F2DA /* SystemSideMenu.swift in Sources */,
+				BE254F9329BF1104004FE9AE /* UserEntryRecommendationView.swift in Sources */,
 				BE3CD65B29B72B0700C19442 /* ProgressViewModel.swift in Sources */,
 				E0CF7EF428DF385800735142 /* ItemCards.swift in Sources */,
 				E05FE94528F71BFB00263F98 /* ColorExtension.swift in Sources */,

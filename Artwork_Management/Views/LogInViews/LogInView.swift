@@ -69,7 +69,7 @@ enum AddressSignInFase {
     var messageText: (text1: String, text2: String) {
         switch self {
         case .start   : return ("メールアドレスに本人確認メールを送ります。"  ,
-                                "メール内のリンクからunicoへアクセスしてください。")
+                                "届いたメールからunicoへアクセスしてください。")
             
         case .check   : return ("メールアドレスをチェックしています..."          ,
                                 ""                                        )
@@ -167,6 +167,7 @@ struct InputLogIn {
     var createAccountShowContents: Bool = false
     var isShowPickerView: Bool = false
     var isShowGoBackLogInAlert: Bool = false
+    var isShowUserEntryRecommendation = false
     var keyboardOffset: CGFloat = 0.0
     var repeatAnimation: Bool = false
     var sendAddressButtonDisabled: Bool = true
@@ -340,6 +341,11 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 
                 // メールアドレス登録選択時に出現するアドレス入力ハーフシートView
                 inputAdressHalfSheet()
+                
+                UserEntryRecommendationView(logInVM: logInVM,
+                                            isShow: $inputLogIn.isShowUserEntryRecommendation)
+                .opacity(inputLogIn.isShowUserEntryRecommendation ? 1.0 : 0.0)
+                .offset(y: inputLogIn.isShowUserEntryRecommendation ? 0 : getRect().height)
             }
             
         } // ZStack
@@ -581,18 +587,18 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 .tracking(2)
 
             Button {
-                
-                // 匿名ログイン選択時の処理
-                // TODO: アカウント登録によって解放される機能を通知する
-                logInVM.signInAnonymously()
-
+                // お試しログイン選択時の処理
+                hapticSuccessNotification()
+                withAnimation(.easeInOut(duration: 0.4)) {
+                    inputLogIn.isShowUserEntryRecommendation.toggle()
+                }
             } label: {
                 ZStack {
                     RoundedRectangle(cornerRadius: 15)
-                        .fill(.green.gradient)
+                        .fill(.gray.gradient)
                         .frame(width: 250, height: 50)
                         .shadow(radius: 10, x: 5, y: 5)
-                    Label("匿名でログイン", systemImage: "person.crop.circle.fill")
+                    Label("お試しでログイン", systemImage: "person.crop.circle.fill")
                         .fontWeight(.semibold)
                         .tracking(2)
                         .foregroundColor(.white)
