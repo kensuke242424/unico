@@ -28,9 +28,9 @@ struct UserEntryRecommendationView: View {
                 .foregroundColor(.white)
                 
                 VStack(alignment: .leading, spacing: 20) {
-                    Text("\(Image(systemName: "person.2.fill")) 他のユーザーのチームへの参加")
-                    Text("\(Image(systemName: "person.wave.2.fill"))  自分のチームにユーザーを招待")
-                    Text("\(Image(systemName: "cube.transparent.fill"))  永続的なアカウントの保存")
+                    Label("他のユーザーのチームへの参加", systemImage: "person.2.fill")
+                    Label(" 自分のチームにユーザーを招待", systemImage: "person.wave.2.fill")
+                    Label(" 永続的なデータの保存", systemImage: "cube.transparent.fill")
                 }
                 .font(.subheadline)
                 .fontWeight(.semibold)
@@ -53,7 +53,6 @@ struct UserEntryRecommendationView: View {
                 }
                 .font(.footnote)
                 .foregroundColor(.white.opacity(0.8))
-                
             }
             
             // 下部の選択ボタンを保有するView
@@ -81,7 +80,7 @@ struct UserEntryRecommendationView: View {
             }
             
         }
-        .frame(width: getRect().width - 50, height: getRect().height - 300)
+        .frame(width: getRect().width - 50, height: getRect().height)
         .offset(y: 50)
         .background {
             ZStack {
