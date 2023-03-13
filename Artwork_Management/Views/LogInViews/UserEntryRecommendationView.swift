@@ -30,6 +30,7 @@ struct UserEntryRecommendationView: View {
                 VStack(alignment: .leading, spacing: 20) {
                     Label("他のユーザーのチームへの参加", systemImage: "person.2.fill")
                     Label(" 自分のチームにユーザーを招待", systemImage: "person.wave.2.fill")
+                        .offset(x: 2)
                     Label(" 永続的なデータの保存", systemImage: "cube.transparent.fill")
                 }
                 .font(.subheadline)
@@ -47,7 +48,7 @@ struct UserEntryRecommendationView: View {
                 .padding(.vertical)
                 
                 VStack(alignment: .leading, spacing: 20) {
-                    Text("※お試しアカウントは作成した日から30日間で\n  自動的にデータが削除されます。")
+                    Text("※お試しアカウントの期間は作成した日から30日間です。\n  30日後、自動的にデータが削除されます。")
                     Text("※アカウント登録はお試し期間中いつでも可能です。\n  登録が完了すると、お試しアカウントから\n  登録済みアカウントに切り替わります。管理していた\n  アイテムやデータは全て引き継がれます。")
                         
                 }

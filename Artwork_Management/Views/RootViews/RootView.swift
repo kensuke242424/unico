@@ -73,6 +73,7 @@ struct RootView: View {
             }
 
         } // ZStack
+        .preferredColorScheme(.dark)
 
         // fetch...
         .onChange(of: logInVM.rootNavigation) { navigation in
