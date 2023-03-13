@@ -73,20 +73,6 @@ struct RootView: View {
             }
 
         } // ZStack
-//        .background {
-//            ZStack {
-//
-//                Image("background_1")
-//                    .resizable()
-//                    .scaledToFill()
-//                    .blur(radius: 2)
-//                    .ignoresSafeArea()
-//
-//                Color(.black).opacity(0.3)
-//                    .background(.ultraThinMaterial).opacity(0.45)
-//                    .ignoresSafeArea()
-//            }
-//        }
 
         // fetch...
         .onChange(of: logInVM.rootNavigation) { navigation in
@@ -94,6 +80,7 @@ struct RootView: View {
             if navigation == .fetch {
                 Task {
                     do {
+                        logInVM.addressSignInFase = .start // アドレスログインフローを初期化
                         try await userVM.fetchUser()
                         guard let user = userVM.user else {
                             print("userVMのuserがnilです。ログイン画面に戻ります。")
@@ -185,11 +172,11 @@ struct RootView: View {
                 }
                 // ダイナミックリンクが有効かチェック
                 // リンクが有効だった場合、メールリンクからのサインインメソッド実行
-                // TODO: メールリンクから遷移が成功したら、データのフェッチ開始までProgressViewを表示
                 let defaults = UserDefaults.standard
                 if let email = defaults.string(forKey: "Email") {
                     progress.isShow.toggle()
                     withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
+                        // ViewModel内のアドレスログインフローに関わる状態を初期化
                         logInVM.showEmailHalfSheet.toggle()
                         logInVM.showEmailSheetBackground = false
                     }

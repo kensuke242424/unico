@@ -24,7 +24,7 @@ class LogInViewModel: ObservableObject {
     @Published var rootNavigation: RootNavigation = .logIn
     
     @Published var AlreadyExistsUserDocument: Bool = false
-    @Published var existsCurrentUserCheck: Bool = false
+    @Published var existCurrentUserCheck: Bool = false
     @Published var isShowLogInFlowAlert: Bool = false
     @Published var showEmailHalfSheet: Bool = false
     @Published var showEmailSheetBackground: Bool = false
@@ -52,13 +52,13 @@ class LogInViewModel: ObservableObject {
             if user != nil {
                 print("currentUserCheck_サインイン⭕️")
                 print("uid: \(self.uid ?? "アンラップ失敗")")
-                self.existsCurrentUserCheck = true
-                print("checkCurrentUserExists: \(self.existsCurrentUserCheck)")
+                self.existCurrentUserCheck = true
+                print("checkCurrentUserExists: \(self.existCurrentUserCheck)")
                 
             } else {
                 print("currentUserCheck_サインイン❌")
                 print("uid: \(self.uid ?? "nil")")
-                self.existsCurrentUserCheck = false
+                self.existCurrentUserCheck = false
             }
         }
     }
@@ -87,50 +87,6 @@ class LogInViewModel: ObservableObject {
         // sha256 ⇨ 256文字のハッシュ関数を生成し暗号化。サインイン認証時に照らし合わせる
         // 元となる文字列の文字数に関係なく256文字が生成される。この値はサインイン処理のたびに異なる値を照らし合わせる。
         request.nonce = sha256(nonce)
-    }
-
-    @MainActor
-    func handleSignInWithAppleCompletion(_ result: Result<ASAuthorization, Error>) {
-        if case .failure(let failure) = result {
-            logInErrorAlertMessage = failure.localizedDescription
-        }
-        else if case .success(let success) = result {
-            // ASAuthorizationAppleIDCredential: AppleID認証が成功した結果として得られる資格情報。
-            if let appleIDCredential = success.credential as? ASAuthorizationAppleIDCredential {
-                guard let nonce = currentNonce else {
-                    fatalError("fatalError: handleSignInWithAppleCompletion_currentNonceの値が存在しません。")
-                }
-                guard let appleIDToken = appleIDCredential.identityToken else {
-                    print("Unable to fetch identify token。識別トークンをフェッチできません。")
-                    return
-                }
-                guard let authorizationCode = appleIDCredential.authorizationCode else {
-                    print("Unable to fetch authorizationCode。")
-                    return
-                }
-                guard let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
-                    print("Unable to serialise token string from data: \(appleIDToken.debugDescription). データからトークン文字列をシリアライズできません。")
-                    return
-                }
-                
-                print("＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝")
-                print("appleIDToken: \(appleIDToken)")
-                print("authorizationCode: \(authorizationCode)")
-                print("＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝")
-
-                let credential = OAuthProvider.credential(withProviderID: "apple.com",
-                                                          idToken: idTokenString,
-                                                          rawNonce: nonce)
-                Task {
-                    do {
-                         _ = try await Auth.auth().signIn(with: credential)
-                        print("Sign In With Appleからのアカウント登録完了")
-                    } catch {
-                        print("Error authenticating: \(error.localizedDescription)")
-                    }
-                }
-            }
-        }
     }
     
     //  TODO: メソッド名がわかりにくい気がする...
@@ -397,7 +353,62 @@ class LogInViewModel: ObservableObject {
       return hashString
     }
     
+    func logOut() {
+        do {
+            try Auth.auth().signOut()
+            print("ログアウト成功")
+        } catch let signOutError as NSError {
+            print("Error signing out: %@", signOutError)
+            print("ログアウト失敗")
+        }
+    }
+    
+    @MainActor
+    // TODO: Sign in with Appleはまだ実装できていない。
+    func handleSignInWithAppleCompletion(_ result: Result<ASAuthorization, Error>) {
+        if case .failure(let failure) = result {
+            logInErrorAlertMessage = failure.localizedDescription
+        }
+        else if case .success(let success) = result {
+            // ASAuthorizationAppleIDCredential: AppleID認証が成功した結果として得られる資格情報。
+            if let appleIDCredential = success.credential as? ASAuthorizationAppleIDCredential {
+                guard let nonce = currentNonce else {
+                    fatalError("fatalError: handleSignInWithAppleCompletion_currentNonceの値が存在しません。")
+                }
+                guard let appleIDToken = appleIDCredential.identityToken else {
+                    print("Unable to fetch identify token。識別トークンをフェッチできません。")
+                    return
+                }
+                guard let authorizationCode = appleIDCredential.authorizationCode else {
+                    print("Unable to fetch authorizationCode。")
+                    return
+                }
+                guard let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
+                    print("Unable to serialise token string from data: \(appleIDToken.debugDescription). データからトークン文字列をシリアライズできません。")
+                    return
+                }
+                
+                print("＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝")
+                print("appleIDToken: \(appleIDToken)")
+                print("authorizationCode: \(authorizationCode)")
+                print("＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝")
+
+                let credential = OAuthProvider.credential(withProviderID: "apple.com",
+                                                          idToken: idTokenString,
+                                                          rawNonce: nonce)
+                Task {
+                    do {
+                         _ = try await Auth.auth().signIn(with: credential)
+                        print("Sign In With Appleからのアカウント登録完了")
+                    } catch {
+                        print("Error authenticating: \(error.localizedDescription)")
+                    }
+                }
+            }
+        }
+    }
     // --- 🔥アップルサインインアカウントのサインアウト&AppleID連携解除のメソッド🔥  ---
+    // TODO: Sign in with Appleはまだ実装できていない。
     func signOutAndDeleteAccount(credencial:  ASAuthorizationAppleIDCredential?) {
       // Firebase Authenticationからサインアウトする
       do {
@@ -420,6 +431,7 @@ class LogInViewModel: ObservableObject {
       deleteAccountFromServer(identityToken: identityToken, authorizationCode: authorizationCode)
     }
     // アップルサインインデータを削除するために必要な「appleIDToken」「authorizationCode」を保持するASAuthorizationAppleIDCredentialを取得するメソッド
+    // TODO: Sign in with Appleはまだ実装できていない。
     func getSignOutWithAppleCredential(_ result: Result<ASAuthorization, Error>) ->  ASAuthorizationAppleIDCredential? {
         
         print("getSignOutWithAppleCredentialメソッド実行")
@@ -455,6 +467,7 @@ class LogInViewModel: ObservableObject {
         return credential
     }
     
+    // TODO: Sign in with Appleはまだ実装できていない。
     func deleteAccountFromServer(identityToken: String, authorizationCode: String) {
         // 認証用の秘密鍵の読み込み
         guard let filePath = Bundle.main.path(forResource: "AuthKey_MWXRWWC3VP", ofType: "p8") else {
@@ -525,17 +538,6 @@ class LogInViewModel: ObservableObject {
             // ...
         }
         task.resume()
-    }
-
-    
-    func logOut() {
-        do {
-            try Auth.auth().signOut()
-            print("ログアウト成功")
-        } catch let signOutError as NSError {
-            print("Error signing out: %@", signOutError)
-            print("ログアウト失敗")
-        }
     }
     
     deinit {

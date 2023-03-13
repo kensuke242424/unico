@@ -342,7 +342,6 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 inputAdressHalfSheet()
             }
             
-            
         } // ZStack
         // ログインフロー全体のアラートを管理
         .alert(logInVM.logInAlertMessage.title,
@@ -361,7 +360,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 
             case .existsUserDocument         :
                 Button("戻る") {
-                    logInVM.existsCurrentUserCheck = false
+                    logInVM.existCurrentUserCheck = false
                     logInVM.logOut()
                 }
                 Button("ログイン") {
@@ -373,12 +372,13 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 
             case .existEmailAddressAccount   :
                 Button("戻る") {
-                    logInVM.existsCurrentUserCheck = false
+                    logInVM.existCurrentUserCheck = false
                     logInVM.addressSignInFase = .start
                     logInVM.logOut()
                 }
                 Button("ログイン") {
                     withAnimation(.spring(response: 0.5)) {
+                        logInVM.selectSignInType = .logIn
                         logInVM.rootNavigation = .fetch
                     }
                 }
@@ -437,7 +437,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         
         // currentUserを監視するリスナーによってサインインが検知されたら、ユーザが選択したサインインフローに分岐して処理
         // (ログイン or サインアップ)
-        .onChange(of: logInVM.existsCurrentUserCheck) { currentCheck in
+        .onChange(of: logInVM.existCurrentUserCheck) { currentCheck in
             print("logInVM.checkCurrentUserExists更新を検知")
             print("checkCurrentUserExists: \(currentCheck)")
             if !currentCheck {
@@ -447,7 +447,9 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 
             case .start: print("")
 
-            case .logIn: withAnimation(.spring(response: 0.5)) { logInVM.rootNavigation = .fetch }
+            case .logIn: withAnimation(.spring(response: 0.5)) {
+                logInVM.rootNavigation = .fetch
+            }
             
             case .signAp:
                 // ✅ユーザーがサインアップを選択していた場合は、ユーザードキュメントが既に作られているか確認する必要がある✅
@@ -455,7 +457,6 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 Task {
                     // サインアップ実行ユーザに既にuserDocumentが存在するかチェック
                     let existCheckResult = try await logInVM.existUserDocumentCheck()
-                    // もし既にユーザドキュメントが存在した場合は、既存のドキュメントへのログインを促すアラートを出して処理を終了
                     if existCheckResult == true {
                         print("既に登録されているuserドキュメントを検知")
                         return
