@@ -70,13 +70,18 @@ struct UserEntryRecommendationView: View {
                     }
                     .buttonStyle(.borderedProminent)
                     Button("お試しで始める") {
-                        Task {
-                            logInVM.selectSignInType = .signAp
-                            logInVM.signInAnonymously()
-                            withAnimation(.easeInOut(duration: 0.3)) {
-                                isShow.toggle()
-                            }
+                        
+                        logInVM.signInAnonymously()
+                        
+                        withAnimation(.easeInOut(duration: 0.5)) {
+                            isShow.toggle()
                         }
+                        withAnimation(.spring(response: 0.8).delay(0.5)) {
+                            logInVM.selectSignInType   = .signAp
+                            logInVM.createAccountFase  = .check
+                            logInVM.selectProviderType = .trial
+                        }
+                        
                     }
                     .buttonStyle(.borderedProminent)
                 }

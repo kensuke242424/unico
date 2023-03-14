@@ -109,20 +109,21 @@ struct RootView: View {
                         try await teamVM.fetchTeam(teamID: lastLogInTeamID)
                             await tagVM.fetchTag(teamID: lastLogInTeamID)
                             await itemVM.fetchItem(teamID: lastLogInTeamID)
-                        
-                        
-                        /// ログインが完了したら、LogInViewの操作フローを初期化
-                        logInVM.selectSignInType     = .start
-                        logInVM.selectProviderType   = .start
-                        logInVM.addressSignInFase    = .start
 
                         /// チームandユーザーデータのリスナーを起動
                         _ = try await teamVM.teamRealtimeListener()
                         _ = try await userVM.userRealtimeListener()
                         
                         /// ホーム画面へ遷移
-                        withAnimation(.spring(response: 1)) {
-                            logInVM.rootNavigation = .home
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                            withAnimation(.spring(response: 1)) {
+                                logInVM.rootNavigation = .home
+                                /// ログインが完了したら、LogInViewの操作フローを初期化
+                                logInVM.createAccountFase    = .start
+                                logInVM.selectSignInType     = .start
+                                logInVM.selectProviderType   = .start
+                                logInVM.addressSignInFase    = .start
+                            }
                         }
 
                     } catch CustomError.uidEmpty {

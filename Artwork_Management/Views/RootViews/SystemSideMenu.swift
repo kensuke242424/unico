@@ -69,38 +69,44 @@ struct SystemSideMenu: View {
             VStack {
 
                 VStack(alignment: .leading, spacing: 20) {
-
-                    AsyncImageCircleIcon(photoURL: teamVM.team!.iconURL, size: getRect().width / 3 + 20)
-                        .overlay(alignment: .topTrailing) {
-                            Button {
-                                // チーム一覧のハーフモーダル
-                            } label: {
-                                Circle()
-                                    .foregroundColor(userVM.user!.userColor.color3)
-                                    .frame(width: 40, height: 40)
-                                    .shadow(radius: 5, x: 5, y: 5)
-                                    .overlay {
-                                        Image(systemName: "person.2.crop.square.stack")
-                                            .resizable()
-                                            .frame(width: 20, height: 20)
-                                            .foregroundColor(.white)
-                                    }
-                            }
-                            .offset(x: 40, y: -10)
+                    
+                    Group {
+                        if let iconURL = teamVM.team?.iconURL {
+                            AsyncImageCircleIcon(photoURL: iconURL, size: getRect().width / 3 + 20)
+                        } else {
+                            CubeCircleIcon(size: getRect().width / 3 + 20)
                         }
-
-                        .overlay(alignment: .bottomTrailing) {
-                            AsyncImageCircleIcon(photoURL: userVM.user!.iconURL, size: getRect().width / 6)
-                                .offset(x: getRect().width / 4 - 10)
+                    }
+                    .overlay(alignment: .topTrailing) {
+                        Button {
+                            // チーム一覧のハーフモーダル
+                        } label: {
+                            Circle()
+                                .foregroundColor(userVM.user!.userColor.color3)
+                                .frame(width: 40, height: 40)
+                                .shadow(radius: 5, x: 5, y: 5)
+                                .overlay {
+                                    Image(systemName: "person.2.crop.square.stack")
+                                        .resizable()
+                                        .frame(width: 20, height: 20)
+                                        .foregroundColor(.white)
+                                }
                         }
-                        .overlay(alignment: .bottom) {
-                            if teamVM.team!.name.count < 12 {
-                                Text(teamVM.team!.name)
-                                    .font(.title3.bold()).foregroundColor(.white)
-                                    .frame(width: getRect().width * 0.7)
-                                    .offset(y: 35)
-                            }
+                        .offset(x: 40, y: -10)
+                    }
+                    
+                    .overlay(alignment: .bottomTrailing) {
+                        AsyncImageCircleIcon(photoURL: userVM.user?.iconURL, size: getRect().width / 6)
+                            .offset(x: getRect().width / 4 - 10)
+                    }
+                    .overlay(alignment: .bottom) {
+                        if teamVM.team!.name.count < 12 {
+                            Text(teamVM.team!.name)
+                                .font(.title3.bold()).foregroundColor(.white)
+                                .frame(width: getRect().width * 0.7)
+                                .offset(y: 35)
                         }
+                    }
                     if teamVM.team!.name.count >= 12 {
                         Text(teamVM.team!.name)
                             .font(.title3.bold()).foregroundColor(.white)
@@ -110,127 +116,127 @@ struct SystemSideMenu: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
                 .padding(.top)
-
+                
                 Spacer(minLength: 40)
                 HStack {
                     ScrollView(showsIndicators: false) {
                         VStack(alignment: .leading, spacing: 60) {
-
+                            
                             // Item Menu...
                             VStack(alignment: .leading) {
-
+                                
                                 SideMenuButton(open: $inputSideMenu.item, title: "アイテム", image: "shippingbox")
-
+                                
                                 if inputSideMenu.item {
-
+                                    
                                     VStack(alignment: .leading, spacing: 40) {
-
+                                        
                                         Label("アイテム追加", systemImage: "shippingbox.fill")
-                                        .onTapGesture {
-                                            inputHome.editItemStatus = .create
-                                            inputHome.isPresentedEditItem.toggle()
-                                        }
-
+                                            .onTapGesture {
+                                                inputHome.editItemStatus = .create
+                                                inputHome.isPresentedEditItem.toggle()
+                                            }
+                                        
                                     } // VStack
                                     .foregroundColor(.white)
                                     .frame(width: 210, height: 60, alignment: .topLeading)
                                     .offset(x: 20, y: 30)
-
+                                    
                                 }
                             }
-
+                            
                             // Tag Menu...
                             VStack(alignment: .leading) {
-
+                                
                                 HStack {
-
+                                    
                                     SideMenuButton(open: $inputSideMenu.tag, title: "タグ", image: "tag")
-
+                                    
                                     if inputSideMenu.tag {
-
+                                        
                                         if tagVM.tags.count > 2 {
                                             Button(action: {
                                                 withAnimation {
                                                     inputSideMenu.editMode = inputSideMenu.editMode.isEditing ? .inactive : .active
                                                 }
-
+                                                
                                             }, label: {
                                                 Text(inputSideMenu.editMode.isEditing ? "終了" : "編集")
                                             })
                                             .offset(x: 20)
                                         }
-
+                                        
                                         Button {
                                             inputTag.tagSideMenuStatus = .create
-
+                                            
                                             withAnimation(.spring(response: 0.3, blendDuration: 1)) {
                                                 inputHome.isOpenEditTagSideMenu.toggle()
                                             }
-
+                                            
                                             withAnimation(.easeIn(duration: 0.2)) {
                                                 inputHome.editTagSideMenuBackground.toggle()
                                             }
-
+                                            
                                         } label: {
                                             Image(systemName: "plus.square")
                                         }
                                         .offset(x: 30)
                                     }
                                 } // HStack
-
+                                
                                 if inputSideMenu.tag {
-
+                                    
                                     Spacer(minLength: 0)
-
+                                    
                                     if tagVM.tags.count > 2 {
                                         List {
-
+                                            
                                             ForEach(Array(tagVM.tags.enumerated()), id: \.offset) { offset, tag in
-
+                                                
                                                 if tag != tagVM.tags.first! && tag != tagVM.tags.last! {
                                                     HStack {
                                                         Image(systemName: "tag.fill")
                                                             .font(.caption)
                                                             .foregroundColor(tag.tagColor.color)
                                                             .opacity(0.6)
-
+                                                        
                                                         Text(tag.tagName)
                                                             .lineLimit(1)
                                                             .frame(alignment: .leading)
                                                             .foregroundColor(.white)
-
+                                                        
                                                         Spacer()
-
+                                                        
                                                         if inputSideMenu.editMode == .inactive {
                                                             Image(systemName: "highlighter")
-                                                            .foregroundColor(.gray)
-                                                            .opacity(inputSideMenu.editMode.isEditing ? 0.0 : 0.6)
-                                                            .onTapGesture {
-
-                                                                print("タグ編集ボタンタップ")
-                                                                inputTag.tagSideMenuStatus = .update
-                                                                inputSideMenu.selectTag = tag
-                                                                inputTag.newTagNameText = tag.tagName
-                                                                inputTag.selectionSideMenuTagColor = tag.tagColor
-
-                                                                withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                                                                    inputHome.isOpenEditTagSideMenu.toggle()
+                                                                .foregroundColor(.gray)
+                                                                .opacity(inputSideMenu.editMode.isEditing ? 0.0 : 0.6)
+                                                                .onTapGesture {
+                                                                    
+                                                                    print("タグ編集ボタンタップ")
+                                                                    inputTag.tagSideMenuStatus = .update
+                                                                    inputSideMenu.selectTag = tag
+                                                                    inputTag.newTagNameText = tag.tagName
+                                                                    inputTag.selectionSideMenuTagColor = tag.tagColor
+                                                                    
+                                                                    withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+                                                                        inputHome.isOpenEditTagSideMenu.toggle()
+                                                                    }
+                                                                    
+                                                                    withAnimation(.easeIn(duration: 0.2)) {
+                                                                        inputHome.editTagSideMenuBackground.toggle()
+                                                                    }
                                                                 }
-
-                                                                withAnimation(.easeIn(duration: 0.2)) {
-                                                                    inputHome.editTagSideMenuBackground.toggle()
-                                                                }
-                                                            }
                                                         }
-
+                                                        
                                                     } // HStack
                                                     .overlay {
                                                         if colorScheme == .light {
                                                             Image(systemName: "line.3.horizontal")
-                                                            .foregroundColor(.gray)
-                                                            .opacity(inputSideMenu.editMode.isEditing ? 0.6 : 0.0)
-                                                            .frame(width: UIScreen.main.bounds.width * 0.58, alignment: .leading)
-                                                            .offset(x: UIScreen.main.bounds.width * 0.44)
+                                                                .foregroundColor(.gray)
+                                                                .opacity(inputSideMenu.editMode.isEditing ? 0.6 : 0.0)
+                                                                .frame(width: UIScreen.main.bounds.width * 0.58, alignment: .leading)
+                                                                .offset(x: UIScreen.main.bounds.width * 0.44)
                                                         }
                                                     }
                                                     .listRowBackground(Color.clear)

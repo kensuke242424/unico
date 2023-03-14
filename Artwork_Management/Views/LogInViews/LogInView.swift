@@ -22,7 +22,7 @@ enum SelectProviderType {
 }
 
 enum CreateAccountFase {
-    case start, fase1, fase2, fase3, success
+    case start, fase1, fase2, fase3, check, success
 }
 
 enum ShowKyboard {
@@ -173,9 +173,6 @@ struct InputLogIn {
     var sendAddressButtonDisabled   : Bool = true
     var selectBackground            : Background = .sample1
     
-    /// ログインフローの進行を管理するプロパティ
-    var createAccountFase: CreateAccountFase = .start
-    
     /// Sheetやアラートなどのプレゼンテーションを管理するプロパティ
     var isShowPickerView             : Bool = false
     var isShowUserEntryRecommendation: Bool = false
@@ -198,7 +195,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
     @State private var inputLogIn: InputLogIn = InputLogIn()
     @State private var createFaseLineImprove: CGFloat = 0.0
     
-    @FocusState private var showKyboard: ShowKyboard?
+    @FocusState private var showEmailKyboard: ShowKyboard?
+    @FocusState private var showUserNameKyboard: ShowKyboard?
     
     var body: some View {
         
@@ -213,8 +211,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 }
             }
             .offset(x: -getRect().width / 3, y: -getRect().height / 2.5 - 5)
-            .offset(x: inputLogIn.createAccountFase == .fase3 || inputLogIn.createAccountFase == .fase3 ? 0 : 30)
-            .opacity(inputLogIn.createAccountFase == .fase3 || inputLogIn.createAccountFase == .fase3 ? 1.0 : 0.0)
+            .offset(x: logInVM.createAccountFase == .fase3 ? 0 : 30)
+            .opacity(logInVM.createAccountFase == .fase3 ? 1.0 : 0.0)
             .onTapGesture { inputLogIn.isShowPickerView.toggle() }
             
             LogoMark()
@@ -238,16 +236,14 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         signInTitle(title: "ログイン")
                             .padding(.bottom)
                         
-                        ZStack {
-                            logInSelectButtons()
-                        }
+                        logInSelectButtons()
                     }
                     .offset(y: getRect().height / 10)
                     .opacity(logInVM.selectSignInType == .logIn ? 1.0 : 0.0)
                 }
                 
                 // アカウント登録フローで用いるコンテンツ全体のView
-                if inputLogIn.createAccountFase != .start {
+                if logInVM.createAccountFase != .start {
                     createAccountViews()
                 }
                 
@@ -255,6 +251,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 if logInVM.selectSignInType == .signAp {
                     createAccountIndicator()
                         .opacity(inputLogIn.checkBackgroundOpacity)
+                        .opacity(logInVM.createAccountFase == .check ||
+                                 logInVM.createAccountFase == .success ? 0 : 1)
                         .offset(y: -getRect().height / 3 + 30)
                         .padding(.bottom)
                 }
@@ -264,31 +262,36 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     Button {
                         withAnimation(.spring(response: 0.5)) {
                             
-                            if logInVM.selectProviderType == .mailAddress {
-                                logInVM.selectSignInType = .start
-                                return
-                            }
-                            
                             switch logInVM.selectSignInType {
                             case .start: print("")
                             case .logIn: logInVM.selectSignInType = .start
                             case .signAp: print("")
                             }
                             
-                            switch inputLogIn.createAccountFase {
-                            case .start: print("")
+                            switch logInVM.createAccountFase {
+                            case .start:
+                                print("戻るボタンは非表示")
+                                
                             case .fase1:
                                 logInVM.selectSignInType = .start
-                                inputLogIn.createAccountFase = .start
+                                logInVM.createAccountFase = .start
                                 inputLogIn.createAccountTitle = false
                                 inputLogIn.createAccountShowContents = false
+                                
                             case .fase2:
-                                inputLogIn.createAccountFase = .fase1
+                                logInVM.createAccountFase = .fase1
+                                
                             case .fase3:
-                                inputLogIn.createAccountFase = .fase2
-                                if inputLogIn.createUserNameText == "名無し" { inputLogIn.createUserNameText = ""
+                                logInVM.createAccountFase = .fase2
+                                if inputLogIn.createUserNameText == "名無し" {
+                                    inputLogIn.createUserNameText = ""
                                 }
-                            case .success: print("")
+                                
+                            case .check:
+                                print("ボタンアクションは無効化")
+                                
+                            case .success:
+                                print("ボタンアクションは無効化")
                             }
                             
                         }
@@ -297,10 +300,17 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             .fontWeight(.semibold)
                             .foregroundColor(.white.opacity(0.7))
                     }
-                    .disabled(logInVM.addressSignInFase == .success ? true : false)
+                    .disabled(logInVM.addressSignInFase == .success ||
+                              logInVM.addressSignInFase == .check ? true : false)
+                    .disabled(logInVM.createAccountFase == .success ||
+                              logInVM.createAccountFase == .check ? true : false)
                     .opacity(inputLogIn.checkBackgroundOpacity)
-                    .opacity(logInVM.addressSignInFase == .success ? 0.2 : 1.0)
-                    .opacity(inputLogIn.createAccountFase == .fase1 && !inputLogIn.createAccountShowContents ? 0.0 : 1.0)
+                    .opacity(logInVM.addressSignInFase == .success ||
+                             logInVM.addressSignInFase == .check ? 0.2 : 1.0)
+                    .opacity(logInVM.createAccountFase == .success ||
+                             logInVM.createAccountFase == .check ? 0.2 : 1.0)
+                    .opacity(logInVM.createAccountFase == .fase1 &&
+                             !inputLogIn.createAccountShowContents ? 0.0 : 1.0)
                     .offset(y: getRect().height / 2 - 100)
                 }
                 
@@ -316,9 +326,9 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     }
                     .disabled(logInVM.addressSignInFase == .success ? true : false)
                     .opacity(logInVM.addressSignInFase == .success ? 0.2 : 1.0)
-                    .opacity(inputLogIn.createAccountFase == .start ||
-                             inputLogIn.createAccountFase == .fase1 ||
-                             inputLogIn.createAccountFase == .success ? 0.0 : 1.0)
+                    .opacity(logInVM.createAccountFase == .start ||
+                             logInVM.createAccountFase == .fase1 ||
+                             logInVM.createAccountFase == .success ? 0.0 : 1.0)
                     .foregroundColor(.white.opacity(0.5))
                     .offset(x: -getRect().width / 2 + 40, y: getRect().height / 2 - 60 )
                     .alert("確認", isPresented: $inputLogIn.isShowGoBackLogInAlert) {
@@ -333,7 +343,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             withAnimation(.spring(response: 0.7)) {
                                 logInVM.selectSignInType = .start
                                 logInVM.selectProviderType = .start
-                                inputLogIn.createAccountFase = .start
+                                logInVM.createAccountFase = .start
                                 inputLogIn.createAccountTitle = false
                                 inputLogIn.createAccountShowContents = false
                                 if inputLogIn.createUserNameText == "名無し" { inputLogIn.createUserNameText = "" }
@@ -414,9 +424,9 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         }
         .sheet(isPresented: $inputLogIn.isShowPickerView) {
             // .fase1ならバックグラウンドの画像設定、.fase2ならユーザーアイコンの画像設定
-            if inputLogIn.createAccountFase == .fase1 {
+            if logInVM.createAccountFase == .fase1 {
                 PHPickerView(captureImage: $inputLogIn.captureBackgroundImage, isShowSheet: $inputLogIn.isShowPickerView, isShowError: $inputLogIn.captureError)
-            } else if inputLogIn.createAccountFase == .fase2 {
+            } else if logInVM.createAccountFase == .fase2 {
                 PHPickerView(captureImage: $inputLogIn.captureUserIconImage, isShowSheet: $inputLogIn.isShowPickerView, isShowError: $inputLogIn.captureError)
             }
         }
@@ -439,18 +449,21 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     }
                     Color(.black)
                         .frame(width: proxy.size.width, height: proxy.size.height)
-                        .opacity(inputLogIn.checkBackgroundEffect ? 0.0 : 0.2)
+                        .opacity(inputLogIn.checkBackgroundEffect      ? 0.0 :
+                                 logInVM.createAccountFase == .success ? 0.5 :
+                                 0.2)
                 }
                 .ignoresSafeArea()
             }
         }
-        .onChange(of: inputLogIn.createAccountFase) { newFaseValue in
+        .onChange(of: logInVM.createAccountFase) { newFaseValue in
             withAnimation(.spring(response: 1.0)) {
                 switch newFaseValue {
                 case .start: createFaseLineImprove = 0
                 case .fase1: createFaseLineImprove = 0
                 case .fase2: createFaseLineImprove = 100
                 case .fase3: createFaseLineImprove = 200
+                case .check: createFaseLineImprove = 200
                 case .success: createFaseLineImprove = 200
                 }
             }
@@ -463,6 +476,15 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             print("logInVM.existCurrentUserCheck更新を検知")
             if !resultValue { return }
             
+            /// ログインボタンの先からお試しログインを選んだ場合、
+            /// サインアップフローまで一気に飛ばして、各要素TitleとContentsをトグルして表示する
+            if logInVM.selectProviderType == .trial {
+                withAnimation(.easeInOut(duration: 0.5)) {
+                    inputLogIn.createAccountTitle = true
+                    inputLogIn.createAccountShowContents = true
+                }
+            }
+            
             switch logInVM.selectSignInType {
                 
             case .start:
@@ -474,6 +496,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 }
             
             case .signAp:
+                
                 Task {
                     do {
                         /// 以前に作った既存のuserDocumentデータがあるかどうかをチェック
@@ -504,11 +527,20 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         try await teamVM.addTeam(teamData: teamData)
                         try await userVM.addNewJoinTeam(newJoinTeam: joinTeamData)
                         
-                        withAnimation(.spring(response: 0.5)) {
-                            logInVM.rootNavigation = .fetch
+                        /// データ生成の成功を知らせるアニメーションの後、データのフェッチとログイン開始
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                            withAnimation(.spring(response: 1.3)) {
+                                logInVM.createAccountFase = .success
+                            }
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
+                            withAnimation(.spring(response: 0.7)) {
+                                logInVM.rootNavigation = .fetch
+                            }
                         }
                     } catch {
                         print("ユーザーデータの作成に失敗しました")
+                        withAnimation(.spring(response: 0.5)) { logInVM.createAccountFase = .fase3 }
                     }
                 } // Task end
             }
@@ -560,7 +592,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     logInVM.selectSignInType = .signAp
                 }
                 
-                inputLogIn.createAccountFase = .fase1
+                logInVM.createAccountFase = .fase1
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
                     withAnimation(.spring(response: 1.0)) {
                         inputLogIn.createAccountTitle = true
@@ -641,7 +673,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         VStack(spacing: 50) {
             
             Group {
-                switch inputLogIn.createAccountFase {
+                switch logInVM.createAccountFase {
                 case .start:
                     Text("")
                     
@@ -659,19 +691,28 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             .tracking(10)
                         Text("あなたのことを教えてください")
                     }
+                    .frame(maxWidth: .infinity)
                     
                 case .fase3:
                     VStack(spacing: 10) {
                         Text("初めまして、\(inputLogIn.createUserNameText)さん")
                         Text("どちらから登録しますか？")
                     }
-                    .frame(width: 250)
+                    .frame(maxWidth: .infinity)
+                    
+                case .check:
+                    VStack(spacing: 10) {
+                        Text("データを生成しています。")
+                        Text("少しお時間いただきます...")
+                    }
+                    .frame(maxWidth: .infinity)
 
                 case .success:
                     VStack(spacing: 10) {
-                        Text("アカウント登録が完了しました！")
-                            .frame(width: 250)
+                        Text("unicoの準備が完了しました！")
+                        Text("ようこそ、\(inputLogIn.createUserNameText)さん")
                     }
+                    .frame(maxWidth: .infinity)
                 }
             } // Group
             .tracking(5)
@@ -680,11 +721,11 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             .opacity(inputLogIn.createAccountTitle ? 1.0 : 0.0)
             
             Group {
-                switch inputLogIn.createAccountFase {
+                switch logInVM.createAccountFase {
                     
                 case .start: Text("")
                     
-                // Fase1: 背景写真を選んでもらう
+                // Fase1: 背景写真を選んでもらうフェーズ
                 case .fase1:
                     
                     VStack(spacing: 30) {
@@ -744,7 +785,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         withAnimation(.spring(response: 1.0)) {
                             inputLogIn.createAccountTitle = false
                             inputLogIn.createAccountShowContents = false
-                            inputLogIn.createAccountFase = .fase2
+                            logInVM.createAccountFase = .fase2
                         }
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                             withAnimation(.spring(response: 0.8)) {
@@ -778,8 +819,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     }
                     .offset(y: 20)
                     
+                /// ユーザー情報「名前」「アイコン」を入力するフェーズ
                 case .fase2:
-                    
                     Group {
                         if let captureImage = inputLogIn.captureUserIconImage {
                             UIImageCircleIcon(photoImage: captureImage, size: 150)
@@ -803,12 +844,12 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     TextField("", text: $inputLogIn.createUserNameText)
                         .frame(width: 230)
                         .foregroundColor(.white)
-                        .focused($showKyboard, equals: .check)
+                        .focused($showUserNameKyboard, equals: .check)
                         .textInputAutocapitalization(.never)
                         .multilineTextAlignment(.center)
                         .background {
                             ZStack {
-                                Text(showKyboard == nil && inputLogIn.createUserNameText.isEmpty ? "名前を入力" : "")
+                                Text(showUserNameKyboard == nil && inputLogIn.createUserNameText.isEmpty ? "名前を入力" : "")
                                     .foregroundColor(.white.opacity(0.4))
                                 Rectangle().foregroundColor(.white.opacity(0.7)).frame(height: 1)
                                     .offset(y: 20)
@@ -819,7 +860,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         withAnimation(.spring(response: 0.9)) {
                             inputLogIn.createAccountTitle = false
                             inputLogIn.createAccountShowContents = false
-                            inputLogIn.createAccountFase = .fase3
+                            logInVM.createAccountFase = .fase3
                         }
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
                             if inputLogIn.createUserNameText.isEmpty {
@@ -836,13 +877,18 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     .buttonStyle(.borderedProminent)
                     
                 case .fase3:
-                    
                     VStack(spacing: 30) {
                         signInTitle(title: "新規登録")
                         logInSelectButtons()
                     }
+                    
+                case .check:
+                    ProgressView()
+                    
                 case .success:
-                    EmptyView()
+                    UIImageCircleIcon(photoImage: inputLogIn.captureUserIconImage, size: 140)
+                        .transition(AnyTransition.opacity.combined(with: .offset(y: 30)))
+                    
                 }
             }
             .opacity(inputLogIn.createAccountShowContents ? 1.0 : 0.0)
@@ -855,7 +901,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             RoundedRectangle(cornerRadius: 40)
                 .frame(width: getRect().width, height: getRect().height / 2)
                 .foregroundColor(colorScheme == .light ? .customHalfSheetForgroundLight : .customHalfSheetForgroundDark)
-                .onTapGesture { showKyboard = nil }
+                .onTapGesture { showEmailKyboard = nil }
                 .overlay {
                     VStack {
                         HStack {
@@ -867,7 +913,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             Button {
                                 withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
                                     logInVM.showEmailHalfSheet.toggle()
-                                    showKyboard = nil
+                                    showEmailKyboard = nil
                                 }
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                                     logInVM.showEmailSheetBackground.toggle()
@@ -979,7 +1025,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         
                         
                         TextField("メールアドレスを入力", text: $inputLogIn.address)
-                            .focused($showKyboard, equals: .check)
+                            .focused($showEmailKyboard, equals: .check)
                             .autocapitalization(.none)
                             .padding()
                             .frame(width: getRect().width * 0.8, height: 30)
@@ -987,7 +1033,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                 RoundedRectangle(cornerRadius: 10)
                                     .foregroundColor(colorScheme == .dark ? .gray.opacity(0.2) : .white)
                                     .frame(height: 30)
-                                    .shadow(color: showKyboard == .check ? .blue : .clear, radius: 3)
+                                    .shadow(color: showEmailKyboard == .check ? .blue : .clear, radius: 3)
                             )
                             .padding(20)
                             .onChange(of: inputLogIn.address) { newValue in
@@ -1029,7 +1075,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         }
         .offset(y: logInVM.showEmailHalfSheet ? 0 : getRect().height / 2)
         .offset(y: inputLogIn.keyboardOffset)
-        .onChange(of: showKyboard) { newValue in
+        .onChange(of: showEmailKyboard) { newValue in
             if newValue == .check {
                 withAnimation(.spring(response: 0.4)) {
                     inputLogIn.keyboardOffset = -UIScreen.main.bounds.height / 3
@@ -1045,7 +1091,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             Color.black.opacity(logInVM.showEmailSheetBackground ? 0.7 : 0.0)
                 .ignoresSafeArea()
                 .onTapGesture {
-                    showKyboard = nil
+                    showEmailKyboard = nil
                 }
         }
     }
@@ -1062,48 +1108,48 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         
             .overlay(alignment: .leading) {
                 Circle().frame(width: 12, height: 12)
-                    .foregroundColor(inputLogIn.createAccountFase != .fase1 ? .green :
-                                     inputLogIn.createAccountFase == .fase1 &&
+                    .foregroundColor(logInVM.createAccountFase != .fase1 ? .green :
+                                        logInVM.createAccountFase == .fase1 &&
                                      inputLogIn.createAccountShowContents ? .yellow : .white)
-                    .scaleEffect(inputLogIn.createAccountFase == .fase1 && inputLogIn.createAccountShowContents ? 1.5 : 1.0)
+                    .scaleEffect(logInVM.createAccountFase == .fase1 && inputLogIn.createAccountShowContents ? 1.5 : 1.0)
                     .overlay(alignment: .top) {
                         Text("Check!")
                             .font(.caption2).foregroundColor(.white.opacity(0.5))
                             .frame(width: 50)
-                            .opacity(inputLogIn.createAccountFase == .fase1 && inputLogIn.createAccountShowContents ? 1.0 : 0.0)
+                            .opacity(logInVM.createAccountFase == .fase1 && inputLogIn.createAccountShowContents ? 1.0 : 0.0)
                             .offset(y: -20)
                     }
             }
         
             .overlay {
                 Circle().frame(width: 12, height: 12)
-                    .foregroundColor(inputLogIn.createAccountFase != .fase1 &&
-                                     inputLogIn.createAccountFase != .fase2 ? .green :
-                                     inputLogIn.createAccountFase == .fase2 &&
+                    .foregroundColor(logInVM.createAccountFase != .fase1 &&
+                                     logInVM.createAccountFase != .fase2 ? .green :
+                                     logInVM.createAccountFase == .fase2 &&
                                      inputLogIn.createAccountShowContents ? .yellow : .white)
-                    .scaleEffect(inputLogIn.createAccountFase == .fase2 && inputLogIn.createAccountShowContents ? 1.5 : 1.0)
+                    .scaleEffect(logInVM.createAccountFase == .fase2 && inputLogIn.createAccountShowContents ? 1.5 : 1.0)
                     .overlay(alignment: .top) {
                         Text("Check!")
                             .font(.caption2).foregroundColor(.white.opacity(0.5))
                             .frame(width: 50)
-                            .opacity(inputLogIn.createAccountFase == .fase2 && inputLogIn.createAccountShowContents ? 1.0 : 0.0)
+                            .opacity(logInVM.createAccountFase == .fase2 && inputLogIn.createAccountShowContents ? 1.0 : 0.0)
                             .offset(y: -20)
                     }
             }
         
             .overlay(alignment: .trailing) {
                 Circle().frame(width: 12, height: 12)
-                    .foregroundColor(inputLogIn.createAccountFase != .fase1 &&
-                                     inputLogIn.createAccountFase != .fase2 &&
-                                     inputLogIn.createAccountFase != .fase3 ? .green :
-                                     inputLogIn.createAccountFase == .fase3 &&
+                    .foregroundColor(logInVM.createAccountFase != .fase1 &&
+                                     logInVM.createAccountFase != .fase2 &&
+                                     logInVM.createAccountFase != .fase3 ? .green :
+                                        logInVM.createAccountFase == .fase3 &&
                                      inputLogIn.createAccountShowContents ? .yellow : .white)
-                    .scaleEffect(inputLogIn.createAccountFase == .fase3 && inputLogIn.createAccountShowContents ? 1.5 : 1.0)
+                    .scaleEffect(logInVM.createAccountFase == .fase3 && inputLogIn.createAccountShowContents ? 1.5 : 1.0)
                     .overlay(alignment: .top) {
                         Text("Check!")
                             .font(.caption2).foregroundColor(.white.opacity(0.5))
                             .frame(width: 50)
-                            .opacity(inputLogIn.createAccountFase == .fase3 && inputLogIn.createAccountShowContents ? 1.0 : 0.0)
+                            .opacity(logInVM.createAccountFase == .fase3 && inputLogIn.createAccountShowContents ? 1.0 : 0.0)
                             .offset(y: -20)
                     }
             }

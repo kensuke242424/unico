@@ -35,12 +35,6 @@ struct UpdateTeamOrUserDataView: View {
 
         ZStack {
 
-            Color(.black).opacity(0.7)
-                .background(.ultraThinMaterial).opacity(0.9)
-                .onTapGesture {
-                    updateTeamfocused = nil
-                }
-
             LogoMark().scaleEffect(0.5).opacity(0.2)
                 .offset(y: -getRect().height / 2 + getSafeArea().top + 40)
 
@@ -64,7 +58,9 @@ struct UpdateTeamOrUserDataView: View {
                     if let captureImage = inputUpdate.captureImage {
                         UIImageCircleIcon(photoImage: captureImage, size: 150)
                     } else {
-                        Image(systemName: "photo.circle.fill").resizable().scaledToFit()
+                        Image(systemName: "photo.circle.fill")
+                            .resizable()
+                            .scaledToFit()
                             .foregroundColor(.white.opacity(0.5)).frame(width: 150)
                     }
                 }
@@ -141,6 +137,15 @@ struct UpdateTeamOrUserDataView: View {
                              isShowError: $inputUpdate.captureError)
             }
         } // ZStack
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background {
+            Color(.black).opacity(0.7)
+                .background(.ultraThinMaterial).opacity(0.9)
+                .ignoresSafeArea()
+                .onTapGesture {
+                    updateTeamfocused = nil
+                }
+        }
 
         .onChange(of: selectedUpdate) { select in
             switch select {

@@ -37,6 +37,7 @@ class LogInViewModel: ObservableObject {
     
     /// LogInViewでのサインイン操作フローを管理するプロパティ
     @Published var selectSignInType: SelectSignInType = .start
+    @Published var createAccountFase: CreateAccountFase = .start
     @Published var selectProviderType: SelectProviderType = .start
     @Published var addressSignInFase: AddressSignInFase = .start
 
