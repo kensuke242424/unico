@@ -478,16 +478,18 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     do {
                         /// 以前に作った既存のuserDocumentデータがあるかどうかをチェック
                         /// もし存在したら、関数内で既存データへのログインを促すアラートを発火しています
-                        _ = try await logInVM.existUserDocumentCheck()
+                        try await logInVM.existUserDocumentCheck()
                         
                         /// ユーザーの入力値をもとにユーザーデータを作成し、Firestoreに保存⬇︎
-                        _ = try await logInVM.setSignUpUserDocument(name: inputLogIn.createUserNameText,
-                                                                password: inputLogIn.password,
-                                                                imageData: inputLogIn.captureUserIconImage,
-                                                                color: inputLogIn.selectUserColor)
+                        if inputLogIn.createUserNameText == "" { inputLogIn.createUserNameText = "名無し" }
+                        
+                        try await logInVM.setSignUpUserDocument(name: inputLogIn.createUserNameText,
+                                                                    password: inputLogIn.password,
+                                                                    imageData: inputLogIn.captureUserIconImage,
+                                                                    color: inputLogIn.selectUserColor)
                         
                         // Firestoreに保存したデータをローカルに引っ張ってくる
-                        _ = try await userVM.fetchUser()
+                        try await userVM.fetchUser()
                         guard let user = userVM.user else { return }
                         
                         /// 新規チームデータの準備⬇︎

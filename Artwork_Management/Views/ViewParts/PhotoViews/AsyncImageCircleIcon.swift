@@ -42,9 +42,3 @@ struct AsyncImageCircleIcon: View {
 
     }
 }
-
-struct CircleIcon_Previews: PreviewProvider {
-    static var previews: some View {
-        AsyncImageCircleIcon(photoURL: nil, size: 35)
-    }
-}

@@ -164,7 +164,7 @@ struct RootView: View {
                 print("RootView_onAppear_currentUser == nil")
                 isShowStandBy.toggle()
 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                     withAnimation(.easeIn(duration: 0.5)) {
                         isShowStandBy.toggle()
                     }
