@@ -78,16 +78,20 @@ struct RootView: View {
         // fetch...
         .onChange(of: logInVM.rootNavigation) { navigation in
             print("LogInVM.rootNavigation: \(logInVM.rootNavigation)")
+            
             if navigation == .fetch {
                 Task {
                     do {
-                        try await userVM.fetchUser()
+                        /// ユーザーデータの取得
+                        _ = try await userVM.fetchUser()
+                        
+                        /// ユーザーデータの所得ができなければ、ログイン画面に遷移
                         guard let user = userVM.user else {
-                            print("userVMのuserがnilです。ログイン画面に戻ります。")
                             logInVM.rootNavigation = .logIn
                             return
                         }
-                        print("userVM.user: \(user)")
+                        
+                        /// チームデータを持っていなければ、チーム追加画面へ遷移
                         if user.joins.isEmpty {
                             print("参加チーム無し。チーム作成画面へ遷移")
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -98,25 +102,28 @@ struct RootView: View {
                             }
                             return
                         }
-                        guard let lastLogInTeamID = user.lastLogIn else { return }
-                        try await teamVM.fetchTeam(teamID: lastLogInTeamID)
-                        await tagVM.fetchTag(teamID: lastLogInTeamID)
-                        await itemVM.fetchItem(teamID: lastLogInTeamID)
                         
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.3) {
-                            withAnimation(.spring(response: 1)) {
-                                userVM.canUserFetchedListener = nil
-                                logInVM.rootNavigation = .home
-                                
-                                /// ログインが完了したら、LogInViewの操作フローを初期化
-                                logInVM.selectSignInType     = .start
-                                logInVM.selectProviderType   = .start
-                                logInVM.addressSignInFase    = .start
-                            }
-                        }
+                        /// 最後にログインしたチーム情報をもとに、対象のチームの全データを取得
+                        guard let lastLogInTeamID = user.lastLogIn else { return }
+                        
+                        try await teamVM.fetchTeam(teamID: lastLogInTeamID)
+                            await tagVM.fetchTag(teamID: lastLogInTeamID)
+                            await itemVM.fetchItem(teamID: lastLogInTeamID)
+                        
+                        
+                        /// ログインが完了したら、LogInViewの操作フローを初期化
+                        logInVM.selectSignInType     = .start
+                        logInVM.selectProviderType   = .start
+                        logInVM.addressSignInFase    = .start
 
+                        /// チームandユーザーデータのリスナーを起動
                         _ = try await teamVM.teamRealtimeListener()
                         _ = try await userVM.userRealtimeListener()
+                        
+                        /// ホーム画面へ遷移
+                        withAnimation(.spring(response: 1)) {
+                            logInVM.rootNavigation = .home
+                        }
 
                     } catch CustomError.uidEmpty {
                         print("Error: uidEmpty")

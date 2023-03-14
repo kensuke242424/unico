@@ -480,7 +480,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         /// もし存在したら、関数内で既存データへのログインを促すアラートを発火しています
                         _ = try await logInVM.existUserDocumentCheck()
                         
-                        /// ユーザーデータをFirestoreに保存⬇︎
+                        /// ユーザーの入力値をもとにユーザーデータを作成し、Firestoreに保存⬇︎
                         _ = try await logInVM.setSignUpUserDocument(name: inputLogIn.createUserNameText,
                                                                 password: inputLogIn.password,
                                                                 imageData: inputLogIn.captureUserIconImage,

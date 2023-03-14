@@ -72,17 +72,19 @@ class LogInViewModel: ObservableObject {
     
     func signInAnonymously() {
         
+        print("＝＝＝＝＝signInAnonymouslyメソッド実行＝＝＝＝＝＝")
+        
         Auth.auth().signInAnonymously { (authResult, error) in
             
             if let error = error {
                 print(error.localizedDescription)
-                print("AnonymousSignIn_error")
+                print("匿名サインインに失敗しました")
                 self.isShowLogInFlowAlert.toggle()
                 return
             }
             if let user = authResult?.user {
+                print("匿名サインインに成功しました")
                 print("isAnonymousSignIn: \(user.isAnonymous)")
-                self.selectProviderType = .trial
             }
         }
     }

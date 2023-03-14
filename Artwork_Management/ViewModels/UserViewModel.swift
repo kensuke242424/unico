@@ -27,7 +27,6 @@ class UserViewModel: ObservableObject {
     var uid: String? { return Auth.auth().currentUser?.uid }
 
     @Published var user: User?
-    @Published var canUserFetchedListener: Bool?
     @Published var isAnonymous: Bool = false
     @Published var showAlert = false
     @Published var userErrorMessage = ""
