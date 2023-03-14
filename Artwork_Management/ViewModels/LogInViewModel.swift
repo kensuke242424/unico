@@ -21,16 +21,23 @@ class LogInViewModel: ObservableObject {
         self.startCurrentUserListener()
     }
 
+    /// LogInViewから次の画面へのナビゲーションを総括管理するプロパティ
     @Published var rootNavigation: RootNavigation = .logIn
     
-    @Published var AlreadyExistsUserDocument: Bool = false
-    @Published var existCurrentUserCheck: Bool = false
-    @Published var isShowLogInFlowAlert: Bool = false
+    /// リスナーによってサインインが検知されたらトグルするプロパティ
+    @Published var signedInOrNot: Bool = false
+    
+    /// メールアドレスログイン用のハーフシートを管理するプロパティ
     @Published var showEmailHalfSheet: Bool = false
     @Published var showEmailSheetBackground: Bool = false
+    
+    /// LogInView内でのエラーアラートとメッセージを管理するプロパティ
+    @Published var isShowLogInFlowAlert: Bool = false
+    @Published var logInAlertMessage: LogInAlert = .start
+    
+    /// LogInViewでのサインイン操作フローを管理するプロパティ
     @Published var selectSignInType: SelectSignInType = .start
     @Published var selectProviderType: SelectProviderType = .start
-    @Published var logInAlertMessage: LogInAlert = .start
     @Published var addressSignInFase: AddressSignInFase = .start
 
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
@@ -50,15 +57,15 @@ class LogInViewModel: ObservableObject {
         
         listenerHandle = Auth.auth().addStateDidChangeListener { auth, user in
             if user != nil {
-                print("currentUserCheck_サインイン⭕️")
+                print("signedInOrNot_サインイン⭕️")
                 print("uid: \(self.uid ?? "アンラップ失敗")")
-                self.existCurrentUserCheck = true
-                print("checkCurrentUserExists: \(self.existCurrentUserCheck)")
+                self.signedInOrNot = true
+                print("checkCurrentUserExists: \(self.signedInOrNot)")
                 
             } else {
-                print("currentUserCheck_サインイン❌")
+                print("signedInOrNot_サインイン❌")
                 print("uid: \(self.uid ?? "nil")")
-                self.existCurrentUserCheck = false
+                self.signedInOrNot = false
             }
         }
     }
@@ -74,8 +81,8 @@ class LogInViewModel: ObservableObject {
                 return
             }
             if let user = authResult?.user {
-                print("\(user.displayName ?? "No displayName")")
                 print("isAnonymousSignIn: \(user.isAnonymous)")
+                self.selectProviderType = .trial
             }
         }
     }
@@ -151,7 +158,7 @@ class LogInViewModel: ObservableObject {
         }
     }
     
-    func existUserDocumentCheck() async throws -> Bool {
+    func existUserDocumentCheck() async throws {
         print("checkExistsUserDocumentメソッド実行")
         guard let uid = uid else { throw CustomError.uidEmpty }
         if let doc = db?.collection("users").document(uid) {
@@ -164,29 +171,27 @@ class LogInViewModel: ObservableObject {
                 print("userデータ: \(user)")
                 self.logInAlertMessage = .existsUserDocument
                 self.isShowLogInFlowAlert.toggle()
-                return true
+                throw CustomError.existUserDocument
             } catch {
                 print("このアカウントに既存userDocumentデータはありません。")
-                return false
             }
         } else {
             print("サインインユーザーに作成しているuserドキュメントは存在しませんでした")
-            return false
         }
     }
 
-    func setSignUpUserDocument(name: String, password: String?, imageData: UIImage?, color: MemberColor) async -> Bool {
+    func setSignUpUserDocument(name: String, password: String?, imageData: UIImage?, color: MemberColor) async throws {
 
-        print("addUserSignInWithApple実行")
+        print("setSignUpUserDocument実行")
 
         guard let usersRef = db?.collection("users") else {
-            print("error: guard let itemsRef = db?.collection(users), let uid = Auth.auth().currentUser?.uid")
-            return false
+            print("ERROR: guard let itemsRef = db?.collection(users), let uid = Auth.auth().currentUser?.uid")
+            throw CustomError.getRef
         }
 
         guard let currentUser = Auth.auth().currentUser else {
-            print("Error: guard let currentUser")
-            return false
+            print("ERROR: guard let currentUser")
+            throw CustomError.uidEmpty
         }
 
         let uplaodImageData = await  self.uploadImage(imageData)
@@ -201,10 +206,10 @@ class LogInViewModel: ObservableObject {
         do {
             // currentUserのuidとドキュメントIDを同じにして保存
             _ = try usersRef.document(newUserData.id).setData(from: newUserData)
-            return true
+
         } catch {
-            print("Error: try usersRef.document(newUserData.id).setData(from: newUserData)")
-            return false
+            print("ERROR: try usersRef.document(newUserData.id).setData(from: newUserData)")
+            throw CustomError.setData
         }
     }
     

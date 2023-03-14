@@ -73,7 +73,9 @@ struct UserEntryRecommendationView: View {
                         Task {
                             logInVM.selectSignInType = .signAp
                             logInVM.signInAnonymously()
-                            isShow.toggle()
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                isShow.toggle()
+                            }
                         }
                     }
                     .buttonStyle(.borderedProminent)
@@ -91,8 +93,9 @@ struct UserEntryRecommendationView: View {
                     .opacity(0.7)
                     .ignoresSafeArea()
                 
-                BlurView(style: .systemUltraThinMaterialDark)
-                    .opacity(0.8)
+                BlurView(style: .systemThinMaterialDark)
+                    .frame(width: getRect().width, height: getRect().height)
+                    .opacity(0.9)
                     .ignoresSafeArea()
                 
                 LogoMark()

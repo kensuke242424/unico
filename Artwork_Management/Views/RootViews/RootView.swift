@@ -42,7 +42,7 @@ struct RootView: View {
         ZStack {
             switch logInVM.rootNavigation {
             case .logIn:
-                LogInView(logInVM: logInVM, teamVM: teamVM)
+                LogInView(logInVM: logInVM, teamVM: teamVM, userVM: userVM)
                     .environment(\.resizableSheetCenter, resizableSheetCenter)
 
             case .fetch:
@@ -81,7 +81,6 @@ struct RootView: View {
             if navigation == .fetch {
                 Task {
                     do {
-                        logInVM.addressSignInFase = .start // アドレスログインフローを初期化
                         try await userVM.fetchUser()
                         guard let user = userVM.user else {
                             print("userVMのuserがnilです。ログイン画面に戻ります。")
@@ -103,10 +102,16 @@ struct RootView: View {
                         try await teamVM.fetchTeam(teamID: lastLogInTeamID)
                         await tagVM.fetchTag(teamID: lastLogInTeamID)
                         await itemVM.fetchItem(teamID: lastLogInTeamID)
+                        
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.3) {
                             withAnimation(.spring(response: 1)) {
                                 userVM.canUserFetchedListener = nil
                                 logInVM.rootNavigation = .home
+                                
+                                /// ログインが完了したら、LogInViewの操作フローを初期化
+                                logInVM.selectSignInType     = .start
+                                logInVM.selectProviderType   = .start
+                                logInVM.addressSignInFase    = .start
                             }
                         }
 

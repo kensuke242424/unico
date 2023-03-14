@@ -154,26 +154,33 @@ enum Background: CaseIterable {
 }
 
 struct InputLogIn {
-    var createUserNameText: String = ""
-    var captureUserIconImage: UIImage?
-    var captureBackgroundImage: UIImage?
-    var captureError: Bool = false
-    var address: String = ""
-    var password: String = ""
-    var checkBackgroundOpacity: CGFloat = 1.0
-    var checkBackgroundEffect: Bool = false
-    var checkBackgroundToggle: Bool = false
-    var createAccountTitle: Bool = false
-    var createAccountShowContents: Bool = false
-    var isShowPickerView: Bool = false
-    var isShowGoBackLogInAlert: Bool = false
-    var isShowUserEntryRecommendation = false
-    var keyboardOffset: CGFloat = 0.0
-    var repeatAnimation: Bool = false
-    var sendAddressButtonDisabled: Bool = true
+    /// 新規ユーザーデータの入力用プロパティ
+    var createUserNameText      : String = ""
+    var address                 : String = ""
+    var password                : String = ""
+    var captureUserIconImage    : UIImage?
+    var captureBackgroundImage  : UIImage?
+    var selectUserColor         : MemberColor = .blue
+    
+    /// Viewの表示・非表示やアニメーションをコントロールするプロパティ
+    var checkBackgroundOpacity      : CGFloat = 1.0
+    var keyboardOffset              : CGFloat = 0.0
+    var checkBackgroundEffect       : Bool = false
+    var checkBackgroundOpacityToggle: Bool = false
+    var createAccountTitle          : Bool = false
+    var createAccountShowContents   : Bool = false
+    var repeatAnimation             : Bool = false
+    var sendAddressButtonDisabled   : Bool = true
+    var selectBackground            : Background = .sample1
+    
+    /// ログインフローの進行を管理するプロパティ
     var createAccountFase: CreateAccountFase = .start
-    var selectUserColor: MemberColor = .gray
-    var selectBackground: Background = .sample1
+    
+    /// Sheetやアラートなどのプレゼンテーションを管理するプロパティ
+    var isShowPickerView             : Bool = false
+    var isShowUserEntryRecommendation: Bool = false
+    var isShowGoBackLogInAlert       : Bool = false
+    var captureError                 : Bool = false
 }
 
 // ✅ ログイン画面の親Viewです。
@@ -185,6 +192,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
     
     @StateObject var logInVM: LogInViewModel
     @StateObject var teamVM : TeamViewModel
+    @StateObject var userVM : UserViewModel
     
     @State private var logInNavigationPath: [Navigation] = []
     @State private var inputLogIn: InputLogIn = InputLogIn()
@@ -286,6 +294,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         }
                     } label: {
                         Text("< 戻る")
+                            .fontWeight(.semibold)
                             .foregroundColor(.white.opacity(0.7))
                     }
                     .disabled(logInVM.addressSignInFase == .success ? true : false)
@@ -334,7 +343,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             Text("はい")
                         }
                     } message: {
-                        Text("ログイン画面に戻ります。よろしいですか？")
+                        Text("最初の画面に戻ります。よろしいですか？")
                     } // alert
                     
                 }
@@ -349,6 +358,9 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             }
             
         } // ZStack
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .ignoresSafeArea()
+        
         // ログインフロー全体のアラートを管理
         .alert(logInVM.logInAlertMessage.title,
                isPresented: $logInVM.isShowLogInFlowAlert) {
@@ -366,7 +378,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 
             case .existsUserDocument         :
                 Button("戻る") {
-                    logInVM.existCurrentUserCheck = false
+                    logInVM.signedInOrNot = false
                     logInVM.logOut()
                 }
                 Button("ログイン") {
@@ -378,7 +390,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 
             case .existEmailAddressAccount   :
                 Button("戻る") {
-                    logInVM.existCurrentUserCheck = false
+                    logInVM.signedInOrNot = false
                     logInVM.addressSignInFase = .start
                     logInVM.logOut()
                 }
@@ -411,27 +423,30 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         
         .background {
             ZStack {
-                if inputLogIn.selectBackground == .original {
-                    Image(uiImage: inputLogIn.captureBackgroundImage ?? UIImage())
-                        .resizable()
-                        .scaledToFill()
-                        .blur(radius: inputLogIn.checkBackgroundEffect ? 0 : 2)
-                        .ignoresSafeArea()
-                } else {
-                    Image(inputLogIn.selectBackground.imageName)
-                        .resizable()
-                        .scaledToFill()
-                        .blur(radius: inputLogIn.checkBackgroundEffect ? 0 : 2)
-                        .ignoresSafeArea()
+                GeometryReader { proxy in
+                    if inputLogIn.selectBackground == .original {
+                        Image(uiImage: inputLogIn.captureBackgroundImage ?? UIImage())
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: proxy.size.width, height: proxy.size.height)
+                            .blur(radius: inputLogIn.checkBackgroundEffect ? 0 : 2)
+                    } else {
+                        Image(inputLogIn.selectBackground.imageName)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: proxy.size.width, height: proxy.size.height)
+                            .blur(radius: inputLogIn.checkBackgroundEffect ? 0 : 2)
+                    }
+                    Color(.black)
+                        .frame(width: proxy.size.width, height: proxy.size.height)
+                        .opacity(inputLogIn.checkBackgroundEffect ? 0.0 : 0.2)
                 }
-                Color(.black)
-                    .opacity(inputLogIn.checkBackgroundEffect ? 0.0 : 0.2)
-                    .ignoresSafeArea()
+                .ignoresSafeArea()
             }
         }
-        .onChange(of: inputLogIn.createAccountFase) { newFase in
+        .onChange(of: inputLogIn.createAccountFase) { newFaseValue in
             withAnimation(.spring(response: 1.0)) {
-                switch newFase {
+                switch newFaseValue {
                 case .start: createFaseLineImprove = 0
                 case .fase1: createFaseLineImprove = 0
                 case .fase2: createFaseLineImprove = 100
@@ -443,42 +458,55 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         
         // currentUserを監視するリスナーによってサインインが検知されたら、ユーザが選択したサインインフローに分岐して処理
         // (ログイン or サインアップ)
-        .onChange(of: logInVM.existCurrentUserCheck) { currentCheck in
-            print("logInVM.checkCurrentUserExists更新を検知")
-            print("checkCurrentUserExists: \(currentCheck)")
-            if !currentCheck {
-                return
-            }
+        .onChange(of: logInVM.signedInOrNot) { resultValue in
+            
+            print("logInVM.existCurrentUserCheck更新を検知")
+            if !resultValue { return }
+            
             switch logInVM.selectSignInType {
                 
-            case .start: print("")
+            case .start:
+                print("処理なし")
 
-            case .logIn: withAnimation(.spring(response: 0.5)) {
+            case .logIn:
+                withAnimation(.spring(response: 0.5)) {
                 logInVM.rootNavigation = .fetch
-            }
+                }
             
             case .signAp:
-                // ✅ユーザーがサインアップを選択していた場合は、ユーザードキュメントが既に作られているか確認する必要がある✅
-                // userドキュメントが既にある場合は、新規上書きしてしまうのを防ぐためにsetUserDocumentを止め、アラートに移行する
                 Task {
-                    // サインアップ実行ユーザに既にuserDocumentが存在するかチェック
-                    let existCheckResult = try await logInVM.existUserDocumentCheck()
-                    if existCheckResult == true {
-                        print("既に登録されているuserドキュメントを検知")
-                        return
-                    } else {
-                        // userドキュメントが存在しなかった場合は、新規userドキュメントをFirestoreに作成
-                        let didSetUserDocument = await logInVM.setSignUpUserDocument(name: inputLogIn.createUserNameText,
-                                                                                    password: inputLogIn.password,
-                                                                                    imageData: inputLogIn.captureUserIconImage,
-                                                                                    color: inputLogIn.selectUserColor)
-                        if didSetUserDocument {
-                            withAnimation(.spring(response: 0.5)) {
-                                logInVM.rootNavigation = .fetch
-                            }
-                        } else {
-                            print("didSetUserDocument_Error!! -新規ユーザドキュメントの作成に失敗しました-")
+                    do {
+                        /// 以前に作った既存のuserDocumentデータがあるかどうかをチェック
+                        /// もし存在したら、関数内で既存データへのログインを促すアラートを発火しています
+                        _ = try await logInVM.existUserDocumentCheck()
+                        
+                        /// ユーザーデータをFirestoreに保存⬇︎
+                        _ = try await logInVM.setSignUpUserDocument(name: inputLogIn.createUserNameText,
+                                                                password: inputLogIn.password,
+                                                                imageData: inputLogIn.captureUserIconImage,
+                                                                color: inputLogIn.selectUserColor)
+                        
+                        // Firestoreに保存したデータをローカルに引っ張ってくる
+                        _ = try await userVM.fetchUser()
+                        guard let user = userVM.user else { return }
+                        
+                        /// 新規チームデータの準備⬇︎
+                        let createTeamID = UUID().uuidString
+                        let joinMember = JoinMember(memberUID: user.id, name: user.name, iconURL: user.iconURL)
+                        
+                        let teamData = Team(id: createTeamID, name: "\(user.name)のチーム", members: [joinMember])
+                        let joinTeamData = JoinTeam(teamID: teamData.id, name: teamData.name)
+                        
+                        /// 準備したチームデータをFirestoreに保存していく
+                        /// userDocument側にも新規作成したチームのidを保存しておく(addNewJoinTeam)
+                        try await teamVM.addTeam(teamData: teamData)
+                        try await userVM.addNewJoinTeam(newJoinTeam: joinTeamData)
+                        
+                        withAnimation(.spring(response: 0.5)) {
+                            logInVM.rootNavigation = .fetch
                         }
+                    } catch {
+                        print("ユーザーデータの作成に失敗しました")
                     }
                 } // Task end
             }
@@ -489,13 +517,13 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
     @ViewBuilder
     func signInTitle(title: String) -> some View {
         HStack {
-            Rectangle().foregroundColor(.white.opacity(0.2)).frame(width: 60, height: 1)
+            Rectangle().foregroundColor(.white.opacity(0.4)).frame(width: 60, height: 1)
             Text(title)
                 .tracking(10)
                 .font(.subheadline)
-                .foregroundColor(.white.opacity(0.5))
+                .foregroundColor(.white.opacity(0.7))
                 .padding(.horizontal)
-            Rectangle().foregroundColor(.white.opacity(0.2)).frame(width: 60, height: 1)
+            Rectangle().foregroundColor(.white.opacity(0.4)).frame(width: 60, height: 1)
         }
     }
     func firstSelectButtons() -> some View {
@@ -732,11 +760,11 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     .overlay(alignment: .trailing) {
                         VStack {
                             Text("確認する").font(.footnote).offset(x: 15)
-                            Toggle("", isOn: $inputLogIn.checkBackgroundToggle)
+                            Toggle("", isOn: $inputLogIn.checkBackgroundOpacityToggle)
                         }
                         .frame(width: 80)
                         .offset(x: 130)
-                        .onChange(of: inputLogIn.checkBackgroundToggle) { newValue in
+                        .onChange(of: inputLogIn.checkBackgroundOpacityToggle) { newValue in
                             if newValue {
                                 withAnimation(.easeIn(duration: 0.2)) { inputLogIn.checkBackgroundOpacity = 0.0 }
                                 withAnimation(.easeIn(duration: 0.2)) { inputLogIn.checkBackgroundEffect.toggle() }
@@ -837,6 +865,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             Button {
                                 withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
                                     logInVM.showEmailHalfSheet.toggle()
+                                    showKyboard = nil
                                 }
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                                     logInVM.showEmailSheetBackground.toggle()
@@ -997,7 +1026,19 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 }
         }
         .offset(y: logInVM.showEmailHalfSheet ? 0 : getRect().height / 2)
-        .offset(y: getSafeArea().bottom)
+        .offset(y: inputLogIn.keyboardOffset)
+        .onChange(of: showKyboard) { newValue in
+            if newValue == .check {
+                withAnimation(.spring(response: 0.4)) {
+                    inputLogIn.keyboardOffset = -UIScreen.main.bounds.height / 3
+                }
+            } else {
+                withAnimation(.easeInOut(duration: 0.25)) {
+                    inputLogIn.keyboardOffset = 0
+                }
+            }
+        }
+        
         .background {
             Color.black.opacity(logInVM.showEmailSheetBackground ? 0.7 : 0.0)
                 .ignoresSafeArea()
@@ -1070,6 +1111,6 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
 
 struct LogInView_Previews: PreviewProvider {
     static var previews: some View {
-        LogInView(logInVM: LogInViewModel(), teamVM: TeamViewModel())
+        LogInView(logInVM: LogInViewModel(), teamVM: TeamViewModel(), userVM: UserViewModel())
     }
 }

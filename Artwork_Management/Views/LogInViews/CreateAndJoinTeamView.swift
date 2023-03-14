@@ -271,6 +271,7 @@ struct CreateAndJoinTeamView: View {
                     selectTeamFase = .fase1
                 }
             }
+            .fontWeight(.semibold)
             .foregroundColor(.white.opacity(0.7))
             .offset(y: getRect().height * 0.36)
             .opacity(selectTeamFase == .fase2 ? 1.0 : 0.0)
@@ -403,6 +404,9 @@ struct CreateAndJoinTeamView: View {
                 }
             }
         }
+        .sheet(isPresented: $isShowPickerView) {
+            PHPickerView(captureImage: $captureImage, isShowSheet: $isShowPickerView, isShowError: $captureError)
+        }
 
         .onAppear {
             // currentUserのuidをQRコードに変換
@@ -412,12 +416,6 @@ struct CreateAndJoinTeamView: View {
                     selectTeamFase = .fase1
                 }
             }
-        }
-        .sheet(isPresented: $isShowSignUpSheetView) {
-            LogInView(logInVM: logInVM, teamVM: teamVM)
-        }
-        .sheet(isPresented: $isShowPickerView) {
-            PHPickerView(captureImage: $captureImage, isShowSheet: $isShowPickerView, isShowError: $captureError)
         }
     }
 
