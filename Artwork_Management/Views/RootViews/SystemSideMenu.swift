@@ -73,8 +73,14 @@ struct SystemSideMenu: View {
                     Group {
                         if let iconURL = teamVM.team?.iconURL {
                             AsyncImageCircleIcon(photoURL: iconURL, size: getRect().width / 3 + 20)
+                                .onTapGesture {
+                                    withAnimation(.spring(response: 0.5)) { inputHome.selectedUpdateData = .team }
+                                }
                         } else {
                             CubeCircleIcon(size: getRect().width / 3 + 20)
+                                .onTapGesture {
+                                    withAnimation(.spring(response: 0.5)) { inputHome.selectedUpdateData = .team }
+                                }
                         }
                     }
                     .overlay(alignment: .topTrailing) {
@@ -98,6 +104,9 @@ struct SystemSideMenu: View {
                     .overlay(alignment: .bottomTrailing) {
                         AsyncImageCircleIcon(photoURL: userVM.user?.iconURL, size: getRect().width / 6)
                             .offset(x: getRect().width / 4 - 10)
+                            .onTapGesture {
+                                withAnimation(.spring(response: 0.5)) { inputHome.selectedUpdateData = .user }
+                            }
                     }
                     .overlay(alignment: .bottom) {
                         if teamVM.team!.name.count < 12 {
@@ -115,9 +124,10 @@ struct SystemSideMenu: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
-                .padding(.top)
+                .padding(.vertical)
                 
                 Spacer(minLength: 40)
+                
                 HStack {
                     ScrollView(showsIndicators: false) {
                         VStack(alignment: .leading, spacing: 60) {

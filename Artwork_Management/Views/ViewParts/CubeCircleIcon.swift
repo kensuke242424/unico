@@ -14,7 +14,7 @@ struct CubeCircleIcon: View {
     var body: some View {
         
         Circle()
-            .foregroundColor(.userGray1)
+            .foregroundColor(.userGray2)
             .opacity(0.8)
             .frame(width: size, height: size)
             .shadow(radius: 2, x: 1, y: 2)
