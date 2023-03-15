@@ -8,15 +8,11 @@
 import SwiftUI
 import ResizableSheet
 
-/// 各タブの選択を管理する
-enum SelectionTab {
-    case home
-    case item
-}
-
 struct NewTabView: View {
     
     @State private var selectionTab: SelectionTab = .item
+    
+    @State private var imageBlur: CGFloat = 4
 
     var body: some View {
 
@@ -32,16 +28,24 @@ struct NewTabView: View {
             .background {
                 ZStack {
                     GeometryReader { proxy in
-                        Image("background_1")
+                        Image("background_4")
                             .resizable()
                             .scaledToFill()
                             .frame(width: proxy.size.width, height: proxy.size.height)
                             .ignoresSafeArea()
-                            .blur(radius: selectionTab == .home ? 0 : 5)
+                            .blur(radius: imageBlur)
                     }
                 }
             }
             .ignoresSafeArea()
+            .onChange(of: selectionTab) { _ in
+                switch selectionTab {
+                case .home:
+                    withAnimation(.easeInOut(duration: 0.3)) { imageBlur = 0 }
+                case .item:
+                    withAnimation(.easeInOut(duration: 0.3)) { imageBlur = 4 }
+                }
+            }
         }
         
     } // body

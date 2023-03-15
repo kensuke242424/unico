@@ -24,13 +24,13 @@ struct NewItemsView: View {
             
             /// Tab Top
             HStack {
-                Text("アイテム管理")
+                Text("")
                     .font(.title3)
                     .fontWeight(.semibold)
                     .padding(.leading, 15)
                     .foregroundColor(.white)
                     .offset(y: 2)
-                
+                    .opacity(showDarkBackground ? 0 : 1)
             }
             .frame(maxWidth: .infinity)
             .padding(.horizontal, 15)
@@ -44,19 +44,19 @@ struct NewItemsView: View {
                     VStack(spacing: 35) {
                         ForEach(sampleBooks) { book in
                             BooksCardView(book)
-                                /// カードをタップすると詳細画面が表示されます。
                                 .onTapGesture {
-                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                    withAnimation(.easeInOut(duration: 0.25)) {
                                         animateCurrentBook = true
                                         showDarkBackground = true
                                         selectedBook = book
                                     }
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
                                         withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.7, blendDuration: 0.7)) {
                                             showDetailView.toggle()
                                         }
                                     }
                                 }
+                                .opacity(showDarkBackground && selectedBook != book ? 0 : 1)
                         }
                     }
                     .padding(.horizontal, 15)
@@ -209,10 +209,10 @@ struct NewItemsView: View {
                                     .matchedGeometryEffect(id: "ACTIVETAG", in: animation)
                             } else {
                                 Capsule()
-                                    .fill(Color.gray.opacity(0.2))
+                                    .fill(Color.gray.opacity(0.4))
                             }
                         }
-                        .foregroundColor(activeTag == tag ? .white : .gray)
+                        .foregroundColor(activeTag == tag ? .white : .white.opacity(0.6))
                         .onTapGesture {
                             withAnimation(.interactiveSpring(response: 0.5, dampingFraction: 0.7, blendDuration: 0.7)) {
                                 activeTag = tag
@@ -230,14 +230,6 @@ struct NewItemsView: View {
                 .padding(.leading, 5)
             }
             .padding(.horizontal, 15)
-        }
-        .background {
-            Rectangle()
-                .fill(Color("userGray1"))
-                .opacity(0.7)
-                .frame(maxWidth: .infinity)
-                .frame(height: 50)
-                .blur(radius: 2)
         }
         .padding(.top)
     }
