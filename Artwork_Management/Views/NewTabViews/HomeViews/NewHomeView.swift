@@ -9,9 +9,15 @@ import SwiftUI
 
 struct NewHomeView: View {
     var body: some View {
-        VStack {
-            Text("Homeタブです。")
+        GeometryReader {
+            let size = $0.size
+            VStack {
+                Text("Homeタブです。")
+            }
+            .frame(width: size.width, height: size.height)
         }
+        .ignoresSafeArea()
+        
     }
 }
 

@@ -20,26 +20,13 @@ struct NewItemsView: View {
     @State private var animateCurrentBook: Bool = false
     
     var body: some View {
+        GeometryReader {
+            let size = $0.size
         VStack(spacing: 15) {
-            
-            /// Tab Top
-            HStack {
-                Text("")
-                    .font(.title3)
-                    .fontWeight(.semibold)
-                    .padding(.leading, 15)
-                    .foregroundColor(.white)
-                    .offset(y: 2)
-                    .opacity(showDarkBackground ? 0 : 1)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.horizontal, 15)
             
             TagsView()
                 .opacity(showDarkBackground ? 0 : 1)
             
-            GeometryReader {
-                let size = $0.size
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack(spacing: 35) {
                         ForEach(sampleBooks) { book in

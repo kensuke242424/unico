@@ -27,6 +27,7 @@
 		BE254FBF29C0C396004FE9AE /* CubeCircleIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE254FBE29C0C396004FE9AE /* CubeCircleIcon.swift */; };
 		BE254FC129C0CA0B004FE9AE /* PersonCircleIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE254FC029C0CA0B004FE9AE /* PersonCircleIcon.swift */; };
 		BE392FF029C20E6900BB5700 /* Tab.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE392FEF29C20E6900BB5700 /* Tab.swift */; };
+		BE392FF329C2135300BB5700 /* ScrollOffsetModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE392FF229C2135300BB5700 /* ScrollOffsetModifier.swift */; };
 		BE3CD65B29B72B0700C19442 /* ProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3CD65A29B72B0700C19442 /* ProgressViewModel.swift */; };
 		BE41783D29B4535800434CFC /* AnimationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE41783C29B4535800434CFC /* AnimationExtension.swift */; };
 		BE41784029B4AB3100434CFC /* FirebaseDynamicLinks in Frameworks */ = {isa = PBXBuildFile; productRef = BE41783F29B4AB3100434CFC /* FirebaseDynamicLinks */; };
@@ -126,6 +127,7 @@
 		BE254FBE29C0C396004FE9AE /* CubeCircleIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CubeCircleIcon.swift; sourceTree = "<group>"; };
 		BE254FC029C0CA0B004FE9AE /* PersonCircleIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonCircleIcon.swift; sourceTree = "<group>"; };
 		BE392FEF29C20E6900BB5700 /* Tab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tab.swift; sourceTree = "<group>"; };
+		BE392FF229C2135300BB5700 /* ScrollOffsetModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollOffsetModifier.swift; sourceTree = "<group>"; };
 		BE3CD65A29B72B0700C19442 /* ProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressViewModel.swift; sourceTree = "<group>"; };
 		BE41783C29B4535800434CFC /* AnimationExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationExtension.swift; sourceTree = "<group>"; };
 		BEAB502D29A7C6D400ECCB4F /* PageTabNavigateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageTabNavigateView.swift; sourceTree = "<group>"; };
@@ -260,6 +262,14 @@
 			path = "Account Settings";
 			sourceTree = "<group>";
 		};
+		BE392FF129C2133B00BB5700 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				BE392FF229C2135300BB5700 /* ScrollOffsetModifier.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
 		BE41783E29B4AB3100434CFC /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -337,6 +347,7 @@
 				E0FCADA2296F289A00BA6A75 /* Artwork_Management.entitlements */,
 				E08F272428DDA08E00329C5E /* Artwork_ManagementApp.swift */,
 				E0455FDF292BBB74004F677D /* GoogleService-Info.plist */,
+				BE392FF129C2133B00BB5700 /* Helpers */,
 				E08F273228DDB3B200329C5E /* Views */,
 				E08F273328DDB3C400329C5E /* ViewModels */,
 				E08F273428DDB3CA00329C5E /* Models */,
@@ -709,6 +720,7 @@
 				E09F09CE28F146DB00D07669 /* EditItemView.swift in Sources */,
 				E0CF7EEC28DEEED700735142 /* LibraryListView.swift in Sources */,
 				E0A7DE50290DAB40008C3F3F /* BlurView.swift in Sources */,
+				BE392FF329C2135300BB5700 /* ScrollOffsetModifier.swift in Sources */,
 				E0DE98D828E2DBB800471AB4 /* TeamViewModel.swift in Sources */,
 				E0CC79B828E7811500CE0B19 /* ItemDetailData.swift in Sources */,
 				E09F09C928EE3B4900D07669 /* UsefulButton.swift in Sources */,
