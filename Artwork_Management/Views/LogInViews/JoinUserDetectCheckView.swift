@@ -21,7 +21,7 @@ struct JoinUserDetectCheckView: View {
     @StateObject var teamVM: TeamViewModel
 
     @State private var joinUserCheckFase: JoinUserCheckFase = .start
-    @State private var inputUserIDText: String = "TFYQ2cWA0FNrWeff3P2pxLQRFaq2"
+    @State private var inputUserIDText: String = ""
     @State private var isShowQRReader: Bool = false
     @State private var isAgreed: Bool = false
     @State private var detectedUser: User?
