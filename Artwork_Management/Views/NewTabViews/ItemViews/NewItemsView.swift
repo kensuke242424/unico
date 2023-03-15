@@ -163,6 +163,7 @@ struct NewItemsView: View {
                             .frame(width: size.width / 2, height: size.height)
                             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                             /// Matched Geometry ID
+                            .transition(.asymmetric(insertion: .slide, removal: .identity))
                             .matchedGeometryEffect(id: book.id, in: animation)
                             // Applying Shadow
                             .shadow(color: .black.opacity(0.1), radius: 5, x: 5, y: -5)

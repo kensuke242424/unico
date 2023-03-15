@@ -26,8 +26,15 @@ struct DetailView: View {
                 /// Closing Detail View
                 withAnimation(.easeInOut(duration: 0.35).delay(0.1)) {
                     animationContent = false
-                    show.toggle()
+                    
                 }
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    withAnimation(.easeInOut(duration: 0.35).delay(0.1)) {
+                        show.toggle()
+                    }
+                }
+                
             } label: {
                 Image(systemName: "chevron.left")
                     .font(.title3)
@@ -50,6 +57,7 @@ struct DetailView: View {
                         .frame(width: (size.width - 30) / 2, height: size.height)
                         .clipShape(CustomCorners(corners: [.topRight, .bottomRight], radius: 20))
                         /// Matched Geometry ID
+                        .transition(.opacity)
                         .matchedGeometryEffect(id: book.id, in: animation)
                     
                     VStack(alignment: .leading, spacing: 8) {
@@ -170,5 +178,14 @@ struct DetailView: View {
         /// Applying Offset Animation
         .offset(y: offsetAnimation ? 0 : 50)
         .opacity(offsetAnimation ? 1 : 0)
+    }
+}
+
+struct DetailView_Previews: PreviewProvider {
+    @Namespace static var animation
+    static var previews: some View {
+        DetailView(show: .constant(true),
+                   animation: animation,
+                   book: sampleBooks.first!)
     }
 }

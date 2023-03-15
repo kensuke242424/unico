@@ -24,7 +24,7 @@ struct ArtworkManagementApp: App {
     
     var body: some Scene {
         WindowGroup {
-            NewItemsView()
+            RootView()
                 .environmentObject(ProgressViewModel())
         }
     }

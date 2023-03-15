@@ -16,7 +16,7 @@ enum SelectionTab {
 
 struct NewTabView: View {
     
-    @State private var selectionTab: SelectionTab = .home
+    @State private var selectionTab: SelectionTab = .item
 
     var body: some View {
 
