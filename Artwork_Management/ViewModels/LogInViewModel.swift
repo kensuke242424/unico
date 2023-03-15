@@ -36,10 +36,11 @@ class LogInViewModel: ObservableObject {
     @Published var logInAlertMessage: LogInAlert = .start
     
     /// LogInViewでのサインイン操作フローを管理するプロパティ
-    @Published var selectSignInType: SelectSignInType = .start
-    @Published var createAccountFase: CreateAccountFase = .start
+    @Published var userSelectedSignInType  : UserSelectedSignInType = .start
+    @Published var createAccountFase : CreateAccountFase = .start
     @Published var selectProviderType: SelectProviderType = .start
-    @Published var addressSignInFase: AddressSignInFase = .start
+    @Published var addressSignInFase : AddressSignInFase = .start
+    @Published var resultSignInType: ResultSignInType = .signIn
 
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
     var listenerHandle: AuthStateDidChangeListenerHandle?
@@ -49,9 +50,6 @@ class LogInViewModel: ObservableObject {
 
     // sign in with Appleにてサインイン時に生成されるランダム文字列「ノンス」
     fileprivate var currentNonce: String?
-
-    var logInErrorMessage: String = ""
-    var logInErrorAlertMessage: String = ""
     
     func startCurrentUserListener() {
         print("startCurrentUserListenerが実行されました")
@@ -89,17 +87,7 @@ class LogInViewModel: ObservableObject {
             }
         }
     }
-
-    func handleSignInWithAppleRequest(_ request: ASAuthorizationAppleIDRequest) {
-        request.requestedScopes = [.fullName, .email]
-        let nonce = randomNonceString()
-        currentNonce = nonce
-        // sha256 ⇨ 256文字のハッシュ関数を生成し暗号化。サインイン認証時に照らし合わせる
-        // 元となる文字列の文字数に関係なく256文字が生成される。この値はサインイン処理のたびに異なる値を照らし合わせる。
-        request.nonce = sha256(nonce)
-    }
     
-    //  TODO: メソッド名がわかりにくい気がする...
     func existEmailAccountCheck(_ email: String) {
         
         /// 受け取ったメールアドレスを使って、Auth内から既存アカウントの有無を調べる
@@ -120,7 +108,7 @@ class LogInViewModel: ObservableObject {
             /// Authの判定後、ユーザが選択したサインインタイプによってさらに処理がスイッチ分岐する
             if let providers = providers, providers.count > 0 {
                 // アカウントが既に存在していた場合の処理
-                switch self.selectSignInType {
+                switch self.userSelectedSignInType {
                     
                 case .start :
                     print("処理なし")
@@ -128,7 +116,7 @@ class LogInViewModel: ObservableObject {
                 case .logIn :
                     self.sendSignInLink(email: email)
                     
-                case .signAp:
+                case .signUp:
                     // アカウントが既に存在することをアラートで伝えて、既存データへのログインを促す
                     self.logInAlertMessage = .existEmailAddressAccount
                     self.isShowLogInFlowAlert.toggle()
@@ -138,7 +126,7 @@ class LogInViewModel: ObservableObject {
                 
             } else {
                 // アカウントが存在しなかった場合の処理
-                switch self.selectSignInType {
+                switch self.userSelectedSignInType {
                     
                 case .start :
                     print("処理なし")
@@ -153,7 +141,7 @@ class LogInViewModel: ObservableObject {
                     }
                     hapticErrorNotification()
 
-                case .signAp:
+                case .signUp:
                     self.sendSignInLink(email: email)
                     
                 }
@@ -371,11 +359,20 @@ class LogInViewModel: ObservableObject {
         }
     }
     
+    func handleSignInWithAppleRequest(_ request: ASAuthorizationAppleIDRequest) {
+        request.requestedScopes = [.fullName, .email]
+        let nonce = randomNonceString()
+        currentNonce = nonce
+        // sha256 ⇨ 256文字のハッシュ関数を生成し暗号化。サインイン認証時に照らし合わせる
+        // 元となる文字列の文字数に関係なく256文字が生成される。この値はサインイン処理のたびに異なる値を照らし合わせる。
+        request.nonce = sha256(nonce)
+    }
+    
     @MainActor
     // TODO: Sign in with Appleはまだ実装できていない。
     func handleSignInWithAppleCompletion(_ result: Result<ASAuthorization, Error>) {
         if case .failure(let failure) = result {
-            logInErrorAlertMessage = failure.localizedDescription
+            print(failure.localizedDescription)
         }
         else if case .success(let success) = result {
             // ASAuthorizationAppleIDCredential: AppleID認証が成功した結果として得られる資格情報。
@@ -448,7 +445,7 @@ class LogInViewModel: ObservableObject {
         var credential: ASAuthorizationAppleIDCredential?
         
         if case .failure(let failure) = result {
-            logInErrorAlertMessage = failure.localizedDescription
+            print(failure.localizedDescription)
         }
         else if case .success(let success) = result {
             // ASAuthorizationAppleIDCredential: AppleID認証が成功した結果として得られる資格情報。

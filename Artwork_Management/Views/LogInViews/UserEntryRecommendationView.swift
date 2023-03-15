@@ -71,15 +71,16 @@ struct UserEntryRecommendationView: View {
                     .buttonStyle(.borderedProminent)
                     Button("お試しで始める") {
                         
+                        logInVM.resultSignInType = .signUp
                         logInVM.signInAnonymously()
                         
                         withAnimation(.easeInOut(duration: 0.5)) {
                             isShow.toggle()
                         }
                         withAnimation(.spring(response: 0.8).delay(0.5)) {
-                            logInVM.selectSignInType   = .signAp
-                            logInVM.createAccountFase  = .check
-                            logInVM.selectProviderType = .trial
+                            logInVM.userSelectedSignInType = .signUp
+                            logInVM.createAccountFase      = .check
+                            logInVM.selectProviderType     = .trial
                         }
                         
                     }

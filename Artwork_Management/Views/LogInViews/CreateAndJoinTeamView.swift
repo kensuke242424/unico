@@ -301,7 +301,7 @@ struct CreateAndJoinTeamView: View {
                 Button {
                     withAnimation(.spring(response: 1.0)) {
                         logInVM.rootNavigation = .logIn
-                        logInVM.selectSignInType = .start
+                        logInVM.userSelectedSignInType = .start
                         logInVM.selectProviderType = .start
                         logInVM.showEmailSheetBackground = false
                         logInVM.showEmailHalfSheet = false

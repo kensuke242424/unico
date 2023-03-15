@@ -13,8 +13,8 @@ enum Navigation: Hashable {
     case home
 }
 
-enum SelectSignInType {
-    case logIn, signAp, start
+enum UserSelectedSignInType {
+    case logIn, signUp, start
 }
 
 enum SelectProviderType {
@@ -23,6 +23,11 @@ enum SelectProviderType {
 
 enum CreateAccountFase {
     case start, fase1, fase2, fase3, check, success
+}
+
+/// 「サインアップしようとしたが既存のアカウントがあった」などで、最終的に決まったログイン方法
+enum ResultSignInType {
+    case signIn, signUp
 }
 
 enum ShowKyboard {
@@ -89,6 +94,7 @@ enum AddressSignInFase {
 enum LogInAlert {
     case start
     case sendMailLinkUpperLimit
+    case invalidLink
     case emailImproper
     case existsUserDocument
     case existEmailAddressAccount
@@ -101,6 +107,8 @@ enum LogInAlert {
             return ""
         case .sendMailLinkUpperLimit  :
             return "送信の上限"
+        case .invalidLink:
+            return "エラー"
         case .emailImproper           :
             return "エラー"
         case .existsUserDocument      :
@@ -120,6 +128,8 @@ enum LogInAlert {
             return ""
         case .sendMailLinkUpperLimit  :
             return "認証メールの送信上限に達しました。日にちを置いてアクセスしてください。"
+        case .invalidLink             :
+            return "お使いのリンクは使用期限が切れている可能性があります。再度試してみてください。"
         case .emailImproper           :
             return "アドレスの書式が正しくありません。"
         case .existsUserDocument      :
@@ -129,7 +139,7 @@ enum LogInAlert {
         case .notExistEmailAddressAccount:
             return "入力したメールアドレスのアカウントは存在しませんでした。ユーザの新規登録をしてください。"
         case .other                   :
-            return "処理に失敗しました。入力に間違いがないかチェックしてください。"
+            return "処理に失敗しました。再度試してみてください。"
         }
     }
 }
@@ -216,10 +226,10 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             .onTapGesture { inputLogIn.isShowPickerView.toggle() }
             
             LogoMark()
-                .scaleEffect(logInVM.selectSignInType == .signAp ? 0.4 : 1.0)
-                .offset(y: logInVM.selectSignInType == .signAp ? -getRect().height / 2.5 : -getRect().height / 4)
-                .offset(x: logInVM.selectSignInType == .signAp ? getRect().width / 3 : 0)
-                .opacity(logInVM.selectSignInType == .signAp ? 0.4 : 1.0)
+                .scaleEffect(logInVM.userSelectedSignInType == .signUp ? 0.4 : 1.0)
+                .offset(y: logInVM.userSelectedSignInType == .signUp ? -getRect().height / 2.5 : -getRect().height / 4)
+                .offset(x: logInVM.userSelectedSignInType == .signUp ? getRect().width / 3 : 0)
+                .opacity(logInVM.userSelectedSignInType == .signUp ? 0.4 : 1.0)
             
             /// ログインフロー全体的なコンテンツをまとめたGroup
             /// View数が多いとコンパイルが通らないため現状こうしている
@@ -228,10 +238,10 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 // 起動時最初のログイン画面で表示される「ログイン」「いえ、初めてです」ボタン
                 firstSelectButtons()
                     .offset(y: getRect().height / 8)
-                    .opacity(logInVM.selectSignInType == .start ? 1.0 : 0.0)
+                    .opacity(logInVM.userSelectedSignInType == .start ? 1.0 : 0.0)
                 
                 // ログイン画面最初のページで「ログイン」を選んだ時のコンテンツView
-                if logInVM.selectSignInType == .logIn {
+                if logInVM.userSelectedSignInType == .logIn {
                     VStack {
                         signInTitle(title: "ログイン")
                             .padding(.bottom)
@@ -239,7 +249,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         logInSelectButtons()
                     }
                     .offset(y: getRect().height / 10)
-                    .opacity(logInVM.selectSignInType == .logIn ? 1.0 : 0.0)
+                    .opacity(logInVM.userSelectedSignInType == .logIn ? 1.0 : 0.0)
                 }
                 
                 // アカウント登録フローで用いるコンテンツ全体のView
@@ -248,7 +258,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 }
                 
                 // アカウント登録の進捗を表すインジケーター
-                if logInVM.selectSignInType == .signAp {
+                if logInVM.userSelectedSignInType == .signUp {
                     createAccountIndicator()
                         .opacity(inputLogIn.checkBackgroundOpacity)
                         .opacity(logInVM.createAccountFase == .check ||
@@ -258,14 +268,14 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 }
                 
                 // アカウント登録フロー時、前のフェーズに戻るボタン
-                if logInVM.selectSignInType != .start {
+                if logInVM.userSelectedSignInType != .start {
                     Button {
                         withAnimation(.spring(response: 0.5)) {
                             
-                            switch logInVM.selectSignInType {
+                            switch logInVM.userSelectedSignInType {
                             case .start: print("")
-                            case .logIn: logInVM.selectSignInType = .start
-                            case .signAp: print("")
+                            case .logIn: logInVM.userSelectedSignInType = .start
+                            case .signUp: print("")
                             }
                             
                             switch logInVM.createAccountFase {
@@ -273,7 +283,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                 print("戻るボタンは非表示")
                                 
                             case .fase1:
-                                logInVM.selectSignInType = .start
+                                logInVM.userSelectedSignInType = .start
                                 logInVM.createAccountFase = .start
                                 inputLogIn.createAccountTitle = false
                                 inputLogIn.createAccountShowContents = false
@@ -308,14 +318,14 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     .opacity(logInVM.addressSignInFase == .success ||
                              logInVM.addressSignInFase == .check ? 0.2 : 1.0)
                     .opacity(logInVM.createAccountFase == .success ||
-                             logInVM.createAccountFase == .check ? 0.2 : 1.0)
+                             logInVM.createAccountFase == .check ? 0.0 : 1.0)
                     .opacity(logInVM.createAccountFase == .fase1 &&
                              !inputLogIn.createAccountShowContents ? 0.0 : 1.0)
                     .offset(y: getRect().height / 2 - 100)
                 }
                 
                 // ログイン画面最初のページまで戻るボタン
-                if logInVM.selectSignInType != .start {
+                if logInVM.userSelectedSignInType != .start {
                     Button {
                         inputLogIn.isShowGoBackLogInAlert.toggle()
                     } label: {
@@ -328,6 +338,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     .opacity(logInVM.addressSignInFase == .success ? 0.2 : 1.0)
                     .opacity(logInVM.createAccountFase == .start ||
                              logInVM.createAccountFase == .fase1 ||
+                             logInVM.createAccountFase == .check ||
                              logInVM.createAccountFase == .success ? 0.0 : 1.0)
                     .foregroundColor(.white.opacity(0.5))
                     .offset(x: -getRect().width / 2 + 40, y: getRect().height / 2 - 60 )
@@ -341,7 +352,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         
                         Button {
                             withAnimation(.spring(response: 0.7)) {
-                                logInVM.selectSignInType = .start
+                                logInVM.userSelectedSignInType = .start
                                 logInVM.selectProviderType = .start
                                 logInVM.createAccountFase = .start
                                 inputLogIn.createAccountTitle = false
@@ -386,6 +397,9 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             case .sendMailLinkUpperLimit     :
                 Button("OK") {}
                 
+            case .invalidLink                :
+                Button("OK") {}
+                
             case .existsUserDocument         :
                 Button("戻る") {
                     logInVM.signedInOrNot = false
@@ -393,7 +407,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 }
                 Button("ログイン") {
                     withAnimation(.spring(response: 0.5)) {
-                        logInVM.selectSignInType = .logIn
+                        logInVM.resultSignInType = .signIn
                         logInVM.rootNavigation = .fetch
                     }
                 }
@@ -402,12 +416,11 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 Button("戻る") {
                     logInVM.signedInOrNot = false
                     logInVM.addressSignInFase = .start
-                    logInVM.logOut()
                 }
                 Button("ログイン") {
                     withAnimation(.spring(response: 0.5)) {
-                        logInVM.selectSignInType = .logIn
-                        logInVM.rootNavigation = .fetch
+                        logInVM.resultSignInType = .signIn
+                        logInVM.sendSignInLink(email: inputLogIn.address)
                     }
                 }
                 
@@ -485,17 +498,14 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 }
             }
             
-            switch logInVM.selectSignInType {
-                
-            case .start:
-                print("処理なし")
+            switch logInVM.resultSignInType {
 
-            case .logIn:
+            case .signIn:
                 withAnimation(.spring(response: 0.5)) {
                 logInVM.rootNavigation = .fetch
                 }
             
-            case .signAp:
+            case .signUp:
                 
                 Task {
                     do {
@@ -530,6 +540,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         /// データ生成の成功を知らせるアニメーションの後、データのフェッチとログイン開始
                         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                             withAnimation(.spring(response: 1.3)) {
+                                hapticSuccessNotification()
                                 logInVM.createAccountFase = .success
                             }
                         }
@@ -540,7 +551,12 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         }
                     } catch {
                         print("ユーザーデータの作成に失敗しました")
-                        withAnimation(.spring(response: 0.5)) { logInVM.createAccountFase = .fase3 }
+                        logInVM.isShowLogInFlowAlert.toggle()
+                        logInVM.logInAlertMessage = .other
+                        withAnimation(.spring(response: 0.5)) {
+                            hapticErrorNotification()
+                            logInVM.createAccountFase = .fase3
+                        }
                     }
                 } // Task end
             }
@@ -571,7 +587,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             
             Button {
                 withAnimation(.easeIn(duration: 0.3)) {
-                    logInVM.selectSignInType = .logIn
+                    logInVM.userSelectedSignInType = .logIn
                 }
             } label: {
                 ZStack {
@@ -589,7 +605,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             Button {
                 
                 withAnimation(.easeIn(duration: 1)) {
-                    logInVM.selectSignInType = .signAp
+                    logInVM.userSelectedSignInType = .signUp
                 }
                 
                 logInVM.createAccountFase = .fase1
@@ -905,7 +921,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 .overlay {
                     VStack {
                         HStack {
-                            Text(logInVM.selectSignInType == .logIn ?  "Mail Address  ログイン" : "Mail Address  ユーザー登録")
+                            Text(logInVM.userSelectedSignInType == .logIn ?  "Mail Address  ログイン" : "Mail Address  ユーザー登録")
                                 .font(.title3).fontWeight(.bold)
                             
                             Spacer()
@@ -1051,7 +1067,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                 logInVM.addressSignInFase = .check
                             }
                             
-                            switch logInVM.selectSignInType {
+                            switch logInVM.userSelectedSignInType {
                                 
                             case .start :
                                 print("処理なし")
@@ -1059,7 +1075,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             case .logIn :
                                 logInVM.existEmailAccountCheck(inputLogIn.address)
                                 
-                            case .signAp:
+                            case .signUp:
                                 logInVM.existEmailAccountCheck(inputLogIn.address)
                                 
                             }

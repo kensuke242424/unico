@@ -120,7 +120,7 @@ struct RootView: View {
                                 logInVM.rootNavigation = .home
                                 /// ログインが完了したら、LogInViewの操作フローを初期化
                                 logInVM.createAccountFase    = .start
-                                logInVM.selectSignInType     = .start
+                                logInVM.userSelectedSignInType     = .start
                                 logInVM.selectProviderType   = .start
                                 logInVM.addressSignInFase    = .start
                             }
@@ -191,7 +191,7 @@ struct RootView: View {
                     progress.isShow.toggle()
                     withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
                         // ViewModel内のアドレスログインフローに関わる状態を初期化
-                        logInVM.showEmailHalfSheet.toggle()
+                        logInVM.showEmailHalfSheet = false
                         logInVM.showEmailSheetBackground = false
                     }
                     
@@ -205,6 +205,8 @@ struct RootView: View {
                             print("ログインエラー：", error.localizedDescription)
                             progress.isShow.toggle()
                             // TODO: リンクメールの有効期限が切れていた時、ここに処理が走るみたい。適切なアラート要る
+                            logInVM.isShowLogInFlowAlert.toggle()
+                            logInVM.logInAlertMessage = .invalidLink
                             return
                         }
                         // メールリンクからのサインイン成功時の処理
