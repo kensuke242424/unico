@@ -14,6 +14,7 @@
 		BE1F272929C16E0800AD55DF /* ScrollViewDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1F272829C16E0800AD55DF /* ScrollViewDetector.swift */; };
 		BE1F272B29C16E2000AD55DF /* CustomCorners.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1F272A29C16E2000AD55DF /* CustomCorners.swift */; };
 		BE1F272D29C16E4200AD55DF /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1F272C29C16E4200AD55DF /* DetailView.swift */; };
+		BE1F272F29C17AC000AD55DF /* Book.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1F272E29C17AC000AD55DF /* Book.swift */; };
 		BE20B04129BADFC90078169B /* AccountSystemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE20B04029BADFC90078169B /* AccountSystemView.swift */; };
 		BE20B04329BAEA170078169B /* CustomBackButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE20B04229BAEA170078169B /* CustomBackButton.swift */; };
 		BE20B04629BAEF2F0078169B /* DeleteAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE20B04529BAEF2F0078169B /* DeleteAccountView.swift */; };
@@ -111,6 +112,7 @@
 		BE1F272829C16E0800AD55DF /* ScrollViewDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollViewDetector.swift; sourceTree = "<group>"; };
 		BE1F272A29C16E2000AD55DF /* CustomCorners.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCorners.swift; sourceTree = "<group>"; };
 		BE1F272C29C16E4200AD55DF /* DetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
+		BE1F272E29C17AC000AD55DF /* Book.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Book.swift; sourceTree = "<group>"; };
 		BE20B04029BADFC90078169B /* AccountSystemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSystemView.swift; sourceTree = "<group>"; };
 		BE20B04229BAEA170078169B /* CustomBackButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomBackButton.swift; sourceTree = "<group>"; };
 		BE20B04529BAEF2F0078169B /* DeleteAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteAccountView.swift; sourceTree = "<group>"; };
@@ -391,6 +393,7 @@
 				E0CF7EEF28DF152D00735142 /* ItemModel.swift */,
 				E01AA3A22916C674000FCD37 /* TagModel.swift */,
 				E0796AD428F4850D0094E50C /* ButtonModel.swift */,
+				BE1F272E29C17AC000AD55DF /* Book.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -697,6 +700,7 @@
 				E0CC79B628E761EA00CE0B19 /* UserModel.swift in Sources */,
 				E0A36452290A37A600B30A14 /* CustomArcShape.swift in Sources */,
 				E0455FE4292C8EF0004F677D /* BounceAnimationView.swift in Sources */,
+				BE1F272F29C17AC000AD55DF /* Book.swift in Sources */,
 				E01AA3A729177A76000FCD37 /* UserViewModel.swift in Sources */,
 				E09F09CE28F146DB00D07669 /* EditItemView.swift in Sources */,
 				E0CF7EEC28DEEED700735142 /* LibraryListView.swift in Sources */,

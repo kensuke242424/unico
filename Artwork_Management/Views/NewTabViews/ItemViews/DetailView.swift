@@ -10,7 +10,7 @@ import SwiftUI
 struct DetailView: View {
     @Binding var show: Bool
     var animation: Namespace.ID
-    var item: Item
+    var book: Book
     /// View Properties
     @State private var animationContent: Bool = false
     @State private var offsetAnimation: Bool = false
@@ -39,28 +39,29 @@ struct DetailView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .opacity(animationContent ? 1 : 0)
             
-            /// Item Preview (with Matched Geometry Effect)
+            /// Book Preview (with Matched Geometry Effect)
             GeometryReader {
                 let size = $0.size
                 
                 HStack(spacing: 20) {
-                    Image(item.name)
+                    Image(book.imageName)
                         .resizable()
                         .scaledToFill()
                         .frame(width: (size.width - 30) / 2, height: size.height)
                         .clipShape(CustomCorners(corners: [.topRight, .bottomRight], radius: 20))
                         /// Matched Geometry ID
-                        .matchedGeometryEffect(id: item.id, in: animation)
+                        .matchedGeometryEffect(id: book.id, in: animation)
                     
                     VStack(alignment: .leading, spacing: 8) {
-                        Text(item.name)
+                        Text(book.title)
                             .font(.title)
                             .fontWeight(.semibold)
                         
-                        Text(": \(item.inventory)")
+                        Text(": \(book.author)")
                             .font(.callout)
                             .foregroundColor(.gray)
                         
+                        RatingView(rating: book.rating)
                     }
                     .padding(.trailing, 15)
                     .padding(.top, 30)
@@ -75,7 +76,7 @@ struct DetailView: View {
                 .fill(.gray.opacity(0.05))
                 .ignoresSafeArea()
                 .overlay(alignment: .top) {
-                    ItemDetails()
+                    BookDetails()
                 }
                 .padding(.leading, 30)
                 .padding(.top, -180)
@@ -85,12 +86,11 @@ struct DetailView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background {
             Rectangle()
-                .fill(.clear)
+                .fill(.black)
                 .ignoresSafeArea()
                 .opacity(animationContent ? 1 : 0)
         }
         .onAppear {
-            print("onAppear_アイテムカード詳細画面生成")
             withAnimation(.easeInOut(duration: 0.35)) {
                 animationContent = true
             }
@@ -101,7 +101,7 @@ struct DetailView: View {
         }
     }
     @ViewBuilder
-    func ItemDetails() -> some View {
+    func BookDetails() -> some View {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
                 
@@ -138,7 +138,7 @@ struct DetailView: View {
             
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: 15) {
-                    Text("About the Item")
+                    Text("About the book")
                         .font(.title3)
                         .fontWeight(.semibold)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -172,4 +172,3 @@ struct DetailView: View {
         .opacity(offsetAnimation ? 1 : 0)
     }
 }
-

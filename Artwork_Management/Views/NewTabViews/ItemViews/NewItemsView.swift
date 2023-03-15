@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct NewItemsView: View {
-    
     /// View Propaties
     @State private var activeTag: String = "全て"
     @State private var carouselMode: Bool = false
@@ -16,11 +15,10 @@ struct NewItemsView: View {
     @Namespace private var animation
     /// Detail View Properties
     @State private var showDetailView: Bool = false
-    @State private var selectedItem: Item?
-    @State private var animateCurrentItem: Bool = false
+    @State private var selectedBook: Book?
+    @State private var animateCurrentBook: Bool = false
     
     var body: some View {
-        
         VStack(spacing: 15) {
             HStack {
                 Text("Browse").font(.largeTitle.bold())
@@ -52,13 +50,13 @@ struct NewItemsView: View {
                 let size = $0.size
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack(spacing: 35) {
-                        ForEach(TestItem().testItem) { item in
-                            ItemsCardView(item)
+                        ForEach(sampleBooks) { book in
+                            BooksCardView(book)
                                 /// カードをタップすると詳細画面が表示されます。
                                 .onTapGesture {
                                     withAnimation(.easeInOut(duration: 0.2)) {
-                                        animateCurrentItem = true
-                                        selectedItem = item
+                                        animateCurrentBook = true
+                                        selectedBook = book
                                     }
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                                         withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.7, blendDuration: 0.7)) {
@@ -73,7 +71,7 @@ struct NewItemsView: View {
                     .padding(.bottom, bottomPadding(size))
                     .background {
                         ScrollViewDetector(carouselMode: $carouselMode,
-                                           totalContent: TestItem().testItem.count)
+                                           totalContent: sampleBooks.count)
                     }
                 }
                 /// Since we need offset from here and not from global View
@@ -85,8 +83,8 @@ struct NewItemsView: View {
             .padding(.top, 15)
         }
         .overlay {
-            if let selectedItem, showDetailView {
-                DetailView(show: $showDetailView, animation: animation, item: selectedItem)
+            if let selectedBook, showDetailView {
+                DetailView(show: $showDetailView, animation: animation, book: selectedBook)
                     .transition(.asymmetric(insertion: .identity, removal: .offset(y: 0)))
             }
         }
@@ -94,12 +92,11 @@ struct NewItemsView: View {
         .onChange(of: showDetailView) { newValue in
             if !newValue {
                 withAnimation(.easeInOut(duration: 0.35).delay(0.4)) {
-                    animateCurrentItem = false
+                    animateCurrentBook = false
                 }
             }
         }
-        
-    } // body
+    }
     
     /// 最後のカードが上部に移動するためのボトムパディング
     func bottomPadding(_ size: CGSize = .zero) -> CGFloat {
@@ -109,28 +106,32 @@ struct NewItemsView: View {
     }
     
     @ViewBuilder
-    func ItemsCardView(_ item: Item) -> some View {
+    func BooksCardView(_ book: Book) -> some View {
         GeometryReader {
             let size = $0.size
             let rect = $0.frame(in: .named("SCROLLVIEW"))
             
             HStack(spacing: -25) {
-                /// Item Detail Card
+                /// Book Detail Card
                 /// このカードを置くと、カバー画像を愛でることができます。
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(item.name)
+                    Text(book.title)
                         .font(.title3)
                         .fontWeight(.semibold)
                         .foregroundColor(.black)
                     
-                    Text(": \(item.inventory)")
+                    Text(": \(book.author)")
                         .font(.caption)
                         .foregroundColor(.gray)
+                    
+                    /// Rating View
+                    RatingView(rating: book.rating)
+                        .padding(.top, 10)
                     
                     Spacer(minLength: 10)
                     
                     HStack(spacing: 4) {
-                        Text("\(item.sales)")
+                        Text("\(book.bookViews)")
                             .font(.caption)
                             .fontWeight(.semibold)
                             .foregroundColor(.blue)
@@ -150,19 +151,19 @@ struct NewItemsView: View {
                         .shadow(color: .black.opacity(0.08), radius: 8, x: -5, y: -5)
                 }
                 .zIndex(1)
-                /// Moving the item, it it's tapped
-                .offset(x: animateCurrentItem && selectedItem?.id == item.id ? -20 : 0)
+                /// Moving the book, it it's tapped
+                .offset(x: animateCurrentBook && selectedBook?.id == book.id ? -20 : 0)
                 
-                /// Item Cover Image
+                /// Book Cover Image
                 ZStack {
-                    if !(showDetailView && selectedItem?.id == item.id) {
-                        Image(item.name)
+                    if !(showDetailView && selectedBook?.id == book.id) {
+                        Image(book.imageName)
                             .resizable()
                             .scaledToFill()
                             .frame(width: size.width / 2, height: size.height)
                             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                             /// Matched Geometry ID
-                            .matchedGeometryEffect(id: item.id, in: animation)
+                            .matchedGeometryEffect(id: book.id, in: animation)
                             // Applying Shadow
                             .shadow(color: .black.opacity(0.1), radius: 5, x: 5, y: -5)
                             .shadow(color: .black.opacity(0.1), radius: 5, x: -5, y: -5)
