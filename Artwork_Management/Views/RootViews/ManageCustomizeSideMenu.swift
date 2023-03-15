@@ -133,7 +133,7 @@ struct ManageCustomizeSideMenu: View {
                         }
 
                         VStack(alignment: .leading) {
-                            Label("並び替え条件", systemImage: "books.vertical.fill").font(.subheadline)
+                            Label("並び替え条件", systemImage: "Items.vertical.fill").font(.subheadline)
                             Divider().background(.white)
 
                             Picker("並び替え条件", selection: $inputManage.sortType) {

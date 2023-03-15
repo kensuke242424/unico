@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BE1F271E29C162B300AD55DF /* NewHomeTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1F271D29C162B300AD55DF /* NewHomeTabView.swift */; };
+		BE1F272329C166E700AD55DF /* NewHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1F272229C166E700AD55DF /* NewHomeView.swift */; };
+		BE1F272529C1673900AD55DF /* NewItemsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1F272429C1673900AD55DF /* NewItemsView.swift */; };
+		BE1F272729C16DEB00AD55DF /* RatingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1F272629C16DEB00AD55DF /* RatingView.swift */; };
+		BE1F272929C16E0800AD55DF /* ScrollViewDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1F272829C16E0800AD55DF /* ScrollViewDetector.swift */; };
+		BE1F272B29C16E2000AD55DF /* CustomCorners.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1F272A29C16E2000AD55DF /* CustomCorners.swift */; };
+		BE1F272D29C16E4200AD55DF /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1F272C29C16E4200AD55DF /* DetailView.swift */; };
 		BE20B04129BADFC90078169B /* AccountSystemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE20B04029BADFC90078169B /* AccountSystemView.swift */; };
 		BE20B04329BAEA170078169B /* CustomBackButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE20B04229BAEA170078169B /* CustomBackButton.swift */; };
 		BE20B04629BAEF2F0078169B /* DeleteAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE20B04529BAEF2F0078169B /* DeleteAccountView.swift */; };
@@ -97,6 +104,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		BE1F271D29C162B300AD55DF /* NewHomeTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewHomeTabView.swift; sourceTree = "<group>"; };
+		BE1F272229C166E700AD55DF /* NewHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewHomeView.swift; sourceTree = "<group>"; };
+		BE1F272429C1673900AD55DF /* NewItemsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewItemsView.swift; sourceTree = "<group>"; };
+		BE1F272629C16DEB00AD55DF /* RatingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingView.swift; sourceTree = "<group>"; };
+		BE1F272829C16E0800AD55DF /* ScrollViewDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollViewDetector.swift; sourceTree = "<group>"; };
+		BE1F272A29C16E2000AD55DF /* CustomCorners.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCorners.swift; sourceTree = "<group>"; };
+		BE1F272C29C16E4200AD55DF /* DetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
 		BE20B04029BADFC90078169B /* AccountSystemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSystemView.swift; sourceTree = "<group>"; };
 		BE20B04229BAEA170078169B /* CustomBackButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomBackButton.swift; sourceTree = "<group>"; };
 		BE20B04529BAEF2F0078169B /* DeleteAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteAccountView.swift; sourceTree = "<group>"; };
@@ -202,6 +216,36 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		BE1F271F29C1669400AD55DF /* NewTabViews */ = {
+			isa = PBXGroup;
+			children = (
+				BE1F271D29C162B300AD55DF /* NewHomeTabView.swift */,
+				BE1F272129C166B200AD55DF /* ItemViews */,
+				BE1F272029C166A400AD55DF /* HomeViews */,
+			);
+			path = NewTabViews;
+			sourceTree = "<group>";
+		};
+		BE1F272029C166A400AD55DF /* HomeViews */ = {
+			isa = PBXGroup;
+			children = (
+				BE1F272229C166E700AD55DF /* NewHomeView.swift */,
+			);
+			path = HomeViews;
+			sourceTree = "<group>";
+		};
+		BE1F272129C166B200AD55DF /* ItemViews */ = {
+			isa = PBXGroup;
+			children = (
+				BE1F272429C1673900AD55DF /* NewItemsView.swift */,
+				BE1F272629C16DEB00AD55DF /* RatingView.swift */,
+				BE1F272829C16E0800AD55DF /* ScrollViewDetector.swift */,
+				BE1F272A29C16E2000AD55DF /* CustomCorners.swift */,
+				BE1F272C29C16E4200AD55DF /* DetailView.swift */,
+			);
+			path = ItemViews;
+			sourceTree = "<group>";
+		};
 		BE20B04429BAEF000078169B /* Account Settings */ = {
 			isa = PBXGroup;
 			children = (
@@ -309,6 +353,7 @@
 		E08F273228DDB3B200329C5E /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				BE1F271F29C1669400AD55DF /* NewTabViews */,
 				BEAB502C29A7C5E300ECCB4F /* PageTabNavigateViews */,
 				E094B788298EB7C700A2E33C /* UpdateTeamOrUserViews */,
 				E05FE94328F71BE400263F98 /* Extensions */,
@@ -589,6 +634,7 @@
 				E0FCADA429708B9800BA6A75 /* LogoMark.swift in Sources */,
 				E01AA3A9291780DD000FCD37 /* UIImageExtension.swift in Sources */,
 				E08F273828DDB51600329C5E /* ManageView.swift in Sources */,
+				BE1F271E29C162B300AD55DF /* NewHomeTabView.swift in Sources */,
 				E01AA3A529176FE7000FCD37 /* PHPickerView.swift in Sources */,
 				BEAB502E29A7C6D400ECCB4F /* PageTabNavigateView.swift in Sources */,
 				E01AA3AB291780ED000FCD37 /* StringExtension.swift in Sources */,
@@ -605,6 +651,7 @@
 				E0796AD328F46CC90094E50C /* ItemCardRow.swift in Sources */,
 				BE254FC129C0CA0B004FE9AE /* PersonCircleIcon.swift in Sources */,
 				BE20B04329BAEA170078169B /* CustomBackButton.swift in Sources */,
+				BE1F272729C16DEB00AD55DF /* RatingView.swift in Sources */,
 				E08F273628DDB48100329C5E /* StockView.swift in Sources */,
 				E0CF7EF228DF166700735142 /* ItemViewModel.swift in Sources */,
 				E0CF7EF028DF152D00735142 /* ItemModel.swift in Sources */,
@@ -624,18 +671,23 @@
 				E08F272528DDA08E00329C5E /* Artwork_ManagementApp.swift in Sources */,
 				BE20B04829BAEFDB0078169B /* UpdateAddressView.swift in Sources */,
 				E0F78FC42919F06D00A95CD1 /* DateFormatterExtension.swift in Sources */,
+				BE1F272D29C16E4200AD55DF /* DetailView.swift in Sources */,
 				E09F09C528ED5DEA00D07669 /* SideMenuEditTagView.swift in Sources */,
 				E0DE335029288D07008C7147 /* TeamModel.swift in Sources */,
 				E0A3B996292EFCE600209ADC /* CreateAndJoinTeamView.swift in Sources */,
 				E01E1392291F961A0001F2DA /* TagViewModel.swift in Sources */,
 				E0796ADD28F5F2830094E50C /* CartItemsSheet.swift in Sources */,
 				E094F10028E20F1000D3C845 /* LogInView.swift in Sources */,
+				BE1F272B29C16E2000AD55DF /* CustomCorners.swift in Sources */,
+				BE1F272929C16E0800AD55DF /* ScrollViewDetector.swift in Sources */,
 				E0BE39AD29331218002499C4 /* UIImageCircleIcon.swift in Sources */,
 				E0003D0328FD3BB0007308B0 /* TagTitle.swift in Sources */,
 				E01E13942920EE850001F2DA /* EmptyItemView.swift in Sources */,
 				BE254FBF29C0C396004FE9AE /* CubeCircleIcon.swift in Sources */,
 				E01E1390291D168B0001F2DA /* SystemSideMenu.swift in Sources */,
 				BE254F9329BF1104004FE9AE /* UserEntryRecommendationView.swift in Sources */,
+				BE1F272329C166E700AD55DF /* NewHomeView.swift in Sources */,
+				BE1F272529C1673900AD55DF /* NewItemsView.swift in Sources */,
 				BE3CD65B29B72B0700C19442 /* ProgressViewModel.swift in Sources */,
 				E0CF7EF428DF385800735142 /* ItemCards.swift in Sources */,
 				E05FE94528F71BFB00263F98 /* ColorExtension.swift in Sources */,

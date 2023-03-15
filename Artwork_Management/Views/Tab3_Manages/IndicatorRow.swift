@@ -131,9 +131,3 @@ struct IndicatorRow: View {
         }
     }
 }
-
-struct IndicatorView_Previews: PreviewProvider {
-    static var previews: some View {
-        IndicatorRow(inputManage: .constant(InputManageCustomizeSideMenu()), item: TestItem().testItem, color: .red)
-    }
-}

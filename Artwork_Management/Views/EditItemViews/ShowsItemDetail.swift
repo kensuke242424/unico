@@ -204,7 +204,7 @@ struct ShowsItemDetail_Previews: PreviewProvider {
     static var previews: some View {
         ShowsItemDetail(itemVM: ItemViewModel(),
                         inputHome: .constant(InputHome()),
-                        item: TestItem().testItem,
+                        item: TestItem().testItem.first!,
                         teamID: "")
     }
 }
