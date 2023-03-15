@@ -12,7 +12,6 @@ struct NewHomeView: View {
         VStack {
             Text("Homeタブです。")
         }
-        .navigationTitle("ホーム画面")
     }
 }
 

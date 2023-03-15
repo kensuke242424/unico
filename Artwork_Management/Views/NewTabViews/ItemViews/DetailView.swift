@@ -29,11 +29,11 @@ struct DetailView: View {
                     
                 }
                 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+//                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                     withAnimation(.easeInOut(duration: 0.35).delay(0.1)) {
                         show.toggle()
                     }
-                }
+//                }
                 
             } label: {
                 Image(systemName: "chevron.left")
@@ -96,7 +96,7 @@ struct DetailView: View {
             Rectangle()
                 .fill(.black)
                 .ignoresSafeArea()
-                .opacity(animationContent ? 1 : 0)
+                .opacity(show ? 1 : 0)
         }
         .onAppear {
             withAnimation(.easeInOut(duration: 0.35)) {

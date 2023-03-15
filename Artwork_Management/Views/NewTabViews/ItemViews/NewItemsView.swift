@@ -15,36 +15,28 @@ struct NewItemsView: View {
     @Namespace private var animation
     /// Detail View Properties
     @State private var showDetailView: Bool = false
+    @State private var showDarkBackground: Bool = false
     @State private var selectedBook: Book?
     @State private var animateCurrentBook: Bool = false
     
     var body: some View {
         VStack(spacing: 15) {
+            
+            /// Tab Top
             HStack {
-                Text("Browse").font(.largeTitle.bold())
-                
-                Text("Recommend")
+                Text("アイテム管理")
+                    .font(.title3)
                     .fontWeight(.semibold)
                     .padding(.leading, 15)
-                    .foregroundColor(.gray)
+                    .foregroundColor(.white)
                     .offset(y: 2)
                 
-                Spacer(minLength: 10)
-                
-                Menu {
-                    Button("Toggle Carousel Mode (\(carouselMode ? "ON" : "OFF"))") {
-                        carouselMode.toggle()
-                    }
-                } label: {
-                    Image(systemName: "ellipsis")
-                        .rotationEffect(.init(degrees: -90))
-                        .foregroundColor(.gray)
-                }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(maxWidth: .infinity)
             .padding(.horizontal, 15)
             
             TagsView()
+                .opacity(showDarkBackground ? 0 : 1)
             
             GeometryReader {
                 let size = $0.size
@@ -56,9 +48,10 @@ struct NewItemsView: View {
                                 .onTapGesture {
                                     withAnimation(.easeInOut(duration: 0.2)) {
                                         animateCurrentBook = true
+                                        showDarkBackground = true
                                         selectedBook = book
                                     }
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                                         withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.7, blendDuration: 0.7)) {
                                             showDetailView.toggle()
                                         }
@@ -88,9 +81,20 @@ struct NewItemsView: View {
                     .transition(.asymmetric(insertion: .identity, removal: .offset(y: 0)))
             }
         }
+        .background {
+            ZStack {
+                GeometryReader { proxy in
+                    Color(.black)
+                        .frame(width: proxy.size.width, height: proxy.size.height)
+                        .opacity(showDarkBackground ? 1 : 0)
+                }
+                .ignoresSafeArea()
+            }
+        }
         
         .onChange(of: showDetailView) { newValue in
             if !newValue {
+                showDarkBackground = false
                 withAnimation(.easeInOut(duration: 0.35).delay(0.4)) {
                     animateCurrentBook = false
                 }
@@ -227,6 +231,15 @@ struct NewItemsView: View {
             }
             .padding(.horizontal, 15)
         }
+        .background {
+            Rectangle()
+                .fill(Color("userGray1"))
+                .opacity(0.7)
+                .frame(maxWidth: .infinity)
+                .frame(height: 50)
+                .blur(radius: 2)
+        }
+        .padding(.top)
     }
 } // View
 

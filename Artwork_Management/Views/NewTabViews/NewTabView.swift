@@ -29,6 +29,19 @@ struct NewTabView: View {
                     .tag(SelectionTab.item)
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
+            .background {
+                ZStack {
+                    GeometryReader { proxy in
+                        Image("background_1")
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: proxy.size.width, height: proxy.size.height)
+                            .ignoresSafeArea()
+                            .blur(radius: selectionTab == .home ? 0 : 5)
+                    }
+                }
+            }
+            .ignoresSafeArea()
         }
         
     } // body
