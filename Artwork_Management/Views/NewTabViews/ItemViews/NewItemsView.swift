@@ -9,6 +9,7 @@ import SwiftUI
 
 struct NewItemsView: View {
     /// View Propaties
+    @Environment(\.colorScheme) var colorScheme
     @State private var activeTag: String = "全て"
     @State private var carouselMode: Bool = false
     /// For Matched Geometry Effect
@@ -71,7 +72,8 @@ struct NewItemsView: View {
         .background {
             ZStack {
                 GeometryReader { proxy in
-                    Color(.black)
+                    Rectangle()
+                        .fill(colorScheme == .light ? .white : .black)
                         .frame(width: proxy.size.width, height: proxy.size.height)
                         .opacity(showDarkBackground ? 1 : 0)
                 }

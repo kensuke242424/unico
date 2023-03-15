@@ -11,6 +11,7 @@ import ResizableSheet
 struct NewTabView: View {
     
     @State private var selectionTab: Tab = .item
+    @State private var animationTab: Tab = .item
     
     @State private var scrollProgress: CGFloat = .zero
     @State private var imageBlur: CGFloat = 4
@@ -21,8 +22,12 @@ struct NewTabView: View {
             let size = $0.size
             
             NavigationStack {
+                
                 VStack {
+                    
                     TabIndicatorView()
+                    
+                    Spacer(minLength: 0)
                     
                     TabView(selection: $selectionTab) {
                         NewHomeView()
@@ -30,7 +35,6 @@ struct NewTabView: View {
                             .offsetX(selectionTab == Tab.home) { rect in
                                 let minX = rect.minX
                                 let pageOffset = minX - (size.width * CGFloat(Tab.home.index))
-                                print(pageOffset)
                                 
                                 let pageProgress = pageOffset / size.width
                                 scrollProgress = max(min(pageProgress, 0), -CGFloat(Tab.allCases.count - 1))
@@ -41,33 +45,35 @@ struct NewTabView: View {
                             .offsetX(selectionTab == Tab.item) { rect in
                                 let minX = rect.minX
                                 let pageOffset = minX - (size.width * CGFloat(Tab.item.index))
-                                print(pageOffset)
                                 
                                 let pageProgress = pageOffset / size.width
                                 scrollProgress = max(min(pageProgress, 0), -CGFloat(Tab.allCases.count - 1))
                             }
                     }
                     .tabViewStyle(.page(indexDisplayMode: .never))
-                    .background {
-                        ZStack {
-                            GeometryReader { proxy in
-                                Image("background_4")
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: proxy.size.width, height: proxy.size.height)
-                                    .ignoresSafeArea()
-                                    .blur(radius: imageBlur)
-                            }
+                }
+                .background {
+                    ZStack {
+                        GeometryReader { proxy in
+                            Image("background_3")
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: proxy.size.width, height: proxy.size.height)
+                                .ignoresSafeArea()
+                                .blur(radius: imageBlur, opaque: true)
+                            
                         }
                     }
-                    .ignoresSafeArea()
                 }
+                .ignoresSafeArea()
                 .onChange(of: selectionTab) { _ in
                     switch selectionTab {
                     case .home:
-                        withAnimation(.easeInOut(duration: 0.3)) { imageBlur = 0 }
+                        withAnimation(.easeInOut(duration: 0.2)) { imageBlur = 0 }
+                        withAnimation(.easeInOut(duration: 0.3)) { animationTab = .home }
                     case .item:
-                        withAnimation(.easeInOut(duration: 0.3)) { imageBlur = 4 }
+                        withAnimation(.spring(response: 0.2)) { imageBlur = 4 }
+                        withAnimation(.spring(response: 0.3)) { animationTab = .item }
                     }
                 }
             } // NavigationStack
@@ -85,21 +91,52 @@ struct NewTabView: View {
                     Text(tab.rawValue)
                         .font(.title3.bold())
                         .tracking(4)
+                        .scaleEffect(selectionTab == tab ? 1.0 : 0.7)
                         .foregroundColor(selectionTab == tab ? .primary : .gray)
                         .frame(width: tabWidth)
                         .contentShape(Rectangle())
-                        .onTapGesture {
-                            withAnimation(.easeInOut(duration: 0.3)) {
-                                selectionTab = tab
-                            }
-                        }
+                        .padding(.top, 60)
                 }
             }
             .frame(width: CGFloat(Tab.allCases.count) * tabWidth)
             .padding(.leading, tabWidth)
             .offset(x: scrollProgress * tabWidth)
+            .overlay {
+                HStack {
+                    if animationTab == .home {
+                        Circle()
+                            .frame(width: 35, height: 35)
+                            .transition(.asymmetric(
+                                insertion: AnyTransition.opacity.combined(with: .offset(x: -20, y: 0)),
+                                removal: AnyTransition.opacity.combined(with: .offset(x: -20, y: 0))
+                            ))
+                    }
+                    
+                    Spacer()
+                    if animationTab == .item {
+                        Image(systemName: "shippingbox.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 30, height: 30)
+                            .transition(.asymmetric(
+                                insertion: AnyTransition.opacity.combined(with: .offset(x: 20, y: 0)),
+                                removal: AnyTransition.opacity.combined(with: .offset(x: 20, y: 0))
+                            ))
+                            .onTapGesture {}
+                    }
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 60)
+            }
         }
-        .frame(height: 40)
+        .frame(height: 100)
+        .background(
+            Color.clear
+                .overlay {
+                    BlurView(style: .systemUltraThinMaterial)
+                        .ignoresSafeArea()
+                }
+        )
     }
 } // View
 

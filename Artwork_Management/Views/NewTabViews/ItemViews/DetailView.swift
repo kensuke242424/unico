@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct DetailView: View {
+    
+    @Environment(\.colorScheme) var colorScheme
+    
     @Binding var show: Bool
     var animation: Namespace.ID
     var book: Book
@@ -94,7 +97,7 @@ struct DetailView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background {
             Rectangle()
-                .fill(.black)
+                .fill(colorScheme == .light ? .white : .black)
                 .ignoresSafeArea()
                 .opacity(show ? 1 : 0)
         }
