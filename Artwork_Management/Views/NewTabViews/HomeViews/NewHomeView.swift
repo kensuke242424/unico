@@ -24,5 +24,11 @@ struct NewHomeView: View {
 struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
         NewHomeView()
+            .background {
+                Image("background_1")
+                    .resizable()
+                    .scaledToFill()
+                    .ignoresSafeArea()
+            }
     }
 }
