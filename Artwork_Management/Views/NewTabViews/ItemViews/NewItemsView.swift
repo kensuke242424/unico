@@ -91,11 +91,11 @@ struct NewItemsView: View {
         }
     }
     
-    /// 最後のカードが上部に移動するためのボトムパディング
+    /// 最後のカードが上部に残るためのボトムパディング
     func bottomPadding(_ size: CGSize = .zero) -> CGFloat {
         let cardHeight: CGFloat = 220
         let scrollViewHeight: CGFloat = size.height
-        return scrollViewHeight - cardHeight - 40
+        return scrollViewHeight - cardHeight - 110
     }
     
     @ViewBuilder
