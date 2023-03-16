@@ -10,12 +10,12 @@ import ResizableSheet
 
 struct NewTabView: View {
     
+    /// View Propertys
     @State private var selectionTab: Tab = .item
     @State private var animationTab: Tab = .item
     @State private var animationOpacity: CGFloat = 1
     @State private var animationScale: CGFloat = 1
     @State private var scrollProgress: CGFloat = .zero
-    @State private var imageBlur: CGFloat = 4
 
     var body: some View {
 
@@ -36,8 +36,8 @@ struct NewTabView: View {
                             .offsetX(selectionTab == Tab.home) { rect in
                                 let minX = rect.minX
                                 let pageOffset = minX - (size.width * CGFloat(Tab.home.index))
-                                
                                 let pageProgress = pageOffset / size.width
+                                
                                 scrollProgress = max(min(pageProgress, 0), -CGFloat(Tab.allCases.count - 1))
                                 animationOpacity = 1 - -scrollProgress
                             }
@@ -47,10 +47,9 @@ struct NewTabView: View {
                             .offsetX(selectionTab == Tab.item) { rect in
                                 let minX = rect.minX
                                 let pageOffset = minX - (size.width * CGFloat(Tab.item.index))
-                                
                                 let pageProgress = pageOffset / size.width
+                                
                                 scrollProgress = max(min(pageProgress, 0), -CGFloat(Tab.allCases.count - 1))
-                                print(scrollProgress)
                                 animationOpacity = -scrollProgress
                             }
                     }
@@ -65,7 +64,6 @@ struct NewTabView: View {
                                 .frame(width: proxy.size.width, height: proxy.size.height)
                                 .ignoresSafeArea()
                                 .blur(radius: min((-scrollProgress * 4), 4), opaque: true)
-                            
                         }
                     }
                 }
@@ -73,10 +71,8 @@ struct NewTabView: View {
                 .onChange(of: selectionTab) { _ in
                     switch selectionTab {
                     case .home:
-                        withAnimation(.easeInOut(duration: 0.2)) { imageBlur = 0 }
                         withAnimation(.easeInOut(duration: 0.2)) { animationTab = .home }
                     case .item:
-                        withAnimation(.spring(response: 0.2)) { imageBlur = 4 }
                         withAnimation(.spring(response: 0.2)) { animationTab = .item }
                     }
                 }
@@ -122,16 +118,20 @@ struct NewTabView: View {
                     
                     /// Itemタブに移動した時に表示するアイテム追加タブボタン
                     if animationTab == .item {
-                        Image(systemName: "shippingbox.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 30, height: 30)
-                            .transition(.asymmetric(
-                                insertion: AnyTransition.opacity.combined(with: .offset(x: 20, y: 0)),
-                                removal: AnyTransition.opacity.combined(with: .offset(x: 20, y: 0))
-                            ))
-                            .onTapGesture {}
-                            .opacity(animationOpacity)
+                        Button {
+                            
+                        } label: {
+                            Image(systemName: "shippingbox.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .foregroundColor(.primary)
+                                .frame(width: 30, height: 30)
+                                .opacity(animationOpacity)
+                        }
+                        .transition(.asymmetric(
+                            insertion: AnyTransition.opacity.combined(with: .offset(x: 20, y: 0)),
+                            removal: AnyTransition.opacity.combined(with: .offset(x: 20, y: 0))
+                        ))
                     }
                 }
                 .padding(.horizontal, 20)
