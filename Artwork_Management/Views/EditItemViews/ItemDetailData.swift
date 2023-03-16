@@ -63,7 +63,7 @@ struct ItemDetailData_Previews: PreviewProvider {
                 .opacity(0.7)
                 .frame(width: 300, height: 300)
 
-            ItemDetailData(item: TestItem().testItem.first!)
+            ItemDetailData(item: testItem.first!)
 
         } // ZStack
     } // body

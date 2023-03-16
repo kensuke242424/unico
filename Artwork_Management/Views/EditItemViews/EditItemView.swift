@@ -382,7 +382,7 @@ struct EditItemView_Previews: PreviewProvider {
                      inputHome: .constant(InputHome()),
                      inputImage: .constant(InputImage()),
                      itemIndex: 0,
-                     passItemData: TestItem().testItem.first!,
+                     passItemData: testItem.first!,
                      editItemStatus: .update
         )
     }

@@ -13,7 +13,7 @@ struct DetailView: View {
     
     @Binding var show: Bool
     var animation: Namespace.ID
-    var book: Book
+    var item: Item
     /// View Properties
     @State private var animationContent: Bool = false
     @State private var offsetAnimation: Bool = false
@@ -54,25 +54,25 @@ struct DetailView: View {
                 let size = $0.size
                 
                 HStack(spacing: 20) {
-                    Image(book.imageName)
+                    Image(item.name)
                         .resizable()
                         .scaledToFill()
                         .frame(width: (size.width - 30) / 2, height: size.height)
                         .clipShape(CustomCorners(corners: [.topRight, .bottomRight], radius: 20))
                         /// Matched Geometry ID
                         .transition(.opacity)
-                        .matchedGeometryEffect(id: book.id, in: animation)
+                        .matchedGeometryEffect(id: item.id, in: animation)
                     
                     VStack(alignment: .leading, spacing: 8) {
-                        Text(book.title)
+                        Text(item.name)
                             .font(.title)
                             .fontWeight(.semibold)
                         
-                        Text(": \(book.author)")
+                        Text(": \(item.sales)")
                             .font(.callout)
                             .foregroundColor(.gray)
                         
-                        RatingView(rating: book.rating)
+                        RatingView(rating: item.inventory)
                     }
                     .padding(.trailing, 15)
                     .padding(.top, 30)
@@ -189,6 +189,6 @@ struct DetailView_Previews: PreviewProvider {
     static var previews: some View {
         DetailView(show: .constant(true),
                    animation: animation,
-                   book: sampleBooks.first!)
+                   item: testItem.first!)
     }
 }

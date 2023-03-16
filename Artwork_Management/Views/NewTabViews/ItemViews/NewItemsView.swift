@@ -17,8 +17,8 @@ struct NewItemsView: View {
     /// Detail View Properties
     @State private var showDetailView: Bool = false
     @State private var showDarkBackground: Bool = false
-    @State private var selectedBook: Book?
-    @State private var animateCurrentBook: Bool = false
+    @State private var selectedItem: Item?
+    @State private var animateCurrentItem: Bool = false
     
     var body: some View {
         GeometryReader {
@@ -30,13 +30,13 @@ struct NewItemsView: View {
             
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack(spacing: 35) {
-                        ForEach(sampleBooks) { book in
-                            BooksCardView(book)
+                        ForEach(testItem, id: \.self) { item in
+                            ItemsCardView(item)
                                 .onTapGesture {
                                     withAnimation(.easeInOut(duration: 0.25)) {
-                                        animateCurrentBook = true
+                                        animateCurrentItem = true
                                         showDarkBackground = true
-                                        selectedBook = book
+                                        selectedItem = item
                                     }
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
                                         withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.7, blendDuration: 0.7)) {
@@ -44,7 +44,7 @@ struct NewItemsView: View {
                                         }
                                     }
                                 }
-                                .opacity(showDarkBackground && selectedBook != book ? 0 : 1)
+                                .opacity(showDarkBackground && selectedItem != item ? 0 : 1)
                         }
                     }
                     .padding(.horizontal, 15)
@@ -64,8 +64,8 @@ struct NewItemsView: View {
             .padding(.top, 15)
         }
         .overlay {
-            if let selectedBook, showDetailView {
-                DetailView(show: $showDetailView, animation: animation, book: selectedBook)
+            if let selectedItem, showDetailView {
+                DetailView(show: $showDetailView, animation: animation, item: selectedItem)
                     .transition(.asymmetric(insertion: .identity, removal: .offset(y: 0)))
             }
         }
@@ -85,7 +85,7 @@ struct NewItemsView: View {
             if !newValue {
                 showDarkBackground = false
                 withAnimation(.easeInOut(duration: 0.35).delay(0.4)) {
-                    animateCurrentBook = false
+                    animateCurrentItem = false
                 }
             }
         }
@@ -99,7 +99,7 @@ struct NewItemsView: View {
     }
     
     @ViewBuilder
-    func BooksCardView(_ book: Book) -> some View {
+    func ItemsCardView(_ item: Item) -> some View {
         GeometryReader {
             let size = $0.size
             let rect = $0.frame(in: .named("SCROLLVIEW"))
@@ -108,23 +108,23 @@ struct NewItemsView: View {
                 /// Book Detail Card
                 /// このカードを置くと、カバー画像を愛でることができます。
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(book.title)
+                    Text(item.name)
                         .font(.title3)
                         .fontWeight(.semibold)
                         .foregroundColor(.black)
                     
-                    Text(": \(book.author)")
+                    Text(": \(item.sales)")
                         .font(.caption)
                         .foregroundColor(.gray)
                     
                     /// Rating View
-                    RatingView(rating: book.rating)
+                    RatingView(rating: item.inventory)
                         .padding(.top, 10)
                     
                     Spacer(minLength: 10)
                     
                     HStack(spacing: 4) {
-                        Text("\(book.bookViews)")
+                        Text("\(item.sales)")
                             .font(.caption)
                             .fontWeight(.semibold)
                             .foregroundColor(.blue)
@@ -145,19 +145,19 @@ struct NewItemsView: View {
                 }
                 .zIndex(1)
                 /// Moving the book, it it's tapped
-                .offset(x: animateCurrentBook && selectedBook?.id == book.id ? -20 : 0)
+                .offset(x: animateCurrentItem && selectedItem?.id == item.id ? -20 : 0)
                 
                 /// Book Cover Image
                 ZStack {
-                    if !(showDetailView && selectedBook?.id == book.id) {
-                        Image(book.imageName)
+                    if !(showDetailView && selectedItem?.id == item.id) {
+                        Image(item.name)
                             .resizable()
                             .scaledToFill()
                             .frame(width: size.width / 2, height: size.height)
                             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                             /// Matched Geometry ID
                             .transition(.asymmetric(insertion: .slide, removal: .identity))
-                            .matchedGeometryEffect(id: book.id, in: animation)
+                            .matchedGeometryEffect(id: item.id, in: animation)
                             // Applying Shadow
                             .shadow(color: .black.opacity(0.1), radius: 5, x: 5, y: -5)
                             .shadow(color: .black.opacity(0.1), radius: 5, x: -5, y: -5)
