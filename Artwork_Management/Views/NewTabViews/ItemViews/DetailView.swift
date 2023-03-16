@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseFirestore
 
 struct DetailView: View {
     
@@ -17,6 +18,7 @@ struct DetailView: View {
     /// View Properties
     @State private var animationContent: Bool = false
     @State private var offsetAnimation: Bool = false
+    @State private var openDetail: Bool = false
     
     var body: some View {
         VStack(spacing: 15) {
@@ -124,51 +126,77 @@ struct DetailView: View {
     @ViewBuilder
     func BookDetails() -> some View {
         VStack(spacing: 0) {
-            HStack(spacing: 0) {
-                
-                Button {
+            if !openDetail {
+                HStack(spacing: 0) {
                     
-                } label: {
-                    Label("Share", systemImage: "square.and.arrow.up")
-                        .font(.callout)
-                        .foregroundColor(.gray)
-                }
-                .frame(maxWidth: .infinity)
-                
-                Button {
+                    Button {
+                        
+                    } label: {
+                        Label("Share", systemImage: "square.and.arrow.up")
+                            .font(.callout)
+                            .foregroundColor(.gray)
+                    }
+                    .frame(maxWidth: .infinity)
                     
-                } label: {
-                    Label("Like", systemImage: "suit.heart")
-                        .font(.callout)
-                        .foregroundColor(.gray)
-                }
-                .frame(maxWidth: .infinity)
-                
-                Button {
+                    Button {
+                        
+                    } label: {
+                        Label("Like", systemImage: "suit.heart")
+                            .font(.callout)
+                            .foregroundColor(.gray)
+                    }
+                    .frame(maxWidth: .infinity)
                     
-                } label: {
-                    Label("Cart", systemImage: "cart.fill.badge.plus")
-                        .font(.callout)
-                        .foregroundColor(.gray)
+                    Button {
+                        
+                    } label: {
+                        Label("Cart", systemImage: "cart.fill.badge.plus")
+                            .font(.callout)
+                            .foregroundColor(.orange)
+                    }
+                    .frame(maxWidth: .infinity)
                 }
-                .frame(maxWidth: .infinity)
-            }
             
-            Divider()
-                .padding(.vertical, 25)
+            
+                Divider()
+                    .padding(.vertical, 25)
+                
+            } // if !openDetail
             
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: 15) {
-                    Text("アイテム詳細")
-                        .font(.title3)
-                        .fontWeight(.semibold)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    HStack {
+                        Text("このアイテムについて")
+                            .font(.title3)
+                            .fontWeight(.semibold)
+                        
+                        Button {
+                            withAnimation(.spring(response: 0.6)) {
+                                openDetail.toggle()
+                            }
+                        } label: {
+                            Image(systemName: openDetail ?
+                                  "list.bullet.circle.fill" : "list.bullet.circle")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 22)
+                        }
+                        
+                        .padding(.leading, 50)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    if openDetail {
+                        ItemSalesDetail()
+                    }
                     
                     /// Detail
-                    Text("① 書きもの。書き付け。書類。ぶんしょ。もんぞ。※性霊集‐五（835頃）為大使与福州観察使書「州使責以二文書一、疑二彼腹心一」※宇津保（970‐999頃）藤原の君「かくのごとく人の嘆きをのぞき給はば、人の嘆き願ひみつべし、となん、もんしょに言へる」")
+                    Text(item.detail)
                         .font(.subheadline)
                         .foregroundColor(.primary.opacity(0.7))
+                        .padding(.top)
                 }
+                .padding(.bottom, 100)
             }
             Button {
                 
@@ -191,6 +219,56 @@ struct DetailView: View {
         /// Applying Offset Animation
         .offset(y: offsetAnimation ? 0 : 50)
         .opacity(offsetAnimation ? 1 : 0)
+    }
+    
+    @ViewBuilder
+    func ItemSalesDetail() -> some View {
+        
+        VStack(alignment: .listRowSeparatorLeading, spacing: 8) {
+
+            Divider()
+                .frame(width: 300)
+                .padding(.bottom)
+            
+            Text("タグ　　　:　　 \(item.tag)")
+                .padding(.bottom, 12)
+            Text("在庫　　　:　　 \(item.inventory) 個")
+            Text(item.price != 0 ? "価格　　　:　　 ¥ \(item.price)" : "価格　　　:　　   -")
+                .padding(.bottom, 12)
+            Text(item.totalInventory != 0 ?
+                 "総在庫　　:　　 \(item.totalInventory) 個": "総在庫　　:　　   -  個")
+            Text(item.totalAmount != 0 ?
+                 "総売個数　:　　 \(item.totalAmount) 個" : "総売個数　:　　   - 個")
+            Text(item.sales != 0 ?
+                 "総売上　　:　　 ¥ \(item.sales)" : "総売上　　:　　   -")
+                .padding(.bottom, 12)
+
+            Text("登録日　　:　　 \(asTimesString(item.createTime))")
+            Text("最終更新　:　　 \(asTimesString(item.updateTime))")
+            
+            Divider()
+                .frame(width: 300)
+                .padding(.top)
+
+        } // VStack
+        .frame(maxWidth: .infinity)
+        .font(.callout)
+        .fontWeight(.light)
+        .opacity(0.6)
+        .tracking(1)
+        .lineLimit(1)
+        .padding(.vertical, 10)
+    }
+    
+    func asTimesString(_ time: Timestamp?) -> String {
+        
+        if let time = item.createTime {
+            let formatter = DateFormatter()
+            formatter.setTemplate(.date, .jaJP)
+            return formatter.string(from: time.dateValue())
+        } else {
+            return "???"
+        }
     }
 }
 
