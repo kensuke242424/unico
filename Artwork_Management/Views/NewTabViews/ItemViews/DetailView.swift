@@ -99,7 +99,7 @@ struct DetailView: View {
                 .fill(.gray.opacity(0.05))
                 .ignoresSafeArea()
                 .overlay(alignment: .top) {
-                    BookDetails()
+                    ItemDetails()
                 }
                 .padding(.leading, 30)
                 .padding(.top, -180)
@@ -124,7 +124,7 @@ struct DetailView: View {
         }
     }
     @ViewBuilder
-    func BookDetails() -> some View {
+    func ItemDetails() -> some View {
         VStack(spacing: 0) {
             if !openDetail {
                 HStack(spacing: 0) {
@@ -156,10 +156,12 @@ struct DetailView: View {
                     }
                     .frame(maxWidth: .infinity)
                 }
+                .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: -20)))
             
             
                 Divider()
                     .padding(.vertical, 25)
+                    .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: -20)))
                 
             } // if !openDetail
             
@@ -254,7 +256,7 @@ struct DetailView: View {
         .frame(maxWidth: .infinity)
         .font(.callout)
         .fontWeight(.light)
-        .opacity(0.6)
+        .opacity(0.7)
         .tracking(1)
         .lineLimit(1)
         .padding(.vertical, 10)

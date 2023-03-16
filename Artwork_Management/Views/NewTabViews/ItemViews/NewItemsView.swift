@@ -149,7 +149,7 @@ struct NewItemsView: View {
                 /// カートにアイテムを入れるボタン
                 .overlay(alignment: .bottomTrailing) {
                     Button {
-                        /* カートシートの表示とアイテムのカート追加 */
+                        // TODO: カートシートの表示とアイテムのカート追加
                     } label: {
                         Image(systemName: "cart.fill")
                             .foregroundColor(.gray)
