@@ -7,14 +7,20 @@
 
 import SwiftUI
 
-struct InputTime {
+struct InputTimesView {
 
     var nowDate =  Date()
     let timer = Timer.publish(every: 1, on: .current, in: .common).autoconnect()
 
-    var time: String {
+    var ampm: String {
         let formatter = DateFormatter()
-        formatter.setTemplate(.time, .enUS)
+        formatter.setTemplate(.ampm, .enUS)
+        return formatter.string(from: nowDate)
+    }
+    
+    var hm: String {
+        let formatter = DateFormatter()
+        formatter.setTemplate(.hm, .enUS)
         return formatter.string(from: nowDate)
     }
     var week: String {

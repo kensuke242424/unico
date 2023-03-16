@@ -53,7 +53,7 @@ struct RootView: View {
                 CreateAndJoinTeamView(logInVM: logInVM, teamVM: teamVM, userVM: userVM)
 
             case .home:
-                NewTabView()
+                NewTabView(teamVM: teamVM, itemVM: itemVM)
                     .environment(\.resizableSheetCenter, resizableSheetCenter)
             }
 

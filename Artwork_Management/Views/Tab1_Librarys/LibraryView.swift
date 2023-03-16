@@ -33,7 +33,7 @@ struct LibraryView: View {
 
     @GestureState private var dragOffset: CGFloat = 0
     @State private var inputLibrary: InputLibrary = InputLibrary()
-    @State private var inputTime: InputTime = InputTime()
+    @State private var inputTime: InputTimesView = InputTimesView()
     @State private var headerImageSize: HeaderImageSize = .fit
 
     var tagFilterItemCards: [Item] {
@@ -58,7 +58,7 @@ struct LibraryView: View {
                 HStack {
                     VStack(alignment: .leading, spacing: 8) {
                         Group {
-                            Text(inputTime.time)
+                            Text(inputTime.hm)
                                 .tracking(8)
                                 .font(.title3.bold())
                                 .frame(height: 40)

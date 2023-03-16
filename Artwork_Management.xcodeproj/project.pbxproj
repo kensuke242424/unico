@@ -21,7 +21,7 @@
 		BE20B04829BAEFDB0078169B /* UpdateAddressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE20B04729BAEFDB0078169B /* UpdateAddressView.swift */; };
 		BE20B04A29BC565D0078169B /* AuthKey_K22AWHD46U.p8 in Resources */ = {isa = PBXBuildFile; fileRef = BE20B04929BC565D0078169B /* AuthKey_K22AWHD46U.p8 */; };
 		BE20B04C29BD5DD00078169B /* AuthKey_MWXRWWC3VP.p8 in Resources */ = {isa = PBXBuildFile; fileRef = BE20B04B29BD5DD00078169B /* AuthKey_MWXRWWC3VP.p8 */; };
-		BE23A16229C33E7E00876194 /* TimesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE23A16129C33E7E00876194 /* TimesView.swift */; };
+		BE23A16229C33E7E00876194 /* TimesFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE23A16129C33E7E00876194 /* TimesFormatter.swift */; };
 		BE24374B29BE3A3F000C2D01 /* UIImageRectIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE24374A29BE3A3F000C2D01 /* UIImageRectIcon.swift */; };
 		BE254F9329BF1104004FE9AE /* UserEntryRecommendationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE254F9229BF1104004FE9AE /* UserEntryRecommendationView.swift */; };
 		BE254FBD29C092F5004FE9AE /* AsyncImageBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE254FBC29C092F5004FE9AE /* AsyncImageBackground.swift */; };
@@ -122,7 +122,7 @@
 		BE20B04729BAEFDB0078169B /* UpdateAddressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateAddressView.swift; sourceTree = "<group>"; };
 		BE20B04929BC565D0078169B /* AuthKey_K22AWHD46U.p8 */ = {isa = PBXFileReference; lastKnownFileType = text; name = AuthKey_K22AWHD46U.p8; path = Artwork_Management/AuthKey_K22AWHD46U.p8; sourceTree = "<group>"; };
 		BE20B04B29BD5DD00078169B /* AuthKey_MWXRWWC3VP.p8 */ = {isa = PBXFileReference; lastKnownFileType = text; name = AuthKey_MWXRWWC3VP.p8; path = Artwork_Management/AuthKey_MWXRWWC3VP.p8; sourceTree = "<group>"; };
-		BE23A16129C33E7E00876194 /* TimesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimesView.swift; sourceTree = "<group>"; };
+		BE23A16129C33E7E00876194 /* TimesFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimesFormatter.swift; sourceTree = "<group>"; };
 		BE24374A29BE3A3F000C2D01 /* UIImageRectIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageRectIcon.swift; sourceTree = "<group>"; };
 		BE254F9229BF1104004FE9AE /* UserEntryRecommendationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserEntryRecommendationView.swift; sourceTree = "<group>"; };
 		BE254FBC29C092F5004FE9AE /* AsyncImageBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncImageBackground.swift; sourceTree = "<group>"; };
@@ -238,7 +238,7 @@
 			isa = PBXGroup;
 			children = (
 				BE1F272229C166E700AD55DF /* NewHomeView.swift */,
-				BE23A16129C33E7E00876194 /* TimesView.swift */,
+				BE23A16129C33E7E00876194 /* TimesFormatter.swift */,
 			);
 			path = HomeViews;
 			sourceTree = "<group>";
@@ -709,7 +709,7 @@
 				BE254F9329BF1104004FE9AE /* UserEntryRecommendationView.swift in Sources */,
 				BE1F272329C166E700AD55DF /* NewHomeView.swift in Sources */,
 				BE1F272529C1673900AD55DF /* NewItemsView.swift in Sources */,
-				BE23A16229C33E7E00876194 /* TimesView.swift in Sources */,
+				BE23A16229C33E7E00876194 /* TimesFormatter.swift in Sources */,
 				BE3CD65B29B72B0700C19442 /* ProgressViewModel.swift in Sources */,
 				E0CF7EF428DF385800735142 /* ItemCards.swift in Sources */,
 				E05FE94528F71BFB00263F98 /* ColorExtension.swift in Sources */,

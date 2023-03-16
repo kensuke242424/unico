@@ -8,14 +8,21 @@
 import SwiftUI
 import ResizableSheet
 
+struct InputTab {
+    var selectionTab: Tab = .item
+    var animationTab: Tab = .item
+    var animationOpacity: CGFloat = 1
+    var animationScale: CGFloat = 1
+    var scrollProgress: CGFloat = .zero
+}
+
 struct NewTabView: View {
     
+    @StateObject var teamVM: TeamViewModel
+    @StateObject var itemVM: ItemViewModel
+    
     /// View Propertys
-    @State private var selectionTab: Tab = .item
-    @State private var animationTab: Tab = .item
-    @State private var animationOpacity: CGFloat = 1
-    @State private var animationScale: CGFloat = 1
-    @State private var scrollProgress: CGFloat = .zero
+    @State private var inputTab = InputTab()
 
     var body: some View {
 
@@ -30,27 +37,27 @@ struct NewTabView: View {
                     
                     Spacer(minLength: 0)
                     
-                    TabView(selection: $selectionTab) {
-                        NewHomeView()
+                    TabView(selection: $inputTab.selectionTab) {
+                        NewHomeView(teamVM: teamVM, itemVM: itemVM, inputTab: $inputTab)
                             .tag(Tab.home)
-                            .offsetX(selectionTab == Tab.home) { rect in
+                            .offsetX(inputTab.selectionTab == Tab.home) { rect in
                                 let minX = rect.minX
                                 let pageOffset = minX - (size.width * CGFloat(Tab.home.index))
                                 let pageProgress = pageOffset / size.width
                                 
-                                scrollProgress = max(min(pageProgress, 0), -CGFloat(Tab.allCases.count - 1))
-                                animationOpacity = 1 - -scrollProgress
+                                inputTab.scrollProgress = max(min(pageProgress, 0), -CGFloat(Tab.allCases.count - 1))
+                                inputTab.animationOpacity = 1 - -inputTab.scrollProgress
                             }
                         
                         NewItemsView()
                             .tag(Tab.item)
-                            .offsetX(selectionTab == Tab.item) { rect in
+                            .offsetX(inputTab.selectionTab == Tab.item) { rect in
                                 let minX = rect.minX
                                 let pageOffset = minX - (size.width * CGFloat(Tab.item.index))
                                 let pageProgress = pageOffset / size.width
                                 
-                                scrollProgress = max(min(pageProgress, 0), -CGFloat(Tab.allCases.count - 1))
-                                animationOpacity = -scrollProgress
+                                inputTab.scrollProgress = max(min(pageProgress, 0), -CGFloat(Tab.allCases.count - 1))
+                                inputTab.animationOpacity = -inputTab.scrollProgress
                             }
                     }
                     .tabViewStyle(.page(indexDisplayMode: .never))
@@ -58,22 +65,26 @@ struct NewTabView: View {
                 .background {
                     ZStack {
                         GeometryReader { proxy in
-                            Image("background_1")
+                            Image("background_4")
                                 .resizable()
                                 .scaledToFill()
                                 .frame(width: proxy.size.width, height: proxy.size.height)
                                 .ignoresSafeArea()
-                                .blur(radius: min((-scrollProgress * 4), 4), opaque: true)
+                                .blur(radius: min((-inputTab.scrollProgress * 4), 4), opaque: true)
                         }
                     }
                 }
                 .ignoresSafeArea()
-                .onChange(of: selectionTab) { _ in
-                    switch selectionTab {
+                .onChange(of: inputTab.selectionTab) { _ in
+                    switch inputTab.selectionTab {
                     case .home:
-                        withAnimation(.easeInOut(duration: 0.2)) { animationTab = .home }
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            inputTab.animationTab = .home
+                        }
                     case .item:
-                        withAnimation(.spring(response: 0.2)) { animationTab = .item }
+                        withAnimation(.spring(response: 0.2)) {
+                            inputTab.animationTab = .item
+                        }
                     }
                 }
             } // NavigationStack
@@ -89,10 +100,12 @@ struct NewTabView: View {
             HStack {
                 ForEach(Tab.allCases, id: \.rawValue) { tab in
                     Text(tab.rawValue)
-                        .font(.title3.bold())
+//                        .font(.system(.title3, design: .monospaced))
+                        .font(.title3)
+                        .fontWeight(.semibold)
                         .tracking(4)
-                        .scaleEffect(animationTab == tab ? 1.0 : 0.5)
-                        .foregroundColor(animationTab == tab ? .primary : .gray)
+                        .scaleEffect(inputTab.animationTab == tab ? 1.0 : 0.5)
+                        .foregroundColor(inputTab.animationTab == tab ? .primary : .gray)
                         .frame(width: tabWidth)
                         .contentShape(Rectangle())
                         .padding(.top, 60)
@@ -100,24 +113,22 @@ struct NewTabView: View {
             }
             .frame(width: CGFloat(Tab.allCases.count) * tabWidth)
             .padding(.leading, tabWidth)
-            .offset(x: scrollProgress * tabWidth)
+            .offset(x: inputTab.scrollProgress * tabWidth)
             .overlay {
                 HStack {
                     /// Homeタブに移動した時に表示するチームアイコン
-                    if animationTab == .home {
+                    if inputTab.animationTab == .home {
                         Circle()
                             .frame(width: 35, height: 35)
                             .transition(.asymmetric(
                                 insertion: AnyTransition.opacity.combined(with: .offset(x: -20, y: 0)),
                                 removal: AnyTransition.opacity.combined(with: .offset(x: -20, y: 0))
                             ))
-                            .opacity(animationOpacity)
+                            .opacity(inputTab.animationOpacity)
                     }
-                    
                     Spacer()
-                    
                     /// Itemタブに移動した時に表示するアイテム追加タブボタン
-                    if animationTab == .item {
+                    if inputTab.animationTab == .item {
                         Button {
                             
                         } label: {
@@ -126,31 +137,31 @@ struct NewTabView: View {
                                 .scaledToFit()
                                 .foregroundColor(.primary)
                                 .frame(width: 30, height: 30)
-                                .opacity(animationOpacity)
+                                .opacity(inputTab.animationOpacity)
                         }
                         .transition(.asymmetric(
                             insertion: AnyTransition.opacity.combined(with: .offset(x: 20, y: 0)),
                             removal: AnyTransition.opacity.combined(with: .offset(x: 20, y: 0))
                         ))
                     }
-                }
+                } // HStack
                 .padding(.horizontal, 20)
                 .padding(.top, 60)
             }
-        }
+        } // Geometry
         .frame(height: 100)
         .background(
             Color.clear
                 .overlay {
                     BlurView(style: .systemUltraThinMaterial)
                         .ignoresSafeArea()
-                        .opacity(min(-scrollProgress, 1))
+                        .opacity(min(-inputTab.scrollProgress, 1))
                 }
         )
     }
 } // View
 
-struct HomeTabView_Previews: PreviewProvider {
+struct NewTabView_Previews: PreviewProvider {
 
     static var previews: some View {
 
@@ -163,7 +174,7 @@ struct HomeTabView_Previews: PreviewProvider {
                    windowScene.flatMap(ResizableSheetCenter.resolve(for:))
                }
 
-        return NewTabView()
+        return NewTabView(teamVM: TeamViewModel(), itemVM: ItemViewModel())
             .environment(\.resizableSheetCenter, resizableSheetCenter)
 
     }

@@ -26,3 +26,8 @@ struct JoinMember: Hashable, Codable {
     var name: String
     var iconURL: URL?
 }
+
+var testTeam: Team = Team(id: UUID().uuidString,
+                          name: "テストチーム",
+                          members: [JoinMember(memberUID: UUID().uuidString, name: "ken")]
+)

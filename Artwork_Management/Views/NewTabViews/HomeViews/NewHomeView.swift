@@ -9,14 +9,31 @@ import SwiftUI
 
 struct NewHomeView: View {
     
-    @State private var inputTime = InputTime()
+    @StateObject var teamVM: TeamViewModel
+    @StateObject var itemVM: ItemViewModel
+    
+    /// Tab親Viewから受け取った状態変数群
+    @Binding var inputTab: InputTab
+    
+    @State private var inputTime = InputTimesView()
+    @State private var animationContent: Bool = true
     
     var body: some View {
         GeometryReader {
             let size = $0.size
             
             VStack {
-                TimeView(size)
+                if animationContent {
+                    TimeView(size)
+                        .opacity(1 - min((-inputTab.scrollProgress * 2), 1))
+                        .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 20)))
+                }
+                
+                if animationContent {
+                    TeamView(size)
+                        .opacity(1 - min((-inputTab.scrollProgress * 2), 1))
+                        .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 20)))
+                }
                 
             } // VStack
             .frame(width: size.width, height: size.height)
@@ -30,21 +47,22 @@ struct NewHomeView: View {
         HStack {
             VStack(alignment: .leading, spacing: 8) {
                 
-                Text(inputTime.time)
+                Text(inputTime.hm)
                     .italic()
                     .tracking(8)
-                    .font(.title2.bold())
+                    .font(.title2)
+                    .fontWeight(.semibold)
                     .padding(.bottom)
                     .opacity(0.8)
                 
-                Text(inputTime.week)
+                Text("\(inputTime.week).")
                     .italic()
                     .tracking(5)
-                    .font(.title3)
+                    .font(.subheadline)
                     .opacity(0.8)
                 
                 Text(inputTime.dateStyle)
-                    .font(.title3)
+                    .font(.subheadline)
                     .italic()
                     .tracking(5)
                     .padding(.leading)
@@ -56,18 +74,78 @@ struct NewHomeView: View {
             Spacer()
         } // HStack
         .frame(maxWidth: .infinity)
-        .shadow(radius: 4, x: 3, y: 3)
-        .shadow(radius: 4, x: 3, y: 3)
         .padding(.trailing, size.width / 2)
-        .padding(.leading, 15)
+        .padding([.leading, .bottom], 15)
     }
+    
+    func TeamView(_ size: CGSize) -> some View {
+        // チーム情報一覧
+        HStack {
+            Spacer()
+
+            ZStack {
+                VStack(alignment: .leading, spacing: 60) {
+
+                    Group {
+                        Text("Useday.  ")
+                        Text("Items.  ")
+                        Text("Member.  ")
+                    }
+                    .font(.footnote)
+                    .tracking(5)
+                    .opacity(0.8)
+
+                } // VStack
+                
+                VStack(alignment: .trailing, spacing: 60) {
+                    
+                    Text("55 day")
+                        .font(.footnote)
+                        .opacity(0.8)
+                    
+                    Text("\(itemVM.items.count) item")
+                        .font(.footnote)
+                        .opacity(0.8)
+                    
+                    // Team members Icon...
+                    teamMembersIcon(members: testTeam.members)
+                }
+                .offset(x: 20, y: 35)
+                .tracking(5)
+            } // ZStack
+        } // HStack
+        .padding(.trailing, 20)
+    }
+    
+    func teamMembersIcon(members: [JoinMember]) -> some View {
+        Group {
+            if members.count <= 2 {
+                HStack {
+                    ForEach(members, id: \.self) { member in
+                        AsyncImageCircleIcon(photoURL: member.iconURL, size: 30)
+                    }
+                }
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack {
+                        ForEach(members, id: \.self) { member in
+                            AsyncImageCircleIcon(photoURL: member.iconURL, size: 30)
+                        }
+                    }
+                }.frame(width: 80)
+            }
+        }
+    } // teamMembersIcon
 }
 
 struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
-        NewHomeView()
+        NewHomeView(teamVM: TeamViewModel(),
+                    itemVM: ItemViewModel(),
+                    inputTab: .constant(InputTab())
+        )
             .background {
-                Image("background_1")
+                Image("background_4")
                     .resizable()
                     .scaledToFill()
                     .ignoresSafeArea()

@@ -60,7 +60,7 @@ struct DetailView: View {
                     
                     VStack(alignment: .leading, spacing: 8) {
                         Text(item.name)
-                            .font(.title2)
+                            .font(.title3)
                             .fontWeight(.semibold)
                         
                         Text(": \(item.author)")
@@ -195,7 +195,9 @@ struct DetailView: View {
                     /// Detail
                     Text(item.detail)
                         .font(.subheadline)
-                        .foregroundColor(.primary.opacity(0.7))
+                        .kerning(0.5)
+                        .lineSpacing(4)
+                        .foregroundColor(.primary.opacity(0.5))
                         .padding(.top, 8)
                 }
                 .padding(.bottom, 100)
@@ -256,7 +258,7 @@ struct DetailView: View {
         .frame(maxWidth: .infinity)
         .font(.callout)
         .fontWeight(.light)
-        .opacity(0.7)
+        .opacity(0.6)
         .tracking(1)
         .lineLimit(1)
         .padding(.vertical, 10)
