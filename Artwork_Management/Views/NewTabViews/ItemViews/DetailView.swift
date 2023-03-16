@@ -21,23 +21,16 @@ struct DetailView: View {
     var body: some View {
         VStack(spacing: 15) {
             Button {
-                
                 withAnimation(.easeInOut(duration: 0.2)) {
                     offsetAnimation = false
                 }
-                
                 /// Closing Detail View
                 withAnimation(.easeInOut(duration: 0.35).delay(0.1)) {
                     animationContent = false
-                    
                 }
-                
-//                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                    withAnimation(.easeInOut(duration: 0.35).delay(0.1)) {
-                        show.toggle()
-                    }
-//                }
-                
+                withAnimation(.easeInOut(duration: 0.35).delay(0.1)) {
+                    show.toggle()
+                }
             } label: {
                 Image(systemName: "chevron.left")
                     .font(.title3)
@@ -65,17 +58,34 @@ struct DetailView: View {
                     
                     VStack(alignment: .leading, spacing: 8) {
                         Text(item.name)
-                            .font(.title)
+                            .font(.title2)
                             .fontWeight(.semibold)
                         
-                        Text(": \(item.sales)")
-                            .font(.callout)
+                        Text(": \(item.name)")
+                            .font(.caption)
                             .foregroundColor(.gray)
                         
-                        RatingView(rating: item.inventory)
+                        HStack {
+                            Image(systemName: "shippingbox.fill")
+                            Text("\(item.inventory)")
+                        }
+                        .font(.callout)
+                        .foregroundColor(.orange)
+                        .padding(.top, 10)
+                        
+                        HStack {
+                            Text("\(item.price)")
+                                .opacity(0.6)
+                            Text("yen")
+                                .opacity(0.4)
+                        }
+                        .font(.callout)
+                        .tracking(2)
+                        
+                            
                     }
                     .padding(.trailing, 15)
-                    .padding(.top, 30)
+                    .padding(.top, 60)
                     .offset(y: offsetAnimation ? 0 : 50)
                     .opacity(offsetAnimation ? 1 : 0)
                 }
@@ -119,7 +129,7 @@ struct DetailView: View {
                 Button {
                     
                 } label: {
-                    Label("Reviews", systemImage: "text.alignleft")
+                    Label("Share", systemImage: "square.and.arrow.up")
                         .font(.callout)
                         .foregroundColor(.gray)
                 }
@@ -137,7 +147,7 @@ struct DetailView: View {
                 Button {
                     
                 } label: {
-                    Label("Share", systemImage: "square.and.arrow.up")
+                    Label("Cart", systemImage: "cart.fill.badge.plus")
                         .font(.callout)
                         .foregroundColor(.gray)
                 }
@@ -149,7 +159,7 @@ struct DetailView: View {
             
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: 15) {
-                    Text("About the book")
+                    Text("アイテム詳細")
                         .font(.title3)
                         .fontWeight(.semibold)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -157,7 +167,7 @@ struct DetailView: View {
                     /// Detail
                     Text("① 書きもの。書き付け。書類。ぶんしょ。もんぞ。※性霊集‐五（835頃）為大使与福州観察使書「州使責以二文書一、疑二彼腹心一」※宇津保（970‐999頃）藤原の君「かくのごとく人の嘆きをのぞき給はば、人の嘆き願ひみつべし、となん、もんしょに言へる」")
                         .font(.subheadline)
-                        .foregroundColor(.white.opacity(0.7))
+                        .foregroundColor(.primary.opacity(0.7))
                 }
             }
             Button {

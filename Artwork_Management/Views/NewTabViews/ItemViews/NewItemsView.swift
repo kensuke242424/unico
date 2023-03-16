@@ -113,26 +113,27 @@ struct NewItemsView: View {
                         .fontWeight(.semibold)
                         .foregroundColor(.black)
                     
-                    Text(": \(item.sales)")
+                    Text(": \(item.name)")
                         .font(.caption)
                         .foregroundColor(.gray)
                     
-                    /// Rating View
-                    RatingView(rating: item.inventory)
-                        .padding(.top, 10)
-                    
-                    Spacer(minLength: 10)
-                    
-                    HStack(spacing: 4) {
-                        Text("\(item.sales)")
-                            .font(.caption)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.blue)
-                        
-                        Text("Views")
-                            .font(.caption)
-                            .foregroundColor(.gray)
+                    HStack {
+                        Image(systemName: "shippingbox.fill")
+                        Text("\(item.inventory)")
                     }
+                    .font(.callout)
+                    .foregroundColor(.orange)
+                    .padding(.top, 20)
+                    
+                    HStack {
+                        Text("\(item.price)")
+                            .opacity(0.6)
+                        Text("yen")
+                            .opacity(0.4)
+                    }
+                    .font(.callout)
+                    .tracking(2)
+                    .foregroundColor(.black)
                 }
                 .padding(20)
                 .frame(width: size.width / 2, height: size.height * 0.8)

@@ -12,7 +12,7 @@ struct NewHomeView: View {
         GeometryReader {
             let size = $0.size
             VStack {
-                Text("Homeタブです。")
+                Text("")
             }
             .frame(width: size.width, height: size.height)
         }

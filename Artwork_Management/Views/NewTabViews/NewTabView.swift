@@ -144,6 +144,7 @@ struct NewTabView: View {
                 .overlay {
                     BlurView(style: .systemUltraThinMaterial)
                         .ignoresSafeArea()
+                        .opacity(min(-scrollProgress, 1))
                 }
         )
     }
