@@ -12,7 +12,8 @@ struct NewTabView: View {
     
     @State private var selectionTab: Tab = .item
     @State private var animationTab: Tab = .item
-    
+    @State private var animationOpacity: CGFloat = 1
+    @State private var animationScale: CGFloat = 1
     @State private var scrollProgress: CGFloat = .zero
     @State private var imageBlur: CGFloat = 4
 
@@ -38,6 +39,7 @@ struct NewTabView: View {
                                 
                                 let pageProgress = pageOffset / size.width
                                 scrollProgress = max(min(pageProgress, 0), -CGFloat(Tab.allCases.count - 1))
+                                animationOpacity = 1 - -scrollProgress
                             }
                         
                         NewItemsView()
@@ -48,6 +50,8 @@ struct NewTabView: View {
                                 
                                 let pageProgress = pageOffset / size.width
                                 scrollProgress = max(min(pageProgress, 0), -CGFloat(Tab.allCases.count - 1))
+                                print(scrollProgress)
+                                animationOpacity = -scrollProgress
                             }
                     }
                     .tabViewStyle(.page(indexDisplayMode: .never))
@@ -55,12 +59,12 @@ struct NewTabView: View {
                 .background {
                     ZStack {
                         GeometryReader { proxy in
-                            Image("background_3")
+                            Image("background_1")
                                 .resizable()
                                 .scaledToFill()
                                 .frame(width: proxy.size.width, height: proxy.size.height)
                                 .ignoresSafeArea()
-                                .blur(radius: imageBlur, opaque: true)
+                                .blur(radius: min((-scrollProgress * 4), 4), opaque: true)
                             
                         }
                     }
@@ -70,10 +74,10 @@ struct NewTabView: View {
                     switch selectionTab {
                     case .home:
                         withAnimation(.easeInOut(duration: 0.2)) { imageBlur = 0 }
-                        withAnimation(.easeInOut(duration: 0.3)) { animationTab = .home }
+                        withAnimation(.easeInOut(duration: 0.2)) { animationTab = .home }
                     case .item:
                         withAnimation(.spring(response: 0.2)) { imageBlur = 4 }
-                        withAnimation(.spring(response: 0.3)) { animationTab = .item }
+                        withAnimation(.spring(response: 0.2)) { animationTab = .item }
                     }
                 }
             } // NavigationStack
@@ -91,8 +95,8 @@ struct NewTabView: View {
                     Text(tab.rawValue)
                         .font(.title3.bold())
                         .tracking(4)
-                        .scaleEffect(selectionTab == tab ? 1.0 : 0.7)
-                        .foregroundColor(selectionTab == tab ? .primary : .gray)
+                        .scaleEffect(animationTab == tab ? 1.0 : 0.5)
+                        .foregroundColor(animationTab == tab ? .primary : .gray)
                         .frame(width: tabWidth)
                         .contentShape(Rectangle())
                         .padding(.top, 60)
@@ -103,6 +107,7 @@ struct NewTabView: View {
             .offset(x: scrollProgress * tabWidth)
             .overlay {
                 HStack {
+                    /// Homeタブに移動した時に表示するチームアイコン
                     if animationTab == .home {
                         Circle()
                             .frame(width: 35, height: 35)
@@ -110,9 +115,12 @@ struct NewTabView: View {
                                 insertion: AnyTransition.opacity.combined(with: .offset(x: -20, y: 0)),
                                 removal: AnyTransition.opacity.combined(with: .offset(x: -20, y: 0))
                             ))
+                            .opacity(animationOpacity)
                     }
                     
                     Spacer()
+                    
+                    /// Itemタブに移動した時に表示するアイテム追加タブボタン
                     if animationTab == .item {
                         Image(systemName: "shippingbox.fill")
                             .resizable()
@@ -123,6 +131,7 @@ struct NewTabView: View {
                                 removal: AnyTransition.opacity.combined(with: .offset(x: 20, y: 0))
                             ))
                             .onTapGesture {}
+                            .opacity(animationOpacity)
                     }
                 }
                 .padding(.horizontal, 20)
