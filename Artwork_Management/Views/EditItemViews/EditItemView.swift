@@ -14,6 +14,7 @@ struct InputEditItem {
     var photoURL: URL? = nil
     var photoPath: String? = nil
     var editItemName: String = ""
+    var editItemAuthor: String = ""
     var editItemInventory: String = ""
     var editItemCost: String = ""
     var editItemPrice: String = ""
@@ -113,6 +114,7 @@ struct EditItemView: View {
                     inputEdit.photoURL = passItemData.photoURL
                     inputEdit.photoPath = passItemData.photoPath
                     inputEdit.editItemName = passItemData.name
+                    inputEdit.editItemAuthor = passItemData.author
                     inputEdit.editItemInventory = String(passItemData.inventory)
                     inputEdit.editItemCost = String(passItemData.cost)
                     inputEdit.editItemPrice = String(passItemData.price)
@@ -142,8 +144,8 @@ struct EditItemView: View {
                             Task {
                                 let uploadImage =  await itemVM.uploadImage(inputEdit.captureImage)
                                 let itemData = Item(tag: inputEdit.selectionTagName,
-                                                    tagColor: tagColor,
                                                     name: inputEdit.editItemName,
+                                                    author: inputEdit.editItemAuthor,
                                                     detail: inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "メモなし",
                                                     photoURL: uploadImage.url,
                                                     photoPath: uploadImage.filePath,
@@ -179,8 +181,8 @@ struct EditItemView: View {
                                 // NOTE: アイテムを更新
                                 let updateItemData = (Item(createTime: passItemData.createTime,
                                                            tag: inputEdit.selectionTagName,
-                                                           tagColor: tagColor,
                                                            name: inputEdit.editItemName,
+                                                           author: inputEdit.editItemAuthor,
                                                            detail: inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "メモなし",
                                                            photoURL: inputEdit.photoURL,
                                                            photoPath: inputEdit.photoPath,

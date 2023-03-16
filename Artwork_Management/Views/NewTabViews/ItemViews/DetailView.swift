@@ -63,7 +63,7 @@ struct DetailView: View {
                             .font(.title2)
                             .fontWeight(.semibold)
                         
-                        Text(": \(item.name)")
+                        Text(": \(item.author)")
                             .font(.caption)
                             .foregroundColor(.gray)
                         
@@ -194,7 +194,7 @@ struct DetailView: View {
                     Text(item.detail)
                         .font(.subheadline)
                         .foregroundColor(.primary.opacity(0.7))
-                        .padding(.top)
+                        .padding(.top, 8)
                 }
                 .padding(.bottom, 100)
             }

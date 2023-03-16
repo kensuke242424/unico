@@ -107,13 +107,14 @@ struct NewItemsView: View {
             HStack(spacing: -25) {
                 /// Book Detail Card
                 /// このカードを置くと、カバー画像を愛でることができます。
-                VStack(alignment: .leading, spacing: 6) {
+                VStack(alignment: .leading, spacing: 8) {
                     Text(item.name)
                         .font(.title3)
                         .fontWeight(.semibold)
                         .foregroundColor(.black)
+                        .lineLimit(1)
                     
-                    Text(": \(item.name)")
+                    Text(": \(item.author)")
                         .font(.caption)
                         .foregroundColor(.gray)
                     
@@ -131,7 +132,7 @@ struct NewItemsView: View {
                         Text("yen")
                             .opacity(0.4)
                     }
-                    .font(.callout)
+                    .font(.caption)
                     .tracking(2)
                     .foregroundColor(.black)
                 }
@@ -145,7 +146,25 @@ struct NewItemsView: View {
                         .shadow(color: .black.opacity(0.08), radius: 8, x: -5, y: -5)
                 }
                 .zIndex(1)
-                /// Moving the book, it it's tapped
+                /// カートにアイテムを入れるボタン
+                .overlay(alignment: .bottomTrailing) {
+                    Button {
+                        /* カートシートの表示とアイテムのカート追加 */
+                    } label: {
+                        Image(systemName: "cart.fill")
+                            .foregroundColor(.gray)
+                            .background {
+                                Circle()
+                                    .foregroundColor(.white)
+                                    .scaleEffect(2)
+                                    .shadow(radius: 1, x: 1, y: 1)
+                                    .shadow(radius: 1, x: 1, y: 1)
+                            }
+                    }
+                    .padding([.bottom, .trailing], 20)
+                    
+                    
+                }
                 .offset(x: animateCurrentItem && selectedItem?.id == item.id ? -20 : 0)
                 
                 /// Book Cover Image

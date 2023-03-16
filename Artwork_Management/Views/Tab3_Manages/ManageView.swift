@@ -296,10 +296,6 @@ struct ManageView: View {
                         .offset(x: 80)
                     }
 
-                    IndicatorRow(inputManage: $inputManage,
-                                 item: item,
-                                 color: item.tagColor)
-
                     Text(item.name)
                         .font(.caption.bold())
                         .foregroundColor(.white.opacity(0.7))
