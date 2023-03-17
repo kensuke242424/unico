@@ -37,7 +37,6 @@ struct EditItemView: View {
     @Binding var inputHome: InputHome
     @Binding var inputImage: InputImage
 
-    let itemIndex: Int
     let passItemData: Item?
     let editItemStatus: EditStatus
 
@@ -383,7 +382,6 @@ struct EditItemView_Previews: PreviewProvider {
                      tagVM: TagViewModel(),
                      inputHome: .constant(InputHome()),
                      inputImage: .constant(InputImage()),
-                     itemIndex: 0,
                      passItemData: testItem.first!,
                      editItemStatus: .update
         )

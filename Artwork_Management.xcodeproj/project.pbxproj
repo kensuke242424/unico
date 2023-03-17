@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BE0E580B29C4055900F5E42F /* NewEditItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE0E580A29C4055900F5E42F /* NewEditItemView.swift */; };
 		BE1F271E29C162B300AD55DF /* NewTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1F271D29C162B300AD55DF /* NewTabView.swift */; };
 		BE1F272329C166E700AD55DF /* NewHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1F272229C166E700AD55DF /* NewHomeView.swift */; };
 		BE1F272529C1673900AD55DF /* NewItemsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1F272429C1673900AD55DF /* NewItemsView.swift */; };
@@ -108,6 +109,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		BE0E580A29C4055900F5E42F /* NewEditItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewEditItemView.swift; sourceTree = "<group>"; };
 		BE1F271D29C162B300AD55DF /* NewTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabView.swift; sourceTree = "<group>"; };
 		BE1F272229C166E700AD55DF /* NewHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewHomeView.swift; sourceTree = "<group>"; };
 		BE1F272429C1673900AD55DF /* NewItemsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewItemsView.swift; sourceTree = "<group>"; };
@@ -224,12 +226,21 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		BE0E580929C4050600F5E42F /* EditItemViews */ = {
+			isa = PBXGroup;
+			children = (
+				BE0E580A29C4055900F5E42F /* NewEditItemView.swift */,
+			);
+			path = EditItemViews;
+			sourceTree = "<group>";
+		};
 		BE1F271F29C1669400AD55DF /* NewTabViews */ = {
 			isa = PBXGroup;
 			children = (
 				BE1F271D29C162B300AD55DF /* NewTabView.swift */,
-				BE1F272129C166B200AD55DF /* ItemViews */,
 				BE1F272029C166A400AD55DF /* HomeViews */,
+				BE1F272129C166B200AD55DF /* ItemViews */,
+				BE0E580929C4050600F5E42F /* EditItemViews */,
 			);
 			path = NewTabViews;
 			sourceTree = "<group>";
@@ -659,6 +670,7 @@
 				BEAB502E29A7C6D400ECCB4F /* PageTabNavigateView.swift in Sources */,
 				E01AA3AB291780ED000FCD37 /* StringExtension.swift in Sources */,
 				E0BE39AF29335317002499C4 /* ShowsItemAsyncImagePhoto.swift in Sources */,
+				BE0E580B29C4055900F5E42F /* NewEditItemView.swift in Sources */,
 				E0796AD728F485850094E50C /* ButtonViewModel.swift in Sources */,
 				E0BFE1C929746B06005481CA /* QRReaderView.swift in Sources */,
 				E04ACF4328E73C660054A6C4 /* IndicatorRow.swift in Sources */,

@@ -16,6 +16,14 @@ struct Tag: Identifiable, Equatable, Codable {
     var tagColor: UsedColor
 }
 
+var testTag: [Tag] {
+    [
+        Tag(oderIndex: 0, tagName: "サンプルタグ1", tagColor: .gray),
+        Tag(oderIndex: 1, tagName: "サンプルタグ2", tagColor: .gray),
+        Tag(oderIndex: 2, tagName: "サンプルタグ3", tagColor: .gray),
+    ]
+}
+
 enum UsedColor: CaseIterable, Codable {
 
     case red
