@@ -29,13 +29,13 @@ enum EditStatus: CaseIterable {
 }
 
 extension EditStatus.Model {
-    static let name = EditStatus.Model(          title: "アイテム名", example: "")
-    static let author = EditStatus.Model(        title: "作者"     , example: "")
+    static let name = EditStatus.Model(          title: "アイテム名", example: "unico")
+    static let author = EditStatus.Model(        title: "作者"     , example: "ユーザー")
     static let inventory = EditStatus.Model(     title: "在庫"     , example: "100")
     static let price = EditStatus.Model(         title: "価格"     , example: "1500")
     static let sales = EditStatus.Model(         title: "売上"     , example: "100000")
-    static let totalAmount = EditStatus.Model(   title: "総売上"    , example: "")
-    static let totalInventory = EditStatus.Model(title: "総売個数"  , example: "")
+    static let totalAmount = EditStatus.Model(   title: "総売上"    , example: "150")
+    static let totalInventory = EditStatus.Model(title: "総売個数"  , example: "300")
 }
 
 struct InputEditItem {
@@ -111,11 +111,12 @@ struct NewEditItemView: View {
                     
                     /// 入力欄エリア
                     ForEach(EditStatus.allCases, id: \.self) { value in
-                        VStack(alignment: .leading, spacing: 40) {
+                        VStack(alignment: .leading, spacing: 10) {
                             
                             HStack {
                                 Text("■ \(value.model.title)")
                                     .fontWeight(.semibold)
+                                    .tracking(1)
                                 Spacer()
                             }
                             VStack(alignment: .leading) {
@@ -148,10 +149,10 @@ struct NewEditItemView: View {
                             }
                             
                         }
-                        .frame(width: size.width * 0.9, height: 100)
-//                        .border(.red)
-                    }
-                }.padding(.bottom, 100)
+                        .frame(width: size.width * 0.8, height: 90)
+                    } // ForEach
+                } // ScrollView
+                .padding(.bottom, 100)
             }
         }
         /// 少し下めにするのがちょうど良さそう
