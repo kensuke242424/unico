@@ -12,7 +12,6 @@ struct PHPickerView: UIViewControllerRepresentable {
 
     @Binding var captureImage: UIImage?
     @Binding var isShowSheet: Bool
-    @Binding var isShowError: Bool
 
     class Coordinator: NSObject, PHPickerViewControllerDelegate {
 
@@ -36,9 +35,6 @@ struct PHPickerView: UIViewControllerRepresentable {
                     self.parent.captureImage = unwrapImage
                 } else {
                     print("Error: image as? UIImage")
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                        self.parent.isShowError.toggle()
-                    }
                 }
             }
             self.parent.isShowSheet.toggle()

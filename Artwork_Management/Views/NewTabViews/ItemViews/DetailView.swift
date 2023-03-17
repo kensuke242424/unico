@@ -12,6 +12,8 @@ struct DetailView: View {
     
     @Environment(\.colorScheme) var colorScheme
     
+    @Binding var inputTab: InputTab
+    
     @Binding var show: Bool
     var animation: Namespace.ID
     var item: Item
@@ -203,7 +205,7 @@ struct DetailView: View {
                 .padding(.bottom, 100)
             }
             Button {
-                
+                inputTab.path = [.edit]
             } label: {
                 Label("編集", systemImage: "pencil.line")
                     .font(.callout)
@@ -279,7 +281,8 @@ struct DetailView: View {
 struct DetailView_Previews: PreviewProvider {
     @Namespace static var animation
     static var previews: some View {
-        DetailView(show: .constant(true),
+        DetailView(inputTab: .constant(InputTab()),
+                   show: .constant(true),
                    animation: animation,
                    item: testItem.first!)
     }

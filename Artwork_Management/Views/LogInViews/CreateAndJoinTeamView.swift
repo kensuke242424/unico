@@ -405,7 +405,7 @@ struct CreateAndJoinTeamView: View {
             }
         }
         .sheet(isPresented: $isShowPickerView) {
-            PHPickerView(captureImage: $captureImage, isShowSheet: $isShowPickerView, isShowError: $captureError)
+            PHPickerView(captureImage: $captureImage, isShowSheet: $isShowPickerView)
         }
 
         .onAppear {

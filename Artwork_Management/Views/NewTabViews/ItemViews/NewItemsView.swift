@@ -80,7 +80,7 @@ struct NewItemsView: View {
         } // Geometry
         .overlay {
             if let selectedItem, showDetailView {
-                DetailView(show: $showDetailView, animation: animation, item: selectedItem)
+                DetailView(inputTab: $inputTab, show: $showDetailView, animation: animation, item: selectedItem)
                     .transition(.asymmetric(insertion: .identity, removal: .offset(y: 0)))
             }
         }

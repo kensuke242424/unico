@@ -204,8 +204,7 @@ struct LibraryView: View {
 
         .sheet(isPresented: $inputLibrary.isShowSelectImageSheet) {
             PHPickerView(captureImage: $inputLibrary.captureImage,
-                         isShowSheet: $inputLibrary.isShowSelectImageSheet,
-                         isShowError: $inputLibrary.showErrorFetchImage)
+                         isShowSheet: $inputLibrary.isShowSelectImageSheet)
         }
 
         .onChange(of: inputLibrary.selectFilterTag) { _ in

@@ -7,27 +7,6 @@
 
 import SwiftUI
 
-struct InputEditItem {
-
-    var captureImage: UIImage? = nil
-    var selectionTagName: String = ""
-    var photoURL: URL? = nil
-    var photoPath: String? = nil
-    var editItemName: String = ""
-    var editItemAuthor: String = ""
-    var editItemInventory: String = ""
-    var editItemCost: String = ""
-    var editItemPrice: String = ""
-    var editItemSales: String = ""
-    var editItemDetail: String = ""
-    var editItemTotalAmount: String = ""
-    var editItemTotalInventry: String = ""
-    var disableButton: Bool = true
-    var offset: CGFloat = 0
-    var isCheckedFocuseDetail: Bool = false
-    var isShowItemImageSelectSheet: Bool = false
-}
-
 struct EditItemView: View {
 
     @StateObject var teamVM: TeamViewModel
@@ -35,10 +14,9 @@ struct EditItemView: View {
     @StateObject var itemVM: ItemViewModel
     @StateObject var tagVM: TagViewModel
     @Binding var inputHome: InputHome
-    @Binding var inputImage: InputImage
 
     let passItemData: Item?
-    let editItemStatus: EditStatus
+    let editItemStatus: EditSelect
 
     var tagColor: UsedColor {
         let selectTag = tagVM.tags.filter({ $0.tagName == inputEdit.selectionTagName })
@@ -88,11 +66,10 @@ struct EditItemView: View {
 
             .sheet(isPresented: $inputEdit.isShowItemImageSelectSheet) {
                 PHPickerView(captureImage: $inputEdit.captureImage,
-                             isShowSheet: $inputEdit.isShowItemImageSelectSheet,
-                             isShowError: $inputHome.showErrorFetchImage)
+                             isShowSheet: $inputEdit.isShowItemImageSelectSheet)
             }
 
-            .onChange(of: inputEdit.editItemName) { newValue in
+            .onChange(of: inputEdit.name) { newValue in
 
                 withAnimation(.easeIn(duration: 0.2)) {
                     if newValue.isEmpty {
@@ -112,15 +89,15 @@ struct EditItemView: View {
                     inputEdit.selectionTagName = passItemData.tag
                     inputEdit.photoURL = passItemData.photoURL
                     inputEdit.photoPath = passItemData.photoPath
-                    inputEdit.editItemName = passItemData.name
-                    inputEdit.editItemAuthor = passItemData.author
-                    inputEdit.editItemInventory = String(passItemData.inventory)
-                    inputEdit.editItemCost = String(passItemData.cost)
-                    inputEdit.editItemPrice = String(passItemData.price)
-                    inputEdit.editItemSales = String(passItemData.sales)
-                    inputEdit.editItemDetail = passItemData.detail
-                    inputEdit.editItemTotalAmount = String(passItemData.totalAmount)
-                    inputEdit.editItemTotalInventry = String(passItemData.totalInventory)
+                    inputEdit.name = passItemData.name
+                    inputEdit.author = passItemData.author
+                    inputEdit.inventory = String(passItemData.inventory)
+                    inputEdit.cost = String(passItemData.cost)
+                    inputEdit.price = String(passItemData.price)
+                    inputEdit.sales = String(passItemData.sales)
+                    inputEdit.detail = passItemData.detail
+                    inputEdit.totalAmount = String(passItemData.totalAmount)
+                    inputEdit.totalInventry = String(passItemData.totalInventory)
 
                 } else {
                     // tags[0]には"ALL"があるため、一つ飛ばして[1]を初期値として代入
@@ -143,18 +120,18 @@ struct EditItemView: View {
                             Task {
                                 let uploadImage =  await itemVM.uploadImage(inputEdit.captureImage)
                                 let itemData = Item(tag: inputEdit.selectionTagName,
-                                                    name: inputEdit.editItemName,
-                                                    author: inputEdit.editItemAuthor,
-                                                    detail: inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "メモなし",
+                                                    name: inputEdit.name,
+                                                    author: inputEdit.author,
+                                                    detail: inputEdit.detail != "" ? inputEdit.detail : "メモなし",
                                                     photoURL: uploadImage.url,
                                                     photoPath: uploadImage.filePath,
                                                     cost: 0,
-                                                    price: Int(inputEdit.editItemPrice) ?? 0,
+                                                    price: Int(inputEdit.price) ?? 0,
                                                     amount: 0,
                                                     sales: 0,
-                                                    inventory: Int(inputEdit.editItemInventory) ??  0,
+                                                    inventory: Int(inputEdit.inventory) ??  0,
                                                     totalAmount: 0,
-                                                    totalInventory: Int(inputEdit.editItemInventory) ?? 0)
+                                                    totalInventory: Int(inputEdit.inventory) ?? 0)
 
                                 // Firestoreにコーダブル保存
                                 itemVM.addItem(itemData: itemData, tag: inputEdit.selectionTagName, teamID: teamVM.team!.id)
@@ -167,7 +144,7 @@ struct EditItemView: View {
                             Task {
                                 guard let passItemData = passItemData else { return }
                                 guard let defaultDataID = passItemData.id else { return }
-                                let editInventory = Int(inputEdit.editItemInventory) ?? 0
+                                let editInventory = Int(inputEdit.inventory) ?? 0
 
                                 // captureImageに新しい画像があれば、元の画像データを更新
                                 if let captureImage = inputEdit.captureImage {
@@ -179,16 +156,16 @@ struct EditItemView: View {
 
                                 // NOTE: アイテムを更新
                                 let updateItemData = (Item(createTime: passItemData.createTime,
-                                                           tag: inputEdit.selectionTagName,
-                                                           name: inputEdit.editItemName,
-                                                           author: inputEdit.editItemAuthor,
-                                                           detail: inputEdit.editItemDetail != "" ? inputEdit.editItemDetail : "メモなし",
-                                                           photoURL: inputEdit.photoURL,
+                                                           tag:       inputEdit.selectionTagName,
+                                                           name:      inputEdit.name,
+                                                           author:    inputEdit.author,
+                                                           detail:    inputEdit.detail != "" ? inputEdit.detail : "メモなし",
+                                                           photoURL:  inputEdit.photoURL,
                                                            photoPath: inputEdit.photoPath,
-                                                           cost: Int(inputEdit.editItemCost) ?? 0,
-                                                           price: Int(inputEdit.editItemPrice) ?? 0,
+                                                           cost: Int( inputEdit.cost) ?? 0,
+                                                           price: Int(inputEdit.price) ?? 0,
                                                            amount: 0,
-                                                           sales: Int(inputEdit.editItemSales) ?? 0,
+                                                           sales: Int(inputEdit.sales) ?? 0,
                                                            inventory: editInventory,
                                                            totalAmount: passItemData.totalAmount,
                                                            totalInventory: passItemData.inventory < editInventory ?
@@ -224,7 +201,7 @@ struct InputForms: View {
     @Binding var isOpenEditTagSideMenu: Bool
 
     // NOTE: enum「Status」を用いて、「.create」と「.update」とでViewレイアウトを分岐します。
-    let editItemStatus: EditStatus
+    let editItemStatus: EditSelect
     let passItem: Item?
     let tagColor: UsedColor
 
@@ -275,7 +252,7 @@ struct InputForms: View {
                 InputFormTitle(title: "■アイテム名", isNeed: true)
                     .padding(.bottom)
 
-                TextField("1st Album「...」", text: $inputEdit.editItemName)
+                TextField("1st Album「...」", text: $inputEdit.name)
                     .foregroundColor(.white)
                     .focused($focusedField, equals: .name)
                     .autocapitalization(.none)
@@ -291,7 +268,7 @@ struct InputForms: View {
                 InputFormTitle(title: "■在庫数", isNeed: false)
                 .padding(.bottom)
 
-                TextField("100", text: $inputEdit.editItemInventory)
+                TextField("100", text: $inputEdit.inventory)
                     .foregroundColor(.white)
                     .keyboardType(.numberPad)
                     .focused($focusedField, equals: .stock)
@@ -307,7 +284,7 @@ struct InputForms: View {
                 InputFormTitle(title: "■価格(税込)", isNeed: false)
                     .padding(.bottom)
 
-                TextField("2000", text: $inputEdit.editItemPrice)
+                TextField("2000", text: $inputEdit.price)
                     .foregroundColor(.white)
                     .keyboardType(.numberPad)
                     .focused($focusedField, equals: .price)
@@ -325,7 +302,7 @@ struct InputForms: View {
                     InputFormTitle(title: "■総売上げ", isNeed: false)
                         .padding(.bottom)
 
-                    TextField("2000", text: $inputEdit.editItemSales)
+                    TextField("2000", text: $inputEdit.sales)
                         .foregroundColor(.white)
                         .keyboardType(.numberPad)
                         .focused($focusedField, equals: .sales)
@@ -342,7 +319,7 @@ struct InputForms: View {
                 InputFormTitle(title: "■アイテム詳細(メモ)", isNeed: false)
                     .font(.title3)
 
-                TextEditor(text: $inputEdit.editItemDetail)
+                TextEditor(text: $inputEdit.detail)
                     .frame(height: 300)
                     .shadow(radius: 3, x: 0, y: 0)
                     .autocapitalization(.none)
@@ -350,7 +327,7 @@ struct InputForms: View {
                     .onTapGesture { focusedField = .detail }
                     .overlay(alignment: .topLeading) {
                         if focusedField != .detail {
-                            if inputEdit.editItemDetail.isEmpty {
+                            if inputEdit.detail.isEmpty {
                                 Text("アイテムについてメモを残しましょう。")
                                     .opacity(0.5)
                                     .padding()
@@ -381,7 +358,6 @@ private struct OffsetPreferenceKey: PreferenceKey, Equatable {
 //                     itemVM: ItemViewModel(),
 //                     tagVM: TagViewModel(),
 //                     inputHome: .constant(InputHome()),
-//                     inputImage: .constant(InputImage()),
 //                     passItemData: testItem.first!,
 //                     editItemStatus: .update
 //        )

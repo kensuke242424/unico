@@ -25,6 +25,8 @@ struct InputTab {
     var animationScale: CGFloat = 1
     var scrollProgress: CGFloat = .zero
     
+    var showEditSheet: Bool = false
+    
     /// ItemsViewでユーザーが選択したアイテムが渡されるプロパティ
 }
 
@@ -100,6 +102,13 @@ struct NewTabView: View {
                         }
                     }
                 }
+                .sheet(isPresented: $inputTab.showEditSheet) {
+                    NewEditItemView(teamVM  : teamVM,
+                                    userVM  : userVM,
+                                    itemVM  : itemVM,
+                                    tagVM   : tagVM,
+                                    passItem: nil)
+                }
                 
                 /// NavigationStackによる遷移を管理します
                 .navigationDestination(for: NavigationPath.self) { path in
@@ -107,17 +116,17 @@ struct NewTabView: View {
                     switch path {
                     case .create:
                         
-                        NewEditItemView(teamVM: teamVM,
-                                        userVM: userVM,
-                                        itemVM: itemVM,
-                                        tagVM: tagVM,
+                        NewEditItemView(teamVM  : teamVM,
+                                        userVM  : userVM,
+                                        itemVM  : itemVM,
+                                        tagVM   : tagVM,
                                         passItem: nil)
                         
                     case .edit:
-                        NewEditItemView(teamVM: teamVM,
-                                        userVM: userVM,
-                                        itemVM: itemVM,
-                                        tagVM: tagVM,
+                        NewEditItemView(teamVM  : teamVM,
+                                        userVM  : userVM,
+                                        itemVM  : itemVM,
+                                        tagVM   : tagVM,
                                         passItem: inputTab.selectedItem)
                         
                     case .system:
@@ -169,9 +178,10 @@ struct NewTabView: View {
                         Button {
                             /// アイテム追加エディット画面に遷移
                             ///  追加ボタンなので、selectedItemはnilを入れておく
-                            inputTab.selectedItem = nil
-                            inputTab.path.append(.edit)
-                            print("path: \(inputTab.path)")
+                            withAnimation(.spring(response: 0.4)) {
+                                inputTab.path.append(.edit)
+//                                inputTab.showEditSheet.toggle()
+                            }
                         } label: {
                             Image(systemName: "shippingbox.fill")
                                 .resizable()

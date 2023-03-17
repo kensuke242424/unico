@@ -8,7 +8,7 @@
 import SwiftUI
 import ResizableSheet
 //
-enum EditStatus {
+enum EditSelect {
     case create
     case update
 }
@@ -40,7 +40,7 @@ struct InputHome {
     var isShowSelectImageSheet: Bool = false
     var doCommerce: Bool = false
     var doItemEdit: Bool = false
-    var editItemStatus: EditStatus = .create
+    var editItemStatus: EditSelect = .create
     var selectedUpdateData: SelectedUpdateData = .start
     var updateImageStatus: UpdateImageStatus = .item
     var cartHalfSheet: ResizableSheetState = .hidden
@@ -264,8 +264,7 @@ struct InputImage {
 //
 //        .sheet(isPresented: $inputHome.isShowSelectImageSheet) {
 //            PHPickerView(captureImage: $inputHome.selectCaptureImage,
-//                         isShowSheet: $inputHome.isShowSelectImageSheet,
-//                         isShowError: $inputHome.showErrorFetchImage)
+//                         isShowSheet: $inputHome.isShowSelectImageSheet)
 //        }
 //
 //        .onChange(of: inputHome.cartHalfSheet) { _ in

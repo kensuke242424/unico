@@ -13,7 +13,7 @@ struct InputTagSideMenu {
     var selectionSideMenuTagColor: UsedColor = .red
     var overlapTagNameAlert: Bool = false
     var updateTagErrorAlert: Bool = false
-    var tagSideMenuStatus: EditStatus = .create
+    var tagSideMenuStatus: EditSelect = .create
     // NOTE: 初期値として画面横幅分をoffset(x)軸に渡すことで、呼び出されるまでの間、画面外へ除いておく
 }
 
@@ -28,7 +28,7 @@ struct SideMenuEditTagView: View {
     @Binding var inputHome: InputHome
     @Binding var inputTag: InputTagSideMenu
     let defaultTag: Tag?
-    let tagSideMenuStatus: EditStatus
+    let tagSideMenuStatus: EditSelect
     @FocusState var focusedField: EditTagField?
 
     let screenSize = UIScreen.main.bounds

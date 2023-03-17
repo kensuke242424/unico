@@ -179,13 +179,11 @@ struct UpdateTeamOrUserDataView: View {
             }
             .sheet(isPresented: $inputUpdate.isShowUserPickerView) {
                 PHPickerView(captureImage: $inputUpdate.userIconImage,
-                             isShowSheet: $inputUpdate.isShowUserPickerView,
-                             isShowError: $inputUpdate.captureError)
+                             isShowSheet: $inputUpdate.isShowUserPickerView)
             }
             .sheet(isPresented: $inputUpdate.isShowTeamPickerView) {
                 PHPickerView(captureImage: $inputUpdate.teamIconImage,
-                             isShowSheet: $inputUpdate.isShowTeamPickerView,
-                             isShowError: $inputUpdate.captureError)
+                             isShowSheet: $inputUpdate.isShowTeamPickerView)
             }
         } // ZStack
         .frame(maxWidth: .infinity, maxHeight: .infinity)

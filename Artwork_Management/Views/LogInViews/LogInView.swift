@@ -438,9 +438,9 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         .sheet(isPresented: $inputLogIn.isShowPickerView) {
             // .fase1ならバックグラウンドの画像設定、.fase2ならユーザーアイコンの画像設定
             if logInVM.createAccountFase == .fase1 {
-                PHPickerView(captureImage: $inputLogIn.captureBackgroundImage, isShowSheet: $inputLogIn.isShowPickerView, isShowError: $inputLogIn.captureError)
+                PHPickerView(captureImage: $inputLogIn.captureBackgroundImage, isShowSheet: $inputLogIn.isShowPickerView)
             } else if logInVM.createAccountFase == .fase2 {
-                PHPickerView(captureImage: $inputLogIn.captureUserIconImage, isShowSheet: $inputLogIn.isShowPickerView, isShowError: $inputLogIn.captureError)
+                PHPickerView(captureImage: $inputLogIn.captureUserIconImage, isShowSheet: $inputLogIn.isShowPickerView)
             }
         }
         
