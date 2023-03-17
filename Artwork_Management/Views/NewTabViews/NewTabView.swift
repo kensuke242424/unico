@@ -9,7 +9,7 @@ import SwiftUI
 import ResizableSheet
 
 enum NavigationPath {
-    case edit, system
+    case create, edit, system
 }
 
 struct InputTab {
@@ -103,17 +103,15 @@ struct NewTabView: View {
                 /// NavigationStackによる遷移を管理します
                 .navigationDestination(for: NavigationPath.self) { path in
                     
-                    switch path {
-                    case .edit:
+                    if path == .create {
                         NewEditItemView(teamVM: teamVM,
                                         userVM: userVM,
                                         itemVM: itemVM,
                                         tagVM: tagVM,
                                         inputTab: $inputTab,
                                         passItem: nil)
-                    case .system:
-                        Text("システム画面")
                     }
+                    
                 }
             } // NavigationStack
         } // GeometryReader
@@ -158,7 +156,7 @@ struct NewTabView: View {
                     if inputTab.animationTab == .item {
                         Button {
                             /// アイテム追加エディット画面に遷移
-                            inputTab.path.append(.edit)
+                            inputTab.path.append(.create)
                         } label: {
                             Image(systemName: "shippingbox.fill")
                                 .resizable()

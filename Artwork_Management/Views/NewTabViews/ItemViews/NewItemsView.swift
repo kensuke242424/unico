@@ -31,11 +31,11 @@ struct NewItemsView: View {
     var body: some View {
         GeometryReader {
             let size = $0.size
-        VStack(spacing: 15) {
-            
-            TagsView()
-                .opacity(showDarkBackground ? 0 : 1)
-            
+            VStack(spacing: 15) {
+                
+                TagsView()
+                    .opacity(showDarkBackground ? 0 : 1)
+                
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack(spacing: 35) {
                         ForEach(testItem, id: \.self) { item in
@@ -68,9 +68,13 @@ struct NewItemsView: View {
                 /// ビューの座標空間に名前を付け、
                 /// 他のコードがポイントやサイズなどの次元を名前付きの空間と相対的に操作できるようにします。
                 .coordinateSpace(name: "SCROLLVIEW")
-            }
+            } // VStack
             .padding(.top, 15)
-        }
+            .navigationDestination(for: NavigationPath.self) { path in
+                
+               
+            }
+        } // Geometry
         .overlay {
             if let selectedItem, showDetailView {
                 DetailView(show: $showDetailView, animation: animation, item: selectedItem)
