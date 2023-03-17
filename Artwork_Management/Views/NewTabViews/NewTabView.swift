@@ -8,7 +8,12 @@
 import SwiftUI
 import ResizableSheet
 
+enum NavigationPath {
+    case edit, system
+}
+
 struct InputTab {
+    var path: [NavigationPath] = []
     var selectionTab: Tab = .item
     var animationTab: Tab = .item
     var animationOpacity: CGFloat = 1
@@ -29,11 +34,11 @@ struct NewTabView: View {
         GeometryReader {
             let size = $0.size
             
-            NavigationStack {
+            NavigationStack(path: $inputTab.path) {
                 
                 VStack {
                     
-                    TabIndicatorView()
+                    TabTopBarView()
                     
                     Spacer(minLength: 0)
                     
@@ -65,7 +70,7 @@ struct NewTabView: View {
                 .background {
                     ZStack {
                         GeometryReader { proxy in
-                            Image("background_4")
+                            Image("background_1")
                                 .resizable()
                                 .scaledToFill()
                                 .frame(width: proxy.size.width, height: proxy.size.height)
@@ -87,20 +92,30 @@ struct NewTabView: View {
                         }
                     }
                 }
+                
+                /// NavigationStackによる遷移を管理します
+                .navigationDestination(for: NavigationPath.self) { path in
+                    
+                    switch path {
+                    case .edit:
+                        Text("エディット画面")
+                    case .system:
+                        Text("システム画面")
+                    }
+                }
             } // NavigationStack
         } // GeometryReader
         
 
     } // body
     @ViewBuilder
-    func TabIndicatorView() -> some View {
+    func TabTopBarView() -> some View {
         GeometryReader {
             let size = $0.size
             let tabWidth = size.width / 3
             HStack {
                 ForEach(Tab.allCases, id: \.rawValue) { tab in
                     Text(tab.rawValue)
-//                        .font(.system(.title3, design: .monospaced))
                         .font(.title3)
                         .fontWeight(.semibold)
                         .tracking(4)
@@ -130,7 +145,8 @@ struct NewTabView: View {
                     /// Itemタブに移動した時に表示するアイテム追加タブボタン
                     if inputTab.animationTab == .item {
                         Button {
-                            
+                            /// アイテム追加エディット画面に遷移
+                            inputTab.path.append(.edit)
                         } label: {
                             Image(systemName: "shippingbox.fill")
                                 .resizable()

@@ -80,7 +80,6 @@ struct NewItemsView: View {
                 .ignoresSafeArea()
             }
         }
-        
         .onChange(of: showDetailView) { newValue in
             if !newValue {
                 showDarkBackground = false
@@ -89,6 +88,8 @@ struct NewItemsView: View {
                 }
             }
         }
+        
+        
     }
     
     /// 最後のカードが上部に残るためのボトムパディング
