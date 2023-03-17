@@ -374,16 +374,16 @@ private struct OffsetPreferenceKey: PreferenceKey, Equatable {
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {}
 }
 
-struct EditItemView_Previews: PreviewProvider {
-    static var previews: some View {
-        EditItemView(teamVM: TeamViewModel(),
-                     userVM: UserViewModel(),
-                     itemVM: ItemViewModel(),
-                     tagVM: TagViewModel(),
-                     inputHome: .constant(InputHome()),
-                     inputImage: .constant(InputImage()),
-                     passItemData: testItem.first!,
-                     editItemStatus: .update
-        )
-    }
-}
+//struct EditItemView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        EditItemView(teamVM: TeamViewModel(),
+//                     userVM: UserViewModel(),
+//                     itemVM: ItemViewModel(),
+//                     tagVM: TagViewModel(),
+//                     inputHome: .constant(InputHome()),
+//                     inputImage: .constant(InputImage()),
+//                     passItemData: testItem.first!,
+//                     editItemStatus: .update
+//        )
+//    }
+//}

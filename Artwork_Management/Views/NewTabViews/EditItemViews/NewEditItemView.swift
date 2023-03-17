@@ -14,15 +14,22 @@ struct NewEditItemView: View {
     @StateObject var itemVM: ItemViewModel
     @StateObject var tagVM : TagViewModel
     
-    @Binding var inputTab: InputTab
-    
     let passItem: Item?
     
     var body: some View {
-        VStack {
-            Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        GeometryReader {
+            let size = $0.size
+            
+            VStack {
+                Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+            }
+            .frame(width: size.width, height: size.height)
+            .navigationTitle(passItem == nil ? "アイテム追加" : "アイテム編集")
         }
-        .navigationTitle("")
+        .onAppear {
+            print("アイテムエディット画面生成")
+        }
+        
     }
 }
 
@@ -32,7 +39,6 @@ struct NewEditItemView_Previews: PreviewProvider {
                         userVM: UserViewModel(),
                         itemVM: ItemViewModel(),
                         tagVM : TagViewModel(),
-                        inputTab: .constant(InputTab()),
                         passItem: nil)
     }
 }

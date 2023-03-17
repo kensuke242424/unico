@@ -15,6 +15,8 @@ enum NavigationPath {
 struct InputTab {
     /// Navigation遷移を管理するプロパティ
     var path: [NavigationPath] = []
+    /// NavigationPathによるエディット画面遷移時に渡す
+    var selectedItem: Item?
     
     /// タブViewアニメーションを管理するプロパティ
     var selectionTab: Tab = .item
@@ -23,8 +25,7 @@ struct InputTab {
     var animationScale: CGFloat = 1
     var scrollProgress: CGFloat = .zero
     
-    /// ItemViewでユーザーが選択したアイテムが渡されるプロパティ
-    var selectedItem: Item?
+    /// ItemsViewでユーザーが選択したアイテムが渡されるプロパティ
 }
 
 struct NewTabView: View {
@@ -103,13 +104,24 @@ struct NewTabView: View {
                 /// NavigationStackによる遷移を管理します
                 .navigationDestination(for: NavigationPath.self) { path in
                     
-                    if path == .create {
+                    switch path {
+                    case .create:
+                        
                         NewEditItemView(teamVM: teamVM,
                                         userVM: userVM,
                                         itemVM: itemVM,
                                         tagVM: tagVM,
-                                        inputTab: $inputTab,
                                         passItem: nil)
+                        
+                    case .edit:
+                        NewEditItemView(teamVM: teamVM,
+                                        userVM: userVM,
+                                        itemVM: itemVM,
+                                        tagVM: tagVM,
+                                        passItem: inputTab.selectedItem)
+                        
+                    case .system:
+                        Text("システム画面")
                     }
                     
                 }
@@ -156,7 +168,10 @@ struct NewTabView: View {
                     if inputTab.animationTab == .item {
                         Button {
                             /// アイテム追加エディット画面に遷移
-                            inputTab.path.append(.create)
+                            ///  追加ボタンなので、selectedItemはnilを入れておく
+                            inputTab.selectedItem = nil
+                            inputTab.path.append(.edit)
+                            print("path: \(inputTab.path)")
                         } label: {
                             Image(systemName: "shippingbox.fill")
                                 .resizable()

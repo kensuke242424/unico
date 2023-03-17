@@ -44,7 +44,14 @@ struct NewItemsView: View {
                                     withAnimation(.easeInOut(duration: 0.25)) {
                                         animateCurrentItem = true
                                         showDarkBackground = true
+                                        /// ✅ CHECK
+                                        /// 親View側で、NavigationPathによるエディット画面遷移時に選択アイテム値を渡したい
+                                        /// 選択アイテム値を親View側でまとめて管理しようとしたが、そうすると
+                                        /// 子View側での選択アイテム値を使ったアニメーションの挙動に
+                                        /// チラつきがみられた(View更新の問題？)
+                                        /// よって、親View側と子Viewそれぞれ個別で渡して今は対応している
                                         selectedItem = item
+                                        inputTab.selectedItem = item
                                     }
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
                                         withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.7, blendDuration: 0.7)) {
@@ -70,10 +77,6 @@ struct NewItemsView: View {
                 .coordinateSpace(name: "SCROLLVIEW")
             } // VStack
             .padding(.top, 15)
-            .navigationDestination(for: NavigationPath.self) { path in
-                
-               
-            }
         } // Geometry
         .overlay {
             if let selectedItem, showDetailView {
