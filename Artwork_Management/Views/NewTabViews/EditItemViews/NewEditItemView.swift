@@ -209,7 +209,7 @@ struct NewEditItemView: View {
     }
     @ViewBuilder
     func EditTopNavigateBar() -> some View {
-        Text(passItem == nil ? "アイテム追加" : "アイテム編集")
+        Text(passItem == nil ? "新規アイテム" : "アイテム編集")
             .font(.title3)
             .fontWeight(.semibold)
             .tracking(2)
