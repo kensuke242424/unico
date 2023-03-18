@@ -179,8 +179,8 @@ struct NewTabView: View {
                             /// アイテム追加エディット画面に遷移
                             ///  追加ボタンなので、selectedItemはnilを入れておく
                             withAnimation(.spring(response: 0.4)) {
+                                inputTab.selectedItem = nil
                                 inputTab.path.append(.edit)
-//                                inputTab.showEditSheet.toggle()
                             }
                         } label: {
                             Image(systemName: "shippingbox.fill")
