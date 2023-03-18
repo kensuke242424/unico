@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-enum EditStatus: CaseIterable {
+enum InputFormsStatus: CaseIterable {
     case name, author ,inventory , price, sales ,totalAmount ,totalInventory
     
     struct Model {
@@ -28,14 +28,14 @@ enum EditStatus: CaseIterable {
     }
 }
 
-extension EditStatus.Model {
-    static let name = EditStatus.Model(          title: "アイテム名", example: "unico")
-    static let author = EditStatus.Model(        title: "製作者"   , example: "ユニコ 太郎")
-    static let inventory = EditStatus.Model(     title: "在庫"     , example: "100")
-    static let price = EditStatus.Model(         title: "価格"     , example: "1500")
-    static let sales = EditStatus.Model(         title: "売上"     , example: "100000")
-    static let totalAmount = EditStatus.Model(   title: "総売上"    , example: "150")
-    static let totalInventory = EditStatus.Model(title: "総売個数"  , example: "300")
+extension InputFormsStatus.Model {
+    static let name = InputFormsStatus.Model(          title: "アイテム名", example: "unico")
+    static let author = InputFormsStatus.Model(        title: "製作者"   , example: "ユニコ 太郎")
+    static let inventory = InputFormsStatus.Model(     title: "在庫"     , example: "100")
+    static let price = InputFormsStatus.Model(         title: "価格"     , example: "1500")
+    static let sales = InputFormsStatus.Model(         title: "売上"     , example: "100000")
+    static let totalAmount = InputFormsStatus.Model(   title: "総売上"    , example: "150")
+    static let totalInventory = InputFormsStatus.Model(title: "総売個数"  , example: "300")
 }
 
 struct InputEditItem {
@@ -70,7 +70,7 @@ struct NewEditItemView: View {
     
     @State private var input: InputEditItem = InputEditItem()
     
-    @FocusState var focused: EditStatus?
+    @FocusState var focused: InputFormsStatus?
     // アイテム詳細テキストフィールド専用のフォーカス制御
     @FocusState var detailFocused: Bool?
     
@@ -122,12 +122,9 @@ struct NewEditItemView: View {
                             }
                         }
                     } // ZStack(選択画像エリア)
-                    .onChange(of: input.captureImage) { captureImage in
-                        
-                    }
                     
                     /// 入力欄の各項目
-                    ForEach(EditStatus.allCases, id: \.self) { value in
+                    ForEach(InputFormsStatus.allCases, id: \.self) { value in
                         InputForm(size, value)
                     } // ForEach
                     
@@ -207,6 +204,9 @@ struct NewEditItemView: View {
             }
         }
     }
+    func additemData() {
+            
+    }
     @ViewBuilder
     func EditTopNavigateBar() -> some View {
         Text(passItem == nil ? "新規アイテム" : "アイテム編集")
@@ -214,10 +214,71 @@ struct NewEditItemView: View {
             .fontWeight(.semibold)
             .tracking(2)
             .frame(maxWidth: .infinity)
+            /// ✅ 追加 or 更新ボタン
             .overlay(alignment: .trailing) {
                 Button {
-                    //TODO: アイテム情報の更新 or 追加
-                    dismiss()
+                    /// passItemにデータがある -> update Item
+                    /// passItemにデータがない -> add item
+                    if let passItem {
+
+                        Task {
+                            guard let defaultDataID = passItem.id else { return }
+                            let editInventory = Int(input.inventory) ?? 0
+
+                            // captureImageに新しい画像があれば、元の画像データを更新
+                            if let captureImage = input.captureImage {
+                                await itemVM.deleteImage(path: input.photoPath)
+                                let newImageData =  await itemVM.uploadImage(captureImage)
+                                input.photoURL = newImageData.url
+                                input.photoPath = newImageData.filePath
+                            }
+
+                            // NOTE: アイテムを更新
+                            let updateItemData = (Item(createTime: passItem.createTime,
+                                                       tag        : input.selectionTagName,
+                                                       name       : input.name,
+                                                       author     : input.author,
+                                                       detail     : input.detail != "" ? input.detail : "メモなし",
+                                                       photoURL   : input.photoURL,
+                                                       photoPath  : input.photoPath,
+                                                       cost       : Int( input.cost) ?? 0,
+                                                       price      : Int(input.price) ?? 0,
+                                                       amount     : 0,
+                                                       sales      : Int(input.sales) ?? 0,
+                                                       inventory  : editInventory,
+                                                       totalAmount: passItem.totalAmount,
+                                                       totalInventory: passItem.inventory < editInventory ?
+                                                       passItem.totalInventory + (editInventory - passItem.inventory) :
+                                                        passItem.totalInventory - (passItem.inventory - editInventory) ))
+
+                            itemVM.updateItem(updateData: updateItemData, defaultDataID: defaultDataID, teamID: teamVM.team!.id)
+                            dismiss()
+                        } // Task(update Item)
+                        
+                    } else {
+                        
+                        Task {
+                            let uploadImage =  await itemVM.uploadImage(input.captureImage)
+                            let itemData = Item(tag           : input.selectionTagName,
+                                                name          : input.name,
+                                                author        : input.author,
+                                                detail        : input.detail != "" ? input.detail : "メモなし",
+                                                photoURL      : uploadImage.url,
+                                                photoPath     : uploadImage.filePath,
+                                                cost          : 0,
+                                                price         : Int(input.price) ?? 0,
+                                                amount        : 0,
+                                                sales         : 0,
+                                                inventory     : Int(input.inventory) ??  0,
+                                                totalAmount   : 0,
+                                                totalInventory: Int(input.inventory) ?? 0)
+                            
+                            // Firestoreにコーダブル保存
+                            itemVM.addItem(itemData: itemData, tag: input.selectionTagName, teamID: teamVM.team!.id)
+                            dismiss()
+                        } // Task(add Item)
+                    } // if let passItem
+                        
                 } label: {
                     Text(passItem == nil ? "追加" : "更新")
                         .tracking(1)
@@ -237,7 +298,7 @@ struct NewEditItemView: View {
     }
     
     @ViewBuilder
-    func InputForm(_ size: CGSize,_ value: EditStatus) -> some View {
+    func InputForm(_ size: CGSize,_ value: InputFormsStatus) -> some View {
         
         /// アイテム追加の場合は以下の項目だけを表示する
         if !(passItem == nil    &&

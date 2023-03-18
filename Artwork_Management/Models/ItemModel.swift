@@ -5,6 +5,7 @@
 //  Created by 中川賢亮 on 2022/09/24.
 //
 
+import SwiftUI
 import FirebaseFirestore
 import FirebaseFirestoreSwift
 
@@ -26,6 +27,10 @@ struct Item: Identifiable, Equatable, Hashable, Codable {
     var inventory: Int
     var totalAmount: Int
     var totalInventory: Int
+}
+
+struct ItemImageData: Codable {
+    var image: Data
 }
 
 enum Mode {

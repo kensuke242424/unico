@@ -27,15 +27,13 @@ struct NewItemAsyncImage: View {
                     itemImage
                         .resizable()
                         .scaledToFill()
-                        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                 } placeholder: {
                     ZStack {
                         ProgressView()
                         Color.black.opacity(0.2)
                     }
                 }
-                .frame(width: width / 2, height: height)
-                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                .frame(width: width, height: height)
                 .allowsHitTesting(false)
             }
 

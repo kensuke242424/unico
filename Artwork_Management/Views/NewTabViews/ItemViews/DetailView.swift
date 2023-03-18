@@ -51,10 +51,9 @@ struct DetailView: View {
                 let size = $0.size
                 
                 HStack(spacing: 20) {
-                    Image(item.name)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: (size.width - 30) / 2, height: size.height)
+                    NewItemAsyncImage(imageURL: item.photoURL,
+                                      width: size.width / 2,
+                                      height: size.height)
                         .clipShape(CustomCorners(corners: [.topRight, .bottomRight], radius: 20))
                         /// Matched Geometry ID
                         .transition(.opacity)

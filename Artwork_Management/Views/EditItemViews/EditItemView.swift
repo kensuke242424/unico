@@ -156,11 +156,11 @@ struct EditItemView: View {
 
                                 // NOTE: アイテムを更新
                                 let updateItemData = (Item(createTime: passItemData.createTime,
-                                                           tag:       inputEdit.selectionTagName,
-                                                           name:      inputEdit.name,
-                                                           author:    inputEdit.author,
-                                                           detail:    inputEdit.detail != "" ? inputEdit.detail : "メモなし",
-                                                           photoURL:  inputEdit.photoURL,
+                                                           tag      : inputEdit.selectionTagName,
+                                                           name     : inputEdit.name,
+                                                           author   : inputEdit.author,
+                                                           detail   : inputEdit.detail != "" ? inputEdit.detail : "メモなし",
+                                                           photoURL : inputEdit.photoURL,
                                                            photoPath: inputEdit.photoPath,
                                                            cost: Int( inputEdit.cost) ?? 0,
                                                            price: Int(inputEdit.price) ?? 0,

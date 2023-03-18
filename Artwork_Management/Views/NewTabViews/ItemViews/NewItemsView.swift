@@ -52,7 +52,7 @@ struct NewItemsView: View {
                 
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack(spacing: 35) {
-                        ForEach(testItem, id: \.self) { item in
+                        ForEach(itemVM.items, id: \.self) { item in
                             ItemsCardView(item)
                                 .onTapGesture {
                                     withAnimation(.easeInOut(duration: 0.25)) {
@@ -132,92 +132,92 @@ struct NewItemsView: View {
             }
         }
         // アイテム取引かごのシート画面
-        .resizableSheet($resizableVM.showCart, id: "A") { builder in
-            builder.content { context in
+//        .resizableSheet($resizableVM.showCart, id: "A") { builder in
+//            builder.content { context in
+//
+//                VStack {
+//                    Spacer(minLength: 0)
+//                    GrabBar()
+//                        .foregroundColor(.black)
+//                    Spacer(minLength: 0)
+//
+//                    HStack(alignment: .bottom) {
+//                        Text("カート内のアイテム")
+//                            .foregroundColor(.black)
+//                            .font(.headline)
+//                            .fontWeight(.black)
+//                            .opacity(0.6)
+//                        Spacer()
+//                        Button(
+//                            action: {
+//                                inputCart.resultCartPrice = 0
+//                                inputCart.resultCartAmount = 0
+//                                itemVM.resetAmount()
+//
+//                            },
+//                            label: {
+//                                HStack {
+//                                    Image(systemName: "trash.fill")
+//                                    Text("全て削除")
+//                                        .font(.callout)
+//                                }
+//                                .foregroundColor(.red)
+//                            }
+//                        ) // Button
+//                    } // HStack
+//                    .padding(.horizontal, 20)
+//
+//                    Spacer(minLength: 8)
+//
+//                    ResizableScrollView(
+//                        context: context,
+//                        main: {
+//                            CartItemsSheet(inputCart      : $inputCart,
+//                                           halfSheetScroll: .main)
+//                        },
+//                        additional: {
+//                            CartItemsSheet(inputCart      : $inputCart,
+//                                           halfSheetScroll: .additional)
+//
+//                            Spacer()
+//                                .frame(height: 100)
+//                        }
+//                    )
+//                    Spacer()
+//                        .frame(height: 80)
+//                } // VStack
+//            } // builder.content
+//            .sheetBackground { _ in
+//                LinearGradient(gradient: Gradient(colors: [.white, .customLightGray1]),
+//                               startPoint: .leading, endPoint: .trailing)
+//                .opacity(0.95)
+//                .blur(radius: 1)
+//            }
+//            .background { _ in
+//                EmptyView()
+//            }
+//        } // .resizableSheet
 
-                VStack {
-                    Spacer(minLength: 0)
-                    GrabBar()
-                        .foregroundColor(.black)
-                    Spacer(minLength: 0)
-
-                    HStack(alignment: .bottom) {
-                        Text("カート内のアイテム")
-                            .foregroundColor(.black)
-                            .font(.headline)
-                            .fontWeight(.black)
-                            .opacity(0.6)
-                        Spacer()
-                        Button(
-                            action: {
-                                inputCart.resultCartPrice = 0
-                                inputCart.resultCartAmount = 0
-                                itemVM.resetAmount()
-
-                            },
-                            label: {
-                                HStack {
-                                    Image(systemName: "trash.fill")
-                                    Text("全て削除")
-                                        .font(.callout)
-                                }
-                                .foregroundColor(.red)
-                            }
-                        ) // Button
-                    } // HStack
-                    .padding(.horizontal, 20)
-
-                    Spacer(minLength: 8)
-
-                    ResizableScrollView(
-                        context: context,
-                        main: {
-                            CartItemsSheet(inputCart      : $inputCart,
-                                           halfSheetScroll: .main)
-                        },
-                        additional: {
-                            CartItemsSheet(inputCart      : $inputCart,
-                                           halfSheetScroll: .additional)
-
-                            Spacer()
-                                .frame(height: 100)
-                        }
-                    )
-                    Spacer()
-                        .frame(height: 80)
-                } // VStack
-            } // builder.content
-            .sheetBackground { _ in
-                LinearGradient(gradient: Gradient(colors: [.white, .customLightGray1]),
-                               startPoint: .leading, endPoint: .trailing)
-                .opacity(0.95)
-                .blur(radius: 1)
-            }
-            .background { _ in
-                EmptyView()
-            }
-        } // .resizableSheet
-
-        // 決済リザルトのシート画面
-        .resizableSheet($resizableVM.showCommerce, id: "B") {builder in
-            builder.content { _ in
-
-                CommerceSheet(resizableVM: resizableVM,
-                              inputCart  : $inputCart,
-                              teamID     : teamVM.team!.id)
-
-            } // builder.content
-            .supportedState([.medium])
-            .sheetBackground { _ in
-                LinearGradient(gradient: Gradient(colors: [.white, .customLightGray1]),
-                               startPoint: .leading, endPoint: .trailing)
-                .opacity(0.95)
-            }
-            .background { _ in
-                EmptyView()
-            }
-        } // .resizableSheet
-        
+//        // 決済リザルトのシート画面
+//        .resizableSheet($resizableVM.showCommerce, id: "B") {builder in
+//            builder.content { _ in
+//
+//                CommerceSheet(resizableVM: resizableVM,
+//                              inputCart  : $inputCart,
+//                              teamID     : teamVM.team!.id)
+//
+//            } // builder.content
+//            .supportedState([.medium])
+//            .sheetBackground { _ in
+//                LinearGradient(gradient: Gradient(colors: [.white, .customLightGray1]),
+//                               startPoint: .leading, endPoint: .trailing)
+//                .opacity(0.95)
+//            }
+//            .background { _ in
+//                EmptyView()
+//            }
+//        } // .resizableSheet
+//
     }
     
     func getActionIndex(_ selectedItem: Item) -> Int? {
@@ -263,7 +263,7 @@ struct NewItemsView: View {
                     .padding(.top, 20)
                     
                     HStack {
-                        Text("\(item.price)")
+                        Text(item.price == 0 ? "-" : "\(item.price)")
                             .opacity(0.6)
                         Text("yen")
                             .opacity(0.4)
@@ -273,7 +273,7 @@ struct NewItemsView: View {
                     .foregroundColor(.black)
                 }
                 .padding(20)
-                .frame(width: size.width / 2, height: size.height * 0.8)
+                .frame(width: size.width / 2, height: size.height * 0.8, alignment: .leading)
                 .background {
                     RoundedRectangle(cornerRadius: 10, style: .continuous)
                         .fill(.white)
@@ -317,12 +317,11 @@ struct NewItemsView: View {
                 /// Book Cover Image
                 ZStack {
                     if !(showDetailView && selectedItem?.id == item.id) {
-                        Image(item.name)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: size.width / 2, height: size.height)
-                            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                        NewItemAsyncImage(imageURL: item.photoURL,
+                                          width: size.width / 2,
+                                          height: size.height)
                             /// Matched Geometry ID
+                            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                             .transition(.asymmetric(insertion: .slide, removal: .identity))
                             .matchedGeometryEffect(id: item.id, in: animation)
                             // Applying Shadow
@@ -400,5 +399,10 @@ var tags: [String] =
 struct NewItemsView_Previews: PreviewProvider {
     static var previews: some View {
         NewItemsView(inputTab: .constant(InputTab()))
+            .environmentObject(LogInViewModel())
+            .environmentObject(TeamViewModel())
+            .environmentObject(UserViewModel())
+            .environmentObject(ItemViewModel())
+            .environmentObject(TagViewModel())
     }
 }
