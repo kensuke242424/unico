@@ -25,9 +25,9 @@ struct CreateAndJoinTeamView: View {
         case start, fase1, fase2, check, success
     }
 
-    @StateObject var logInVM: LogInViewModel
-    @StateObject var teamVM: TeamViewModel
-    @StateObject var userVM: UserViewModel
+    @EnvironmentObject var logInVM: LogInViewModel
+    @EnvironmentObject var teamVM: TeamViewModel
+    @EnvironmentObject var userVM: UserViewModel
 
     @State private var inputTeamName: String = ""
     @State private var captureImage: UIImage?
@@ -581,8 +581,6 @@ struct CreateAndJoinTeamView: View {
 
 struct CreateAndJoinTeamView_Previews: PreviewProvider {
     static var previews: some View {
-        CreateAndJoinTeamView(logInVM: LogInViewModel(),
-                              teamVM: TeamViewModel(),
-                              userVM: UserViewModel())
+        CreateAndJoinTeamView()
     }
 }

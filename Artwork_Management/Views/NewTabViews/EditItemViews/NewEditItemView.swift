@@ -63,10 +63,10 @@ struct NewEditItemView: View {
     
     @Environment(\.dismiss) var dismiss
     
-    @StateObject var teamVM: TeamViewModel
-    @StateObject var userVM: UserViewModel
-    @StateObject var itemVM: ItemViewModel
-    @StateObject var tagVM : TagViewModel
+    @EnvironmentObject var teamVM: TeamViewModel
+    @EnvironmentObject var userVM: UserViewModel
+    @EnvironmentObject var itemVM: ItemViewModel
+    @EnvironmentObject var tagVM : TagViewModel
     
     @State private var input: InputEditItem = InputEditItem()
     
@@ -87,16 +87,27 @@ struct NewEditItemView: View {
                 
                 ScrollView(showsIndicators: false) {
                     /// 写真エリア
-                    Rectangle()
-                        .fill(.gray.gradient)
-                        .frame(height: 250)
-                        .opacity(0.1)
-                        .overlay {
+                    ZStack {
+                        Rectangle()
+                            .fill(.gray.gradient)
+                            .frame(height: 250)
+                            .opacity(0.1)
+                            .onTapGesture {
+                                focused       = nil
+                                detailFocused = nil
+                            }
+                        
+                        if let imageURL = passItem?.photoURL {
+                            NewItemAsyncImage(imageURL: imageURL,
+                                              width: size.width / 2,
+                                              height: size.height)
+                        } else {
                             RoundedRectangle(cornerRadius: 10)
                                 .fill(.gray.gradient)
                                 .frame(width: size.width / 2, height: 220)
-                        }
-                        .overlay {
+                                .onTapGesture {
+                                    input.isShowItemImageSelectSheet.toggle()
+                                }
                             VStack(spacing: 20) {
                                 Image(systemName: "cube.transparent.fill")
                                     .resizable()
@@ -110,7 +121,9 @@ struct NewEditItemView: View {
                                     .foregroundColor(.white)
                             }
                         }
-                    /// 入力欄エリア
+                    }
+                    
+                    /// 入力欄の各項目
                     ForEach(EditStatus.allCases, id: \.self) { value in
                         InputForm(size, value)
                     } // ForEach
@@ -166,7 +179,7 @@ struct NewEditItemView: View {
         .background {
             GeometryReader {
                 let size = $0.size
-                Image("background_1")
+                Image("background_2")
                     .resizable()
                     .scaledToFill()
                     .frame(width: size.width, height: size.height)
@@ -174,6 +187,10 @@ struct NewEditItemView: View {
                     .onTapGesture { focused = nil }
             }
             .ignoresSafeArea()
+        }
+        .sheet(isPresented: $input.isShowItemImageSelectSheet) {
+            PHPickerView(captureImage: $input.captureImage,
+                         isShowSheet: $input.isShowItemImageSelectSheet)
         }
     }
     @ViewBuilder
@@ -282,10 +299,6 @@ struct NewEditItemView: View {
 
 struct NewEditItemView_Previews: PreviewProvider {
     static var previews: some View {
-        NewEditItemView(teamVM: TeamViewModel(),
-                        userVM: UserViewModel(),
-                        itemVM: ItemViewModel(),
-                        tagVM : TagViewModel(),
-                        passItem: testItem.first)
+        NewEditItemView(passItem: testItem.first)
     }
 }

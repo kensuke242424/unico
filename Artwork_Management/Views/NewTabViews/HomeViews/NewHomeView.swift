@@ -9,8 +9,8 @@ import SwiftUI
 
 struct NewHomeView: View {
     
-    @StateObject var teamVM: TeamViewModel
-    @StateObject var itemVM: ItemViewModel
+    @EnvironmentObject var teamVM: TeamViewModel
+    @EnvironmentObject var itemVM: ItemViewModel
     
     /// Tab親Viewから受け取った状態変数群
     @Binding var inputTab: InputTab
@@ -24,7 +24,7 @@ struct NewHomeView: View {
             
             VStack {
                 if animationContent {
-                    TimeView(size)
+                    NowTimeView(size)
                         .opacity(1 - min((-inputTab.scrollProgress * 2), 1))
                         .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 20)))
                 }
@@ -43,7 +43,7 @@ struct NewHomeView: View {
     
     // 🕛時刻のレイアウト
     // HStack+Spacerを入れておかないと秒数によって微妙に時計が動いてしまう🤔
-    func TimeView(_ size: CGSize) -> some View {
+    func NowTimeView(_ size: CGSize) -> some View {
         HStack {
             VStack(alignment: .leading, spacing: 8) {
                 
@@ -140,10 +140,7 @@ struct NewHomeView: View {
 
 struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
-        NewHomeView(teamVM: TeamViewModel(),
-                    itemVM: ItemViewModel(),
-                    inputTab: .constant(InputTab())
-        )
+        NewHomeView(inputTab: .constant(InputTab()))
             .background {
                 Image("background_4")
                     .resizable()

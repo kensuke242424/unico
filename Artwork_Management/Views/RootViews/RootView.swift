@@ -18,11 +18,11 @@ struct RootView: View {
     
     @EnvironmentObject var progress: ProgressViewModel
 
-    @StateObject var logInVM: LogInViewModel = LogInViewModel()
-    @StateObject var teamVM: TeamViewModel = TeamViewModel()
-    @StateObject var userVM: UserViewModel = UserViewModel()
-    @StateObject var itemVM: ItemViewModel = ItemViewModel()
-    @StateObject var tagVM: TagViewModel = TagViewModel()
+    @EnvironmentObject var logInVM: LogInViewModel
+    @EnvironmentObject var teamVM: TeamViewModel
+    @EnvironmentObject var userVM: UserViewModel
+    @EnvironmentObject var itemVM: ItemViewModel
+    @EnvironmentObject var tagVM: TagViewModel
 
     @State private var isShowStandBy: Bool = false
     @State private var showLogInAlert: Bool = false
@@ -42,7 +42,7 @@ struct RootView: View {
         ZStack {
             switch logInVM.rootNavigation {
             case .logIn:
-                LogInView(logInVM: logInVM, teamVM: teamVM, userVM: userVM)
+                LogInView()
                     .environment(\.resizableSheetCenter, resizableSheetCenter)
 
             case .fetch:
@@ -50,10 +50,10 @@ struct RootView: View {
 
             case .join:
                 StandByView()
-                CreateAndJoinTeamView(logInVM: logInVM, teamVM: teamVM, userVM: userVM)
+                CreateAndJoinTeamView()
 
             case .home:
-                NewTabView(teamVM: teamVM, userVM: userVM, itemVM: itemVM, tagVM: tagVM)
+                NewTabView()
                     .environment(\.resizableSheetCenter, resizableSheetCenter)
             }
 
@@ -103,7 +103,7 @@ struct RootView: View {
                         guard let lastLogInTeamID = user.lastLogIn else { return }
                         
                         try await teamVM.fetchTeam(teamID: lastLogInTeamID)
-                            await tagVM.fetchTag(teamID: lastLogInTeamID)
+                            await tagVM.fetchTag(  teamID: lastLogInTeamID)
                             await itemVM.fetchItem(teamID: lastLogInTeamID)
 
                         /// チームandユーザーデータのリスナーを起動
@@ -115,10 +115,10 @@ struct RootView: View {
                             withAnimation(.spring(response: 1)) {
                                 logInVM.rootNavigation = .home
                                 /// ログインが完了したら、LogInViewの操作フローを初期化
-                                logInVM.createAccountFase    = .start
+                                logInVM.createAccountFase          = .start
                                 logInVM.userSelectedSignInType     = .start
-                                logInVM.selectProviderType   = .start
-                                logInVM.addressSignInFase    = .start
+                                logInVM.selectProviderType         = .start
+                                logInVM.addressSignInFase          = .start
                             }
                         }
 
@@ -233,5 +233,11 @@ struct RootView: View {
 struct RootView_Previews: PreviewProvider {
     static var previews: some View {
         RootView()
+            .environmentObject(LogInViewModel())
+            .environmentObject(TeamViewModel())
+            .environmentObject(UserViewModel())
+            .environmentObject(ItemViewModel())
+            .environmentObject(TagViewModel())
+            .environmentObject(ProgressViewModel())
     }
 }

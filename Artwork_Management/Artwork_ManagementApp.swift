@@ -25,6 +25,11 @@ struct ArtworkManagementApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
+                .environmentObject(LogInViewModel())
+                .environmentObject(TeamViewModel())
+                .environmentObject(UserViewModel())
+                .environmentObject(ItemViewModel())
+                .environmentObject(TagViewModel())
                 .environmentObject(ProgressViewModel())
         }
     }

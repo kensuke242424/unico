@@ -197,9 +197,9 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
     @Environment(\.colorScheme) var colorScheme: ColorScheme
     @EnvironmentObject var progress: ProgressViewModel
     
-    @StateObject var logInVM: LogInViewModel
-    @StateObject var teamVM : TeamViewModel
-    @StateObject var userVM : UserViewModel
+    @EnvironmentObject var logInVM: LogInViewModel
+    @EnvironmentObject var teamVM : TeamViewModel
+    @EnvironmentObject var userVM : UserViewModel
     
     @State private var logInNavigationPath: [Navigation] = []
     @State private var inputLogIn: InputLogIn = InputLogIn()
@@ -1175,6 +1175,6 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
 
 struct LogInView_Previews: PreviewProvider {
     static var previews: some View {
-        LogInView(logInVM: LogInViewModel(), teamVM: TeamViewModel(), userVM: UserViewModel())
+        LogInView()
     }
 }

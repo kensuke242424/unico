@@ -10,10 +10,10 @@ import SwiftUI
 struct NewItemsView: View {
     
     /// Tab親Viewから受け取るViewModelと状態変数
-    @StateObject var teamVM: TeamViewModel
-    @StateObject var userVM: UserViewModel
-    @StateObject var itemVM: ItemViewModel
-    @StateObject var tagVM : TagViewModel
+    @EnvironmentObject var teamVM: TeamViewModel
+    @EnvironmentObject var userVM: UserViewModel
+    @EnvironmentObject var itemVM: ItemViewModel
+    @EnvironmentObject var tagVM : TagViewModel
     @Binding var inputTab: InputTab
     
     /// View Propaties
@@ -267,10 +267,6 @@ var tags: [String] =
 
 struct NewItemsView_Previews: PreviewProvider {
     static var previews: some View {
-        NewItemsView(teamVM: TeamViewModel(),
-                     userVM: UserViewModel(),
-                     itemVM: ItemViewModel(),
-                     tagVM : TagViewModel(),
-                     inputTab: .constant(InputTab()))
+        NewItemsView(inputTab: .constant(InputTab()))
     }
 }

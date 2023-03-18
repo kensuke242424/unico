@@ -26,16 +26,14 @@ struct InputTab {
     var scrollProgress: CGFloat = .zero
     
     var showEditSheet: Bool = false
-    
-    /// ItemsViewでユーザーが選択したアイテムが渡されるプロパティ
 }
 
 struct NewTabView: View {
     
-    @StateObject var teamVM: TeamViewModel
-    @StateObject var userVM: UserViewModel
-    @StateObject var itemVM: ItemViewModel
-    @StateObject var tagVM : TagViewModel
+    @EnvironmentObject var teamVM: TeamViewModel
+    @EnvironmentObject var userVM: UserViewModel
+    @EnvironmentObject var itemVM: ItemViewModel
+    @EnvironmentObject var tagVM : TagViewModel
     /// View Propertys
     @State private var inputTab = InputTab()
 
@@ -53,7 +51,8 @@ struct NewTabView: View {
                     Spacer(minLength: 0)
                     
                     TabView(selection: $inputTab.selectionTab) {
-                        NewHomeView(teamVM: teamVM, itemVM: itemVM, inputTab: $inputTab)
+                        
+                        NewHomeView(inputTab: $inputTab)
                             .tag(Tab.home)
                             .offsetX(inputTab.selectionTab == Tab.home) { rect in
                                 let minX = rect.minX
@@ -64,7 +63,7 @@ struct NewTabView: View {
                                 inputTab.animationOpacity = 1 - -inputTab.scrollProgress
                             }
                         
-                        NewItemsView(teamVM: teamVM, userVM: userVM, itemVM: itemVM, tagVM: tagVM, inputTab: $inputTab)
+                        NewItemsView(inputTab: $inputTab)
                             .tag(Tab.item)
                             .offsetX(inputTab.selectionTab == Tab.item) { rect in
                                 let minX = rect.minX
@@ -102,32 +101,16 @@ struct NewTabView: View {
                         }
                     }
                 }
-                .sheet(isPresented: $inputTab.showEditSheet) {
-                    NewEditItemView(teamVM  : teamVM,
-                                    userVM  : userVM,
-                                    itemVM  : itemVM,
-                                    tagVM   : tagVM,
-                                    passItem: nil)
-                }
                 
                 /// NavigationStackによる遷移を管理します
                 .navigationDestination(for: NavigationPath.self) { path in
                     
                     switch path {
                     case .create:
-                        
-                        NewEditItemView(teamVM  : teamVM,
-                                        userVM  : userVM,
-                                        itemVM  : itemVM,
-                                        tagVM   : tagVM,
-                                        passItem: nil)
+                        NewEditItemView(passItem: nil)
                         
                     case .edit:
-                        NewEditItemView(teamVM  : teamVM,
-                                        userVM  : userVM,
-                                        itemVM  : itemVM,
-                                        tagVM   : tagVM,
-                                        passItem: inputTab.selectedItem)
+                        NewEditItemView(passItem: inputTab.selectedItem)
                         
                     case .system:
                         Text("システム画面")
@@ -179,8 +162,7 @@ struct NewTabView: View {
                             /// アイテム追加エディット画面に遷移
                             ///  追加ボタンなので、selectedItemはnilを入れておく
                             withAnimation(.spring(response: 0.4)) {
-                                inputTab.selectedItem = nil
-                                inputTab.path.append(.edit)
+                                inputTab.path.append(.create)
                             }
                         } label: {
                             Image(systemName: "shippingbox.fill")
@@ -225,11 +207,12 @@ struct NewTabView_Previews: PreviewProvider {
                    windowScene.flatMap(ResizableSheetCenter.resolve(for:))
                }
 
-        return NewTabView(teamVM: TeamViewModel(),
-                          userVM: UserViewModel(),
-                          itemVM: ItemViewModel(),
-                          tagVM : TagViewModel())
+        return NewTabView()
             .environment(\.resizableSheetCenter, resizableSheetCenter)
-
+            .environmentObject(LogInViewModel())
+            .environmentObject(TeamViewModel())
+            .environmentObject(UserViewModel())
+            .environmentObject(ItemViewModel())
+            .environmentObject(TagViewModel())
     }
 }
