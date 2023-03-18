@@ -1,40 +1,29 @@
 //
-//  NewItemAsyncImage.swift
+//  SwiftUIView.swift
 //  Artwork_Management
 //
 //  Created by Kensuke Nakagawa on 2023/03/18.
 //
-/// NOTE: 画像をclipShapeしても、切り取られた画像部分のタップ判定は残るみたい
-/// 画像本体のタップ判定は無効化して、ZStackで上から同じフレームのViewを重ね、
-/// そちら側にジェスチャー判定を任せている
 
 import SwiftUI
 
-struct NewItemAsyncImage: View {
+struct NewItemUIImage: View {
 
-    let imageURL: URL?
+    let image: UIImage?
     let width: CGFloat
     let height: CGFloat
 
     var body: some View {
-        if let imageURL = imageURL {
+        if let image = image {
             
             ZStack {
                 RoundedRectangle(cornerRadius: 5)
                     .foregroundColor(.white).opacity(0.01)
                     .frame(width: width, height: height)
-                AsyncImage(url: imageURL) { itemImage in
-                    itemImage
+                Image(uiImage: image)
                         .resizable()
                         .scaledToFill()
-                        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                } placeholder: {
-                    ZStack {
-                        ProgressView()
-                        Color.black.opacity(0.2)
-                    }
-                }
-                .frame(width: width / 2, height: height)
+                .frame(width: width, height: height)
                 .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                 .allowsHitTesting(false)
             }
@@ -61,7 +50,7 @@ struct NewItemAsyncImage: View {
     }
 }
 
-struct NewItemAsyncImage_Previews: PreviewProvider {
+struct NewItemUIImage_Previews: PreviewProvider {
     
     static var contentHeight: CGFloat = 220
     
@@ -78,9 +67,9 @@ struct NewItemAsyncImage_Previews: PreviewProvider {
                         .overlay(Text("アイテム詳細"))
                         .zIndex(1)
                     
-                    NewItemAsyncImage(imageURL: nil,
-                                      width: size.width / 2,
-                                      height: size.height)
+                    NewItemUIImage(image: nil,
+                                   width: size.width / 2,
+                                   height: size.height)
                 }
                 Spacer()
             }
@@ -90,5 +79,3 @@ struct NewItemAsyncImage_Previews: PreviewProvider {
         .frame(height: contentHeight)
     }
 }
-
-

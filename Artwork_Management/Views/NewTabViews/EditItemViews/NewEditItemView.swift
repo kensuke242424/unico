@@ -86,28 +86,28 @@ struct NewEditItemView: View {
                 EditTopNavigateBar()
                 
                 ScrollView(showsIndicators: false) {
-                    /// 写真エリア
+                    /// 📷選択写真を表示するエリア📷
                     ZStack {
-                        Rectangle()
-                            .fill(.gray.gradient)
-                            .frame(height: 250)
-                            .opacity(0.1)
-                            .onTapGesture {
-                                focused       = nil
-                                detailFocused = nil
-                            }
+                        SelectItemPhotoBackground(photoImage: input.captureImage,
+                                                  photoURL: passItem?.photoURL,
+                                                  height: 250)
+                        .onTapGesture { focused = nil; detailFocused = nil }
                         
-                        if let imageURL = passItem?.photoURL {
-                            NewItemAsyncImage(imageURL: imageURL,
+                        if let captureImage = input.captureImage {
+                            NewItemUIImage(image: captureImage,
+                                           width: size.width / 2,
+                                           height: 220)
+                            .onTapGesture { input.isShowItemImageSelectSheet.toggle() }
+                        } else if let passItemImageURL = input.photoURL {
+                            NewItemAsyncImage(imageURL: passItemImageURL,
                                               width: size.width / 2,
-                                              height: size.height)
+                                              height: 220)
+                            .onTapGesture { input.isShowItemImageSelectSheet.toggle() }
                         } else {
                             RoundedRectangle(cornerRadius: 10)
                                 .fill(.gray.gradient)
                                 .frame(width: size.width / 2, height: 220)
-                                .onTapGesture {
-                                    input.isShowItemImageSelectSheet.toggle()
-                                }
+                                .onTapGesture { input.isShowItemImageSelectSheet.toggle() }
                             VStack(spacing: 20) {
                                 Image(systemName: "cube.transparent.fill")
                                     .resizable()
@@ -121,6 +121,9 @@ struct NewEditItemView: View {
                                     .foregroundColor(.white)
                             }
                         }
+                    } // ZStack(選択画像エリア)
+                    .onChange(of: input.captureImage) { captureImage in
+                        
                     }
                     
                     /// 入力欄の各項目
@@ -134,15 +137,13 @@ struct NewEditItemView: View {
                         Text("■ アイテムの詳細")
                             .fontWeight(.semibold)
                             .tracking(1)
+                            .opacity(0.5)
                         /// 空白部分タップでフォーカスをnilにするためのほぼ透明の範囲View
                         Color.gray
                             .opacity(0.001)
                     }
                     .frame(width: size.width * 0.8, alignment: .leading)
-                    .onTapGesture {
-                        focused       = nil
-                        detailFocused = nil
-                    }
+                    .onTapGesture { focused = nil; detailFocused = nil }
                     .padding(.top, 30)
                     .padding(.bottom, 10)
                     
@@ -155,7 +156,7 @@ struct NewEditItemView: View {
                     .lineSpacing(4)
                     .focused($detailFocused, equals: true)
                     .textInputAutocapitalization(.never)
-                    .frame(width: size.width * 0.75)
+                    .frame(width: size.width * 0.82)
                     .padding()
                     .background {
                         RoundedRectangle(cornerRadius: 10)
@@ -166,10 +167,7 @@ struct NewEditItemView: View {
                     Color.gray
                         .opacity(0.001)
                         .frame(width: size.width, height: size.height / 2)
-                        .onTapGesture {
-                            focused       = nil
-                            detailFocused = nil
-                        }
+                        .onTapGesture { focused = nil; detailFocused = nil }
                 } // ScrollView
             } // VStack
         } // Geometry
@@ -191,6 +189,22 @@ struct NewEditItemView: View {
         .sheet(isPresented: $input.isShowItemImageSelectSheet) {
             PHPickerView(captureImage: $input.captureImage,
                          isShowSheet: $input.isShowItemImageSelectSheet)
+        }
+        /// passItemにアイテムが存在した場合、各入力値にアイテムデータを入れる
+        .onAppear {
+            if let passItem {
+                input.photoURL = passItem.photoURL
+                input.photoPath = passItem.photoPath
+                input.name = passItem.name
+                input.author = passItem.author
+                input.inventory = String(passItem.inventory)
+                input.cost = String(passItem.cost)
+                input.price = String(passItem.price)
+                input.sales = String(passItem.sales)
+                input.detail = passItem.detail
+                input.totalAmount = String(passItem.totalAmount)
+                input.totalInventry = String(passItem.totalInventory)
+            }
         }
     }
     @ViewBuilder
@@ -238,15 +252,13 @@ struct NewEditItemView: View {
                     Text("■ \(value.model.title)")
                         .fontWeight(.semibold)
                         .tracking(1)
+                        .opacity(0.5)
                     /// 空白部分タップでフォーカスをnilにするためのほぼ透明の範囲View
                     Color.gray
                         .opacity(0.001)
                 }
                 .frame(width: size.width * 0.8, alignment: .leading)
-                .onTapGesture {
-                    focused       = nil
-                    detailFocused = nil
-                }
+                .onTapGesture { focused = nil; detailFocused = nil }
                 
                 VStack {
                 
