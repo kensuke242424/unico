@@ -18,6 +18,7 @@ class ItemViewModel: ObservableObject {
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
 
     @Published var items: [Item] = []
+    @Published var actionItemIndex: Int = 0
 
     func fetchItem(teamID: String) async {
 

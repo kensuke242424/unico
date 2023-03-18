@@ -12,7 +12,7 @@ struct ItemCardRow: View {
     @Environment(\.colorScheme) var colorScheme
     @StateObject var itemVM: ItemViewModel
     @Binding var inputHome: InputHome
-    @Binding var inputStock: InputStock
+    @Binding var inputStock: InputCart
     let itemRow: Item
 
     private let itemWidth: CGFloat = UIScreen.main.bounds.width / 2 - 30
@@ -170,7 +170,7 @@ struct ItemCardRow_Previews: PreviewProvider {
 
         ItemCardRow(itemVM: ItemViewModel(),
                     inputHome: .constant(InputHome()),
-                    inputStock: .constant(InputStock()),
+                    inputStock: .constant(InputCart()),
                     itemRow: testItem.first!)
         .previewLayout(.sizeThatFits)
     }

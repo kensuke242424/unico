@@ -14,7 +14,7 @@ struct TagSortCards: View {
     @StateObject var tagVM: TagViewModel
 
     @Binding var inputHome: InputHome
-    @Binding var inputStock: InputStock
+    @Binding var inputStock: InputCart
     let selectFilterTag: String
 
     private let columnsV: [GridItem] = Array(repeating: .init(.flexible()), count: 2)
@@ -84,7 +84,7 @@ struct UpdateTimeSortCards: View {
     @StateObject var itemVM: ItemViewModel
 
     @Binding var inputHome: InputHome
-    @Binding var inputStock: InputStock
+    @Binding var inputStock: InputCart
 
     // アイテムのディテールを指定します。
     let columnsH: [GridItem] = Array(repeating: .init(.flexible()), count: 1)
@@ -136,7 +136,7 @@ struct TagCards_Previews: PreviewProvider {
              ScrollView(.horizontal) {
                  UpdateTimeSortCards(itemVM: ItemViewModel(),
                                      inputHome: .constant(InputHome()),
-                                     inputStock: .constant(InputStock()))
+                                     inputStock: .constant(InputCart()))
              } // ScrollView
 
             Divider()
@@ -148,7 +148,7 @@ struct TagCards_Previews: PreviewProvider {
             TagSortCards(itemVM: ItemViewModel(),
                          tagVM: TagViewModel(),
                          inputHome: .constant(InputHome()),
-                         inputStock: .constant(InputStock()),
+                         inputStock: .constant(InputCart()),
                          selectFilterTag: "Album")
         } // ScrollView (アイテムロケーション)
     }

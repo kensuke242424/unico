@@ -14,9 +14,8 @@ struct CartItemsSheet: View {
         case additional
     }
 
-    @StateObject var itemVM: ItemViewModel
-    @Binding var inputStock: InputStock
-    @Binding var inputHome: InputHome
+    @EnvironmentObject var itemVM: ItemViewModel
+    @Binding var inputCart: InputCart
 
     let halfSheetScroll: HalfSheetScroll
     private let listLimit: Int = 0
@@ -32,15 +31,12 @@ struct CartItemsSheet: View {
 
             // NOTE: アイテム取引かごシート表示時のアイテム表示数をプロパティ「listLimit」の値分で制限します。
             //       リミット数以降の要素はスクロールにより表示します。
-            if inputStock.resultCartAmount != 0 {
+            if inputCart.resultCartAmount != 0 {
                 ForEach(Array(itemVM.items.enumerated()), id: \.element) { offset, element in
 
                     if listLimit > offset {
                         if element.amount > 0 {
-                            CartItemRow(itemVM: itemVM,
-                                          inputStock: $inputStock,
-                                          inputHome: $inputHome,
-                                          itemRow: element)
+                            CartItemRow(inputCart: $inputCart, itemRow: element)
                         }
 
                     } // if
@@ -53,15 +49,13 @@ struct CartItemsSheet: View {
 
         case .additional:
 
-            if inputStock.resultCartAmount > listLimit {
+            if inputCart.resultCartAmount > listLimit {
                 ForEach(Array(itemVM.items.enumerated()), id: \.element) { offset, element in
 
                     if listLimit <= offset {
                         if element.amount > 0 {
-                            CartItemRow(itemVM: itemVM,
-                                          inputStock: $inputStock,
-                                          inputHome: $inputHome,
-                                          itemRow: element)
+                            CartItemRow(inputCart: $inputCart,
+                                        itemRow: element)
                         }
 
                     } // if listLimit
@@ -76,10 +70,9 @@ struct CartItemsSheet: View {
 // ✅ カスタムView: かご内の一要素分のレイアウト
 struct CartItemRow: View {
 
-    @StateObject var itemVM: ItemViewModel
-    @Binding var inputStock: InputStock
-    @Binding var inputHome: InputHome
-
+    @EnvironmentObject var itemVM: ItemViewModel
+    
+    @Binding var inputCart: InputCart
     let itemRow: Item
 
     @State private var basketItemCount: Int = 0
@@ -121,7 +114,7 @@ struct CartItemRow: View {
                         Button {
 
                             if let newActionIndex = itemVM.items.firstIndex(where: { $0.id == itemRow.id }) {
-                                inputHome.actionItemIndex = newActionIndex
+                                itemVM.actionItemIndex = newActionIndex
                                 print("newActionIndex: \(newActionIndex)")
                             } else {
                                 print("カート内-ボタンのアクションIndexの取得に失敗しました")
@@ -129,14 +122,14 @@ struct CartItemRow: View {
                             } // if let
 
                             // カート内アイテム数カウントが１だった時、アイテムを削除するかをユーザに確認します。
-                            if itemVM.items[inputHome.actionItemIndex].amount == 1 {
+                            if itemVM.items[itemVM.actionItemIndex].amount == 1 {
                                 isShowAlert.toggle()
                                 return
                             }
 
-                            itemVM.items[inputHome.actionItemIndex].amount -= 1
-                            inputStock.resultCartPrice -= itemVM.items[inputHome.actionItemIndex].price
-                            inputStock.resultCartAmount -= 1
+                            itemVM.items[itemVM.actionItemIndex].amount -= 1
+                            inputCart.resultCartPrice -= itemVM.items[itemVM.actionItemIndex].price
+                            inputCart.resultCartAmount -= 1
 
                             if countUpDisable {
                                 countUpDisable.toggle()
@@ -157,11 +150,11 @@ struct CartItemRow: View {
 
                             if let newActionIndex = itemVM.items.firstIndex(where: { $0.id == itemRow.id }) {
 
-                                inputHome.actionItemIndex = newActionIndex
+                                itemVM.actionItemIndex = newActionIndex
 
                                 itemVM.items[newActionIndex].amount += 1
-                                inputStock.resultCartPrice += itemVM.items[newActionIndex].price
-                                inputStock.resultCartAmount += 1
+                                inputCart.resultCartPrice += itemVM.items[newActionIndex].price
+                                inputCart.resultCartAmount += 1
                                 if itemRow.amount == itemRow.inventory {
                                     countUpDisable.toggle()
                                 }
@@ -182,9 +175,9 @@ struct CartItemRow: View {
                     .alert("確認", isPresented: $isShowAlert) {
                         Button("削除", role: .destructive) {
                             // データ削除処理
-                            itemVM.items[inputHome.actionItemIndex].amount -= 1
-                            inputStock.resultCartPrice -= itemVM.items[inputHome.actionItemIndex].price
-                            inputStock.resultCartAmount -= 1
+                            itemVM.items[itemVM.actionItemIndex].amount -= 1
+                            inputCart.resultCartPrice -= itemVM.items[itemVM.actionItemIndex].price
+                            inputCart.resultCartAmount -= 1
                         }
                     } message: {
                         Text("かごから\(itemRow.name)を削除しますか？")
@@ -197,9 +190,7 @@ struct CartItemRow: View {
 //
 struct CartItemsSheet_Previews: PreviewProvider {
     static var previews: some View {
-        CartItemsSheet(itemVM: ItemViewModel(),
-                       inputStock: .constant(InputStock()),
-                       inputHome: .constant(InputHome()),
+        CartItemsSheet(inputCart: .constant(InputCart()),
                        halfSheetScroll: .additional)
     }
 }

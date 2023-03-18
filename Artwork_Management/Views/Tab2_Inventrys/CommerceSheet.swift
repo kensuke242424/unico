@@ -11,9 +11,9 @@ import ResizableSheet
 // NOTE: 取引対象のアイテムの決済を完了するシートです。
 struct CommerceSheet: View {
 
-    @StateObject var itemVM: ItemViewModel
-    @Binding var inputHome: InputHome
-    @Binding var inputStock: InputStock
+    @EnvironmentObject var itemVM: ItemViewModel
+    @StateObject var resizableVM: ResizableSheetViewModel
+    @Binding var inputCart: InputCart
     let teamID: String
 
     @State private var commerceButtonDisable: Bool = false
@@ -24,13 +24,13 @@ struct CommerceSheet: View {
             HStack {
 
                 Button {
-                    switch inputHome.cartHalfSheet {
+                    switch resizableVM.showCart {
                     case .medium:
-                        inputHome.cartHalfSheet = .large
+                        resizableVM.showCart = .large
                     case .large:
-                        inputHome.cartHalfSheet = .medium
+                        resizableVM.showCart = .medium
                     case .hidden:
-                        inputHome.cartHalfSheet = .medium
+                        resizableVM.showCart = .medium
                     }
 
                 } label: {
@@ -41,7 +41,7 @@ struct CommerceSheet: View {
                         .foregroundColor(.black)
                         .padding(.horizontal)
                         .overlay(alignment: .topTrailing) {
-                            if inputStock.resultCartAmount <= 50 {
+                            if inputCart.resultCartAmount <= 50 {
                                 Image(systemName: "\(commerseResults().amount).circle.fill")
                                     .foregroundColor(.customLightBlue2)
                                     .offset(y: -8)
@@ -73,9 +73,9 @@ struct CommerceSheet: View {
                     action: {
 
                         itemVM.updateCommerseItems(teamID: teamID)
-                        inputStock.resultCartPrice = 0
-                        inputStock.resultCartAmount = 0
-                        inputHome.doCommerce = true
+                        inputCart.resultCartPrice = 0
+                        inputCart.resultCartAmount = 0
+                        inputCart.doCommerce = true
                     },
                     label: {
                         RoundedRectangle(cornerRadius: 20)
@@ -91,21 +91,21 @@ struct CommerceSheet: View {
                             }
                     }
                 ) // Button
-                .disabled(inputHome.doCommerce)
-                .opacity(inputHome.doCommerce == true ? 0.3 : 1.0)
+                .disabled(inputCart.doCommerce)
+                .opacity(inputCart.doCommerce == true ? 0.3 : 1.0)
             } // HStack
             .frame(height: 80)
             .padding(.horizontal, 20)
-            .animation(nil, value: inputStock.resultCartPrice)
-            .animation(nil, value: inputStock.resultCartAmount)
+            .animation(nil, value: inputCart.resultCartPrice)
+            .animation(nil, value: inputCart.resultCartAmount)
         } // VStack 決済シートレイアウト
 
-        .onChange(of: inputHome.doCommerce) { _ in
+        .onChange(of: inputCart.doCommerce) { _ in
 
-            if inputHome.doCommerce {
+            if inputCart.doCommerce {
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                    inputHome.doCommerce = false
+                    inputCart.doCommerce = false
                     print("DispatchQueue2秒後doCommerceをfalse")
                 }
             }

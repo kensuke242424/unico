@@ -6,6 +6,16 @@
 //
 
 import SwiftUI
+import ResizableSheet
+
+struct InputCart {
+    var doCommerce: Bool = false
+    var searchItemNameText: String = "ALL"
+    var filterTagIndex: Int = 0
+    var resultCartAmount: Int = 0
+    var resultCartPrice: Int = 0
+    var mode: Mode = .dark
+}
 
 struct NewItemsView: View {
     
@@ -14,10 +24,14 @@ struct NewItemsView: View {
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var itemVM: ItemViewModel
     @EnvironmentObject var tagVM : TagViewModel
+    
+    @StateObject var resizableVM : ResizableSheetViewModel = ResizableSheetViewModel()
+    
     @Binding var inputTab: InputTab
     
     /// View Propaties
     @Environment(\.colorScheme) var colorScheme
+    @State private var inputCart = InputCart()
     @State private var activeTag: String = "全て"
     @State private var carouselMode: Bool = false
     /// For Matched Geometry Effect
@@ -42,14 +56,14 @@ struct NewItemsView: View {
                             ItemsCardView(item)
                                 .onTapGesture {
                                     withAnimation(.easeInOut(duration: 0.25)) {
+                                        guard let actionIndex = getActionIndex(item) else {
+                                            return
+                                        }
+                                        
+                                        itemVM.actionItemIndex = actionIndex
                                         animateCurrentItem = true
                                         showDarkBackground = true
-                                        /// ✅ CHECK
-                                        /// 親View側で、NavigationPathによるエディット画面遷移時に選択アイテム値を渡したい
-                                        /// 選択アイテム値を親View側でまとめて管理しようとしたが、そうすると
-                                        /// 子View側での選択アイテム値を使ったアニメーションの挙動に
-                                        /// チラつきがみられた(View更新の問題？)
-                                        /// よって、親View側と子Viewそれぞれ個別で渡して今は対応している
+                                        /// ✅ アニメーションにチラつきがあったため、二箇所で管理
                                         selectedItem = item
                                         inputTab.selectedItem = item
                                     }
@@ -103,7 +117,114 @@ struct NewItemsView: View {
                 }
             }
         }
+        // NOTE: カート内のアイテムを監視してハーフモーダルを表示
+        .onChange(of: inputCart.resultCartAmount) { [before = inputCart.resultCartAmount] after in
+
+            if before == 0 {
+                resizableVM.showCommerce = .medium
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    resizableVM.showCart = .medium
+                }
+            }
+            if after == 0 {
+                resizableVM.showCart = .hidden
+                resizableVM.showCommerce = .hidden
+            }
+        }
+        // アイテム取引かごのシート画面
+        .resizableSheet($resizableVM.showCart, id: "A") { builder in
+            builder.content { context in
+
+                VStack {
+                    Spacer(minLength: 0)
+                    GrabBar()
+                        .foregroundColor(.black)
+                    Spacer(minLength: 0)
+
+                    HStack(alignment: .bottom) {
+                        Text("カート内のアイテム")
+                            .foregroundColor(.black)
+                            .font(.headline)
+                            .fontWeight(.black)
+                            .opacity(0.6)
+                        Spacer()
+                        Button(
+                            action: {
+                                inputCart.resultCartPrice = 0
+                                inputCart.resultCartAmount = 0
+                                itemVM.resetAmount()
+
+                            },
+                            label: {
+                                HStack {
+                                    Image(systemName: "trash.fill")
+                                    Text("全て削除")
+                                        .font(.callout)
+                                }
+                                .foregroundColor(.red)
+                            }
+                        ) // Button
+                    } // HStack
+                    .padding(.horizontal, 20)
+
+                    Spacer(minLength: 8)
+
+                    ResizableScrollView(
+                        context: context,
+                        main: {
+                            CartItemsSheet(inputCart      : $inputCart,
+                                           halfSheetScroll: .main)
+                        },
+                        additional: {
+                            CartItemsSheet(inputCart      : $inputCart,
+                                           halfSheetScroll: .additional)
+
+                            Spacer()
+                                .frame(height: 100)
+                        }
+                    )
+                    Spacer()
+                        .frame(height: 80)
+                } // VStack
+            } // builder.content
+            .sheetBackground { _ in
+                LinearGradient(gradient: Gradient(colors: [.white, .customLightGray1]),
+                               startPoint: .leading, endPoint: .trailing)
+                .opacity(0.95)
+                .blur(radius: 1)
+            }
+            .background { _ in
+                EmptyView()
+            }
+        } // .resizableSheet
+
+        // 決済リザルトのシート画面
+        .resizableSheet($resizableVM.showCommerce, id: "B") {builder in
+            builder.content { _ in
+
+                CommerceSheet(resizableVM: resizableVM,
+                              inputCart  : $inputCart,
+                              teamID     : teamVM.team!.id)
+
+            } // builder.content
+            .supportedState([.medium])
+            .sheetBackground { _ in
+                LinearGradient(gradient: Gradient(colors: [.white, .customLightGray1]),
+                               startPoint: .leading, endPoint: .trailing)
+                .opacity(0.95)
+            }
+            .background { _ in
+                EmptyView()
+            }
+        } // .resizableSheet
         
+    }
+    
+    func getActionIndex(_ selectedItem: Item) -> Int? {
+        
+        let index = itemVM.items.firstIndex(where: { $0.id == selectedItem.id })
+        print("アクションアイテムのindex: \(index)")
+        return index
     }
     
     /// 最後のカードが上部に残るためのボトムパディング
@@ -165,6 +286,17 @@ struct NewItemsView: View {
                 .overlay(alignment: .bottomTrailing) {
                     Button {
                         // TODO: カートシートの表示とアイテムのカート追加
+                        // 取引かごに追加するボタン
+                        // タップするたびに、値段合計、個数、カート内アイテム要素にプラスする
+                        guard let newActionIndex = getActionIndex(item) else {
+                            print("アクションIndexの取得に失敗しました")
+                            return
+                        }
+
+                        itemVM.actionItemIndex = newActionIndex
+                        itemVM.items[newActionIndex].amount += 1
+                        inputCart.resultCartAmount += 1
+                        inputCart.resultCartPrice += item.price
                     } label: {
                         Image(systemName: "cart.fill")
                             .foregroundColor(.gray)
