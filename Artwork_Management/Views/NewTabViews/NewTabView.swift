@@ -18,7 +18,7 @@ struct InputTab {
     /// NavigationPathによるエディット画面遷移時に渡す
     var selectedItem: Item?
     
-    /// タブViewアニメーションを管理するプロパティ
+    /// タブViewのアニメーションを管理するプロパティ
     var selectionTab: Tab = .item
     var animationTab: Tab = .item
     var animationOpacity: CGFloat = 1
@@ -36,10 +36,10 @@ struct NewTabView: View {
     @EnvironmentObject var tagVM : TagViewModel
     
     @StateObject var itemVM: ItemViewModel
+    @StateObject var cartVM: CartViewModel
     
     /// View Propertys
     @State private var inputTab = InputTab()
-    @State private var inputCart = InputCart()
 
     var body: some View {
 
@@ -67,7 +67,7 @@ struct NewTabView: View {
                                 inputTab.animationOpacity = 1 - -inputTab.scrollProgress
                             }
                         
-                        NewItemsView(itemVM: itemVM, inputTab: $inputTab, inputCart: $inputCart)
+                        NewItemsView(itemVM: itemVM,  cartVM: cartVM, inputTab: $inputTab)
                             .tag(Tab.item)
                             .offsetX(inputTab.selectionTab == Tab.item) { rect in
                                 let minX = rect.minX
@@ -123,15 +123,18 @@ struct NewTabView: View {
                 }
             } // NavigationStack
         } // GeometryReader
-        .onChange(of: inputCart.resultCartAmount) { [before = inputCart.resultCartAmount] after in
+        .onChange(of: cartVM.resultCartAmount) {
+            [beforeCart = cartVM.resultCartAmount] afterCart in
             
-            if before == 0 {
+            if beforeCart == 0 {
+                print("カートにアイテム追加を検知。シートを表示")
                 inputTab.showCommerce = .medium
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                     inputTab.showCart = .medium
                 }
             }
-            if after == 0 {
+            if afterCart == 0 {
+                print("カートアイテムが空になったのを検知。シートを閉じる")
                 inputTab.showCart = .hidden
                 inputTab.showCommerce = .hidden
             }
@@ -155,10 +158,7 @@ struct NewTabView: View {
                         Spacer()
                         Button(
                             action: {
-                                inputCart.resultCartPrice = 0
-                                inputCart.resultCartAmount = 0
-                                itemVM.resetAmount()
-                                
+                                cartVM.resetCart()
                             },
                             label: {
                                 HStack {
@@ -178,14 +178,12 @@ struct NewTabView: View {
                         context: context,
                         main: {
                             CartItemsSheet(
-                                itemVM: itemVM,
-                                inputCart: $inputCart,
+                                cartVM: cartVM,
                                 halfSheetScroll: .main)
                         },
                         additional: {
                             CartItemsSheet(
-                                itemVM: itemVM,
-                                inputCart: $inputCart,
+                                cartVM: cartVM,
                                 halfSheetScroll: .additional)
                             
                             Spacer()
@@ -197,8 +195,7 @@ struct NewTabView: View {
                 } // VStack
             } // builder.content
             .sheetBackground { _ in
-                LinearGradient(gradient: Gradient(colors: [.white, .customLightGray1]),
-                               startPoint: .leading, endPoint: .trailing)
+                Color.white
                 .opacity(0.95)
                 .blur(radius: 1)
             }
@@ -211,16 +208,13 @@ struct NewTabView: View {
         .resizableSheet($inputTab.showCommerce, id: "B") {builder in
             builder.content { _ in
                 
-                CommerceSheet(itemVM: itemVM,
-                              inputTab: $inputTab,
-                              inputCart: $inputCart,
+                CommerceSheet(cartVM: cartVM,
                               teamID: teamVM.team!.id)
                 
             } // builder.content
             .supportedState([.medium])
             .sheetBackground { _ in
-                LinearGradient(gradient: Gradient(colors: [.white, .customLightGray1]),
-                               startPoint: .leading, endPoint: .trailing)
+                Color.white
                 .opacity(0.95)
             }
             .background { _ in
@@ -315,7 +309,7 @@ struct NewTabView_Previews: PreviewProvider {
                    windowScene.flatMap(ResizableSheetCenter.resolve(for:))
                }
 
-        return NewTabView(itemVM: ItemViewModel())
+        return NewTabView(itemVM: ItemViewModel(), cartVM: CartViewModel())
             .environment(\.resizableSheetCenter, resizableSheetCenter)
             .environmentObject(LogInViewModel())
             .environmentObject(TeamViewModel())

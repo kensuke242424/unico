@@ -34,6 +34,7 @@ struct RootView: View {
     @EnvironmentObject var tagVM: TagViewModel
     
     @StateObject var itemVM: ItemViewModel = ItemViewModel()
+    @StateObject var cartVM: CartViewModel = CartViewModel()
 
     @State private var isShowStandBy: Bool = false
     @State private var showLogInAlert: Bool = false
@@ -53,7 +54,7 @@ struct RootView: View {
                 CreateAndJoinTeamView()
 
             case .home:
-                NewTabView(itemVM: itemVM)
+                NewTabView(itemVM: itemVM, cartVM: cartVM)
                     .environment(\.resizableSheetCenter, resizableSheetCenter)
             }
 

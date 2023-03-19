@@ -293,51 +293,51 @@ import ResizableSheet
 //} // View
 
 // ✅カスタムView: サイドタグバーのフレーム、選択タグの前後要素のインフォメーションを表示するオーバーレイviewです。
-struct SideTagBarOverlay: View {
-
-    @Binding var inputStock: InputCart
-    @Binding var tags: [Tag]
-
-    var body: some View {
-        RoundedRectangle(cornerRadius: 0)
-            .foregroundColor(.black)
-            .opacity(0.3)
-            .frame(width: UIScreen.main.bounds.width + 10, height: 40)
-            .shadow(color: .black, radius: 3, x: 0, y: 0)
-
-        // NOTE: タグサイドバー枠内で、現在選択しているタグの前後の値をインフォメーションします。
-            .overlay {
-                HStack {
-                    if inputStock.filterTagIndex - 1 >= 0 {
-                        HStack {
-                            Text("<")
-                            Text("\(tags[inputStock.filterTagIndex - 1].tagName)")
-                                .font(.subheadline)
-                                .frame(width: 80, alignment: .leading)
-                                .lineLimit(1)
-                        } // HStack
-                        .onTapGesture { inputStock.filterTagIndex -= 1 }
-                    }
-
-                    Spacer()
-
-                    if inputStock.filterTagIndex + 1 < tags.count {
-                        HStack {
-                            Text("\(tags[inputStock.filterTagIndex + 1].tagName)")
-                                .font(.subheadline)
-                                .frame(width: 80, alignment: .trailing)
-                                .lineLimit(1)
-                            Text(">")
-                        } // HStack
-                        .onTapGesture { inputStock.filterTagIndex += 1 }
-                    }
-                } // HStack
-                .foregroundColor(.white.opacity(0.6))
-                .padding(.horizontal, 20)
-
-            } // overlay(サイドタグ情報)
-    }
-} // カスタムView
+//struct SideTagBarOverlay: View {
+//
+//    @Binding var inputStock: InputCart
+//    @Binding var tags: [Tag]
+//
+//    var body: some View {
+//        RoundedRectangle(cornerRadius: 0)
+//            .foregroundColor(.black)
+//            .opacity(0.3)
+//            .frame(width: UIScreen.main.bounds.width + 10, height: 40)
+//            .shadow(color: .black, radius: 3, x: 0, y: 0)
+//
+//        // NOTE: タグサイドバー枠内で、現在選択しているタグの前後の値をインフォメーションします。
+//            .overlay {
+//                HStack {
+//                    if inputStock.filterTagIndex - 1 >= 0 {
+//                        HStack {
+//                            Text("<")
+//                            Text("\(tags[inputStock.filterTagIndex - 1].tagName)")
+//                                .font(.subheadline)
+//                                .frame(width: 80, alignment: .leading)
+//                                .lineLimit(1)
+//                        } // HStack
+//                        .onTapGesture { inputStock.filterTagIndex -= 1 }
+//                    }
+//
+//                    Spacer()
+//
+//                    if inputStock.filterTagIndex + 1 < tags.count {
+//                        HStack {
+//                            Text("\(tags[inputStock.filterTagIndex + 1].tagName)")
+//                                .font(.subheadline)
+//                                .frame(width: 80, alignment: .trailing)
+//                                .lineLimit(1)
+//                            Text(">")
+//                        } // HStack
+//                        .onTapGesture { inputStock.filterTagIndex += 1 }
+//                    }
+//                } // HStack
+//                .foregroundColor(.white.opacity(0.6))
+//                .padding(.horizontal, 20)
+//
+//            } // overlay(サイドタグ情報)
+//    }
+//} // カスタムView
 
 //struct StockView_Previews: PreviewProvider {
 //    static var previews: some View {

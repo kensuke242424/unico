@@ -10,11 +10,8 @@ import ResizableSheet
 
 struct InputCart {
     var doCommerce: Bool = false
-    var searchItemNameText: String = "ALL"
-    var filterTagIndex: Int = 0
     var resultCartAmount: Int = 0
     var resultCartPrice: Int = 0
-    var mode: Mode = .dark
 }
 
 struct NewItemsView: View {
@@ -25,9 +22,9 @@ struct NewItemsView: View {
     @EnvironmentObject var tagVM : TagViewModel
     
     @StateObject var itemVM: ItemViewModel
+    @StateObject var cartVM: CartViewModel
     
     @Binding var inputTab: InputTab
-    @Binding var inputCart: InputCart
     
     /// View Propaties
     @Environment(\.colorScheme) var colorScheme
@@ -116,22 +113,6 @@ struct NewItemsView: View {
                 }
             }
         }
-        // NOTE: カート内のアイテムを監視してハーフモーダルを表示
-//        .onChange(of: inputCart.resultCartAmount) { [before = inputCart.resultCartAmount] after in
-//
-//            if before == 0 {
-//                print("aaaaaaaaaaaa")
-//                resizableVM.showCommerce = .medium
-//                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-//                    resizableVM.showCart = .medium
-//                }
-//            }
-//            if after == 0 {
-//                print("bbbbbbbbbbb")
-//                resizableVM.showCart = .hidden
-//                resizableVM.showCommerce = .hidden
-//            }
-//        }
     }
     
     func getActionIndex(_ selectedItem: Item) -> Int? {
@@ -206,10 +187,11 @@ struct NewItemsView: View {
                             print("アクションIndexの取得に失敗しました")
                             return
                         }
-                        itemVM.actionItemIndex = newActionIndex
-                        itemVM.items[newActionIndex].amount += 1
-                        inputCart.resultCartAmount += 1
-                        inputCart.resultCartPrice += item.price
+                        
+                        /// actionItemIndexは、itemVMのアイテムとcartItemのアイテムで同期を取るため必要
+                        cartVM.actionItemIndex = newActionIndex
+                        cartVM.addCartItem(item: item)
+                        
                     } label: {
                         Image(systemName: "cart.fill")
                             .foregroundColor(.gray)
@@ -315,8 +297,8 @@ var tags: [String] =
 struct NewItemsView_Previews: PreviewProvider {
     static var previews: some View {
         NewItemsView(itemVM: ItemViewModel(),
-                     inputTab   : .constant(InputTab()),
-                     inputCart  : .constant(InputCart()))
+                     cartVM: CartViewModel(),
+                     inputTab   : .constant(InputTab()))
         .environmentObject(LogInViewModel())
         .environmentObject(TeamViewModel())
         .environmentObject(UserViewModel())
