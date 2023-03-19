@@ -120,18 +120,19 @@ struct EditItemView: View {
                             Task {
                                 let uploadImage =  await itemVM.uploadImage(inputEdit.captureImage)
                                 let itemData = RootItem(tag: inputEdit.selectionTagName,
-                                                    name: inputEdit.name,
-                                                    author: inputEdit.author,
-                                                    detail: inputEdit.detail != "" ? inputEdit.detail : "メモなし",
-                                                    photoURL: uploadImage.url,
-                                                    photoPath: uploadImage.filePath,
-                                                    cost: 0,
-                                                    price: Int(inputEdit.price) ?? 0,
-                                                    amount: 0,
-                                                    sales: 0,
-                                                    inventory: Int(inputEdit.inventory) ??  0,
-                                                    totalAmount: 0,
-                                                    totalInventory: Int(inputEdit.inventory) ?? 0)
+                                                        teamID: teamVM.team!.id,
+                                                        name: inputEdit.name,
+                                                        author: inputEdit.author,
+                                                        detail: inputEdit.detail != "" ? inputEdit.detail : "メモなし",
+                                                        photoURL: uploadImage.url,
+                                                        photoPath: uploadImage.filePath,
+                                                        cost: 0,
+                                                        price: Int(inputEdit.price) ?? 0,
+                                                        amount: 0,
+                                                        sales: 0,
+                                                        inventory: Int(inputEdit.inventory) ??  0,
+                                                        totalAmount: 0,
+                                                        totalInventory: Int(inputEdit.inventory) ?? 0)
 
                                 // Firestoreにコーダブル保存
                                 itemVM.addItem(itemData: itemData, tag: inputEdit.selectionTagName, teamID: teamVM.team!.id)
@@ -148,7 +149,7 @@ struct EditItemView: View {
 
                                 // captureImageに新しい画像があれば、元の画像データを更新
                                 if let captureImage = inputEdit.captureImage {
-                                    await itemVM.deleteImage(path: inputEdit.photoPath)
+                                    itemVM.deleteImage(path: inputEdit.photoPath)
                                     let newImageData =  await itemVM.uploadImage(captureImage)
                                     inputEdit.photoURL = newImageData.url
                                     inputEdit.photoPath = newImageData.filePath
@@ -156,21 +157,22 @@ struct EditItemView: View {
 
                                 // NOTE: アイテムを更新
                                 let updateItemData = (RootItem(createTime: passItemData.createTime,
-                                                           tag      : inputEdit.selectionTagName,
-                                                           name     : inputEdit.name,
-                                                           author   : inputEdit.author,
-                                                           detail   : inputEdit.detail != "" ? inputEdit.detail : "メモなし",
-                                                           photoURL : inputEdit.photoURL,
-                                                           photoPath: inputEdit.photoPath,
-                                                           cost: Int( inputEdit.cost) ?? 0,
-                                                           price: Int(inputEdit.price) ?? 0,
-                                                           amount: 0,
-                                                           sales: Int(inputEdit.sales) ?? 0,
-                                                           inventory: editInventory,
-                                                           totalAmount: passItemData.totalAmount,
-                                                           totalInventory: passItemData.inventory < editInventory ?
-                                                           passItemData.totalInventory + (editInventory - passItemData.inventory) :
-                                                            passItemData.totalInventory - (passItemData.inventory - editInventory) ))
+                                                               tag      : inputEdit.selectionTagName,
+                                                               teamID: teamVM.team!.id,
+                                                               name     : inputEdit.name,
+                                                               author   : inputEdit.author,
+                                                               detail   : inputEdit.detail != "" ? inputEdit.detail : "メモなし",
+                                                               photoURL : inputEdit.photoURL,
+                                                               photoPath: inputEdit.photoPath,
+                                                               cost: Int( inputEdit.cost) ?? 0,
+                                                               price: Int(inputEdit.price) ?? 0,
+                                                               amount: 0,
+                                                               sales: Int(inputEdit.sales) ?? 0,
+                                                               inventory: editInventory,
+                                                               totalAmount: passItemData.totalAmount,
+                                                               totalInventory: passItemData.inventory < editInventory ?
+                                                               passItemData.totalInventory + (editInventory - passItemData.inventory) :
+                                                               passItemData.totalInventory - (passItemData.inventory - editInventory) ))
 
                                 itemVM.updateItem(updateData: updateItemData, defaultDataID: defaultDataID, teamID: teamVM.team!.id)
 

@@ -93,9 +93,30 @@ class ItemViewModel: ObservableObject {
 
         itemRef.delete()
     }
+    
+    func resizeUIImage(image: UIImage?, width: CGFloat) -> UIImage? {
+        
+        if let originalImage = image {
+            // オリジナル画像のサイズからアスペクト比を計算
+            let aspectScale = originalImage.size.height / originalImage.size.width
+            
+            // widthからアスペクト比を元にリサイズ後のサイズを取得
+            let resizedSize = CGSize(width: width * 1.5, height: width * Double(aspectScale) * 1.5)
+            
+            // リサイズ後のUIImageを生成して返却
+            UIGraphicsBeginImageContext(resizedSize)
+            originalImage.draw(in: CGRect(x: 0, y: 0, width: resizedSize.width, height: resizedSize.height))
+            let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
+            UIGraphicsEndImageContext()
+            
+            return resizedImage
+        }
+        return nil
+    }
 
     func uploadImage(_ image: UIImage?) async -> (url: URL?, filePath: String?) {
-
+        
+        print("uploadImage実行")
         guard let imageData = image?.jpegData(compressionQuality: 0.8) else {
             return (url: nil, filePath: nil)
         }
@@ -107,14 +128,16 @@ class ItemViewModel: ObservableObject {
             let imageRef = reference.child(filePath)
             _ = try await imageRef.putDataAsync(imageData)
             let url = try await imageRef.downloadURL()
+            print("uploadImage完了")
 
             return (url: url, filePath: filePath)
         } catch {
+            print("uploadImage失敗")
             return (url: nil, filePath: nil)
         }
     }
 
-    func deleteImage(path: String?) async {
+    func deleteImage(path: String?) {
 
         guard let path = path else { return }
 

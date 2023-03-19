@@ -92,7 +92,7 @@ struct CartItemRow: View {
                 Spacer()
 
                 VStack(alignment: .trailing, spacing: 30) {
-                    Text("\(itemRow.name)")
+                    Text(itemRow.name == "" ? "No Name" : itemRow.name)
                         .foregroundColor(.black)
                         .opacity(0.8)
                         .font(.title3.bold())
@@ -193,12 +193,31 @@ struct CartItemPhoto: View {
     let photoURL: URL?
     var body: some View {
         
-        WebImage(url: photoURL)
-            .resizable()
-            .scaledToFill()
-            .frame(width: 100, height: 100)
-            .clipShape(RoundedRectangle(cornerRadius: 5))
-        
+        if let photoURL {
+            WebImage(url: photoURL)
+                .resizable()
+                .scaledToFill()
+                .frame(width: 100, height: 100)
+                .clipShape(RoundedRectangle(cornerRadius: 5))
+        } else {
+            RoundedRectangle(cornerRadius: 10)
+                .foregroundColor(Color.gray)
+                .frame(width: 100, height: 100)
+                .overlay {
+                    VStack {
+                        Image(systemName: "cube.transparent.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 40)
+                            .foregroundColor(.white)
+                        Text("No Image.")
+                            .font(.subheadline)
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+                            .opacity(0.7)
+                    }
+                }
+        }
     }
 }
 

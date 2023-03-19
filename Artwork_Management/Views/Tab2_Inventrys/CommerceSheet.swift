@@ -12,6 +12,7 @@ import ResizableSheet
 struct CommerceSheet: View {
 
     @StateObject var cartVM: CartViewModel
+    @Binding var inputTab: InputTab
     let teamID: String
 
     @State private var commerceButtonDisable: Bool = false
@@ -22,13 +23,13 @@ struct CommerceSheet: View {
             HStack {
 
                 Button {
-                    switch cartVM.showCart {
+                    switch inputTab.showCart {
                     case .medium:
-                        cartVM.showCart = .large
+                        inputTab.showCart = .large
                     case .large:
-                        cartVM.showCart = .medium
+                        inputTab.showCart = .medium
                     case .hidden:
-                        cartVM.showCart = .medium
+                        inputTab.showCart = .medium
                     }
 
                 } label: {
@@ -59,7 +60,7 @@ struct CommerceSheet: View {
                     Text("¥")
                         .foregroundColor(.black)
                         .font(.title2.bold())
-                    Text(String(commerseResults().price))
+                    Text(commerseResults().price == 0 ? "-" : "\(commerseResults().price)")
                         .foregroundColor(.black)
                         .font(.title.bold())
                     Spacer()

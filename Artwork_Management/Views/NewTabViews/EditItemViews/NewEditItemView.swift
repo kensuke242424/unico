@@ -33,9 +33,9 @@ extension InputFormsStatus.Model {
     static let author = InputFormsStatus.Model(        title: "製作者"   , example: "ユニコ 太郎")
     static let inventory = InputFormsStatus.Model(     title: "在庫"     , example: "100")
     static let price = InputFormsStatus.Model(         title: "価格"     , example: "1500")
-    static let sales = InputFormsStatus.Model(         title: "売上"     , example: "100000")
-    static let totalAmount = InputFormsStatus.Model(   title: "総売上"    , example: "150")
-    static let totalInventory = InputFormsStatus.Model(title: "総売個数"  , example: "300")
+    static let sales = InputFormsStatus.Model(         title: "総売上"    , example: "100000")
+    static let totalAmount = InputFormsStatus.Model(   title: "総売個数"  , example: "150")
+    static let totalInventory = InputFormsStatus.Model(title: "総仕入れ"  , example: "300")
 }
 
 struct InputEditItem {
@@ -57,6 +57,7 @@ struct InputEditItem {
     var offset: CGFloat = 0
     var isCheckedFocuseDetail: Bool = false
     var isShowItemImageSelectSheet: Bool = false
+    var showProgress: Bool = false
 }
 
 struct NewEditItemView: View {
@@ -83,7 +84,7 @@ struct NewEditItemView: View {
             
             VStack(spacing: 20) {
                 
-                EditTopNavigateBar()
+                EditTopNavigateBar(width: size.width - 15)
                 
                 ScrollView(showsIndicators: false) {
                     /// 📷選択写真を表示するエリア📷
@@ -185,6 +186,11 @@ struct NewEditItemView: View {
             }
             .ignoresSafeArea()
         }
+        .overlay {
+            if input.showProgress {
+                SavingProgressView()
+            }
+        }
         .sheet(isPresented: $input.isShowItemImageSelectSheet) {
             PHPickerView(captureImage: $input.captureImage,
                          isShowSheet: $input.isShowItemImageSelectSheet)
@@ -192,25 +198,23 @@ struct NewEditItemView: View {
         /// passItemにアイテムが存在した場合、各入力値にアイテムデータを入れる
         .onAppear {
             if let passItem {
-                input.photoURL = passItem.photoURL
-                input.photoPath = passItem.photoPath
-                input.name = passItem.name
-                input.author = passItem.author
-                input.inventory = String(passItem.inventory)
-                input.cost = String(passItem.cost)
-                input.price = String(passItem.price)
-                input.sales = String(passItem.sales)
-                input.detail = passItem.detail
-                input.totalAmount = String(passItem.totalAmount)
-                input.totalInventry = String(passItem.totalInventory)
+                input.photoURL      = passItem.photoURL
+                input.photoPath     = passItem.photoPath
+                input.name          = passItem.name != "No Name" ? passItem.name : ""
+                input.author        = passItem.author
+                input.inventory     = String(passItem.inventory)
+                input.cost          = passItem.cost != 0 ? String(passItem.cost) : ""
+                input.price         = passItem.price != 0 ? String(passItem.price) : ""
+                input.sales         = passItem.sales != 0 ? String(passItem.sales) : ""
+                input.detail        = passItem.detail != "メモなし" ? passItem.detail : ""
+                input.totalAmount   = passItem.totalAmount != 0 ? String(passItem.totalAmount) : ""
+                input.totalInventry = passItem.totalInventory != 0 ? String(passItem.totalInventory) : ""
             }
         }
     }
-    func additemData() {
-            
-    }
+    
     @ViewBuilder
-    func EditTopNavigateBar() -> some View {
+    func EditTopNavigateBar(width: CGFloat) -> some View {
         Text(passItem == nil ? "新規アイテム" : "アイテム編集")
             .font(.title3)
             .fontWeight(.semibold)
@@ -229,54 +233,72 @@ struct NewEditItemView: View {
 
                             // captureImageに新しい画像があれば、元の画像データを更新
                             if let captureImage = input.captureImage {
-                                await itemVM.deleteImage(path: input.photoPath)
-                                let newImageData =  await itemVM.uploadImage(captureImage)
+                                input.showProgress = true
+                                itemVM.deleteImage(path: input.photoPath)
+                                let resizedImage = itemVM.resizeUIImage(image: captureImage,
+                                                                        width: width)
+                                let newImageData =  await itemVM.uploadImage(resizedImage)
                                 input.photoURL = newImageData.url
                                 input.photoPath = newImageData.filePath
                             }
 
                             // NOTE: アイテムを更新
                             let updateItemData = (RootItem(createTime: passItem.createTime,
-                                                       tag        : input.selectionTagName,
-                                                       name       : input.name,
-                                                       author     : input.author,
-                                                       detail     : input.detail != "" ? input.detail : "メモなし",
-                                                       photoURL   : input.photoURL,
-                                                       photoPath  : input.photoPath,
-                                                       cost       : Int( input.cost) ?? 0,
-                                                       price      : Int(input.price) ?? 0,
-                                                       amount     : 0,
-                                                       sales      : Int(input.sales) ?? 0,
-                                                       inventory  : editInventory,
-                                                       totalAmount: passItem.totalAmount,
-                                                       totalInventory: passItem.inventory < editInventory ?
-                                                       passItem.totalInventory + (editInventory - passItem.inventory) :
-                                                        passItem.totalInventory - (passItem.inventory - editInventory) ))
+                                                           tag        : input.selectionTagName,
+                                                           teamID: teamVM.team!.id,
+                                                           name       : input.name,
+                                                           author     : input.author,
+                                                           detail     : input.detail != "" ? input.detail : "メモなし",
+                                                           photoURL   : input.photoURL,
+                                                           photoPath  : input.photoPath,
+                                                           cost       : Int( input.cost) ?? 0,
+                                                           price      : Int(input.price) ?? 0,
+                                                           amount     : 0,
+                                                           sales      : Int(input.sales) ?? 0,
+                                                           inventory  : editInventory,
+                                                           totalAmount: passItem.totalAmount,
+                                                           totalInventory: passItem.inventory < editInventory ?
+                                                           passItem.totalInventory + (editInventory - passItem.inventory) :
+                                                            passItem.totalInventory - (passItem.inventory - editInventory) ))
 
                             itemVM.updateItem(updateData: updateItemData, defaultDataID: defaultDataID, teamID: teamVM.team!.id)
+                            input.showProgress = false
                             dismiss()
                         } // Task(update Item)
                         
                     } else {
                         
                         Task {
-                            let uploadImage =  await itemVM.uploadImage(input.captureImage)
+                            
+                            // captureImageに新しい画像があれば、元の画像データを更新
+                            if let captureImage = input.captureImage {
+                                input.showProgress = true
+                                itemVM.deleteImage(path: input.photoPath)
+                                let resizedImage = itemVM.resizeUIImage(image: captureImage, width: width)
+                                let newImageData =  await itemVM.uploadImage(resizedImage)
+                                input.photoURL = newImageData.url
+                                input.photoPath = newImageData.filePath
+                            }
+                            
                             let itemData = RootItem(tag           : input.selectionTagName,
-                                                name          : input.name,
-                                                author        : input.author,
-                                                detail        : input.detail != "" ? input.detail : "メモなし",
-                                                photoURL      : uploadImage.url,
-                                                photoPath     : uploadImage.filePath,
-                                                cost          : 0,
-                                                price         : Int(input.price) ?? 0,
-                                                amount        : 0,
-                                                sales         : 0,
-                                                inventory     : Int(input.inventory) ??  0,
-                                                totalAmount   : 0,
-                                                totalInventory: Int(input.inventory) ?? 0)
+                                                    teamID: teamVM.team!.id,
+                                                    name          : input.name,
+                                                    author        : input.author,
+                                                    detail        : input.detail != "" ? input.detail : "メモなし",
+                                                    photoURL      : input.photoURL,
+                                                    photoPath     : input.photoPath,
+                                                    cost          : 0,
+                                                    price         : Int(input.price) ?? 0,
+                                                    amount        : 0,
+                                                    sales         : 0,
+                                                    inventory     : Int(input.inventory) ??  0,
+                                                    totalAmount   : 0,
+                                                    totalInventory: Int(input.inventory) ?? 0)
                             
                             // Firestoreにコーダブル保存
                             itemVM.addItem(itemData: itemData, tag: input.selectionTagName, teamID: teamVM.team!.id)
+                            
+                            input.showProgress = false
                             dismiss()
                         } // Task(add Item)
                     } // if let passItem

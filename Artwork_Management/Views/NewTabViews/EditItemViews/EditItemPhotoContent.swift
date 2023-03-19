@@ -30,21 +30,12 @@ struct SelectItemPhotoBackground: View {
                         RoundedRectangle(cornerRadius: 5)
                             .foregroundColor(.white).opacity(0.1)
                             .frame(width: getRect().width, height: height)
-                        AsyncImage(url: photoURL) { itemImage in
-                            itemImage
-                                .resizable()
-                                .scaledToFill()
-                            
-                        } placeholder: {
-                            ZStack {
-                                ProgressView()
-                                Color.black.opacity(0.2)
-                            }
-                        }
-                        .frame(width: getRect().width, height: height)
+                        
+                        NewItemSDWebImage(imageURL: photoURL,
+                                          width: getRect().width,
+                                          height: height)
                         .clipShape(RoundedRectangle(cornerRadius: 5))
                         .allowsHitTesting(false)
-                        .shadow(radius: 4, x: 4, y: 4)
                     }
                     
                 } else {

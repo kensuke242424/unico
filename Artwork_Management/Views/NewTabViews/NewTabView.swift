@@ -114,7 +114,8 @@ struct NewTabView: View {
                         NewEditItemView(itemVM: itemVM, passItem: nil)
                         
                     case .edit:
-                        NewEditItemView(itemVM: itemVM, passItem: inputTab.selectedItem)
+                        NewEditItemView(itemVM: itemVM,
+                                        passItem: itemVM.rootItems[cartVM.actionItemIndex])
                         
                     case .system:
                         Text("システム画面")
@@ -209,6 +210,7 @@ struct NewTabView: View {
             builder.content { _ in
                 
                 CommerceSheet(cartVM: cartVM,
+                              inputTab: $inputTab,
                               teamID: teamVM.team!.id)
                 
             } // builder.content

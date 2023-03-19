@@ -23,7 +23,14 @@ struct NewItemSDWebImage: View {
                     .frame(width: width, height: height)
                 WebImage(url: imageURL)
                     .resizable()
-                    .placeholder { ProgressView() }
+                    .placeholder {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 10)
+                                .foregroundColor(.black.opacity(0.4))
+                                .frame(width: width, height: height)
+                            ProgressView()
+                        }
+                    }
                     .scaledToFill()
                     .frame(width: width, height: height)
                     .allowsHitTesting(false)

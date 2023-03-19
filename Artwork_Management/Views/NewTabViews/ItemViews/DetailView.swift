@@ -12,8 +12,9 @@ struct DetailView: View {
     
     @Environment(\.colorScheme) var colorScheme
     
+    @StateObject var itemVM: ItemViewModel
+    @StateObject var cartVM: CartViewModel
     @Binding var inputTab: InputTab
-    
     @Binding var show: Bool
     var animation: Namespace.ID
     var item: RootItem
@@ -21,6 +22,7 @@ struct DetailView: View {
     @State private var animationContent: Bool = false
     @State private var offsetAnimation: Bool = false
     @State private var openDetail: Bool = false
+    @State private var showDeleteAlert: Bool = false
     
     var body: some View {
         
@@ -57,17 +59,20 @@ struct DetailView: View {
                                       height: size.height)
                         .clipShape(CustomCorners(corners: [.topRight, .bottomRight], radius: 10))
                         /// Matched Geometry ID
-                        .transition(.opacity)
+                        .transition(.asymmetric(insertion: .opacity, removal: .opacity))
                         .matchedGeometryEffect(id: item.id, in: animation)
+//                        .opacity(animationContent ? 1 : 0)
                     
                     VStack(alignment: .leading, spacing: 8) {
-                        Text(item.name)
-                            .font(.title3)
-                            .fontWeight(.semibold)
+                        Text(item.name != "" ?
+                             item.name : "No Name")
+                        .font(.title3)
+                        .fontWeight(.semibold)
                         
-                        Text(": \(item.author)")
-                            .font(.caption)
-                            .foregroundColor(.gray)
+                        Text(item.author != "" ?
+                             ": \(item.author)" : "")
+                        .font(.caption)
+                        .foregroundColor(.gray)
                         
                         HStack {
                             Image(systemName: "shippingbox.fill")
@@ -148,13 +153,15 @@ struct DetailView: View {
                     .frame(maxWidth: .infinity)
                     
                     Button {
-                        
+                        cartVM.addCartItem(item: item)
                     } label: {
                         Label("Cart", systemImage: "cart.fill.badge.plus")
                             .font(.callout)
                             .foregroundColor(.orange)
                     }
                     .frame(maxWidth: .infinity)
+                    .disabled(checkHaveNotInventory(item))
+                    .opacity(checkHaveNotInventory(item) ? 0.3 : 1)
                 }
                 .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: -20)))
             
@@ -202,21 +209,70 @@ struct DetailView: View {
                 }
                 .padding(.bottom, 100)
             }
-            Button {
-                inputTab.path = [.edit]
-            } label: {
-                Label("編集", systemImage: "pencil.line")
-                    .font(.callout)
-                    .fontWeight(.semibold)
-                    .padding(.horizontal, 45)
-                    .padding(.vertical, 10)
-                    .background {
-                        Capsule()
-                            .fill(Color.red.gradient)
-                    }
-                    .foregroundColor(.white)
+            
+            HStack {
+                
             }
-            .padding(.bottom, 15)
+            .alert("確認", isPresented: $showDeleteAlert) {
+
+                Button("削除", role: .destructive) {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        offsetAnimation = false
+                    }
+                    /// Closing Detail View
+                    withAnimation(.easeInOut(duration: 0.35).delay(0.1)) {
+                        animationContent = false
+                    }
+                    withAnimation(.easeInOut(duration: 0.35).delay(0.1)) {
+                        show.toggle()
+                    }
+
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        withAnimation {
+                            itemVM.rootItems.removeAll(where: { $0.id == item.id })
+                        }
+                        Task {
+                            itemVM.deleteImage(path: item.photoPath)
+                            itemVM.deleteItem(deleteItem: item, teamID: item.teamID)
+                        }
+                    }
+                }
+                .foregroundColor(.red)
+            } message: {
+                Text("\(item.name != "" ? "\(item.name)" : "No Name") を削除しますか？")
+            } // alert
+            
+            HStack {
+                Spacer()
+                Button {
+                    inputTab.path = [.edit]
+                } label: {
+                    Label("編集", systemImage: "pencil.line")
+                        .font(.callout)
+                        .fontWeight(.semibold)
+                        .padding(.horizontal, 45)
+                        .padding(.vertical, 10)
+                        .background {
+                            Capsule()
+                                .fill(Color.orange.gradient)
+                        }
+                        .foregroundColor(.white)
+                }
+                .disabled(inputTab.showCommerce != .hidden ? true : false)
+                .opacity(inputTab.showCommerce != .hidden ? 0.3 : 1)
+                Spacer()
+                
+                Button {
+                    showDeleteAlert.toggle()
+                } label: {
+                    Image(systemName: "trash.fill")
+                        .font(.title3)
+                        .foregroundColor(.red)
+                }
+            }
+            .padding([.bottom, .horizontal], 15)
+            
+            
         }
         .padding(.top, 180)
         .padding([.horizontal, .top], 15)
@@ -234,17 +290,29 @@ struct DetailView: View {
                 .frame(width: 300)
                 .padding(.bottom)
             
-            Text("タグ　　　:　　 \(item.tag)")
+            Text(item.tag != "" ?
+                      "タグ　　　:　　 \(item.tag)" :
+                      "タグ　　　:　　 未設定")
                 .padding(.bottom, 12)
+                 
             Text("在庫　　　:　　 \(item.inventory) 個")
-            Text(item.price != 0 ? "価格　　　:　　 ¥ \(item.price)" : "価格　　　:　　   -")
+                 
+            Text(item.price != 0 ?
+                 "価格　　　:　　 ¥ \(item.price)" :
+                 "価格　　　:　　   -")
                 .padding(.bottom, 12)
-            Text(item.totalInventory != 0 ?
-                 "総在庫　　:　　 \(item.totalInventory) 個": "総在庫　　:　　   -  個")
-            Text(item.totalAmount != 0 ?
-                 "総売個数　:　　 \(item.totalAmount) 個" : "総売個数　:　　   - 個")
+            
             Text(item.sales != 0 ?
-                 "総売上　　:　　 ¥ \(item.sales)" : "総売上　　:　　   -")
+                 "総売上　　:　　 ¥ \(item.sales)" :
+                 "総売上　　:　　   -")
+            
+            Text(item.totalAmount != 0 ?
+                 "総売個数　:　　 \(item.totalAmount) 個" :
+                 "総売個数　:　　   -")
+            
+            Text(item.totalInventory != 0 ?
+                 "総在庫数　:　　 \(item.totalInventory) 個":
+                 "総仕入れ　:　　   -")
                 .padding(.bottom, 12)
 
             Text("登録日　　:　　 \(asTimesString(item.createTime))")
@@ -274,12 +342,39 @@ struct DetailView: View {
             return "???"
         }
     }
+    
+    func checkHaveNotInventory(_ item: RootItem) -> Bool {
+        
+        var checkResult: Bool = false
+        
+        if item.inventory == 0 {
+            checkResult = true
+            return checkResult
+        }
+        
+        let filterCartItem = cartVM.cartItems.filter({ item.id == $0.id })
+        if filterCartItem.isEmpty {
+            checkResult = false
+            return checkResult
+        } else {
+            for cartItem in filterCartItem {
+                if item.inventory - cartItem.amount <= 0 {
+                    checkResult =  true
+                } else {
+                    checkResult = false
+                }
+            }
+        }
+        return checkResult
+    }
 }
 
 struct DetailView_Previews: PreviewProvider {
     @Namespace static var animation
     static var previews: some View {
-        DetailView(inputTab: .constant(InputTab()),
+        DetailView(itemVM: ItemViewModel(),
+                   cartVM: CartViewModel(),
+                   inputTab: .constant(InputTab()),
                    show: .constant(true),
                    animation: animation,
                    item: testItem.first!)

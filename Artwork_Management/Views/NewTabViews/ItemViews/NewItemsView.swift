@@ -69,7 +69,7 @@ struct NewItemsView: View {
                                         }
                                     }
                                 }
-                                .opacity(showDarkBackground && selectedItem != item ? 0 : 1)
+                                .opacity(showDarkBackground && inputTab.selectedItem != item ? 0 : 1)
                         }
                     }
                     .padding(.horizontal, 15)
@@ -90,8 +90,15 @@ struct NewItemsView: View {
         } // Geometry
         .overlay {
             if let selectedItem, showDetailView {
-                DetailView(inputTab: $inputTab, show: $showDetailView, animation: animation, item: selectedItem)
+                DetailView(itemVM: itemVM,
+                           cartVM: cartVM,
+                           inputTab: $inputTab,
+                           show: $showDetailView,
+                           animation: animation,
+                           item: itemVM.rootItems[cartVM.actionItemIndex])
                     .transition(.asymmetric(insertion: .identity, removal: .offset(y: 0)))
+                    .onAppear { print("カード詳細onAppear") }
+                    .onDisappear { print("カード詳細onDisappear") }
             }
         }
         .background {
@@ -139,13 +146,13 @@ struct NewItemsView: View {
                 /// Book Detail Card
                 /// このカードを置くと、カバー画像を愛でることができます。
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(item.name)
+                    Text(item.name == "" ? "No Name" : item.name)
                         .font(.title3)
                         .fontWeight(.semibold)
                         .foregroundColor(.black)
                         .lineLimit(1)
                     
-                    Text(": \(item.author)")
+                    Text(item.author == "" ? "" : ": \(item.author)")
                         .font(.caption)
                         .foregroundColor(.gray)
                     
@@ -180,7 +187,6 @@ struct NewItemsView: View {
                 /// カートにアイテムを入れるボタン
                 .overlay(alignment: .bottomTrailing) {
                     Button {
-                        // TODO: カートシートの表示とアイテムのカート追加
                         // 取引かごに追加するボタン
                         // タップするたびに、値段合計、個数、カート内アイテム要素にプラスする
                         guard let newActionIndex = getActionIndex(item) else {
@@ -201,11 +207,15 @@ struct NewItemsView: View {
                                     .scaleEffect(2)
                                     .shadow(radius: 1, x: 1, y: 1)
                                     .shadow(radius: 1, x: 1, y: 1)
+                                    .opacity(checkHaveNotInventory(item) ? 0.3 : 1)
                             }
                     }
+                    .disabled(checkHaveNotInventory(item))
+                    .opacity(checkHaveNotInventory(item) ? 0.3 : 1)
+                    .onTapGesture {
+                        print("これ以上カートに入れる在庫がありません")
+                    }
                     .padding([.bottom, .trailing], 20)
-                    
-                    
                 }
                 .offset(x: animateCurrentItem && selectedItem?.id == item.id ? -20 : 0)
                 
@@ -233,6 +243,31 @@ struct NewItemsView: View {
         .onAppear {
             print("ItemCardsView onAppear")
         }
+    }
+    
+    func checkHaveNotInventory(_ item: RootItem) -> Bool {
+        
+        var checkResult: Bool = false
+        
+        if item.inventory == 0 {
+            checkResult = true
+            return checkResult
+        }
+        
+        let filterCartItem = cartVM.cartItems.filter({ item.id == $0.id })
+        if filterCartItem.isEmpty {
+            checkResult = false
+            return checkResult
+        } else {
+            for cartItem in filterCartItem {
+                if item.inventory - cartItem.amount <= 0 {
+                    checkResult =  true
+                } else {
+                    checkResult = false
+                }
+            }
+        }
+        return checkResult
     }
     
     /// Converting minY Rotation -minY回転を変換する-
