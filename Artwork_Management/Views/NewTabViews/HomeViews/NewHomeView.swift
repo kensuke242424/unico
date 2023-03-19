@@ -103,7 +103,7 @@ struct NewHomeView: View {
                         .font(.footnote)
                         .opacity(0.8)
                     
-                    Text("\(itemVM.items.count) item")
+                    Text("\(itemVM.rootItems.count) item")
                         .font(.footnote)
                         .opacity(0.8)
                     

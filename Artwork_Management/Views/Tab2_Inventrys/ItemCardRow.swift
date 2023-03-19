@@ -13,7 +13,7 @@ struct ItemCardRow: View {
     @StateObject var itemVM: ItemViewModel
     @Binding var inputHome: InputHome
     @Binding var inputStock: InputCart
-    let itemRow: Item
+    let itemRow: RootItem
 
     private let itemWidth: CGFloat = UIScreen.main.bounds.width / 2 - 30
     private let itemHeight: CGFloat = UIScreen.main.bounds.height / 4
@@ -40,7 +40,7 @@ struct ItemCardRow: View {
             .overlay(alignment: .topTrailing) {
                 Button {
 
-                    guard let newActionIndex = itemVM.items.firstIndex(where: { $0.id == itemRow.id }) else {
+                    guard let newActionIndex = itemVM.rootItems.firstIndex(where: { $0.id == itemRow.id }) else {
                         print("アクションIndexの取得に失敗しました")
                         return
                     }
@@ -110,13 +110,13 @@ struct ItemCardRow: View {
                         Button {
                             // 取引かごに追加するボタン
                             // タップするたびに、値段合計、個数、カート内アイテム要素にプラスする
-                            guard let newActionIndex = itemVM.items.firstIndex(where: { $0.id == itemRow.id }) else {
+                            guard let newActionIndex = itemVM.rootItems.firstIndex(where: { $0.id == itemRow.id }) else {
                                 print("アクションIndexの取得に失敗しました")
                                 return
                             }
 
                             inputHome.actionItemIndex = newActionIndex
-                            itemVM.items[newActionIndex].amount += 1
+                            itemVM.rootItems[newActionIndex].amount += 1
                             inputStock.resultCartAmount += 1
                             inputStock.resultCartPrice += itemRow.price
 

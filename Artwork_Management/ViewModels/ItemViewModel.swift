@@ -17,20 +17,10 @@ class ItemViewModel: ObservableObject {
     var listener: ListenerRegistration?
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
 
-    @Published var items: [Item] = [Item(tag: "Clothes",
-                                         name: "cloth_sample2",
-                                         author: "Anonymous User",
-                                         detail: "文がいくつか集まり、かつ、まとまった内容を表すもの。内容のうえで前の文と密接な関係をもつと考えられる文は、そのまま続いて書き継がれ、前の文と隔たりが意識されたとき、次の文は行を改めて書かれる。すなわち、段落がつけられるということであり、これは、書き手がまとまった内容を段落ごとにまとめようとするからである。この、一つの段落にまとめられる、いくつかの文の集まりを一文章というが、よりあいまいに、いくつかの文をまとめて取り上げるときにそれを文章と称したり、文と同意義としたりすることもあるなど文章はことばの単位として厳密なものでないことが多い。。",
-                                         photoURL: nil,
-                                         photoPath: nil,
-                                         cost: 1000,
-                                         price: 2800,
-                                         amount: 0,
-                                         sales: 128000,
-                                         inventory: 2,
-                                         totalAmount: 120,
-                                         totalInventory: 200)]
-    @Published var actionItemIndex: Int = 0
+    @Published var rootItems: [RootItem] = []
+    /// ✅ Firestoreから取り出したアイテムのphotoURLから先にImageを生成して詰め直す。こちらの配列をViewに使う
+    //TODO: これにより余計なImageのダウンロードをなくせる？
+    @Published var showItems: [ShowItem] = []
 
     func fetchItem(teamID: String) async {
 
@@ -50,15 +40,15 @@ class ItemViewModel: ObservableObject {
 
             // 取得できたアイテムをデコーダブル ⇨ Itemモデルを参照 ⇨ 「items」に詰めていく
             // with: ⇨ ServerTimestampを扱う際のオプションを指定
-            self.items = documents.compactMap { (snap) -> Item? in
+            self.rootItems = documents.compactMap { (snap) -> RootItem? in
 
-                return try? snap.data(as: Item.self, with: .estimate)
+                return try? snap.data(as: RootItem.self, with: .estimate)
             }
         }
         print("fetchItem完了")
     }
 
-    func addItem(itemData: Item, tag: String, teamID: String) {
+    func addItem(itemData: RootItem, tag: String, teamID: String) {
 
         print("addItem実行")
 
@@ -75,7 +65,7 @@ class ItemViewModel: ObservableObject {
         print("addItem完了")
     }
 
-    func updateItem(updateData: Item, defaultDataID: String, teamID: String) {
+    func updateItem(updateData: RootItem, defaultDataID: String, teamID: String) {
 
         print("updateItem実行")
 
@@ -96,7 +86,7 @@ class ItemViewModel: ObservableObject {
         print("updateItem完了")
     }
 
-    func deleteItem(deleteItem: Item, teamID: String) {
+    func deleteItem(deleteItem: RootItem, teamID: String) {
 
         guard let itemID = deleteItem.id else { return }
         guard let itemRef = db?.collection("teams").document(teamID).collection("items").document(itemID) else {
@@ -146,8 +136,8 @@ class ItemViewModel: ObservableObject {
 
     func resetAmount() {
 
-        for index in items.indices where items[index].amount != 0 {
-            items[index].amount = 0
+        for index in rootItems.indices where rootItems[index].amount != 0 {
+            rootItems[index].amount = 0
         }
         print("resetAmount完了")
     }
@@ -161,7 +151,7 @@ class ItemViewModel: ObservableObject {
             return
         }
 
-        for item in items where item.amount != 0 {
+        for item in rootItems where item.amount != 0 {
 
             guard let itemID = item.id else {
                 print("Error: 「\(item.name)」 guard let = item.id")
@@ -187,7 +177,7 @@ class ItemViewModel: ObservableObject {
 
     func itemsUpDownOderSort() {
 
-        items.reverse()
+        rootItems.reverse()
     }
 
     func itemsValueSort(order: UpDownOrder, status: IndicatorValueStatus) {
@@ -198,22 +188,22 @@ class ItemViewModel: ObservableObject {
 
             switch status {
             case .stock:
-                items.sort(by: { $0.inventory > $1.inventory })
+                rootItems.sort(by: { $0.inventory > $1.inventory })
             case .price:
-                items.sort(by: { $0.price > $1.price })
+                rootItems.sort(by: { $0.price > $1.price })
             case .sales:
-                items.sort(by: { $0.sales > $1.sales })
+                rootItems.sort(by: { $0.sales > $1.sales })
             }
 
         case .down:
 
             switch status {
             case .stock:
-                items.sort(by: { $0.inventory < $1.inventory })
+                rootItems.sort(by: { $0.inventory < $1.inventory })
             case .price:
-                items.sort(by: { $0.price < $1.price })
+                rootItems.sort(by: { $0.price < $1.price })
             case .sales:
-                items.sort(by: { $0.sales < $1.sales })
+                rootItems.sort(by: { $0.sales < $1.sales })
             }
         }
     }
@@ -223,10 +213,10 @@ class ItemViewModel: ObservableObject {
         switch order {
 
         case .up:
-            items.sort(by: { $0.name > $1.name })
+            rootItems.sort(by: { $0.name > $1.name })
 
         case .down:
-            items.sort(by: { $0.name < $1.name })
+            rootItems.sort(by: { $0.name < $1.name })
         }
     }
 
@@ -234,11 +224,11 @@ class ItemViewModel: ObservableObject {
 
         switch order {
         case .up:
-            items.sort { before, after in
+            rootItems.sort { before, after in
                 before.createTime!.dateValue() > after.createTime!.dateValue() ? true : false
             }
         case .down:
-            items.sort { before, after in
+            rootItems.sort { before, after in
                 before.createTime!.dateValue() < after.createTime!.dateValue() ? true : false
             }
         }
@@ -247,11 +237,11 @@ class ItemViewModel: ObservableObject {
     func itemsUpdateTimeSort(order: UpDownOrder) {
         switch order {
         case .up:
-            items.sort { before, after in
+            rootItems.sort { before, after in
                 before.updateTime!.dateValue() > after.updateTime!.dateValue() ? true : false
             }
         case .down:
-            items.sort { before, after in
+            rootItems.sort { before, after in
                 before.updateTime!.dateValue() < after.updateTime!.dateValue() ? true : false
             }
         }

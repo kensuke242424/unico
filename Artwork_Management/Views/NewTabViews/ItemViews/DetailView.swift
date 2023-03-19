@@ -16,7 +16,7 @@ struct DetailView: View {
     
     @Binding var show: Bool
     var animation: Namespace.ID
-    var item: Item
+    var item: RootItem
     /// View Properties
     @State private var animationContent: Bool = false
     @State private var offsetAnimation: Bool = false

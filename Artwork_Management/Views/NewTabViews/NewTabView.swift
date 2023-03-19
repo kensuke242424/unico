@@ -16,7 +16,7 @@ struct InputTab {
     /// Navigation遷移を管理するプロパティ
     var path: [NavigationPath] = []
     /// NavigationPathによるエディット画面遷移時に渡す
-    var selectedItem: Item?
+    var selectedItem: RootItem?
     
     /// タブViewのアニメーションを管理するプロパティ
     var selectionTab: Tab = .item

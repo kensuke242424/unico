@@ -35,7 +35,7 @@ struct NewItemsView: View {
     /// Detail View Properties
     @State private var showDetailView: Bool = false
     @State private var showDarkBackground: Bool = false
-    @State private var selectedItem: Item?
+    @State private var selectedItem: RootItem?
     @State private var animateCurrentItem: Bool = false
     
     var body: some View {
@@ -48,7 +48,7 @@ struct NewItemsView: View {
                 
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack(spacing: 35) {
-                        ForEach(itemVM.items, id: \.self) { item in
+                        ForEach(itemVM.rootItems, id: \.self) { item in
                             ItemsCardView(item)
                                 .onTapGesture {
                                     withAnimation(.easeInOut(duration: 0.25)) {
@@ -56,7 +56,7 @@ struct NewItemsView: View {
                                             return
                                         }
                                         
-                                        itemVM.actionItemIndex = actionIndex
+                                        cartVM.actionItemIndex = actionIndex
                                         animateCurrentItem = true
                                         showDarkBackground = true
                                         /// ✅ アニメーションにチラつきがあったため、二箇所で管理
@@ -115,9 +115,9 @@ struct NewItemsView: View {
         }
     }
     
-    func getActionIndex(_ selectedItem: Item) -> Int? {
+    func getActionIndex(_ selectedItem: RootItem) -> Int? {
         
-        let index = itemVM.items.firstIndex(where: { $0.id == selectedItem.id })
+        let index = itemVM.rootItems.firstIndex(where: { $0.id == selectedItem.id })
         print("アクションアイテムのindex: \(index)")
         return index
     }
@@ -130,7 +130,7 @@ struct NewItemsView: View {
     }
     
     @ViewBuilder
-    func ItemsCardView(_ item: Item) -> some View {
+    func ItemsCardView(_ item: RootItem) -> some View {
         GeometryReader {
             let size = $0.size
             let rect = $0.frame(in: .named("SCROLLVIEW"))

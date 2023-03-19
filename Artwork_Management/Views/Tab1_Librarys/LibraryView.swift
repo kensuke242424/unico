@@ -36,11 +36,11 @@ struct LibraryView: View {
     @State private var inputTime: InputTimesView = InputTimesView()
     @State private var headerImageSize: HeaderImageSize = .fit
 
-    var tagFilterItemCards: [Item] {
+    var tagFilterItemCards: [RootItem] {
         if inputLibrary.selectFilterTag == tagVM.tags.first!.tagName {
-            return itemVM.items
+            return itemVM.rootItems
         } else {
-            return itemVM .items.filter({ $0.tag == inputLibrary.selectFilterTag })
+            return itemVM .rootItems.filter({ $0.tag == inputLibrary.selectFilterTag })
         }
     }
 
@@ -108,7 +108,7 @@ struct LibraryView: View {
                         VStack(alignment: .trailing, spacing: 60) {
                             Group {
                                 Text("55 day")
-                                Text("\(itemVM.items.count) item")
+                                Text("\(itemVM.rootItems.count) item")
                             }
                             .font(.footnote)
                             .opacity(0.5)
@@ -146,7 +146,7 @@ struct LibraryView: View {
                         }
 
                     } else {
-                        if itemVM.items.contains(where: {$0.tag == (tagVM.tags.last!.tagName)}) {
+                        if itemVM.rootItems.contains(where: {$0.tag == (tagVM.tags.last!.tagName)}) {
                             Button {
                                 inputLibrary.selectFilterTag = tag.tagName
                             } label: {
@@ -165,7 +165,7 @@ struct LibraryView: View {
             .offset(x: -UIScreen.main.bounds.width / 2.5,
                     y: UIScreen.main.bounds.height / 11)
 
-            if itemVM.items == [] {
+            if itemVM.rootItems == [] {
                 EmptyItemView(inputHome: $inputHome, text: "")
                     .offset(x: -UIScreen.main.bounds.width / 4,
                             y: UIScreen.main.bounds.height / 5)
@@ -340,7 +340,7 @@ struct LibraryView: View {
         .ignoresSafeArea()
     } // homeHeaderPhoto
 
-    func homeItemPhotoPanel(items: [Item]) -> some View {
+    func homeItemPhotoPanel(items: [RootItem]) -> some View {
         GeometryReader { bodyView in
 
             let libraryItemPadding: CGFloat = 200
@@ -371,7 +371,7 @@ struct LibraryView: View {
                             if inputLibrary.isShowCardInfomation {
                                 Button {
                                     if let cardRowIndex =
-                                        itemVM.items.firstIndex(where: { $0.id == tagFilterItemCards[index].id }) {
+                                        itemVM.rootItems.firstIndex(where: { $0.id == tagFilterItemCards[index].id }) {
 
                                         inputHome.actionItemIndex = cardRowIndex
 

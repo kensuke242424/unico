@@ -15,7 +15,7 @@ struct EditItemView: View {
     @StateObject var tagVM: TagViewModel
     @Binding var inputHome: InputHome
 
-    let passItemData: Item?
+    let passItemData: RootItem?
     let editItemStatus: EditSelect
 
     var tagColor: UsedColor {
@@ -119,7 +119,7 @@ struct EditItemView: View {
                         case .create:
                             Task {
                                 let uploadImage =  await itemVM.uploadImage(inputEdit.captureImage)
-                                let itemData = Item(tag: inputEdit.selectionTagName,
+                                let itemData = RootItem(tag: inputEdit.selectionTagName,
                                                     name: inputEdit.name,
                                                     author: inputEdit.author,
                                                     detail: inputEdit.detail != "" ? inputEdit.detail : "メモなし",
@@ -155,7 +155,7 @@ struct EditItemView: View {
                                 }
 
                                 // NOTE: アイテムを更新
-                                let updateItemData = (Item(createTime: passItemData.createTime,
+                                let updateItemData = (RootItem(createTime: passItemData.createTime,
                                                            tag      : inputEdit.selectionTagName,
                                                            name     : inputEdit.name,
                                                            author   : inputEdit.author,
@@ -202,7 +202,7 @@ struct InputForms: View {
 
     // NOTE: enum「Status」を用いて、「.create」と「.update」とでViewレイアウトを分岐します。
     let editItemStatus: EditSelect
-    let passItem: Item?
+    let passItem: RootItem?
     let tagColor: UsedColor
 
     @FocusState private var focusedField: EditItemField?

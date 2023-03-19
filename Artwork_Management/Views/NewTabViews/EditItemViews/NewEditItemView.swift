@@ -74,7 +74,7 @@ struct NewEditItemView: View {
     // アイテム詳細テキストフィールド専用のフォーカス制御
     @FocusState var detailFocused: Bool?
     
-    let passItem: Item?
+    let passItem: RootItem?
     
     var body: some View {
         
@@ -236,7 +236,7 @@ struct NewEditItemView: View {
                             }
 
                             // NOTE: アイテムを更新
-                            let updateItemData = (Item(createTime: passItem.createTime,
+                            let updateItemData = (RootItem(createTime: passItem.createTime,
                                                        tag        : input.selectionTagName,
                                                        name       : input.name,
                                                        author     : input.author,
@@ -261,7 +261,7 @@ struct NewEditItemView: View {
                         
                         Task {
                             let uploadImage =  await itemVM.uploadImage(input.captureImage)
-                            let itemData = Item(tag           : input.selectionTagName,
+                            let itemData = RootItem(tag           : input.selectionTagName,
                                                 name          : input.name,
                                                 author        : input.author,
                                                 detail        : input.detail != "" ? input.detail : "メモなし",

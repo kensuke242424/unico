@@ -35,7 +35,7 @@ struct ManageView: View {
 
                         case true:
 
-                            if itemVM.items == [] {
+                            if itemVM.rootItems == [] {
 
                                 EmptyItemView(inputHome: $inputHome, text: "アイテムが存在しません")
 
@@ -60,10 +60,10 @@ struct ManageView: View {
                                         GradientLine(color1: .gray, color2: .clear)
                                             .padding(.bottom)
 
-                                        if itemVM.items.contains(where: {$0.tag == tagRow.tagName}) {
+                                        if itemVM.rootItems.contains(where: {$0.tag == tagRow.tagName}) {
 
                                             VStack {
-                                                ForEach(itemVM.items) { item in
+                                                ForEach(itemVM.rootItems) { item in
 
                                                     if item.tag == tagRow.tagName {
                                                         manageListRow(item: item)
@@ -76,7 +76,7 @@ struct ManageView: View {
                                                     Text("\(tagRow.tagName)  合計 ¥ ")
                                                         .font(.caption)
 
-                                                    Text(String(tagGroupTotalSales(items: itemVM.items,
+                                                    Text(String(tagGroupTotalSales(items: itemVM.rootItems,
                                                                                    tag: tagRow.tagName,
                                                                                    group: inputManage.isTagGroup)))
                                                     .font(.subheadline.bold())
@@ -101,7 +101,7 @@ struct ManageView: View {
                                 } // ForEach tagVM.tags
 
                                 // "未グループ"タグのついたアイテムが存在した場合
-                                if itemVM.items.contains(where: {$0.tag == (tagVM.tags.last!.tagName)}) {
+                                if itemVM.rootItems.contains(where: {$0.tag == (tagVM.tags.last!.tagName)}) {
                                     Text(tagVM.tags.last!.tagName)
                                         .foregroundColor(.white)
                                         .font(.title2.bold())
@@ -110,7 +110,7 @@ struct ManageView: View {
 
                                     GradientLine(color1: .gray, color2: .clear)
 
-                                        ForEach(itemVM.items) { item in
+                                        ForEach(itemVM.rootItems) { item in
 
                                             if item.tag == "\(tagVM.tags.last!.tagName)" {
                                                 manageListRow(item: item)
@@ -132,7 +132,7 @@ struct ManageView: View {
 
                             GradientLine(color1: .gray, color2: .clear)
 
-                            ForEach(itemVM.items) { item in
+                            ForEach(itemVM.rootItems) { item in
 
                                 manageListRow(item: item)
 
@@ -143,7 +143,7 @@ struct ManageView: View {
                                 Text("\(tagVM.tags.first!.tagName)  合計 ¥ ")
                                     .font(.caption)
 
-                                Text(String(tagGroupTotalSales(items: itemVM.items,
+                                Text(String(tagGroupTotalSales(items: itemVM.rootItems,
                                                                tag: tagVM.tags.first!.tagName,
                                                                group: inputManage.isTagGroup)))
                                 .font(.subheadline.bold())
@@ -231,7 +231,7 @@ struct ManageView: View {
 
     // Manage List Row...
     @ViewBuilder
-    func manageListRow(item: Item) -> some View {
+    func manageListRow(item: RootItem) -> some View {
 
         VStack {
 
@@ -239,7 +239,7 @@ struct ManageView: View {
 
                 ShowsItemAsyncImagePhoto(photoURL: item.photoURL, size: UIScreen.main.bounds.width / 5)
                     .onTapGesture {
-                        if let actionItemIndex = itemVM.items.firstIndex(of: item) {
+                        if let actionItemIndex = itemVM.rootItems.firstIndex(of: item) {
                             inputHome.actionItemIndex = actionItemIndex
                             withAnimation(.easeIn(duration: 0.15)) {
                                 inputHome.isShowItemDetail.toggle()
@@ -307,7 +307,7 @@ struct ManageView: View {
         .padding(.vertical)
     }
 
-    private func tagGroupTotalSales(items: [Item], tag: String, group: Bool) -> Int {
+    private func tagGroupTotalSales(items: [RootItem], tag: String, group: Bool) -> Int {
 
         var itemsSales = 0
 
