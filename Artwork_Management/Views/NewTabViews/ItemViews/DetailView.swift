@@ -142,6 +142,7 @@ struct DetailView: View {
                             .foregroundColor(.gray)
                     }
                     .frame(maxWidth: .infinity)
+                    .disabled(openDetail ? true : false)
                     
                     Button {
                         
@@ -151,6 +152,7 @@ struct DetailView: View {
                             .foregroundColor(.gray)
                     }
                     .frame(maxWidth: .infinity)
+                    .disabled(openDetail ? true : false)
                     
                     Button {
                         cartVM.addCartItem(item: item)
@@ -161,6 +163,7 @@ struct DetailView: View {
                     }
                     .frame(maxWidth: .infinity)
                     .disabled(checkHaveNotInventory(item))
+                    .disabled(openDetail ? true : false)
                     .opacity(checkHaveNotInventory(item) ? 0.3 : 1)
                 }
                 .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: -20)))
@@ -188,7 +191,7 @@ struct DetailView: View {
                                   "list.bullet.circle.fill" : "list.bullet.circle")
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 22)
+                            .frame(width: 28)
                         }
                         
                         .padding(.leading, 50)
@@ -204,6 +207,7 @@ struct DetailView: View {
                         .font(.subheadline)
                         .kerning(0.5)
                         .lineSpacing(4)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .foregroundColor(.primary.opacity(0.5))
                         .padding(.top, 8)
                 }
