@@ -10,7 +10,7 @@ import SwiftUI
 struct NewHomeView: View {
     
     @EnvironmentObject var teamVM: TeamViewModel
-    @EnvironmentObject var itemVM: ItemViewModel
+    @StateObject var itemVM: ItemViewModel
     
     /// Tab親Viewから受け取った状態変数群
     @Binding var inputTab: InputTab
@@ -140,12 +140,13 @@ struct NewHomeView: View {
 
 struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
-        NewHomeView(inputTab: .constant(InputTab()))
-            .background {
-                Image("background_4")
-                    .resizable()
-                    .scaledToFill()
-                    .ignoresSafeArea()
-            }
+        NewHomeView(itemVM: ItemViewModel(),
+                    inputTab: .constant(InputTab()))
+        .background {
+            Image("background_4")
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
+        }
     }
 }

@@ -12,5 +12,6 @@ class ResizableSheetViewModel: ObservableObject {
     
     @Published var showCart    : ResizableSheetState = .hidden
     @Published var showCommerce: ResizableSheetState = .hidden
+    @Published var showHalfSheet: Bool = false
 }
 

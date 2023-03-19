@@ -22,16 +22,15 @@ struct NewItemsView: View {
     /// Tab親Viewから受け取るViewModelと状態変数
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
-    @EnvironmentObject var itemVM: ItemViewModel
     @EnvironmentObject var tagVM : TagViewModel
     
-    @StateObject var resizableVM : ResizableSheetViewModel = ResizableSheetViewModel()
+    @StateObject var itemVM: ItemViewModel
     
     @Binding var inputTab: InputTab
+    @Binding var inputCart: InputCart
     
     /// View Propaties
     @Environment(\.colorScheme) var colorScheme
-    @State private var inputCart = InputCart()
     @State private var activeTag: String = "全て"
     @State private var carouselMode: Bool = false
     /// For Matched Geometry Effect
@@ -118,106 +117,21 @@ struct NewItemsView: View {
             }
         }
         // NOTE: カート内のアイテムを監視してハーフモーダルを表示
-        .onChange(of: inputCart.resultCartAmount) { [before = inputCart.resultCartAmount] after in
-
-            if before == 0 {
-                resizableVM.showCommerce = .medium
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                    resizableVM.showCart = .medium
-                }
-            }
-            if after == 0 {
-                resizableVM.showCart = .hidden
-                resizableVM.showCommerce = .hidden
-            }
-        }
-        // アイテム取引かごのシート画面
-//        .resizableSheet($resizableVM.showCart, id: "A") { builder in
-//            builder.content { context in
+//        .onChange(of: inputCart.resultCartAmount) { [before = inputCart.resultCartAmount] after in
 //
-//                VStack {
-//                    Spacer(minLength: 0)
-//                    GrabBar()
-//                        .foregroundColor(.black)
-//                    Spacer(minLength: 0)
-//
-//                    HStack(alignment: .bottom) {
-//                        Text("カート内のアイテム")
-//                            .foregroundColor(.black)
-//                            .font(.headline)
-//                            .fontWeight(.black)
-//                            .opacity(0.6)
-//                        Spacer()
-//                        Button(
-//                            action: {
-//                                inputCart.resultCartPrice = 0
-//                                inputCart.resultCartAmount = 0
-//                                itemVM.resetAmount()
-//
-//                            },
-//                            label: {
-//                                HStack {
-//                                    Image(systemName: "trash.fill")
-//                                    Text("全て削除")
-//                                        .font(.callout)
-//                                }
-//                                .foregroundColor(.red)
-//                            }
-//                        ) // Button
-//                    } // HStack
-//                    .padding(.horizontal, 20)
-//
-//                    Spacer(minLength: 8)
-//
-//                    ResizableScrollView(
-//                        context: context,
-//                        main: {
-//                            CartItemsSheet(inputCart      : $inputCart,
-//                                           halfSheetScroll: .main)
-//                        },
-//                        additional: {
-//                            CartItemsSheet(inputCart      : $inputCart,
-//                                           halfSheetScroll: .additional)
-//
-//                            Spacer()
-//                                .frame(height: 100)
-//                        }
-//                    )
-//                    Spacer()
-//                        .frame(height: 80)
-//                } // VStack
-//            } // builder.content
-//            .sheetBackground { _ in
-//                LinearGradient(gradient: Gradient(colors: [.white, .customLightGray1]),
-//                               startPoint: .leading, endPoint: .trailing)
-//                .opacity(0.95)
-//                .blur(radius: 1)
+//            if before == 0 {
+//                print("aaaaaaaaaaaa")
+//                resizableVM.showCommerce = .medium
+//                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+//                    resizableVM.showCart = .medium
+//                }
 //            }
-//            .background { _ in
-//                EmptyView()
+//            if after == 0 {
+//                print("bbbbbbbbbbb")
+//                resizableVM.showCart = .hidden
+//                resizableVM.showCommerce = .hidden
 //            }
-//        } // .resizableSheet
-
-//        // 決済リザルトのシート画面
-//        .resizableSheet($resizableVM.showCommerce, id: "B") {builder in
-//            builder.content { _ in
-//
-//                CommerceSheet(resizableVM: resizableVM,
-//                              inputCart  : $inputCart,
-//                              teamID     : teamVM.team!.id)
-//
-//            } // builder.content
-//            .supportedState([.medium])
-//            .sheetBackground { _ in
-//                LinearGradient(gradient: Gradient(colors: [.white, .customLightGray1]),
-//                               startPoint: .leading, endPoint: .trailing)
-//                .opacity(0.95)
-//            }
-//            .background { _ in
-//                EmptyView()
-//            }
-//        } // .resizableSheet
-//
+//        }
     }
     
     func getActionIndex(_ selectedItem: Item) -> Int? {
@@ -292,7 +206,6 @@ struct NewItemsView: View {
                             print("アクションIndexの取得に失敗しました")
                             return
                         }
-
                         itemVM.actionItemIndex = newActionIndex
                         itemVM.items[newActionIndex].amount += 1
                         inputCart.resultCartAmount += 1
@@ -317,7 +230,7 @@ struct NewItemsView: View {
                 /// Book Cover Image
                 ZStack {
                     if !(showDetailView && selectedItem?.id == item.id) {
-                        NewItemAsyncImage(imageURL: item.photoURL,
+                        NewItemSDWebImage(imageURL: item.photoURL,
                                           width: size.width / 2,
                                           height: size.height)
                             /// Matched Geometry ID
@@ -335,6 +248,9 @@ struct NewItemsView: View {
             .rotation3DEffect(.init(degrees: convertOffsetToRotation(rect)), axis: (x: 1, y: 0, z: 0), anchor: .bottom, anchorZ: 1, perspective: 0.5)
         }
         .frame(height: 220)
+        .onAppear {
+            print("ItemCardsView onAppear")
+        }
     }
     
     /// Converting minY Rotation -minY回転を変換する-
@@ -398,11 +314,13 @@ var tags: [String] =
 
 struct NewItemsView_Previews: PreviewProvider {
     static var previews: some View {
-        NewItemsView(inputTab: .constant(InputTab()))
-            .environmentObject(LogInViewModel())
-            .environmentObject(TeamViewModel())
-            .environmentObject(UserViewModel())
-            .environmentObject(ItemViewModel())
-            .environmentObject(TagViewModel())
+        NewItemsView(itemVM: ItemViewModel(),
+                     inputTab   : .constant(InputTab()),
+                     inputCart  : .constant(InputCart()))
+        .environmentObject(LogInViewModel())
+        .environmentObject(TeamViewModel())
+        .environmentObject(UserViewModel())
+        .environmentObject(ItemViewModel())
+        .environmentObject(TagViewModel())
     }
 }

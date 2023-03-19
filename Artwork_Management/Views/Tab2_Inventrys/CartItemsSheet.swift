@@ -14,7 +14,7 @@ struct CartItemsSheet: View {
         case additional
     }
 
-    @EnvironmentObject var itemVM: ItemViewModel
+    @StateObject var itemVM: ItemViewModel
     @Binding var inputCart: InputCart
 
     let halfSheetScroll: HalfSheetScroll
@@ -36,7 +36,9 @@ struct CartItemsSheet: View {
 
                     if listLimit > offset {
                         if element.amount > 0 {
-                            CartItemRow(inputCart: $inputCart, itemRow: element)
+                            CartItemRow(itemVM: itemVM,
+                                        inputCart: $inputCart,
+                                        itemRow: element)
                         }
 
                     } // if
@@ -54,7 +56,8 @@ struct CartItemsSheet: View {
 
                     if listLimit <= offset {
                         if element.amount > 0 {
-                            CartItemRow(inputCart: $inputCart,
+                            CartItemRow(itemVM: itemVM,
+                                        inputCart: $inputCart,
                                         itemRow: element)
                         }
 
@@ -70,7 +73,7 @@ struct CartItemsSheet: View {
 // ✅ カスタムView: かご内の一要素分のレイアウト
 struct CartItemRow: View {
 
-    @EnvironmentObject var itemVM: ItemViewModel
+    @StateObject var itemVM: ItemViewModel
     
     @Binding var inputCart: InputCart
     let itemRow: Item
@@ -190,7 +193,8 @@ struct CartItemRow: View {
 //
 struct CartItemsSheet_Previews: PreviewProvider {
     static var previews: some View {
-        CartItemsSheet(inputCart: .constant(InputCart()),
+        CartItemsSheet(itemVM: ItemViewModel(),
+                       inputCart: .constant(InputCart()),
                        halfSheetScroll: .additional)
     }
 }

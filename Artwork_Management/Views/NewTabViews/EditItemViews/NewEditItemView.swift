@@ -65,8 +65,8 @@ struct NewEditItemView: View {
     
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
-    @EnvironmentObject var itemVM: ItemViewModel
     @EnvironmentObject var tagVM : TagViewModel
+    @StateObject var itemVM: ItemViewModel
     
     @State private var input: InputEditItem = InputEditItem()
     
@@ -95,18 +95,20 @@ struct NewEditItemView: View {
                         
                         if let captureImage = input.captureImage {
                             NewItemUIImage(image: captureImage,
-                                           width: size.width / 2,
+                                           width: size.width / 2 - 15,
                                            height: 220)
+                            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                             .onTapGesture { input.isShowItemImageSelectSheet.toggle() }
                         } else if let passItemImageURL = input.photoURL {
-                            NewItemAsyncImage(imageURL: passItemImageURL,
-                                              width: size.width / 2,
+                            NewItemSDWebImage(imageURL: passItemImageURL,
+                                              width: size.width / 2 - 15,
                                               height: 220)
+                            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                             .onTapGesture { input.isShowItemImageSelectSheet.toggle() }
                         } else {
                             RoundedRectangle(cornerRadius: 10)
                                 .fill(.gray.gradient)
-                                .frame(width: size.width / 2, height: 220)
+                                .frame(width: abs(size.width / 2 - 15), height: 220)
                                 .onTapGesture { input.isShowItemImageSelectSheet.toggle() }
                             VStack(spacing: 20) {
                                 Image(systemName: "cube.transparent.fill")
@@ -372,6 +374,6 @@ struct NewEditItemView: View {
 
 struct NewEditItemView_Previews: PreviewProvider {
     static var previews: some View {
-        NewEditItemView(passItem: testItem.first)
+        NewEditItemView(itemVM: ItemViewModel(), passItem: testItem.first)
     }
 }

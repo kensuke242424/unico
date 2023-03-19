@@ -16,17 +16,6 @@ enum RootNavigation {
 
 struct RootView: View {
     
-    @EnvironmentObject var progress: ProgressViewModel
-
-    @EnvironmentObject var logInVM: LogInViewModel
-    @EnvironmentObject var teamVM: TeamViewModel
-    @EnvironmentObject var userVM: UserViewModel
-    @EnvironmentObject var itemVM: ItemViewModel
-    @EnvironmentObject var tagVM: TagViewModel
-
-    @State private var isShowStandBy: Bool = false
-    @State private var showLogInAlert: Bool = false
-
     var windowScene: UIWindowScene? {
         let scenes = UIApplication.shared.connectedScenes
         let windowScene = scenes.first as? UIWindowScene
@@ -36,6 +25,18 @@ struct RootView: View {
     var resizableSheetCenter: ResizableSheetCenter? {
         windowScene.flatMap(ResizableSheetCenter.resolve(for:))
     }
+    
+    @EnvironmentObject var progress: ProgressViewModel
+
+    @EnvironmentObject var logInVM: LogInViewModel
+    @EnvironmentObject var teamVM: TeamViewModel
+    @EnvironmentObject var userVM: UserViewModel
+    @EnvironmentObject var tagVM: TagViewModel
+    
+    @StateObject var itemVM: ItemViewModel = ItemViewModel()
+
+    @State private var isShowStandBy: Bool = false
+    @State private var showLogInAlert: Bool = false
 
     var body: some View {
 
@@ -43,7 +44,6 @@ struct RootView: View {
             switch logInVM.rootNavigation {
             case .logIn:
                 LogInView()
-                    .environment(\.resizableSheetCenter, resizableSheetCenter)
 
             case .fetch:
                 StandByView()
@@ -53,7 +53,7 @@ struct RootView: View {
                 CreateAndJoinTeamView()
 
             case .home:
-                NewTabView()
+                NewTabView(itemVM: itemVM)
                     .environment(\.resizableSheetCenter, resizableSheetCenter)
             }
 

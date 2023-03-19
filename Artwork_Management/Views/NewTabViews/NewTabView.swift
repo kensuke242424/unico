@@ -25,17 +25,21 @@ struct InputTab {
     var animationScale: CGFloat = 1
     var scrollProgress: CGFloat = .zero
     
-    var showEditSheet: Bool = false
+    var showCart: ResizableSheetState = .hidden
+    var showCommerce: ResizableSheetState = .hidden
 }
 
 struct NewTabView: View {
     
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
-    @EnvironmentObject var itemVM: ItemViewModel
     @EnvironmentObject var tagVM : TagViewModel
+    
+    @StateObject var itemVM: ItemViewModel
+    
     /// View Propertys
     @State private var inputTab = InputTab()
+    @State private var inputCart = InputCart()
 
     var body: some View {
 
@@ -52,7 +56,7 @@ struct NewTabView: View {
                     
                     TabView(selection: $inputTab.selectionTab) {
                         
-                        NewHomeView(inputTab: $inputTab)
+                        NewHomeView(itemVM: itemVM, inputTab: $inputTab)
                             .tag(Tab.home)
                             .offsetX(inputTab.selectionTab == Tab.home) { rect in
                                 let minX = rect.minX
@@ -63,7 +67,7 @@ struct NewTabView: View {
                                 inputTab.animationOpacity = 1 - -inputTab.scrollProgress
                             }
                         
-                        NewItemsView(inputTab: $inputTab)
+                        NewItemsView(itemVM: itemVM, inputTab: $inputTab, inputCart: $inputCart)
                             .tag(Tab.item)
                             .offsetX(inputTab.selectionTab == Tab.item) { rect in
                                 let minX = rect.minX
@@ -107,10 +111,10 @@ struct NewTabView: View {
                     
                     switch path {
                     case .create:
-                        NewEditItemView(passItem: nil)
+                        NewEditItemView(itemVM: itemVM, passItem: nil)
                         
                     case .edit:
-                        NewEditItemView(passItem: inputTab.selectedItem)
+                        NewEditItemView(itemVM: itemVM, passItem: inputTab.selectedItem)
                         
                     case .system:
                         Text("システム画面")
@@ -119,8 +123,112 @@ struct NewTabView: View {
                 }
             } // NavigationStack
         } // GeometryReader
+        .onChange(of: inputCart.resultCartAmount) { [before = inputCart.resultCartAmount] after in
+            
+            if before == 0 {
+                inputTab.showCommerce = .medium
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    inputTab.showCart = .medium
+                }
+            }
+            if after == 0 {
+                inputTab.showCart = .hidden
+                inputTab.showCommerce = .hidden
+            }
+        }
+//         アイテム取引かごのシート画面
+        .resizableSheet($inputTab.showCart, id: "A") { builder in
+            builder.content { context in
+                
+                VStack {
+                    Spacer(minLength: 0)
+                    GrabBar()
+                        .foregroundColor(.black)
+                    Spacer(minLength: 0)
+                    
+                    HStack(alignment: .bottom) {
+                        Text("カート内のアイテム")
+                            .foregroundColor(.black)
+                            .font(.headline)
+                            .fontWeight(.black)
+                            .opacity(0.6)
+                        Spacer()
+                        Button(
+                            action: {
+                                inputCart.resultCartPrice = 0
+                                inputCart.resultCartAmount = 0
+                                itemVM.resetAmount()
+                                
+                            },
+                            label: {
+                                HStack {
+                                    Image(systemName: "trash.fill")
+                                    Text("全て削除")
+                                        .font(.callout)
+                                }
+                                .foregroundColor(.red)
+                            }
+                        ) // Button
+                    } // HStack
+                    .padding(.horizontal, 20)
+                    
+                    Spacer(minLength: 8)
+                    
+                    ResizableScrollView(
+                        context: context,
+                        main: {
+                            CartItemsSheet(
+                                itemVM: itemVM,
+                                inputCart: $inputCart,
+                                halfSheetScroll: .main)
+                        },
+                        additional: {
+                            CartItemsSheet(
+                                itemVM: itemVM,
+                                inputCart: $inputCart,
+                                halfSheetScroll: .additional)
+                            
+                            Spacer()
+                                .frame(height: 100)
+                        }
+                    )
+                    Spacer()
+                        .frame(height: 80)
+                } // VStack
+            } // builder.content
+            .sheetBackground { _ in
+                LinearGradient(gradient: Gradient(colors: [.white, .customLightGray1]),
+                               startPoint: .leading, endPoint: .trailing)
+                .opacity(0.95)
+                .blur(radius: 1)
+            }
+            .background { _ in
+                EmptyView()
+            }
+        } // .resizableSheet
         
-
+        // 決済リザルトのシート画面
+        .resizableSheet($inputTab.showCommerce, id: "B") {builder in
+            builder.content { _ in
+                
+                CommerceSheet(itemVM: itemVM,
+                              inputTab: $inputTab,
+                              inputCart: $inputCart,
+                              teamID: teamVM.team!.id)
+                
+            } // builder.content
+            .supportedState([.medium])
+            .sheetBackground { _ in
+                LinearGradient(gradient: Gradient(colors: [.white, .customLightGray1]),
+                               startPoint: .leading, endPoint: .trailing)
+                .opacity(0.95)
+            }
+            .background { _ in
+                EmptyView()
+            }
+        } // .resizableSheet
+        
+        
     } // body
     @ViewBuilder
     func TabTopBarView() -> some View {
@@ -207,12 +315,11 @@ struct NewTabView_Previews: PreviewProvider {
                    windowScene.flatMap(ResizableSheetCenter.resolve(for:))
                }
 
-        return NewTabView()
+        return NewTabView(itemVM: ItemViewModel())
             .environment(\.resizableSheetCenter, resizableSheetCenter)
             .environmentObject(LogInViewModel())
             .environmentObject(TeamViewModel())
             .environmentObject(UserViewModel())
-            .environmentObject(ItemViewModel())
             .environmentObject(TagViewModel())
     }
 }

@@ -11,8 +11,8 @@ import ResizableSheet
 // NOTE: 取引対象のアイテムの決済を完了するシートです。
 struct CommerceSheet: View {
 
-    @EnvironmentObject var itemVM: ItemViewModel
-    @StateObject var resizableVM: ResizableSheetViewModel
+    @StateObject var itemVM: ItemViewModel
+    @Binding var inputTab: InputTab
     @Binding var inputCart: InputCart
     let teamID: String
 
@@ -24,13 +24,13 @@ struct CommerceSheet: View {
             HStack {
 
                 Button {
-                    switch resizableVM.showCart {
+                    switch inputTab.showCart {
                     case .medium:
-                        resizableVM.showCart = .large
+                        inputTab.showCart = .large
                     case .large:
-                        resizableVM.showCart = .medium
+                        inputTab.showCart = .medium
                     case .hidden:
-                        resizableVM.showCart = .medium
+                        inputTab.showCart = .medium
                     }
 
                 } label: {

@@ -23,6 +23,7 @@ struct DetailView: View {
     @State private var openDetail: Bool = false
     
     var body: some View {
+        
         VStack(spacing: 15) {
             Button {
                 withAnimation(.easeInOut(duration: 0.2)) {
@@ -51,10 +52,10 @@ struct DetailView: View {
                 let size = $0.size
                 
                 HStack(spacing: 20) {
-                    NewItemAsyncImage(imageURL: item.photoURL,
-                                      width: size.width / 2,
+                    NewItemSDWebImage(imageURL: item.photoURL,
+                                      width: size.width / 2 - 15,
                                       height: size.height)
-                        .clipShape(CustomCorners(corners: [.topRight, .bottomRight], radius: 20))
+                        .clipShape(CustomCorners(corners: [.topRight, .bottomRight], radius: 10))
                         /// Matched Geometry ID
                         .transition(.opacity)
                         .matchedGeometryEffect(id: item.id, in: animation)
@@ -84,8 +85,6 @@ struct DetailView: View {
                         }
                         .font(.callout)
                         .tracking(2)
-                        
-                            
                     }
                     .padding(.trailing, 15)
                     .padding(.top, 60)

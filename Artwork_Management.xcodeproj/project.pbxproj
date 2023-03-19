@@ -29,6 +29,8 @@
 		BE245BCB29C576F900539A04 /* EditItemPhotoContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE245BCA29C576F900539A04 /* EditItemPhotoContent.swift */; };
 		BE245BCD29C5865300539A04 /* ResizableSheetViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE245BCC29C5865300539A04 /* ResizableSheetViewModel.swift */; };
 		BE245BCF29C5A41200539A04 /* NewItemUrlToUIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE245BCE29C5A41200539A04 /* NewItemUrlToUIImage.swift */; };
+		BE245BD229C5DA4F00539A04 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = BE245BD129C5DA4F00539A04 /* SDWebImageSwiftUI */; };
+		BE245BD429C5DA9E00539A04 /* NewItemSDWebImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE245BD329C5DA9E00539A04 /* NewItemSDWebImage.swift */; };
 		BE254F9329BF1104004FE9AE /* UserEntryRecommendationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE254F9229BF1104004FE9AE /* UserEntryRecommendationView.swift */; };
 		BE254FBD29C092F5004FE9AE /* AsyncImageBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE254FBC29C092F5004FE9AE /* AsyncImageBackground.swift */; };
 		BE254FBF29C0C396004FE9AE /* CubeCircleIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE254FBE29C0C396004FE9AE /* CubeCircleIcon.swift */; };
@@ -136,6 +138,7 @@
 		BE245BCA29C576F900539A04 /* EditItemPhotoContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditItemPhotoContent.swift; sourceTree = "<group>"; };
 		BE245BCC29C5865300539A04 /* ResizableSheetViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResizableSheetViewModel.swift; sourceTree = "<group>"; };
 		BE245BCE29C5A41200539A04 /* NewItemUrlToUIImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewItemUrlToUIImage.swift; sourceTree = "<group>"; };
+		BE245BD329C5DA9E00539A04 /* NewItemSDWebImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewItemSDWebImage.swift; sourceTree = "<group>"; };
 		BE254F9229BF1104004FE9AE /* UserEntryRecommendationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserEntryRecommendationView.swift; sourceTree = "<group>"; };
 		BE254FBC29C092F5004FE9AE /* AsyncImageBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncImageBackground.swift; sourceTree = "<group>"; };
 		BE254FBE29C0C396004FE9AE /* CubeCircleIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CubeCircleIcon.swift; sourceTree = "<group>"; };
@@ -227,6 +230,7 @@
 				E01AA3A129167F02000FCD37 /* ResizableSheet in Frameworks */,
 				E099CD2D291B395E00057543 /* FirebaseAuth in Frameworks */,
 				E099CD2F291B395E00057543 /* FirebaseFirestore in Frameworks */,
+				BE245BD229C5DA4F00539A04 /* SDWebImageSwiftUI in Frameworks */,
 				E099CD33291B395E00057543 /* FirebaseStorage in Frameworks */,
 				E099CD31291B395E00057543 /* FirebaseFirestoreSwift in Frameworks */,
 				BE41784029B4AB3100434CFC /* FirebaseDynamicLinks in Frameworks */,
@@ -521,6 +525,7 @@
 				E0A7DE4A290B9E09008C3F3F /* ShowItemUIImagePhoto.swift */,
 				E0BE39AE29335317002499C4 /* ShowsItemAsyncImagePhoto.swift */,
 				BE245BC629C5637A00539A04 /* NewItemAsyncImage.swift */,
+				BE245BD329C5DA9E00539A04 /* NewItemSDWebImage.swift */,
 				BE245BC829C5718A00539A04 /* NewItemUIImage.swift */,
 				BE245BCE29C5A41200539A04 /* NewItemUrlToUIImage.swift */,
 				E0A7DE4D290C289A008C3F3F /* AsyncImageCircleIcon.swift */,
@@ -585,6 +590,7 @@
 				E099CD32291B395E00057543 /* FirebaseStorage */,
 				BE41783F29B4AB3100434CFC /* FirebaseDynamicLinks */,
 				BE41784129B4AB7E00434CFC /* FirebaseAnalytics */,
+				BE245BD129C5DA4F00539A04 /* SDWebImageSwiftUI */,
 			);
 			productName = Artwork_Management;
 			productReference = E08F272128DDA08E00329C5E /* Artwork_Management.app */;
@@ -617,6 +623,7 @@
 			packageReferences = (
 				E01AA39F29167F02000FCD37 /* XCRemoteSwiftPackageReference "ResizableSheet" */,
 				E099CD2B291B395E00057543 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				BE245BD029C5DA4F00539A04 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
 			);
 			productRefGroup = E08F272228DDA08E00329C5E /* Products */;
 			projectDirPath = "";
@@ -735,6 +742,7 @@
 				BE245BCF29C5A41200539A04 /* NewItemUrlToUIImage.swift in Sources */,
 				E0003D0328FD3BB0007308B0 /* TagTitle.swift in Sources */,
 				E01E13942920EE850001F2DA /* EmptyItemView.swift in Sources */,
+				BE245BD429C5DA9E00539A04 /* NewItemSDWebImage.swift in Sources */,
 				BE254FBF29C0C396004FE9AE /* CubeCircleIcon.swift in Sources */,
 				E01E1390291D168B0001F2DA /* SystemSideMenu.swift in Sources */,
 				BE254F9329BF1104004FE9AE /* UserEntryRecommendationView.swift in Sources */,
@@ -970,6 +978,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		BE245BD029C5DA4F00539A04 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SDWebImage/SDWebImageSwiftUI.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
 		E01AA39F29167F02000FCD37 /* XCRemoteSwiftPackageReference "ResizableSheet" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/mtj0928/ResizableSheet.git";
@@ -989,6 +1005,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		BE245BD129C5DA4F00539A04 /* SDWebImageSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BE245BD029C5DA4F00539A04 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
+			productName = SDWebImageSwiftUI;
+		};
 		BE41783F29B4AB3100434CFC /* FirebaseDynamicLinks */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = E099CD2B291B395E00057543 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
