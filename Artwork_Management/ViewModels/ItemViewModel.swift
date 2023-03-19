@@ -18,9 +18,6 @@ class ItemViewModel: ObservableObject {
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
 
     @Published var rootItems: [RootItem] = []
-    /// ✅ Firestoreから取り出したアイテムのphotoURLから先にImageを生成して詰め直す。こちらの配列をViewに使う
-    //TODO: これにより余計なImageのダウンロードをなくせる？
-    @Published var showItems: [ShowItem] = []
 
     func fetchItem(teamID: String) async {
 
