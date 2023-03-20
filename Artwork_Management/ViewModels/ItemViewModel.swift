@@ -101,7 +101,7 @@ class ItemViewModel: ObservableObject {
             let aspectScale = originalImage.size.height / originalImage.size.width
             
             // widthからアスペクト比を元にリサイズ後のサイズを取得
-            let resizedSize = CGSize(width: width * 1.5, height: width * Double(aspectScale) * 1.5)
+            let resizedSize = CGSize(width: width * 3, height: width * Double(aspectScale) * 3)
             
             // リサイズ後のUIImageを生成して返却
             UIGraphicsBeginImageContext(resizedSize)

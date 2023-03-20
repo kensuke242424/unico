@@ -46,7 +46,7 @@ struct EditItemView: View {
                         .offset(y: 340)
                     VStack {
                         // ✅カスタムView 写真ゾーン
-                        EditItemPhotoArea(showImageSheet: $inputEdit.isShowItemImageSelectSheet,
+                        EditItemPhotoArea(showImageSheet: $inputEdit.showPicker,
                                           photoImage: inputEdit.captureImage,
                                           photoURL: inputEdit.photoURL)
 
@@ -60,24 +60,24 @@ struct EditItemView: View {
 
                     } // VStack(パーツ全体)
                 } // ZStack(View全体)
-                .animation(.easeIn(duration: 0.3), value: inputEdit.offset)
+//                .animation(.easeIn(duration: 0.3), value: inputEdit.offset)
 
             } // ScrollView
 
-            .sheet(isPresented: $inputEdit.isShowItemImageSelectSheet) {
+            .sheet(isPresented: $inputEdit.showPicker) {
                 PHPickerView(captureImage: $inputEdit.captureImage,
-                             isShowSheet: $inputEdit.isShowItemImageSelectSheet)
+                             isShowSheet: $inputEdit.showPicker)
             }
 
             .onChange(of: inputEdit.name) { newValue in
 
-                withAnimation(.easeIn(duration: 0.2)) {
-                    if newValue.isEmpty {
-                        inputEdit.disableButton = true
-                    } else {
-                        inputEdit.disableButton = false
-                    }
-                }
+//                withAnimation(.easeIn(duration: 0.2)) {
+//                    if newValue.isEmpty {
+//                        inputEdit.disableButton = true
+//                    } else {
+//                        inputEdit.disableButton = false
+//                    }
+//                }
             } // onChange(ボタンdisable分岐)
 
             // NOTE: updateitemView呼び出し時に、親Viewから受け取ったアイテム情報を各入力欄に格納します。
@@ -183,7 +183,7 @@ struct EditItemView: View {
                     } label: {
                         Text(editItemStatus == .create ? "追加する" : "更新する")
                     }
-                    .disabled(inputEdit.disableButton)
+//                    .disabled(inputEdit.disableButton)
                 }
             } // toolbar(アイテム追加ボタン)
 
@@ -245,7 +245,7 @@ struct InputForms: View {
                 } // HStack(Pickerタグ要素)
 
                 // NOTE: フォーカスの有無によって、入力欄の下線の色をスイッチします。(カスタムView)
-                FocusedLineRow(select: focusedField == .tag ? true : false)
+//                FocusedLineRow(select: focusedField == .tag ? true : false)
 
             } // ■タグ設定
 
@@ -261,7 +261,7 @@ struct InputForms: View {
                     .onTapGesture { focusedField = .name }
                     .onSubmit { focusedField = .stock }
 
-                FocusedLineRow(select: focusedField == .name ? true : false)
+//                FocusedLineRow(select: focusedField == .name ? true : false)
 
             } // ■アイテム名
 
@@ -277,7 +277,7 @@ struct InputForms: View {
                     .onTapGesture { focusedField = .stock }
                     .onSubmit { focusedField = .price }
 
-                FocusedLineRow(select: focusedField == .stock ? true : false)
+//                FocusedLineRow(select: focusedField == .stock ? true : false)
 
             } // ■在庫数
 
@@ -293,7 +293,7 @@ struct InputForms: View {
                     .onTapGesture { focusedField = .price }
                     .onSubmit { focusedField = .sales }
 
-                FocusedLineRow(select: focusedField == .price ? true : false)
+//                FocusedLineRow(select: focusedField == .price ? true : false)
 
             } // ■価格
 
@@ -312,7 +312,7 @@ struct InputForms: View {
                         }
                         .onSubmit { focusedField = .sales }
 
-                    FocusedLineRow(select: focusedField == .sales ? true : false)
+//                    FocusedLineRow(select: focusedField == .sales ? true : false)
                 } // ■総売上
             } // if .update「総売上」
 

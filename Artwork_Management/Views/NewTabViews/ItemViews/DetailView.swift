@@ -220,18 +220,18 @@ struct DetailView: View {
             .alert("確認", isPresented: $showDeleteAlert) {
 
                 Button("削除", role: .destructive) {
-                    withAnimation(.easeInOut(duration: 0.2)) {
+                    withAnimation(.easeInOut(duration: 0.15)) {
                         offsetAnimation = false
                     }
                     /// Closing Detail View
-                    withAnimation(.easeInOut(duration: 0.35).delay(0.1)) {
+                    withAnimation(.easeInOut(duration: 0.3).delay(0.1)) {
                         animationContent = false
                     }
-                    withAnimation(.easeInOut(duration: 0.35).delay(0.1)) {
+                    withAnimation(.easeInOut(duration: 0.3).delay(0.1)) {
                         show.toggle()
                     }
 
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
                         withAnimation {
                             itemVM.rootItems.removeAll(where: { $0.id == item.id })
                         }

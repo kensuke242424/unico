@@ -40,23 +40,23 @@ extension InputFormsStatus.Model {
 
 struct InputEditItem {
 
-    var captureImage: UIImage? = nil
+    /// アイテムの入力ステータス群
+    var captureImage    : UIImage? = nil
     var selectionTagName: String = ""
-    var photoURL: URL? = nil
-    var photoPath: String? = nil
-    var name: String = ""
-    var author: String = ""
-    var inventory: String = ""
-    var cost: String = ""
-    var price: String = ""
-    var sales: String = ""
-    var detail: String = ""
-    var totalAmount: String = ""
-    var totalInventry: String = ""
-    var disableButton: Bool = true
-    var offset: CGFloat = 0
-    var isCheckedFocuseDetail: Bool = false
-    var isShowItemImageSelectSheet: Bool = false
+    var name            : String = ""
+    var author          : String = ""
+    var photoURL        : URL? = nil
+    var photoPath       : String? = nil
+    var detail          : String = ""
+    var inventory       : String = ""
+    var cost            : String = ""
+    var price           : String = ""
+    var sales           : String = ""
+    var totalAmount     : String = ""
+    var totalInventry   : String = ""
+    
+    /// view表示Presentを管理する
+    var showPicker  : Bool = false
     var showProgress: Bool = false
 }
 
@@ -67,7 +67,7 @@ struct NewEditItemView: View {
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var tagVM : TagViewModel
-    @StateObject var itemVM: ItemViewModel
+    @StateObject var itemVM      : ItemViewModel
     
     @State private var input: InputEditItem = InputEditItem()
     
@@ -99,18 +99,18 @@ struct NewEditItemView: View {
                                            width: size.width / 2 - 15,
                                            height: 220)
                             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                            .onTapGesture { input.isShowItemImageSelectSheet.toggle() }
+                            .onTapGesture { input.showPicker.toggle() }
                         } else if let passItemImageURL = input.photoURL {
                             NewItemSDWebImage(imageURL: passItemImageURL,
                                               width: size.width / 2 - 15,
                                               height: 220)
                             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                            .onTapGesture { input.isShowItemImageSelectSheet.toggle() }
+                            .onTapGesture { input.showPicker.toggle() }
                         } else {
                             RoundedRectangle(cornerRadius: 10)
                                 .fill(.gray.gradient)
                                 .frame(width: abs(size.width / 2 - 15), height: 220)
-                                .onTapGesture { input.isShowItemImageSelectSheet.toggle() }
+                                .onTapGesture { input.showPicker.toggle() }
                             VStack(spacing: 20) {
                                 Image(systemName: "cube.transparent.fill")
                                     .resizable()
@@ -191,9 +191,9 @@ struct NewEditItemView: View {
                 SavingProgressView()
             }
         }
-        .sheet(isPresented: $input.isShowItemImageSelectSheet) {
+        .sheet(isPresented: $input.showPicker) {
             PHPickerView(captureImage: $input.captureImage,
-                         isShowSheet: $input.isShowItemImageSelectSheet)
+                         isShowSheet: $input.showPicker)
         }
         /// passItemにアイテムが存在した場合、各入力値にアイテムデータを入れる
         .onAppear {
@@ -314,7 +314,7 @@ struct NewEditItemView: View {
                 Button {
                     dismiss()
                 } label: {
-                    Label("戻る", systemImage: "chevron.left")
+                    Label("キャンセル", systemImage: "chevron.left")
                         .font(.subheadline)
                 }
                 .padding(.leading)
@@ -385,12 +385,19 @@ struct NewEditItemView: View {
                             .tracking(1)
                     }
                     
-                    FocusedLineRow(select: focused == value ? true : false)
+                    FocusedLineRow(select: focused == value ? true : false,
+                                   width : size.width * 0.8)
                 }
             } // VStack
             .frame(width: size.width * 0.8, height: 90)
+            .onChange(of: focused) { newValue in
+                if newValue == .inventory {
+                    if input.inventory == "0" {
+                        input.inventory = ""
+                    }
+                }
+            }
         }
-        
     }
 }
 
