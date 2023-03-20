@@ -47,10 +47,11 @@ struct NewItemsView: View {
                     .opacity(showDarkBackground ? 0 : 1)
                 
                 ScrollView(.vertical, showsIndicators: false) {
-                    VStack(spacing: 35) {
+                    LazyVStack(spacing: 35) {
                         ForEach(itemVM.rootItems, id: \.self) { item in
                             ItemsCardView(item)
                                 .onAppear {print("ItemCardsView_onAppear: \(item.name)") }
+                                .onDisappear {print("ItemCardsView_onDisapper: \(item.name)") }
                                 .onTapGesture {
                                     withAnimation(.easeInOut(duration: 0.25)) {
                                         guard let actionIndex = getActionIndex(item) else {
