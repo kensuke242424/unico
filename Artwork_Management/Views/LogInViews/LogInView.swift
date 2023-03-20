@@ -298,10 +298,10 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                 }
                                 
                             case .check:
-                                print("ボタンアクションは無効化")
+                                return
                                 
                             case .success:
-                                print("ボタンアクションは無効化")
+                                return
                             }
                             
                         }
@@ -453,22 +453,25 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             .scaledToFill()
                             .frame(width: proxy.size.width, height: proxy.size.height)
                             .blur(radius: inputLogIn.checkBackgroundEffect ? 0 : 2)
+                            .ignoresSafeArea()
                     } else {
                         Image(inputLogIn.selectBackground.imageName)
                             .resizable()
                             .scaledToFill()
                             .frame(width: proxy.size.width, height: proxy.size.height)
                             .blur(radius: inputLogIn.checkBackgroundEffect ? 0 : 2)
+                            .ignoresSafeArea()
                     }
                     Color(.black)
                         .frame(width: proxy.size.width, height: proxy.size.height)
                         .opacity(inputLogIn.checkBackgroundEffect      ? 0.0 :
                                  logInVM.createAccountFase == .success ? 0.5 :
                                  0.2)
+                        .ignoresSafeArea()
                 }
-                .ignoresSafeArea()
             }
         }
+        .ignoresSafeArea()
         .onChange(of: logInVM.createAccountFase) { newFaseValue in
             withAnimation(.spring(response: 1.0)) {
                 switch newFaseValue {
@@ -513,13 +516,19 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         /// もし存在したら、関数内で既存データへのログインを促すアラートを発火しています
                         try await logInVM.existUserDocumentCheck()
                         
+                        // 60 -> アイコンwidth
+                        let resizeIconImage = logInVM.resizeUIImage(image: inputLogIn.captureUserIconImage,
+                                                                    width: 60)
+                        let resizeBackgroundImage = logInVM.resizeUIImage(image: inputLogIn.captureBackgroundImage,
+                                                                          width: getRect().width)
+                        
                         /// ユーザーの入力値をもとにユーザーデータを作成し、Firestoreに保存⬇︎
                         if inputLogIn.createUserNameText == "" { inputLogIn.createUserNameText = "名無し" }
                         
-                        try await logInVM.setSignUpUserDocument(name: inputLogIn.createUserNameText,
-                                                                    password: inputLogIn.password,
-                                                                    imageData: inputLogIn.captureUserIconImage,
-                                                                    color: inputLogIn.selectUserColor)
+                        try await logInVM.setSignUpUserDocument(name     : inputLogIn.createUserNameText,
+                                                                password : inputLogIn.password,
+                                                                imageData: resizeIconImage,
+                                                                color    : inputLogIn.selectUserColor)
                         
                         // Firestoreに保存したデータをローカルに引っ張ってくる
                         try await userVM.fetchUser()

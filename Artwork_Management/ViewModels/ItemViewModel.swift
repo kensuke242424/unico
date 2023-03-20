@@ -110,8 +110,9 @@ class ItemViewModel: ObservableObject {
             UIGraphicsEndImageContext()
             
             return resizedImage
+        } else {
+            return nil
         }
-        return nil
     }
 
     func uploadImage(_ image: UIImage?) async -> (url: URL?, filePath: String?) {

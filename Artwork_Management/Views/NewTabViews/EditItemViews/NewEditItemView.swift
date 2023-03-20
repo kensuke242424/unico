@@ -81,10 +81,13 @@ struct NewEditItemView: View {
         
         GeometryReader {
             let size = $0.size
+            /// アプリ内で指定されたアイテムカードのサイズ
+            let cardWidth : CGFloat = size.width - 15
+            let cardHeight: CGFloat = 220
             
             VStack(spacing: 20) {
                 
-                EditTopNavigateBar(width: size.width - 15)
+                EditTopNavigateBar(width: cardWidth)
                 
                 ScrollView(showsIndicators: false) {
                     /// 📷選択写真を表示するエリア📷
@@ -96,20 +99,20 @@ struct NewEditItemView: View {
                         
                         if let captureImage = input.captureImage {
                             NewItemUIImage(image: captureImage,
-                                           width: size.width / 2 - 15,
-                                           height: 220)
+                                           width: cardWidth,
+                                           height: cardHeight)
                             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                             .onTapGesture { input.showPicker.toggle() }
                         } else if let passItemImageURL = input.photoURL {
                             NewItemSDWebImage(imageURL: passItemImageURL,
-                                              width: size.width / 2 - 15,
-                                              height: 220)
+                                              width: cardWidth,
+                                              height: cardHeight)
                             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                             .onTapGesture { input.showPicker.toggle() }
                         } else {
                             RoundedRectangle(cornerRadius: 10)
                                 .fill(.gray.gradient)
-                                .frame(width: abs(size.width / 2 - 15), height: 220)
+                                .frame(width: abs(cardWidth), height: cardHeight)
                                 .onTapGesture { input.showPicker.toggle() }
                             VStack(spacing: 20) {
                                 Image(systemName: "cube.transparent.fill")

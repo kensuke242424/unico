@@ -260,6 +260,27 @@ class LogInViewModel: ObservableObject {
             return (url: nil, filePath: nil)
         }
     }
+    
+    func resizeUIImage(image: UIImage?, width: CGFloat) -> UIImage? {
+        
+        if let originalImage = image {
+            // オリジナル画像のサイズからアスペクト比を計算
+            let aspectScale = originalImage.size.height / originalImage.size.width
+            
+            // widthからアスペクト比を元にリサイズ後のサイズを取得
+            let resizedSize = CGSize(width: width * 3, height: width * Double(aspectScale) * 3)
+            
+            // リサイズ後のUIImageを生成して返却
+            UIGraphicsBeginImageContext(resizedSize)
+            originalImage.draw(in: CGRect(x: 0, y: 0, width: resizedSize.width, height: resizedSize.height))
+            let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
+            UIGraphicsEndImageContext()
+            
+            return resizedImage
+        } else {
+            return nil
+        }
+    }
 
     func deleteImage(path: String) async {
 
