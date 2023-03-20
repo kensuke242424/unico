@@ -197,8 +197,8 @@ class TeamViewModel: ObservableObject {
 
         print("storage保存に必要なデータ取得おけ")
         do {
-            team.headerURL = data.url
-            team.headerPath = data.filePath
+            team.backgroundURL = data.url
+            team.backgroundPath = data.filePath
             try teamRef.setData(from: team)
             print("storageにヘッダー画像保存成功")
             try await getTeamHeaderImage(teamID: team.id)
@@ -291,8 +291,8 @@ class TeamViewModel: ObservableObject {
         do {
             let teamDocument = try await teamRef.getDocument()
             let teamData = try teamDocument.data(as: Team.self)
-            self.team?.headerURL = teamData.headerURL
-            self.team?.headerPath = teamData.headerPath
+            self.team?.backgroundURL = teamData.backgroundURL
+            self.team?.backgroundPath = teamData.backgroundPath
         } catch {
             throw CustomError.fetch
         }

@@ -53,7 +53,7 @@ struct LibraryView: View {
 
             VStack {
 
-                homeHeaderPhoto(photoURL: teamVM.team!.headerURL)
+                homeHeaderPhoto(photoURL: teamVM.team!.backgroundURL)
                 // 時刻レイアウト
                 HStack {
                     VStack(alignment: .leading, spacing: 8) {
@@ -189,7 +189,7 @@ struct LibraryView: View {
             print("bbb")
             Task {
                 do {
-                    await itemVM.deleteImage(path: teamVM.team!.headerPath)
+                    itemVM.deleteImage(path: teamVM.team!.backgroundPath)
                     let uploadImageData = await itemVM.uploadImage(newHeaderImage)
                     try await teamVM.updateTeamHeaderImage(data: uploadImageData)
                 } catch CustomError.fetch {

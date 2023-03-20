@@ -14,8 +14,8 @@ struct Team: Identifiable, Codable {
     var name: String
     var iconURL: URL?
     var iconPath: String?
-    var headerURL: URL?
-    var headerPath: String?
+    var backgroundURL: URL?
+    var backgroundPath: String?
     var members: [JoinMember]
 }
 

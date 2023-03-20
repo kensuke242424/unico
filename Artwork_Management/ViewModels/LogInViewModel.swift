@@ -171,7 +171,7 @@ class LogInViewModel: ObservableObject {
         }
     }
 
-    func setSignUpUserDocument(name: String, password: String?, imageData: UIImage?, color: MemberColor) async throws {
+    func setSignUpUserDocument(name: String, password: String?, imageData: (url: URL?, filePath: String?), color: MemberColor) async throws {
 
         print("setSignUpUserDocument実行")
 
@@ -184,14 +184,12 @@ class LogInViewModel: ObservableObject {
             print("ERROR: guard let currentUser")
             throw CustomError.uidEmpty
         }
-
-        let uplaodImageData = await  self.uploadImage(imageData)
         let newUserData = User(id: currentUser.uid,
                                name: name,
                                address: currentUser.email,
                                password: password,
-                               iconURL: uplaodImageData.url,
-                               iconPath: uplaodImageData.filePath,
+                               iconURL: imageData.url,
+                               iconPath: imageData.filePath,
                                userColor: color,
                                joins: [])
         do {

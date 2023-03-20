@@ -125,7 +125,7 @@ struct InputImage {
 //                    NavigationHeader(inputHome: $inputHome, photoURL: teamVM.team?.iconURL)
 //                        .opacity(!inputHome.isShowHomeTopNavigation &&
 //                                 inputHome.homeTabIndex == 0 &&
-//                                 teamVM.team!.headerURL != nil
+//                                 teamVM.team!.backgroundURL != nil
 //                                 ? 0.0 : 1.0)
 //                        .offset(y: -getRect().height / 2 + getSafeArea().top + 15)
 //                        .padding(.horizontal, 20)

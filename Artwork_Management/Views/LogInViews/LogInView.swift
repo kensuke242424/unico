@@ -516,18 +516,34 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         /// もし存在したら、関数内で既存データへのログインを促すアラートを発火しています
                         try await logInVM.existUserDocumentCheck()
                         
+                        // 背景、アイコン画像をリサイズして保存していく
+                        var resizeIconImage      : UIImage?
+                        var resizeBackgroundImage: UIImage?
+                        
                         // 60 -> アイコンwidth
-                        let resizeIconImage = logInVM.resizeUIImage(image: inputLogIn.captureUserIconImage,
+                        if let captureIconUIImage = inputLogIn.captureUserIconImage {
+                            resizeIconImage = logInVM.resizeUIImage(image: captureIconUIImage,
                                                                     width: 60)
-                        let resizeBackgroundImage = logInVM.resizeUIImage(image: inputLogIn.captureBackgroundImage,
+                        }
+                        /// オリジナル背景を選択していなければ、付属のImageをUIImageに直してからリサイズ
+                        if let captureBackgroundImage = inputLogIn.captureUserIconImage {
+                            resizeBackgroundImage = logInVM.resizeUIImage(image: captureBackgroundImage,
                                                                           width: getRect().width)
+                        } else {
+                            let convertBackgroundUIImage = UIImage(named: inputLogIn.selectBackground.imageName)
+                            resizeBackgroundImage = logInVM.resizeUIImage(image: convertBackgroundUIImage,
+                                                                          width: getRect().width)
+                        }
+                        
+                        let uplaodIconImageData = await logInVM.uploadImage(resizeIconImage)
+                        let uplaodBackgroundImageData = await logInVM.uploadImage(resizeBackgroundImage)
                         
                         /// ユーザーの入力値をもとにユーザーデータを作成し、Firestoreに保存⬇︎
                         if inputLogIn.createUserNameText == "" { inputLogIn.createUserNameText = "名無し" }
                         
                         try await logInVM.setSignUpUserDocument(name     : inputLogIn.createUserNameText,
                                                                 password : inputLogIn.password,
-                                                                imageData: resizeIconImage,
+                                                                imageData: uplaodIconImageData,
                                                                 color    : inputLogIn.selectUserColor)
                         
                         // Firestoreに保存したデータをローカルに引っ張ってくる
@@ -536,9 +552,15 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         
                         /// 新規チームデータの準備⬇︎
                         let createTeamID = UUID().uuidString
-                        let joinMember = JoinMember(memberUID: user.id, name: user.name, iconURL: user.iconURL)
+                        let joinMember = JoinMember(memberUID: user.id,
+                                                    name     : user.name,
+                                                    iconURL  : user.iconURL)
                         
-                        let teamData = Team(id: createTeamID, name: "\(user.name)のチーム", members: [joinMember])
+                        let teamData = Team(id: createTeamID,
+                                            name          : "\(user.name)のチーム",
+                                            backgroundURL : uplaodBackgroundImageData.url,
+                                            backgroundPath: uplaodBackgroundImageData.filePath,
+                                            members       : [joinMember])
                         let joinTeamData = JoinTeam(teamID: teamData.id, name: teamData.name)
                         
                         /// 準備したチームデータをFirestoreに保存していく
