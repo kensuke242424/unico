@@ -14,7 +14,8 @@ struct EditTagView: View {
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var tagVM : TagViewModel
     
-    let passTag: Tag?
+    @Binding var passTag: Tag?
+    @Binding var show: Bool
     
     @State private var tagName     : String = ""
     @State private var nameEmpty   : Bool = true
@@ -57,18 +58,31 @@ struct EditTagView: View {
                     .padding(.horizontal)
                     .padding(.vertical, 10)
                 
-                Button("追加") {
-                    if let passTag {
-                        var updateTagData = passTag
+                Button(passTag == nil ? "追加" : "完了") {
+                    
+                    if let defaultTag = passTag {
+                        var updateTagData     = defaultTag
                         updateTagData.tagName = tagName
-                        tagVM.updateTagData(updateData : updateTagData,
-                                            defaultData: passTag,
-                                            teamID     : teamVM.team!.id)
+                        
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            tagVM.updateTagData(updateData : updateTagData,
+                                                defaultData: defaultTag,
+                                                teamID     : teamVM.team!.id)
+                            
+                            self.passTag = updateTagData
+                            show = false
+                        }
+                        
                     } else {
-                        var createTagData = Tag(oderIndex: tagVM.tags.count,
+                        let createTagData = Tag(oderIndex: tagVM.tags.count,
                                                 tagName  : tagName,
                                                 tagColor : .gray)
-                        tagVM.addTag(tagData: createTagData, teamID: teamVM.team!.id)
+                        
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            tagVM.addTag(tagData: createTagData, teamID: teamVM.team!.id)
+                            self.passTag = createTagData
+                            show = false
+                        }
                     }
                 }
                 .buttonStyle(.borderedProminent)
@@ -81,7 +95,7 @@ struct EditTagView: View {
                     }
                 }
                 .onChange(of: tagName) { newValue in
-                    if tagVM.tags.contains(where: {$0.tagName == tagName}) {
+                    if passTag == nil, tagVM.tags.contains(where: {$0.tagName == tagName}) {
                         withAnimation(.easeInOut(duration: 0.3)) { containsName = true }
                     } else {
                         withAnimation(.easeInOut(duration: 0.3)) { containsName = false }
@@ -101,7 +115,7 @@ struct EditTagView: View {
             
             Button {
                 /// dismiss
-                withAnimation(.easeInOut(duration: 0.3)) { tagVM.showEdit = false }
+                withAnimation(.easeInOut(duration: 0.3)) { show = false }
             } label: {
                 Label("閉じる", systemImage: "xmark.circle.fill")
             }
@@ -118,12 +132,17 @@ struct EditTagView: View {
                 .ignoresSafeArea()
                 .onTapGesture { focused = nil }
         }
+        .onAppear {
+            if let passTag {
+                tagName = passTag.tagName
+            }
+        }
     }
 }
 
 struct EditTagView_Previews: PreviewProvider {
     static var previews: some View {
-        EditTagView(passTag: nil)
+        EditTagView(passTag: .constant(nil), show: .constant(true))
             .background {
                 Image("background_1")
                     .resizable()

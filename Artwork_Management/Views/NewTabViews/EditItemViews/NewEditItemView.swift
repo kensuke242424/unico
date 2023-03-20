@@ -42,6 +42,7 @@ struct InputEditItem {
 
     /// アイテムの入力ステータス群
     var captureImage    : UIImage? = nil
+    var selectionTag    : Tag?
     var selectionTagName: String = ""
     var name            : String = ""
     var author          : String = ""
@@ -56,8 +57,9 @@ struct InputEditItem {
     var totalInventry   : String = ""
     
     /// view表示Presentを管理する
-    var showPicker  : Bool = false
-    var showProgress: Bool = false
+    var showPhotoPicker: Bool = false
+    var showTagEdit    : Bool = false
+    var showProgress   : Bool = false
 }
 
 struct NewEditItemView: View {
@@ -101,15 +103,27 @@ struct NewEditItemView: View {
                                            width: cardWidth,
                                            height: cardHeight)
                             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                            .onTapGesture {
+                                input.showPhotoPicker.toggle()
+                                focused = nil; detailFocused = nil
+                            }
                         } else if let passItemImageURL = input.photoURL {
                             SDWebImageView(imageURL: passItemImageURL,
                                               width: cardWidth,
                                               height: cardHeight)
                             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                            .onTapGesture {
+                                input.showPhotoPicker.toggle()
+                                focused = nil; detailFocused = nil
+                            }
                         } else {
                             RoundedRectangle(cornerRadius: 10)
                                 .fill(.gray.gradient)
                                 .frame(width: abs(cardWidth), height: cardHeight)
+                                .onTapGesture {
+                                    input.showPhotoPicker.toggle()
+                                    focused = nil; detailFocused = nil
+                                }
                                 
                             VStack(spacing: 20) {
                                 Image(systemName: "cube.transparent.fill")
@@ -123,12 +137,61 @@ struct NewEditItemView: View {
                                     .tracking(5)
                                     .foregroundColor(.white)
                             }
+                            .onTapGesture {
+                                input.showPhotoPicker.toggle()
+                                focused = nil; detailFocused = nil
+                            }
                         }
                     } // ZStack(選択画像エリア)
-                    .onTapGesture {
-                        input.showPicker.toggle()
-                        focused = nil; detailFocused = nil
+                    
+                    HStack {
+                        Text("\(Image(systemName: "tag.fill")) タグ")
+                            .fontWeight(.semibold)
+                            .tracking(1)
+                            .opacity(0.5)
+                            .padding(.trailing, 50)
+
+                        Button {
+                            // タグ追加処理
+                            input.selectionTag = nil
+                            withAnimation(.easeInOut(duration: 0.3)) { input.showTagEdit = true }
+                        } label: {
+                            Label("タグ追加", systemImage: "plus.app.fill")
+                        }
+                        .font(.footnote)
                     }
+                    .frame(width: size.width * 0.8, alignment: .leading)
+                    .padding(.vertical, 10)
+                    
+                    HStack {
+                        Picker("タグを選択", selection: $input.selectionTagName) {
+                            ForEach(tagVM.tags.filter({ $0.tagName != "全て" }))
+                            { tag in
+                                Text(tag.tagName)
+                                    .tag(tag.tagName)
+                            }
+                        }
+                        .padding(.trailing)
+                        .lineLimit(1)
+                        .overlay(alignment: .trailing) {
+                            if input.selectionTagName != "未グループ" {
+                                Button {
+                                    /// 現在Pickerで選ばれているタグ名を用いて、tagVMから編集対象のTagを取り出す
+                                    input.selectionTag = tagVM.tags.first(where: { $0.tagName == input.selectionTagName })
+                                    withAnimation(.easeInOut(duration: 0.3)) { input.showTagEdit = true }
+                                } label: {
+                                    Image(systemName: "pencil.line")
+                                        .foregroundColor(.orange)
+                                }
+                                .offset(x: 20)
+                            }
+                        }
+                    }
+                    .frame(width: size.width * 0.8, alignment: .leading)
+                    
+                    FocusedLineRow(select: false,
+                                   width : size.width * 0.8)
+                    .frame(width: size.width * 0.8)
                     
                     /// 入力欄の各項目
                     ForEach(InputFormsStatus.allCases, id: \.self) { value in
@@ -178,6 +241,11 @@ struct NewEditItemView: View {
         /// 少し下めにするのがちょうど良さそう
         .offset(y: getSafeArea().top)
         .navigationBarBackButtonHidden()
+        .overlay {
+            if input.showTagEdit {
+                EditTagView(passTag: $input.selectionTag, show: $input.showTagEdit)
+            }
+        }
         .background {
             GeometryReader {
                 let size = $0.size
@@ -196,24 +264,33 @@ struct NewEditItemView: View {
                     .transition(AnyTransition.opacity.combined(with: .offset(y: 20)))
             }
         }
-        .sheet(isPresented: $input.showPicker) {
+        .sheet(isPresented: $input.showPhotoPicker) {
             PHPickerView(captureImage: $input.captureImage,
-                         isShowSheet: $input.showPicker)
+                         isShowSheet: $input.showPhotoPicker)
+        }
+        /// NOTE: 親Viewから渡されたアイテムのタグをもとにTagデータを取り出し、Pickerの$String値に使う
+        .onChange(of: input.selectionTag) { newTag in
+            guard let newTagName = newTag?.tagName else { return }
+            input.selectionTagName = newTagName
         }
         /// passItemにアイテムが存在した場合、各入力値にアイテムデータを入れる
         .onAppear {
             if let passItem {
-                input.photoURL      = passItem.photoURL
-                input.photoPath     = passItem.photoPath
-                input.name          = passItem.name != "No Name" ? passItem.name : ""
-                input.author        = passItem.author
-                input.inventory     = String(passItem.inventory)
-                input.cost          = passItem.cost != 0 ? String(passItem.cost) : ""
-                input.price         = passItem.price != 0 ? String(passItem.price) : ""
-                input.sales         = passItem.sales != 0 ? String(passItem.sales) : ""
-                input.detail        = passItem.detail != "メモなし" ? passItem.detail : ""
-                input.totalAmount   = passItem.totalAmount != 0 ? String(passItem.totalAmount) : ""
-                input.totalInventry = passItem.totalInventory != 0 ? String(passItem.totalInventory) : ""
+                input.selectionTag     = tagVM.tags.first(where: { $0.tagName == passItem.tag })
+                input.photoURL         = passItem.photoURL
+                input.photoPath        = passItem.photoPath
+                input.name             = passItem.name != "No Name" ? passItem.name : ""
+                input.author           = passItem.author
+                input.inventory        = String(passItem.inventory)
+                input.cost             = passItem.cost != 0 ? String(passItem.cost) : ""
+                input.price            = passItem.price != 0 ? String(passItem.price) : ""
+                input.sales            = passItem.sales != 0 ? String(passItem.sales) : ""
+                input.detail           = passItem.detail != "メモなし" ? passItem.detail : ""
+                input.totalAmount      = passItem.totalAmount != 0 ? String(passItem.totalAmount) : ""
+                input.totalInventry    = passItem.totalInventory != 0 ? String(passItem.totalInventory) : ""
+            } else {
+                let filterTags = tagVM.tags.filter({ $0.tagName != "全て" })
+                input.selectionTag = filterTags.first
             }
         }
     }
@@ -249,8 +326,7 @@ struct NewEditItemView: View {
 
                             // NOTE: アイテムを更新
                             let updateItemData = (RootItem(createTime: passItem.createTime,
-                                                           tag        : input.selectionTagName.isEmpty ?
-                                                           "未設定" : input.selectionTagName,
+                                                           tag        : input.selectionTagName,
                                                            teamID     : teamVM.team!.id,
                                                            name       : input.name,
                                                            author     : input.author,
@@ -286,8 +362,7 @@ struct NewEditItemView: View {
                                 input.photoPath = newImageData.filePath
                             }
                             
-                            let itemData = RootItem(tag           : input.selectionTagName.isEmpty ?
-                                                    "未設定" : input.selectionTagName,
+                            let itemData = RootItem(tag           : input.selectionTagName,
                                                     teamID        : teamVM.team!.id,
                                                     name          : input.name,
                                                     author        : input.author,
@@ -303,7 +378,9 @@ struct NewEditItemView: View {
                                                     totalInventory: Int(input.inventory) ?? 0)
                             
                             // Firestoreにコーダブル保存
-                            itemVM.addItem(itemData: itemData, tag: input.selectionTagName, teamID: teamVM.team!.id)
+                            itemVM.addItem(itemData: itemData,
+                                           tag: input.selectionTag?.tagName ?? "未グループ",
+                                           teamID: teamVM.team!.id)
                             
                             withAnimation(.easeIn(duration: 0.1)) { input.showProgress = false }
                             dismiss()
@@ -321,7 +398,7 @@ struct NewEditItemView: View {
                 Button {
                     dismiss()
                 } label: {
-                    Label("キャンセル", systemImage: "chevron.left")
+                    Label("戻る", systemImage: "chevron.left")
                         .font(.subheadline)
                 }
                 .padding(.leading)
@@ -411,5 +488,6 @@ struct NewEditItemView: View {
 struct NewEditItemView_Previews: PreviewProvider {
     static var previews: some View {
         NewEditItemView(itemVM: ItemViewModel(), passItem: testItem.first)
+            .environmentObject(TagViewModel())
     }
 }

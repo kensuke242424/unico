@@ -287,10 +287,10 @@ struct NewItemsView: View {
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
-                    // MEMO: 未設定タグのアイテムがあるかどうかで「未設定」タグの表示を切り替える
-                    ForEach(tags.filter(items.contains(where: { $0.tag == "未設定" }) ?
+                    // MEMO: 未グループタグのアイテムがあるかどうかで「未グループ」タグの表示を切り替える
+                    ForEach(tags.filter(items.contains(where: { $0.tag == "未グループ" }) ?
                                         {$0.tagName != ""} :
-                                        {$0.tagName != "未設定"})) { tag in
+                                        {$0.tagName != "未グループ"})) { tag in
                         Text(tag.tagName)
                             .font(.caption)
                             .padding(.horizontal, 12)
@@ -319,6 +319,7 @@ struct NewItemsView: View {
             
             /// Add Tag
             Button {
+                inputTab.selectedTag = nil
                 withAnimation(.easeInOut(duration: 0.3)) { tagVM.showEdit = true }
             } label: {
                 Image(systemName: "plus.app.fill")

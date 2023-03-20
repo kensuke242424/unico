@@ -17,6 +17,7 @@ struct InputTab {
     var path: [NavigationPath] = []
     /// NavigationPathによるエディット画面遷移時に渡す
     var selectedItem: RootItem?
+    var selectedTag: Tag?
     
     /// タブViewのアニメーションを管理するプロパティ
     var selectionTab    : Tab = .home
@@ -96,7 +97,8 @@ struct NewTabView: View {
                 /// 🏷タグの追加や編集を行うView
                 .overlay {
                     if tagVM.showEdit {
-                        EditTagView(passTag: nil)
+                        EditTagView(passTag: $inputTab.selectedTag,
+                                    show   : $tagVM.showEdit)
                     }
                 }
                 .ignoresSafeArea()

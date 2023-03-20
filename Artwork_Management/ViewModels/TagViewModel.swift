@@ -55,7 +55,7 @@ class TagViewModel: ObservableObject {
 
             // firestoreからタグのfetch後、ローカル環境にALLと未グループを追加
             self.tags.insert(Tag(oderIndex: 0, tagName: "全て", tagColor: .gray), at: 0)
-            self.tags.append(Tag(oderIndex: self.tags.count, tagName: "未設定", tagColor: .gray))
+            self.tags.append(Tag(oderIndex: self.tags.count, tagName: "未グループ", tagColor: .gray))
         }
         print("fetchTag終了")
     }

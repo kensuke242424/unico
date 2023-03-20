@@ -18,10 +18,10 @@ class ItemViewModel: ObservableObject {
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
 
     @Published var items: [RootItem] = []
-    // アイテムの中にタグが未設定のものがあるかどうか
+    // アイテムの中にタグが未グループのものがあるかどうか
     var unsetTag: Bool {
-        let result = self.items.contains(where: { $0.tag == "未設定" })
-        print("タグ未設定アイテムの有無: \(result)")
+        let result = self.items.contains(where: { $0.tag == "未グループ" })
+        print("タグ未グループアイテムの有無: \(result)")
         return result
     }
 

@@ -19,7 +19,7 @@ struct EditItemView: View {
     let editItemStatus: EditSelect
 
     var tagColor: UsedColor {
-        let selectTag = tagVM.tags.filter({ $0.tagName == inputEdit.selectionTagName })
+        let selectTag = tagVM.tags.filter({ $0 == inputEdit.selectionTag })
         if let selectTag = selectTag.first {
             return selectTag.tagColor
         } else {
@@ -34,19 +34,19 @@ struct EditItemView: View {
 
         NavigationView {
 
-            ScrollView(showsIndicators: false) {
-
-                ZStack {
-                    Color.customDarkGray1
-                        .ignoresSafeArea()
-                        .overlay {
-                            LinearGradient(gradient: Gradient(colors: [.clear, .customLightGray1]),
-                                                       startPoint: .top, endPoint: .bottom)
-                        }
-                        .offset(y: 340)
+//            ScrollView(showsIndicators: false) {
+//
+//                ZStack {
+//                    Color.customDarkGray1
+//                        .ignoresSafeArea()
+//                        .overlay {
+//                            LinearGradient(gradient: Gradient(colors: [.clear, .customLightGray1]),
+//                                                       startPoint: .top, endPoint: .bottom)
+//                        }
+//                        .offset(y: 340)
                     VStack {
                         // ✅カスタムView 写真ゾーン
-                        EditItemPhotoArea(showImageSheet: $inputEdit.showPicker,
+                        EditItemPhotoArea(showImageSheet: $inputEdit.showPhotoPicker,
                                           photoImage: inputEdit.captureImage,
                                           photoURL: inputEdit.photoURL)
 
@@ -59,17 +59,17 @@ struct EditItemView: View {
                                    tagColor: tagColor)
 
                     } // VStack(パーツ全体)
-                } // ZStack(View全体)
-//                .animation(.easeIn(duration: 0.3), value: inputEdit.offset)
+//                } // ZStack(View全体)
+////                .animation(.easeIn(duration: 0.3), value: inputEdit.offset)
+//
+//            } // ScrollView
 
-            } // ScrollView
+//            .sheet(isPresented: $inputEdit.showPhotoPicker) {
+//                PHPickerView(captureImage: $inputEdit.captureImage,
+//                             isShowSheet: $inputEdit.showPhotoPicker)
+//            }
 
-            .sheet(isPresented: $inputEdit.showPicker) {
-                PHPickerView(captureImage: $inputEdit.captureImage,
-                             isShowSheet: $inputEdit.showPicker)
-            }
-
-            .onChange(of: inputEdit.name) { newValue in
+//            .onChange(of: inputEdit.name) { newValue in
 
 //                withAnimation(.easeIn(duration: 0.2)) {
 //                    if newValue.isEmpty {
@@ -81,115 +81,115 @@ struct EditItemView: View {
             } // onChange(ボタンdisable分岐)
 
             // NOTE: updateitemView呼び出し時に、親Viewから受け取ったアイテム情報を各入力欄に格納します。
-            .onAppear {
+//            .onAppear {
+//
+//                // NOTE: 新規アイテム登録遷移の場合、passItemDataにはnilが代入されている
+//                if let passItemData = passItemData {
+//
+//                    inputEdit.selectionTagName = passItemData.tag
+//                    inputEdit.photoURL = passItemData.photoURL
+//                    inputEdit.photoPath = passItemData.photoPath
+//                    inputEdit.name = passItemData.name
+//                    inputEdit.author = passItemData.author
+//                    inputEdit.inventory = String(passItemData.inventory)
+//                    inputEdit.cost = String(passItemData.cost)
+//                    inputEdit.price = String(passItemData.price)
+//                    inputEdit.sales = String(passItemData.sales)
+//                    inputEdit.detail = passItemData.detail
+//                    inputEdit.totalAmount = String(passItemData.totalAmount)
+//                    inputEdit.totalInventry = String(passItemData.totalInventory)
+//
+//                } else {
+//                    // tags[0]には"ALL"があるため、一つ飛ばして[1]を初期値として代入
+//                    inputEdit.selectionTagName = tagVM.tags[1].tagName
+//                }
+//
+//            } // onAppear
 
-                // NOTE: 新規アイテム登録遷移の場合、passItemDataにはnilが代入されている
-                if let passItemData = passItemData {
+//            .navigationTitle(editItemStatus == .create ? "新規アイテム" : "アイテム編集")
+//            .navigationBarTitleDisplayMode(.inline)
 
-                    inputEdit.selectionTagName = passItemData.tag
-                    inputEdit.photoURL = passItemData.photoURL
-                    inputEdit.photoPath = passItemData.photoPath
-                    inputEdit.name = passItemData.name
-                    inputEdit.author = passItemData.author
-                    inputEdit.inventory = String(passItemData.inventory)
-                    inputEdit.cost = String(passItemData.cost)
-                    inputEdit.price = String(passItemData.price)
-                    inputEdit.sales = String(passItemData.sales)
-                    inputEdit.detail = passItemData.detail
-                    inputEdit.totalAmount = String(passItemData.totalAmount)
-                    inputEdit.totalInventry = String(passItemData.totalInventory)
-
-                } else {
-                    // tags[0]には"ALL"があるため、一つ飛ばして[1]を初期値として代入
-                    inputEdit.selectionTagName = tagVM.tags[1].tagName
-                }
-
-            } // onAppear
-
-            .navigationTitle(editItemStatus == .create ? "新規アイテム" : "アイテム編集")
-            .navigationBarTitleDisplayMode(.inline)
-
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-
-                    Button {
-
-                        switch editItemStatus {
-
-                        case .create:
-                            Task {
-                                let uploadImage =  await itemVM.uploadImage(inputEdit.captureImage)
-                                let itemData = RootItem(tag: inputEdit.selectionTagName,
-                                                        teamID: teamVM.team!.id,
-                                                        name: inputEdit.name,
-                                                        author: inputEdit.author,
-                                                        detail: inputEdit.detail != "" ? inputEdit.detail : "メモなし",
-                                                        photoURL: uploadImage.url,
-                                                        photoPath: uploadImage.filePath,
-                                                        cost: 0,
-                                                        price: Int(inputEdit.price) ?? 0,
-                                                        amount: 0,
-                                                        sales: 0,
-                                                        inventory: Int(inputEdit.inventory) ??  0,
-                                                        totalAmount: 0,
-                                                        totalInventory: Int(inputEdit.inventory) ?? 0)
-
-                                // Firestoreにコーダブル保存
-                                itemVM.addItem(itemData: itemData, tag: inputEdit.selectionTagName, teamID: teamVM.team!.id)
-
-                                inputHome.isPresentedEditItem.toggle()
-                            }
-
-                        case .update:
-
-                            Task {
-                                guard let passItemData = passItemData else { return }
-                                guard let defaultDataID = passItemData.id else { return }
-                                let editInventory = Int(inputEdit.inventory) ?? 0
-
-                                // captureImageに新しい画像があれば、元の画像データを更新
-                                if let captureImage = inputEdit.captureImage {
-                                    itemVM.deleteImage(path: inputEdit.photoPath)
-                                    let newImageData =  await itemVM.uploadImage(captureImage)
-                                    inputEdit.photoURL = newImageData.url
-                                    inputEdit.photoPath = newImageData.filePath
-                                }
-
-                                // NOTE: アイテムを更新
-                                let updateItemData = (RootItem(createTime: passItemData.createTime,
-                                                               tag      : inputEdit.selectionTagName,
-                                                               teamID: teamVM.team!.id,
-                                                               name     : inputEdit.name,
-                                                               author   : inputEdit.author,
-                                                               detail   : inputEdit.detail != "" ? inputEdit.detail : "メモなし",
-                                                               photoURL : inputEdit.photoURL,
-                                                               photoPath: inputEdit.photoPath,
-                                                               cost: Int( inputEdit.cost) ?? 0,
-                                                               price: Int(inputEdit.price) ?? 0,
-                                                               amount: 0,
-                                                               sales: Int(inputEdit.sales) ?? 0,
-                                                               inventory: editInventory,
-                                                               totalAmount: passItemData.totalAmount,
-                                                               totalInventory: passItemData.inventory < editInventory ?
-                                                               passItemData.totalInventory + (editInventory - passItemData.inventory) :
-                                                               passItemData.totalInventory - (passItemData.inventory - editInventory) ))
-
-                                itemVM.updateItem(updateData: updateItemData, defaultDataID: defaultDataID, teamID: teamVM.team!.id)
-
-                                inputHome.isPresentedEditItem.toggle()
-                            }
-
-                        } // switch editItemStatus(データ追加、更新)
-                    } label: {
-                        Text(editItemStatus == .create ? "追加する" : "更新する")
-                    }
-//                    .disabled(inputEdit.disableButton)
-                }
-            } // toolbar(アイテム追加ボタン)
+//            .toolbar {
+//                ToolbarItem(placement: .navigationBarTrailing) {
+//
+//                    Button {
+//
+//                        switch editItemStatus {
+//
+//                        case .create:
+//                            Task {
+//                                let uploadImage =  await itemVM.uploadImage(inputEdit.captureImage)
+//                                let itemData = RootItem(tag: inputEdit.selectionTagName,
+//                                                        teamID: teamVM.team!.id,
+//                                                        name: inputEdit.name,
+//                                                        author: inputEdit.author,
+//                                                        detail: inputEdit.detail != "" ? inputEdit.detail : "メモなし",
+//                                                        photoURL: uploadImage.url,
+//                                                        photoPath: uploadImage.filePath,
+//                                                        cost: 0,
+//                                                        price: Int(inputEdit.price) ?? 0,
+//                                                        amount: 0,
+//                                                        sales: 0,
+//                                                        inventory: Int(inputEdit.inventory) ??  0,
+//                                                        totalAmount: 0,
+//                                                        totalInventory: Int(inputEdit.inventory) ?? 0)
+//
+//                                // Firestoreにコーダブル保存
+//                                itemVM.addItem(itemData: itemData, tag: inputEdit.selectionTagName, teamID: teamVM.team!.id)
+//
+//                                inputHome.isPresentedEditItem.toggle()
+//                            }
+//
+//                        case .update:
+//
+//                            Task {
+//                                guard let passItemData = passItemData else { return }
+//                                guard let defaultDataID = passItemData.id else { return }
+//                                let editInventory = Int(inputEdit.inventory) ?? 0
+//
+//                                // captureImageに新しい画像があれば、元の画像データを更新
+//                                if let captureImage = inputEdit.captureImage {
+//                                    itemVM.deleteImage(path: inputEdit.photoPath)
+//                                    let newImageData =  await itemVM.uploadImage(captureImage)
+//                                    inputEdit.photoURL = newImageData.url
+//                                    inputEdit.photoPath = newImageData.filePath
+//                                }
+//
+//                                // NOTE: アイテムを更新
+//                                let updateItemData = (RootItem(createTime: passItemData.createTime,
+//                                                               tag      : inputEdit.selectionTagName,
+//                                                               teamID: teamVM.team!.id,
+//                                                               name     : inputEdit.name,
+//                                                               author   : inputEdit.author,
+//                                                               detail   : inputEdit.detail != "" ? inputEdit.detail : "メモなし",
+//                                                               photoURL : inputEdit.photoURL,
+//                                                               photoPath: inputEdit.photoPath,
+//                                                               cost: Int( inputEdit.cost) ?? 0,
+//                                                               price: Int(inputEdit.price) ?? 0,
+//                                                               amount: 0,
+//                                                               sales: Int(inputEdit.sales) ?? 0,
+//                                                               inventory: editInventory,
+//                                                               totalAmount: passItemData.totalAmount,
+//                                                               totalInventory: passItemData.inventory < editInventory ?
+//                                                               passItemData.totalInventory + (editInventory - passItemData.inventory) :
+//                                                               passItemData.totalInventory - (passItemData.inventory - editInventory) ))
+//
+//                                itemVM.updateItem(updateData: updateItemData, defaultDataID: defaultDataID, teamID: teamVM.team!.id)
+//
+//                                inputHome.isPresentedEditItem.toggle()
+//                            }
+//
+//                        } // switch editItemStatus(データ追加、更新)
+//                    } label: {
+//                        Text(editItemStatus == .create ? "追加する" : "更新する")
+//                    }
+////                    .disabled(inputEdit.disableButton)
+//                }
+//            } // toolbar(アイテム追加ボタン)
 
         } // NavigationView
     } // body
-} // View
+// View
 
 struct InputForms: View {
 
@@ -213,41 +213,41 @@ struct InputForms: View {
 
         VStack(spacing: 40) {
 
-            VStack(alignment: .leading) {
-                InputFormTitle(title: "■タグ設定", isNeed: true)
-                    .padding(.bottom)
-
-                HStack {
-                    Image(systemName: "tag.fill")
-                        .foregroundColor(tagColor.color)
-                    Picker("タグネーム", selection: $inputEdit.selectionTagName) {
-
-                        if passItem?.tag == tagVM.tags.last!.tagName {
-
-                            ForEach(tagVM.tags) { tag in
-                                if tag != tagVM.tags.first! {
-                                    Text(tag.tagName).tag(tag.tagName)
-                                }
-                            }
-
-                        } else {
-
-                            ForEach(tagVM.tags) { tag in
-                                if tag != tagVM.tags.first! && tag != tagVM.tags.last! {
-                                    Text(tag.tagName).tag(tag.tagName)
-                                }
-                            }
-                        }
-                    } // Picker
-
-                    Spacer()
-
-                } // HStack(Pickerタグ要素)
-
-                // NOTE: フォーカスの有無によって、入力欄の下線の色をスイッチします。(カスタムView)
-//                FocusedLineRow(select: focusedField == .tag ? true : false)
-
-            } // ■タグ設定
+//            VStack(alignment: .leading) {
+//                InputFormTitle(title: "■タグ設定", isNeed: true)
+//                    .padding(.bottom)
+//
+//                HStack {
+//                    Image(systemName: "tag.fill")
+//                        .foregroundColor(tagColor.color)
+//                    Picker("タグネーム", selection: $inputEdit.selectionTagName) {
+//
+//                        if passItem?.tag == tagVM.tags.last!.tagName {
+//
+//                            ForEach(tagVM.tags) { tag in
+//                                if tag != tagVM.tags.first! {
+//                                    Text(tag.tagName).tag(tag.tagName)
+//                                }
+//                            }
+//
+//                        } else {
+//
+//                            ForEach(tagVM.tags) { tag in
+//                                if tag != tagVM.tags.first! && tag != tagVM.tags.last! {
+//                                    Text(tag.tagName).tag(tag.tagName)
+//                                }
+//                            }
+//                        }
+//                    } // Picker
+//
+//                    Spacer()
+//
+//                } // HStack(Pickerタグ要素)
+//
+//                // NOTE: フォーカスの有無によって、入力欄の下線の色をスイッチします。(カスタムView)
+////                FocusedLineRow(select: focusedField == .tag ? true : false)
+//
+//            } // ■タグ設定
 
             VStack(alignment: .leading) {
 

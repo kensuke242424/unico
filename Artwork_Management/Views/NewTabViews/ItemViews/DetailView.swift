@@ -298,7 +298,7 @@ struct DetailView: View {
             
             Text(item.tag != "" ?
                       "タグ　　　:　　 \(item.tag)" :
-                      "タグ　　　:　　 未設定")
+                      "タグ　　　:　　 未グループ")
                 .padding(.bottom, 12)
                  
             Text("在庫　　　:　　 \(item.inventory) 個")
