@@ -105,7 +105,8 @@ class ItemViewModel: ObservableObject {
             
             // リサイズ後のUIImageを生成して返却
             UIGraphicsBeginImageContext(resizedSize)
-            originalImage.draw(in: CGRect(x: 0, y: 0, width: resizedSize.width, height: resizedSize.height))
+            /// MEMO: 保存後の画像heightに少しだけ隙間ができるので、resizedSize.height + 1で対応してる
+            originalImage.draw(in: CGRect(x: 0, y: 0, width: resizedSize.width, height: resizedSize.height + 1))
             let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
             UIGraphicsEndImageContext()
             

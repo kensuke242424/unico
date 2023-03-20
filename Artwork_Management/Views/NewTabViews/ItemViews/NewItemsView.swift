@@ -50,6 +50,7 @@ struct NewItemsView: View {
                     VStack(spacing: 35) {
                         ForEach(itemVM.rootItems, id: \.self) { item in
                             ItemsCardView(item)
+                                .onAppear {print("ItemCardsView_onAppear: \(item.name)") }
                                 .onTapGesture {
                                     withAnimation(.easeInOut(duration: 0.25)) {
                                         guard let actionIndex = getActionIndex(item) else {
@@ -57,8 +58,9 @@ struct NewItemsView: View {
                                         }
                                         
                                         cartVM.actionItemIndex = actionIndex
-                                        animateCurrentItem = true
-                                        showDarkBackground = true
+                                        animateCurrentItem        = true
+                                        showDarkBackground        = true
+                                        inputTab.reportShowDetail = true
                                         /// ✅ アニメーションにチラつきがあったため、二箇所で管理
                                         selectedItem = item
                                         inputTab.selectedItem = item
@@ -123,9 +125,7 @@ struct NewItemsView: View {
     }
     
     func getActionIndex(_ selectedItem: RootItem) -> Int? {
-        
         let index = itemVM.rootItems.firstIndex(where: { $0.id == selectedItem.id })
-        print("アクションアイテムのindex: \(index)")
         return index
     }
     
@@ -194,6 +194,12 @@ struct NewItemsView: View {
                             return
                         }
                         
+                        // TODO: カートに追加する在庫が無いことを知らせるアラートメッセージ
+                        if checkHaveNotInventory(item) {
+                            print("これ以上カートに追加する在庫がありません")
+                            return
+                        }
+                        
                         /// actionItemIndexは、itemVMのアイテムとcartItemのアイテムで同期を取るため必要
                         cartVM.actionItemIndex = newActionIndex
                         cartVM.addCartItem(item: item)
@@ -201,19 +207,14 @@ struct NewItemsView: View {
                     } label: {
                         Image(systemName: "cart.fill")
                             .foregroundColor(.gray)
+                            .opacity(checkHaveNotInventory(item) ? 0.3 : 1)
                             .background {
                                 Circle()
                                     .foregroundColor(.white)
                                     .scaleEffect(2)
                                     .shadow(radius: 1, x: 1, y: 1)
                                     .shadow(radius: 1, x: 1, y: 1)
-                                    .opacity(checkHaveNotInventory(item) ? 0.3 : 1)
                             }
-                    }
-                    .disabled(checkHaveNotInventory(item))
-                    .opacity(checkHaveNotInventory(item) ? 0.3 : 1)
-                    .onTapGesture {
-                        print("これ以上カートに入れる在庫がありません")
                     }
                     .padding([.bottom, .trailing], 20)
                 }
@@ -222,7 +223,7 @@ struct NewItemsView: View {
                 /// Book Cover Image
                 ZStack {
                     if !(showDetailView && selectedItem?.id == item.id) {
-                        NewItemSDWebImage(imageURL: item.photoURL,
+                        SDWebImageView(imageURL: item.photoURL,
                                           width: size.width / 2,
                                           height: size.height)
                             /// Matched Geometry ID
@@ -240,9 +241,6 @@ struct NewItemsView: View {
             .rotation3DEffect(.init(degrees: convertOffsetToRotation(rect)), axis: (x: 1, y: 0, z: 0), anchor: .bottom, anchorZ: 1, perspective: 0.5)
         }
         .frame(height: 220)
-        .onAppear {
-            print("ItemCardsView onAppear")
-        }
     }
     
     func checkHaveNotInventory(_ item: RootItem) -> Bool {

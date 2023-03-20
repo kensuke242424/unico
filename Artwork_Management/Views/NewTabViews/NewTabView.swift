@@ -19,11 +19,13 @@ struct InputTab {
     var selectedItem: RootItem?
     
     /// タブViewのアニメーションを管理するプロパティ
-    var selectionTab: Tab = .item
-    var animationTab: Tab = .item
+    var selectionTab    : Tab = .home
+    var animationTab    : Tab = .home
     var animationOpacity: CGFloat = 1
-    var animationScale: CGFloat = 1
-    var scrollProgress: CGFloat = .zero
+    var animationScale  : CGFloat = 1
+    var scrollProgress  : CGFloat = .zero
+    /// MEMO: ItemsTab内でDetailが開かれている間はTopNavigateBarを隠すためのプロパティ
+    var reportShowDetail: Bool = false
     
     var showCart: ResizableSheetState = .hidden
     var showCommerce: ResizableSheetState = .hidden
@@ -83,10 +85,9 @@ struct NewTabView: View {
                 .background {
                     ZStack {
                         GeometryReader { proxy in
-                            Image("background_1")
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: proxy.size.width, height: proxy.size.height)
+                            SDWebImageView(imageURL : teamVM.team?.backgroundURL,
+                                              width : proxy.size.width,
+                                              height: proxy.size.height)
                                 .ignoresSafeArea()
                                 .blur(radius: min((-inputTab.scrollProgress * 4), 4), opaque: true)
                         }
@@ -261,7 +262,7 @@ struct NewTabView: View {
                     }
                     Spacer()
                     /// Itemタブに移動した時に表示するアイテム追加タブボタン
-                    if inputTab.animationTab == .item {
+                    if inputTab.animationTab == .item && !inputTab.reportShowDetail {
                         Button {
                             /// アイテム追加エディット画面に遷移
                             ///  追加ボタンなので、selectedItemはnilを入れておく

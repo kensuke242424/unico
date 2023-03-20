@@ -35,10 +35,11 @@ struct SelectItemPhotoBackground: View {
                             .frame(width: getRect().width, height: height)
                             .opacity(0.5)
                         
-                        NewItemSDWebImage(imageURL: photoURL,
+                        SDWebImageView(imageURL: photoURL,
                                           width: getRect().width,
                                           height: height)
                         .clipShape(RoundedRectangle(cornerRadius: 5))
+                        .blur(radius: 4, opaque: true)
                         .allowsHitTesting(false)
                     }
                     

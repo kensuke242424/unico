@@ -81,8 +81,8 @@ struct NewEditItemView: View {
         
         GeometryReader {
             let size = $0.size
-            /// アプリ内で指定されたアイテムカードのサイズ
-            let cardWidth : CGFloat = size.width - 15
+            /// 親View側のスクロールViewを参照したsizeを元にしたカードのサイズ
+            let cardWidth : CGFloat = size.width / 2 - 15
             let cardHeight: CGFloat = 220
             
             VStack(spacing: 20) {
@@ -95,25 +95,22 @@ struct NewEditItemView: View {
                         SelectItemPhotoBackground(photoImage: input.captureImage,
                                                   photoURL: passItem?.photoURL,
                                                   height: 250)
-                        .onTapGesture { focused = nil; detailFocused = nil }
                         
                         if let captureImage = input.captureImage {
                             NewItemUIImage(image: captureImage,
                                            width: cardWidth,
                                            height: cardHeight)
                             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                            .onTapGesture { input.showPicker.toggle() }
                         } else if let passItemImageURL = input.photoURL {
-                            NewItemSDWebImage(imageURL: passItemImageURL,
+                            SDWebImageView(imageURL: passItemImageURL,
                                               width: cardWidth,
                                               height: cardHeight)
                             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                            .onTapGesture { input.showPicker.toggle() }
                         } else {
                             RoundedRectangle(cornerRadius: 10)
                                 .fill(.gray.gradient)
                                 .frame(width: abs(cardWidth), height: cardHeight)
-                                .onTapGesture { input.showPicker.toggle() }
+                                
                             VStack(spacing: 20) {
                                 Image(systemName: "cube.transparent.fill")
                                     .resizable()
@@ -128,6 +125,10 @@ struct NewEditItemView: View {
                             }
                         }
                     } // ZStack(選択画像エリア)
+                    .onTapGesture {
+                        input.showPicker.toggle()
+                        focused = nil; detailFocused = nil
+                    }
                     
                     /// 入力欄の各項目
                     ForEach(InputFormsStatus.allCases, id: \.self) { value in
@@ -192,6 +193,7 @@ struct NewEditItemView: View {
         .overlay {
             if input.showProgress {
                 SavingProgressView()
+                    .transition(AnyTransition.opacity.combined(with: .offset(y: 20)))
             }
         }
         .sheet(isPresented: $input.showPicker) {
@@ -236,10 +238,10 @@ struct NewEditItemView: View {
 
                             // captureImageに新しい画像があれば、元の画像データを更新
                             if let captureImage = input.captureImage {
-                                input.showProgress = true
+                                withAnimation(.easeIn(duration: 0.1)) { input.showProgress = true }
                                 itemVM.deleteImage(path: input.photoPath)
                                 let resizedImage = itemVM.resizeUIImage(image: captureImage,
-                                                                        width: width)
+                                                                        width: width * 2)
                                 let newImageData =  await itemVM.uploadImage(resizedImage)
                                 input.photoURL = newImageData.url
                                 input.photoPath = newImageData.filePath
@@ -265,7 +267,7 @@ struct NewEditItemView: View {
                                                             passItem.totalInventory - (passItem.inventory - editInventory) ))
 
                             itemVM.updateItem(updateData: updateItemData, defaultDataID: defaultDataID, teamID: teamVM.team!.id)
-                            input.showProgress = false
+                            withAnimation(.easeIn(duration: 0.1)) { input.showProgress = false }
                             dismiss()
                         } // Task(update Item)
                         
@@ -275,7 +277,7 @@ struct NewEditItemView: View {
                             
                             // captureImageに新しい画像があれば、元の画像データを更新
                             if let captureImage = input.captureImage {
-                                input.showProgress = true
+                                withAnimation(.easeIn(duration: 0.1)) { input.showProgress = true }
                                 itemVM.deleteImage(path: input.photoPath)
                                 let resizedImage = itemVM.resizeUIImage(image: captureImage, width: width)
                                 let newImageData =  await itemVM.uploadImage(resizedImage)
@@ -301,7 +303,7 @@ struct NewEditItemView: View {
                             // Firestoreにコーダブル保存
                             itemVM.addItem(itemData: itemData, tag: input.selectionTagName, teamID: teamVM.team!.id)
                             
-                            input.showProgress = false
+                            withAnimation(.easeIn(duration: 0.1)) { input.showProgress = false }
                             dismiss()
                         } // Task(add Item)
                     } // if let passItem

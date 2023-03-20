@@ -33,7 +33,8 @@ struct DetailView: View {
                 }
                 /// Closing Detail View
                 withAnimation(.easeInOut(duration: 0.35).delay(0.1)) {
-                    animationContent = false
+                    animationContent          = false
+                    inputTab.reportShowDetail = false
                 }
                 withAnimation(.easeInOut(duration: 0.35).delay(0.1)) {
                     show.toggle()
@@ -54,7 +55,7 @@ struct DetailView: View {
                 let size = $0.size
                 
                 HStack(spacing: 20) {
-                    NewItemSDWebImage(imageURL: item.photoURL,
+                    SDWebImageView(imageURL: item.photoURL,
                                       width: size.width / 2 - 15,
                                       height: size.height)
                         .clipShape(CustomCorners(corners: [.topRight, .bottomRight], radius: 10))
@@ -220,14 +221,15 @@ struct DetailView: View {
             .alert("確認", isPresented: $showDeleteAlert) {
 
                 Button("削除", role: .destructive) {
-                    withAnimation(.easeInOut(duration: 0.15)) {
+                    withAnimation(.easeInOut(duration: 0.1)) {
                         offsetAnimation = false
                     }
                     /// Closing Detail View
-                    withAnimation(.easeInOut(duration: 0.3).delay(0.1)) {
-                        animationContent = false
+                    withAnimation(.easeInOut(duration: 0.2).delay(0.1)) {
+                        animationContent          = false
+                        inputTab.reportShowDetail = false
                     }
-                    withAnimation(.easeInOut(duration: 0.3).delay(0.1)) {
+                    withAnimation(.easeInOut(duration: 0.2).delay(0.1)) {
                         show.toggle()
                     }
 

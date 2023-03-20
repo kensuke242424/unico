@@ -8,7 +8,7 @@
 import SwiftUI
 import SDWebImageSwiftUI
 
-struct NewItemSDWebImage: View {
+struct SDWebImageView: View {
     
     let imageURL: URL?
     let width: CGFloat
@@ -76,7 +76,7 @@ struct NewItemSDWebImage_Previews: PreviewProvider {
                         .overlay(Text("アイテム詳細"))
                         .zIndex(1)
                     
-                    NewItemSDWebImage(imageURL: nil,
+                    SDWebImageView(imageURL: nil,
                                       width: size.width / 2 - 15,
                                       height: size.height)
                 }

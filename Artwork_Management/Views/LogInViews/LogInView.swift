@@ -517,26 +517,27 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         try await logInVM.existUserDocumentCheck()
                         
                         // 背景、アイコン画像をリサイズして保存していく
-                        var resizeIconImage      : UIImage?
-                        var resizeBackgroundImage: UIImage?
+                        var resizedIconImage      : UIImage?
+                        var resizedBackgroundImage: UIImage?
                         
                         // 60 -> アイコンwidth
                         if let captureIconUIImage = inputLogIn.captureUserIconImage {
-                            resizeIconImage = logInVM.resizeUIImage(image: captureIconUIImage,
+                            resizedIconImage = logInVM.resizeUIImage(image: captureIconUIImage,
                                                                     width: 60)
                         }
                         /// オリジナル背景を選択していなければ、付属のImageをUIImageに直してからリサイズ
-                        if let captureBackgroundImage = inputLogIn.captureUserIconImage {
-                            resizeBackgroundImage = logInVM.resizeUIImage(image: captureBackgroundImage,
-                                                                          width: getRect().width)
+                        if let captureBackgroundImage = inputLogIn.captureBackgroundImage {
+                            resizedBackgroundImage = logInVM.resizeUIImage(image: captureBackgroundImage,
+                                                                          width: getRect().width * 4)
                         } else {
                             let convertBackgroundUIImage = UIImage(named: inputLogIn.selectBackground.imageName)
-                            resizeBackgroundImage = logInVM.resizeUIImage(image: convertBackgroundUIImage,
-                                                                          width: getRect().width)
+                            resizedBackgroundImage = logInVM.resizeUIImage(image: convertBackgroundUIImage,
+                                                                          width: getRect().width * 4)
                         }
                         
-                        let uplaodIconImageData = await logInVM.uploadImage(resizeIconImage)
-                        let uplaodBackgroundImageData = await logInVM.uploadImage(resizeBackgroundImage)
+                        /// リサイズ処理した画像をFirestorageに保存
+                        let uplaodIconImageData       = await logInVM.uploadImage(resizedIconImage)
+                        let uplaodBackgroundImageData = await logInVM.uploadImage(resizedBackgroundImage)
                         
                         /// ユーザーの入力値をもとにユーザーデータを作成し、Firestoreに保存⬇︎
                         if inputLogIn.createUserNameText == "" { inputLogIn.createUserNameText = "名無し" }

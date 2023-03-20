@@ -37,6 +37,7 @@ struct NewHomeView: View {
                 
             } // VStack
             .frame(width: size.width, height: size.height)
+            .offset(y: -50)
         }
         .ignoresSafeArea()
     }
@@ -108,7 +109,7 @@ struct NewHomeView: View {
                         .opacity(0.8)
                     
                     // Team members Icon...
-                    teamMembersIcon(members: testTeam.members)
+                    teamMembersIcon(members: teamVM.team!.members)
                 }
                 .offset(x: 20, y: 35)
                 .tracking(5)
