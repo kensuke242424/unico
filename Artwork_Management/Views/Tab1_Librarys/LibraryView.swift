@@ -38,9 +38,9 @@ struct LibraryView: View {
 
     var tagFilterItemCards: [RootItem] {
         if inputLibrary.selectFilterTag == tagVM.tags.first!.tagName {
-            return itemVM.rootItems
+            return itemVM.items
         } else {
-            return itemVM .rootItems.filter({ $0.tag == inputLibrary.selectFilterTag })
+            return itemVM .items.filter({ $0.tag == inputLibrary.selectFilterTag })
         }
     }
 
@@ -108,7 +108,7 @@ struct LibraryView: View {
                         VStack(alignment: .trailing, spacing: 60) {
                             Group {
                                 Text("55 day")
-                                Text("\(itemVM.rootItems.count) item")
+                                Text("\(itemVM.items.count) item")
                             }
                             .font(.footnote)
                             .opacity(0.5)
@@ -146,7 +146,7 @@ struct LibraryView: View {
                         }
 
                     } else {
-                        if itemVM.rootItems.contains(where: {$0.tag == (tagVM.tags.last!.tagName)}) {
+                        if itemVM.items.contains(where: {$0.tag == (tagVM.tags.last!.tagName)}) {
                             Button {
                                 inputLibrary.selectFilterTag = tag.tagName
                             } label: {
@@ -165,7 +165,7 @@ struct LibraryView: View {
             .offset(x: -UIScreen.main.bounds.width / 2.5,
                     y: UIScreen.main.bounds.height / 11)
 
-            if itemVM.rootItems == [] {
+            if itemVM.items == [] {
                 EmptyItemView(inputHome: $inputHome, text: "")
                     .offset(x: -UIScreen.main.bounds.width / 4,
                             y: UIScreen.main.bounds.height / 5)
@@ -371,7 +371,7 @@ struct LibraryView: View {
                             if inputLibrary.isShowCardInfomation {
                                 Button {
                                     if let cardRowIndex =
-                                        itemVM.rootItems.firstIndex(where: { $0.id == tagFilterItemCards[index].id }) {
+                                        itemVM.items.firstIndex(where: { $0.id == tagFilterItemCards[index].id }) {
 
                                         inputHome.actionItemIndex = cardRowIndex
 

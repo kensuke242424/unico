@@ -93,6 +93,12 @@ struct NewTabView: View {
                         }
                     }
                 }
+                /// 🏷タグの追加や編集を行うView
+                .overlay {
+                    if tagVM.showEdit {
+                        EditTagView(passTag: nil)
+                    }
+                }
                 .ignoresSafeArea()
                 .onChange(of: inputTab.selectionTab) { _ in
                     switch inputTab.selectionTab {
@@ -116,7 +122,7 @@ struct NewTabView: View {
                         
                     case .edit:
                         NewEditItemView(itemVM: itemVM,
-                                        passItem: itemVM.rootItems[cartVM.actionItemIndex])
+                                        passItem: itemVM.items[cartVM.actionItemIndex])
                         
                     case .system:
                         Text("システム画面")

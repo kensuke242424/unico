@@ -235,7 +235,7 @@ struct DetailView: View {
 
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
                         withAnimation {
-                            itemVM.rootItems.removeAll(where: { $0.id == item.id })
+                            itemVM.items.removeAll(where: { $0.id == item.id })
                         }
                         Task {
                             itemVM.deleteImage(path: item.photoPath)

@@ -19,6 +19,7 @@ class TagViewModel: ObservableObject {
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
 
     @Published var tags: [Tag] = []
+    @Published var showEdit: Bool = false
 
     func fetchTag(teamID: String) async {
 
@@ -53,8 +54,8 @@ class TagViewModel: ObservableObject {
             self.tags.sort { $0.oderIndex < $1.oderIndex }
 
             // firestoreからタグのfetch後、ローカル環境にALLと未グループを追加
-            self.tags.insert(Tag(oderIndex: 0, tagName: "ALL", tagColor: .gray), at: 0)
-            self.tags.append(Tag(oderIndex: self.tags.count, tagName: "未グループ", tagColor: .gray))
+            self.tags.insert(Tag(oderIndex: 0, tagName: "全て", tagColor: .gray), at: 0)
+            self.tags.append(Tag(oderIndex: self.tags.count, tagName: "未設定", tagColor: .gray))
         }
         print("fetchTag終了")
     }

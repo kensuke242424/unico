@@ -28,7 +28,7 @@ struct NewItemsView: View {
     
     /// View Propaties
     @Environment(\.colorScheme) var colorScheme
-    @State private var activeTag: String = "全て"
+    @State private var activeTag: Tag?
     @State private var carouselMode: Bool = false
     /// For Matched Geometry Effect
     @Namespace private var animation
@@ -43,12 +43,13 @@ struct NewItemsView: View {
             let size = $0.size
             VStack(spacing: 15) {
                 
-                TagsView()
+                TagsView(tags: tagVM.tags, items: itemVM.items)
                     .opacity(showDarkBackground ? 0 : 1)
+                    .onAppear { activeTag = tagVM.tags.first }
                 
                 ScrollView(.vertical, showsIndicators: false) {
                     LazyVStack(spacing: 35) {
-                        ForEach(itemVM.rootItems, id: \.self) { item in
+                        ForEach(itemVM.items, id: \.self) { item in
                             ItemsCardView(item)
                                 .onAppear {print("ItemCardsView_onAppear: \(item.name)") }
                                 .onDisappear {print("ItemCardsView_onDisapper: \(item.name)") }
@@ -98,7 +99,7 @@ struct NewItemsView: View {
                            inputTab: $inputTab,
                            show: $showDetailView,
                            animation: animation,
-                           item: itemVM.rootItems[cartVM.actionItemIndex])
+                           item: itemVM.items[cartVM.actionItemIndex])
                     .transition(.asymmetric(insertion: .identity, removal: .offset(y: 0)))
                     .onAppear { print("カード詳細onAppear") }
                     .onDisappear { print("カード詳細onDisappear") }
@@ -126,7 +127,7 @@ struct NewItemsView: View {
     }
     
     func getActionIndex(_ selectedItem: RootItem) -> Int? {
-        let index = itemVM.rootItems.firstIndex(where: { $0.id == selectedItem.id })
+        let index = itemVM.items.firstIndex(where: { $0.id == selectedItem.id })
         return index
     }
     
@@ -281,52 +282,61 @@ struct NewItemsView: View {
     }
     
     @ViewBuilder
-    func TagsView() -> some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 10) {
-                ForEach(tags, id: \.self) { tag in
-                    Text(tag)
-                        .font(.caption)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 5)
-                        .background {
-                            if activeTag == tag {
-                                Capsule()
-                                    .fill(Color.blue)
-                                    .matchedGeometryEffect(id: "ACTIVETAG", in: animation)
-                            } else {
-                                Capsule()
-                                    .fill(Color.gray.opacity(0.4))
+    func TagsView(tags: [Tag], items: [RootItem]) -> some View {
+        HStack {
+            
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    // MEMO: 未設定タグのアイテムがあるかどうかで「未設定」タグの表示を切り替える
+                    ForEach(tags.filter(items.contains(where: { $0.tag == "未設定" }) ?
+                                        {$0.tagName != ""} :
+                                        {$0.tagName != "未設定"})) { tag in
+                        Text(tag.tagName)
+                            .font(.caption)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 5)
+                            .background {
+                                if activeTag == tag {
+                                    Capsule()
+                                        .fill(Color.blue)
+                                        .matchedGeometryEffect(id: "ACTIVETAG", in: animation)
+                                } else {
+                                    Capsule()
+                                        .fill(Color.gray.opacity(0.4))
+                                }
                             }
-                        }
-                        .foregroundColor(activeTag == tag ? .white : .white.opacity(0.6))
-                        .onTapGesture {
-                            withAnimation(.interactiveSpring(response: 0.5, dampingFraction: 0.7, blendDuration: 0.7)) {
-                                activeTag = tag
+                            .foregroundColor(activeTag == tag ? .white : .white.opacity(0.6))
+                            .onTapGesture {
+                                withAnimation(.interactiveSpring(response: 0.5, dampingFraction: 0.7, blendDuration: 0.7)) {
+                                    activeTag = tag
+                                }
                             }
-                        }
-                }
-                
-                /// Add Tag
-                Button {
-                    
-                } label: {
-                    Image(systemName: "plus.app.fill")
-                        .foregroundColor(Color.gray.opacity(0.5))
-                }
-                .padding(.leading, 5)
+                        
+                    } // ForEath
+                } // HStack
+                .padding(.leading, 15)
+            } // ScrollView
+            
+            /// Add Tag
+            Button {
+                withAnimation(.easeInOut(duration: 0.3)) { tagVM.showEdit = true }
+            } label: {
+                Image(systemName: "plus.app.fill")
+                    .foregroundColor(Color.gray)
+                    .shadow(radius: 1, x: 1, y: 1)
             }
-            .padding(.horizontal, 15)
+            .padding(.leading, 5)
+            .padding(.trailing, 15)
         }
         .padding(.top)
     }
 } // View
 
 /// Sample Tags
-var tags: [String] =
-[
-"全て", "CD", "トートバッグ", "缶バッジ", "DVD",
-]
+//var tags: [String] =
+//[
+//"全て", "CD", "トートバッグ", "缶バッジ", "DVD", "サンプル１", "サンプル２", "サンプル３",
+//]
 
 struct NewItemsView_Previews: PreviewProvider {
     static var previews: some View {

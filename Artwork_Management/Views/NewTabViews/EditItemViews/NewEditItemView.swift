@@ -249,8 +249,9 @@ struct NewEditItemView: View {
 
                             // NOTE: アイテムを更新
                             let updateItemData = (RootItem(createTime: passItem.createTime,
-                                                           tag        : input.selectionTagName,
-                                                           teamID: teamVM.team!.id,
+                                                           tag        : input.selectionTagName.isEmpty ?
+                                                           "未設定" : input.selectionTagName,
+                                                           teamID     : teamVM.team!.id,
                                                            name       : input.name,
                                                            author     : input.author,
                                                            detail     : input.detail != "" ? input.detail : "メモなし",
@@ -285,8 +286,9 @@ struct NewEditItemView: View {
                                 input.photoPath = newImageData.filePath
                             }
                             
-                            let itemData = RootItem(tag           : input.selectionTagName,
-                                                    teamID: teamVM.team!.id,
+                            let itemData = RootItem(tag           : input.selectionTagName.isEmpty ?
+                                                    "未設定" : input.selectionTagName,
+                                                    teamID        : teamVM.team!.id,
                                                     name          : input.name,
                                                     author        : input.author,
                                                     detail        : input.detail != "" ? input.detail : "メモなし",

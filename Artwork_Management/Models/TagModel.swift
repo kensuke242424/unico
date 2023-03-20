@@ -9,7 +9,7 @@ import SwiftUI
 import FirebaseFirestore
 import FirebaseFirestoreSwift
 
-struct Tag: Identifiable, Equatable, Codable {
+struct Tag: Identifiable, Equatable, Codable, Hashable {
     @DocumentID var id = UUID().uuidString
     var oderIndex: Int
     var tagName: String
