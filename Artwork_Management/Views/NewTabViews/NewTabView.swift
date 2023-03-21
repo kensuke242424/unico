@@ -15,6 +15,7 @@ enum NavigationPath {
 struct InputTab {
     /// Navigation遷移を管理するプロパティ
     var path: [NavigationPath] = []
+    var showSideMenu: Bool = false
     /// NavigationPathによるエディット画面遷移時に渡す
     var selectedItem: RootItem?
     var selectedTag: Tag?
@@ -102,6 +103,12 @@ struct NewTabView: View {
                             .ignoresSafeArea()
                         EditTagView(passTag: $inputTab.selectedTag,
                                     show   : $tagVM.showEdit)
+                    }
+                }
+                /// サイドメニュー
+                .overlay {
+                    if inputTab.showSideMenu {
+                        SystemSideMenu(itemVM: itemVM, inputTab: $inputTab)
                     }
                 }
                 .ignoresSafeArea()
@@ -263,12 +270,18 @@ struct NewTabView: View {
                 HStack {
                     /// Homeタブに移動した時に表示するチームアイコン
                     if inputTab.animationTab == .home {
-                        SDWebImageCircleIcon(imageURL: teamVM.team?.iconURL, width: 40, height: 40)
+                        SDWebImageCircleIcon(imageURL: teamVM.team?.iconURL, width: 50, height: 50)
                             .transition(.asymmetric(
                                 insertion: AnyTransition.opacity.combined(with: .offset(x: -20, y: 0)),
                                 removal: AnyTransition.opacity.combined(with: .offset(x: -20, y: 0))
                             ))
                             .opacity(inputTab.animationOpacity)
+                            .onTapGesture {
+                                // TODO: サイドメニュー表示
+                                withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+                                    inputTab.showSideMenu.toggle()
+                                }
+                            }
                     }
                     Spacer()
                     /// Itemタブに移動した時に表示するアイテム追加タブボタン

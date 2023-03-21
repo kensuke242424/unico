@@ -249,6 +249,7 @@
 		BE0E580929C4050600F5E42F /* EditItemViews */ = {
 			isa = PBXGroup;
 			children = (
+				BE245BE229C825DE00539A04 /* EditTagView.swift */,
 				BE0E580A29C4055900F5E42F /* NewEditItemView.swift */,
 				BE245BCA29C576F900539A04 /* EditItemPhotoContent.swift */,
 			);
@@ -279,7 +280,6 @@
 			isa = PBXGroup;
 			children = (
 				BE1F272429C1673900AD55DF /* NewItemsView.swift */,
-				BE245BE229C825DE00539A04 /* EditTagView.swift */,
 				BE1F272629C16DEB00AD55DF /* RatingView.swift */,
 				BE1F272829C16E0800AD55DF /* ScrollViewDetector.swift */,
 				BE1F272A29C16E2000AD55DF /* CustomCorners.swift */,

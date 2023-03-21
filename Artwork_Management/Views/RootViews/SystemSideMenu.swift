@@ -22,16 +22,16 @@ struct SystemSideMenu: View {
 
     @Environment(\.colorScheme) var colorScheme: ColorScheme
 
-    @StateObject var teamVM: TeamViewModel
-    @StateObject var userVM: UserViewModel
     @StateObject var itemVM: ItemViewModel
-    @StateObject var tagVM: TagViewModel
-    @StateObject var logInVM: LogInViewModel
+    
+    @EnvironmentObject var progress: ProgressViewModel
+    @EnvironmentObject var logInVM : LogInViewModel
+    @EnvironmentObject var teamVM  : TeamViewModel
+    @EnvironmentObject var userVM  : UserViewModel
+    @EnvironmentObject var tagVM   : TagViewModel
 
-    @Binding var inputHome: InputHome
-    @Binding var inputImage: InputImage
-    @Binding var inputTag: InputTagSideMenu
-    @Binding var inputSideMenu: InputSideMenu
+    @Binding var inputTab: InputTab
+    @State private var inputSideMenu: InputSideMenu = InputSideMenu()
 
     @GestureState var dragOffset: CGFloat = 0.0
 
@@ -40,17 +40,13 @@ struct SystemSideMenu: View {
         ZStack {
             // Blur View...
             BlurView(style: .systemUltraThinMaterialDark)
-
             userVM.user!.userColor.color1
                 .opacity(0.7)
                 .blur(radius: 15)
                 .overlay(alignment: .topLeading) {
                     Button {
                         withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                            inputHome.isShowSystemSideMenu.toggle()
-                        }
-                        withAnimation(.easeIn(duration: 0.2)) {
-                            inputHome.sideMenuBackGround.toggle()
+                            inputTab.showSideMenu = false
                         }
                     } label: {
                         Image(systemName: "multiply.circle.fill")
@@ -70,22 +66,15 @@ struct SystemSideMenu: View {
 
                 VStack(alignment: .leading, spacing: 20) {
                     
-                    Group {
-                        if let iconURL = teamVM.team?.iconURL {
-                            AsyncImageCircleIcon(photoURL: iconURL, size: getRect().width / 3 + 20)
-                                .onTapGesture {
-                                    withAnimation(.spring(response: 0.5)) { inputHome.selectedUpdateData = .team }
-                                }
-                        } else {
-                            CubeCircleIcon(size: getRect().width / 3 + 20)
-                                .onTapGesture {
-                                    withAnimation(.spring(response: 0.5)) { inputHome.selectedUpdateData = .team }
-                                }
-                        }
+                    SDWebImageCircleIcon(imageURL: teamVM.team?.iconURL,
+                                         width   : getRect().width / 3 + 20,
+                                         height  : getRect().width / 3 + 20)
+                    .onTapGesture {
+//                        withAnimation(.spring(response: 0.5)) { inputTab.selectedUpdateData = .team }
                     }
                     .overlay(alignment: .topTrailing) {
                         Button {
-                            // チーム一覧のハーフモーダル
+                            // TODO: チーム一覧のハーフモーダル表示
                         } label: {
                             Circle()
                                 .foregroundColor(userVM.user!.userColor.color3)
@@ -101,13 +90,13 @@ struct SystemSideMenu: View {
                         .offset(x: 40, y: -10)
                     }
                     
-                    .overlay(alignment: .bottomTrailing) {
-                        AsyncImageCircleIcon(photoURL: userVM.user?.iconURL, size: getRect().width / 6)
-                            .offset(x: getRect().width / 4 - 10)
-                            .onTapGesture {
-                                withAnimation(.spring(response: 0.5)) { inputHome.selectedUpdateData = .user }
-                            }
-                    }
+//                    .overlay(alignment: .bottomTrailing) {
+//                        AsyncImageCircleIcon(photoURL: userVM.user?.iconURL, size: getRect().width / 6)
+//                            .offset(x: getRect().width / 4 - 10)
+//                            .onTapGesture {
+//                                withAnimation(.spring(response: 0.5)) { inputHome.selectedUpdateData = .user }
+//                            }
+//                    }
                     .overlay(alignment: .bottom) {
                         if teamVM.team!.name.count < 12 {
                             Text(teamVM.team!.name)
@@ -140,18 +129,12 @@ struct SystemSideMenu: View {
                                 if inputSideMenu.item {
                                     
                                     VStack(alignment: .leading, spacing: 40) {
-                                        
                                         Label("アイテム追加", systemImage: "shippingbox.fill")
-                                            .onTapGesture {
-                                                inputHome.editItemStatus = .create
-                                                inputHome.isPresentedEditItem.toggle()
-                                            }
-                                        
-                                    } // VStack
+                                            .onTapGesture { inputTab.path.append(.create) }
+                                    }
                                     .foregroundColor(.white)
                                     .frame(width: 210, height: 60, alignment: .topLeading)
                                     .offset(x: 20, y: 30)
-                                    
                                 }
                             }
                             
@@ -169,7 +152,6 @@ struct SystemSideMenu: View {
                                                 withAnimation {
                                                     inputSideMenu.editMode = inputSideMenu.editMode.isEditing ? .inactive : .active
                                                 }
-                                                
                                             }, label: {
                                                 Text(inputSideMenu.editMode.isEditing ? "終了" : "編集")
                                             })
@@ -177,16 +159,8 @@ struct SystemSideMenu: View {
                                         }
                                         
                                         Button {
-                                            inputTag.tagSideMenuStatus = .create
-                                            
-                                            withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                                                inputHome.isOpenEditTagSideMenu.toggle()
-                                            }
-                                            
-                                            withAnimation(.easeIn(duration: 0.2)) {
-                                                inputHome.editTagSideMenuBackground.toggle()
-                                            }
-                                            
+                                            inputTab.selectedTag = nil
+                                            tagVM.showEdit       = true
                                         } label: {
                                             Image(systemName: "plus.square")
                                         }
@@ -222,23 +196,11 @@ struct SystemSideMenu: View {
                                                                 .foregroundColor(.gray)
                                                                 .opacity(inputSideMenu.editMode.isEditing ? 0.0 : 0.6)
                                                                 .onTapGesture {
-                                                                    
                                                                     print("タグ編集ボタンタップ")
-                                                                    inputTag.tagSideMenuStatus = .update
-                                                                    inputSideMenu.selectTag = tag
-                                                                    inputTag.newTagNameText = tag.tagName
-                                                                    inputTag.selectionSideMenuTagColor = tag.tagColor
-                                                                    
-                                                                    withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                                                                        inputHome.isOpenEditTagSideMenu.toggle()
-                                                                    }
-                                                                    
-                                                                    withAnimation(.easeIn(duration: 0.2)) {
-                                                                        inputHome.editTagSideMenuBackground.toggle()
-                                                                    }
+                                                                    inputTab.selectedTag = tag
+                                                                    tagVM.showEdit = true
                                                                 }
                                                         }
-                                                        
                                                     } // HStack
                                                     .overlay {
                                                         if colorScheme == .light {
@@ -284,7 +246,7 @@ struct SystemSideMenu: View {
 
                                         Label("チーム情報変更", systemImage: "person.text.rectangle.fill")
                                             .onTapGesture {
-                                                withAnimation(.spring(response: 0.5)) { inputHome.selectedUpdateData = .team }
+//                                                withAnimation(.spring(response: 0.5)) { inputHome.selectedUpdateData = .team }
                                             }
 
                                         Label("メンバー招待", systemImage: "person.wave.2.fill")
@@ -317,7 +279,7 @@ struct SystemSideMenu: View {
 
                                         Label("ユーザ情報変更", systemImage: "person.text.rectangle")
                                             .onTapGesture {
-                                                withAnimation(.spring(response: 0.5)) { inputHome.selectedUpdateData = .user }
+//                                                withAnimation(.spring(response: 0.5)) { inputHome.selectedUpdateData = .user }
                                             }
 
                                         Label("ログアウト", systemImage: "figure.wave")
@@ -332,9 +294,9 @@ struct SystemSideMenu: View {
                                     .alert("確認", isPresented: $inputSideMenu.isShowLogOutAlert) {
                                         Button("戻る") { inputSideMenu.isShowLogOutAlert.toggle() }
                                         Button("ログアウト") {
-                                            inputHome.isShowProgress.toggle()
+                                            progress.isShow.toggle()
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                                                inputHome.isShowProgress.toggle()
+                                                progress.isShow.toggle()
                                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                                     withAnimation(.easeIn(duration: 0.5)) {
                                                         logInVM.rootNavigation = .logIn
@@ -358,11 +320,7 @@ struct SystemSideMenu: View {
 
                                     VStack(alignment: .leading, spacing: 40) {
                                         
-                                        NavigationLink {
-                                            SystemView(logInVM: logInVM, itemVM: itemVM)
-                                        } label: {
-                                            Label("システム設定", systemImage: "gearshape.fill")
-                                        }
+                                        Label("システム設定", systemImage: "gearshape.fill")
 
                                     } // VStack
                                     .foregroundColor(.white)
@@ -388,17 +346,6 @@ struct SystemSideMenu: View {
             .offset(y: UIScreen.main.bounds.height / 12)
 
         } // ZStack
-        .onChange(of: inputHome.isShowSystemSideMenu) { newValue in
-            if !newValue {
-                inputSideMenu.item = false
-                inputSideMenu.tag = false
-                inputSideMenu.account = false
-                inputSideMenu.team = false
-                inputSideMenu.help = false
-                inputSideMenu.editMode = .inactive
-            }
-        }
-
         // NOTE: ローカルのタグ順番操作をfirestoreに保存
         .onChange(of: inputSideMenu.editMode) { newEdit in
             if newEdit == .inactive {
@@ -412,51 +359,43 @@ struct SystemSideMenu: View {
             SideMenuShape()
                 .stroke(
                     .linearGradient(.init(colors: [
-
                         Color.customLightGray1,
                         Color.customLightGray1.opacity(0.7),
                         Color.customLightGray1.opacity(0.5),
                         Color.clear
-
                     ]), startPoint: .top, endPoint: .bottom),
-                    lineWidth: 7
-                )
+                    lineWidth: 7)
                 .padding(.leading, -50)
 
         )
+        // TODO: トランジションの確認
+        .transition(.asymmetric(insertion: .offset(x: -getRect().width),
+                                removal  : .offset(x: -getRect().width)))
         .ignoresSafeArea()
         .offset(x: dragOffset)
         .gesture(
             DragGesture()
                 .updating(self.$dragOffset, body: { (value, state, _) in
-
                     if value.translation.width < 0 {
-
                         state = value.translation.width
-
                     }})
                 .onEnded { value in
                     if value.translation.width < -100 {
-
                         withAnimation(.spring(response: 0.4, blendDuration: 1)) {
-                            inputHome.isShowSystemSideMenu.toggle()
-                        }
-                        withAnimation(.easeIn(duration: 0.2)) {
-                            inputHome.sideMenuBackGround.toggle()
+                            inputTab.showSideMenu = false
                         }
                     }
                 }
-
         )
-        .animation(.interpolatingSpring(mass: 0.8,
-                                        stiffness: 100,
-                                        damping: 80,
-                                        initialVelocity: 0.1), value: dragOffset)
+        .animation(.interpolatingSpring(mass           : 0.8,
+                                        stiffness      : 100,
+                                        damping        : 80,
+                                        initialVelocity: 0.1),
+                                        value          : dragOffset)
 
     } // body
 
     func rowRemove(offsets: IndexSet) {
-
         for tagIndex in offsets {
             print(tagIndex)
             tagVM.deleteTag(deleteTag: tagVM.tags[tagIndex], teamID: teamVM.team!.id)

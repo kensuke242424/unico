@@ -87,7 +87,11 @@ struct NewItemsView: View {
                         
                         if itemVM.items.isEmpty {
                             AddItemScrollContainerView(size: size)
-                                .onTapGesture { inputTab.path.append(.create) }
+                                .onTapGesture {
+                                    DispatchQueue.main.async {
+                                        inputTab.path.append(.create)
+                                    }
+                                }
                         }
                         
                     }
@@ -409,8 +413,11 @@ struct NewItemsView: View {
             
             /// Add Tag
             Button {
-                inputTab.selectedTag = nil
-                withAnimation(.easeInOut(duration: 0.3)) { tagVM.showEdit = true }
+                
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    inputTab.selectedTag = nil
+                    tagVM.showEdit = true
+                }
             } label: {
                 Image(systemName: "plus.app.fill")
                     .foregroundColor(Color.gray)
