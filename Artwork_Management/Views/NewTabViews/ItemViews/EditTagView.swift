@@ -86,17 +86,19 @@ struct EditTagView: View {
                     }
                 }
                 .buttonStyle(.borderedProminent)
+                .transition(.slide)
                 .disabled(nameEmpty)
                 .disabled(containsName)
                 .onChange(of: tagName) { newValue in
                     if newValue.isEmpty {
-                        withAnimation(.easeInOut(duration: 0.3)) { nameEmpty = true }
+                        nameEmpty = true
                     } else {
-                        withAnimation(.easeInOut(duration: 0.3)) { nameEmpty = false }
+                        nameEmpty = false
                     }
                 }
                 .onChange(of: tagName) { newValue in
-                    if passTag == nil, tagVM.tags.contains(where: {$0.tagName == tagName}) {
+                    if passTag?.tagName != tagName &&
+                       tagVM.tags.contains(where: {$0.tagName == tagName}) {
                         withAnimation(.easeInOut(duration: 0.3)) { containsName = true }
                     } else {
                         withAnimation(.easeInOut(duration: 0.3)) { containsName = false }

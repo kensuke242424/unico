@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		BE0E580B29C4055900F5E42F /* NewEditItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE0E580A29C4055900F5E42F /* NewEditItemView.swift */; };
+		BE17B97129C9977100F08915 /* SDWebImageCircleIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE17B97029C9977100F08915 /* SDWebImageCircleIcon.swift */; };
 		BE1F271E29C162B300AD55DF /* NewTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1F271D29C162B300AD55DF /* NewTabView.swift */; };
 		BE1F272329C166E700AD55DF /* NewHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1F272229C166E700AD55DF /* NewHomeView.swift */; };
 		BE1F272529C1673900AD55DF /* NewItemsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1F272429C1673900AD55DF /* NewItemsView.swift */; };
@@ -119,6 +120,7 @@
 
 /* Begin PBXFileReference section */
 		BE0E580A29C4055900F5E42F /* NewEditItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewEditItemView.swift; sourceTree = "<group>"; };
+		BE17B97029C9977100F08915 /* SDWebImageCircleIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDWebImageCircleIcon.swift; sourceTree = "<group>"; };
 		BE1F271D29C162B300AD55DF /* NewTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabView.swift; sourceTree = "<group>"; };
 		BE1F272229C166E700AD55DF /* NewHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewHomeView.swift; sourceTree = "<group>"; };
 		BE1F272429C1673900AD55DF /* NewItemsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewItemsView.swift; sourceTree = "<group>"; };
@@ -531,6 +533,7 @@
 				E0BE39AE29335317002499C4 /* ShowsItemAsyncImagePhoto.swift */,
 				BE245BC629C5637A00539A04 /* NewItemAsyncImage.swift */,
 				BE245BD329C5DA9E00539A04 /* SDWebImageView.swift */,
+				BE17B97029C9977100F08915 /* SDWebImageCircleIcon.swift */,
 				BE245BC829C5718A00539A04 /* NewItemUIImage.swift */,
 				BE245BCE29C5A41200539A04 /* NewItemUrlToUIImage.swift */,
 				E0A7DE4D290C289A008C3F3F /* AsyncImageCircleIcon.swift */,
@@ -721,6 +724,7 @@
 				E0F0180E2975A9E10063C96B /* JoinUserDetectCheckView.swift in Sources */,
 				E0CB9DCB2913964F00D95C54 /* ViewExtension.swift in Sources */,
 				E0A7DE4E290C289A008C3F3F /* AsyncImageCircleIcon.swift in Sources */,
+				BE17B97129C9977100F08915 /* SDWebImageCircleIcon.swift in Sources */,
 				E094B78A298EB84200A2E33C /* UpdateTeamOrUserDataView.swift in Sources */,
 				E0455FE8292CCB39004F677D /* HashableExtension.swift in Sources */,
 				E0796AE328F6D77A0094E50C /* CommerceSheet.swift in Sources */,

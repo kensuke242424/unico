@@ -263,8 +263,7 @@ struct NewTabView: View {
                 HStack {
                     /// Homeタブに移動した時に表示するチームアイコン
                     if inputTab.animationTab == .home {
-                        Circle()
-                            .frame(width: 35, height: 35)
+                        SDWebImageCircleIcon(imageURL: teamVM.team?.iconURL, width: 40, height: 40)
                             .transition(.asymmetric(
                                 insertion: AnyTransition.opacity.combined(with: .offset(x: -20, y: 0)),
                                 removal: AnyTransition.opacity.combined(with: .offset(x: -20, y: 0))
