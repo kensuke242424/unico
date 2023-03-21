@@ -33,10 +33,11 @@ struct NewItemsView: View {
     /// For Matched Geometry Effect
     @Namespace private var animation
     /// Detail View Properties
-    @State private var showDetailView: Bool = false
+    @State private var showDetailView    : Bool = false
     @State private var showDarkBackground: Bool = false
-    @State private var selectedItem: RootItem?
+    @State private var selectedItem      : RootItem?
     @State private var animateCurrentItem: Bool = false
+    @State private var filterFavorite    : Bool = false
     
     var body: some View {
         GeometryReader {
@@ -49,7 +50,15 @@ struct NewItemsView: View {
                 
                 ScrollView(.vertical, showsIndicators: false) {
                     LazyVStack(spacing: 35) {
-                        ForEach(itemVM.items, id: \.self) { item in
+                        ForEach(itemVM.items.filter(
+                            filterFavorite ?
+                            {   $0.favorite == true &&
+                                ($0.tag == activeTag?.tagName ||
+                                activeTag?.tagName == "全て") } :
+                            {   $0.tag == activeTag?.tagName ||
+                                activeTag?.tagName == "全て"
+                                
+                            })) { item in
                             ItemsCardView(item)
                                 .onAppear {print("ItemCardsView_onAppear: \(item.name)") }
                                 .onDisappear {print("ItemCardsView_onDisapper: \(item.name)") }
@@ -74,7 +83,13 @@ struct NewItemsView: View {
                                     }
                                 }
                                 .opacity(showDarkBackground && inputTab.selectedItem != item ? 0 : 1)
+                        } // ForEath
+                        
+                        if itemVM.items.isEmpty {
+                            AddItemScrollContainerView(size: size)
+                                .onTapGesture { inputTab.path.append(.create) }
                         }
+                        
                     }
                     .padding(.horizontal, 15)
                     .padding(.vertical, 20)
@@ -104,6 +119,14 @@ struct NewItemsView: View {
                     .onAppear { print("カード詳細onAppear") }
                     .onDisappear { print("カード詳細onDisappear") }
             }
+        }
+        .overlay(alignment: .bottomTrailing) {
+            
+            FilterFavoriteItemButton()
+                .padding(.trailing, 40)
+                .padding(.bottom, 20)
+                .opacity(!animateCurrentItem ? 1 : 0)
+            
         }
         .background {
             ZStack {
@@ -218,6 +241,9 @@ struct NewItemsView: View {
                                     .shadow(radius: 1, x: 1, y: 1)
                             }
                     }
+                    .overlay(alignment: .top) {
+                        FavoriteButton(item)
+                    }
                     .padding([.bottom, .trailing], 20)
                 }
                 .offset(x: animateCurrentItem && selectedItem?.id == item.id ? -20 : 0)
@@ -282,6 +308,70 @@ struct NewItemsView: View {
     }
     
     @ViewBuilder
+    private func FavoriteButton(_ item: RootItem) -> some View {
+        Button {
+            itemVM.updateFavorite(item)
+        } label: {
+            if item.favorite {
+                Image(systemName: "heart.fill")
+            } else {
+                Image(systemName: "heart")
+            }
+        }
+        .foregroundColor(.red)
+        .offset(x: 2, y: -40)
+    }
+    
+    @ViewBuilder
+    func FilterFavoriteItemButton() -> some View {
+        ZStack {
+            Capsule()
+                .frame(width: 40, height: 12)
+                .foregroundColor(filterFavorite ? .green.opacity(0.7) : .gray.opacity(0.5))
+            Image(systemName: "heart.fill")
+                .font(.title)
+                .foregroundColor(.black).opacity(0.6)
+                .offset(x: filterFavorite ? 9 : -7)
+            Image(systemName: "heart.fill")
+                .font(.title)
+                .foregroundColor(filterFavorite ? .red : .white)
+                .scaleEffect(0.95)
+                .padding()
+                .offset(x: filterFavorite ? 9 : -7)
+        }
+        .opacity(itemVM.items.isEmpty ? 0 : 1)
+        .onTapGesture {
+            withAnimation(.easeInOut(duration: 0.3)) {
+                filterFavorite.toggle()
+            }
+        }
+    }
+    
+    @ViewBuilder
+    func AddItemScrollContainerView(size: CGSize) -> some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 20)
+                .fill(.gray.gradient)
+                .frame(width: size.width * 0.5, height: 120)
+            
+            Image(systemName: "shippingbox")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 60)
+                .foregroundColor(.black.opacity(0.3))
+                .overlay(alignment: .topTrailing) {
+                    Image(systemName: "plus.circle.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 27)
+                        .foregroundColor(.black.opacity(0.35))
+                        .offset(x: 20, y: -15)
+                }
+        }
+        .opacity(0.7)
+    }
+    
+    @ViewBuilder
     func TagsView(tags: [Tag], items: [RootItem]) -> some View {
         HStack {
             
@@ -302,7 +392,7 @@ struct NewItemsView: View {
                                         .matchedGeometryEffect(id: "ACTIVETAG", in: animation)
                                 } else {
                                     Capsule()
-                                        .fill(Color.gray.opacity(0.4))
+                                        .fill(Color.gray.opacity(0.5))
                                 }
                             }
                             .foregroundColor(activeTag == tag ? .white : .white.opacity(0.6))
@@ -325,25 +415,21 @@ struct NewItemsView: View {
                 Image(systemName: "plus.app.fill")
                     .foregroundColor(Color.gray)
                     .shadow(radius: 1, x: 1, y: 1)
+                    .shadow(radius: 1, x: 1, y: 1)
             }
             .padding(.leading, 5)
             .padding(.trailing, 15)
+            .offset(y: -1)
         }
         .padding(.top)
     }
 } // View
 
-/// Sample Tags
-//var tags: [String] =
-//[
-//"全て", "CD", "トートバッグ", "缶バッジ", "DVD", "サンプル１", "サンプル２", "サンプル３",
-//]
-
 struct NewItemsView_Previews: PreviewProvider {
     static var previews: some View {
-        NewItemsView(itemVM: ItemViewModel(),
-                     cartVM: CartViewModel(),
-                     inputTab   : .constant(InputTab()))
+        NewItemsView(itemVM  : ItemViewModel(),
+                     cartVM  : CartViewModel(),
+                     inputTab: .constant(InputTab()))
         .environmentObject(LogInViewModel())
         .environmentObject(TeamViewModel())
         .environmentObject(UserViewModel())

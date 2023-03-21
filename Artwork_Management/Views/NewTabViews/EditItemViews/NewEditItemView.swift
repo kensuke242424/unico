@@ -243,7 +243,11 @@ struct NewEditItemView: View {
         .navigationBarBackButtonHidden()
         .overlay {
             if input.showTagEdit {
+                Color.black
+                    .opacity(0.7)
+                    .ignoresSafeArea()
                 EditTagView(passTag: $input.selectionTag, show: $input.showTagEdit)
+                    .ignoresSafeArea()
             }
         }
         .background {
@@ -311,6 +315,7 @@ struct NewEditItemView: View {
 
                         Task {
                             guard let defaultDataID = passItem.id else { return }
+                            guard let teamID = teamVM.team?.id else { return }
                             let editInventory = Int(input.inventory) ?? 0
 
                             // captureImageに新しい画像があれば、元の画像データを更新
@@ -319,7 +324,7 @@ struct NewEditItemView: View {
                                 itemVM.deleteImage(path: input.photoPath)
                                 let resizedImage = itemVM.resizeUIImage(image: captureImage,
                                                                         width: width * 2)
-                                let newImageData =  await itemVM.uploadImage(resizedImage)
+                                let newImageData =  await itemVM.uploadImage(resizedImage, teamID)
                                 input.photoURL = newImageData.url
                                 input.photoPath = newImageData.filePath
                             }
@@ -333,6 +338,7 @@ struct NewEditItemView: View {
                                                            detail     : input.detail != "" ? input.detail : "メモなし",
                                                            photoURL   : input.photoURL,
                                                            photoPath  : input.photoPath,
+                                                           favorite   : false,
                                                            cost       : Int( input.cost) ?? 0,
                                                            price      : Int(input.price) ?? 0,
                                                            amount     : 0,
@@ -351,13 +357,14 @@ struct NewEditItemView: View {
                     } else {
                         
                         Task {
+                            guard let teamID = teamVM.team?.id else { return }
                             
                             // captureImageに新しい画像があれば、元の画像データを更新
                             if let captureImage = input.captureImage {
                                 withAnimation(.easeIn(duration: 0.1)) { input.showProgress = true }
                                 itemVM.deleteImage(path: input.photoPath)
                                 let resizedImage = itemVM.resizeUIImage(image: captureImage, width: width)
-                                let newImageData =  await itemVM.uploadImage(resizedImage)
+                                let newImageData =  await itemVM.uploadImage(resizedImage, teamID)
                                 input.photoURL = newImageData.url
                                 input.photoPath = newImageData.filePath
                             }
@@ -369,6 +376,7 @@ struct NewEditItemView: View {
                                                     detail        : input.detail != "" ? input.detail : "メモなし",
                                                     photoURL      : input.photoURL,
                                                     photoPath     : input.photoPath,
+                                                    favorite      : false,
                                                     cost          : 0,
                                                     price         : Int(input.price) ?? 0,
                                                     amount        : 0,

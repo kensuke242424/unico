@@ -146,11 +146,11 @@ struct DetailView: View {
                     .disabled(openDetail ? true : false)
                     
                     Button {
-                        
+                        itemVM.updateFavorite(item)
                     } label: {
-                        Label("Like", systemImage: "suit.heart")
+                        Label("Like", systemImage: item.favorite ? "heart.fill" : "suit.heart")
                             .font(.callout)
-                            .foregroundColor(.gray)
+                            .foregroundColor(item.favorite ? .red : .gray)
                     }
                     .frame(maxWidth: .infinity)
                     .disabled(openDetail ? true : false)

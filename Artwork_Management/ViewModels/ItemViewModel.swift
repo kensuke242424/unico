@@ -75,7 +75,7 @@ class ItemViewModel: ObservableObject {
         print(defaultDataID)
 
         guard let updateItemRef = db?.collection("teams").document(teamID).collection("items").document(defaultDataID) else {
-            print("error: guard let tagsRef")
+            print("error: guard let updateItemRef")
             return
         }
 
@@ -100,6 +100,28 @@ class ItemViewModel: ObservableObject {
         itemRef.delete()
     }
     
+    func updateFavorite(_ item: RootItem) {
+        print("updateFavoriteメソッド実行")
+
+        guard let itemsRef = db?.collection("teams").document(item.teamID).collection("items") else {
+            print("error: guard let itemsRef")
+            return
+        }
+        guard let itemID = item.id else { return }
+        
+        var item = item
+        item.favorite.toggle()
+
+        do {
+            try itemsRef.document(itemID).setData(from: item)
+        } catch {
+            hapticErrorNotification()
+            print("updateFavoriteメソッド失敗")
+        }
+        hapticSuccessNotification()
+        print("updateFavoriteメソッド完了")
+    }
+    
     func resizeUIImage(image: UIImage?, width: CGFloat) -> UIImage? {
         
         if let originalImage = image {
@@ -122,7 +144,7 @@ class ItemViewModel: ObservableObject {
         }
     }
 
-    func uploadImage(_ image: UIImage?) async -> (url: URL?, filePath: String?) {
+    func uploadImage(_ image: UIImage?, _ teamID: String) async -> (url: URL?, filePath: String?) {
         
         print("uploadImage実行")
         guard let imageData = image?.jpegData(compressionQuality: 0.8) else {
@@ -132,7 +154,7 @@ class ItemViewModel: ObservableObject {
         do {
             let storage = Storage.storage()
             let reference = storage.reference()
-            let filePath = "images/\(Date()).jpeg"
+            let filePath = "\(teamID)/items/\(Date()).jpeg"
             let imageRef = reference.child(filePath)
             _ = try await imageRef.putDataAsync(imageData)
             let url = try await imageRef.downloadURL()

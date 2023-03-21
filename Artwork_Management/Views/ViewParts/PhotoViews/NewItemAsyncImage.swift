@@ -27,10 +27,14 @@ struct NewItemAsyncImage: View {
                     itemImage
                         .resizable()
                         .scaledToFill()
+                        .shadow(radius: 1, x: 2, y: 2)
+                        .shadow(radius: 1, x: 2, y: 2)
                 } placeholder: {
                     ZStack {
                         ProgressView()
                         Color.black.opacity(0.2)
+                            .shadow(radius: 1, x: 2, y: 2)
+                            .shadow(radius: 1, x: 2, y: 2)
                     }
                 }
                 .frame(width: width, height: height)
@@ -41,6 +45,8 @@ struct NewItemAsyncImage: View {
             RoundedRectangle(cornerRadius: 10)
                 .foregroundColor(Color.gray)
                 .frame(width: width, height: height)
+                .shadow(radius: 1, x: 2, y: 2)
+                .shadow(radius: 1, x: 2, y: 2)
                 .overlay {
                     VStack(spacing: 20) {
                         Image(systemName: "cube.transparent.fill")

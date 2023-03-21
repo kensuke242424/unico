@@ -30,7 +30,7 @@ struct EditTagView: View {
                 HStack {
                     Image(systemName: "tag.fill")
                         .font(.title3)
-                    Text(passTag == nil ? "タグの追加" : "タグの編集")
+                    Text(passTag == nil ? "新規タグ" : "タグ編集")
                         .font(.title)
                         .tracking(4)
                         .fontWeight(.semibold)
@@ -86,7 +86,8 @@ struct EditTagView: View {
                     }
                 }
                 .buttonStyle(.borderedProminent)
-                .disabled(tagName.isEmpty ? true : false)
+                .disabled(nameEmpty)
+                .disabled(containsName)
                 .onChange(of: tagName) { newValue in
                     if newValue.isEmpty {
                         withAnimation(.easeInOut(duration: 0.3)) { nameEmpty = true }
@@ -127,8 +128,8 @@ struct EditTagView: View {
         .offset(y: 30)
         .transition(AnyTransition.opacity.combined(with: .offset(y: 50)))
         .background {
-            Color.black
-                .opacity(0.7)
+            Color.gray
+                .opacity(0.001)
                 .ignoresSafeArea()
                 .onTapGesture { focused = nil }
         }

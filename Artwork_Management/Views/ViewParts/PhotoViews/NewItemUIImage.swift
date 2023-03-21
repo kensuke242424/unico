@@ -25,6 +25,8 @@ struct NewItemUIImage: View {
                         .scaledToFill()
                 .frame(width: width, height: height)
                 .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                .shadow(radius: 1, x: 2, y: 2)
+                .shadow(radius: 1, x: 2, y: 2)
                 .allowsHitTesting(false)
             }
 
@@ -32,6 +34,8 @@ struct NewItemUIImage: View {
             RoundedRectangle(cornerRadius: 10)
                 .foregroundColor(Color.gray)
                 .frame(width: width, height: height)
+                .shadow(radius: 1, x: 2, y: 2)
+                .shadow(radius: 1, x: 2, y: 2)
                 .overlay {
                     VStack(spacing: 20) {
                         Image(systemName: "cube.transparent.fill")

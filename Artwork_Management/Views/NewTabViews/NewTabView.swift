@@ -97,6 +97,9 @@ struct NewTabView: View {
                 /// 🏷タグの追加や編集を行うView
                 .overlay {
                     if tagVM.showEdit {
+                        Color.black
+                            .opacity(0.7)
+                            .ignoresSafeArea()
                         EditTagView(passTag: $inputTab.selectedTag,
                                     show   : $tagVM.showEdit)
                     }

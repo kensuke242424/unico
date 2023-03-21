@@ -15,31 +15,30 @@ struct SelectItemPhotoBackground: View {
     
     var body: some View {
         
-        Color.clear
+        BlurView(style: .systemUltraThinMaterialDark)
             .frame(width: getRect().width, height: height)
-            .background(.ultraThinMaterial)
-            .opacity(0.9)
+//            .opacity(0.9)
             .background {
                 if let photoImage = photoImage {
                     Image(uiImage: photoImage)
                         .resizable()
                         .scaledToFill()
                         .frame(width: getRect().width, height: height)
-                        .clipped()
-                        .blur(radius: 4, opaque: true)
+                        .clipShape(RoundedRectangle(cornerRadius: 5))
+                        .blur(radius: 8, opaque: true)
                         .opacity(0.5)
                 } else if let photoURL = photoURL {
                     ZStack {
                         RoundedRectangle(cornerRadius: 5)
-                            .foregroundColor(.white).opacity(0.1)
+                            .foregroundColor(.white)
+                            .opacity(0.1)
                             .frame(width: getRect().width, height: height)
-                            .opacity(0.5)
                         
                         SDWebImageView(imageURL: photoURL,
                                           width: getRect().width,
                                           height: height)
                         .clipShape(RoundedRectangle(cornerRadius: 5))
-                        .blur(radius: 4, opaque: true)
+                        .blur(radius: 8, opaque: true)
                         .allowsHitTesting(false)
                     }
                     
@@ -49,11 +48,8 @@ struct SelectItemPhotoBackground: View {
                         .scaledToFill()
                         .frame(width: getRect().width, height: height)
                         .clipShape(RoundedRectangle(cornerRadius: 5))
+                        .blur(radius: 8, opaque: true)
                 }
-            }
-            .overlay {
-                LinearGradient(colors: [.clear, .black.opacity(0.3)], startPoint: .top, endPoint: .bottom)
-                    .blur(radius: 5)
             }
     } // body
 } // カスタムView

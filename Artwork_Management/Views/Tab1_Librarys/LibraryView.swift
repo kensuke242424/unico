@@ -189,8 +189,9 @@ struct LibraryView: View {
             print("bbb")
             Task {
                 do {
+                    guard let teamID = teamVM.team?.id else { return }
                     itemVM.deleteImage(path: teamVM.team!.backgroundPath)
-                    let uploadImageData = await itemVM.uploadImage(newHeaderImage)
+                    let uploadImageData = await itemVM.uploadImage(newHeaderImage, teamID)
                     try await teamVM.updateTeamHeaderImage(data: uploadImageData)
                 } catch CustomError.fetch {
                     print("Error: fetch")

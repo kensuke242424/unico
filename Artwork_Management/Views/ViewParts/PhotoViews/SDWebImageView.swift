@@ -11,8 +11,8 @@ import SDWebImageSwiftUI
 struct SDWebImageView: View {
     
     let imageURL: URL?
-    let width: CGFloat
-    let height: CGFloat
+    let width   : CGFloat
+    let height  : CGFloat
     
     var body: some View {
         if let imageURL = imageURL {
@@ -33,6 +33,8 @@ struct SDWebImageView: View {
                     }
                     .scaledToFill()
                     .frame(width: width, height: height)
+                    .shadow(radius: 1, x: 2, y: 2)
+                    .shadow(radius: 1, x: 2, y: 2)
                     .allowsHitTesting(false)
             }
             
@@ -40,6 +42,8 @@ struct SDWebImageView: View {
             RoundedRectangle(cornerRadius: 10)
                 .foregroundColor(Color.gray)
                 .frame(width: width, height: height)
+                .shadow(radius: 1, x: 2, y: 2)
+                .shadow(radius: 1, x: 2, y: 2)
                 .overlay {
                     VStack(spacing: 20) {
                         Image(systemName: "cube.transparent.fill")
