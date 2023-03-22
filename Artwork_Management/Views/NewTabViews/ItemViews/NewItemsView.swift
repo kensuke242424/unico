@@ -45,7 +45,7 @@ struct NewItemsView: View {
             VStack(spacing: 15) {
                 
                 TagsView(tags: tagVM.tags, items: itemVM.items)
-                    .opacity(showDarkBackground ? 0 : 1)
+                    .opacity(showDetailView ? 0 : 1)
                     .onAppear { activeTag = tagVM.tags.first }
                 
                 ScrollView(.vertical, showsIndicators: false) {
@@ -67,22 +67,21 @@ struct NewItemsView: View {
                                         guard let actionIndex = getActionIndex(item) else {
                                             return
                                         }
-                                        
                                         cartVM.actionItemIndex = actionIndex
                                         animateCurrentItem        = true
                                         showDarkBackground        = true
-                                        inputTab.reportShowDetail = true
                                         /// ✅ アニメーションにチラつきがあったため、二箇所で管理
                                         selectedItem = item
                                         inputTab.selectedItem = item
                                     }
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.22) {
                                         withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.7, blendDuration: 0.7)) {
                                             showDetailView.toggle()
+                                            inputTab.reportShowDetail = true
                                         }
                                     }
                                 }
-                                .opacity(showDarkBackground && inputTab.selectedItem != item ? 0 : 1)
+                                .opacity(showDetailView && inputTab.selectedItem != item ? 0 : 1)
                         } // ForEath
                         
                         if itemVM.items.isEmpty {
@@ -93,7 +92,6 @@ struct NewItemsView: View {
                                     }
                                 }
                         }
-                        
                     }
                     .padding(.horizontal, 15)
                     .padding(.vertical, 20)
@@ -129,7 +127,7 @@ struct NewItemsView: View {
             FilterFavoriteItemButton()
                 .padding(.trailing, 40)
                 .padding(.bottom, 20)
-                .opacity(!animateCurrentItem ? 1 : 0)
+                .opacity(showDetailView ? 0 : 1)
             
         }
         .background {
@@ -138,7 +136,7 @@ struct NewItemsView: View {
                     Rectangle()
                         .fill(colorScheme == .light ? .white : .black)
                         .frame(width: proxy.size.width, height: proxy.size.height)
-                        .opacity(showDarkBackground ? 1 : 0)
+                        .opacity(showDetailView ? 1 : 0)
                 }
                 .ignoresSafeArea()
             }
@@ -212,7 +210,6 @@ struct NewItemsView: View {
                         .shadow(color: .black.opacity(0.08), radius: 8, x: 5, y: -5)
                         .shadow(color: .black.opacity(0.08), radius: 8, x: -5, y: -5)
                 }
-                .zIndex(1)
                 /// カートにアイテムを入れるボタン
                 .overlay(alignment: .bottomTrailing) {
                     Button {
@@ -250,7 +247,9 @@ struct NewItemsView: View {
                     }
                     .padding([.bottom, .trailing], 20)
                 }
+                .zIndex(1)
                 .offset(x: animateCurrentItem && selectedItem?.id == item.id ? -20 : 0)
+                .opacity(showDetailView ? 0 : 1)
                 
                 /// Book Cover Image
                 ZStack {

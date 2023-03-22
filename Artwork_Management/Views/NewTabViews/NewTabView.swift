@@ -288,7 +288,6 @@ struct NewTabView: View {
                     if inputTab.animationTab == .item && !inputTab.reportShowDetail {
                         Button {
                             /// アイテム追加エディット画面に遷移
-                            ///  追加ボタンなので、selectedItemはnilを入れておく
                             withAnimation(.spring(response: 0.4)) {
                                 inputTab.path.append(.create)
                             }

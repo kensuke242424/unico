@@ -22,23 +22,28 @@ struct DetailView: View {
     @State private var animationContent: Bool = false
     @State private var offsetAnimation: Bool = false
     @State private var openDetail: Bool = false
+    @State private var showDetailBackground: Bool = false
     @State private var showDeleteAlert: Bool = false
     
     var body: some View {
         
         VStack(spacing: 15) {
             Button {
-                withAnimation(.easeInOut(duration: 0.2)) {
+                withAnimation(.easeInOut(duration: 0.15)) {
                     offsetAnimation = false
                 }
                 /// Closing Detail View
                 withAnimation(.easeInOut(duration: 0.35).delay(0.1)) {
                     animationContent          = false
+                    showDetailBackground      = false
                     inputTab.reportShowDetail = false
                 }
-                withAnimation(.easeInOut(duration: 0.35).delay(0.1)) {
-                    show.toggle()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                    withAnimation(.easeInOut(duration: 0.35)) {
+                        show.toggle()
+                    }
                 }
+                
             } label: {
                 Image(systemName: "chevron.left")
                     .font(.title3)
@@ -117,7 +122,7 @@ struct DetailView: View {
             Rectangle()
                 .fill(colorScheme == .light ? .white : .black)
                 .ignoresSafeArea()
-                .opacity(show ? 1 : 0)
+                .opacity(animationContent ? 1 : 0)
         }
         .onAppear {
             withAnimation(.easeInOut(duration: 0.35)) {
@@ -126,6 +131,10 @@ struct DetailView: View {
             
             withAnimation(.easeInOut(duration: 0.35).delay(0.1)) {
                 offsetAnimation = true
+            }
+            
+            withAnimation(.easeInOut(duration: 0.35).delay(0.1)) {
+                showDetailBackground = true
             }
         }
     }
@@ -213,10 +222,6 @@ struct DetailView: View {
                         .padding(.top, 8)
                 }
                 .padding(.bottom, 100)
-            }
-            
-            HStack {
-                
             }
             .alert("確認", isPresented: $showDeleteAlert) {
 
