@@ -47,7 +47,6 @@ struct UpdateTeamOrUserDataView: View {
                     .font(.title3.bold())
                     .foregroundColor(.white)
                     .opacity(0.7)
-//                    .opacity(updateContentOpacity)
                     .tracking(10)
 
                 VStack(spacing: 10) {
@@ -65,7 +64,6 @@ struct UpdateTeamOrUserDataView: View {
                 .opacity(0.7)
                 .foregroundColor(.white)
                 .padding(.bottom, 8)
-                
                 
                 if let captureImage = inputUpdate.captureImage {
                     UIImageCircleIcon(photoImage: captureImage, size: 150)

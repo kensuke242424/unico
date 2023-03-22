@@ -70,7 +70,7 @@ struct SystemSideMenu: View {
                                          width   : getRect().width / 3 + 20,
                                          height  : getRect().width / 3 + 20)
                     .onTapGesture {
-//                        withAnimation(.spring(response: 0.5)) { inputTab.selectedUpdateData = .team }
+                        withAnimation(.spring(response: 0.5)) { inputTab.selectedUpdateData = .team }
                     }
                     .overlay(alignment: .topTrailing) {
                         Button {
@@ -159,8 +159,10 @@ struct SystemSideMenu: View {
                                         }
                                         
                                         Button {
-                                            inputTab.selectedTag = nil
-                                            tagVM.showEdit       = true
+                                            withAnimation(.easeInOut(duration: 0.3)) {
+                                                inputTab.selectedTag = nil
+                                                tagVM.showEdit = true
+                                            }
                                         } label: {
                                             Image(systemName: "plus.square")
                                         }
@@ -193,12 +195,13 @@ struct SystemSideMenu: View {
                                                         
                                                         if inputSideMenu.editMode == .inactive {
                                                             Image(systemName: "highlighter")
-                                                                .foregroundColor(.gray)
+                                                                .foregroundColor(.orange)
                                                                 .opacity(inputSideMenu.editMode.isEditing ? 0.0 : 0.6)
                                                                 .onTapGesture {
-                                                                    print("タグ編集ボタンタップ")
-                                                                    inputTab.selectedTag = tag
-                                                                    tagVM.showEdit = true
+                                                                    withAnimation(.easeInOut(duration: 0.3)) {
+                                                                        inputTab.selectedTag = tag
+                                                                        tagVM.showEdit = true
+                                                                    }
                                                                 }
                                                         }
                                                     } // HStack
@@ -350,6 +353,16 @@ struct SystemSideMenu: View {
         .onChange(of: inputSideMenu.editMode) { newEdit in
             if newEdit == .inactive {
                 tagVM.updateOderTagIndex(teamID: teamVM.team!.id)
+            }
+        }
+        .onChange(of: inputTab.showSideMenu) { newValue in
+            if !newValue {
+                inputSideMenu.item     = false
+                inputSideMenu.tag      = false
+                inputSideMenu.team     = false
+                inputSideMenu.account  = false
+                inputSideMenu.help     = false
+                inputSideMenu.editMode = .inactive
             }
         }
         .clipShape(SideMenuShape())

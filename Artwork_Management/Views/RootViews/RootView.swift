@@ -38,6 +38,9 @@ struct RootView: View {
 
     @State private var isShowStandBy: Bool = false
     @State private var showLogInAlert: Bool = false
+    @State private var inputTab: InputTab = InputTab()
+    
+    @State private var preloadViews: Bool = false
 
     var body: some View {
 
@@ -70,7 +73,24 @@ struct RootView: View {
             }
 
         } // ZStack
-//        .preferredColorScheme(.dark)
+        //        .preferredColorScheme(.dark)
+        /// プリロードView
+        /// 一度ロードしたViewはキャッシュが作られて初回時のView表示が軽くなる仕様を使う
+        .background {
+            if preloadViews {
+                Group {
+                    NewItemsView(itemVM: itemVM, cartVM: cartVM, inputTab: $inputTab)
+                    NewEditItemView(itemVM: itemVM, passItem: nil)
+                }
+                .opacity(0)
+            }
+        }
+        .onAppear {
+            preloadViews = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+                preloadViews = false
+            }
+        }
 
         // fetch...
         .onChange(of: logInVM.rootNavigation) { navigation in
@@ -154,7 +174,6 @@ struct RootView: View {
 
         // Auth check...
         .onAppear {
-            
             if Auth.auth().currentUser != nil {
                 print("RootView_onAppear_currentUser != nil")
                 logInVM.rootNavigation = .fetch

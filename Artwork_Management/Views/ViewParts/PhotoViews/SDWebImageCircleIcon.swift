@@ -41,7 +41,7 @@ struct SDWebImageCircleIcon: View {
             
         } else {
             Circle()
-                .foregroundColor(.userBlue4)
+                .foregroundColor(.userGray2)
                 .frame(width: width, height: height)
                 .shadow(radius: 1, x: 1, y: 1)
                 .overlay {

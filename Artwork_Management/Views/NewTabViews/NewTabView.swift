@@ -94,6 +94,11 @@ struct NewTabView: View {
                         }
                     }
                 }
+                /// サイドメニューView
+                .overlay {
+                    SystemSideMenu(itemVM: itemVM, inputTab: $inputTab)
+                        .offset(x: inputTab.showSideMenu ? 0 : -size.width)
+                }
                 /// 🏷タグの追加や編集を行うView
                 .overlay {
                     if tagVM.showEdit {
@@ -103,11 +108,6 @@ struct NewTabView: View {
                         EditTagView(passTag: $inputTab.selectedTag,
                                     show   : $tagVM.showEdit)
                     }
-                }
-                /// サイドメニューView
-                .overlay {
-                    SystemSideMenu(itemVM: itemVM, inputTab: $inputTab)
-                        .offset(x: inputTab.showSideMenu ? 0 : -size.width)
                 }
                 /// チームへの招待View
                 .overlay {

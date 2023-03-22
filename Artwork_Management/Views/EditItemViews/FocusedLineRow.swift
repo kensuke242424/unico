@@ -40,7 +40,7 @@ struct FocusedLineRow: View {
         
             .onChange(of: select) { newValue in
                 if newValue == true {
-                    withAnimation(.spring(response: 0.2)) {
+                    withAnimation(.spring(response: 0.3)) {
                         lineAnimation = width
                     }
                 } else {

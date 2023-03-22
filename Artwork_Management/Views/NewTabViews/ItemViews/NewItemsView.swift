@@ -344,7 +344,7 @@ struct NewItemsView: View {
         }
         .opacity(itemVM.items.isEmpty ? 0 : 1)
         .onTapGesture {
-            withAnimation(.easeInOut(duration: 0.3)) {
+            withAnimation(.spring(response: 0.4)) {
                 filterFavorite.toggle()
             }
         }
