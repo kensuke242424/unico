@@ -74,7 +74,7 @@ struct NewItemsView: View {
                                         selectedItem = item
                                         inputTab.selectedItem = item
                                     }
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.22) {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
                                         withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.7, blendDuration: 0.7)) {
                                             showDetailView.toggle()
                                             inputTab.reportShowDetail = true
@@ -210,6 +210,7 @@ struct NewItemsView: View {
                         .shadow(color: .black.opacity(0.08), radius: 8, x: 5, y: -5)
                         .shadow(color: .black.opacity(0.08), radius: 8, x: -5, y: -5)
                 }
+                .zIndex(1)
                 /// カートにアイテムを入れるボタン
                 .overlay(alignment: .bottomTrailing) {
                     Button {
@@ -247,11 +248,10 @@ struct NewItemsView: View {
                     }
                     .padding([.bottom, .trailing], 20)
                 }
-                .zIndex(1)
                 .offset(x: animateCurrentItem && selectedItem?.id == item.id ? -20 : 0)
                 .opacity(showDetailView ? 0 : 1)
                 
-                /// Book Cover Image
+                /// Book Cover Imager
                 ZStack {
                     if !(showDetailView && selectedItem?.id == item.id) {
                         SDWebImageView(imageURL: item.photoURL,

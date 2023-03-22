@@ -33,12 +33,12 @@ struct DetailView: View {
                     offsetAnimation = false
                 }
                 /// Closing Detail View
-                withAnimation(.easeInOut(duration: 0.35).delay(0.1)) {
+                withAnimation(.easeInOut(duration: 0.2).delay(0.1)) {
                     animationContent          = false
                     showDetailBackground      = false
                     inputTab.reportShowDetail = false
                 }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                     withAnimation(.easeInOut(duration: 0.35)) {
                         show.toggle()
                     }
