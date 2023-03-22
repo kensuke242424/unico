@@ -246,7 +246,7 @@ struct SystemSideMenu: View {
 
                                         Label("チーム情報変更", systemImage: "person.text.rectangle.fill")
                                             .onTapGesture {
-//                                                withAnimation(.spring(response: 0.5)) { inputHome.selectedUpdateData = .team }
+                                                withAnimation(.spring(response: 0.5)) { inputTab.selectedUpdateData = .team }
                                             }
 
                                         Label("メンバー招待", systemImage: "person.wave.2.fill")
@@ -279,7 +279,7 @@ struct SystemSideMenu: View {
 
                                         Label("ユーザ情報変更", systemImage: "person.text.rectangle")
                                             .onTapGesture {
-//                                                withAnimation(.spring(response: 0.5)) { inputHome.selectedUpdateData = .user }
+                                                withAnimation(.spring(response: 0.5)) { inputTab.selectedUpdateData = .user }
                                             }
 
                                         Label("ログアウト", systemImage: "figure.wave")
@@ -369,8 +369,6 @@ struct SystemSideMenu: View {
 
         )
         // TODO: トランジションの確認
-        .transition(.asymmetric(insertion: .offset(x: -getRect().width),
-                                removal  : .offset(x: -getRect().width)))
         .ignoresSafeArea()
         .offset(x: dragOffset)
         .gesture(

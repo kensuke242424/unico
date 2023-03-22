@@ -16,6 +16,7 @@ struct InputTab {
     /// Navigation遷移を管理するプロパティ
     var path: [NavigationPath] = []
     var showSideMenu: Bool = false
+    var selectedUpdateData: SelectedUpdateData = .start
     /// NavigationPathによるエディット画面遷移時に渡す
     var selectedItem: Item?
     var selectedTag: Tag?
@@ -53,13 +54,11 @@ struct NewTabView: View {
             NavigationStack(path: $inputTab.path) {
                 
                 VStack {
-                    
                     TabTopBarView()
                     
                     Spacer(minLength: 0)
                     
                     TabView(selection: $inputTab.selectionTab) {
-                        
                         NewHomeView(itemVM: itemVM, inputTab: $inputTab)
                             .tag(Tab.home)
                             .offsetX(inputTab.selectionTab == Tab.home) { rect in
@@ -105,10 +104,24 @@ struct NewTabView: View {
                                     show   : $tagVM.showEdit)
                     }
                 }
-                /// サイドメニュー
+                /// サイドメニューView
                 .overlay {
-                    if inputTab.showSideMenu {
-                        SystemSideMenu(itemVM: itemVM, inputTab: $inputTab)
+                    SystemSideMenu(itemVM: itemVM, inputTab: $inputTab)
+                        .offset(x: inputTab.showSideMenu ? 0 : -size.width)
+                }
+                /// チームへの招待View
+                .overlay {
+                    if teamVM.isShowSearchedNewMemberJoinTeam {
+                        JoinUserDetectCheckView(teamVM: teamVM)
+                            .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
+                    }
+                }
+                /// チームorユーザ情報の編集View
+                .overlay {
+                    if inputTab.selectedUpdateData == .user ||
+                        inputTab.selectedUpdateData == .team {
+                        UpdateTeamOrUserDataView(selectedUpdate: $inputTab.selectedUpdateData)
+                            .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
                     }
                 }
                 .ignoresSafeArea()

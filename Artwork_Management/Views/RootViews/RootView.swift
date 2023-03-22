@@ -58,9 +58,9 @@ struct RootView: View {
                     .environment(\.resizableSheetCenter, resizableSheetCenter)
             }
 
-            // チームに他のユーザを招待するView
-            JoinUserDetectCheckView(teamVM: teamVM)
-                .opacity(teamVM.isShowSearchedNewMemberJoinTeam ? 1.0 : 0.0)
+//            // チームに他のユーザを招待するView
+//            JoinUserDetectCheckView(teamVM: teamVM)
+//                .opacity(teamVM.isShowSearchedNewMemberJoinTeam ? 1.0 : 0.0)
 
             StandByView()
                 .opacity(isShowStandBy ? 1.0 : 0.0)
