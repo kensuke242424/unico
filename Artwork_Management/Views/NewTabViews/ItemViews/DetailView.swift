@@ -17,7 +17,7 @@ struct DetailView: View {
     @Binding var inputTab: InputTab
     @Binding var show: Bool
     var animation: Namespace.ID
-    var item: RootItem
+    var item: Item
     /// View Properties
     @State private var animationContent: Bool = false
     @State private var offsetAnimation: Bool = false
@@ -354,7 +354,7 @@ struct DetailView: View {
         }
     }
     
-    func checkHaveNotInventory(_ item: RootItem) -> Bool {
+    func checkHaveNotInventory(_ item: Item) -> Bool {
         
         var checkResult: Bool = false
         

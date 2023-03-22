@@ -231,7 +231,7 @@ struct ManageView: View {
 
     // Manage List Row...
     @ViewBuilder
-    func manageListRow(item: RootItem) -> some View {
+    func manageListRow(item: Item) -> some View {
 
         VStack {
 
@@ -307,7 +307,7 @@ struct ManageView: View {
         .padding(.vertical)
     }
 
-    private func tagGroupTotalSales(items: [RootItem], tag: String, group: Bool) -> Int {
+    private func tagGroupTotalSales(items: [Item], tag: String, group: Bool) -> Int {
 
         var itemsSales = 0
 

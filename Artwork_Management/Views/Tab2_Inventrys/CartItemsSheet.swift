@@ -72,7 +72,7 @@ struct CartItemRow: View {
 
     @StateObject var cartVM: CartViewModel
     
-    let itemRow: RootItem
+    let itemRow: Item
 
     @State private var basketItemCount: Int = 0
     @State private var isShowAlert: Bool = false

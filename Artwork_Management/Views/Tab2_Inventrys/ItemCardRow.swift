@@ -13,7 +13,7 @@ struct ItemCardRow: View {
     @StateObject var itemVM: ItemViewModel
     @Binding var inputHome: InputHome
     @Binding var inputStock: InputCart
-    let itemRow: RootItem
+    let itemRow: Item
 
     private let itemWidth: CGFloat = UIScreen.main.bounds.width / 2 - 30
     private let itemHeight: CGFloat = UIScreen.main.bounds.height / 4

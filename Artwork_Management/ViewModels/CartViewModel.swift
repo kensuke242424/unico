@@ -17,14 +17,14 @@ class CartViewModel: ObservableObject {
     @Published var showCart    : ResizableSheetState = .hidden
     @Published var showCommerce: ResizableSheetState = .hidden
     
-    @Published var cartItems: [RootItem] = []
+    @Published var cartItems: [Item] = []
     
     @Published var doCommerce: Bool = false
     @Published var actionItemIndex: Int = 0
     @Published var resultCartAmount: Int = 0
     @Published var resultCartPrice: Int = 0
     
-    func addCartItem(item: RootItem) {
+    func addCartItem(item: Item) {
         
         let index = cartItems.firstIndex(where: { $0.id == item.id })
         print("cartItems_index: \(index)")

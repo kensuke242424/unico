@@ -77,7 +77,7 @@ struct NewEditItemView: View {
     // アイテム詳細テキストフィールド専用のフォーカス制御
     @FocusState var detailFocused: Bool?
     
-    let passItem: RootItem?
+    let passItem: Item?
     
     var body: some View {
         
@@ -330,7 +330,7 @@ struct NewEditItemView: View {
                             }
 
                             // NOTE: アイテムを更新
-                            let updateItemData = (RootItem(createTime: passItem.createTime,
+                            let updateItemData = (Item(createTime: passItem.createTime,
                                                            tag        : input.selectionTagName,
                                                            teamID     : teamVM.team!.id,
                                                            name       : input.name,
@@ -369,7 +369,7 @@ struct NewEditItemView: View {
                                 input.photoPath = newImageData.filePath
                             }
                             
-                            let itemData = RootItem(tag           : input.selectionTagName,
+                            let itemData = Item(tag           : input.selectionTagName,
                                                     teamID        : teamVM.team!.id,
                                                     name          : input.name,
                                                     author        : input.author,

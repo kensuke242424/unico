@@ -17,7 +17,7 @@ class ItemViewModel: ObservableObject {
     var listener: ListenerRegistration?
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
 
-    @Published var items: [RootItem] = []
+    @Published var items: [Item] = []
     // アイテムの中にタグが未グループのものがあるかどうか
     var unsetTag: Bool {
         let result = self.items.contains(where: { $0.tag == "未グループ" })
@@ -43,15 +43,15 @@ class ItemViewModel: ObservableObject {
 
             // 取得できたアイテムをデコーダブル ⇨ Itemモデルを参照 ⇨ 「items」に詰めていく
             // with: ⇨ ServerTimestampを扱う際のオプションを指定
-            self.items = documents.compactMap { (snap) -> RootItem? in
+            self.items = documents.compactMap { (snap) -> Item? in
 
-                return try? snap.data(as: RootItem.self, with: .estimate)
+                return try? snap.data(as: Item.self, with: .estimate)
             }
         }
         print("fetchItem完了")
     }
 
-    func addItem(itemData: RootItem, tag: String, teamID: String) {
+    func addItem(itemData: Item, tag: String, teamID: String) {
 
         print("addItem実行")
 
@@ -68,7 +68,7 @@ class ItemViewModel: ObservableObject {
         print("addItem完了")
     }
 
-    func updateItem(updateData: RootItem, defaultDataID: String, teamID: String) {
+    func updateItem(updateData: Item, defaultDataID: String, teamID: String) {
 
         print("updateItem実行")
 
@@ -89,7 +89,7 @@ class ItemViewModel: ObservableObject {
         print("updateItem完了")
     }
 
-    func deleteItem(deleteItem: RootItem, teamID: String) {
+    func deleteItem(deleteItem: Item, teamID: String) {
 
         guard let itemID = deleteItem.id else { return }
         guard let itemRef = db?.collection("teams").document(teamID).collection("items").document(itemID) else {
@@ -100,7 +100,7 @@ class ItemViewModel: ObservableObject {
         itemRef.delete()
     }
     
-    func updateFavorite(_ item: RootItem) {
+    func updateFavorite(_ item: Item) {
         print("updateFavoriteメソッド実行")
 
         guard let itemsRef = db?.collection("teams").document(item.teamID).collection("items") else {

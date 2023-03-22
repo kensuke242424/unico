@@ -9,7 +9,7 @@ import SwiftUI
 import FirebaseFirestore
 import FirebaseFirestoreSwift
 
-struct RootItem: Identifiable, Equatable, Hashable, Codable {
+struct Item: Identifiable, Equatable, Hashable, Codable {
 
     @DocumentID var id: String? = UUID().uuidString
     @ServerTimestamp var createTime: Timestamp?
@@ -40,9 +40,9 @@ enum Mode {
     case light
 }
 
-var testItem: [RootItem] =
+var testItem: [Item] =
 [
-    RootItem(tag: "Clothes",
+    Item(tag: "Clothes",
              teamID: "",
              name: "cloth_sample2",
              author: "Anonymous User",

@@ -12,7 +12,7 @@ struct ShowsItemDetail: View {
     @StateObject var itemVM: ItemViewModel
 
     @Binding var inputHome: InputHome
-    let item: RootItem
+    let item: Item
     let teamID: String
 
     struct InputItemDetail {

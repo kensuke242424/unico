@@ -35,7 +35,7 @@ struct NewItemsView: View {
     /// Detail View Properties
     @State private var showDetailView    : Bool = false
     @State private var showDarkBackground: Bool = false
-    @State private var selectedItem      : RootItem?
+    @State private var selectedItem      : Item?
     @State private var animateCurrentItem: Bool = false
     @State private var filterFavorite    : Bool = false
     
@@ -151,7 +151,7 @@ struct NewItemsView: View {
         }
     }
     
-    func getActionIndex(_ selectedItem: RootItem) -> Int? {
+    func getActionIndex(_ selectedItem: Item) -> Int? {
         let index = itemVM.items.firstIndex(where: { $0.id == selectedItem.id })
         return index
     }
@@ -164,7 +164,7 @@ struct NewItemsView: View {
     }
     
     @ViewBuilder
-    func ItemsCardView(_ item: RootItem) -> some View {
+    func ItemsCardView(_ item: Item) -> some View {
         GeometryReader {
             let size = $0.size
             let rect = $0.frame(in: .named("SCROLLVIEW"))
@@ -274,7 +274,7 @@ struct NewItemsView: View {
         .frame(height: 220)
     }
     
-    func checkHaveNotInventory(_ item: RootItem) -> Bool {
+    func checkHaveNotInventory(_ item: Item) -> Bool {
         
         var checkResult: Bool = false
         
@@ -311,7 +311,7 @@ struct NewItemsView: View {
     }
     
     @ViewBuilder
-    private func FavoriteButton(_ item: RootItem) -> some View {
+    private func FavoriteButton(_ item: Item) -> some View {
         Button {
             itemVM.updateFavorite(item)
         } label: {
@@ -375,7 +375,7 @@ struct NewItemsView: View {
     }
     
     @ViewBuilder
-    func TagsView(tags: [Tag], items: [RootItem]) -> some View {
+    func TagsView(tags: [Tag], items: [Item]) -> some View {
         HStack {
             
             ScrollView(.horizontal, showsIndicators: false) {

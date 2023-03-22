@@ -10,7 +10,7 @@ import SwiftUI
 struct IndicatorRow: View {
 
     @Binding var inputManage: InputManageCustomizeSideMenu
-    let item: RootItem
+    let item: Item
     let color: UsedColor
 
     @State private var animationValue: CGFloat = 0
@@ -102,7 +102,7 @@ struct IndicatorRow: View {
             }
     }
 
-    private func indicatorElement(item: RootItem, limit: Int) -> (value: CGFloat, guide: Int) {
+    private func indicatorElement(item: Item, limit: Int) -> (value: CGFloat, guide: Int) {
 
         // value値はCGFloat型で返すため、limit値のCGFloat型を用意
         let cgFloatLimit: CGFloat = CGFloat(limit)

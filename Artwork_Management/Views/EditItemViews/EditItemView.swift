@@ -15,7 +15,7 @@ struct EditItemView: View {
     @StateObject var tagVM: TagViewModel
     @Binding var inputHome: InputHome
 
-    let passItemData: RootItem?
+    let passItemData: Item?
     let editItemStatus: EditSelect
 
     var tagColor: UsedColor {
@@ -204,7 +204,7 @@ struct InputForms: View {
 
     // NOTE: enum「Status」を用いて、「.create」と「.update」とでViewレイアウトを分岐します。
     let editItemStatus: EditSelect
-    let passItem: RootItem?
+    let passItem: Item?
     let tagColor: UsedColor
 
     @FocusState private var focusedField: EditItemField?

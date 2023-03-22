@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ItemDetailData: View {
 
-    let item: RootItem
+    let item: Item
 
     var createTime: String {
         if let createTime = item.createTime {

@@ -17,7 +17,7 @@ struct InputTab {
     var path: [NavigationPath] = []
     var showSideMenu: Bool = false
     /// NavigationPathによるエディット画面遷移時に渡す
-    var selectedItem: RootItem?
+    var selectedItem: Item?
     var selectedTag: Tag?
     
     /// タブViewのアニメーションを管理するプロパティ

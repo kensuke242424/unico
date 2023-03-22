@@ -36,7 +36,7 @@ struct LibraryView: View {
     @State private var inputTime: InputTimesView = InputTimesView()
     @State private var headerImageSize: HeaderImageSize = .fit
 
-    var tagFilterItemCards: [RootItem] {
+    var tagFilterItemCards: [Item] {
         if inputLibrary.selectFilterTag == tagVM.tags.first!.tagName {
             return itemVM.items
         } else {
@@ -341,7 +341,7 @@ struct LibraryView: View {
         .ignoresSafeArea()
     } // homeHeaderPhoto
 
-    func homeItemPhotoPanel(items: [RootItem]) -> some View {
+    func homeItemPhotoPanel(items: [Item]) -> some View {
         GeometryReader { bodyView in
 
             let libraryItemPadding: CGFloat = 200
