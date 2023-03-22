@@ -34,13 +34,14 @@ struct SystemSideMenu: View {
     @State private var inputSideMenu: InputSideMenu = InputSideMenu()
 
     @GestureState var dragOffset: CGFloat = 0.0
+    let menuHeight: CGFloat = 60
 
     var body: some View {
 
         ZStack {
             // Blur View...
             BlurView(style: .systemUltraThinMaterialDark)
-            userVM.user!.userColor.color1
+            userVM.user?.userColor.color1
                 .opacity(0.7)
                 .blur(radius: 15)
                 .overlay(alignment: .topLeading) {
@@ -133,7 +134,7 @@ struct SystemSideMenu: View {
                                             .onTapGesture { inputTab.path.append(.create) }
                                     }
                                     .foregroundColor(.white)
-                                    .frame(width: 210, height: 60, alignment: .topLeading)
+                                    .frame(width: 210, height: menuHeight, alignment: .topLeading)
                                     .offset(x: 20, y: 30)
                                 }
                             }
@@ -222,7 +223,7 @@ struct SystemSideMenu: View {
                                         } // List
                                         .environment(\.editMode, $inputSideMenu.editMode)
                                         .frame(width: UIScreen.main.bounds.width * 0.58,
-                                               height: 60 + (40 * CGFloat(tagVM.tags.count - 2)))
+                                               height: menuHeight + (40 * CGFloat(tagVM.tags.count - 2)))
                                         .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
                                         .scrollContentBackground(.hidden)
                                         .offset(x: -10)
@@ -231,7 +232,7 @@ struct SystemSideMenu: View {
                                         Text("登録タグはありません")
                                             .font(.subheadline).foregroundColor(.white)
                                             .opacity(0.7)
-                                            .frame(height: 60)
+                                            .frame(height: menuHeight)
                                             .offset(y: 30)
 
                                     } // if tagVM.tags.count > 2
@@ -265,7 +266,7 @@ struct SystemSideMenu: View {
                                     } // VStack
                                     .foregroundColor(.white)
                                     // メニュー一つ分のheight = コンテンツ数 * 60
-                                    .frame(width: 210, height: 180, alignment: .topLeading)
+                                    .frame(width: 210, height: menuHeight * 3, alignment: .topLeading)
                                     .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
                                     .offset(x: 20, y: 30)
                                 }
@@ -291,7 +292,7 @@ struct SystemSideMenu: View {
                                     } // VStack
                                     .foregroundColor(.white)
                                     // メニュー一つ分のheight = コンテンツ数 * 60
-                                    .frame(width: 210, height: 120, alignment: .topLeading)
+                                    .frame(width: 210, height: menuHeight * 2, alignment: .topLeading)
                                     .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
                                     .offset(x: 20, y: 30)
                                     .alert("確認", isPresented: $inputSideMenu.isShowLogOutAlert) {
@@ -328,18 +329,18 @@ struct SystemSideMenu: View {
                                     } // VStack
                                     .foregroundColor(.white)
                                     // メニュー一つ分のheight = コンテンツ数 * 60
-                                    .frame(width: 210, height: 120, alignment: .topLeading)
+                                    .frame(width: 210, height: menuHeight, alignment: .topLeading)
                                     .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
                                     .offset(x: 20, y: 30)
 
                                 }
                             }
+                            /// スクロール下に余白を作るため
+                            Color.clear
+                                .frame(height: 150)
                         } // VStack(メニュー列全体)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding([.leading, .top])
-
-                        Color.clear
-                            .frame(height: 300)
 
                     } // ScrollView
                     .frame(width: UIScreen.main.bounds.width / 2 + 50)

@@ -21,9 +21,15 @@ struct RootView: View {
         let windowScene = scenes.first as? UIWindowScene
         return windowScene
     }
-
     var resizableSheetCenter: ResizableSheetCenter? {
         windowScene.flatMap(ResizableSheetCenter.resolve(for:))
+    }
+    
+    private struct PreloadProperty {
+        var startPreload: Bool = false
+        var inputTab    : InputTab = InputTab()
+        var captureImage: UIImage?
+        var showSheet   : Bool = false
     }
     
     @EnvironmentObject var progress: ProgressViewModel
@@ -32,15 +38,15 @@ struct RootView: View {
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var tagVM: TagViewModel
+    @EnvironmentObject var preloadVM: PreloadViewModel
     
     @StateObject var itemVM: ItemViewModel = ItemViewModel()
     @StateObject var cartVM: CartViewModel = CartViewModel()
 
     @State private var isShowStandBy: Bool = false
     @State private var showLogInAlert: Bool = false
-    @State private var inputTab: InputTab = InputTab()
     
-    @State private var preloadViews: Bool = false
+    @State private var preloads: PreloadProperty = PreloadProperty()
 
     var body: some View {
 
@@ -77,18 +83,20 @@ struct RootView: View {
         /// プリロードView
         /// 一度ロードしたViewはキャッシュが作られて初回時のView表示が軽くなる仕様を使う
         .background {
-            if preloadViews {
+            if preloads.startPreload {
                 Group {
-                    NewItemsView(itemVM: itemVM, cartVM: cartVM, inputTab: $inputTab)
+                    NewItemsView(itemVM: itemVM, cartVM: cartVM, inputTab: $preloads.inputTab)
                     NewEditItemView(itemVM: itemVM, passItem: nil)
+                    PHPickerView(captureImage: $preloads.captureImage, isShowSheet: $preloads.showSheet)
+//                    SystemSideMenu(itemVM: itemVM, inputTab: $preloads.inputTab)
                 }
                 .opacity(0)
             }
         }
         .onAppear {
-            preloadViews = true
+            preloads.startPreload = true
             DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
-                preloadViews = false
+                preloads.startPreload = false
             }
         }
 
