@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import StoreKit
 
 struct SystemView: View {
     
@@ -15,6 +16,7 @@ struct SystemView: View {
         case twitter
         case query
         case review
+        case share
         case rules
         case privacy
         
@@ -36,6 +38,9 @@ struct SystemView: View {
                 
             case .review:
                 return "star.bubble"
+                
+            case .share:
+                return "square.and.arrow.up"
                 
             case .rules:
                 return "network.badge.shield.half.filled"
@@ -63,6 +68,9 @@ struct SystemView: View {
             case .review:
                 return "アプリへの評価"
                 
+            case .share:
+                return "アプリをシェア"
+                
             case .rules:
                 return "利用規約"
                 
@@ -89,6 +97,9 @@ struct SystemView: View {
             case .review:
                 return "unicoのレビュー評価を行います。"
                 
+            case .share:
+                return "unicoアプリをシェアします。"
+                
             case .rules:
                 return "アプリの利用規約について記載しています。"
                 
@@ -98,7 +109,7 @@ struct SystemView: View {
         }
     }
 
-    @StateObject var logInVM: LogInViewModel
+    @EnvironmentObject var logInVM: LogInViewModel
     @StateObject var itemVM: ItemViewModel
 
     var body: some View {
@@ -106,34 +117,80 @@ struct SystemView: View {
         VStack {
             ForEach(SystemListContents.allCases, id: \.self) { listRow in
                 
-                NavigationLink {
-                    switch listRow {
-                        
-                    case .infomation:
+                
+                switch listRow {
+                    
+                case .infomation:
+                    NavigationLink {
                         EmptyView()
-                        
-                    case .account:
-                        AccountSystemView(logInVM: logInVM)
-                        
-                    case .twitter:
-                        EmptyView()
-                        
-                    case .query:
-                        EmptyView()
-                        
-                    case .review:
-                        EmptyView()
-                        
-                    case .rules:
-                        EmptyView()
-                        
-                    case .privacy:
-                        EmptyView()
+                    } label: {
+                        ListRowView(icon : listRow.icon,
+                                    title: listRow.title,
+                                    text : listRow.infomation)
                     }
-                } label: {
-                    ListRowView(icon : listRow.icon,
-                            title: listRow.title,
-                            text : listRow.infomation)
+                    
+                case .account:
+                    NavigationLink {
+                        AccountSystemView(logInVM: logInVM)
+                    } label: {
+                        ListRowView(icon : listRow.icon,
+                                    title: listRow.title,
+                                    text : listRow.infomation)
+                    }
+                    
+                case .twitter:
+                    NavigationLink {
+                        EmptyView()
+                    } label: {
+                        ListRowView(icon : listRow.icon,
+                                    title: listRow.title,
+                                    text : listRow.infomation)
+                    }
+                    
+                case .query:
+                    NavigationLink {
+                        EmptyView()
+                    } label: {
+                        ListRowView(icon : listRow.icon,
+                                    title: listRow.title,
+                                    text : listRow.infomation)
+                    }
+                    
+                case .review:
+                    Button {
+                        
+                    } label: {
+                        ListRowView(icon : listRow.icon,
+                                    title: listRow.title,
+                                    text : listRow.infomation)
+                    }
+                    
+                case .share:
+                    Button {
+                        logInVM.shareApp()
+                    } label: {
+                        ListRowView(icon : listRow.icon,
+                                    title: listRow.title,
+                                    text : listRow.infomation)
+                    }
+                    
+                case .rules:
+                    NavigationLink {
+                        EmptyView()
+                    } label: {
+                        ListRowView(icon : listRow.icon,
+                                    title: listRow.title,
+                                    text : listRow.infomation)
+                    }
+                    
+                case .privacy:
+                    NavigationLink {
+                        EmptyView()
+                    } label: {
+                        ListRowView(icon : listRow.icon,
+                                    title: listRow.title,
+                                    text : listRow.infomation)
+                    }
                 }
             }
             
@@ -197,6 +254,6 @@ struct ListRowView: View {
 
 struct SystemView_Previews: PreviewProvider {
     static var previews: some View {
-        SystemView(logInVM: LogInViewModel(), itemVM: ItemViewModel())
+        SystemView(itemVM: ItemViewModel())
     }
 }

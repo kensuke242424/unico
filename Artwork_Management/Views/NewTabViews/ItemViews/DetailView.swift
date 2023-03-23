@@ -77,8 +77,8 @@ struct DetailView: View {
                         .font(.title3)
                         .fontWeight(.semibold)
                         
-                        Text(item.author != "" ?
-                             ": \(item.author)" : "")
+                        Text(item.tag != "" ?
+                             ": \(item.tag)" : "未グループ")
                         .font(.caption)
                         .foregroundColor(.gray)
                         
@@ -293,33 +293,40 @@ struct DetailView: View {
                 .frame(width: 300)
                 .padding(.bottom)
             
-            Text(item.tag != "" ?
-                      "タグ　　　:　　 \(item.tag)" :
-                      "タグ　　　:　　 未グループ")
-                .padding(.bottom, 12)
-                 
-            Text("在庫　　　:　　 \(item.inventory) 個")
-                 
-            Text(item.price != 0 ?
-                 "価格　　　:　　 ¥ \(item.price)" :
-                 "価格　　　:　　   -")
-                .padding(.bottom, 12)
-            
-            Text(item.sales != 0 ?
-                 "総売上　　:　　 ¥ \(item.sales)" :
-                 "総売上　　:　　   -")
-            
-            Text(item.totalAmount != 0 ?
-                 "総売個数　:　　 \(item.totalAmount) 個" :
-                 "総売個数　:　　   -")
-            
-            Text(item.totalInventory != 0 ?
-                 "総在庫数　:　　 \(item.totalInventory) 個":
-                 "総仕入れ　:　　   -")
-                .padding(.bottom, 12)
+            Group {
+                Text(item.name != "" ?
+                          "名前　　　:　　 \(item.name)" :
+                          "名前　　　:　　 No Name")
+                
+                Text(item.author != "" ?
+                          "制作者　　:　　 \(item.author)" :
+                          "制作者　　:　　 ???")
+                    .padding(.bottom, 12)
+                     
+                Text("在庫　　　:　　 \(item.inventory) 個")
+                     
+                Text(item.price != 0 ?
+                     "価格　　　:　　 ¥ \(item.price)" :
+                     "価格　　　:　　   -")
+                    .padding(.bottom, 12)
+                
+                Text(item.sales != 0 ?
+                     "総売上　　:　　 ¥ \(item.sales)" :
+                     "総売上　　:　　   -")
+                
+                Text(item.totalAmount != 0 ?
+                     "総売個数　:　　 \(item.totalAmount) 個" :
+                     "総売個数　:　　   -")
+                
+                Text(item.totalInventory != 0 ?
+                     "総在庫数　:　　 \(item.totalInventory) 個":
+                     "総仕入れ　:　　   -")
+                    .padding(.bottom, 12)
 
-            Text("登録日　　:　　 \(asTimesString(item.createTime))")
-            Text("最終更新　:　　 \(asTimesString(item.updateTime))")
+                Text("登録日　　:　　 \(asTimesString(item.createTime))")
+                Text("最終更新　:　　 \(asTimesString(item.updateTime))")
+            }
+            
             
             Divider()
                 .frame(width: 300)

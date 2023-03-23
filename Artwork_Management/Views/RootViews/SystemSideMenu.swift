@@ -242,13 +242,13 @@ struct SystemSideMenu: View {
                             // Team menu...
                             VStack(alignment: .leading) {
 
-                                SideMenuButton(open: $inputSideMenu.team, title: "チーム", image: "person.2")
+                                SideMenuButton(open: $inputSideMenu.team, title: "チーム", image: "cube.transparent")
 
                                 if inputSideMenu.team {
 
                                     VStack(alignment: .leading, spacing: 40) {
 
-                                        Label("チーム情報変更", systemImage: "person.text.rectangle.fill")
+                                        Label("チーム情報変更", systemImage: "cube.transparent.fill")
                                             .onTapGesture {
                                                 withAnimation(.spring(response: 0.5)) { inputTab.selectedUpdateData = .team }
                                             }
@@ -287,6 +287,7 @@ struct SystemSideMenu: View {
                                             }
 
                                         Label("ログアウト", systemImage: "door.right.hand.open")
+                                            .foregroundColor(.orange)
                                             .onTapGesture { inputSideMenu.isShowLogOutAlert.toggle() }
 
                                     } // VStack
@@ -310,7 +311,7 @@ struct SystemSideMenu: View {
                                             }
                                         }
                                     } message: {
-                                        Text("ログイン画面に戻ります。よろしいですか？")
+                                        Text("アカウントからログアウトして、ログイン画面に戻ります。よろしいですか？")
                                     } // alert
                                 }
                             }

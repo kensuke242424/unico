@@ -368,6 +368,22 @@ class LogInViewModel: ObservableObject {
       return hashString
     }
     
+    func shareApp(){
+        let productURL:URL = URL(string: "https://apps.apple.com/us/app/unico/id1663765686")!
+        
+        let activityViewController = UIActivityViewController(
+            activityItems: [productURL],
+            applicationActivities: nil)
+        
+        let scenes = UIApplication.shared.connectedScenes
+        let windowScene = scenes.first as? UIWindowScene
+        let window = windowScene?.windows.first
+        
+        if let window {
+            window.rootViewController?.present(activityViewController, animated: true, completion: nil)
+        }
+    }
+    
     func logOut() {
         do {
             try Auth.auth().signOut()

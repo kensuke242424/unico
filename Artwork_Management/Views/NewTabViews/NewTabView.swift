@@ -16,6 +16,7 @@ struct InputTab {
     /// Navigation遷移を管理するプロパティ
     var path: [NavigationPath] = []
     var showSideMenu: Bool = false
+    var showEntryAccount: Bool = false
     var selectedUpdateData: SelectedUpdateData = .start
     /// NavigationPathによるエディット画面遷移時に渡す
     var selectedItem: Item?
@@ -124,6 +125,11 @@ struct NewTabView: View {
                             .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
                     }
                 }
+                .overlay {
+                    if inputTab.showEntryAccount {
+                        UserEntryRecommendationView(isShow: $inputTab.showEntryAccount)
+                    }
+                }
                 .ignoresSafeArea()
                 .onChange(of: inputTab.selectionTab) { _ in
                     switch inputTab.selectionTab {
@@ -150,7 +156,7 @@ struct NewTabView: View {
                                         passItem: itemVM.items[cartVM.actionItemIndex])
                         
                     case .system:
-                        Text("システム画面")
+                        SystemView(itemVM: itemVM)
                     }
                     
                 }
@@ -293,6 +299,20 @@ struct NewTabView: View {
                                 // TODO: サイドメニュー表示
                                 withAnimation(.spring(response: 0.3, blendDuration: 1)) {
                                     inputTab.showSideMenu.toggle()
+                                }
+                            }
+                            .overlay(alignment: .bottom) {
+                                if userVM.isAnonymous {
+                                    ZStack {
+                                        RoundedRectangle(cornerRadius: 20)
+                                            .fill(.black.gradient)
+                                            .frame(width: 50, height: 20)
+                                        Text("お試し中")
+                                            .foregroundColor(.orange)
+                                            .font(.caption2)
+                                    }
+                                    .opacity(inputTab.animationOpacity)
+                                    .offset(y: 30)
                                 }
                             }
                     }

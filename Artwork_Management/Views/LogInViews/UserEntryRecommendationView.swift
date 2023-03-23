@@ -9,7 +9,7 @@ import SwiftUI
 
 struct UserEntryRecommendationView: View {
     
-    @StateObject var logInVM: LogInViewModel
+    @EnvironmentObject var logInVM: LogInViewModel
     @Binding var isShow: Bool
     
     var body: some View {
@@ -108,10 +108,6 @@ struct UserEntryRecommendationView: View {
                     .frame(width: getRect().width, height: getRect().height)
                     .opacity(0.9)
                     .ignoresSafeArea()
-                
-//                LogoMark()
-//                    .scaleEffect(0.5)
-//                    .offset(y: -getRect().height + 200)
             }
             
         }
@@ -120,6 +116,6 @@ struct UserEntryRecommendationView: View {
 
 struct UserEntryRecommendationView_Previews: PreviewProvider {
     static var previews: some View {
-        UserEntryRecommendationView(logInVM: LogInViewModel(), isShow: .constant(true))
+        UserEntryRecommendationView(isShow: .constant(true))
     }
 }

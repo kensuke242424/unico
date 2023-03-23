@@ -179,7 +179,7 @@ struct NewItemsView: View {
                         .foregroundColor(.black)
                         .lineLimit(1)
                     
-                    Text(item.author == "" ? "" : ": \(item.author)")
+                    Text(item.tag == "" ? ": 未グループ" : ": \(item.tag)")
                         .font(.caption)
                         .foregroundColor(.gray)
                     

@@ -372,8 +372,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 // メールアドレス登録選択時に出現するアドレス入力ハーフシートView
                 inputAdressHalfSheet()
                 
-                UserEntryRecommendationView(logInVM: logInVM,
-                                            isShow: $inputLogIn.isShowUserEntryRecommendation)
+                UserEntryRecommendationView(isShow: $inputLogIn.isShowUserEntryRecommendation)
                 .opacity(inputLogIn.isShowUserEntryRecommendation ? 1.0 : 0.0)
                 .offset(y: inputLogIn.isShowUserEntryRecommendation ? 0 : getRect().height)
             }
