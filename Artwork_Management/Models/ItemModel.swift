@@ -31,6 +31,55 @@ struct Item: Identifiable, Equatable, Hashable, Codable {
     var totalInventory: Int
 }
 
+//Text(item.tag != "" ?
+//          "タグ　　　:　　 \(item.tag)" :
+//          "タグ　　　:　　 未グループ")
+//    .padding(.bottom, 12)
+//
+//Text("在庫　　　:　　 \(item.inventory) 個")
+//
+//Text(item.price != 0 ?
+//     "価格　　　:　　 ¥ \(item.price)" :
+//     "価格　　　:　　   -")
+//    .padding(.bottom, 12)
+//
+//Text(item.sales != 0 ?
+//     "総売上　　:　　 ¥ \(item.sales)" :
+//     "総売上　　:　　   -")
+//
+//Text(item.totalAmount != 0 ?
+//     "総売個数　:　　 \(item.totalAmount) 個" :
+//     "総売個数　:　　   -")
+//
+//Text(item.totalInventory != 0 ?
+//     "総在庫数　:　　 \(item.totalInventory) 個":
+//     "総仕入れ　:　　   -")
+//    .padding(.bottom, 12)
+//
+//Text("登録日　　:　　 \(asTimesString(item.createTime))")
+//Text("最終更新　:　　 \(asTimesString(item.updateTime))")
+
+extension Item {
+    func description() -> String {
+        
+        var descriptions: String {
+"""
+名前　　: \(self.name)
+タグ　　: \(self.tag)
+在庫　　: \(self.inventory)
+価格　　: \(self.price)
+総売個数: \(self.totalAmount)
+総仕入れ: \(self.totalInventory)
+
+登録日　: \(String(describing: self.createTime))
+更新日　: \(String(describing: self.updateTime))
+
+"""
+        }
+        return descriptions
+    }
+}
+
 struct ItemImageData: Codable {
     var image: Data
 }

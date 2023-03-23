@@ -96,11 +96,8 @@ struct NewTabView: View {
                 }
                 /// サイドメニューView
                 .overlay {
-//                    if inputTab.showSideMenu {
-                        SystemSideMenu(itemVM: itemVM, inputTab: $inputTab)
-                            .offset(x: inputTab.showSideMenu ? 0 : -size.width)
-//                            .transition(.asymmetric(insertion: .offset(x: -size.width), removal: .offset(x: -size.width)))
-//                    }
+                    SystemSideMenu(itemVM: itemVM, inputTab: $inputTab)
+                        .offset(x: inputTab.showSideMenu ? 0 : -size.width)
                 }
                 /// 🏷タグの追加や編集を行うView
                 .overlay {

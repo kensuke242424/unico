@@ -286,7 +286,7 @@ struct SystemSideMenu: View {
                                                 withAnimation(.spring(response: 0.5)) { inputTab.selectedUpdateData = .user }
                                             }
 
-                                        Label("ログアウト", systemImage: "figure.wave")
+                                        Label("ログアウト", systemImage: "door.right.hand.open")
                                             .onTapGesture { inputSideMenu.isShowLogOutAlert.toggle() }
 
                                     } // VStack
@@ -325,6 +325,7 @@ struct SystemSideMenu: View {
                                     VStack(alignment: .leading, spacing: 40) {
                                         
                                         Label("システム設定", systemImage: "gearshape.fill")
+                                            .onTapGesture { inputTab.path.append(.system) }
 
                                     } // VStack
                                     .foregroundColor(.white)

@@ -25,6 +25,9 @@ struct DetailView: View {
     @State private var showDetailBackground: Bool = false
     @State private var showDeleteAlert: Bool = false
     
+    // TODO: シェアリンク
+    @State private var rendeledImage: Image?
+    
     var body: some View {
         
         VStack(spacing: 15) {
@@ -67,7 +70,6 @@ struct DetailView: View {
                         /// Matched Geometry ID
                         .transition(.asymmetric(insertion: .opacity, removal: .opacity))
                         .matchedGeometryEffect(id: item.id, in: animation)
-//                        .opacity(animationContent ? 1 : 0)
                     
                     VStack(alignment: .leading, spacing: 8) {
                         Text(item.name != "" ?
@@ -143,16 +145,6 @@ struct DetailView: View {
         VStack(spacing: 0) {
             if !openDetail {
                 HStack(spacing: 0) {
-                    
-                    Button {
-                        
-                    } label: {
-                        Label("Share", systemImage: "square.and.arrow.up")
-                            .font(.callout)
-                            .foregroundColor(.gray)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .disabled(openDetail ? true : false)
                     
                     Button {
                         itemVM.updateFavorite(item)
