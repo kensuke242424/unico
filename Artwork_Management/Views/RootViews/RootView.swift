@@ -228,13 +228,11 @@ struct RootView: View {
                     case .entryAccount:
                         if userVM.isAnonymous {
                             logInVM.entryAccountEmailLink(email: email, link: incomingURL.absoluteString)
-                            progress.isShow.toggle()
                         }
                         
                     /// ⚠️アカウント削除選択時の処理
                     case .deleteAccount:
                         logInVM.deleteAccountEmailLink(email: email, link: incomingURL.absoluteString)
-                        progress.isShow.toggle()
                     } // switch
                     
                 } else {

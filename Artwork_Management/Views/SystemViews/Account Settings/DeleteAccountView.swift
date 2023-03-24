@@ -19,7 +19,7 @@ enum DeleteAccountFase {
         case.check:
             return "アドレスをチェックしています..."
         case .notMatches:
-            return "入力アドレスが登録されているアドレスと一致しませんでした。"
+            return "登録されているアドレスと一致しません。"
         case .failure:
             return "エラーが発生しました。"
         case .sendEmail:
@@ -55,7 +55,7 @@ struct DeleteAccountView: View {
             .multilineTextAlignment(.leading)
             
             
-            Text("アカウント削除を実行するために、あなたが当アカウントのユーザー本人であることを確認します。\n現在unicoに登録されているメールアドレスを入力して、本人確認メールからログインしてください。")
+            Text("アカウント削除を実行するために、あなたが当アカウントのユーザー本人であることを確認します。現在unicoに登録されているメールアドレスを入力して、本人確認メールからログインしてください。")
                 .font(.subheadline)
                 .fontWeight(.semibold)
                 .foregroundColor(.white)
@@ -63,7 +63,7 @@ struct DeleteAccountView: View {
                 .multilineTextAlignment(.leading)
                 .padding(.top)
             
-            Text("メールからのログイン認証が完了した時点で、アカウントの削除が実行されます。")
+            Text("メールリンクからの本人認証が完了した時点で、アカウントの削除が実行されます。")
                 .foregroundColor(.red)
                 .font(.caption)
                 .opacity(0.7)
@@ -96,7 +96,10 @@ struct DeleteAccountView: View {
                     let matchesCheckResult = await logInVM.verifyInputEmailMatchesCurrent(email: inputEmailAddress)
 
                     if matchesCheckResult {
-                        // リンクメールを送る前に、認証リンクがどのように使われるかハンドルする
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            logInVM.deleteAccountFase = .sendEmail
+                        }
+                        // リンクメールを送る前に、認証リンクがどのように使われるかハンドルするために
                         // 「handleUseReceivedEmailLink」に値を設定しておく必要がある
                         logInVM.handleUseReceivedEmailLink = .deleteAccount
                         logInVM.sendEmailLink(email: inputEmailAddress)
@@ -108,14 +111,7 @@ struct DeleteAccountView: View {
                     }
                 }
             }
-            // アカウント削除を検知したら、DeletedViewへ遷移
-            .onChange(of: logInVM.deleteAccountFase) { newValue in
-                if newValue == .success {
-                    navigationVM.path.append(SystemAccountPath.deletedData)
-                }
-            }
-            
-            HStack {
+            HStack(spacing: 10) {
                 Text(logInVM.deleteAccountFase.faseText)
                     .foregroundColor(logInVM.deleteAccountFase == .notMatches ||
                                      logInVM.deleteAccountFase == .failure ? .red : .white)
@@ -135,6 +131,12 @@ struct DeleteAccountView: View {
         .customSystemBackground()
         .customBackButton()
         .navigationTitle("アカウントの削除")
+        // アカウント削除を検知したら、DeletedViewへ遷移
+        .onChange(of: logInVM.deleteAccountFase) { newValue in
+            if newValue == .success {
+                navigationVM.path.append(SystemAccountPath.deletedData)
+            }
+        }
     }
 }
 
