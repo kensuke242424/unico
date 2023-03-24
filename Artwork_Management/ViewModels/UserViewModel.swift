@@ -50,10 +50,10 @@ class UserViewModel: ObservableObject {
         print("userVM_isAnonymousCheck実行")
         
         if let user = Auth.auth().currentUser, user.isAnonymous {
-            print("currentUser: Not anonymous user")
+            print("currentUser: anonymous user")
             self.isAnonymous = true
         } else {
-            print("currentUser: Anonymous user")
+            print("currentUser: Not Anonymous user")
             self.isAnonymous = false
         }
     }
@@ -75,6 +75,7 @@ class UserViewModel: ObservableObject {
                     self.user = userData
                     print("userRealtimeListenerによりチームデータを更新")
                     DispatchQueue.main.async {
+                        self.isAnonymousCheck()
                         self.updatedUser.toggle()
                     }
                 } catch {
@@ -99,7 +100,7 @@ class UserViewModel: ObservableObject {
         }
     }
 
-    func uploadUserImageData(_ image: UIImage?) async -> (url: URL?, filePath: String?) {
+    func uploadUserImage(_ image: UIImage?) async -> (url: URL?, filePath: String?) {
 
         guard let imageData = image?.jpegData(compressionQuality: 0.8) else {
             return (url: nil, filePath: nil)

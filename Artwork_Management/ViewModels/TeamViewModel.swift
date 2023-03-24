@@ -153,7 +153,7 @@ class TeamViewModel: ObservableObject {
         }
     }
 
-    func uploadTeamImageData(_ image: UIImage?) async -> (url: URL?, filePath: String?) {
+    func uploadTeamImage(_ image: UIImage?) async -> (url: URL?, filePath: String?) {
 
         guard let imageData = image?.jpegData(compressionQuality: 0.8) else {
             return (url: nil, filePath: nil)

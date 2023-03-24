@@ -324,7 +324,7 @@ struct NewEditItemView: View {
                                 itemVM.deleteImage(path: input.photoPath)
                                 let resizedImage = itemVM.resizeUIImage(image: captureImage,
                                                                         width: width * 2)
-                                let newImageData =  await itemVM.uploadImage(resizedImage, teamID)
+                                let newImageData =  await itemVM.uploadItemImage(resizedImage, teamID)
                                 input.photoURL = newImageData.url
                                 input.photoPath = newImageData.filePath
                             }
@@ -364,7 +364,7 @@ struct NewEditItemView: View {
                                 withAnimation(.easeIn(duration: 0.1)) { input.showProgress = true }
                                 itemVM.deleteImage(path: input.photoPath)
                                 let resizedImage = itemVM.resizeUIImage(image: captureImage, width: width)
-                                let newImageData =  await itemVM.uploadImage(resizedImage, teamID)
+                                let newImageData =  await itemVM.uploadItemImage(resizedImage, teamID)
                                 input.photoURL = newImageData.url
                                 input.photoPath = newImageData.filePath
                             }

@@ -24,10 +24,15 @@ class LogInViewModel: ObservableObject {
     /// LogInViewから次の画面へのナビゲーションを総括管理するプロパティ
     @Published var rootNavigation: RootNavigation = .logIn
     
+    enum HandleUseReceivedEmailLink {
+        case signIn, entryAccount, deleteAccount
+    }
+    @Published var handleUseReceivedEmailLink: HandleUseReceivedEmailLink = .signIn
+    
     /// リスナーによってサインインが検知されたらトグルするプロパティ
     @Published var signedInOrNot: Bool = false
     
-    /// メールアドレスログイン用のハーフシートを管理するプロパティ
+    /// メールアドレス入力用のハーフシートを管理するプロパティ
     @Published var showEmailHalfSheet: Bool = false
     @Published var showEmailSheetBackground: Bool = false
     
@@ -37,10 +42,14 @@ class LogInViewModel: ObservableObject {
     
     /// LogInViewでのサインイン操作フローを管理するプロパティ
     @Published var userSelectedSignInType  : UserSelectedSignInType = .start
-    @Published var createAccountFase : CreateAccountFase = .start
-    @Published var selectProviderType: SelectProviderType = .start
-    @Published var addressSignInFase : AddressSignInFase = .start
-    @Published var resultSignInType: ResultSignInType = .signIn
+    @Published var createAccountFase       : CreateAccountFase = .start
+    @Published var selectProviderType      : SelectProviderType = .start
+    @Published var addressSignInFase       : AddressSignInFase = .start
+    @Published var resultSignInType        : ResultSignInType = .signIn
+    
+    // 匿名アカウントから永久アカウントへの認証結果を管理するプロパティ
+    @Published var resultAccountLink   : Bool = false
+    @Published var showAccountLinkAlert: Bool = false
 
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
     var listenerHandle: AuthStateDidChangeListenerHandle?
@@ -88,6 +97,26 @@ class LogInViewModel: ObservableObject {
         }
     }
     
+    func entryAccountEmailLink(email: String, link: String) {
+        
+        let credential = EmailAuthProvider.credential(withEmail: email, link: link)
+        
+        Auth.auth().currentUser?.link(with: credential) { authData, error in
+            if let error {
+                // And error occurred during linking.
+                print("アカウントリンク時にエラー発生")
+                self.resultAccountLink = false
+                self.showAccountLinkAlert.toggle()
+                return
+            }
+            // The provider was successfully linked.
+            // The phone user can now sign in with their phone number or email.
+            print("アカウントリンク成功")
+            self.resultAccountLink = true
+            self.showAccountLinkAlert.toggle()
+        }
+    }
+    
     func existEmailAccountCheck(_ email: String) {
         
         /// 受け取ったメールアドレスを使って、Auth内から既存アカウントの有無を調べる
@@ -114,7 +143,7 @@ class LogInViewModel: ObservableObject {
                     print("処理なし")
                     
                 case .logIn :
-                    self.sendSignInLink(email: email)
+                    self.sendEmailLink(email: email)
                     
                 case .signUp:
                     // アカウントが既に存在することをアラートで伝えて、既存データへのログインを促す
@@ -142,7 +171,7 @@ class LogInViewModel: ObservableObject {
                     hapticErrorNotification()
 
                 case .signUp:
-                    self.sendSignInLink(email: email)
+                    self.sendEmailLink(email: email)
                     
                 }
             }
@@ -171,7 +200,10 @@ class LogInViewModel: ObservableObject {
         }
     }
 
-    func setSignUpUserDocument(name: String, password: String?, imageData: (url: URL?, filePath: String?), color: MemberColor) async throws {
+    func setSignUpUserDocument(name     : String,
+                               password : String?,
+                               imageData: (url: URL?, filePath: String?),
+                               color: MemberColor) async throws {
 
         print("setSignUpUserDocument実行")
 
@@ -203,7 +235,7 @@ class LogInViewModel: ObservableObject {
     }
     
     // ダイナミックリンクによってメールアドレス認証でのサインインをするため、ユーザにメールを送信するメソッド
-    func sendSignInLink(email: String) {
+    func sendEmailLink(email: String) {
         
         withAnimation(.easeInOut(duration: 0.3)) {
             self.addressSignInFase = .check
@@ -226,7 +258,7 @@ class LogInViewModel: ObservableObject {
                 }
                 return
             }
-            print("Sign in link sent successfully.") 
+            print("Sign in link sent successfully.")
             hapticSuccessNotification()
             
             // TODO: ⬇︎の処理まだできてない。どうやってリンク側のアドレスを取得するかまだわかってない。
@@ -235,6 +267,24 @@ class LogInViewModel: ObservableObject {
             
             withAnimation(.easeInOut(duration: 0.7)) {
                 self.addressSignInFase = .success
+            }
+        }
+    }
+    
+    func signInEmailLink(email: String, link: String) {
+        Auth.auth().signIn(withEmail: email, link: link)
+        { authResult, error in
+            if let error {
+                print("ログインエラー：", error.localizedDescription)
+                //リンクメールの有効期限が切れていた時、ここに処理が走るみたい。
+                self.isShowLogInFlowAlert.toggle()
+                self.logInAlertMessage = .invalidLink
+                return
+            }
+            // メールリンクからのサインイン成功時の処理
+            if let authResult {
+                print("メールリンクからのログイン成功")
+                print("currentUser: \(Auth.auth().currentUser)")
             }
         }
     }
@@ -384,6 +434,22 @@ class LogInViewModel: ObservableObject {
         }
     }
     
+    func reviewApp(){
+            let productURL:URL = URL(string: "https://apps.apple.com/us/app/unico/id1663765686")!
+            
+            var components = URLComponents(url: productURL, resolvingAgainstBaseURL: false)
+            
+            components?.queryItems = [
+                URLQueryItem(name: "action", value: "write-review")
+            ]
+            
+            guard let writeReviewURL = components?.url else {
+                return
+            }
+            
+            UIApplication.shared.open(writeReviewURL)
+        }
+    
     func logOut() {
         do {
             try Auth.auth().signOut()
@@ -393,6 +459,19 @@ class LogInViewModel: ObservableObject {
             print("ログアウト失敗")
         }
     }
+    
+    func deleteAccountEmailLink(email: String, link: String) {
+        let credential = EmailAuthProvider.credential(withEmail:email, link:link)
+          Auth.auth().currentUser?.reauthenticate(with: credential) { authData, error in
+            if let error {
+                print("アカウントの再認証に失敗しました")
+              return
+            }
+            // The user was successfully re-authenticated.
+          }
+    }
+    
+    // MARK: - Sign in with Appleはまだ実装できていない⬇︎
     
     func handleSignInWithAppleRequest(_ request: ASAuthorizationAppleIDRequest) {
         request.requestedScopes = [.fullName, .email]
@@ -404,7 +483,6 @@ class LogInViewModel: ObservableObject {
     }
     
     @MainActor
-    // TODO: Sign in with Appleはまだ実装できていない。
     func handleSignInWithAppleCompletion(_ result: Result<ASAuthorization, Error>) {
         if case .failure(let failure) = result {
             print(failure.localizedDescription)
@@ -448,7 +526,6 @@ class LogInViewModel: ObservableObject {
         }
     }
     // --- 🔥アップルサインインアカウントのサインアウト&AppleID連携解除のメソッド🔥  ---
-    // TODO: Sign in with Appleはまだ実装できていない。
     func signOutAndDeleteAccount(credencial:  ASAuthorizationAppleIDCredential?) {
       // Firebase Authenticationからサインアウトする
       do {
@@ -507,7 +584,6 @@ class LogInViewModel: ObservableObject {
         return credential
     }
     
-    // TODO: Sign in with Appleはまだ実装できていない。
     func deleteAccountFromServer(identityToken: String, authorizationCode: String) {
         // 認証用の秘密鍵の読み込み
         guard let filePath = Bundle.main.path(forResource: "AuthKey_MWXRWWC3VP", ofType: "p8") else {

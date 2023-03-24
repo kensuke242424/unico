@@ -10,15 +10,16 @@ import SwiftUI
 struct UserEntryRecommendationView: View {
     
     @EnvironmentObject var logInVM: LogInViewModel
+    @EnvironmentObject var userVM : UserViewModel
     @Binding var isShow: Bool
     
     var body: some View {
         
-        VStack(spacing: 70) {
+        VStack(spacing: 60) {
             
             LogoMark()
-                .scaleEffect(0.5)
-                .frame(height: 50)
+                .scaleEffect(0.3)
+                .frame(height: 30)
             
             // アカウント登録時の機能説明を保持するView
             VStack(alignment: .leading, spacing: 30) {
@@ -63,8 +64,8 @@ struct UserEntryRecommendationView: View {
             }
             
             // 下部の選択ボタンを保有するView
-            VStack(spacing: 40) {
-                Text("お試しアカウントで始めますか？")
+            VStack(spacing: 30) {
+                Text(userVM.isAnonymous ? "アカウント登録を行いますか？" : "お試しアカウントで始めますか？")
                     .foregroundColor(.white)
                     .tracking(3)
                 
@@ -75,20 +76,29 @@ struct UserEntryRecommendationView: View {
                         }
                     }
                     .buttonStyle(.borderedProminent)
-                    Button("お試しで始める") {
+                    Button(userVM.isAnonymous ? "\(Image(systemName: "envelope.fill")) 登録" : "お試しで始める") {
                         
-                        logInVM.resultSignInType = .signUp
-                        logInVM.signInAnonymously()
-                        
-                        withAnimation(.easeInOut(duration: 0.5)) {
-                            isShow.toggle()
+                        if userVM.isAnonymous {
+                            // すでにお試しアカウントでアプリを始めている場合の処理
+                            withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
+                                logInVM.userSelectedSignInType = .signUp
+                                logInVM.showEmailHalfSheet.toggle()
+                            }
+                            
+                        } else {
+                            // アプリをまだ始めてなくて、ログイン画面からのアクセスの場合の処理
+                            logInVM.resultSignInType = .signUp
+                            logInVM.signInAnonymously()
+                            
+                            withAnimation(.easeInOut(duration: 0.5)) {
+                                isShow.toggle()
+                            }
+                            withAnimation(.spring(response: 0.8).delay(0.5)) {
+                                logInVM.userSelectedSignInType = .signUp
+                                logInVM.createAccountFase      = .check
+                                logInVM.selectProviderType     = .trial
+                            }
                         }
-                        withAnimation(.spring(response: 0.8).delay(0.5)) {
-                            logInVM.userSelectedSignInType = .signUp
-                            logInVM.createAccountFase      = .check
-                            logInVM.selectProviderType     = .trial
-                        }
-                        
                     }
                     .buttonStyle(.borderedProminent)
                 }
@@ -98,7 +108,6 @@ struct UserEntryRecommendationView: View {
         .frame(width: getRect().width - 50, height: getRect().height)
         .background {
             ZStack {
-                
                 Color.userBlue1
                     .frame(width: getRect().width, height: getRect().height)
                     .opacity(0.7)

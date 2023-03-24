@@ -88,7 +88,6 @@ struct RootView: View {
                     NewItemsView(itemVM: itemVM, cartVM: cartVM, inputTab: $preloads.inputTab)
                     NewEditItemView(itemVM: itemVM, passItem: nil)
                     PHPickerView(captureImage: $preloads.captureImage, isShowSheet: $preloads.showSheet)
-//                    SystemSideMenu(itemVM: itemVM, inputTab: $preloads.inputTab)
                 }
                 .opacity(0)
             }
@@ -140,7 +139,7 @@ struct RootView: View {
                         _ = try await userVM.userRealtimeListener()
                         
                         /// ホーム画面へ遷移
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                             withAnimation(.spring(response: 1)) {
                                 logInVM.rootNavigation = .home
                                 /// ログインが完了したら、LogInViewの操作フローを初期化
@@ -183,10 +182,10 @@ struct RootView: View {
         // Auth check...
         .onAppear {
             if Auth.auth().currentUser != nil {
-                print("RootView_onAppear_currentUser != nil")
+                print("RootView_onAppear_currentUserが存在します。fetchを開始")
                 logInVM.rootNavigation = .fetch
             } else {
-                print("RootView_onAppear_currentUser == nil")
+                print("RootView_onAppear_currentUserがnilです。ログイン画面に遷移します。")
                 isShowStandBy.toggle()
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
@@ -196,6 +195,7 @@ struct RootView: View {
                 }
             }
         }
+        /// 📩メールリンク経由からURLを受け取った時に発火
         .onOpenURL { url in
             
             // handle the URL that must be opened
@@ -214,33 +214,28 @@ struct RootView: View {
                 if let email = defaults.string(forKey: "Email") {
                     progress.isShow.toggle()
                     withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
-                        // ViewModel内のアドレスログインフローに関わる状態を初期化
-                        logInVM.showEmailHalfSheet = false
+                        // アドレス入力ハーフシートを閉じる
+                        logInVM.showEmailHalfSheet       = false
                         logInVM.showEmailSheetBackground = false
                     }
-                    
                     print("アカウント登録するユーザのメールアドレス: \(email)")
-                    // Firebase Authにアカウントの登録
-                    /// TODO: この時すでにアカウントが存在した場合どのような動きになるか確認する
-                    ///  ⇨ uidなどのデータはそのまま引き継がれ、サインインの形になった
-                    Auth.auth().signIn(withEmail: email, link: incomingURL.absoluteString)
-                    { authResult, error in
-                        if let error {
-                            print("ログインエラー：", error.localizedDescription)
-                            progress.isShow.toggle()
-                            // TODO: リンクメールの有効期限が切れていた時、ここに処理が走るみたい。適切なアラート要る
-                            logInVM.isShowLogInFlowAlert.toggle()
-                            logInVM.logInAlertMessage = .invalidLink
-                            return
-                        }
-                        // メールリンクからのサインイン成功時の処理
-                        if let authResult {
-                            print("メールリンクからのログイン成功")
-                            print("currentUser: \(Auth.auth().currentUser)")
-                            
+                    
+                    switch logInVM.handleUseReceivedEmailLink {
+                    case .signIn:
+                        logInVM.signInEmailLink(email: email, link: incomingURL.absoluteString)
+                        progress.isShow.toggle()
+                        
+                    case .entryAccount:
+                        if userVM.isAnonymous {
+                            logInVM.entryAccountEmailLink(email: email, link: incomingURL.absoluteString)
                             progress.isShow.toggle()
                         }
-                    }
+                        
+                    case .deleteAccount:
+                        logInVM.deleteAccountEmailLink(email: email, link: incomingURL.absoluteString)
+                        progress.isShow.toggle()
+                    } // switch
+                    
                 } else {
                     print("ユーザーデフォルトからのメールアドレス取得失敗: defaults.string(forKey: Email)")
                     progress.isShow.toggle()

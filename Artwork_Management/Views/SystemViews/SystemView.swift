@@ -66,7 +66,7 @@ struct SystemView: View {
                 return "お問い合わせ"
                 
             case .review:
-                return "アプリへの評価"
+                return "アプリへのレビューを書く"
                 
             case .share:
                 return "アプリをシェア"
@@ -92,13 +92,13 @@ struct SystemView: View {
                 return "unicoの公式Twitterへ移動します。"
                 
             case .query:
-                return "アプリご利用についてお問い合わせを行います。"
+                return "アプリのご利用に関してお問い合わせを行います。"
                 
             case .review:
-                return "unicoのレビュー評価を行います。"
+                return "App Storeにてunicoのレビュー評価を行います。"
                 
             case .share:
-                return "unicoアプリをシェアします。"
+                return "シェア画面から他の人にunicoアプリをシェアします。"
                 
             case .rules:
                 return "アプリの利用規約について記載しています。"
@@ -131,7 +131,7 @@ struct SystemView: View {
                     
                 case .account:
                     NavigationLink {
-                        AccountSystemView(logInVM: logInVM)
+                        AccountSystemView()
                     } label: {
                         ListRowView(icon : listRow.icon,
                                     title: listRow.title,
@@ -158,7 +158,7 @@ struct SystemView: View {
                     
                 case .review:
                     Button {
-                        
+                        logInVM.reviewApp()
                     } label: {
                         ListRowView(icon : listRow.icon,
                                     title: listRow.title,
@@ -223,6 +223,7 @@ struct ListRowView: View {
                 } else {
                     Image(systemName: icon)
                         .font(.title3)
+                        .foregroundColor(.white)
                         .frame(width: 30, height: 30)
                 }
                 
@@ -230,9 +231,12 @@ struct ListRowView: View {
                 VStack(alignment: .leading) {
                     Text(title)
                         .fontWeight(.semibold)
+                        .foregroundColor(title == "アカウントの削除" ? .red :
+                                         title == "ログアウト"      ? .orange : .white)
                         .padding(.bottom, 1)
                     Text(text)
                         .font(.caption)
+                        .foregroundColor(.white)
                         .opacity(0.5)
                         .multilineTextAlignment(.leading)
                 }
@@ -242,12 +246,12 @@ struct ListRowView: View {
                 
                 Image(systemName: "chevron.right")
                     .fontWeight(.semibold)
+                    .foregroundColor(.white)
                     .opacity(0.7)
             }
             .padding(.horizontal, 15)
         }
         .frame(maxWidth: .infinity)
-        .foregroundColor(.white)
         .padding(.vertical, 10)
     }
 }

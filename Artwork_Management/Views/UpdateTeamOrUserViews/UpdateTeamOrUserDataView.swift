@@ -116,7 +116,7 @@ struct UpdateTeamOrUserDataView: View {
                                 inputUpdate.savingWait.toggle()
                             }
                             // アイコンデータのアップロード保存
-                            let iconData = await userVM.uploadUserImageData(inputUpdate.captureImage)
+                            let iconData = await userVM.uploadUserImage(inputUpdate.captureImage)
                             // ユーザの名前とアイコンデータをfirestoreに保存
                             try await userVM.updateUserNameAndIcon(name: inputUpdate.nameText, data: iconData)
                             // ユーザが保持している各チームのメンバーデータ(JoinMember)を更新
@@ -136,7 +136,7 @@ struct UpdateTeamOrUserDataView: View {
                                 inputUpdate.savingWait.toggle()
                             }
                             // アイコンデータのアップロード保存
-                            let iconData = await teamVM.uploadTeamImageData(inputUpdate.captureImage)
+                            let iconData = await teamVM.uploadTeamImage(inputUpdate.captureImage)
                             // チームの名前とアイコンデータをfirestoreに保存
                             try await teamVM.updateTeamNameAndIcon(name: inputUpdate.nameText, data: iconData)
                             // チームが保持している各メンバーのチームデータ(JoinTeam)を更新

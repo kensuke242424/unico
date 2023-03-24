@@ -37,6 +37,7 @@ struct InputTab {
 
 struct NewTabView: View {
     
+    @EnvironmentObject var logInVM: LogInViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var tagVM : TagViewModel
@@ -125,11 +126,22 @@ struct NewTabView: View {
                             .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
                     }
                 }
+                // お試しアカウントが本登録を行うView
                 .overlay {
                     if inputTab.showEntryAccount {
                         UserEntryRecommendationView(isShow: $inputTab.showEntryAccount)
                     }
                 }
+//                .alert(logInVM.resultAccountLink ? "登録完了" : "登録失敗",
+//                       isPresented: $logInVM.showAccountLinkAlert) {
+//                    Button("OK") { logInVM.showAccountLinkAlert.toggle() }
+//                } message: {
+//                    if logInVM.resultAccountLink {
+//                        Text("アカウントの登録に成功しました！引き続き、unicoをよろしくお願い致します。")
+//                    } else {
+//                        Text("アカウント登録時にエラーが発生しました。もう一度試してみてください。")
+//                    }
+//                } // alert
                 .ignoresSafeArea()
                 .onChange(of: inputTab.selectionTab) { _ in
                     switch inputTab.selectionTab {

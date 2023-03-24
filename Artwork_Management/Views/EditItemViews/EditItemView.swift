@@ -118,7 +118,7 @@ struct EditItemView: View {
 //
 //                        case .create:
 //                            Task {
-//                                let uploadImage =  await itemVM.uploadImage(inputEdit.captureImage)
+//                                let uploadImage =  await itemVM.uploadItemImage(inputEdit.captureImage)
 //                                let itemData = RootItem(tag: inputEdit.selectionTagName,
 //                                                        teamID: teamVM.team!.id,
 //                                                        name: inputEdit.name,

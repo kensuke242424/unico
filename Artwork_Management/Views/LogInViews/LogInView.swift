@@ -419,7 +419,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 Button("ログイン") {
                     withAnimation(.spring(response: 0.5)) {
                         logInVM.resultSignInType = .signIn
-                        logInVM.sendSignInLink(email: inputLogIn.address)
+                        logInVM.sendEmailLink(email: inputLogIn.address)
                     }
                 }
                 
@@ -524,7 +524,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             resizedIconImage = logInVM.resizeUIImage(image: captureIconUIImage,
                                                                     width: 60)
                         }
-                        /// オリジナル背景を選択していなければ、付属のImageをUIImageに直してからリサイズ
+                        /// オリジナル背景ではなくサンプル背景を選択していた場合は、付属のImageをUIImageに直してからリサイズ
                         if let captureBackgroundImage = inputLogIn.captureBackgroundImage {
                             resizedBackgroundImage = logInVM.resizeUIImage(image: captureBackgroundImage,
                                                                           width: getRect().width * 4)
@@ -535,8 +535,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         }
                         
                         /// リサイズ処理した画像をFirestorageに保存
-                        let uplaodIconImageData       = await logInVM.uploadImage(resizedIconImage)
-                        let uplaodBackgroundImageData = await logInVM.uploadImage(resizedBackgroundImage)
+                        let uplaodIconImageData       = await userVM.uploadUserImage(resizedIconImage)
+                        let uplaodBackgroundImageData = await teamVM.uploadTeamImage(resizedBackgroundImage)
                         
                         /// ユーザーの入力値をもとにユーザーデータを作成し、Firestoreに保存⬇︎
                         if inputLogIn.createUserNameText == "" { inputLogIn.createUserNameText = "名無し" }
@@ -591,6 +591,9 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     }
                 } // Task end
             }
+        }
+        .onAppear {
+            userVM.isAnonymousCheck()
         }
         
     } // body
