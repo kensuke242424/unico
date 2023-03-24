@@ -9,11 +9,11 @@ import SwiftUI
 import ResizableSheet
 
 struct InputTab {
-    /// Navigation遷移を管理するプロパティ
-    var path = NavigationPath()
+    // 各設定Viewの表示を管理するプロパティ
     var showSideMenu: Bool = false
     var showEntryAccount: Bool = false
     var selectedUpdateData: SelectedUpdateData = .start
+    
     /// NavigationPathによるエディット画面遷移時に渡す
     var selectedItem: Item?
     var selectedTag: Tag?
@@ -159,6 +159,7 @@ struct NewTabView: View {
                     switch systemPath {
                     case .root:
                         SystemView(itemVM: itemVM)
+                            .preferredColorScheme(.dark)
                     }
                 }
             } // NavigationStack

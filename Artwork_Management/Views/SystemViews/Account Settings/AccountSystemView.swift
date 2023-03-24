@@ -78,7 +78,8 @@ struct AccountSystemView: View {
     @State private var showExistAccountAlert: Bool = false
     
     var body: some View {
-        VStack {
+        
+        VStack(spacing: 20) {
             ForEach(AccountListContents.allCases, id: \.self) { listRow in
                 
                     switch listRow {
@@ -195,16 +196,12 @@ struct AccountSystemView: View {
             }
         }
     }
-    
-    @ViewBuilder
-    func deleteAccount() -> some View {
-        
-    }
 }
 
 struct AccountSetting_Previews: PreviewProvider {
     static var previews: some View {
         AccountSystemView()
             .environmentObject(LogInViewModel())
+            .environmentObject(UserViewModel())
     }
 }
