@@ -34,6 +34,7 @@ struct RootView: View {
     
     @EnvironmentObject var progress: ProgressViewModel
 
+    @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var logInVM: LogInViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
@@ -212,7 +213,6 @@ struct RootView: View {
                 // リンクが有効だった場合、メールリンクからのサインインメソッド実行
                 let defaults = UserDefaults.standard
                 if let email = defaults.string(forKey: "Email") {
-                    progress.isShow.toggle()
                     withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
                         // アドレス入力ハーフシートを閉じる
                         logInVM.showEmailHalfSheet       = false
@@ -223,7 +223,9 @@ struct RootView: View {
                     switch logInVM.handleUseReceivedEmailLink {
                     case .signIn:
                         logInVM.signInEmailLink(email: email, link: incomingURL.absoluteString)
-                        progress.isShow.toggle()
+                        
+                    case .updateEmail:
+                        navigationVM.path.append(SystemAccountPath.updateEmail)
                         
                     case .entryAccount:
                         if userVM.isAnonymous {
@@ -237,7 +239,6 @@ struct RootView: View {
                     
                 } else {
                     print("ユーザーデフォルトからのメールアドレス取得失敗: defaults.string(forKey: Email)")
-                    progress.isShow.toggle()
                 }
             }
             if linkHandled {
@@ -245,7 +246,6 @@ struct RootView: View {
                 return
             } else {
                 print("NO linkHandled")
-                progress.isShow.toggle()
                 return
             }
         }
@@ -255,6 +255,7 @@ struct RootView: View {
 struct RootView_Previews: PreviewProvider {
     static var previews: some View {
         RootView()
+            .environmentObject(NavigationViewModel())
             .environmentObject(LogInViewModel())
             .environmentObject(TeamViewModel())
             .environmentObject(UserViewModel())

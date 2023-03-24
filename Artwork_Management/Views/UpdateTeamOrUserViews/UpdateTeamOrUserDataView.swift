@@ -37,7 +37,7 @@ struct UpdateTeamOrUserDataView: View {
     var body: some View {
 
         ZStack {
-            LogoMark().scaleEffect(0.4).opacity(0.2)
+            LogoMark().scaleEffect(0.4).opacity(0.4)
                 .offset(x: getRect().width / 2 - 70,
                         y: -getRect().height / 2 + getSafeArea().top + 40)
 
@@ -136,7 +136,8 @@ struct UpdateTeamOrUserDataView: View {
                                 inputUpdate.savingWait.toggle()
                             }
                             // アイコンデータのアップロード保存
-                            let iconData = await teamVM.uploadTeamImage(inputUpdate.captureImage)
+                            guard let teamID = teamVM.team?.id else { return }
+                            let iconData = await teamVM.uploadTeamImage(inputUpdate.captureImage, teamID: teamID)
                             // チームの名前とアイコンデータをfirestoreに保存
                             try await teamVM.updateTeamNameAndIcon(name: inputUpdate.nameText, data: iconData)
                             // チームが保持している各メンバーのチームデータ(JoinTeam)を更新
@@ -174,12 +175,21 @@ struct UpdateTeamOrUserDataView: View {
         } // ZStack
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background {
-            Color(.black).opacity(0.7)
-                .background(.ultraThinMaterial).opacity(0.9)
+            Color.userBlue1
+                .frame(width: getRect().width, height: getRect().height)
+                .opacity(0.7)
                 .ignoresSafeArea()
-                .onTapGesture {
-                    showKyboard = nil
-                }
+                .onTapGesture { showKyboard = nil }
+
+            BlurView(style: .systemThinMaterialDark)
+                .frame(width: getRect().width, height: getRect().height)
+                .opacity(0.9)
+                .ignoresSafeArea()
+                .onTapGesture { showKyboard = nil }
+            
+            LogoMark().scaleEffect(0.4).opacity(0.4)
+                .offset(x: getRect().width / 2 - 70,
+                        y: -getRect().height / 2 + getSafeArea().top + 40)
         }
 
         .onAppear {
@@ -200,5 +210,7 @@ struct UpdateTeamOrUserDataView: View {
 struct UpdateTeamDataView_Previews: PreviewProvider {
     static var previews: some View {
         UpdateTeamOrUserDataView(selectedUpdate: .constant(.user))
+            .environmentObject(TeamViewModel())
+            .environmentObject(UserViewModel())
     }
 }

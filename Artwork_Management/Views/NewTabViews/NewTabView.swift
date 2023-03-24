@@ -166,8 +166,11 @@ struct NewTabView: View {
                     case .root:
                         AccountSystemView()
                         
+                    case .defaultEmailCheck:
+                        DefaultEmailCheckView()
+                        
                     case .updateEmail:
-                        Text("メールアドレス更新画面")
+                        UpdateAddressView()
                         
                     case .deleteAccount:
                         DeleteAccountView()

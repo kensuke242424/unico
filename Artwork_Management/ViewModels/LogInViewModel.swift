@@ -25,7 +25,7 @@ class LogInViewModel: ObservableObject {
     @Published var rootNavigation: RootNavigation = .logIn
     
     enum HandleUseReceivedEmailLink {
-        case signIn, entryAccount, deleteAccount
+        case signIn, entryAccount, updateEmail, deleteAccount
     }
     // メールリンクによって受け取ったユーザリンクをどのように扱うかをハンドルするプロパティ
     @Published var handleUseReceivedEmailLink: HandleUseReceivedEmailLink = .signIn
@@ -53,7 +53,29 @@ class LogInViewModel: ObservableObject {
     @Published var showAccountLinkAlert: Bool = false
     
     // アカウント削除の操作フローを管理するプロパティ
-    @Published var deleteAccountFase: DeleteAccountFase = .start
+    @Published var systemAccountEmailCheckFase: SystemAccountEmailCheckFase = .start
+    enum SystemAccountEmailCheckFase {
+        case start, check, failure, notMatches, sendEmail, waitDelete, success
+        
+        var faseText: String {
+            switch self {
+            case .start:
+                return ""
+            case.check:
+                return "アドレスをチェックしています..."
+            case .notMatches:
+                return "登録されているアドレスと一致しません。"
+            case .failure:
+                return "エラーが発生しました。"
+            case .sendEmail:
+                return "入力アドレスにメールを送信しました。"
+            case .waitDelete:
+                return "アカウントの削除を実行しています..."
+            case .success:
+                return "アカウントの削除が完了しました。"
+            }
+        }
+    }
 
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
     var listenerHandle: AuthStateDidChangeListenerHandle?
@@ -485,11 +507,11 @@ class LogInViewModel: ObservableObject {
             user.delete { error in
                 if let error = error {
                     print("アカウント削除失敗: \(error.localizedDescription)")
-                    self.deleteAccountFase = .failure
+                    self.systemAccountEmailCheckFase = .failure
                 } else {
                     // Account deleted.
                     print("アカウント削除完了")
-                    self.deleteAccountFase = .success
+                    self.systemAccountEmailCheckFase = .success
                 }
             }
         }

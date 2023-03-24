@@ -112,7 +112,6 @@ struct AccountSystemView: View {
                             Button("OK") {
                                 logInVM.showAccountLinkAlert.toggle()
                                 dismiss()
-                                
                             }
                         } message: {
                             if logInVM.resultAccountLink {
@@ -129,7 +128,7 @@ struct AccountSystemView: View {
                         
                     case .addressChange:
                         Button {
-                            navigationVM.path.append(SystemAccountPath.updateEmail)
+                            navigationVM.path.append(SystemAccountPath.defaultEmailCheck)
                         } label: {
                             ListRowView(icon : listRow.icon,
                                         title: listRow.title,
@@ -158,6 +157,9 @@ struct AccountSystemView: View {
                                             logInVM.logOut()
                                         }
                                     }
+                                }
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                    navigationVM.path.removeLast(navigationVM.path.count)
                                 }
                             }
                         } message: {

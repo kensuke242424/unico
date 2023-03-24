@@ -1,50 +1,35 @@
 //
-//  DeleteAccountView.swift
+//  DefaultEmailCheckView.swift
 //  Artwork_Management
 //
-//  Created by Kensuke Nakagawa on 2023/03/10.
+//  Created by Kensuke Nakagawa on 2023/03/24.
 //
 
 import SwiftUI
-import FirebaseAuth
-import AuthenticationServices
 
-struct DeleteAccountView: View {
-    
-    @EnvironmentObject var navigationVM: NavigationViewModel
+struct DefaultEmailCheckView: View {
     @EnvironmentObject var logInVM: LogInViewModel
-    
     @State private var inputEmailAddress: String = ""
-    
     var body: some View {
-        VStack(spacing: 30) {
-
-            VStack(alignment: .leading) {
-                Text("※ unicoに登録されているアカウントデータ及び、\n「アイテム」「ユーザー」「チーム」データを削除します。")
-                    .foregroundColor(.white)
-                    .padding(.vertical)
-                    
-                Text("※ チーム内に他のメンバーが存在する場合、チーム内の\n 「アイテム」「タグ」を含めたチームデータは消去されずに\n   残ります。")
-                    .foregroundColor(.orange)
+        VStack {
+            Text("本人確認")
+                .font(.title2)
+                .fontWeight(.bold)
+                .tracking(3)
+                .foregroundColor(.white)
+                .padding(.top, 20)
+            
+            Group {
+                Text("現在unicoに登録されているメールアドレスに本人確認メールを送信します。")
+                Text("メールリンクから本人確認が完了したら、新しいメールアドレスへの変更処理に移ります。")
             }
-            .font(.caption)
-            .opacity(0.6)
-            .multilineTextAlignment(.leading)
             
-            
-            Text("アカウント削除を実行するために、あなたが当アカウントのユーザー本人であることを確認します。現在unicoに登録されているメールアドレスを入力して、本人確認メールからログインしてください。")
                 .font(.subheadline)
                 .fontWeight(.semibold)
                 .foregroundColor(.white)
                 .opacity(0.7)
                 .multilineTextAlignment(.leading)
                 .padding(.top)
-            
-            Text("メールリンクからの本人認証が完了した時点で、アカウントの削除が実行されます。")
-                .foregroundColor(.red)
-                .font(.caption)
-                .opacity(0.7)
-                .multilineTextAlignment(.leading)
             
             TextField("", text: $inputEmailAddress)
                 .textInputAutocapitalization(.never)
@@ -57,11 +42,12 @@ struct DeleteAccountView: View {
                             .opacity(0.8)
                             .frame(height: 32)
                         
-                        Text(inputEmailAddress.isEmpty ? "登録メールアドレスを入力" : "")
+                        Text(inputEmailAddress.isEmpty ? "登録済のメールアドレスを入力" : "")
                             .foregroundColor(.black)
                             .opacity(0.4)
                     }
                 }
+                .padding()
             
             Button("メールを送信") {
                 Task {
@@ -74,6 +60,7 @@ struct DeleteAccountView: View {
 
                     if matchesCheckResult {
                         withAnimation(.easeInOut(duration: 0.2)) {
+                            logInVM.handleUseReceivedEmailLink = .updateEmail
                             logInVM.systemAccountEmailCheckFase = .sendEmail
                         }
                         // リンクメールを送る前に、認証リンクがどのように使われるかハンドルするために
@@ -98,37 +85,22 @@ struct DeleteAccountView: View {
                    ProgressView()
                 }
             }
-            
+            .padding()
             
             Spacer()
-            
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.horizontal, 30)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .customSystemBackground()
         .customBackButton()
-        .navigationTitle("アカウントの削除")
-        // アカウント削除を検知したら、DeletedViewへ遷移
-        .onChange(of: logInVM.systemAccountEmailCheckFase) { newValue in
-            if newValue == .success {
-                navigationVM.path.append(SystemAccountPath.deletedData)
-            }
-        }
+        .navigationTitle("メールアドレスの変更")
+        
     }
 }
 
-struct DeleteAccountView_Previews: PreviewProvider {
+struct DefaultEmailCheckView_Previews: PreviewProvider {
     static var previews: some View {
-        NavigationStack {
-            VStack {
-                DeleteAccountView()
-                    .environmentObject(NavigationViewModel())
-                    .environmentObject(LogInViewModel())
-            }
-            .navigationTitle("アカウントの削除")
-            .navigationBarTitleDisplayMode(.inline)
-            .preferredColorScheme(.dark)
-        }
-        
+        DefaultEmailCheckView()
+            .environmentObject(LogInViewModel())
     }
 }

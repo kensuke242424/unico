@@ -17,10 +17,6 @@ struct UserEntryRecommendationView: View {
         
         VStack(spacing: 60) {
             
-            LogoMark()
-                .scaleEffect(0.3)
-                .frame(height: 30)
-            
             // アカウント登録時の機能説明を保持するView
             VStack(alignment: .leading, spacing: 30) {
                 
@@ -43,6 +39,7 @@ struct UserEntryRecommendationView: View {
                 .foregroundColor(.white)
                 .tracking(1)
                 .background {
+                    
                     RoundedRectangle(cornerRadius: 10)
                         .foregroundColor(.userBlue1)
                         .opacity(0.7)
@@ -81,6 +78,8 @@ struct UserEntryRecommendationView: View {
                         if userVM.isAnonymous {
                             // すでにお試しアカウントでアプリを始めている場合の処理
                             withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
+                                logInVM.handleUseReceivedEmailLink = .entryAccount
+                                /// ⬇︎関係ない値のように見えるが、メソッドのハンドリングに使われる値のため、消さない！！
                                 logInVM.userSelectedSignInType = .signUp
                                 logInVM.showEmailHalfSheet.toggle()
                             }
@@ -108,17 +107,22 @@ struct UserEntryRecommendationView: View {
         .frame(width: getRect().width - 50, height: getRect().height)
         .background {
             ZStack {
+                
                 Color.userBlue1
                     .frame(width: getRect().width, height: getRect().height)
                     .opacity(0.7)
                     .ignoresSafeArea()
-                
+
                 BlurView(style: .systemThinMaterialDark)
                     .frame(width: getRect().width, height: getRect().height)
                     .opacity(0.9)
                     .ignoresSafeArea()
+                
+                LogoMark().scaleEffect(0.35).opacity(0.4)
+                    .offset(x: 0,
+                            y: -getRect().height / 2 + getSafeArea().top + 40)
+                    
             }
-            
         }
     }
 }
@@ -126,5 +130,7 @@ struct UserEntryRecommendationView: View {
 struct UserEntryRecommendationView_Previews: PreviewProvider {
     static var previews: some View {
         UserEntryRecommendationView(isShow: .constant(true))
+            .environmentObject(LogInViewModel())
+            .environmentObject(UserViewModel())
     }
 }

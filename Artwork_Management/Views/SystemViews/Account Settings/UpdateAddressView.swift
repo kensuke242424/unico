@@ -8,10 +8,12 @@
 import SwiftUI
 
 struct UpdateAddressView: View {
+    @EnvironmentObject var logInVM: LogInViewModel
     var body: some View {
         VStack {
-            Text("アカウント削除画面")
+            Text("メールアドレス更新画面")
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .customSystemBackground()
         .customBackButton()
         .navigationTitle("メールアドレスの変更")
@@ -22,5 +24,6 @@ struct UpdateAddressView: View {
 struct UpadateAddressView_Previews: PreviewProvider {
     static var previews: some View {
         UpdateAddressView()
+            .environmentObject(LogInViewModel())
     }
 }

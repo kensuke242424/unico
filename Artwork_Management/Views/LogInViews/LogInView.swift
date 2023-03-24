@@ -526,6 +526,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         // 背景、アイコン画像をリサイズして保存していく
                         var resizedIconImage      : UIImage?
                         var resizedBackgroundImage: UIImage?
+                        // チームIDを作成しておく。背景画像をFireStorage保存時に使う
+                        let createTeamID = UUID().uuidString
                         
                         // 60 -> アイコンwidth
                         if let captureIconUIImage = inputLogIn.captureUserIconImage {
@@ -544,7 +546,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         
                         /// リサイズ処理した画像をFirestorageに保存
                         let uplaodIconImageData       = await userVM.uploadUserImage(resizedIconImage)
-                        let uplaodBackgroundImageData = await teamVM.uploadTeamImage(resizedBackgroundImage)
+                        let uplaodBackgroundImageData = await teamVM.uploadTeamImage(resizedBackgroundImage,
+                                                                                     teamID: createTeamID)
                         
                         /// ユーザーの入力値をもとにユーザーデータを作成し、Firestoreに保存⬇︎
                         if inputLogIn.createUserNameText == "" { inputLogIn.createUserNameText = "名無し" }
@@ -558,8 +561,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         try await userVM.fetchUser()
                         guard let user = userVM.user else { return }
                         
-                        /// 新規チームデータの準備⬇︎
-                        let createTeamID = UUID().uuidString
+                        /// 新規チームデータに格納するjoinMemberデータの準備⬇︎
                         let joinMember = JoinMember(memberUID: user.id,
                                                     name     : user.name,
                                                     iconURL  : user.iconURL)

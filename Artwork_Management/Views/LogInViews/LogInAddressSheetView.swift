@@ -174,19 +174,7 @@ struct LogInAddressSheetView: View {
                                 withAnimation(.spring(response: 0.3)) {
                                     logInVM.addressSignInFase = .check
                                 }
-                                
-                                switch logInVM.userSelectedSignInType {
-                                    
-                                case .start :
-                                    print("処理なし")
-                                    
-                                case .logIn :
-                                    logInVM.existEmailAccountCheck(inputLogIn.address)
-                                    
-                                case .signUp:
-                                    logInVM.existEmailAccountCheck(inputLogIn.address)
-                                    
-                                }
+                                logInVM.existEmailAccountCheck(inputLogIn.address)
                             }
                             .buttonStyle(.borderedProminent)
                             .disabled(inputLogIn.sendAddressButtonDisabled)

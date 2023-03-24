@@ -115,7 +115,7 @@ struct SystemView: View {
 
     var body: some View {
 
-        VStack(spacing: 20) {
+        VStack(spacing: 10) {
             ForEach(SystemListContents.allCases, id: \.self) { listRow in
                 
                 

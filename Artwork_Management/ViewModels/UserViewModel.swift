@@ -110,7 +110,7 @@ class UserViewModel: ObservableObject {
         do {
             let storage = Storage.storage()
             let reference = storage.reference()
-            let filePath = "users/\(user.id)/\(Date()).jpeg"
+            let filePath = "users/\(Date()).jpeg"
             let imageRef = reference.child(filePath)
             _ = try await imageRef.putDataAsync(imageData)
             let url = try await imageRef.downloadURL()
