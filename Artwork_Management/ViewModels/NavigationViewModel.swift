@@ -15,6 +15,10 @@ enum SystemPath {
     case root
 }
 
+enum SystemAccountPath {
+    case root, updateEmail, deleteAccount, deletedData
+}
+
 class NavigationViewModel: ObservableObject {
     
     @Published var path = NavigationPath()

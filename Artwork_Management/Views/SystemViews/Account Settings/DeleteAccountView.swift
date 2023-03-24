@@ -9,8 +9,32 @@ import SwiftUI
 import FirebaseAuth
 import AuthenticationServices
 
+enum DeleteAccountFase {
+    case start, check, failure, notMatches, sendEmail, waitDelete, success
+    
+    var faseText: String {
+        switch self {
+        case .start:
+            return ""
+        case.check:
+            return "アドレスをチェックしています..."
+        case .notMatches:
+            return "入力アドレスが登録されているアドレスと一致しませんでした。"
+        case .failure:
+            return "エラーが発生しました。"
+        case .sendEmail:
+            return "入力アドレスにメールを送信しました。"
+        case .waitDelete:
+            return "アカウントの削除を実行しています..."
+        case .success:
+            return "アカウントの削除が完了しました。"
+        }
+    }
+}
+
 struct DeleteAccountView: View {
     
+    @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var logInVM: LogInViewModel
     
     @State private var inputEmailAddress: String = ""
@@ -19,7 +43,7 @@ struct DeleteAccountView: View {
         VStack(spacing: 30) {
 
             VStack(alignment: .leading) {
-                Text("※ unicoに登録されているアカウントデータ及び、\n「アイテム」「ユーザー」「チーム」データをを削除します。")
+                Text("※ unicoに登録されているアカウントデータ及び、\n「アイテム」「ユーザー」「チーム」データを削除します。")
                     .foregroundColor(.white)
                     .padding(.vertical)
                     
@@ -27,12 +51,13 @@ struct DeleteAccountView: View {
                     .foregroundColor(.orange)
             }
             .font(.caption)
-            .opacity(0.5)
+            .opacity(0.6)
             .multilineTextAlignment(.leading)
             
             
             Text("アカウント削除を実行するために、あなたが当アカウントのユーザー本人であることを確認します。\n現在unicoに登録されているメールアドレスを入力して、本人確認メールからログインしてください。")
                 .font(.subheadline)
+                .fontWeight(.semibold)
                 .foregroundColor(.white)
                 .opacity(0.7)
                 .multilineTextAlignment(.leading)
@@ -62,12 +87,37 @@ struct DeleteAccountView: View {
                 }
             
             Button("メールを送信") {
-                logInVM.sendEmailLink(email: inputEmailAddress)
+                navigationVM.path.append(SystemAccountPath.deletedData)
+//                Task {
+//                    withAnimation(.easeInOut(duration: 0.2)) {
+//                        logInVM.deleteAccountFase = .check
+//                    }
+//
+//                    let matchesCheckResult = await logInVM.verifyInputEmailMatchesCurrent(email: inputEmailAddress)
+//
+//                    if matchesCheckResult {
+//                        logInVM.handleUseReceivedEmailLink = .deleteAccount
+//                        logInVM.sendEmailLink(email: inputEmailAddress)
+//                    } else {
+//                        hapticErrorNotification()
+//                        withAnimation(.easeInOut(duration: 0.2)) {
+//                            logInVM.deleteAccountFase = .notMatches
+//                        }
+//                    }
+//                }
             }
             
-            if logInVM.addressSignInFase == .check {
+            HStack {
+                Text(logInVM.deleteAccountFase.faseText)
+                    .foregroundColor(logInVM.deleteAccountFase == .notMatches ||
+                                     logInVM.deleteAccountFase == .failure ? .red : .white)
                 
+                if logInVM.deleteAccountFase == .check ||
+                   logInVM.deleteAccountFase == .waitDelete {
+                   ProgressView()
+                }
             }
+            
             
             Spacer()
             
@@ -77,7 +127,6 @@ struct DeleteAccountView: View {
         .customSystemBackground()
         .customBackButton()
         .navigationTitle("アカウントの削除")
-        
     }
 }
 
@@ -86,6 +135,7 @@ struct DeleteAccountView_Previews: PreviewProvider {
         NavigationStack {
             VStack {
                 DeleteAccountView()
+                    .environmentObject(NavigationViewModel())
                     .environmentObject(LogInViewModel())
             }
             .navigationTitle("アカウントの削除")

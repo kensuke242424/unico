@@ -99,6 +99,7 @@ enum LogInAlert {
     case existsUserDocument
     case existEmailAddressAccount
     case notExistEmailAddressAccount
+    case notEmailCurrentMatches
     case other
     
     var title: String {
@@ -117,6 +118,9 @@ enum LogInAlert {
             return "ログイン"
         case .notExistEmailAddressAccount:
             return "アカウント無し"
+        case .notEmailCurrentMatches:
+            return "エラー"
+            
         case .other:
             return "エラー"
         }
@@ -138,6 +142,8 @@ enum LogInAlert {
             return "入力したアドレスには以前作成したunicoデータが存在します。ログインしますか？"
         case .notExistEmailAddressAccount:
             return "入力したメールアドレスのアカウントは存在しませんでした。ユーザの新規登録をしてください。"
+        case .notEmailCurrentMatches  :
+            return "入力したメールアドレスは登録されているアドレスと異なります。"
         case .other                   :
             return "処理に失敗しました。再度試してみてください。"
         }
@@ -426,9 +432,11 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             case .notExistEmailAddressAccount:
                 Button("OK") {}
                 
-            case .other                      :
+            case .notEmailCurrentMatches:
                 Button("OK") {}
                 
+            case .other                      :
+                Button("OK") {}
             }
                     
         } message: {

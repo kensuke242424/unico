@@ -68,6 +68,7 @@ struct AccountSystemView: View {
     @Environment(\.dismiss) var dismiss
     
     @EnvironmentObject var progress: ProgressViewModel
+    @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var logInVM: LogInViewModel
     @EnvironmentObject var userVM: UserViewModel
     
@@ -127,8 +128,8 @@ struct AccountSystemView: View {
                         }
                         
                     case .addressChange:
-                        NavigationLink {
-                            UpdateAddressView()
+                        Button {
+                            navigationVM.path.append(SystemAccountPath.updateEmail)
                         } label: {
                             ListRowView(icon : listRow.icon,
                                         title: listRow.title,
@@ -168,14 +169,13 @@ struct AccountSystemView: View {
                         } // alert
                         
                     case .deleteAccount:
-                        NavigationLink {
-                            DeleteAccountView()
+                        Button {
+                            navigationVM.path.append(SystemAccountPath.deleteAccount)
                         } label: {
                             ListRowView(icon : listRow.icon,
                                         title: listRow.title,
                                         text : listRow.infomation
                             )
-                            .foregroundColor(.red)
                         }
                     }
             }
@@ -202,6 +202,7 @@ struct AccountSetting_Previews: PreviewProvider {
     static var previews: some View {
         AccountSystemView()
             .environmentObject(LogInViewModel())
+            .environmentObject(NavigationViewModel())
             .environmentObject(UserViewModel())
     }
 }

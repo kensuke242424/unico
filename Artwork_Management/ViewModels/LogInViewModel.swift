@@ -27,6 +27,7 @@ class LogInViewModel: ObservableObject {
     enum HandleUseReceivedEmailLink {
         case signIn, entryAccount, deleteAccount
     }
+    // メールリンクによって受け取ったユーザリンクをどのように扱うかをハンドルするプロパティ
     @Published var handleUseReceivedEmailLink: HandleUseReceivedEmailLink = .signIn
     
     /// リスナーによってサインインが検知されたらトグルするプロパティ
@@ -50,6 +51,9 @@ class LogInViewModel: ObservableObject {
     // 匿名アカウントから永久アカウントへの認証結果を管理するプロパティ
     @Published var resultAccountLink   : Bool = false
     @Published var showAccountLinkAlert: Bool = false
+    
+    // アカウント削除の操作フローを管理するプロパティ
+    @Published var deleteAccountFase: DeleteAccountFase = .start
 
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
     var listenerHandle: AuthStateDidChangeListenerHandle?
@@ -114,6 +118,15 @@ class LogInViewModel: ObservableObject {
             print("アカウントリンク成功")
             self.resultAccountLink = true
             self.showAccountLinkAlert.toggle()
+        }
+    }
+    
+    func verifyInputEmailMatchesCurrent(email: String) async -> Bool {
+        guard let user = Auth.auth().currentUser else  { return false }
+        if user.email == email {
+            return true
+        } else  {
+            return false
         }
     }
     

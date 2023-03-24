@@ -159,7 +159,21 @@ struct NewTabView: View {
                     switch systemPath {
                     case .root:
                         SystemView(itemVM: itemVM)
-                            .preferredColorScheme(.dark)
+                    }
+                }
+                .navigationDestination(for: SystemAccountPath.self) { accountPath in
+                    switch accountPath {
+                    case .root:
+                        AccountSystemView()
+                        
+                    case .updateEmail:
+                        Text("メールアドレス更新画面")
+                        
+                    case .deleteAccount:
+                        DeleteAccountView()
+                        
+                    case .deletedData:
+                        Text("アカウントの削除が完了しました画面")
                     }
                 }
             } // NavigationStack
@@ -371,6 +385,7 @@ struct NewTabView_Previews: PreviewProvider {
 
         return NewTabView(itemVM: ItemViewModel(), cartVM: CartViewModel())
             .environment(\.resizableSheetCenter, resizableSheetCenter)
+            .environmentObject(NavigationViewModel())
             .environmentObject(LogInViewModel())
             .environmentObject(TeamViewModel())
             .environmentObject(UserViewModel())

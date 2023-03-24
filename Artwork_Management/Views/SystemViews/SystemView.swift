@@ -109,6 +109,7 @@ struct SystemView: View {
         }
     }
 
+    @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var logInVM: LogInViewModel
     @StateObject var itemVM: ItemViewModel
 
@@ -130,8 +131,8 @@ struct SystemView: View {
                     }
                     
                 case .account:
-                    NavigationLink {
-                        AccountSystemView()
+                    Button {
+                        navigationVM.path.append(SystemAccountPath.root)
                     } label: {
                         ListRowView(icon : listRow.icon,
                                     title: listRow.title,
