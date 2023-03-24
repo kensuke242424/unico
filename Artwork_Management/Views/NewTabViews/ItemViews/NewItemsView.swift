@@ -17,6 +17,7 @@ struct InputCart {
 struct NewItemsView: View {
     
     /// Tab親Viewから受け取るViewModelと状態変数
+    @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var tagVM : TagViewModel
@@ -88,7 +89,7 @@ struct NewItemsView: View {
                             AddItemScrollContainerView(size: size)
                                 .onTapGesture {
                                     DispatchQueue.main.async {
-                                        inputTab.path.append(.create)
+                                        navigationVM.path.append(EditItemPath.create)
                                     }
                                 }
                         }

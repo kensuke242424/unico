@@ -168,7 +168,7 @@ struct AccountSystemView: View {
                         
                     case .deleteAccount:
                         NavigationLink {
-                            DeleteAccountView(logInVM: logInVM)
+                            DeleteAccountView()
                         } label: {
                             ListRowView(icon : listRow.icon,
                                         title: listRow.title,

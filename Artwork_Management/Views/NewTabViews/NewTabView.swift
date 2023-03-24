@@ -8,13 +8,9 @@
 import SwiftUI
 import ResizableSheet
 
-enum NavigationPath {
-    case create, edit, system
-}
-
 struct InputTab {
     /// Navigation遷移を管理するプロパティ
-    var path: [NavigationPath] = []
+    var path = NavigationPath()
     var showSideMenu: Bool = false
     var showEntryAccount: Bool = false
     var selectedUpdateData: SelectedUpdateData = .start
@@ -37,6 +33,7 @@ struct InputTab {
 
 struct NewTabView: View {
     
+    @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var logInVM: LogInViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
@@ -53,7 +50,7 @@ struct NewTabView: View {
         GeometryReader {
             let size = $0.size
             
-            NavigationStack(path: $inputTab.path) {
+            NavigationStack(path: $navigationVM.path) {
                 
                 VStack {
                     TabTopBarView()
@@ -132,16 +129,6 @@ struct NewTabView: View {
                         UserEntryRecommendationView(isShow: $inputTab.showEntryAccount)
                     }
                 }
-//                .alert(logInVM.resultAccountLink ? "登録完了" : "登録失敗",
-//                       isPresented: $logInVM.showAccountLinkAlert) {
-//                    Button("OK") { logInVM.showAccountLinkAlert.toggle() }
-//                } message: {
-//                    if logInVM.resultAccountLink {
-//                        Text("アカウントの登録に成功しました！引き続き、unicoをよろしくお願い致します。")
-//                    } else {
-//                        Text("アカウント登録時にエラーが発生しました。もう一度試してみてください。")
-//                    }
-//                } // alert
                 .ignoresSafeArea()
                 .onChange(of: inputTab.selectionTab) { _ in
                     switch inputTab.selectionTab {
@@ -157,9 +144,8 @@ struct NewTabView: View {
                 }
                 
                 /// NavigationStackによる遷移を管理します
-                .navigationDestination(for: NavigationPath.self) { path in
-                    
-                    switch path {
+                .navigationDestination(for: EditItemPath.self) { itemPath in
+                    switch itemPath {
                     case .create:
                         NewEditItemView(itemVM: itemVM, passItem: nil)
                         
@@ -167,10 +153,13 @@ struct NewTabView: View {
                         NewEditItemView(itemVM: itemVM,
                                         passItem: itemVM.items[cartVM.actionItemIndex])
                         
-                    case .system:
+                    }
+                }
+                .navigationDestination(for: SystemPath.self) { systemPath in
+                    switch systemPath {
+                    case .root:
                         SystemView(itemVM: itemVM)
                     }
-                    
                 }
             } // NavigationStack
         } // GeometryReader
@@ -334,7 +323,7 @@ struct NewTabView: View {
                         Button {
                             /// アイテム追加エディット画面に遷移
                             withAnimation(.spring(response: 0.4)) {
-                                inputTab.path.append(.create)
+                                navigationVM.path.append(EditItemPath.create)
                             }
                         } label: {
                             Image(systemName: "shippingbox.fill")

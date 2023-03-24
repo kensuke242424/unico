@@ -10,7 +10,7 @@ import FirebaseAuth
 import AuthenticationServices
 
 struct DeleteAccountView: View {
-    @StateObject var logInVM: LogInViewModel
+    @EnvironmentObject var logInVM: LogInViewModel
     var body: some View {
         VStack {
 
@@ -28,6 +28,6 @@ struct DeleteAccountView: View {
 
 struct DeleteAccountView_Previews: PreviewProvider {
     static var previews: some View {
-        DeleteAccountView(logInVM: LogInViewModel())
+        DeleteAccountView()
     }
 }

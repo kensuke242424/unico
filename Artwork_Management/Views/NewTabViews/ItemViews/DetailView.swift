@@ -12,6 +12,8 @@ struct DetailView: View {
     
     @Environment(\.colorScheme) var colorScheme
     
+    @EnvironmentObject var navigationVM: NavigationViewModel
+    
     @StateObject var itemVM: ItemViewModel
     @StateObject var cartVM: CartViewModel
     @Binding var inputTab: InputTab
@@ -248,7 +250,7 @@ struct DetailView: View {
             HStack {
                 Spacer()
                 Button {
-                    inputTab.path = [.edit]
+                    navigationVM.path.append(EditItemPath.edit)
                 } label: {
                     Label("編集", systemImage: "pencil.line")
                         .font(.callout)

@@ -24,6 +24,7 @@ struct SystemSideMenu: View {
 
     @StateObject var itemVM: ItemViewModel
     
+    @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var progress: ProgressViewModel
     @EnvironmentObject var logInVM : LogInViewModel
     @EnvironmentObject var teamVM  : TeamViewModel
@@ -131,7 +132,7 @@ struct SystemSideMenu: View {
                                     
                                     VStack(alignment: .leading, spacing: 40) {
                                         Label("アイテム追加", systemImage: "shippingbox.fill")
-                                            .onTapGesture { inputTab.path.append(.create) }
+                                            .onTapGesture { navigationVM.path.append(EditItemPath.create) }
                                     }
                                     .foregroundColor(.white)
                                     .frame(width: 210, height: menuHeight, alignment: .topLeading)
@@ -326,7 +327,7 @@ struct SystemSideMenu: View {
                                     VStack(alignment: .leading, spacing: 40) {
                                         
                                         Label("システム設定", systemImage: "gearshape.fill")
-                                            .onTapGesture { inputTab.path.append(.system) }
+                                            .onTapGesture { navigationVM.path.append(SystemPath.root) }
 
                                     } // VStack
                                     .foregroundColor(.white)
