@@ -475,13 +475,24 @@ class LogInViewModel: ObservableObject {
     
     func deleteAccountEmailLink(email: String, link: String) {
         let credential = EmailAuthProvider.credential(withEmail:email, link:link)
-          Auth.auth().currentUser?.reauthenticate(with: credential) { authData, error in
+        guard let user = Auth.auth().currentUser else { return }
+        user.reauthenticate(with: credential) { authData, error in
             if let error {
-                print("アカウントの再認証に失敗しました")
-              return
+                print("アカウント再認証失敗: \(error.localizedDescription)")
+                return
             }
-            // The user was successfully re-authenticated.
-          }
+            // ユーザーの再認証成功。アカウント削除処理実行
+            user.delete { error in
+                if let error = error {
+                    print("アカウント削除失敗: \(error.localizedDescription)")
+                    self.deleteAccountFase = .failure
+                } else {
+                    // Account deleted.
+                    print("アカウント削除完了")
+                    self.deleteAccountFase = .success
+                }
+            }
+        }
     }
     
     // MARK: - Sign in with Appleはまだ実装できていない⬇︎

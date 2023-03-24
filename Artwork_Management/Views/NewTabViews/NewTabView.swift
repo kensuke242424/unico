@@ -173,7 +173,7 @@ struct NewTabView: View {
                         DeleteAccountView()
                         
                     case .deletedData:
-                        Text("アカウントの削除が完了しました画面")
+                        DeletedView()
                     }
                 }
             } // NavigationStack

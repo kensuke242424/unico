@@ -87,24 +87,32 @@ struct DeleteAccountView: View {
                 }
             
             Button("メールを送信") {
-                navigationVM.path.append(SystemAccountPath.deletedData)
-//                Task {
-//                    withAnimation(.easeInOut(duration: 0.2)) {
-//                        logInVM.deleteAccountFase = .check
-//                    }
-//
-//                    let matchesCheckResult = await logInVM.verifyInputEmailMatchesCurrent(email: inputEmailAddress)
-//
-//                    if matchesCheckResult {
-//                        logInVM.handleUseReceivedEmailLink = .deleteAccount
-//                        logInVM.sendEmailLink(email: inputEmailAddress)
-//                    } else {
-//                        hapticErrorNotification()
-//                        withAnimation(.easeInOut(duration: 0.2)) {
-//                            logInVM.deleteAccountFase = .notMatches
-//                        }
-//                    }
-//                }
+                Task {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        logInVM.deleteAccountFase = .check
+                    }
+
+                    /// 入力されたアドレスが、登録アドレスと一致するか検証するメソッド
+                    let matchesCheckResult = await logInVM.verifyInputEmailMatchesCurrent(email: inputEmailAddress)
+
+                    if matchesCheckResult {
+                        // リンクメールを送る前に、認証リンクがどのように使われるかハンドルする
+                        // 「handleUseReceivedEmailLink」に値を設定しておく必要がある
+                        logInVM.handleUseReceivedEmailLink = .deleteAccount
+                        logInVM.sendEmailLink(email: inputEmailAddress)
+                    } else {
+                        hapticErrorNotification()
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            logInVM.deleteAccountFase = .notMatches
+                        }
+                    }
+                }
+            }
+            // アカウント削除を検知したら、DeletedViewへ遷移
+            .onChange(of: logInVM.deleteAccountFase) { newValue in
+                if newValue == .success {
+                    navigationVM.path.append(SystemAccountPath.deletedData)
+                }
             }
             
             HStack {
