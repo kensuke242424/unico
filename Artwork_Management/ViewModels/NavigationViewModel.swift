@@ -16,7 +16,7 @@ enum SystemPath {
 }
 
 enum SystemAccountPath {
-    case root, defaultEmailCheck, updateEmail, deleteAccount, deletedData
+    case root, defaultEmailCheck, updateEmail, successUpdateEmail, deleteAccount, deletedData
 }
 
 class NavigationViewModel: ObservableObject {

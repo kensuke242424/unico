@@ -172,6 +172,9 @@ struct NewTabView: View {
                     case .updateEmail:
                         UpdateAddressView()
                         
+                    case .successUpdateEmail:
+                        SuccessUpdateAddressView()
+                        
                     case .deleteAccount:
                         DeleteAccountView()
                         

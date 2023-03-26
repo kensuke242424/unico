@@ -9,6 +9,29 @@ import SwiftUI
 import FirebaseAuth
 import AuthenticationServices
 
+enum DeleteAccountCheckFase {
+    case start, check, failure, notMatches, sendEmail, waitDelete, success
+    
+    var faseText: String {
+        switch self {
+        case .start:
+            return ""
+        case.check:
+            return "アドレスをチェックしています..."
+        case .notMatches:
+            return "登録されているアドレスと一致しません。"
+        case .failure:
+            return "エラーが発生しました。"
+        case .sendEmail:
+            return "入力アドレスにメールを送信しました。"
+        case .waitDelete:
+            return "アカウントの削除を実行しています..."
+        case .success:
+            return "アカウントの削除が完了しました。"
+        }
+    }
+}
+
 struct DeleteAccountView: View {
     
     @EnvironmentObject var navigationVM: NavigationViewModel
@@ -66,7 +89,7 @@ struct DeleteAccountView: View {
             Button("メールを送信") {
                 Task {
                     withAnimation(.easeInOut(duration: 0.2)) {
-                        logInVM.systemAccountEmailCheckFase = .check
+                        logInVM.deleteAccountCheckFase = .check
                     }
 
                     /// 入力されたアドレスが、登録アドレスと一致するか検証するメソッド
@@ -74,7 +97,7 @@ struct DeleteAccountView: View {
 
                     if matchesCheckResult {
                         withAnimation(.easeInOut(duration: 0.2)) {
-                            logInVM.systemAccountEmailCheckFase = .sendEmail
+                            logInVM.deleteAccountCheckFase = .sendEmail
                         }
                         // リンクメールを送る前に、認証リンクがどのように使われるかハンドルするために
                         // 「handleUseReceivedEmailLink」に値を設定しておく必要がある
@@ -83,18 +106,18 @@ struct DeleteAccountView: View {
                     } else {
                         hapticErrorNotification()
                         withAnimation(.easeInOut(duration: 0.2)) {
-                            logInVM.systemAccountEmailCheckFase = .notMatches
+                            logInVM.deleteAccountCheckFase = .notMatches
                         }
                     }
                 }
             }
             HStack(spacing: 10) {
-                Text(logInVM.systemAccountEmailCheckFase.faseText)
-                    .foregroundColor(logInVM.systemAccountEmailCheckFase == .notMatches ||
-                                     logInVM.systemAccountEmailCheckFase == .failure ? .red : .white)
+                Text(logInVM.deleteAccountCheckFase.faseText)
+                    .foregroundColor(logInVM.deleteAccountCheckFase == .notMatches ||
+                                     logInVM.deleteAccountCheckFase == .failure ? .red : .white)
                 
-                if logInVM.systemAccountEmailCheckFase == .check ||
-                   logInVM.systemAccountEmailCheckFase == .waitDelete {
+                if logInVM.deleteAccountCheckFase == .check ||
+                   logInVM.deleteAccountCheckFase == .waitDelete {
                    ProgressView()
                 }
             }
@@ -109,7 +132,7 @@ struct DeleteAccountView: View {
         .customBackButton()
         .navigationTitle("アカウントの削除")
         // アカウント削除を検知したら、DeletedViewへ遷移
-        .onChange(of: logInVM.systemAccountEmailCheckFase) { newValue in
+        .onChange(of: logInVM.deleteAccountCheckFase) { newValue in
             if newValue == .success {
                 navigationVM.path.append(SystemAccountPath.deletedData)
             }

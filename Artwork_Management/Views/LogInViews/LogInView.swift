@@ -514,7 +514,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 }
             }
             
-            /// ✅ 「signIn」ならfetch開始。「.signUp」なら各データの生成後、fetch開始
+            /// ✅ 「signIn」ならfetch開始。「.signUp」なら各データの生成後にfetch開始
             switch logInVM.resultSignInType {
 
             case .signIn:
@@ -563,7 +563,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         /// ユーザーの入力値をもとにユーザーデータを作成し、Firestoreに保存⬇︎
                         if inputLogIn.createUserNameText == "" { inputLogIn.createUserNameText = "名無し" }
                         
-                        try await logInVM.setSignUpUserDocument(name     : inputLogIn.createUserNameText,
+                        try await logInVM.setNewUserDocument(name     : inputLogIn.createUserNameText,
                                                                 password : inputLogIn.password,
                                                                 imageData: uplaodIconImageData,
                                                                 color    : inputLogIn.selectUserColor)

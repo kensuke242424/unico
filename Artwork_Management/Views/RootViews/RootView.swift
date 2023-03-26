@@ -230,16 +230,16 @@ struct RootView: View {
                         logInVM.signInEmailLink(email: email, link: incomingURL.absoluteString)
                         
                     case .updateEmail:
-                        navigationVM.path.append(SystemAccountPath.updateEmail)
-                        
+                        logInVM.addressReauthenticateByEmailLink(email: email,
+                                                                 link: incomingURL.absoluteString)
                     case .entryAccount:
                         if userVM.isAnonymous {
-                            logInVM.entryAccountEmailLink(email: email, link: incomingURL.absoluteString)
+                            logInVM.addressReauthenticateByEmailLink(email: email,
+                                                                     link: incomingURL.absoluteString)
                         }
-                        
-                    /// ⚠️アカウント削除選択時の処理
                     case .deleteAccount:
-                        logInVM.deleteAccountEmailLink(email: email, link: incomingURL.absoluteString)
+                        logInVM.addressReauthenticateByEmailLink(email: email,
+                                                                 link: incomingURL.absoluteString)
                     } // switch
                     
                 } else {

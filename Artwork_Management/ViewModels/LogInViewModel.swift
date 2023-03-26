@@ -52,30 +52,12 @@ class LogInViewModel: ObservableObject {
     @Published var resultAccountLink   : Bool = false
     @Published var showAccountLinkAlert: Bool = false
     
-    // アカウント削除の操作フローを管理するプロパティ
-    @Published var systemAccountEmailCheckFase: SystemAccountEmailCheckFase = .start
-    enum SystemAccountEmailCheckFase {
-        case start, check, failure, notMatches, sendEmail, waitDelete, success
-        
-        var faseText: String {
-            switch self {
-            case .start:
-                return ""
-            case.check:
-                return "アドレスをチェックしています..."
-            case .notMatches:
-                return "登録されているアドレスと一致しません。"
-            case .failure:
-                return "エラーが発生しました。"
-            case .sendEmail:
-                return "入力アドレスにメールを送信しました。"
-            case .waitDelete:
-                return "アカウントの削除を実行しています..."
-            case .success:
-                return "アカウントの削除が完了しました。"
-            }
-        }
-    }
+    // アカウントのメールアドレス設定関連の操作フローを管理するプロパティ
+    @Published var defaultEmailCheckFase: DefaultEmailCheckFase = .start
+    @Published var updateEmailCheckFase: UpdateEmailCheckFase = .success
+    @Published var deleteAccountCheckFase: DeleteAccountCheckFase = .start
+    
+    @Published var addressReauthenticateResult: Bool = false
 
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
     var listenerHandle: AuthStateDidChangeListenerHandle?
@@ -123,7 +105,7 @@ class LogInViewModel: ObservableObject {
         }
     }
     
-    func entryAccountEmailLink(email: String, link: String) {
+    func entryAccountByEmailLink(email: String, link: String) {
         
         let credential = EmailAuthProvider.credential(withEmail: email, link: link)
         
@@ -235,7 +217,7 @@ class LogInViewModel: ObservableObject {
         }
     }
 
-    func setSignUpUserDocument(name     : String,
+    func setNewUserDocument(name     : String,
                                password : String?,
                                imageData: (url: URL?, filePath: String?),
                                color: MemberColor) async throws {
@@ -323,6 +305,48 @@ class LogInViewModel: ObservableObject {
             }
         }
     }
+    
+    func updateEmailAddress(email: String) {
+        Auth.auth().currentUser?.updateEmail(to: email) { error in
+            if let error {
+                print(error.localizedDescription)
+                hapticErrorNotification()
+                self.updateEmailCheckFase = .failure
+            } else {
+                print("メールアドレスの更新に成功しました")
+                hapticSuccessNotification()
+                self.updateEmailCheckFase = .success
+            }
+        }
+    }
+    
+    /// メールリンクからcredentialを作成してアカウント再認証を行う。
+    /// 再認証に成功したら、handleUseReceivedEmailLinkの状態によって適切な処理を行う
+    func addressReauthenticateByEmailLink(email: String, link: String) {
+        guard let user = Auth.auth().currentUser else { return }
+        let credential = EmailAuthProvider.credential(withEmail:email, link:link)
+
+        // アカウントの再認証が成功したら新規メールアドレス入力画面へ移動する
+        user.reauthenticate(with: credential) { authData, error in
+            if let error = error {
+                print("アカウント再認証失敗: \(error.localizedDescription)")
+                self.defaultEmailCheckFase = .failure
+            } else {
+                
+                switch self.handleUseReceivedEmailLink {
+                case .signIn: print("handleUseReceivedEmailLink_処理なし")
+                case .signUp: print("handleUseReceivedEmailLink_処理なし")
+                case .updateEmail:
+                    self.updateEmailAddress(email: email)
+                case .entryAccount:
+                    self.entryAccountByEmailLink(email: email, link: link)
+                case .deleteAccount:
+                    self.deleteAccountWithEmailLink(email: email, link: link)
+                }
+                
+            }
+        }
+    }
 
     func uploadImage(_ image: UIImage?) async -> (url: URL?, filePath: String?) {
 
@@ -406,6 +430,84 @@ class LogInViewModel: ObservableObject {
         return UIImage(cgImage: cgImage)
     }
     
+    func shareApp(){
+        let productURL:URL = URL(string: "https://apps.apple.com/us/app/unico/id1663765686")!
+        
+        let activityViewController = UIActivityViewController(
+            activityItems: [productURL],
+            applicationActivities: nil)
+        
+        let scenes = UIApplication.shared.connectedScenes
+        let windowScene = scenes.first as? UIWindowScene
+        let window = windowScene?.windows.first
+        
+        if let window {
+            window.rootViewController?.present(activityViewController, animated: true, completion: nil)
+        }
+    }
+    
+    func reviewApp(){
+            let productURL:URL = URL(string: "https://apps.apple.com/us/app/unico/id1663765686")!
+            
+            var components = URLComponents(url: productURL, resolvingAgainstBaseURL: false)
+            
+            components?.queryItems = [
+                URLQueryItem(name: "action", value: "write-review")
+            ]
+            
+            guard let writeReviewURL = components?.url else {
+                return
+            }
+            
+            UIApplication.shared.open(writeReviewURL)
+        }
+    
+    func logOut() {
+        do {
+            try Auth.auth().signOut()
+            print("ログアウト成功")
+        } catch let signOutError as NSError {
+            print("Error signing out: %@", signOutError)
+            print("ログアウト失敗")
+        }
+    }
+    
+    func deleteAccountWithEmailLink(email: String, link: String) {
+        let credential = EmailAuthProvider.credential(withEmail:email, link:link)
+        guard let user = Auth.auth().currentUser else { return }
+        user.reauthenticate(with: credential) { authData, error in
+            if let error {
+                print("アカウント再認証失敗: \(error.localizedDescription)")
+                self.defaultEmailCheckFase = .failure
+                return
+            }
+            // ユーザーの再認証成功。アカウント削除処理実行
+            user.delete { error in
+                if let error = error {
+                    print("アカウント削除失敗: \(error.localizedDescription)")
+                    self.defaultEmailCheckFase = .failure
+                } else {
+                    // Account deleted.
+                    print("アカウント削除完了")
+                    self.defaultEmailCheckFase = .success
+                }
+            }
+        }
+    }
+    
+    // サインイン要求で nonce の SHA256 ハッシュを送信すると、Apple はそれを応答で変更せずに渡します。
+    // Firebase は、元のノンスをハッシュし、それを Apple から渡された値と比較することで、応答を検証します。
+    @available(iOS 13, *)
+    private func sha256(_ input: String) -> String {
+        let inputData = Data(input.utf8)
+        let hashedData = SHA256.hash(data: inputData)
+        let hashString = hashedData.compactMap {
+            String(format: "%02x", $0)
+        }.joined()
+        
+        return hashString
+    }
+    
     private func randomNonceString(length: Int = 32) -> String {
       precondition(length > 0)
       let charset: [Character] =
@@ -440,100 +542,6 @@ class LogInViewModel: ObservableObject {
       return result
     }
 
-    // サインイン要求で nonce の SHA256 ハッシュを送信すると、Apple はそれを応答で変更せずに渡します。
-    // Firebase は、元のノンスをハッシュし、それを Apple から渡された値と比較することで、応答を検証します。
-    @available(iOS 13, *)
-    private func sha256(_ input: String) -> String {
-      let inputData = Data(input.utf8)
-      let hashedData = SHA256.hash(data: inputData)
-      let hashString = hashedData.compactMap {
-        String(format: "%02x", $0)
-      }.joined()
-
-      return hashString
-    }
-    
-    func shareApp(){
-        let productURL:URL = URL(string: "https://apps.apple.com/us/app/unico/id1663765686")!
-        
-        let activityViewController = UIActivityViewController(
-            activityItems: [productURL],
-            applicationActivities: nil)
-        
-        let scenes = UIApplication.shared.connectedScenes
-        let windowScene = scenes.first as? UIWindowScene
-        let window = windowScene?.windows.first
-        
-        if let window {
-            window.rootViewController?.present(activityViewController, animated: true, completion: nil)
-        }
-    }
-    
-    func reviewApp(){
-            let productURL:URL = URL(string: "https://apps.apple.com/us/app/unico/id1663765686")!
-            
-            var components = URLComponents(url: productURL, resolvingAgainstBaseURL: false)
-            
-            components?.queryItems = [
-                URLQueryItem(name: "action", value: "write-review")
-            ]
-            
-            guard let writeReviewURL = components?.url else {
-                return
-            }
-            
-            UIApplication.shared.open(writeReviewURL)
-        }
-    
-    // TODO: 3/25 ここからスタート
-    func updateAddressCheckEmailLink(email: String, link: String) {
-        guard let user = Auth.auth().currentUser else { return }
-        let credential = EmailAuthProvider.credential(withEmail:email, link:link)
-
-        // アカウントの再認証が成功したら新規メールアドレス入力画面へ移動する
-        user.reauthenticate(with: credential) { authData, error in
-            if let error = error {
-                print("アカウント再認証失敗: \(error.localizedDescription)")
-                self.systemAccountEmailCheckFase = .failure
-            } else {
-                
-            }
-        }
-    }
-    
-    func logOut() {
-        do {
-            try Auth.auth().signOut()
-            print("ログアウト成功")
-        } catch let signOutError as NSError {
-            print("Error signing out: %@", signOutError)
-            print("ログアウト失敗")
-        }
-    }
-    
-    func deleteAccountEmailLink(email: String, link: String) {
-        let credential = EmailAuthProvider.credential(withEmail:email, link:link)
-        guard let user = Auth.auth().currentUser else { return }
-        user.reauthenticate(with: credential) { authData, error in
-            if let error {
-                print("アカウント再認証失敗: \(error.localizedDescription)")
-                self.systemAccountEmailCheckFase = .failure
-                return
-            }
-            // ユーザーの再認証成功。アカウント削除処理実行
-            user.delete { error in
-                if let error = error {
-                    print("アカウント削除失敗: \(error.localizedDescription)")
-                    self.systemAccountEmailCheckFase = .failure
-                } else {
-                    // Account deleted.
-                    print("アカウント削除完了")
-                    self.systemAccountEmailCheckFase = .success
-                }
-            }
-        }
-    }
-    
     // MARK: - Sign in with Appleはまだ実装できていない⬇︎
     
     func handleSignInWithAppleRequest(_ request: ASAuthorizationAppleIDRequest) {

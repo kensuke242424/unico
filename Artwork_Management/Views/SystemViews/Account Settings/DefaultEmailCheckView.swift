@@ -7,6 +7,29 @@
 
 import SwiftUI
 
+enum DefaultEmailCheckFase {
+    case start, check, failure, notMatches, sendEmail, waitDelete, success
+    
+    var faseText: String {
+        switch self {
+        case .start:
+            return ""
+        case.check:
+            return "アドレスをチェックしています..."
+        case .notMatches:
+            return "登録されているアドレスと一致しません。"
+        case .failure:
+            return "エラーが発生しました。"
+        case .sendEmail:
+            return "入力アドレスにメールを送信しました。"
+        case .waitDelete:
+            return "アカウントの削除を実行しています..."
+        case .success:
+            return "アカウントの削除が完了しました。"
+        }
+    }
+}
+
 struct DefaultEmailCheckView: View {
     @EnvironmentObject var logInVM: LogInViewModel
     @State private var inputEmailAddress: String = ""
@@ -51,7 +74,7 @@ struct DefaultEmailCheckView: View {
             Button("メールを送信") {
                 Task {
                     withAnimation(.easeInOut(duration: 0.2)) {
-                        logInVM.systemAccountEmailCheckFase = .check
+                        logInVM.defaultEmailCheckFase = .check
                     }
                     
                     /// 入力されたアドレスが、登録アドレスと一致するか検証するメソッド
@@ -60,7 +83,7 @@ struct DefaultEmailCheckView: View {
                     if matchesCheckResult {
                         withAnimation(.easeInOut(duration: 0.2)) {
                             logInVM.handleUseReceivedEmailLink = .updateEmail
-                            logInVM.systemAccountEmailCheckFase = .sendEmail
+                            logInVM.defaultEmailCheckFase = .sendEmail
                         }
                         // リンクメールを送る前に、認証リンクがどのように使われるかハンドルするために
                         // 「handleUseReceivedEmailLink」に値を設定しておく必要がある
@@ -68,18 +91,18 @@ struct DefaultEmailCheckView: View {
                     } else {
                         hapticErrorNotification()
                         withAnimation(.easeInOut(duration: 0.2)) {
-                            logInVM.systemAccountEmailCheckFase = .notMatches
+                            logInVM.defaultEmailCheckFase = .notMatches
                         }
                     }
                 }
             }
             HStack(spacing: 10) {
-                Text(logInVM.systemAccountEmailCheckFase.faseText)
-                    .foregroundColor(logInVM.systemAccountEmailCheckFase == .notMatches ||
-                                     logInVM.systemAccountEmailCheckFase == .failure ? .red : .white)
+                Text(logInVM.defaultEmailCheckFase.faseText)
+                    .foregroundColor(logInVM.defaultEmailCheckFase == .notMatches ||
+                                     logInVM.defaultEmailCheckFase == .failure ? .red : .white)
                 
-                if logInVM.systemAccountEmailCheckFase == .check ||
-                   logInVM.systemAccountEmailCheckFase == .waitDelete {
+                if logInVM.defaultEmailCheckFase == .check ||
+                   logInVM.defaultEmailCheckFase == .waitDelete {
                    ProgressView()
                 }
             }
@@ -93,7 +116,6 @@ struct DefaultEmailCheckView: View {
         .customSystemBackground()
         .customBackButton()
         .navigationTitle("メールアドレスの変更")
-        
     }
 }
 

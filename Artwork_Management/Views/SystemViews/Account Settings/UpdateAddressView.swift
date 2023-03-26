@@ -6,10 +6,34 @@
 //
 
 import SwiftUI
+import FirebaseAuth
+
+enum UpdateEmailCheckFase {
+    case start, check, failure, success
+    
+    var faseText: String {
+        switch self {
+        case .start:
+            return ""
+        case.check:
+            return "新しいアドレスをチェックしています..."
+        case .failure:
+            return "エラーが発生しました。"
+        case .success:
+            return ""
+        }
+    }
+}
 
 struct UpdateAddressView: View {
+    
+    @Environment(\.dismiss) var dismiss
+    
+    @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var logInVM: LogInViewModel
     @State private var inputEmailAddress: String = ""
+    @State private var showBackAlert: Bool = false
+    
     var body: some View {
         VStack {
             Text("新しいアドレスの入力")
@@ -19,13 +43,24 @@ struct UpdateAddressView: View {
                 .foregroundColor(.white)
                 .padding(.top, 100)
             
-            
             Text("新しく登録するメールアドレスを入力してください。")
-
-            .font(.subheadline)
+                .font(.subheadline)
+                .fontWeight(.semibold)
+                .foregroundColor(.white)
+                .opacity(0.7)
+                .multilineTextAlignment(.leading)
+                .padding(.top)
+            
+            VStack {
+                Text("- 現在登録されているメールアドレス -")
+                    .opacity(0.7)
+                    .padding(.bottom, 7)
+                Text(Auth.auth().currentUser?.email ?? "???")
+                    .opacity(0.5)
+            }
+            .font(.caption)
             .fontWeight(.semibold)
             .foregroundColor(.white)
-            .opacity(0.7)
             .multilineTextAlignment(.leading)
             .padding(.top)
             
@@ -39,8 +74,7 @@ struct UpdateAddressView: View {
                             .fill(.white)
                             .opacity(0.8)
                             .frame(height: 32)
-                        
-                        Text(inputEmailAddress.isEmpty ? "登録済のメールアドレスを入力" : "")
+                        Text(inputEmailAddress.isEmpty ? "新しいメールアドレスを入力" : "")
                             .foregroundColor(.black)
                             .opacity(0.4)
                     }
@@ -50,38 +84,67 @@ struct UpdateAddressView: View {
             Button("アドレスを更新") {
                 Task {
                     withAnimation(.easeInOut(duration: 0.2)) {
-                        logInVM.systemAccountEmailCheckFase = .check
+                        logInVM.updateEmailCheckFase = .check
                     }
                 }
             }
             .buttonStyle(.borderedProminent)
+            
+            // アドレスのチェック状態を表示するテキスト
             HStack(spacing: 10) {
-                Text(logInVM.systemAccountEmailCheckFase.faseText)
-                    .foregroundColor(logInVM.systemAccountEmailCheckFase == .notMatches ||
-                                     logInVM.systemAccountEmailCheckFase == .failure ? .red : .white)
+                Text(logInVM.updateEmailCheckFase.faseText)
+                    .foregroundColor(logInVM.updateEmailCheckFase == .failure ? .red : .white)
                 
-                if logInVM.systemAccountEmailCheckFase == .check ||
-                   logInVM.systemAccountEmailCheckFase == .waitDelete {
-                   ProgressView()
+                if logInVM.updateEmailCheckFase == .check {
+                    ProgressView()
                 }
             }
-            .padding()
+            .padding(.vertical)
+            // 新規アドレスのチェックが通ったら、更新完了Viewへ遷移する
+            .onChange(of: logInVM.updateEmailCheckFase) { newValue in
+                if newValue == .success {
+                    navigationVM.path.append(SystemAccountPath.successUpdateEmail)
+                }
+            }
             
             Spacer()
+        }
+        .alert("確認", isPresented: $showBackAlert) {
+            Button("戻る") {
+                
+            }
+            Button("はい") {
+                navigationVM.path.removeLast(2)
+            }
+        } message: {
+            Text("メールアドレスの更新をやめますか？")
         }
         .padding(.horizontal, 30)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .ignoresSafeArea()
         .customSystemBackground()
-        .customBackButton()
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(
+                    action: {
+                        showBackAlert.toggle()
+                    }, label: {
+                        Image(systemName: "arrow.backward")
+                    }
+                ).tint(.blue)
+            }
+        }
         .navigationTitle("メールアドレスの変更")
-        
     }
 }
 
 struct UpadateAddressView_Previews: PreviewProvider {
     static var previews: some View {
-        UpdateAddressView()
-            .environmentObject(LogInViewModel())
+        NavigationStack {
+            UpdateAddressView()
+                .environmentObject(LogInViewModel())
+        }
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
