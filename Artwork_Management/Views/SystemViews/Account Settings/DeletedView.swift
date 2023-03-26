@@ -11,7 +11,7 @@ struct DeletedView: View {
     
     
     @EnvironmentObject var logInVM: LogInViewModel
-    @StateObject var accountVM: SystemAccountViewModel
+
     var body: some View {
         
         VStack(spacing: 20) {
@@ -50,6 +50,6 @@ struct DeletedView: View {
 
 struct DeletedAccountView_Previews: PreviewProvider {
     static var previews: some View {
-        DeletedView(accountVM: SystemAccountViewModel())
+        DeletedView()
     }
 }

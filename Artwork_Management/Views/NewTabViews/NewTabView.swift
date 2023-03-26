@@ -165,22 +165,22 @@ struct NewTabView: View {
                 .navigationDestination(for: SystemAccountPath.self) { accountPath in
                     switch accountPath {
                     case .root:
-                        AccountSystemView(accountVM: systemAccountVM)
+                        AccountSystemView()
                         
                     case .defaultEmailCheck:
-                        DefaultEmailCheckView(accountVM: systemAccountVM)
+                        DefaultEmailCheckView()
                         
                     case .updateEmail:
-                        UpdateAddressView(accountVM: systemAccountVM)
+                        UpdateAddressView()
                         
                     case .successUpdateEmail:
-                        SuccessUpdateAddressView(accountVM: systemAccountVM)
+                        SuccessUpdateAddressView()
                         
                     case .deleteAccount:
-                        DeleteAccountView(accountVM: systemAccountVM)
+                        DeleteAccountView()
                         
                     case .deletedData:
-                        DeletedView(accountVM: systemAccountVM)
+                        DeletedView()
                     }
                 }
             } // NavigationStack

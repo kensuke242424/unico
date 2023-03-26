@@ -72,8 +72,6 @@ struct AccountSystemView: View {
     @EnvironmentObject var logInVM: LogInViewModel
     @EnvironmentObject var userVM: UserViewModel
     
-    @StateObject var accountVM: SystemAccountViewModel
-    
     @State private var showEntryAccount     : Bool = false
     
     // アラートを管理するプロパティ
@@ -107,20 +105,20 @@ struct AccountSystemView: View {
                         } message: {
                             Text("\(userVM.user?.name ?? "No Name")さんのアカウントはすでに登録済みです。")
                         } // alert
-                        .alert(accountVM.resultAccountLink ? "登録完了" : "登録失敗",
-                               isPresented: $accountVM.showAccountLinkAlert) {
+                        .alert(logInVM.resultAccountLink ? "登録完了" : "登録失敗",
+                               isPresented: $logInVM.showAccountLinkAlert) {
                             Button("OK") {
-                                accountVM.showAccountLinkAlert.toggle()
+                                logInVM.showAccountLinkAlert.toggle()
                                 dismiss()
                             }
                         } message: {
-                            if accountVM.resultAccountLink {
+                            if logInVM.resultAccountLink {
                                 Text("アカウントの登録に成功しました！引き続き、unicoをよろしくお願い致します。")
                             } else {
                                 Text("アカウント登録時にエラーが発生しました。もう一度試してみてください。")
                             }
                         } // alert
-                        .onChange(of: accountVM.resultAccountLink) { result in
+                        .onChange(of: logInVM.resultAccountLink) { result in
                             if result == true {
                                 userVM.isAnonymousCheck()
                             }
@@ -193,7 +191,7 @@ struct AccountSystemView: View {
             }
         }
         .overlay {
-            if accountVM.showEmailHalfSheet {
+            if logInVM.showEmailHalfSheet {
                 LogInAddressSheetView()
             }
         }
@@ -202,7 +200,7 @@ struct AccountSystemView: View {
 
 struct AccountSetting_Previews: PreviewProvider {
     static var previews: some View {
-        AccountSystemView(accountVM: SystemAccountViewModel())
+        AccountSystemView()
             .environmentObject(LogInViewModel())
             .environmentObject(NavigationViewModel())
             .environmentObject(UserViewModel())

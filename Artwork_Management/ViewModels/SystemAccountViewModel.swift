@@ -15,6 +15,12 @@ import FirebaseFirestoreSwift
 
 class SystemAccountViewModel: ObservableObject {
     
+    enum HandleUseReceivedEmailLink {
+        case signIn, signUp, entryAccount, updateEmail, deleteAccount
+    }
+    // メールリンクによって受け取ったユーザリンクをどのように扱うかをハンドルするプロパティ
+    @Published var handleUseReceivedEmailLink: HandleUseReceivedEmailLink = .signIn
+    
     /// メールアドレス入力用のハーフシートを管理するプロパティ
     @Published var showEmailHalfSheet: Bool = false
     @Published var showEmailSheetBackground: Bool = false
