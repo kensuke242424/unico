@@ -72,6 +72,8 @@ struct AccountSystemView: View {
     @EnvironmentObject var logInVM: LogInViewModel
     @EnvironmentObject var userVM: UserViewModel
     
+    @StateObject var accountVM: SystemAccountViewModel
+    
     @State private var showEntryAccount     : Bool = false
     
     // アラートを管理するプロパティ

@@ -31,17 +31,12 @@ struct UpdateAddressView: View {
     
     @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var logInVM: LogInViewModel
+    @EnvironmentObject var userVM : UserViewModel
     @State private var inputEmailAddress: String = ""
     @State private var showBackAlert: Bool = false
     
     var body: some View {
         VStack {
-            Text("新しいアドレスの入力")
-                .font(.title2)
-                .fontWeight(.bold)
-                .tracking(3)
-                .foregroundColor(.white)
-                .padding(.top, 100)
             
             Text("新しく登録するメールアドレスを入力してください。")
                 .font(.subheadline)
@@ -49,7 +44,7 @@ struct UpdateAddressView: View {
                 .foregroundColor(.white)
                 .opacity(0.7)
                 .multilineTextAlignment(.leading)
-                .padding(.top)
+                .padding(.top, 120)
             
             VStack {
                 Text("- 現在登録されているメールアドレス -")
@@ -86,6 +81,7 @@ struct UpdateAddressView: View {
                     withAnimation(.easeInOut(duration: 0.2)) {
                         logInVM.updateEmailCheckFase = .check
                     }
+                    logInVM.updateEmailAddress(email: inputEmailAddress)
                 }
             }
             .buttonStyle(.borderedProminent)
@@ -93,29 +89,27 @@ struct UpdateAddressView: View {
             // アドレスのチェック状態を表示するテキスト
             HStack(spacing: 10) {
                 Text(logInVM.updateEmailCheckFase.faseText)
+                    .font(.callout)
                     .foregroundColor(logInVM.updateEmailCheckFase == .failure ? .red : .white)
                 
-                if logInVM.updateEmailCheckFase == .check {
-                    ProgressView()
-                }
+                if logInVM.updateEmailCheckFase == .check { ProgressView() }
             }
             .padding(.vertical)
-            // 新規アドレスのチェックが通ったら、更新完了Viewへ遷移する
+            // 新規アドレスのチェックが通ったら、Firebaseに新規アドレスを保存後、更新完了Viewへ遷移する
             .onChange(of: logInVM.updateEmailCheckFase) { newValue in
                 if newValue == .success {
-                    navigationVM.path.append(SystemAccountPath.successUpdateEmail)
+                    Task {
+                        await userVM.updateUserEmailAddress(email: inputEmailAddress)
+                        navigationVM.path.append(SystemAccountPath.successUpdateEmail)
+                    }
                 }
             }
             
             Spacer()
-        }
+        } // VStack
         .alert("確認", isPresented: $showBackAlert) {
-            Button("戻る") {
-                
-            }
-            Button("はい") {
-                navigationVM.path.removeLast(2)
-            }
+            Button("戻る") {}
+            Button("はい") { navigationVM.path.removeLast(2) }
         } message: {
             Text("メールアドレスの更新をやめますか？")
         }

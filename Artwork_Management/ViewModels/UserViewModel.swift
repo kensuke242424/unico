@@ -124,7 +124,7 @@ class UserViewModel: ObservableObject {
     func updateUserNameAndIcon(name updateName: String, data iconData: (url: URL?, filePath: String?)) async throws {
 
         // 取得アイコンデータurlがnilだったら処理終了
-//        guard iconData.url != nil else { return }
+        guard iconData.url != nil else { return }
         guard var user else { throw CustomError.userEmpty }
         guard let userRef = db?.collection("users").document(user.id) else { throw CustomError.getDocument }
 
@@ -142,6 +142,19 @@ class UserViewModel: ObservableObject {
             // アイコンデータ更新失敗のため、保存予定だったアイコンデータをfirestorageから削除
             await deleteUserImageData(path: iconData.filePath)
             print("error: updateTeamNameAndIcon_do_try_catch")
+        }
+    }
+    
+    func updateUserEmailAddress(email updateEmail: String) async {
+        guard var user else { return }
+        guard let userRef = db?.collection("users").document(user.id) else { return }
+        
+        do {
+            user.address = updateEmail
+            _ = try userRef.setData(from: user)
+        } catch {
+            print("新しいメールアドレスのFirebaseへの保存に失敗しました")
+            return
         }
     }
     

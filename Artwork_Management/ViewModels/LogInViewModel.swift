@@ -311,11 +311,15 @@ class LogInViewModel: ObservableObject {
             if let error {
                 print(error.localizedDescription)
                 hapticErrorNotification()
-                self.updateEmailCheckFase = .failure
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    self.updateEmailCheckFase = .failure
+                }
             } else {
                 print("メールアドレスの更新に成功しました")
                 hapticSuccessNotification()
-                self.updateEmailCheckFase = .success
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    self.updateEmailCheckFase = .success
+                }
             }
         }
     }
