@@ -214,14 +214,19 @@ struct RootView: View {
                 let defaults = UserDefaults.standard
                 if let email = defaults.string(forKey: "Email") {
                     withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
-                        // アドレス入力ハーフシートを閉じる
+                        // View側で開かれているアドレス入力ハーフシートを閉じる
                         logInVM.showEmailHalfSheet       = false
                         logInVM.showEmailSheetBackground = false
                     }
-                    print("アカウント登録するユーザのメールアドレス: \(email)")
+                    print("メールリンクで受け取ったユーザーのメールアドレス: \(email)")
                     
                     switch logInVM.handleUseReceivedEmailLink {
                     case .signIn:
+                        logInVM.resultSignInType = .signIn
+                        logInVM.signInEmailLink(email: email, link: incomingURL.absoluteString)
+                        
+                    case .signUp:
+                        logInVM.resultSignInType = .signUp
                         logInVM.signInEmailLink(email: email, link: incomingURL.absoluteString)
                         
                     case .updateEmail:

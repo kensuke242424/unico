@@ -25,13 +25,13 @@ class LogInViewModel: ObservableObject {
     @Published var rootNavigation: RootNavigation = .logIn
     
     enum HandleUseReceivedEmailLink {
-        case signIn, entryAccount, updateEmail, deleteAccount
+        case signIn, signUp, entryAccount, updateEmail, deleteAccount
     }
     // メールリンクによって受け取ったユーザリンクをどのように扱うかをハンドルするプロパティ
     @Published var handleUseReceivedEmailLink: HandleUseReceivedEmailLink = .signIn
     
     /// リスナーによってサインインが検知されたらトグルするプロパティ
-    @Published var signedInOrNot: Bool = false
+    @Published var signedInOrNotResult: Bool = false
     
     /// メールアドレス入力用のハーフシートを管理するプロパティ
     @Published var showEmailHalfSheet: Bool = false
@@ -93,13 +93,13 @@ class LogInViewModel: ObservableObject {
             if user != nil {
                 print("signedInOrNot_サインイン⭕️")
                 print("uid: \(self.uid ?? "アンラップ失敗")")
-                self.signedInOrNot = true
-                print("checkCurrentUserExists: \(self.signedInOrNot)")
+                self.signedInOrNotResult = true
+                print("checkCurrentUserExists: \(self.signedInOrNotResult)")
                 
             } else {
                 print("signedInOrNot_サインイン❌")
                 print("uid: \(self.uid ?? "nil")")
-                self.signedInOrNot = false
+                self.signedInOrNotResult = false
             }
         }
     }
@@ -152,7 +152,7 @@ class LogInViewModel: ObservableObject {
         }
     }
     
-    func existEmailAccountCheck(_ email: String) {
+    func existEmailCheckAndSendMailLink(_ email: String) {
         
         /// 受け取ったメールアドレスを使って、Auth内から既存アカウントの有無を調べる
         Auth.auth().fetchSignInMethods(forEmail: email) { (providers, error) in
@@ -485,6 +485,22 @@ class LogInViewModel: ObservableObject {
             UIApplication.shared.open(writeReviewURL)
         }
     
+    // TODO: 3/25 ここからスタート
+    func updateAddressCheckEmailLink(email: String, link: String) {
+        guard let user = Auth.auth().currentUser else { return }
+        let credential = EmailAuthProvider.credential(withEmail:email, link:link)
+
+        // アカウントの再認証が成功したら新規メールアドレス入力画面へ移動する
+        user.reauthenticate(with: credential) { authData, error in
+            if let error = error {
+                print("アカウント再認証失敗: \(error.localizedDescription)")
+                self.systemAccountEmailCheckFase = .failure
+            } else {
+                
+            }
+        }
+    }
+    
     func logOut() {
         do {
             try Auth.auth().signOut()
@@ -501,6 +517,7 @@ class LogInViewModel: ObservableObject {
         user.reauthenticate(with: credential) { authData, error in
             if let error {
                 print("アカウント再認証失敗: \(error.localizedDescription)")
+                self.systemAccountEmailCheckFase = .failure
                 return
             }
             // ユーザーの再認証成功。アカウント削除処理実行

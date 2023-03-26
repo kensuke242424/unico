@@ -378,13 +378,17 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 // メールアドレス登録選択時に出現するアドレス入力ハーフシートView
                 inputAdressHalfSheet()
                 
-                UserEntryRecommendationView(isShow: $inputLogIn.isShowUserEntryRecommendation)
-                .opacity(inputLogIn.isShowUserEntryRecommendation ? 1.0 : 0.0)
-                .offset(y: inputLogIn.isShowUserEntryRecommendation ? 0 : getRect().height)
             }
             
         } // ZStack
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .overlay {
+            if inputLogIn.isShowUserEntryRecommendation {
+                UserEntryRecommendationView(isShow: $inputLogIn.isShowUserEntryRecommendation)
+                    .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
+            }
+            
+        }
         .ignoresSafeArea()
         
         // ログインフロー全体のアラートを管理
@@ -407,7 +411,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 
             case .existsUserDocument         :
                 Button("戻る") {
-                    logInVM.signedInOrNot = false
+                    logInVM.signedInOrNotResult = false
                     logInVM.logOut()
                 }
                 Button("ログイン") {
@@ -419,7 +423,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 
             case .existEmailAddressAccount   :
                 Button("戻る") {
-                    logInVM.signedInOrNot = false
+                    logInVM.signedInOrNotResult = false
                     logInVM.addressSignInFase = .start
                 }
                 Button("ログイン") {
@@ -494,12 +498,14 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         
         // currentUserを監視するリスナーによってサインインが検知されたら、ユーザが選択したサインインフローに分岐して処理
         // (ログイン or サインアップ)
-        .onChange(of: logInVM.signedInOrNot) { resultValue in
+        .onChange(of: logInVM.signedInOrNotResult) { resultValue in
             
-            print("logInVM.existCurrentUserCheck更新を検知")
-            if !resultValue { return }
-            
-            /// ログインボタンの先からお試しログインを選んだ場合、
+            print("logInVM.signedInOrNotResultの更新を検知")
+            if !resultValue {
+                print("signedInOrNotResultがfalseでした。サインイン処理を終了します。")
+                return
+            }
+            /// 🔰ログインボタンの先からお試しログインを選んだ場合、
             /// サインアップフローまで一気に飛ばして、各要素TitleとContentsをトグルして表示する
             if logInVM.selectProviderType == .trial {
                 withAnimation(.easeInOut(duration: 0.5)) {
@@ -508,6 +514,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 }
             }
             
+            /// ✅ 「signIn」ならfetch開始。「.signUp」なら各データの生成後、fetch開始
             switch logInVM.resultSignInType {
 
             case .signIn:
@@ -522,6 +529,10 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         /// 以前に作った既存のuserDocumentデータがあるかどうかをチェック
                         /// もし存在したら、関数内で既存データへのログインを促すアラートを発火しています
                         try await logInVM.existUserDocumentCheck()
+                        
+                        withAnimation(.spring(response: 0.8).delay(0.5)) {
+                            logInVM.createAccountFase = .check
+                        }
                         
                         // 背景、アイコン画像をリサイズして保存していく
                         var resizedIconImage      : UIImage?
@@ -1112,15 +1123,17 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             }
                             
                             switch logInVM.userSelectedSignInType {
-                                
+
                             case .start :
                                 print("処理なし")
                                 
                             case .logIn :
-                                logInVM.existEmailAccountCheck(inputLogIn.address)
+                                logInVM.handleUseReceivedEmailLink = .signIn
+                                logInVM.existEmailCheckAndSendMailLink(inputLogIn.address)
                                 
                             case .signUp:
-                                logInVM.existEmailAccountCheck(inputLogIn.address)
+                                logInVM.handleUseReceivedEmailLink = .signUp
+                                logInVM.existEmailCheckAndSendMailLink(inputLogIn.address)
                                 
                             }
                         }

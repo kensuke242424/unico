@@ -17,19 +17,18 @@ struct DefaultEmailCheckView: View {
                 .fontWeight(.bold)
                 .tracking(3)
                 .foregroundColor(.white)
-                .padding(.top, 20)
+                .padding(.top, 100)
             
             Group {
-                Text("現在unicoに登録されているメールアドレスに本人確認メールを送信します。")
-                Text("メールリンクから本人確認が完了したら、新しいメールアドレスへの変更処理に移ります。")
+                Text("現在unicoに登録されているメールアドレス宛に本人確認メールを送信します。")
+                Text("メールリンクからの本人認証が完了したら、新しいメールアドレスへの変更処理に移ります。")
             }
-            
-                .font(.subheadline)
-                .fontWeight(.semibold)
-                .foregroundColor(.white)
-                .opacity(0.7)
-                .multilineTextAlignment(.leading)
-                .padding(.top)
+            .font(.subheadline)
+            .fontWeight(.semibold)
+            .foregroundColor(.white)
+            .opacity(0.7)
+            .multilineTextAlignment(.leading)
+            .padding(.top)
             
             TextField("", text: $inputEmailAddress)
                 .textInputAutocapitalization(.never)
@@ -54,7 +53,7 @@ struct DefaultEmailCheckView: View {
                     withAnimation(.easeInOut(duration: 0.2)) {
                         logInVM.systemAccountEmailCheckFase = .check
                     }
-
+                    
                     /// 入力されたアドレスが、登録アドレスと一致するか検証するメソッド
                     let matchesCheckResult = await logInVM.verifyInputEmailMatchesCurrent(email: inputEmailAddress)
 
@@ -65,7 +64,6 @@ struct DefaultEmailCheckView: View {
                         }
                         // リンクメールを送る前に、認証リンクがどのように使われるかハンドルするために
                         // 「handleUseReceivedEmailLink」に値を設定しておく必要がある
-                        logInVM.handleUseReceivedEmailLink = .deleteAccount
                         logInVM.sendEmailLink(email: inputEmailAddress)
                     } else {
                         hapticErrorNotification()
@@ -91,6 +89,7 @@ struct DefaultEmailCheckView: View {
         }
         .padding(.horizontal, 30)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .ignoresSafeArea()
         .customSystemBackground()
         .customBackButton()
         .navigationTitle("メールアドレスの変更")

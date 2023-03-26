@@ -38,8 +38,9 @@ struct JoinUserDetectCheckView: View {
                     inputUserIDFocused = nil
                 }
 
-            LogoMark().scaleEffect(0.5).opacity(0.2)
-                .offset(y: -getRect().height / 2 + getSafeArea().top + 40)
+            LogoMark().scaleEffect(0.35).opacity(0.4)
+                .offset(x: 0,
+                        y: -getRect().height / 2 + getSafeArea().top + 40)
 
             VStack(spacing: 30) {
 
