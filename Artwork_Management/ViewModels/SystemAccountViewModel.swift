@@ -15,6 +15,10 @@ import FirebaseFirestoreSwift
 
 class SystemAccountViewModel: ObservableObject {
     
+    /// メールアドレス入力用のハーフシートを管理するプロパティ
+    @Published var showEmailHalfSheet: Bool = false
+    @Published var showEmailSheetBackground: Bool = false
+    
     // 匿名アカウントから永久アカウントへの認証結果を管理するプロパティ
     @Published var resultAccountLink   : Bool = false
     @Published var showAccountLinkAlert: Bool = false

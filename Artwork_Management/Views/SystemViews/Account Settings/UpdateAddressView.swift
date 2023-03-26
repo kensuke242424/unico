@@ -35,6 +35,8 @@ struct UpdateAddressView: View {
     @State private var inputEmailAddress: String = ""
     @State private var showBackAlert: Bool = false
     
+    @StateObject var accountVM: SystemAccountViewModel
+    
     var body: some View {
         VStack {
             
@@ -136,7 +138,7 @@ struct UpdateAddressView: View {
 struct UpadateAddressView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationStack {
-            UpdateAddressView()
+            UpdateAddressView(accountVM: SystemAccountViewModel())
                 .environmentObject(LogInViewModel())
         }
         .navigationBarTitleDisplayMode(.inline)

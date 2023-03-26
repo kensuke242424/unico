@@ -39,6 +39,7 @@ struct NewTabView: View {
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var tagVM : TagViewModel
     
+    @StateObject var systemAccountVM = SystemAccountViewModel()
     @StateObject var itemVM: ItemViewModel
     @StateObject var cartVM: CartViewModel
     
@@ -164,22 +165,22 @@ struct NewTabView: View {
                 .navigationDestination(for: SystemAccountPath.self) { accountPath in
                     switch accountPath {
                     case .root:
-                        AccountSystemView()
+                        AccountSystemView(accountVM: systemAccountVM)
                         
                     case .defaultEmailCheck:
-                        DefaultEmailCheckView()
+                        DefaultEmailCheckView(accountVM: systemAccountVM)
                         
                     case .updateEmail:
-                        UpdateAddressView()
+                        UpdateAddressView(accountVM: systemAccountVM)
                         
                     case .successUpdateEmail:
-                        SuccessUpdateAddressView()
+                        SuccessUpdateAddressView(accountVM: systemAccountVM)
                         
                     case .deleteAccount:
-                        DeleteAccountView()
+                        DeleteAccountView(accountVM: systemAccountVM)
                         
                     case .deletedData:
-                        DeletedView()
+                        DeletedView(accountVM: systemAccountVM)
                     }
                 }
             } // NavigationStack

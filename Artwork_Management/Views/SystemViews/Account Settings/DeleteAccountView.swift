@@ -36,6 +36,7 @@ struct DeleteAccountView: View {
     
     @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var logInVM: LogInViewModel
+    @StateObject var accountVM: SystemAccountViewModel
     
     @State private var inputEmailAddress: String = ""
     
@@ -144,7 +145,7 @@ struct DeleteAccountView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationStack {
             VStack {
-                DeleteAccountView()
+                DeleteAccountView(accountVM: SystemAccountViewModel())
                     .environmentObject(NavigationViewModel())
                     .environmentObject(LogInViewModel())
             }

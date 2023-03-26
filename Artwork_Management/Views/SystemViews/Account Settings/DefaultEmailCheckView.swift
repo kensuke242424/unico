@@ -31,8 +31,12 @@ enum DefaultEmailCheckFase {
 }
 
 struct DefaultEmailCheckView: View {
+    
     @EnvironmentObject var logInVM: LogInViewModel
+    @StateObject var accountVM: SystemAccountViewModel
+    
     @State private var inputEmailAddress: String = ""
+    
     var body: some View {
         VStack {
             Text("本人確認")
@@ -121,7 +125,7 @@ struct DefaultEmailCheckView: View {
 
 struct DefaultEmailCheckView_Previews: PreviewProvider {
     static var previews: some View {
-        DefaultEmailCheckView()
+        DefaultEmailCheckView(accountVM: SystemAccountViewModel())
             .environmentObject(LogInViewModel())
     }
 }

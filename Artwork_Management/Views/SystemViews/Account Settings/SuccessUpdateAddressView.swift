@@ -11,6 +11,7 @@ import FirebaseAuth
 struct SuccessUpdateAddressView: View {
     
     @EnvironmentObject var navigationVM: NavigationViewModel
+    @StateObject var accountVM: SystemAccountViewModel
     
     var body: some View {
         VStack(spacing: 20) {
@@ -44,6 +45,6 @@ struct SuccessUpdateAddressView: View {
 
 struct SuccessUpdateEmailView_Previews: PreviewProvider {
     static var previews: some View {
-        SuccessUpdateAddressView()
+        SuccessUpdateAddressView(accountVM: SystemAccountViewModel())
     }
 }
