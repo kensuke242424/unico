@@ -142,8 +142,8 @@ struct SystemView: View {
                     
                 case .twitter:
                     Button {
-                        let twitterURL = URL(string: "https://twitter.com/kenchan2n4n")
-                        
+                        let twitterURL = URL(string: "https://twitter.com/kenchan2n4n")!
+                        UIApplication.shared.open(twitterURL)
                     } label: {
                         ListRowView(icon : listRow.icon,
                                     title: listRow.title,
