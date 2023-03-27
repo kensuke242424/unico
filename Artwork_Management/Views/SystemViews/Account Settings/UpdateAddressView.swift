@@ -113,7 +113,7 @@ struct UpdateAddressView: View {
         } message: {
             Text("メールアドレスの更新をやめますか？")
         }
-        .padding(.horizontal, 30)
+        .padding(.horizontal, 20)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .ignoresSafeArea()
         .customSystemBackground()

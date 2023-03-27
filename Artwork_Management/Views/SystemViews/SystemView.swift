@@ -7,6 +7,7 @@
 
 import SwiftUI
 import StoreKit
+import SafariServices
 
 struct SystemView: View {
     
@@ -140,8 +141,9 @@ struct SystemView: View {
                     }
                     
                 case .twitter:
-                    NavigationLink {
-                        EmptyView()
+                    Button {
+                        let twitterURL = URL(string: "https://twitter.com/kenchan2n4n")
+                        
                     } label: {
                         ListRowView(icon : listRow.icon,
                                     title: listRow.title,

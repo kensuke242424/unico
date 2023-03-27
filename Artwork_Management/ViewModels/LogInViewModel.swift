@@ -56,7 +56,6 @@ class LogInViewModel: ObservableObject {
     @Published var defaultEmailCheckFase: DefaultEmailCheckFase = .start
     @Published var updateEmailCheckFase: UpdateEmailCheckFase = .success
     @Published var deleteAccountCheckFase: DeleteAccountCheckFase = .start
-    
     @Published var addressReauthenticateResult: Bool = false
 
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
@@ -341,7 +340,7 @@ class LogInViewModel: ObservableObject {
                 case .signIn: print("handleUseReceivedEmailLink_処理なし")
                 case .signUp: print("handleUseReceivedEmailLink_処理なし")
                 case .updateEmail:
-                    self.updateEmailAddress(email: email)
+                    self.addressReauthenticateResult = true
                 case .entryAccount:
                     self.entryAccountByEmailLink(email: email, link: link)
                 case .deleteAccount:

@@ -33,6 +33,7 @@ enum DefaultEmailCheckFase {
 struct DefaultEmailCheckView: View {
     
     @EnvironmentObject var logInVM: LogInViewModel
+    @EnvironmentObject var navigationVM: NavigationViewModel
     
     @State private var inputEmailAddress: String = ""
     
@@ -113,12 +114,18 @@ struct DefaultEmailCheckView: View {
             
             Spacer()
         }
-        .padding(.horizontal, 30)
+        .padding(.horizontal, 20)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .ignoresSafeArea()
         .customSystemBackground()
         .customBackButton()
         .navigationTitle("メールアドレスの変更")
+        // メールリンクによる再認証結果「addressReauthenticateResult」のtrueを検知したら、アドレス更新画面へ遷移
+        .onChange(of: logInVM.addressReauthenticateResult) { newValue in
+            if newValue {
+                navigationVM.path.append(SystemAccountPath.updateEmail)
+            }
+        }
     }
 }
 

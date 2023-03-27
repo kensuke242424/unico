@@ -39,7 +39,6 @@ struct NewTabView: View {
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var tagVM : TagViewModel
     
-    @StateObject var systemAccountVM = SystemAccountViewModel()
     @StateObject var itemVM: ItemViewModel
     @StateObject var cartVM: CartViewModel
     

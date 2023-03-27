@@ -127,7 +127,7 @@ struct DeleteAccountView: View {
             
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding(.horizontal, 30)
+        .padding(.horizontal, 20)
         .customSystemBackground()
         .customBackButton()
         .navigationTitle("アカウントの削除")
