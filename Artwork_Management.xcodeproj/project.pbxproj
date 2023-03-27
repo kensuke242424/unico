@@ -50,6 +50,8 @@
 		BEAAD8F829CDCE3300C53138 /* DeletedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAAD8F729CDCE3300C53138 /* DeletedView.swift */; };
 		BEAAD8FA29CDEF6200C53138 /* DefaultEmailCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAAD8F929CDEF6200C53138 /* DefaultEmailCheckView.swift */; };
 		BEAAD94629D068C000C53138 /* SuccessUpdateAddressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAAD94529D068C000C53138 /* SuccessUpdateAddressView.swift */; };
+		BEAAD94B29D1ED7800C53138 /* UpdateReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAAD94A29D1ED7800C53138 /* UpdateReportView.swift */; };
+		BEAAD94E29D1F86200C53138 /* Version10.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAAD94D29D1F86200C53138 /* Version10.swift */; };
 		BEAB502E29A7C6D400ECCB4F /* PageTabNavigateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAB502D29A7C6D400ECCB4F /* PageTabNavigateView.swift */; };
 		E0003D0328FD3BB0007308B0 /* TagTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0003D0228FD3BB0007308B0 /* TagTitle.swift */; };
 		E01AA3A129167F02000FCD37 /* ResizableSheet in Frameworks */ = {isa = PBXBuildFile; productRef = E01AA3A029167F02000FCD37 /* ResizableSheet */; };
@@ -165,6 +167,8 @@
 		BEAAD8F729CDCE3300C53138 /* DeletedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeletedView.swift; sourceTree = "<group>"; };
 		BEAAD8F929CDEF6200C53138 /* DefaultEmailCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultEmailCheckView.swift; sourceTree = "<group>"; };
 		BEAAD94529D068C000C53138 /* SuccessUpdateAddressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuccessUpdateAddressView.swift; sourceTree = "<group>"; };
+		BEAAD94A29D1ED7800C53138 /* UpdateReportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateReportView.swift; sourceTree = "<group>"; };
+		BEAAD94D29D1F86200C53138 /* Version10.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Version10.swift; sourceTree = "<group>"; };
 		BEAB502D29A7C6D400ECCB4F /* PageTabNavigateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageTabNavigateView.swift; sourceTree = "<group>"; };
 		E0003D0228FD3BB0007308B0 /* TagTitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagTitle.swift; sourceTree = "<group>"; };
 		E01AA3A22916C674000FCD37 /* TagModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagModel.swift; sourceTree = "<group>"; };
@@ -300,7 +304,7 @@
 			path = ItemViews;
 			sourceTree = "<group>";
 		};
-		BE20B04429BAEF000078169B /* Account Settings */ = {
+		BE20B04429BAEF000078169B /* AccountSettingViews */ = {
 			isa = PBXGroup;
 			children = (
 				BE20B04029BADFC90078169B /* AccountSystemView.swift */,
@@ -310,7 +314,7 @@
 				BE20B04729BAEFDB0078169B /* UpdateAddressView.swift */,
 				BEAAD94529D068C000C53138 /* SuccessUpdateAddressView.swift */,
 			);
-			path = "Account Settings";
+			path = AccountSettingViews;
 			sourceTree = "<group>";
 		};
 		BE392FF129C2133B00BB5700 /* Helpers */ = {
@@ -326,6 +330,23 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		BEAAD94929D1ED0C00C53138 /* UpdateReportViews */ = {
+			isa = PBXGroup;
+			children = (
+				BEAAD94A29D1ED7800C53138 /* UpdateReportView.swift */,
+				BEAAD94C29D1F82400C53138 /* ReportContents */,
+			);
+			path = UpdateReportViews;
+			sourceTree = "<group>";
+		};
+		BEAAD94C29D1F82400C53138 /* ReportContents */ = {
+			isa = PBXGroup;
+			children = (
+				BEAAD94D29D1F86200C53138 /* Version10.swift */,
+			);
+			path = ReportContents;
 			sourceTree = "<group>";
 		};
 		BEAB502C29A7C5E300ECCB4F /* PageTabNavigateViews */ = {
@@ -501,9 +522,10 @@
 		E08F274228DEAD5900329C5E /* SystemViews */ = {
 			isa = PBXGroup;
 			children = (
+				BEAAD94929D1ED0C00C53138 /* UpdateReportViews */,
 				E08F273928DDB53700329C5E /* SystemView.swift */,
 				BE20B04229BAEA170078169B /* CustomBackButton.swift */,
-				BE20B04429BAEF000078169B /* Account Settings */,
+				BE20B04429BAEF000078169B /* AccountSettingViews */,
 			);
 			path = SystemViews;
 			sourceTree = "<group>";
@@ -718,6 +740,7 @@
 				E01AA3A529176FE7000FCD37 /* PHPickerView.swift in Sources */,
 				BEAB502E29A7C6D400ECCB4F /* PageTabNavigateView.swift in Sources */,
 				E01AA3AB291780ED000FCD37 /* StringExtension.swift in Sources */,
+				BEAAD94B29D1ED7800C53138 /* UpdateReportView.swift in Sources */,
 				BE245BC929C5718A00539A04 /* NewItemUIImage.swift in Sources */,
 				E0BE39AF29335317002499C4 /* ShowsItemAsyncImagePhoto.swift in Sources */,
 				BE0E580B29C4055900F5E42F /* NewEditItemView.swift in Sources */,
@@ -782,6 +805,7 @@
 				BE254F9329BF1104004FE9AE /* UserEntryRecommendationView.swift in Sources */,
 				BE1F272329C166E700AD55DF /* NewHomeView.swift in Sources */,
 				BE1F272529C1673900AD55DF /* NewItemsView.swift in Sources */,
+				BEAAD94E29D1F86200C53138 /* Version10.swift in Sources */,
 				BE17B97529CC2D8F00F08915 /* LogInAddressSheetView.swift in Sources */,
 				BE23A16229C33E7E00876194 /* TimesFormatter.swift in Sources */,
 				BE3CD65B29B72B0700C19442 /* ProgressViewModel.swift in Sources */,

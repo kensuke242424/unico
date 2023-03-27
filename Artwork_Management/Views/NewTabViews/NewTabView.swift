@@ -182,6 +182,12 @@ struct NewTabView: View {
                         DeletedView()
                     }
                 }
+                .navigationDestination(for: UpdateReportPath.self) { reportPath in
+                    switch reportPath {
+                    case .root:
+                        UpdateReportView()
+                    }
+                }
             } // NavigationStack
         } // GeometryReader
         .onChange(of: cartVM.resultCartAmount) {

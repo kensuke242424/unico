@@ -123,8 +123,8 @@ struct SystemView: View {
                 switch listRow {
                     
                 case .infomation:
-                    NavigationLink {
-                        EmptyView()
+                    Button {
+                        navigationVM.path.append(UpdateReportPath.root)
                     } label: {
                         ListRowView(icon : listRow.icon,
                                     title: listRow.title,

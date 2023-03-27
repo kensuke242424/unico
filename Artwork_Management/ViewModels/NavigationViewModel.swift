@@ -7,6 +7,16 @@
 
 import SwiftUI
 
+class NavigationViewModel: ObservableObject {
+    
+    @Published var path = NavigationPath()
+    
+}
+
+enum UpdateReportPath {
+    case root
+}
+
 enum EditItemPath {
     case create, edit
 }
@@ -19,8 +29,3 @@ enum SystemAccountPath {
     case root, defaultEmailCheck, updateEmail, successUpdateEmail, deleteAccount, deletedData
 }
 
-class NavigationViewModel: ObservableObject {
-    
-    @Published var path = NavigationPath()
-    
-}
