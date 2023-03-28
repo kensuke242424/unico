@@ -16,6 +16,7 @@ struct InputSideMenu {
     var editMode: EditMode = .inactive
     var selectTag: Tag = Tag(oderIndex: 1, tagName: "", tagColor: .red)
     var isShowLogOutAlert: Bool = false
+    var isShowNewTeamAlert: Bool = false
 }
 
 struct SystemSideMenu: View {
@@ -261,8 +262,18 @@ struct SystemSideMenu: View {
                                                 }
                                             }
 
-                                        Label("新規チーム作成", systemImage: "person.2.crop.square.stack.fill")
-                                            .onTapGesture {  }
+                                        Label("チームを追加", systemImage: "person.2.crop.square.stack.fill")
+                                            .onTapGesture { inputSideMenu.isShowNewTeamAlert.toggle() }
+                                            .alert("", isPresented: $inputSideMenu.isShowNewTeamAlert) {
+                                                Button("戻る") {}
+                                                Button("はい") {
+                                                    withAnimation(.spring(response: 0.5)) {
+                                                        logInVM.rootNavigation = .join
+                                                    }
+                                                }
+                                            } message: {
+                                                Text("新規チームの追加画面に移動します。")
+                                            } // alert
 
                                     } // VStack
                                     .foregroundColor(.white)
