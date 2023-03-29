@@ -68,10 +68,6 @@ struct RootView: View {
                     .environment(\.resizableSheetCenter, resizableSheetCenter)
             }
 
-//            // チームに他のユーザを招待するView
-//            JoinUserDetectCheckView(teamVM: teamVM)
-//                .opacity(teamVM.isShowSearchedNewMemberJoinTeam ? 1.0 : 0.0)
-
             StandByView()
                 .opacity(isShowStandBy ? 1.0 : 0.0)
             
@@ -80,7 +76,6 @@ struct RootView: View {
             }
 
         } // ZStack
-        //        .preferredColorScheme(.dark)
         /// プリロードView
         /// 一度ロードしたViewはキャッシュが作られて初回時のView表示が軽くなる仕様を使う
         .background {
@@ -88,6 +83,7 @@ struct RootView: View {
                 Group {
                     NewItemsView(itemVM: itemVM, cartVM: cartVM, inputTab: $preloads.inputTab)
                     NewEditItemView(itemVM: itemVM, passItem: nil)
+                    CreateAndJoinTeamView()
                     PHPickerView(captureImage: $preloads.captureImage, isShowSheet: $preloads.showSheet)
                 }
                 .opacity(0)
