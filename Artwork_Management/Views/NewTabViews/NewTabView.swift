@@ -10,9 +10,9 @@ import ResizableSheet
 
 struct InputTab {
     // 各設定Viewの表示を管理するプロパティ
-    var showSideMenu: Bool = false
-    var showEntryAccount: Bool = false
-    var selectedUpdateData: SelectedUpdateData = .start
+    var showSideMenu       : Bool = false
+    var showEntryAccount   : Bool = false
+    var selectedUpdateData : SelectedUpdateData = .start
     
     /// NavigationPathによるエディット画面遷移時に渡す
     var selectedItem: Item?

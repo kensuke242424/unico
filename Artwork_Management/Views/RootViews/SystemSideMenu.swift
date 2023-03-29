@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct InputSideMenu {
+    // メニュー各項目の状態を管理
     var account: Bool = false
     var team: Bool = false
     var item: Bool = false
@@ -15,8 +16,16 @@ struct InputSideMenu {
     var help: Bool = false
     var editMode: EditMode = .inactive
     var selectTag: Tag = Tag(oderIndex: 1, tagName: "", tagColor: .red)
-    var isShowLogOutAlert: Bool = false
-    var isShowNewTeamAlert: Bool = false
+    
+    // サイドメニュー内でのアラートを管理
+    var isShowLogOutAlert    : Bool = false
+    var isShowCreateTeamAlert: Bool = false
+    var isShowChangeTeamAlert: Bool = false
+    
+    // 操作チームを変更するハーフモーダルを管理
+    var showSelectTeamSheet: Bool = false
+    // ユーザーが移動先に選択したチームが格納される
+    var selectedTeam: JoinTeam?
 }
 
 struct SystemSideMenu: View {
@@ -58,12 +67,11 @@ struct SystemSideMenu: View {
                             .padding(.top, getSafeArea().top)
                     }
                 }
-
-            Image(systemName: "chevron.left.2")
-                .font(.title).opacity(0.5)
-                .foregroundColor(.white.opacity(0.6))
-                .offset(x: UIScreen.main.bounds.width / 4,
-                        y: -UIScreen.main.bounds.height / 3)
+                .overlay(alignment: .topTrailing) {
+                    JoinTeamsIcon(teams: userVM.user!.joins)
+                        .padding(.trailing, 90)
+                        .padding(.top, getSafeArea().top)
+                }
 
             VStack {
 
@@ -75,31 +83,6 @@ struct SystemSideMenu: View {
                     .onTapGesture {
                         withAnimation(.spring(response: 0.5)) { inputTab.selectedUpdateData = .team }
                     }
-                    .overlay(alignment: .topTrailing) {
-                        Button {
-                            // TODO: チーム一覧のハーフモーダル表示
-                        } label: {
-                            Circle()
-                                .foregroundColor(userVM.user!.userColor.color3)
-                                .frame(width: 40, height: 40)
-                                .shadow(radius: 5, x: 5, y: 5)
-                                .overlay {
-                                    Image(systemName: "person.2.crop.square.stack")
-                                        .resizable()
-                                        .frame(width: 20, height: 20)
-                                        .foregroundColor(.white)
-                                }
-                        }
-                        .offset(x: 40, y: -10)
-                    }
-                    
-//                    .overlay(alignment: .bottomTrailing) {
-//                        AsyncImageCircleIcon(photoURL: userVM.user?.iconURL, size: getRect().width / 6)
-//                            .offset(x: getRect().width / 4 - 10)
-//                            .onTapGesture {
-//                                withAnimation(.spring(response: 0.5)) { inputHome.selectedUpdateData = .user }
-//                            }
-//                    }
                     .overlay(alignment: .bottom) {
                         if teamVM.team!.name.count < 12 {
                             Text(teamVM.team!.name)
@@ -263,8 +246,8 @@ struct SystemSideMenu: View {
                                             }
 
                                         Label("チームを追加", systemImage: "person.2.crop.square.stack.fill")
-                                            .onTapGesture { inputSideMenu.isShowNewTeamAlert.toggle() }
-                                            .alert("", isPresented: $inputSideMenu.isShowNewTeamAlert) {
+                                            .onTapGesture { inputSideMenu.isShowCreateTeamAlert.toggle() }
+                                            .alert("", isPresented: $inputSideMenu.isShowCreateTeamAlert) {
                                                 Button("戻る") {}
                                                 Button("はい") {
                                                     withAnimation(.spring(response: 0.5)) {
@@ -368,6 +351,18 @@ struct SystemSideMenu: View {
             .offset(y: UIScreen.main.bounds.height / 12)
 
         } // ZStack
+        .sheet(isPresented: $inputSideMenu.showSelectTeamSheet) {
+            Text(inputSideMenu.selectedTeam?.name ?? "名前なし")
+                .presentationDetents([.medium])
+        }
+        .alert("", isPresented: $inputSideMenu.isShowChangeTeamAlert) {
+            Button("戻る") {}
+            Button("移動する") {
+                // lastLogInの値を更新してからfetch処理を実行
+            }
+        } message: {
+            Text("\(inputSideMenu.selectedTeam?.name ?? "No Name")に移動しますか？")
+        }
         // NOTE: ローカルのタグ順番操作をfirestoreに保存
         .onChange(of: inputSideMenu.editMode) { newEdit in
             if newEdit == .inactive {
@@ -424,6 +419,33 @@ struct SystemSideMenu: View {
                                         value          : dragOffset)
 
     } // body
+    
+    @ViewBuilder
+    func JoinTeamsIcon(teams: [JoinTeam]) -> some View {
+        
+        HStack(spacing: 15) {
+            ForEach(0..<teams.filter({ $0.teamID != teamVM.team!.id}).count, id: \.self) { index in
+                if !teams.isEmpty && index <= 2 {
+                    SDWebImageCircleIcon(imageURL: teams[index].iconURL,
+                                         width: 28, height: 28)
+                    .onTapGesture {
+                        inputSideMenu.selectedTeam = teams[index]
+                        inputSideMenu.isShowChangeTeamAlert.toggle()
+                    }
+                }
+            }
+            
+            Button {
+             //TODO: チーム選択ハーフモーダル
+                inputSideMenu.showSelectTeamSheet.toggle()
+            } label: {
+                Image(systemName: "ellipsis.circle")
+                    .foregroundColor(.white)
+                    .font(.title2)
+            }
+        }
+        .frame(alignment: .trailing)
+    }
 
     func rowRemove(offsets: IndexSet) {
         for tagIndex in offsets {

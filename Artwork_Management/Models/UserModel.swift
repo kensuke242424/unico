@@ -29,7 +29,7 @@ struct User: Identifiable, Codable, Equatable {
     var lastLogIn: String?
 }
 
-struct JoinTeam: Codable {
+struct JoinTeam: Codable, Hashable {
     var teamID: String
     var name: String
     var iconURL: URL?

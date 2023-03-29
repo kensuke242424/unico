@@ -122,12 +122,14 @@ struct UpdateTeamOrUserDataView: View {
                                 let updateMemberData = JoinMember(memberUID: user.id,
                                                                   name     : inputUpdate.nameText,
                                                                   iconURL  : updateIconData.url)
+                                /// 自身のユーザーデータ更新と、所属するチームが保持する自身のデータを更新
                                 try await userVM.updateUserNameAndIcon(name: inputUpdate.nameText, data: updateIconData)
                                 try await teamVM.updateTeamJoinMemberData(data: updateMemberData, joins: user.joins)
                             } else {
                                 let updateMemberData = JoinMember(memberUID: user.id,
                                                                   name     : inputUpdate.nameText,
                                                                   iconURL  : inputUpdate.defaultIconData.url)
+                                /// 自身のユーザーデータ更新と、所属するチームが保持する自身のデータを更新
                                 try await userVM.updateUserNameAndIcon(name: inputUpdate.nameText, data: inputUpdate.defaultIconData)
                                 try await teamVM.updateTeamJoinMemberData(data: updateMemberData, joins: user.joins)
                             }
@@ -153,12 +155,14 @@ struct UpdateTeamOrUserDataView: View {
                                 let updateTeamData = JoinTeam(teamID : team.id,
                                                               name   : inputUpdate.nameText,
                                                               iconURL: uploadIconData.url)
+                                /// チームデータ更新と、所属するユーザーメンバーが保持するチームデータを更新
                                 try await teamVM.updateTeamNameAndIcon(name: inputUpdate.nameText, data: uploadIconData)
                                 try await userVM.updateUserJoinTeamData(data: updateTeamData, members: team.members)
                             } else {
                                 let updateTeamData = JoinTeam(teamID : team.id,
                                                               name   : inputUpdate.nameText,
                                                               iconURL: inputUpdate.defaultIconData.url)
+                                /// チームデータ更新と、所属するユーザーメンバーが保持するチームデータを更新
                                 try await teamVM.updateTeamNameAndIcon(name: inputUpdate.nameText, data: inputUpdate.defaultIconData)
                                 try await userVM.updateUserJoinTeamData(data: updateTeamData, members: team.members)
                             }
