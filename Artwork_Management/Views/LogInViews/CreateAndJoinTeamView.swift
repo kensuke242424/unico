@@ -423,7 +423,7 @@ struct CreateAndJoinTeamView: View {
                     } catch CustomError.getDocument {
                         print("Error: getDocument")
                     } catch {
-                        print("Error")
+                        print("Error: other.")
                     }
                 }
             }

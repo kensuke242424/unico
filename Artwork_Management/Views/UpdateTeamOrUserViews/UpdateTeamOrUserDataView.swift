@@ -19,7 +19,7 @@ struct UpdateTeamOrUserDataView: View {
 
     struct InputUpdateUserOrTeam {
         var nameText: String = ""
-        var updateIconURL: URL?
+        var defaultIconData: (url: URL?, filePath: String?)
         var isShowPickerView: Bool = false
         var captureImage: UIImage?
         var captureError: Bool = false
@@ -69,7 +69,7 @@ struct UpdateTeamOrUserDataView: View {
                     UIImageCircleIcon(photoImage: captureImage, size: 150)
                         .onTapGesture { inputUpdate.isShowPickerView.toggle() }
                 } else {
-                    if let iconURL = inputUpdate.updateIconURL {
+                    if let iconURL = inputUpdate.defaultIconData.url {
                         SDWebImageCircleIcon(imageURL: iconURL, width: 150, height: 150)
                             .onTapGesture { inputUpdate.isShowPickerView.toggle() }
                     } else {
@@ -115,41 +115,60 @@ struct UpdateTeamOrUserDataView: View {
                             withAnimation(.spring(response: 0.3)) {
                                 inputUpdate.savingWait.toggle()
                             }
-                            // アイコンデータのアップロード保存
-                            let iconData = await userVM.uploadUserImage(inputUpdate.captureImage)
-                            // ユーザの名前とアイコンデータをfirestoreに保存
-                            try await userVM.updateUserNameAndIcon(name: inputUpdate.nameText, data: iconData)
-                            // ユーザが保持している各チームのメンバーデータ(JoinMember)を更新
-                            let updateMemberData = JoinMember(memberUID: user.id, name: inputUpdate.nameText, iconURL: iconData.url)
-                            try await teamVM.updateTeamJoinMemberData(data: updateMemberData, joins: user.joins)
+                            /// アイコンデータのアップロード保存
+                            /// 新しいアイコンデータが存在するかどうかで処理を分岐する
+                            if let updateIconImage = inputUpdate.captureImage {
+                                let updateIconData = await userVM.uploadUserImage(updateIconImage)
+                                let updateMemberData = JoinMember(memberUID: user.id,
+                                                                  name     : inputUpdate.nameText,
+                                                                  iconURL  : updateIconData.url)
+                                try await userVM.updateUserNameAndIcon(name: inputUpdate.nameText, data: updateIconData)
+                                try await teamVM.updateTeamJoinMemberData(data: updateMemberData, joins: user.joins)
+                            } else {
+                                let updateMemberData = JoinMember(memberUID: user.id,
+                                                                  name     : inputUpdate.nameText,
+                                                                  iconURL  : inputUpdate.defaultIconData.url)
+                                try await userVM.updateUserNameAndIcon(name: inputUpdate.nameText, data: inputUpdate.defaultIconData)
+                                try await teamVM.updateTeamJoinMemberData(data: updateMemberData, joins: user.joins)
+                            }
+                            
                             // 編集画面を閉じる
                             hapticSuccessNotification()
                             withAnimation(.spring(response: 0.3)) {
                                 selectedUpdate = .start
                                 inputUpdate.savingWait.toggle()
                             }
-                        }
+                        } // Task ここまで
 
                     case .team:
                         Task {
                             withAnimation(.spring(response: 0.3)) {
                                 inputUpdate.savingWait.toggle()
                             }
-                            // アイコンデータのアップロード保存
+                            
                             guard let teamID = teamVM.team?.id else { return }
-                            let iconData = await teamVM.uploadTeamImage(inputUpdate.captureImage, teamID: teamID)
-                            // チームの名前とアイコンデータをfirestoreに保存
-                            try await teamVM.updateTeamNameAndIcon(name: inputUpdate.nameText, data: iconData)
-                            // チームが保持している各メンバーのチームデータ(JoinTeam)を更新
-                            let updateTeamData = JoinTeam(teamID: team.id, name: inputUpdate.nameText, iconURL: iconData.url)
-                            try await userVM.updateUserJoinTeamData(data: updateTeamData, members: team.members)
+                            
+                            if let updateIconImage = inputUpdate.captureImage {
+                                let uploadIconData = await teamVM.uploadTeamImage(updateIconImage, teamID: teamID)
+                                let updateTeamData = JoinTeam(teamID : team.id,
+                                                              name   : inputUpdate.nameText,
+                                                              iconURL: uploadIconData.url)
+                                try await teamVM.updateTeamNameAndIcon(name: inputUpdate.nameText, data: uploadIconData)
+                                try await userVM.updateUserJoinTeamData(data: updateTeamData, members: team.members)
+                            } else {
+                                let updateTeamData = JoinTeam(teamID : team.id,
+                                                              name   : inputUpdate.nameText,
+                                                              iconURL: inputUpdate.defaultIconData.url)
+                                try await teamVM.updateTeamNameAndIcon(name: inputUpdate.nameText, data: inputUpdate.defaultIconData)
+                                try await userVM.updateUserJoinTeamData(data: updateTeamData, members: team.members)
+                            }
                             // 編集画面を閉じる
                             hapticSuccessNotification()
                             withAnimation(.spring(response: 0.3)) {
                                 selectedUpdate = .start
                                 inputUpdate.savingWait.toggle()
                             }
-                        }
+                        } // Task ここまで
                     }
                 }
                 .padding(.top)
@@ -194,14 +213,14 @@ struct UpdateTeamOrUserDataView: View {
 
         .onAppear {
             if selectedUpdate == .user {
-                inputUpdate.updateIconURL = userVM.user?.iconURL
-                let userName = userVM.user?.name ?? ""
-                inputUpdate.nameText = userName
+                inputUpdate.defaultIconData = (url     : userVM.user?.iconURL,
+                                               filePath: userVM.user?.iconPath)
+                inputUpdate.nameText = userVM.user?.name ?? ""
                 
             } else if selectedUpdate == .team {
-                inputUpdate.updateIconURL = teamVM.team?.iconURL
-                let teamName = teamVM.team?.name ?? ""
-                inputUpdate.nameText = teamName
+                inputUpdate.defaultIconData = (url     : teamVM.team?.iconURL,
+                                              filePath : teamVM.team?.iconPath)
+                inputUpdate.nameText = teamVM.team?.name ?? ""
             }
         }
     } // body
