@@ -30,7 +30,7 @@ struct CreateAndJoinTeamView: View {
     @EnvironmentObject var userVM: UserViewModel
 
     @State private var inputTeamName: String = ""
-    @State private var captureImage: UIImage?
+    @State private var captureIconUIImage: UIImage?
     @State private var userQRCodeImage: UIImage?
     @State private var joinedTeamData: JoinTeam?
     @State private var uploadImageData: (url: URL?, filePath: String?)
@@ -63,7 +63,9 @@ struct CreateAndJoinTeamView: View {
             }
             .ignoresSafeArea()
 
-            LogoMark().scaleEffect(0.5).opacity(0.2)
+            LogoMark()
+                .scaleEffect(0.4)
+                .opacity(0.2)
                 .offset(y: -getRect().height / 2 + getSafeArea().top + 40)
 
             VStack(spacing: 30) {
@@ -191,7 +193,7 @@ struct CreateAndJoinTeamView: View {
                             case .start:
                                 EmptyView()
                             case .create:
-                                createTeamIconAndName(captureImage: captureImage)
+                                createTeamIconAndName()
                             case .join:
                                 if selectTeamFase != .success {
                                     VStack(spacing: 40) {
@@ -229,7 +231,7 @@ struct CreateAndJoinTeamView: View {
                                             }
                                         }
                                     }
-                                }
+                                } // if selectTeamFase != .success
                             }
                         }
                         .frame(height: 220)
@@ -239,43 +241,47 @@ struct CreateAndJoinTeamView: View {
                     }
 
                     if selectTeamFase == .success {
-                        joinedTeamIconAndName(url: joinedTeamData?.iconURL, name: joinedTeamData?.name)
+                        joinedTeamIconAndName(image:captureIconUIImage, name: joinedTeamData?.name)
                     }
                 } // ZStack
+                
+                if selectTeamFase != .check && selectTeamFase != .success {
+                    Button(selectTeamFase == .fase1 ? "決定して次へ" : "これで始める") {
+                        if  selectTeamFase == .fase1 {
+                            withAnimation(.spring(response: 0.7)) {
+                                selectTeamFase = .fase2
+                            }
+                        } else if selectTeamFase == .fase2 {
+                            withAnimation(.spring(response: 0.5)) {
+                                selectTeamFase = .check
+                            }
+                        }
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .opacity(selectTeamFase == .start || selectTeamFase == .success ? 0.0 : 1.0)
+                    .opacity(selectedTeamCard == .join && selectTeamFase == .fase2 ? 0.0 : 1.0)
+                    .disabled(selectedTeamCard == .start || selectTeamFase == .success ? true : false)
+                    .disabled(selectedTeamCard == .join && userVM.isAnonymous ? true : false)
+                    .padding(.top, 30)
+                }
+                
+                Button("<戻る") {
+                    withAnimation(.spring(response: 0.7)) {
+                        selectTeamFase = .fase1
+                    }
+                }
+                .fontWeight(.semibold)
+                .foregroundColor(.white.opacity(0.7))
+                .opacity(selectTeamFase == .fase2 ? 1.0 : 0.0)
+                .disabled(selectTeamFase == .success ? true : false)
+                .padding(.top)
 
             } // VStack
             .foregroundColor(.white)
-            .offset(y: -30)
+            .offset(y: 30)
             .opacity(selectTeamFase == .start ? 0.0 : 1.0)
 
-            Button(selectTeamFase == .fase1 ? "決定して次へ" : "これで始める") {
-                if  selectTeamFase == .fase1 {
-                    withAnimation(.spring(response: 0.7)) {
-                        selectTeamFase = .fase2
-                    }
-                } else if selectTeamFase == .fase2 {
-                    withAnimation(.spring(response: 0.5)) {
-                        selectTeamFase = .check
-                    }
-                }
-            }
-            .buttonStyle(.borderedProminent)
-            .offset(y: getRect().height * 0.3)
-            .opacity(selectTeamFase == .start || selectTeamFase == .success ? 0.0 : 1.0)
-            .opacity(selectedTeamCard == .join && selectTeamFase == .fase2 ? 0.0 : 1.0)
-            .disabled(selectedTeamCard == .start || selectTeamFase == .success ? true : false)
-            .disabled(selectedTeamCard == .join && userVM.isAnonymous ? true : false)
-
-            Button("<戻る") {
-                withAnimation(.spring(response: 0.7)) {
-                    selectTeamFase = .fase1
-                }
-            }
-            .fontWeight(.semibold)
-            .foregroundColor(.white.opacity(0.7))
-            .offset(y: getRect().height * 0.36)
-            .opacity(selectTeamFase == .fase2 ? 1.0 : 0.0)
-            .disabled(selectTeamFase == .success ? true : false)
+            
 
             // Go back login flow Button...
             Button {
@@ -329,6 +335,7 @@ struct CreateAndJoinTeamView: View {
             }
         }
 
+        // ✅チーム生成と保存処理
         .onChange(of: selectTeamFase) { _ in
 
             if selectTeamFase == .check {
@@ -337,23 +344,61 @@ struct CreateAndJoinTeamView: View {
                     print("user情報が取得できません。チーム追加処理を終了しました。")
                     return
                 }
-                print("check開始")
+                
                 Task {
                     do {
                         if inputTeamName.isEmpty { inputTeamName = "No Name" }
+                        
+                        // 背景、アイコン画像をリサイズして保存していく
+                        let createTeamID = UUID().uuidString
+                        var resizedIconImage      : UIImage?
+                        var resizedBackgroundImage: UIImage?
+                        // チーム作成時にリソースからランダムで背景をピックアップする。(.originalにImagenameは無いため、除かれる)
+                        var pickUpRandomBackground: SelectBackground = .original
+                        while pickUpRandomBackground == SelectBackground.original {
+                            pickUpRandomBackground = SelectBackground.allCases.randomElement()!
+                            print("ランダム選出された背景: \(pickUpRandomBackground.imageName)")
+                        }
+
+                        // 60 -> アイコンwidth
+                        if let captureIconUIImage {
+                            resizedIconImage = logInVM.resizeUIImage(image: captureIconUIImage,
+                                                                    width: 60)
+                        }
+                        /// オリジナル背景ではなくサンプル背景を選択していた場合は、付属のImageをUIImageに直してからリサイズ
+                        
+                        resizedBackgroundImage = logInVM.resizeUIImage(image: UIImage(named: pickUpRandomBackground.imageName),
+                                                                       width: getRect().width * 4)
+                        
+                        print("resizedIconImage: \(resizedIconImage)")
+                        print("resizedBackgroundImage: \(resizedBackgroundImage)")
+                        
+                        /// リサイズ処理した画像をFirestorageに保存
+                        let uplaodIconImageData       = await teamVM.uploadTeamImage(resizedIconImage,
+                                                                                     teamID: createTeamID)
+                        let uplaodBackgroundImageData = await teamVM.uploadTeamImage(resizedBackgroundImage,
+                                                                                     teamID: createTeamID)
+                        
                         // チームデータに格納するログインユーザのユーザデータ
-                        let joinMember = JoinMember(memberUID: user.id, name: user.name, iconURL: user.iconURL)
-                        // teamsに格納する際のドキュメントID
-                        let teamID = UUID().uuidString
-                        await uploadImageData = logInVM.uploadImage(captureImage)
-                        let teamData = Team(id: teamID,
-                                            name: inputTeamName,
-                                            iconURL: uploadImageData.url,
-                                            iconPath: uploadImageData.filePath,
-                                            members: [joinMember])
-                        let joinTeamData = JoinTeam(teamID: teamID,
-                                                    name: inputTeamName,
-                                                    iconURL: uploadImageData.url)
+                        let joinMember = JoinMember(memberUID: user.id,
+                                                    name     : user.name,
+                                                    iconURL  : user.iconURL)
+                        
+                        let teamData = Team(id: createTeamID,
+                                            name          : inputTeamName,
+                                            iconURL       : uplaodIconImageData.url,
+                                            iconPath      : uplaodIconImageData.filePath,
+                                            backgroundURL : uplaodBackgroundImageData.url,
+                                            backgroundPath: uplaodBackgroundImageData.filePath,
+                                            members       : [joinMember])
+                        
+                        let joinTeamData = JoinTeam(teamID : createTeamID,
+                                                    name   : inputTeamName,
+                                                    iconURL: uplaodIconImageData.url)
+                        
+                        // 作成or参加したチームをView表示する用のプロパティ
+                        self.joinedTeamData = joinTeamData
+                        
                         try await teamVM.addTeam(teamData: teamData)
                         try await userVM.addNewJoinTeam(newJoinTeam: joinTeamData)
 
@@ -384,7 +429,7 @@ struct CreateAndJoinTeamView: View {
             }
         }
         .sheet(isPresented: $isShowPickerView) {
-            PHPickerView(captureImage: $captureImage, isShowSheet: $isShowPickerView)
+            PHPickerView(captureImage: $captureIconUIImage, isShowSheet: $isShowPickerView)
         }
 
         .onAppear {
@@ -491,12 +536,12 @@ struct CreateAndJoinTeamView: View {
         }
     }
 
-    func createTeamIconAndName(captureImage: UIImage?) -> some View {
+    func createTeamIconAndName() -> some View {
         Group {
             VStack(spacing: 40) {
                 Group {
-                    if let captureImage = captureImage {
-                        UIImageCircleIcon(photoImage: captureImage, size: 150)
+                    if let captureIconUIImage {
+                        UIImageCircleIcon(photoImage: captureIconUIImage, size: 150)
                     } else {
                         Image(systemName: "photo.circle.fill").resizable().scaledToFit()
                             .foregroundColor(.white.opacity(0.5)).frame(width: 150)
@@ -527,15 +572,14 @@ struct CreateAndJoinTeamView: View {
         }
     }
 
-    func joinedTeamIconAndName(url photoURL: URL?, name teamName: String?) -> some View {
+    func joinedTeamIconAndName(image iconUIImage: UIImage?, name teamName: String?) -> some View {
         Group {
             VStack(spacing: 40) {
                 Group {
-                    if let photoURL {
-                        AsyncImageCircleIcon(photoURL: photoURL, size: 150)
+                    if let iconUIImage {
+                        UIImageCircleIcon(photoImage: iconUIImage, size: 150)
                     } else {
-                        Image(systemName: "person.2.fill").resizable().scaledToFit()
-                            .foregroundColor(.white.opacity(0.5)).frame(width: 150)
+                        CubeCircleIcon(size: 150)
                     }
                 }
 

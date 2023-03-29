@@ -150,7 +150,7 @@ enum LogInAlert {
     }
 }
 
-enum Background: CaseIterable {
+enum SelectBackground: CaseIterable {
     case original, sample1, sample2, sample3, sample4
     
     var imageName: String {
@@ -187,7 +187,7 @@ struct InputLogIn {
     var createAccountShowContents   : Bool = false
     var repeatAnimation             : Bool = false
     var sendAddressButtonDisabled   : Bool = true
-    var selectBackground            : Background = .sample1
+    var selectBackground            : SelectBackground = .sample1
     
     /// Sheetやアラートなどのプレゼンテーションを管理するプロパティ
     var isShowPickerView             : Bool = false
@@ -803,7 +803,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 30) {
-                                ForEach(Background.allCases, id: \.self) { value in
+                                ForEach(SelectBackground.allCases, id: \.self) { value in
                                     Group {
                                         if value == .original {
                                             Image(uiImage: inputLogIn.captureBackgroundImage ?? UIImage())
