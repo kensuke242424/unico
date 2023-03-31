@@ -183,6 +183,23 @@ class ItemViewModel: ObservableObject {
             }
         }
     }
+    
+    func deleteAllItemImages() {
+        let storage = Storage.storage()
+        let reference = storage.reference()
+        
+        for item in items {
+            guard let itemPath = item.photoPath else { continue }
+            let imageRef = reference.child(itemPath)
+            imageRef.delete { error in
+                if let error = error {
+                    print("画像の削除に失敗しました: \(error.localizedDescription)")
+                } else {
+                    print("\(item.name)の画像削除に成功しました")
+                }
+            }
+        }
+    }
 
     func resetAmount() {
 
@@ -298,7 +315,6 @@ class ItemViewModel: ObservableObject {
     }
 
     deinit {
-
         print("<<<<<<<<<  ItemViewModel_deinit  >>>>>>>>>")
         listener?.remove()
     }
