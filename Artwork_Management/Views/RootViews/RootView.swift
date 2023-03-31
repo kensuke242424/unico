@@ -32,7 +32,7 @@ struct RootView: View {
         var showSheet   : Bool = false
     }
     
-    @EnvironmentObject var progress: ProgressViewModel
+    @EnvironmentObject var progressVM: ProgressViewModel
 
     @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var logInVM: LogInViewModel
@@ -57,25 +57,27 @@ struct RootView: View {
                 LogInView()
 
             case .fetch:
-                StandByView()
+                CubesProgressView()
 
             case .join:
-                StandByView()
+                CubesProgressView()
                 CreateAndJoinTeamView()
 
             case .home:
                 NewTabView(itemVM: itemVM, cartVM: cartVM)
                     .environment(\.resizableSheetCenter, resizableSheetCenter)
             }
-
-            StandByView()
-                .opacity(isShowStandBy ? 1.0 : 0.0)
-            
-            if progress.isShow {
-                CustomProgressView()
-            }
-
         } // ZStack
+        .overlay {
+            if progressVM.showCubesProgress {
+                CubesProgressView()
+            }
+        }
+        .overlay {
+            if progressVM.showLoading {
+                CustomLoadingView()
+            }
+        }
         /// プリロードView
         /// 一度ロードしたViewはキャッシュが作られて初回時のView表示が軽くなる仕様を使う
         .background {
@@ -91,7 +93,7 @@ struct RootView: View {
         }
         .onAppear {
             preloads.startPreload = true
-            DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
                 preloads.startPreload = false
             }
         }
@@ -183,11 +185,11 @@ struct RootView: View {
                 logInVM.rootNavigation = .fetch
             } else {
                 print("RootView_onAppear_currentUserがnilです。ログイン画面に遷移します。")
-                isShowStandBy.toggle()
+                progressVM.showCubesProgress.toggle()
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                     withAnimation(.easeIn(duration: 0.5)) {
-                        isShowStandBy.toggle()
+                        progressVM.showCubesProgress.toggle()
                     }
                 }
             }

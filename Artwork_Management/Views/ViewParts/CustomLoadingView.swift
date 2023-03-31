@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct CustomProgressView: View {
+struct CustomLoadingView: View {
 
     @Environment(\.colorScheme) var colorScheme: ColorScheme
 
@@ -28,6 +28,6 @@ struct CustomProgressView: View {
 
 struct CustomProgressView_Previews: PreviewProvider {
     static var previews: some View {
-        CustomProgressView()
+        CustomLoadingView()
     }
 }

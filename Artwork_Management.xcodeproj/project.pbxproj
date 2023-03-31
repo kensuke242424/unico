@@ -65,7 +65,7 @@
 		E01E13942920EE850001F2DA /* EmptyItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E01E13932920EE840001F2DA /* EmptyItemView.swift */; };
 		E0455FDE292B2B83004F677D /* LogInViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0455FDD292B2B83004F677D /* LogInViewModel.swift */; };
 		E0455FE0292BBB75004F677D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E0455FDF292BBB74004F677D /* GoogleService-Info.plist */; };
-		E0455FE2292C5B1C004F677D /* StandByView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0455FE1292C5B1C004F677D /* StandByView.swift */; };
+		E0455FE2292C5B1C004F677D /* CubesProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0455FE1292C5B1C004F677D /* CubesProgressView.swift */; };
 		E0455FE4292C8EF0004F677D /* BounceAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0455FE3292C8EF0004F677D /* BounceAnimationView.swift */; };
 		E0455FE6292CA002004F677D /* ColorCubeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0455FE5292CA001004F677D /* ColorCubeView.swift */; };
 		E0455FE8292CCB39004F677D /* HashableExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0455FE7292CCB39004F677D /* HashableExtension.swift */; };
@@ -119,7 +119,7 @@
 		E0CF7EF228DF166700735142 /* ItemViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0CF7EF128DF166700735142 /* ItemViewModel.swift */; };
 		E0CF7EF428DF385800735142 /* ItemCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0CF7EF328DF385800735142 /* ItemCards.swift */; };
 		E0DE335029288D07008C7147 /* TeamModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0DE334F29288D07008C7147 /* TeamModel.swift */; };
-		E0DE33522928F48D008C7147 /* CustomProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0DE33512928F48D008C7147 /* CustomProgressView.swift */; };
+		E0DE33522928F48D008C7147 /* CustomLoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0DE33512928F48D008C7147 /* CustomLoadingView.swift */; };
 		E0DE98D828E2DBB800471AB4 /* TeamViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0DE98D728E2DBB800471AB4 /* TeamViewModel.swift */; };
 		E0F0180E2975A9E10063C96B /* JoinUserDetectCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0F0180D2975A9E10063C96B /* JoinUserDetectCheckView.swift */; };
 		E0F78FC42919F06D00A95CD1 /* DateFormatterExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0F78FC32919F06D00A95CD1 /* DateFormatterExtension.swift */; };
@@ -182,7 +182,7 @@
 		E01E13932920EE840001F2DA /* EmptyItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyItemView.swift; sourceTree = "<group>"; };
 		E0455FDD292B2B83004F677D /* LogInViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogInViewModel.swift; sourceTree = "<group>"; };
 		E0455FDF292BBB74004F677D /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		E0455FE1292C5B1C004F677D /* StandByView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandByView.swift; sourceTree = "<group>"; };
+		E0455FE1292C5B1C004F677D /* CubesProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CubesProgressView.swift; sourceTree = "<group>"; };
 		E0455FE3292C8EF0004F677D /* BounceAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BounceAnimationView.swift; sourceTree = "<group>"; };
 		E0455FE5292CA001004F677D /* ColorCubeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorCubeView.swift; sourceTree = "<group>"; };
 		E0455FE7292CCB39004F677D /* HashableExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HashableExtension.swift; sourceTree = "<group>"; };
@@ -234,7 +234,7 @@
 		E0CF7EF128DF166700735142 /* ItemViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemViewModel.swift; sourceTree = "<group>"; };
 		E0CF7EF328DF385800735142 /* ItemCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemCards.swift; sourceTree = "<group>"; };
 		E0DE334F29288D07008C7147 /* TeamModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamModel.swift; sourceTree = "<group>"; };
-		E0DE33512928F48D008C7147 /* CustomProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomProgressView.swift; sourceTree = "<group>"; };
+		E0DE33512928F48D008C7147 /* CustomLoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomLoadingView.swift; sourceTree = "<group>"; };
 		E0DE98D528E2D85E00471AB4 /* LogInCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogInCheckView.swift; sourceTree = "<group>"; };
 		E0DE98D728E2DBB800471AB4 /* TeamViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamViewModel.swift; sourceTree = "<group>"; };
 		E0F0180D2975A9E10063C96B /* JoinUserDetectCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinUserDetectCheckView.swift; sourceTree = "<group>"; };
@@ -384,7 +384,7 @@
 			children = (
 				E05130E128F341610092FE46 /* RootView.swift */,
 				E08F273D28DDB65F00329C5E /* HomeTabView.swift */,
-				E0455FE1292C5B1C004F677D /* StandByView.swift */,
+				E0455FE1292C5B1C004F677D /* CubesProgressView.swift */,
 				E01E138F291D168B0001F2DA /* SystemSideMenu.swift */,
 				E0B3288B2921577F00E94BC3 /* ElementSwitchingPickerView.swift */,
 				E0B328922924A42100E94BC3 /* ManageCustomizeSideMenu.swift */,
@@ -591,7 +591,7 @@
 				E0A7DE4C290C2811008C3F3F /* PhotoViews */,
 				E0BFE1C729746AC1005481CA /* QRReaders */,
 				E0B328902923AD9D00E94BC3 /* GradientLine.swift */,
-				E0DE33512928F48D008C7147 /* CustomProgressView.swift */,
+				E0DE33512928F48D008C7147 /* CustomLoadingView.swift */,
 				E0455FE3292C8EF0004F677D /* BounceAnimationView.swift */,
 				E0455FE5292CA001004F677D /* ColorCubeView.swift */,
 				E0455FE9292D1947004F677D /* GradientBackbround.swift */,
@@ -729,7 +729,7 @@
 				E0455FE6292CA002004F677D /* ColorCubeView.swift in Sources */,
 				E0BFE1C629745AEB005481CA /* QRReader.swift in Sources */,
 				E04ACF4128E6DD600054A6C4 /* ShowsItemDetail.swift in Sources */,
-				E0455FE2292C5B1C004F677D /* StandByView.swift in Sources */,
+				E0455FE2292C5B1C004F677D /* CubesProgressView.swift in Sources */,
 				E01AA3A32916C674000FCD37 /* TagModel.swift in Sources */,
 				E08F273C28DDB61A00329C5E /* LibraryView.swift in Sources */,
 				BE254FBD29C092F5004FE9AE /* AsyncImageBackground.swift in Sources */,
@@ -775,7 +775,7 @@
 				E08F273E28DDB65F00329C5E /* HomeTabView.swift in Sources */,
 				E0455FDE292B2B83004F677D /* LogInViewModel.swift in Sources */,
 				BE20B04629BAEF2F0078169B /* DeleteAccountView.swift in Sources */,
-				E0DE33522928F48D008C7147 /* CustomProgressView.swift in Sources */,
+				E0DE33522928F48D008C7147 /* CustomLoadingView.swift in Sources */,
 				E05130E228F341620092FE46 /* RootView.swift in Sources */,
 				BE245BE329C825DE00539A04 /* EditTagView.swift in Sources */,
 				BE24374B29BE3A3F000C2D01 /* UIImageRectIcon.swift in Sources */,

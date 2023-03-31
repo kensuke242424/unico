@@ -301,9 +301,9 @@ struct SystemSideMenu: View {
                                     .alert("確認", isPresented: $inputSideMenu.isShowLogOutAlert) {
                                         Button("戻る") { inputSideMenu.isShowLogOutAlert.toggle() }
                                         Button("ログアウト") {
-                                            progress.isShow.toggle()
+                                            progress.showLoading.toggle()
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                                                progress.isShow.toggle()
+                                                progress.showLoading.toggle()
                                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                                     withAnimation(.easeIn(duration: 0.5)) {
                                                         logInVM.rootNavigation = .logIn
@@ -366,6 +366,10 @@ struct SystemSideMenu: View {
             Button("戻る") {}
             Button("移動する") {
                 // lastLogInの値を更新してからfetch処理を実行
+                Task {
+                    await userVM.updateLastLogInTeam(selected: inputSideMenu.selectedTeam)
+                    withAnimation(.spring(response: 0.5)) { logInVM.rootNavigation = .fetch }
+                }
             }
         } message: {
             Text("\(inputSideMenu.selectedTeam?.name ?? "No Name")に移動しますか？")
@@ -462,8 +466,25 @@ struct SystemSideMenu: View {
                             }
                             .frame(height: 60)
                             .listRowBackground(Color.clear)
-                        }
-                    }
+                            .onTapGesture {
+                                inputSideMenu.selectedTeam = team
+                                inputSideMenu.isShowChangeTeamAlert.toggle()
+                            }
+                            .alert("", isPresented: $inputSideMenu.isShowChangeTeamAlert) {
+                                Button("戻る") {}
+                                Button("移動する") {
+                                    // lastLogInの値を更新してからfetch処理を実行
+                                    Task {
+                                        inputSideMenu.showChangeTeamSheet = false
+                                        await userVM.updateLastLogInTeam(selected: inputSideMenu.selectedTeam)
+                                        withAnimation(.spring(response: 0.5)) { logInVM.rootNavigation = .fetch }
+                                    }
+                                }
+                            } message: {
+                                Text("\(inputSideMenu.selectedTeam?.name ?? "No Name")に移動しますか？")
+                            }
+                        } // ForEath
+                    } // List
                     .offset(y: -30)
                 }
             }
@@ -503,12 +524,14 @@ struct SystemSideMenu: View {
     func JoinTeamsSideMenuIcon(teams: [JoinTeam]) -> some View {
         
         HStack(spacing: 12) {
-            ForEach(0..<teams.filter({ $0.teamID != teamVM.team!.id}).count, id: \.self) { index in
-                if !teams.isEmpty && index <= 2 {
-                    SDWebImageCircleIcon(imageURL: teams[index].iconURL,
+            ForEach(Array(teams.enumerated()), id: \.offset) { offset, team  in
+                if !teams.isEmpty &&
+                    offset <= 2   &&
+                    team.teamID != userVM.user!.lastLogIn {
+                    SDWebImageCircleIcon(imageURL: team.iconURL,
                                          width: 28, height: 28)
                     .onTapGesture {
-                        inputSideMenu.selectedTeam = teams[index]
+                        inputSideMenu.selectedTeam = team
                         inputSideMenu.isShowChangeTeamAlert.toggle()
                     }
                 }

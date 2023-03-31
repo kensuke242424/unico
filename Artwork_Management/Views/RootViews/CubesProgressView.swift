@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct StandByView: View {
+struct CubesProgressView: View {
 
     private let columnsV: [GridItem] = Array(repeating: .init(.flexible()), count: 4)
     @State private var memberColor: MemberColor = .gray
@@ -40,6 +40,6 @@ struct StandByView: View {
 
 struct StandByView_Previews: PreviewProvider {
     static var previews: some View {
-        StandByView()
+        CubesProgressView()
     }
 }

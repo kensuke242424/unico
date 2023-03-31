@@ -146,9 +146,9 @@ struct AccountSystemView: View {
                         .alert("確認", isPresented: $showLogOutAlert) {
                             Button("戻る") { showLogOutAlert.toggle() }
                             Button("ログアウト") {
-                                progress.isShow.toggle()
+                                progress.showLoading.toggle()
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                                    progress.isShow.toggle()
+                                    progress.showLoading.toggle()
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                         withAnimation(.easeIn(duration: 0.5)) {
                                             logInVM.rootNavigation = .logIn

@@ -84,6 +84,19 @@ class UserViewModel: ObservableObject {
             }
         }
     }
+    
+    func updateLastLogInTeam(selected selectedTeam: JoinTeam?) async {
+        guard var user else { return }
+        guard let selectedTeam else { return }
+        guard let userRef = db?.collection("users").document(user.id) else { return }
+        do {
+            user.lastLogIn = selectedTeam.teamID
+            _ = try userRef.setData(from: user)
+        } catch {
+            print("最新ログインチームのFirestoreへの保存に失敗しました")
+            return
+        }
+    }
 
     func addNewJoinTeam(newJoinTeam: JoinTeam) async throws {
 

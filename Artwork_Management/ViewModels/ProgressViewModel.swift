@@ -8,5 +8,6 @@
 import SwiftUI
 
 class ProgressViewModel: ObservableObject {
-    @Published var isShow: Bool = false
+    @Published var showLoading: Bool = false
+    @Published var showCubesProgress: Bool = false
 }
