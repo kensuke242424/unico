@@ -25,6 +25,10 @@ struct InputSideMenu {
     var isShowChangeTeamAlert: Bool = false
     var showdeleteTeamAlert  : Bool = false
     
+    // チームデータ消去時の状態を管理するプロパティ
+    var showdeletedAllTeamAlert   : Bool = false
+    var showdeletedAllTeamProgress: Bool = false
+    
     // 操作チームを変更するハーフモーダルを管理
     var showChangeTeamSheet: Bool = false
     var teamsListSheetEdit: Bool = false
@@ -451,31 +455,54 @@ struct SystemSideMenu: View {
                     
                 } else {
                     List {
-                        ForEach(teams.filter({ $0.teamID != teamVM.team!.id}), id: \.self) { team in
+                        ForEach(teams.filter({ $0.teamID != teamVM.team!.id}), id: \.self) { teamRow in
                             HStack(spacing: 20) {
                                 if inputSideMenu.teamsListSheetEdit {
                                     Image(systemName: "trash.fill")
                                         .foregroundColor(.red)
                                         .transition(.opacity.combined(with: .offset(x: -30)))
-                                        .onTapGesture { inputSideMenu.showdeleteTeamAlert.toggle() }
+                                        .onTapGesture {
+                                            inputSideMenu.selectedTeam = teamRow
+                                            inputSideMenu.showdeleteTeamAlert.toggle()
+                                        }
                                         .alert("確認", isPresented: $inputSideMenu.showdeleteTeamAlert) {
                                             Button("削除する", role: .destructive) {
-                                                //TODO: チームデータ削除処理(team, item, images, jointeam)
-                                                
+                                                Task {
+                                                    guard let selectedTeam = inputSideMenu.selectedTeam else { return }
+                                                    inputSideMenu.showdeletedAllTeamProgress = true
+                                                    try await userVM.deleteMembersJoinTeam(selected: selectedTeam,
+                                                                                           members : teamVM.team!.members)
+                                                    await teamVM.deleteAllTeamImages()
+                                                    await itemVM.deleteAllItemImages()
+                                                    await teamVM.deleteAllTeamDocuments(selected: selectedTeam)
+                                                    inputSideMenu.showdeletedAllTeamProgress = false
+                                                    //TODO: 削除完了アラートが表示されないぞ？？？
+                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                                        inputSideMenu.showdeletedAllTeamAlert = true
+                                                    }
+                                                }
                                             }
                                         } message: {
                                             Text("チーム内のアイテム、タグ、メンバー情報を含めた全てのデータを消去します。チーム削除を実行しますか？")
                                         } // alert
+                                        .alert("", isPresented: $inputSideMenu.showdeletedAllTeamAlert) {
+                                            Button("OK") {
+                                                // 他のチームデータをfetch
+                                                // 他のチームが存在しなければ、チーム作成画面へ遷移
+                                            }
+                                        } message: {
+                                            Text("チームデータの消去が完了しました")
+                                        } // alert
                                 }
-                                SDWebImageCircleIcon(imageURL: team.iconURL,
+                                SDWebImageCircleIcon(imageURL: teamRow.iconURL,
                                                      width: 50, height: 50)
-                                Text(team.name)
+                                Text(teamRow.name)
                                     .lineLimit(1)
                             }
                             .frame(height: 60)
                             .listRowBackground(Color.clear)
                             .onTapGesture {
-                                inputSideMenu.selectedTeam = team
+                                inputSideMenu.selectedTeam = teamRow
                                 inputSideMenu.isShowChangeTeamAlert.toggle()
                             }
                             .alert("", isPresented: $inputSideMenu.isShowChangeTeamAlert) {

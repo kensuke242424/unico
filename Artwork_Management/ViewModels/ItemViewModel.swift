@@ -184,7 +184,7 @@ class ItemViewModel: ObservableObject {
         }
     }
     
-    func deleteAllItemImages() {
+    func deleteAllItemImages() async {
         let storage = Storage.storage()
         let reference = storage.reference()
         

@@ -222,6 +222,35 @@ class UserViewModel: ObservableObject {
         }
     }
     
+    func deleteMembersJoinTeam(selected selectedTeam: JoinTeam, members joinMembers: [JoinMember]) async throws {
+        var joinMembersID: [String] = []
+        // チームに所属している各メンバーのid文字列データを配列に格納(whereFieldクエリで使う)
+        for member in joinMembers {
+            joinMembersID.append(member.memberUID)
+        }
+
+        // 所属メンバーのid配列を使ってクエリを叩く
+        guard let joinMemberRefs = db?.collection("users")
+            .whereField("id", in: joinMembersID) else { throw CustomError.getRef }
+
+        do {
+            let snapshot = try await joinMemberRefs.getDocuments()
+            
+            for memberDocument in snapshot.documents {
+                
+                var rowMemberData = try memberDocument.data(as: User.self)
+                let resultJoins = rowMemberData.joins.drop(while: { $0.teamID == selectedTeam.teamID })
+                rowMemberData.joins = Array(resultJoins)
+                
+                guard let userRef = db?.collection("users").document(rowMemberData.id) else {
+                    throw CustomError.getRef
+                }
+                _ = try userRef.setData(from: rowMemberData)
+                
+            } // for
+        } // do
+    }
+    
     func resizeUIImage(image: UIImage?, width: CGFloat) -> UIImage? {
         
         if let originalImage = image {

@@ -266,6 +266,21 @@ class TeamViewModel: ObservableObject {
         }
     }
 
+    @MainActor
+    func fetchNewTeamBackgroundImage(teamID: String) async throws {
+
+        guard let teamRef = db?.collection("teams").document(teamID) else { throw CustomError.getRef  }
+
+        do {
+            let teamDocument = try await teamRef.getDocument()
+            let teamData = try teamDocument.data(as: Team.self)
+            self.team?.backgroundURL = teamData.backgroundURL
+            self.team?.backgroundPath = teamData.backgroundPath
+        } catch {
+            throw CustomError.fetch
+        }
+    }
+    
     func getUIImageByUrl(url: URL?) -> UIImage? {
         guard let url else { return nil }
         var iamge: UIImage?
@@ -282,23 +297,8 @@ class TeamViewModel: ObservableObject {
         print("imageの返却")
         return iamge
     }
-
-    @MainActor
-    func fetchNewTeamBackgroundImage(teamID: String) async throws {
-
-        guard let teamRef = db?.collection("teams").document(teamID) else { throw CustomError.getRef  }
-
-        do {
-            let teamDocument = try await teamRef.getDocument()
-            let teamData = try teamDocument.data(as: Team.self)
-            self.team?.backgroundURL = teamData.backgroundURL
-            self.team?.backgroundPath = teamData.backgroundPath
-        } catch {
-            throw CustomError.fetch
-        }
-    }
     
-    func deleteAllTeamImages() {
+    func deleteAllTeamImages() async {
         guard let team else { return }
         
         var teamImagesPath: [String?]
@@ -320,6 +320,19 @@ class TeamViewModel: ObservableObject {
                 }
             }
         } // for in
+    }
+    
+    func deleteAllTeamDocuments(selected selectedTeam: JoinTeam) async {
+        guard let teamRef = db?.collection("teams").document(selectedTeam.teamID) else {
+            print("error: deleteAllTeamDocumentsでリファレンスを取得できませんでした")
+            return
+        }
+        do {
+            _ = try await teamRef.delete()
+        } catch {
+            print("チームドキュメントの削除に失敗しました")
+        }
+        
     }
 
     deinit {
