@@ -458,6 +458,14 @@ struct SystemSideMenu: View {
                                         .foregroundColor(.red)
                                         .transition(.opacity.combined(with: .offset(x: -30)))
                                         .onTapGesture { inputSideMenu.showdeleteTeamAlert.toggle() }
+                                        .alert("確認", isPresented: $inputSideMenu.showdeleteTeamAlert) {
+                                            Button("削除する", role: .destructive) {
+                                                //TODO: チームデータ削除処理(team, item, images, jointeam)
+                                                
+                                            }
+                                        } message: {
+                                            Text("チーム内のアイテム、タグ、メンバー情報を含めた全てのデータを消去します。チーム削除を実行しますか？")
+                                        } // alert
                                 }
                                 SDWebImageCircleIcon(imageURL: team.iconURL,
                                                      width: 50, height: 50)
@@ -471,9 +479,9 @@ struct SystemSideMenu: View {
                                 inputSideMenu.isShowChangeTeamAlert.toggle()
                             }
                             .alert("", isPresented: $inputSideMenu.isShowChangeTeamAlert) {
-                                Button("戻る") {}
+                                Button("キャンセル") {}
                                 Button("移動する") {
-                                    // lastLogInの値を更新してからfetch処理を実行
+                                    // フェッチするチームデータを管理するUserModel内のlastLogInの値を更新後に、再fetchを実行
                                     Task {
                                         inputSideMenu.showChangeTeamSheet = false
                                         await userVM.updateLastLogInTeam(selected: inputSideMenu.selectedTeam)

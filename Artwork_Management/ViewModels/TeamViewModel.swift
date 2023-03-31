@@ -201,7 +201,7 @@ class TeamViewModel: ObservableObject {
             team.backgroundPath = data.filePath
             try teamRef.setData(from: team)
             print("storageにヘッダー画像保存成功")
-            try await getTeamHeaderImage(teamID: team.id)
+            try await fetchNewTeamBackgroundImage(teamID: team.id)
             print("新規ヘッダー画像取得成功")
         } catch {
             print("ヘッダーの保存に失敗")
@@ -284,7 +284,7 @@ class TeamViewModel: ObservableObject {
     }
 
     @MainActor
-    func getTeamHeaderImage(teamID: String) async throws {
+    func fetchNewTeamBackgroundImage(teamID: String) async throws {
 
         guard let teamRef = db?.collection("teams").document(teamID) else { throw CustomError.getRef  }
 
@@ -296,6 +296,30 @@ class TeamViewModel: ObservableObject {
         } catch {
             throw CustomError.fetch
         }
+    }
+    
+    func deleteAllTeamImages() {
+        guard let team else { return }
+        
+        var teamImagesPath: [String?]
+        teamImagesPath = [team.iconPath,
+                          team.backgroundPath]
+        
+        let storage = Storage.storage()
+        let reference = storage.reference()
+        
+        for path in teamImagesPath {
+            guard let path else { return }
+            let imageRef = reference.child(path)
+            imageRef.delete { error in
+                if let error = error {
+                    print("画像の削除に失敗しました: \(path)")
+                    print(error)
+                } else {
+                    print("画像の削除に成功しました")
+                }
+            }
+        } // for in
     }
 
     deinit {
