@@ -137,6 +137,7 @@ struct NewHomeView: View {
             }
         }
     } // teamMembersIcon
+    
 }
 
 struct HomeView_Previews: PreviewProvider {

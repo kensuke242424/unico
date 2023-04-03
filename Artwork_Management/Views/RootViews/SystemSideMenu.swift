@@ -467,19 +467,20 @@ struct SystemSideMenu: View {
                                         }
                                         .alert("確認", isPresented: $inputSideMenu.showdeleteTeamAlert) {
                                             Button("削除する", role: .destructive) {
+                                                
                                                 Task {
                                                     guard let selectedTeam = inputSideMenu.selectedTeam else { return }
                                                     inputSideMenu.showdeletedAllTeamProgress = true
                                                     try await userVM.deleteMembersJoinTeam(selected: selectedTeam,
                                                                                            members : teamVM.team!.members)
+                                                    
                                                     await teamVM.deleteAllTeamImages()
                                                     await itemVM.deleteAllItemImages()
                                                     await teamVM.deleteAllTeamDocuments(selected: selectedTeam)
                                                     inputSideMenu.showdeletedAllTeamProgress = false
                                                     //TODO: 削除完了アラートが表示されないぞ？？？
-                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                                        inputSideMenu.showdeletedAllTeamAlert = true
-                                                    }
+                                                    inputSideMenu.showdeletedAllTeamAlert = true
+                                                    
                                                 }
                                             }
                                         } message: {

@@ -380,6 +380,60 @@ struct NewTabView: View {
                 }
         )
     }
+    
+    func SelectBackgroundViews() -> some View {
+        VStack(spacing: 30) {
+            
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 30) {
+                    ForEach(SelectBackground.allCases, id: \.self) { value in
+                        Group {
+                            if value == .original {
+                                Image(uiImage: inputLogIn.captureBackgroundImage ?? UIImage())
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 120, height: 250)
+                                    .border(.blue, width: 1)
+                                    .overlay {
+                                        Button("写真を挿入") {
+                                            inputLogIn.isShowPickerView.toggle()
+                                        }
+                                        .buttonStyle(.borderedProminent)
+                                        
+                                    }
+                            } else {
+                                Image(value.imageName)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 120, height: 250)
+                            }
+                        }
+                        .clipped()
+                        .scaleEffect(inputLogIn.selectBackground == value ? 1.2 : 1.0)
+                        .overlay(alignment: .topTrailing) {
+                            Image(systemName: "checkmark.seal.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .foregroundColor(.green)
+                                .frame(width: 30, height: 30)
+                                .scaleEffect(inputLogIn.selectBackground == value ? 1.0 : 1.2)
+                                .opacity(inputLogIn.selectBackground == value ? 1.0 : 0.0)
+                                .offset(x: 20, y: -30)
+                        }
+                        .padding(.leading, value == .original ? 40 : 0)
+                        .padding(.trailing, value == .sample4 ? 40 : 0)
+                        .onTapGesture {
+                            withAnimation(.spring(response: 0.5)) {
+                                inputLogIn.selectBackground = value
+                            }
+                        }
+                    }
+                }
+                .frame(height: 310)
+            }
+        } // VStack
+        .opacity(inputLogIn.checkBackgroundOpacity)
+    }
 } // View
 
 struct NewTabView_Previews: PreviewProvider {
