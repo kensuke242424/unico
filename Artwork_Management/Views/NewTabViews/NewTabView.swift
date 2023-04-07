@@ -18,6 +18,11 @@ struct InputTab {
     var selectedItem: Item?
     var selectedTag: Tag?
     
+    /// バックグラウンドを管理するプロパティ
+    var teamBackground: URL?
+    var selectBackground: UIImage?
+    var showSelectBackground: Bool = false
+    
     /// タブViewのアニメーションを管理するプロパティ
     var selectionTab    : Tab = .home
     var animationTab    : Tab = .home
@@ -93,6 +98,18 @@ struct NewTabView: View {
                         }
                     }
                 }
+                .onChange(of: inputTab.selectionTab) { _ in
+                    switch inputTab.selectionTab {
+                    case .home:
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            inputTab.animationTab = .home
+                        }
+                    case .item:
+                        withAnimation(.spring(response: 0.2)) {
+                            inputTab.animationTab = .item
+                        }
+                    }
+                }
                 /// サイドメニューView
                 .overlay {
                     SystemSideMenu(itemVM: itemVM, inputTab: $inputTab)
@@ -130,18 +147,6 @@ struct NewTabView: View {
                     }
                 }
                 .ignoresSafeArea()
-                .onChange(of: inputTab.selectionTab) { _ in
-                    switch inputTab.selectionTab {
-                    case .home:
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            inputTab.animationTab = .home
-                        }
-                    case .item:
-                        withAnimation(.spring(response: 0.2)) {
-                            inputTab.animationTab = .item
-                        }
-                    }
-                }
                 
                 /// NavigationStackによる遷移を管理します
                 .navigationDestination(for: EditItemPath.self) { itemPath in
@@ -190,23 +195,7 @@ struct NewTabView: View {
                 }
             } // NavigationStack
         } // GeometryReader
-        .onChange(of: cartVM.resultCartAmount) {
-            [beforeCart = cartVM.resultCartAmount] afterCart in
-            
-            if beforeCart == 0 {
-                print("カートにアイテム追加を検知。シートを表示")
-                inputTab.showCommerce = .medium
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                    inputTab.showCart = .medium
-                }
-            }
-            if afterCart == 0 {
-                print("カートアイテムが空になったのを検知。シートを閉じる")
-                inputTab.showCart = .hidden
-                inputTab.showCommerce = .hidden
-            }
-        }
-//         アイテム取引かごのシート画面
+        // アイテム取引かごのシート画面
         .resizableSheet($inputTab.showCart, id: "A") { builder in
             builder.content { context in
                 
@@ -270,7 +259,6 @@ struct NewTabView: View {
                 EmptyView()
             }
         } // .resizableSheet
-        
         // 決済リザルトのシート画面
         .resizableSheet($inputTab.showCommerce, id: "B") {builder in
             builder.content { _ in
@@ -289,7 +277,22 @@ struct NewTabView: View {
                 EmptyView()
             }
         } // .resizableSheet
-        
+        .onChange(of: cartVM.resultCartAmount) {
+            [beforeCart = cartVM.resultCartAmount] afterCart in
+            
+            if beforeCart == 0 {
+                print("カートにアイテム追加を検知。シートを表示")
+                inputTab.showCommerce = .medium
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    inputTab.showCart = .medium
+                }
+            }
+            if afterCart == 0 {
+                print("カートアイテムが空になったのを検知。シートを閉じる")
+                inputTab.showCart = .hidden
+                inputTab.showCommerce = .hidden
+            }
+        }
         
     } // body
     @ViewBuilder
