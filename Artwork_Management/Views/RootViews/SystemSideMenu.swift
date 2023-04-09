@@ -269,10 +269,22 @@ struct SystemSideMenu: View {
                                         Label("チームを変更", systemImage: "repeat")
                                             .onTapGesture { inputSideMenu.showChangeTeamSheet.toggle() }
 
+                                        Label("背景の変更", systemImage: "person.wave.2.fill")
+                                            .onTapGesture {
+                                                withAnimation(.spring(response: 0.4, blendDuration: 1)) {
+                                                    inputTab.showSideMenu = false
+                                                }
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                                    withAnimation(.spring(response: 0.5, blendDuration: 1)) {
+                                                        inputTab.showSelectBackground.toggle()
+                                                    }
+                                                }
+                                            }
+
                                     } // VStack
                                     .foregroundColor(.white)
                                     // メニュー一つ分のheight = コンテンツ数 * 60
-                                    .frame(width: 210, height: menuHeight * 4, alignment: .topLeading)
+                                    .frame(width: 210, height: menuHeight * 5, alignment: .topLeading)
                                     .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
                                     .offset(x: 20, y: 30)
                                 }

@@ -20,8 +20,10 @@ struct InputTab {
     
     /// バックグラウンドを管理するプロパティ
     var teamBackground: URL?
-    var selectBackground: UIImage?
+    var captureBackgroundImage: UIImage?
+    var showPickerView: Bool = false
     var showSelectBackground: Bool = false
+    var selectBackground: SelectBackground = .original
     
     /// タブViewのアニメーションを管理するプロパティ
     var selectionTab    : Tab = .home
@@ -87,16 +89,9 @@ struct NewTabView: View {
                     }
                     .tabViewStyle(.page(indexDisplayMode: .never))
                 }
-                .background {
-                    ZStack {
-                        GeometryReader { proxy in
-                            SDWebImageView(imageURL : teamVM.team?.backgroundURL,
-                                              width : proxy.size.width,
-                                              height: proxy.size.height)
-                                .ignoresSafeArea()
-                                .blur(radius: min((-inputTab.scrollProgress * 4), 4), opaque: true)
-                        }
-                    }
+                .sheet(isPresented: $inputTab.showPickerView) {
+                    PHPickerView(captureImage: $inputTab.captureBackgroundImage,
+                                 isShowSheet : $inputTab.showPickerView)
                 }
                 .onChange(of: inputTab.selectionTab) { _ in
                     switch inputTab.selectionTab {
@@ -108,6 +103,23 @@ struct NewTabView: View {
                         withAnimation(.spring(response: 0.2)) {
                             inputTab.animationTab = .item
                         }
+                    }
+                }
+                .background {
+                    ZStack {
+                        GeometryReader { proxy in
+                            SDWebImageView(imageURL : teamVM.team?.backgroundURL,
+                                              width : proxy.size.width,
+                                              height: proxy.size.height)
+                                .ignoresSafeArea()
+                                .blur(radius: min((-inputTab.scrollProgress * 4), 4), opaque: true)
+                        }
+                    }
+                }
+                // チームの背景を変更編集するView
+                .overlay {
+                    if inputTab.showSelectBackground {
+                        SelectBackgroundView(inputTab: $inputTab)
                     }
                 }
                 /// サイドメニューView
@@ -195,7 +207,7 @@ struct NewTabView: View {
                 }
             } // NavigationStack
         } // GeometryReader
-        // アイテム取引かごのシート画面
+        // 🧺アイテム取引かごのシート画面
         .resizableSheet($inputTab.showCart, id: "A") { builder in
             builder.content { context in
                 
@@ -258,8 +270,8 @@ struct NewTabView: View {
             .background { _ in
                 EmptyView()
             }
-        } // .resizableSheet
-        // 決済リザルトのシート画面
+        }
+        // 🧺決済リザルトのシート画面
         .resizableSheet($inputTab.showCommerce, id: "B") {builder in
             builder.content { _ in
                 
@@ -276,7 +288,7 @@ struct NewTabView: View {
             .background { _ in
                 EmptyView()
             }
-        } // .resizableSheet
+        }
         .onChange(of: cartVM.resultCartAmount) {
             [beforeCart = cartVM.resultCartAmount] afterCart in
             
@@ -383,26 +395,31 @@ struct NewTabView: View {
                 }
         )
     }
-    
-    func SelectBackgroundViews() -> some View {
+
+} // View
+
+struct SelectBackgroundView: View {
+
+    @Binding var inputTab: InputTab
+
+    var body: some View {
         VStack(spacing: 30) {
-            
+
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 30) {
                     ForEach(SelectBackground.allCases, id: \.self) { value in
                         Group {
                             if value == .original {
-                                Image(uiImage: inputLogIn.captureBackgroundImage ?? UIImage())
+                                Image(uiImage: inputTab.captureBackgroundImage ?? UIImage())
                                     .resizable()
                                     .scaledToFill()
                                     .frame(width: 120, height: 250)
                                     .border(.blue, width: 1)
                                     .overlay {
                                         Button("写真を挿入") {
-                                            inputLogIn.isShowPickerView.toggle()
+                                            inputTab.showPickerView.toggle()
                                         }
                                         .buttonStyle(.borderedProminent)
-                                        
                                     }
                             } else {
                                 Image(value.imageName)
@@ -412,22 +429,22 @@ struct NewTabView: View {
                             }
                         }
                         .clipped()
-                        .scaleEffect(inputLogIn.selectBackground == value ? 1.2 : 1.0)
+                        .scaleEffect(inputTab.selectBackground == value ? 1.2 : 1.0)
                         .overlay(alignment: .topTrailing) {
                             Image(systemName: "checkmark.seal.fill")
                                 .resizable()
                                 .scaledToFit()
                                 .foregroundColor(.green)
                                 .frame(width: 30, height: 30)
-                                .scaleEffect(inputLogIn.selectBackground == value ? 1.0 : 1.2)
-                                .opacity(inputLogIn.selectBackground == value ? 1.0 : 0.0)
+                                .scaleEffect(inputTab.selectBackground == value ? 1.0 : 1.2)
+                                .opacity(inputTab.selectBackground == value ? 1.0 : 0.0)
                                 .offset(x: 20, y: -30)
                         }
                         .padding(.leading, value == .original ? 40 : 0)
                         .padding(.trailing, value == .sample4 ? 40 : 0)
                         .onTapGesture {
                             withAnimation(.spring(response: 0.5)) {
-                                inputLogIn.selectBackground = value
+                                inputTab.selectBackground = value
                             }
                         }
                     }
@@ -435,8 +452,7 @@ struct NewTabView: View {
                 .frame(height: 310)
             }
         } // VStack
-        .opacity(inputLogIn.checkBackgroundOpacity)
-    }
+    } // body
 } // View
 
 struct NewTabView_Previews: PreviewProvider {

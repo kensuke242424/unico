@@ -816,7 +816,6 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                                         inputLogIn.isShowPickerView.toggle()
                                                     }
                                                     .buttonStyle(.borderedProminent)
-                                                    
                                                 }
                                         } else {
                                             Image(value.imageName)
