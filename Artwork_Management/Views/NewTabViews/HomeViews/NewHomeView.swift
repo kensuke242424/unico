@@ -26,12 +26,15 @@ struct NewHomeView: View {
                 if animationContent {
                     NowTimeView(size)
                         .opacity(1 - min((-inputTab.scrollProgress * 2), 1))
+                        .blur(radius: inputTab.checkBackgroundAnimation ||
+                                      !inputTab.showSelectBackground ? 0 : 2)
                         .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 20)))
                 }
-                
                 if animationContent {
                     TeamView(size)
                         .opacity(1 - min((-inputTab.scrollProgress * 2), 1))
+                        .blur(radius: inputTab.checkBackgroundAnimation ||
+                                      !inputTab.showSelectBackground ? 0 : 2)
                         .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 20)))
                 }
                 

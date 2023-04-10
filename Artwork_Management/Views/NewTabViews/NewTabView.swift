@@ -23,7 +23,8 @@ struct InputTab {
     var captureBackgroundImage: UIImage?
     var showPickerView: Bool = false
     var showSelectBackground: Bool = false
-    var checkBackgroundEffect: Bool = false
+    var checkBackgroundToggle: Bool = false
+    var checkBackgroundAnimation: Bool = false
     var selectBackground: SelectBackground = .original
     
     /// タブViewのアニメーションを管理するプロパティ
@@ -62,6 +63,8 @@ struct NewTabView: View {
                 
                 VStack {
                     TabTopBarView()
+                        .blur(radius: inputTab.checkBackgroundAnimation ||
+                                      !inputTab.showSelectBackground ? 0 : 2)
                     
                     Spacer(minLength: 0)
                     
@@ -116,14 +119,14 @@ struct NewTabView: View {
                                         .resizable()
                                         .scaledToFill()
                                         .frame(width: proxy.size.width, height: proxy.size.height)
-                                        .blur(radius: inputTab.checkBackgroundEffect ? 0 : 2)
+                                        .blur(radius: inputTab.checkBackgroundAnimation ? 0 : 3, opaque: true)
                                         .ignoresSafeArea()
                                 } else {
                                     Image(inputTab.selectBackground.imageName)
                                         .resizable()
                                         .scaledToFill()
                                         .frame(width: proxy.size.width, height: proxy.size.height)
-                                        .blur(radius: inputTab.checkBackgroundEffect ? 0 : 2)
+                                        .blur(radius: inputTab.checkBackgroundAnimation ? 0 : 3, opaque: true)
                                         .ignoresSafeArea()
                                 }
 
@@ -140,6 +143,10 @@ struct NewTabView: View {
                 // チームの背景を変更編集するView
                 .overlay {
                     if inputTab.showSelectBackground {
+
+                        Color.black
+                            .opacity(inputTab.checkBackgroundAnimation ? 0.001 : 0.5)
+                            .ignoresSafeArea()
                         SelectBackgroundView(inputTab: $inputTab)
                     }
                 }
@@ -430,6 +437,12 @@ struct SelectBackgroundView: View {
 
             Spacer()
 
+            Text("背景を選択してください")
+                .foregroundColor(.white)
+                .tracking(5)
+                .opacity(inputTab.checkBackgroundAnimation ? 0 : 0.8)
+                .padding(.bottom, 30)
+
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 30) {
                     ForEach(SelectBackground.allCases, id: \.self) { value in
@@ -476,6 +489,7 @@ struct SelectBackgroundView: View {
                 }
                 .frame(height: 310)
             } // ScrollView
+            .opacity(inputTab.checkBackgroundAnimation ? 0 : 1)
 
             HStack {
 
@@ -490,13 +504,14 @@ struct SelectBackgroundView: View {
                     }
                     .buttonStyle(.borderedProminent)
                     Label("キャンセル", systemImage: "xmark.circle.fill")
-                        .fontWeight(.semibold)
+                        .foregroundColor(.white)
                         .onTapGesture {
                             withAnimation(.spring(response: 0.3, blendDuration: 1)) {
                                 inputTab.showSelectBackground = false
                             }
                         }
                 }
+                .opacity(inputTab.checkBackgroundAnimation ? 0 : 1)
             }
             .overlay {
                 HStack {
@@ -505,22 +520,31 @@ struct SelectBackgroundView: View {
                         BlurView(style: .systemThickMaterial)
                             .frame(width: 90, height: 160)
                             .clipShape(RoundedRectangle(cornerRadius: 15))
-                            .opacity(0.6)
+                            .opacity(0.8)
 
                         VStack(spacing: 20) {
                             VStack {
                                 Text("背景を確認").font(.footnote).offset(x: 15)
-                                Toggle("", isOn: $inputTab.checkBackgroundEffect)
-//                                CustomToggleButton(isOn: $inputTab.checkBackgroundEffect)
+                                Toggle("", isOn: $inputTab.checkBackgroundToggle)
                             }
                             VStack {
                                 Text("ダークモード").font(.footnote).offset(x: 15)
                                 Toggle("", isOn: $darkModeState)
-//                                CustomToggleButton(isOn: $darkModeState)
                             }
                         }
                         .frame(width: 80)
                         .padding(.trailing, 30)
+                        .onChange(of: inputTab.checkBackgroundToggle) { newValue in
+                            if newValue {
+                                withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+                                    inputTab.checkBackgroundAnimation = true
+                                }
+                            } else {
+                                withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+                                    inputTab.checkBackgroundAnimation = false
+                                }
+                            }
+                        }
                     }
                 }
                 .offset(x: getRect().width / 3)
