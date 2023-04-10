@@ -423,7 +423,7 @@ struct SelectBackgroundView: View {
 
     @Binding var inputTab: InputTab
 
-    @AppStorage("homeFontColorState") var homeFontColorState: Bool = false
+    @AppStorage("darkModeState") var darkModeState: Bool = false
 
     var body: some View {
         VStack(spacing: 30) {
@@ -502,7 +502,7 @@ struct SelectBackgroundView: View {
                             }
                             VStack {
                                 Text("ダークモード").font(.footnote).offset(x: 15)
-                                Toggle("", isOn: $homeFontColorState)
+                                Toggle("", isOn: $darkModeState)
                             }
                         }
                         .frame(width: 80)
