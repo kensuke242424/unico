@@ -481,11 +481,21 @@ struct SelectBackgroundView: View {
 
                 VStack(spacing: 40) {
                     Button("決定") {
-                        // チーム背景を更新
+                        // チーム背景の更新処理
+                        Task {
+                            withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+                                inputTab.showSelectBackground = false
+                            }
+                        }
                     }
                     .buttonStyle(.borderedProminent)
                     Label("キャンセル", systemImage: "xmark.circle.fill")
-                        .onTapGesture {}
+                        .fontWeight(.semibold)
+                        .onTapGesture {
+                            withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+                                inputTab.showSelectBackground = false
+                            }
+                        }
                 }
             }
             .overlay {
@@ -493,23 +503,27 @@ struct SelectBackgroundView: View {
                     Spacer()
                     ZStack {
                         BlurView(style: .systemThickMaterial)
-                            .frame(width: 100, height: 160)
+                            .frame(width: 90, height: 160)
+                            .clipShape(RoundedRectangle(cornerRadius: 15))
+                            .opacity(0.6)
 
                         VStack(spacing: 20) {
                             VStack {
                                 Text("背景を確認").font(.footnote).offset(x: 15)
                                 Toggle("", isOn: $inputTab.checkBackgroundEffect)
+//                                CustomToggleButton(isOn: $inputTab.checkBackgroundEffect)
                             }
                             VStack {
                                 Text("ダークモード").font(.footnote).offset(x: 15)
                                 Toggle("", isOn: $darkModeState)
+//                                CustomToggleButton(isOn: $darkModeState)
                             }
                         }
                         .frame(width: 80)
-                        .padding(.trailing, 25)
+                        .padding(.trailing, 30)
                     }
                 }
-                .offset(x: 150)
+                .offset(x: getRect().width / 3)
             }
             .padding(.top, 50)
 

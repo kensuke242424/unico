@@ -40,6 +40,7 @@
 		BE254FBD29C092F5004FE9AE /* AsyncImageBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE254FBC29C092F5004FE9AE /* AsyncImageBackground.swift */; };
 		BE254FBF29C0C396004FE9AE /* CubeCircleIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE254FBE29C0C396004FE9AE /* CubeCircleIcon.swift */; };
 		BE254FC129C0CA0B004FE9AE /* PersonCircleIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE254FC029C0CA0B004FE9AE /* PersonCircleIcon.swift */; };
+		BE2B808129E42CE70081439C /* CustomToggleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE2B808029E42CE60081439C /* CustomToggleButton.swift */; };
 		BE392FF029C20E6900BB5700 /* Tab.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE392FEF29C20E6900BB5700 /* Tab.swift */; };
 		BE392FF329C2135300BB5700 /* ScrollOffsetModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE392FF229C2135300BB5700 /* ScrollOffsetModifier.swift */; };
 		BE3CD65B29B72B0700C19442 /* ProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3CD65A29B72B0700C19442 /* ProgressViewModel.swift */; };
@@ -159,6 +160,7 @@
 		BE254FBC29C092F5004FE9AE /* AsyncImageBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncImageBackground.swift; sourceTree = "<group>"; };
 		BE254FBE29C0C396004FE9AE /* CubeCircleIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CubeCircleIcon.swift; sourceTree = "<group>"; };
 		BE254FC029C0CA0B004FE9AE /* PersonCircleIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonCircleIcon.swift; sourceTree = "<group>"; };
+		BE2B808029E42CE60081439C /* CustomToggleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomToggleButton.swift; sourceTree = "<group>"; };
 		BE392FEF29C20E6900BB5700 /* Tab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tab.swift; sourceTree = "<group>"; };
 		BE392FF229C2135300BB5700 /* ScrollOffsetModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollOffsetModifier.swift; sourceTree = "<group>"; };
 		BE3CD65A29B72B0700C19442 /* ProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressViewModel.swift; sourceTree = "<group>"; };
@@ -591,6 +593,7 @@
 				E0A7DE4C290C2811008C3F3F /* PhotoViews */,
 				E0BFE1C729746AC1005481CA /* QRReaders */,
 				E0B328902923AD9D00E94BC3 /* GradientLine.swift */,
+				BE2B808029E42CE60081439C /* CustomToggleButton.swift */,
 				E0DE33512928F48D008C7147 /* CustomLoadingView.swift */,
 				E0455FE3292C8EF0004F677D /* BounceAnimationView.swift */,
 				E0455FE5292CA001004F677D /* ColorCubeView.swift */,
@@ -811,6 +814,7 @@
 				BE3CD65B29B72B0700C19442 /* ProgressViewModel.swift in Sources */,
 				E0CF7EF428DF385800735142 /* ItemCards.swift in Sources */,
 				E05FE94528F71BFB00263F98 /* ColorExtension.swift in Sources */,
+				BE2B808129E42CE70081439C /* CustomToggleButton.swift in Sources */,
 				BE245BCB29C576F900539A04 /* EditItemPhotoContent.swift in Sources */,
 				E0B328912923AD9D00E94BC3 /* GradientLine.swift in Sources */,
 				E0796AD528F4850D0094E50C /* ButtonModel.swift in Sources */,
