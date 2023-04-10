@@ -23,6 +23,7 @@ struct InputTab {
     var captureBackgroundImage: UIImage?
     var showPickerView: Bool = false
     var showSelectBackground: Bool = false
+    var checkBackgroundEffect: Bool = false
     var selectBackground: SelectBackground = .original
     
     /// タブViewのアニメーションを管理するプロパティ
@@ -108,14 +109,34 @@ struct NewTabView: View {
                 .background {
                     ZStack {
                         GeometryReader { proxy in
-                            SDWebImageView(imageURL : teamVM.team?.backgroundURL,
-                                              width : proxy.size.width,
-                                              height: proxy.size.height)
+                            if inputTab.showSelectBackground {
+
+                                if inputTab.selectBackground == .original {
+                                    Image(uiImage: inputTab.captureBackgroundImage ?? UIImage())
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: proxy.size.width, height: proxy.size.height)
+                                        .blur(radius: inputTab.checkBackgroundEffect ? 0 : 2)
+                                        .ignoresSafeArea()
+                                } else {
+                                    Image(inputTab.selectBackground.imageName)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: proxy.size.width, height: proxy.size.height)
+                                        .blur(radius: inputTab.checkBackgroundEffect ? 0 : 2)
+                                        .ignoresSafeArea()
+                                }
+
+                            } else {
+                                SDWebImageView(imageURL : teamVM.team?.backgroundURL,
+                                               width : proxy.size.width,
+                                               height: proxy.size.height)
                                 .ignoresSafeArea()
                                 .blur(radius: min((-inputTab.scrollProgress * 4), 4), opaque: true)
+                            }
                         }
                     }
-                }
+                } // background
                 // チームの背景を変更編集するView
                 .overlay {
                     if inputTab.showSelectBackground {
@@ -402,8 +423,12 @@ struct SelectBackgroundView: View {
 
     @Binding var inputTab: InputTab
 
+    @AppStorage("homeFontColorState") var homeFontColorState: Bool = false
+
     var body: some View {
         VStack(spacing: 30) {
+
+            Spacer()
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 30) {
@@ -450,7 +475,46 @@ struct SelectBackgroundView: View {
                     }
                 }
                 .frame(height: 310)
+            } // ScrollView
+
+            HStack {
+
+                VStack(spacing: 40) {
+                    Button("決定") {
+                        // チーム背景を更新
+                    }
+                    .buttonStyle(.borderedProminent)
+                    Label("キャンセル", systemImage: "xmark.circle.fill")
+                        .onTapGesture {}
+                }
             }
+            .overlay {
+                HStack {
+                    Spacer()
+                    ZStack {
+                        BlurView(style: .systemThickMaterial)
+                            .frame(width: 100, height: 160)
+
+                        VStack(spacing: 20) {
+                            VStack {
+                                Text("背景を確認").font(.footnote).offset(x: 15)
+                                Toggle("", isOn: $inputTab.checkBackgroundEffect)
+                            }
+                            VStack {
+                                Text("ダークモード").font(.footnote).offset(x: 15)
+                                Toggle("", isOn: $homeFontColorState)
+                            }
+                        }
+                        .frame(width: 80)
+                        .padding(.trailing, 25)
+                    }
+                }
+                .offset(x: 150)
+            }
+            .padding(.top, 50)
+
+            Spacer()
+                .frame(height: 50)
         } // VStack
     } // body
 } // View
