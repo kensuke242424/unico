@@ -342,7 +342,7 @@ struct NewTabView: View {
             let tabWidth = size.width / 3
             HStack {
                 ForEach(Tab.allCases, id: \.rawValue) { tab in
-                    Text(tab.rawValue)
+                    Text(tab == .home && inputTab.showSelectBackground ? "背景変更中" : tab.rawValue)
                         .font(.title3)
                         .fontWeight(.semibold)
                         .tracking(4)
