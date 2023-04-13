@@ -459,73 +459,63 @@ struct SelectBackgroundView: View {
             Spacer()
 
             if showContents {
-                Text("背景を選択してください")
-                    .foregroundColor(.white)
-                    .tracking(5)
-                    .opacity(inputTab.checkBackgroundAnimation ? 0 : 0.8)
-                    .padding(.bottom, 30)
+                VStack(spacing: 15) {
+                    Text("背景を選択してください")
+                        .tracking(5)
+                        .foregroundColor(.white)
+                        .opacity(inputTab.checkBackgroundAnimation ? 0 : 0.8)
+
+                    Text("チーム: \(teamVM.team?.name ?? "No Name")")
+                        .tracking(3)
+                        .font(.caption)
+                        .foregroundColor(.white)
+                        .opacity(inputTab.checkBackgroundAnimation ? 0 : 0.6)
+                }
+                .padding(.bottom, 5)
+
 
                 ScrollBackgroundImages()
                     .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
                     .opacity(inputTab.checkBackgroundAnimation ? 0 : 1)
 
-                HStack {
-
-                    VStack(spacing: 40) {
-                        Button("保存") {
-                            withAnimation(.easeIn(duration: 0.15)) { showProgress = true }
-                            // 新しい背景が選択されていた場合、更新処理を実行する
-                            Task {
-                                do {
-                                    var updateBackgroundImage: UIImage?
-                                    if inputTab.selectBackground == .original {
-                                        updateBackgroundImage = inputTab.captureBackgroundImage
-                                    } else {
-                                        updateBackgroundImage = UIImage(named: inputTab.selectBackground.imageName)
-                                    }
-                                    if let updateBackgroundImage {
-                                        let defaultImagePath = teamVM.team?.backgroundPath
-                                        let resizedImage = teamVM.resizeUIImage(image: updateBackgroundImage,
-                                                                                width: getRect().width * 4)
-                                        let uploadImageData = await teamVM.uploadTeamImage(resizedImage)
-                                        let _ = try await teamVM.updateTeamBackgroundImage(data: uploadImageData)
-                                        // 新規背景画像の保存が完了したら、以前の背景データを削除
-                                        let _ = await teamVM.deleteTeamImageData(path: defaultImagePath)
-                                    }
-                                    withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                                        showContents = false
-                                        showProgress = false
-                                    }
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                        withAnimation(.spring(response: 0.5, blendDuration: 1)) {
-                                            inputTab.captureBackgroundImage = nil
-                                            inputTab.selectBackground = .original
-                                            inputTab.showSelectBackground = false
-                                        }
-                                    }
-                                } catch {
-                                    withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                                        showContents = false
-                                        showProgress = false
-                                    }
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                        withAnimation(.spring(response: 0.5, blendDuration: 1)) {
-                                            inputTab.captureBackgroundImage = nil
-                                            inputTab.selectBackground = .original
-                                            inputTab.showSelectBackground = false
-                                        }
-                                    }
+                VStack(spacing: 40) {
+                    Button("保存") {
+                        withAnimation(.easeIn(duration: 0.15)) { showProgress = true }
+                        // 新しい背景が選択されていた場合、更新処理を実行する
+                        Task {
+                            do {
+                                var updateBackgroundImage: UIImage?
+                                if inputTab.selectBackground == .original {
+                                    updateBackgroundImage = inputTab.captureBackgroundImage
+                                } else {
+                                    updateBackgroundImage = UIImage(named: inputTab.selectBackground.imageName)
                                 }
-                            }
-                        }
-                        .buttonStyle(.borderedProminent)
-                        Label("キャンセル", systemImage: "xmark.circle.fill")
-                            .foregroundColor(.white)
-                            .onTapGesture {
+                                if let updateBackgroundImage {
+                                    let defaultImagePath = teamVM.team?.backgroundPath
+                                    let resizedImage = teamVM.resizeUIImage(image: updateBackgroundImage,
+                                                                            width: getRect().width * 4)
+                                    let uploadImageData = await teamVM.uploadTeamImage(resizedImage)
+                                    let _ = try await teamVM.updateTeamBackgroundImage(data: uploadImageData)
+                                    // 新規背景画像の保存が完了したら、以前の背景データを削除
+                                    let _ = await teamVM.deleteTeamImageData(path: defaultImagePath)
+                                }
                                 withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                                    showContents.toggle()
+                                    showContents = false
+                                    showProgress = false
                                 }
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                    withAnimation(.spring(response: 0.5, blendDuration: 1)) {
+                                        inputTab.captureBackgroundImage = nil
+                                        inputTab.selectBackground = .original
+                                        inputTab.showSelectBackground = false
+                                    }
+                                }
+                            } catch {
+                                withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+                                    showContents = false
+                                    showProgress = false
+                                }
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                                     withAnimation(.spring(response: 0.5, blendDuration: 1)) {
                                         inputTab.captureBackgroundImage = nil
                                         inputTab.selectBackground = .original
@@ -533,9 +523,25 @@ struct SelectBackgroundView: View {
                                     }
                                 }
                             }
+                        }
                     }
-                    .opacity(inputTab.checkBackgroundAnimation ? 0 : 1)
+                    .buttonStyle(.borderedProminent)
+                    Label("キャンセル", systemImage: "xmark.circle.fill")
+                        .foregroundColor(.white)
+                        .onTapGesture {
+                            withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+                                showContents.toggle()
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                                withAnimation(.spring(response: 0.5, blendDuration: 1)) {
+                                    inputTab.captureBackgroundImage = nil
+                                    inputTab.selectBackground = .original
+                                    inputTab.showSelectBackground = false
+                                }
+                            }
+                        }
                 }
+                .opacity(inputTab.checkBackgroundAnimation ? 0 : 1)
                 .overlay {
                     CustomizeToggleButtons()
                         .offset(x: getRect().width / 3)

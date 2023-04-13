@@ -561,7 +561,9 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                                                                           id: createTeamID)
                         
                         /// ユーザーの入力値をもとにユーザーデータを作成し、Firestoreに保存⬇︎
-                        if inputLogIn.createUserNameText == "" { inputLogIn.createUserNameText = "名無し" }
+                        if inputLogIn.createUserNameText == "" {
+                            inputLogIn.createUserNameText = "名無し"
+                        }
                         
                         try await logInVM.setNewUserDocument(name     : inputLogIn.createUserNameText,
                                                                 password : inputLogIn.password,
