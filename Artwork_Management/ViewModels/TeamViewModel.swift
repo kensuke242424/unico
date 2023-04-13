@@ -190,7 +190,7 @@ class TeamViewModel: ObservableObject {
         }
     }
 
-    func updateTeamHeaderImage(data: (url: URL?, filePath: String?)) async throws {
+    func updateTeamBackgroundImage(data: (url: URL?, filePath: String?)) async throws {
 
         guard var team else { throw CustomError.teamEmpty }
         guard let teamRef = db?.collection("teams").document(team.id) else { throw CustomError.getDocument }

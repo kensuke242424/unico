@@ -112,6 +112,7 @@ struct NewTabView: View {
                 .background {
                     ZStack {
                         GeometryReader { proxy in
+                            // ーーー　背景編集モード時　ーーー
                             if inputTab.showSelectBackground {
                                 if inputTab.selectBackground == .original {
                                     if let captureNewImage = inputTab.captureBackgroundImage {
@@ -125,6 +126,7 @@ struct NewTabView: View {
                                         SDWebImageView(imageURL : teamVM.team?.backgroundURL,
                                                        width : proxy.size.width,
                                                        height: proxy.size.height)
+                                        .blur(radius: inputTab.checkBackgroundAnimation ? 0 : 3, opaque: true)
                                     }
 
                                 } else {
@@ -135,7 +137,7 @@ struct NewTabView: View {
                                         .blur(radius: inputTab.checkBackgroundAnimation ? 0 : 3, opaque: true)
                                         .ignoresSafeArea()
                                 }
-
+                            // ーーー　通常時　ーーー
                             } else {
                                 SDWebImageView(imageURL : teamVM.team?.backgroundURL,
                                                width : proxy.size.width,
@@ -151,6 +153,8 @@ struct NewTabView: View {
                     if inputTab.showSelectBackground {
 
                         Color.black
+                            .blur(radius: inputTab.checkBackgroundAnimation ||
+                                          !inputTab.showSelectBackground ? 0 : 2)
                             .opacity(inputTab.checkBackgroundAnimation ? 0.001 : 0.5)
                             .ignoresSafeArea()
                         SelectBackgroundView(inputTab: $inputTab,
@@ -567,8 +571,7 @@ struct SelectBackgroundView: View {
             }
             .padding(.top, 50)
 
-            Spacer()
-                .frame(height: 50)
+            Spacer().frame(height: 50)
         } // VStack
     } // body
 } // View
