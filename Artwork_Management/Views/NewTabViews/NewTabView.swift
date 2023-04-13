@@ -159,8 +159,10 @@ struct NewTabView: View {
                                           !inputTab.showSelectBackground ? 0 : 2)
                             .opacity(inputTab.checkBackgroundAnimation ? 0.1 : 0.5)
                             .ignoresSafeArea()
-                        SelectBackgroundView(inputTab: $inputTab,
-                                             teamBackgroundURL: teamVM.team?.backgroundURL)
+                            .onTapGesture(perform: {
+                                // FIXME: これを入れておかないと下層のViewにタップが貫通してしまう🤔
+                            })
+                        SelectBackgroundView(inputTab: $inputTab)
                     }
                 }
                 /// サイドメニューView
@@ -200,7 +202,7 @@ struct NewTabView: View {
                     }
                 }
                 .ignoresSafeArea()
-                
+
                 /// NavigationStackによる遷移を管理します
                 .navigationDestination(for: EditItemPath.self) { itemPath in
                     switch itemPath {
@@ -346,7 +348,7 @@ struct NewTabView: View {
                 inputTab.showCommerce = .hidden
             }
         }
-        
+
     } // body
     @ViewBuilder
     func TabTopBarView() -> some View {
@@ -361,7 +363,7 @@ struct NewTabView: View {
                         .tracking(4)
                         .scaleEffect(inputTab.animationTab == tab ? 1.0 : 0.5)
                         .foregroundColor(homeTextColorMode ? .white : .black)
-//                        .foregroundColor(inputTab.animationTab == tab ? .primary : .gray)
+                        .opacity(inputTab.animationTab == tab ? 1 : 0.2)
                         .frame(width: tabWidth)
                         .contentShape(Rectangle())
                         .padding(.top, 60)
@@ -444,7 +446,6 @@ struct SelectBackgroundView: View {
 
     @EnvironmentObject var teamVM: TeamViewModel
     @Binding var inputTab: InputTab
-    let teamBackgroundURL: URL?
 
     @State private var showProgress: Bool = false
 
@@ -473,7 +474,7 @@ struct SelectBackgroundView: View {
                                             .scaledToFill()
                                             .frame(width: 120, height: 250)
                                     } else {
-                                        SDWebImageView(imageURL: teamBackgroundURL,
+                                        SDWebImageView(imageURL: teamVM.team?.backgroundURL,
                                                        width: 120,
                                                        height: 250)
                                     }
@@ -521,25 +522,33 @@ struct SelectBackgroundView: View {
 
                 VStack(spacing: 40) {
                     Button("保存") {
-                        // チーム背景の更新処理
-                        // captureImageに新しい画像があれば、元の画像データを更新
+                        // 新しい背景が選択されていた場合、更新処理を実行する
                         Task {
-                            if inputTab.selectBackground != .original {
-                                inputTab.captureBackgroundImage = UIImage(named: inputTab.selectBackground.imageName)
-                            }
-                            if let captureBackgroundImage = inputTab.captureBackgroundImage {
-                                withAnimation(.easeIn(duration: 0.1)) { showProgress = true }
-                                let defaultImagePath = teamVM.team?.backgroundPath
-                                let resizedImage = teamVM.resizeUIImage(image: captureBackgroundImage,
-                                                                        width: getRect().width * 4)
-                                let uploadImageData = await teamVM.uploadTeamImage(resizedImage)
-                                let _ = try await teamVM.updateTeamBackgroundImage(data: uploadImageData)
-                                // 新規背景画像の保存が完了したら、以前の背景データを削除
-                                let _ = await teamVM.deleteTeamImageData(path: defaultImagePath)
+                            do {
+                                if inputTab.selectBackground != .original {
+                                    inputTab.captureBackgroundImage = UIImage(named: inputTab.selectBackground.imageName)
+                                }
+                                if let captureBackgroundImage = inputTab.captureBackgroundImage {
+                                    withAnimation(.easeIn(duration: 0.1)) { showProgress = true }
+                                    let defaultImagePath = teamVM.team?.backgroundPath
+                                    let resizedImage = teamVM.resizeUIImage(image: captureBackgroundImage,
+                                                                            width: getRect().width * 4)
+                                    let uploadImageData = await teamVM.uploadTeamImage(resizedImage)
+                                    let _ = try await teamVM.updateTeamBackgroundImage(data: uploadImageData)
+                                    // 新規背景画像の保存が完了したら、以前の背景データを削除
+                                    let _ = await teamVM.deleteTeamImageData(path: defaultImagePath)
+                                }
                                 withAnimation(.easeIn(duration: 0.1)) { showProgress = false }
-                            }
-                            withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                                inputTab.showSelectBackground = false
+                                withAnimation(.spring(response: 0.3, blendDuration: 1).delay(0.2)) {
+                                    inputTab.captureBackgroundImage = nil
+                                    inputTab.showSelectBackground = false
+                                }
+                            } catch {
+                                withAnimation(.easeIn(duration: 0.1)) { showProgress = false }
+                                withAnimation(.spring(response: 0.3, blendDuration: 1).delay(0.2)) {
+                                    inputTab.captureBackgroundImage = nil
+                                    inputTab.showSelectBackground = false
+                                }
                             }
                         }
                     }
