@@ -269,7 +269,7 @@ struct SystemSideMenu: View {
                                         Label("チームを変更", systemImage: "repeat")
                                             .onTapGesture { inputSideMenu.showChangeTeamSheet.toggle() }
 
-                                        Label("背景の変更", systemImage: "person.wave.2.fill")
+                                        Label("背景の変更", systemImage: "photo.artframe")
                                             .onTapGesture {
                                                 withAnimation(.spring(response: 0.4, blendDuration: 1)) {
                                                     inputTab.showSideMenu = false

@@ -541,12 +541,14 @@ struct SelectBackgroundView: View {
                                 withAnimation(.easeIn(duration: 0.1)) { showProgress = false }
                                 withAnimation(.spring(response: 0.3, blendDuration: 1).delay(0.2)) {
                                     inputTab.captureBackgroundImage = nil
+                                    inputTab.selectBackground = .original
                                     inputTab.showSelectBackground = false
                                 }
                             } catch {
                                 withAnimation(.easeIn(duration: 0.1)) { showProgress = false }
                                 withAnimation(.spring(response: 0.3, blendDuration: 1).delay(0.2)) {
                                     inputTab.captureBackgroundImage = nil
+                                    inputTab.selectBackground = .original
                                     inputTab.showSelectBackground = false
                                 }
                             }
