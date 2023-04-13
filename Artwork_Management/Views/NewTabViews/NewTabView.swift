@@ -113,14 +113,20 @@ struct NewTabView: View {
                     ZStack {
                         GeometryReader { proxy in
                             if inputTab.showSelectBackground {
-
                                 if inputTab.selectBackground == .original {
-                                    Image(uiImage: inputTab.captureBackgroundImage ?? UIImage())
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(width: proxy.size.width, height: proxy.size.height)
-                                        .blur(radius: inputTab.checkBackgroundAnimation ? 0 : 3, opaque: true)
-                                        .ignoresSafeArea()
+                                    if let captureNewImage = inputTab.captureBackgroundImage {
+                                        Image(uiImage: captureNewImage)
+                                            .resizable()
+                                            .scaledToFill()
+                                            .frame(width: proxy.size.width, height: proxy.size.height)
+                                            .blur(radius: inputTab.checkBackgroundAnimation ? 0 : 3, opaque: true)
+                                            .ignoresSafeArea()
+                                    } else {
+                                        SDWebImageView(imageURL : teamVM.team?.backgroundURL,
+                                                       width : proxy.size.width,
+                                                       height: proxy.size.height)
+                                    }
+
                                 } else {
                                     Image(inputTab.selectBackground.imageName)
                                         .resizable()
@@ -147,7 +153,8 @@ struct NewTabView: View {
                         Color.black
                             .opacity(inputTab.checkBackgroundAnimation ? 0.001 : 0.5)
                             .ignoresSafeArea()
-                        SelectBackgroundView(inputTab: $inputTab)
+                        SelectBackgroundView(inputTab: $inputTab,
+                                             teamBackgroundURL: teamVM.team?.backgroundURL)
                     }
                 }
                 /// サイドメニューView
@@ -429,6 +436,7 @@ struct NewTabView: View {
 struct SelectBackgroundView: View {
 
     @Binding var inputTab: InputTab
+    let teamBackgroundURL: URL?
 
     @AppStorage("darkModeState") var darkModeState: Bool = false
 
@@ -448,24 +456,32 @@ struct SelectBackgroundView: View {
                     ForEach(SelectBackground.allCases, id: \.self) { value in
                         Group {
                             if value == .original {
-                                Image(uiImage: inputTab.captureBackgroundImage ?? UIImage())
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 120, height: 250)
-                                    .border(.blue, width: 1)
-                                    .overlay {
-                                        Button("写真を挿入") {
-                                            inputTab.showPickerView.toggle()
-                                        }
-                                        .buttonStyle(.borderedProminent)
+                                Group {
+                                    if let captureNewImage = inputTab.captureBackgroundImage {
+                                        Image(uiImage: captureNewImage)
+                                            .resizable()
+                                            .scaledToFill()
+                                            .frame(width: 120, height: 250)
+                                    } else {
+                                        SDWebImageView(imageURL: teamBackgroundURL,
+                                                       width: 120,
+                                                       height: 250)
                                     }
+                                }
+                                .overlay {
+                                    Button("写真を挿入") {
+                                        inputTab.showPickerView.toggle()
+                                    }
+                                    .font(.footnote)
+                                    .buttonStyle(.borderedProminent)
+                                }
                             } else {
                                 Image(value.imageName)
                                     .resizable()
                                     .scaledToFill()
                                     .frame(width: 120, height: 250)
                             }
-                        }
+                        } // Group
                         .clipped()
                         .scaleEffect(inputTab.selectBackground == value ? 1.2 : 1.0)
                         .overlay(alignment: .topTrailing) {
