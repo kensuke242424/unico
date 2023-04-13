@@ -557,8 +557,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         
                         /// リサイズ処理した画像をFirestorageに保存
                         let uplaodIconImageData       = await userVM.uploadUserImage(resizedIconImage)
-                        let uplaodBackgroundImageData = await teamVM.uploadTeamImage(resizedBackgroundImage,
-                                                                                     teamID: createTeamID)
+                        let uplaodBackgroundImageData = await teamVM.firstUploadTeamImage(resizedBackgroundImage,
+                                                                                          id: createTeamID)
                         
                         /// ユーザーの入力値をもとにユーザーデータを作成し、Firestoreに保存⬇︎
                         if inputLogIn.createUserNameText == "" { inputLogIn.createUserNameText = "名無し" }

@@ -148,10 +148,8 @@ struct UpdateTeamOrUserDataView: View {
                                 inputUpdate.savingWait.toggle()
                             }
                             
-                            guard let teamID = teamVM.team?.id else { return }
-                            
                             if let updateIconImage = inputUpdate.captureImage {
-                                let uploadIconData = await teamVM.uploadTeamImage(updateIconImage, teamID: teamID)
+                                let uploadIconData = await teamVM.uploadTeamImage(updateIconImage)
                                 let updateTeamData = JoinTeam(teamID : team.id,
                                                               name   : inputUpdate.nameText,
                                                               iconURL: uploadIconData.url)

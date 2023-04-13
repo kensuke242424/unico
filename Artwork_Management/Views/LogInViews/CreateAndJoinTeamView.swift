@@ -374,10 +374,10 @@ struct CreateAndJoinTeamView: View {
                         print("resizedBackgroundImage: \(resizedBackgroundImage)")
                         
                         /// リサイズ処理した画像をFirestorageに保存
-                        let uplaodIconImageData       = await teamVM.uploadTeamImage(resizedIconImage,
-                                                                                     teamID: createTeamID)
-                        let uplaodBackgroundImageData = await teamVM.uploadTeamImage(resizedBackgroundImage,
-                                                                                     teamID: createTeamID)
+                        let uplaodIconImageData       = await teamVM.firstUploadTeamImage(resizedIconImage,
+                                                                                          id: createTeamID)
+                        let uplaodBackgroundImageData = await teamVM.firstUploadTeamImage(resizedBackgroundImage,
+                                                                                          id: createTeamID)
                         
                         // チームデータに格納するログインユーザのユーザデータ
                         let joinMember = JoinMember(memberUID: user.id,

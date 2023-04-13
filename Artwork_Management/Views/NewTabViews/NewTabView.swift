@@ -155,7 +155,7 @@ struct NewTabView: View {
                         Color.black
                             .blur(radius: inputTab.checkBackgroundAnimation ||
                                           !inputTab.showSelectBackground ? 0 : 2)
-                            .opacity(inputTab.checkBackgroundAnimation ? 0.001 : 0.5)
+                            .opacity(inputTab.checkBackgroundAnimation ? 0.1 : 0.5)
                             .ignoresSafeArea()
                         SelectBackgroundView(inputTab: $inputTab,
                                              teamBackgroundURL: teamVM.team?.backgroundURL)
@@ -191,7 +191,7 @@ struct NewTabView: View {
                             .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
                     }
                 }
-                // お試しアカウントが本登録を行うView
+                // お試しアカウントユーザーに本登録のインフォメーションを表示するView
                 .overlay {
                     if inputTab.showEntryAccount {
                         UserEntryRecommendationView(isShow: $inputTab.showEntryAccount)
@@ -439,8 +439,11 @@ struct NewTabView: View {
 
 struct SelectBackgroundView: View {
 
+    @EnvironmentObject var teamVM: TeamViewModel
     @Binding var inputTab: InputTab
     let teamBackgroundURL: URL?
+
+    @State private var showProgress: Bool = false
 
     @AppStorage("darkModeState") var darkModeState: Bool = false
 
@@ -514,9 +517,24 @@ struct SelectBackgroundView: View {
             HStack {
 
                 VStack(spacing: 40) {
-                    Button("決定") {
+                    Button("保存") {
                         // チーム背景の更新処理
+                        // captureImageに新しい画像があれば、元の画像データを更新
                         Task {
+                            if inputTab.selectBackground != .original {
+                                inputTab.captureBackgroundImage = UIImage(named: inputTab.selectBackground.imageName)
+                            }
+                            if let captureBackgroundImage = inputTab.captureBackgroundImage {
+                                withAnimation(.easeIn(duration: 0.1)) { showProgress = true }
+                                let defaultImagePath = teamVM.team?.backgroundPath
+                                let resizedImage = teamVM.resizeUIImage(image: captureBackgroundImage,
+                                                                        width: getRect().width * 4)
+                                let uploadImageData = await teamVM.uploadTeamImage(resizedImage)
+                                let _ = try await teamVM.updateTeamBackgroundImage(data: uploadImageData)
+                                // 新規背景画像の保存が完了したら、以前の背景データを削除
+                                let _ = await teamVM.deleteTeamImageData(path: defaultImagePath)
+                                withAnimation(.easeIn(duration: 0.1)) { showProgress = false }
+                            }
                             withAnimation(.spring(response: 0.3, blendDuration: 1)) {
                                 inputTab.showSelectBackground = false
                             }
@@ -573,6 +591,12 @@ struct SelectBackgroundView: View {
 
             Spacer().frame(height: 50)
         } // VStack
+        .overlay {
+            if showProgress {
+                SavingProgressView()
+                    .transition(AnyTransition.opacity.combined(with: .offset(y: 20)))
+            }
+        }
     } // body
 } // View
 
