@@ -162,6 +162,7 @@ struct NewTabView: View {
                             .onTapGesture(perform: {
                                 // FIXME: これを入れておかないと下層のViewにタップが貫通してしまう🤔
                             })
+
                         SelectBackgroundView(inputTab: $inputTab)
                     }
                 }
@@ -447,171 +448,213 @@ struct SelectBackgroundView: View {
     @EnvironmentObject var teamVM: TeamViewModel
     @Binding var inputTab: InputTab
 
+    @State private var showContents: Bool = false
     @State private var showProgress: Bool = false
 
     @AppStorage("homeTextColorMode") var homeTextColorMode: Bool = false
 
     var body: some View {
-        VStack(spacing: 30) {
 
+        VStack(spacing: 30) {
             Spacer()
 
-            Text("背景を選択してください")
-                .foregroundColor(.white)
-                .tracking(5)
-                .opacity(inputTab.checkBackgroundAnimation ? 0 : 0.8)
-                .padding(.bottom, 30)
+            if showContents {
+                Text("背景を選択してください")
+                    .foregroundColor(.white)
+                    .tracking(5)
+                    .opacity(inputTab.checkBackgroundAnimation ? 0 : 0.8)
+                    .padding(.bottom, 30)
 
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 30) {
-                    ForEach(SelectBackground.allCases, id: \.self) { value in
-                        Group {
-                            if value == .original {
-                                Group {
-                                    if let captureNewImage = inputTab.captureBackgroundImage {
-                                        Image(uiImage: captureNewImage)
-                                            .resizable()
-                                            .scaledToFill()
-                                            .frame(width: 120, height: 250)
-                                    } else {
-                                        SDWebImageView(imageURL: teamVM.team?.backgroundURL,
-                                                       width: 120,
-                                                       height: 250)
-                                    }
-                                }
-                                .overlay {
-                                    Button("写真を挿入") {
-                                        inputTab.showPickerView.toggle()
-                                    }
-                                    .font(.footnote)
-                                    .buttonStyle(.borderedProminent)
-                                }
-                            } else {
-                                Image(value.imageName)
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 120, height: 250)
-                            }
-                        } // Group
-                        .clipped()
-                        .scaleEffect(inputTab.selectBackground == value ? 1.2 : 1.0)
-                        .overlay(alignment: .topTrailing) {
-                            Image(systemName: "checkmark.seal.fill")
-                                .resizable()
-                                .scaledToFit()
-                                .foregroundColor(.green)
-                                .frame(width: 30, height: 30)
-                                .scaleEffect(inputTab.selectBackground == value ? 1.0 : 1.2)
-                                .opacity(inputTab.selectBackground == value ? 1.0 : 0.0)
-                                .offset(x: 20, y: -30)
-                        }
-                        .padding(.leading, value == .original ? 40 : 0)
-                        .padding(.trailing, value == .sample4 ? 40 : 0)
-                        .onTapGesture {
-                            withAnimation(.spring(response: 0.5)) {
-                                inputTab.selectBackground = value
-                            }
-                        }
-                    }
-                }
-                .frame(height: 310)
-            } // ScrollView
-            .opacity(inputTab.checkBackgroundAnimation ? 0 : 1)
+                ScrollBackgroundImages()
+                    .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
+                    .opacity(inputTab.checkBackgroundAnimation ? 0 : 1)
 
-            HStack {
-
-                VStack(spacing: 40) {
-                    Button("保存") {
-                        // 新しい背景が選択されていた場合、更新処理を実行する
-                        Task {
-                            do {
-                                if inputTab.selectBackground != .original {
-                                    inputTab.captureBackgroundImage = UIImage(named: inputTab.selectBackground.imageName)
-                                }
-                                if let captureBackgroundImage = inputTab.captureBackgroundImage {
-                                    withAnimation(.easeIn(duration: 0.1)) { showProgress = true }
-                                    let defaultImagePath = teamVM.team?.backgroundPath
-                                    let resizedImage = teamVM.resizeUIImage(image: captureBackgroundImage,
-                                                                            width: getRect().width * 4)
-                                    let uploadImageData = await teamVM.uploadTeamImage(resizedImage)
-                                    let _ = try await teamVM.updateTeamBackgroundImage(data: uploadImageData)
-                                    // 新規背景画像の保存が完了したら、以前の背景データを削除
-                                    let _ = await teamVM.deleteTeamImageData(path: defaultImagePath)
-                                }
-                                withAnimation(.easeIn(duration: 0.1)) { showProgress = false }
-                                withAnimation(.spring(response: 0.3, blendDuration: 1).delay(0.2)) {
-                                    inputTab.captureBackgroundImage = nil
-                                    inputTab.selectBackground = .original
-                                    inputTab.showSelectBackground = false
-                                }
-                            } catch {
-                                withAnimation(.easeIn(duration: 0.1)) { showProgress = false }
-                                withAnimation(.spring(response: 0.3, blendDuration: 1).delay(0.2)) {
-                                    inputTab.captureBackgroundImage = nil
-                                    inputTab.selectBackground = .original
-                                    inputTab.showSelectBackground = false
-                                }
-                            }
-                        }
-                    }
-                    .buttonStyle(.borderedProminent)
-                    Label("キャンセル", systemImage: "xmark.circle.fill")
-                        .foregroundColor(.white)
-                        .onTapGesture {
-                            withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                                inputTab.showSelectBackground = false
-                            }
-                        }
-                }
-                .opacity(inputTab.checkBackgroundAnimation ? 0 : 1)
-            }
-            .overlay {
                 HStack {
-                    Spacer()
-                    ZStack {
-                        BlurView(style: .systemThickMaterial)
-                            .frame(width: 90, height: 160)
-                            .clipShape(RoundedRectangle(cornerRadius: 15))
-                            .opacity(0.8)
 
-                        VStack(spacing: 20) {
-                            VStack {
-                                Text("背景を確認").font(.footnote).offset(x: 15)
-                                Toggle("", isOn: $inputTab.checkBackgroundToggle)
-                            }
-                            VStack {
-                                Text("文字色を反転").font(.footnote).offset(x: 15)
-                                Toggle("", isOn: $homeTextColorMode)
+                    VStack(spacing: 40) {
+                        Button("保存") {
+                            withAnimation(.easeIn(duration: 0.15)) { showProgress = true }
+                            // 新しい背景が選択されていた場合、更新処理を実行する
+                            Task {
+                                do {
+                                    var updateBackgroundImage: UIImage?
+                                    if inputTab.selectBackground == .original {
+                                        updateBackgroundImage = inputTab.captureBackgroundImage
+                                    } else {
+                                        updateBackgroundImage = UIImage(named: inputTab.selectBackground.imageName)
+                                    }
+                                    if let updateBackgroundImage {
+                                        let defaultImagePath = teamVM.team?.backgroundPath
+                                        let resizedImage = teamVM.resizeUIImage(image: updateBackgroundImage,
+                                                                                width: getRect().width * 4)
+                                        let uploadImageData = await teamVM.uploadTeamImage(resizedImage)
+                                        let _ = try await teamVM.updateTeamBackgroundImage(data: uploadImageData)
+                                        // 新規背景画像の保存が完了したら、以前の背景データを削除
+                                        let _ = await teamVM.deleteTeamImageData(path: defaultImagePath)
+                                    }
+                                    withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+                                        showContents = false
+                                        showProgress = false
+                                    }
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                        withAnimation(.spring(response: 0.5, blendDuration: 1)) {
+                                            inputTab.captureBackgroundImage = nil
+                                            inputTab.selectBackground = .original
+                                            inputTab.showSelectBackground = false
+                                        }
+                                    }
+                                } catch {
+                                    withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+                                        showContents = false
+                                        showProgress = false
+                                    }
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                        withAnimation(.spring(response: 0.5, blendDuration: 1)) {
+                                            inputTab.captureBackgroundImage = nil
+                                            inputTab.selectBackground = .original
+                                            inputTab.showSelectBackground = false
+                                        }
+                                    }
+                                }
                             }
                         }
-                        .frame(width: 80)
-                        .padding(.trailing, 30)
-                        .onChange(of: inputTab.checkBackgroundToggle) { newValue in
-                            if newValue {
+                        .buttonStyle(.borderedProminent)
+                        Label("キャンセル", systemImage: "xmark.circle.fill")
+                            .foregroundColor(.white)
+                            .onTapGesture {
                                 withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                                    inputTab.checkBackgroundAnimation = true
+                                    showContents.toggle()
                                 }
-                            } else {
-                                withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                                    inputTab.checkBackgroundAnimation = false
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                                    withAnimation(.spring(response: 0.5, blendDuration: 1)) {
+                                        inputTab.captureBackgroundImage = nil
+                                        inputTab.selectBackground = .original
+                                        inputTab.showSelectBackground = false
+                                    }
                                 }
                             }
-                        }
                     }
+                    .opacity(inputTab.checkBackgroundAnimation ? 0 : 1)
                 }
-                .offset(x: getRect().width / 3)
-            }
-            .padding(.top, 50)
+                .overlay {
+                    CustomizeToggleButtons()
+                        .offset(x: getRect().width / 3)
+                }
+                .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
+                .padding(.top, 50)
+            } // if showContents
 
             Spacer().frame(height: 50)
         } // VStack
         .overlay {
             if showProgress {
                 SavingProgressView()
-                    .transition(AnyTransition.opacity.combined(with: .offset(y: 20)))
+                    .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
+            }
+        }
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                withAnimation(.spring(response: 1, blendDuration: 1)) {
+                    showContents.toggle()
+                }
             }
         }
     } // body
+
+    @ViewBuilder
+    func ScrollBackgroundImages() -> some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 30) {
+                ForEach(SelectBackground.allCases, id: \.self) { value in
+                    Group {
+                        if value == .original {
+                            Group {
+                                if let captureNewImage = inputTab.captureBackgroundImage {
+                                    Image(uiImage: captureNewImage)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 120, height: 250)
+                                } else {
+                                    SDWebImageView(imageURL: teamVM.team?.backgroundURL,
+                                                   width: 120,
+                                                   height: 250)
+                                }
+                            }
+                            .overlay {
+                                Button("写真を挿入") {
+                                    inputTab.showPickerView.toggle()
+                                }
+                                .font(.footnote)
+                                .buttonStyle(.borderedProminent)
+                            }
+                        } else {
+                            Image(value.imageName)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 120, height: 250)
+                        }
+                    } // Group
+                    .clipped()
+                    .scaleEffect(inputTab.selectBackground == value ? 1.15 : 1.0)
+                    .overlay(alignment: .topTrailing) {
+                        Image(systemName: "checkmark.seal.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .foregroundColor(.green)
+                            .frame(width: 30, height: 30)
+                            .scaleEffect(inputTab.selectBackground == value ? 1.0 : 1.15)
+                            .opacity(inputTab.selectBackground == value ? 1.0 : 0.0)
+                            .offset(x: 15, y: -20)
+                    }
+                    .padding(.leading, value == .original ? 40 : 0)
+                    .padding(.trailing, value == .sample4 ? 40 : 0)
+                    .onTapGesture {
+                        withAnimation(.spring(response: 0.5)) {
+                            inputTab.selectBackground = value
+                        }
+                    }
+                }
+            }
+            .frame(height: 300)
+        } // ScrollView
+    }
+
+    @ViewBuilder
+    func CustomizeToggleButtons() -> some View {
+        HStack {
+            Spacer()
+            ZStack {
+                BlurView(style: .systemThickMaterial)
+                    .frame(width: 90, height: 160)
+                    .clipShape(RoundedRectangle(cornerRadius: 15))
+                    .opacity(0.8)
+
+                VStack(spacing: 20) {
+                    VStack {
+                        Text("背景を確認").font(.footnote).offset(x: 15)
+                        Toggle("", isOn: $inputTab.checkBackgroundToggle)
+                    }
+                    VStack {
+                        Text("文字色を反転").font(.footnote).offset(x: 15)
+                        Toggle("", isOn: $homeTextColorMode)
+                    }
+                }
+                .frame(width: 80)
+                .padding(.trailing, 30)
+                .onChange(of: inputTab.checkBackgroundToggle) { newValue in
+                    if newValue {
+                        withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+                            inputTab.checkBackgroundAnimation = true
+                        }
+                    } else {
+                        withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+                            inputTab.checkBackgroundAnimation = false
+                        }
+                    }
+                }
+            }
+        }
+    }
 } // View
 
 struct NewTabView_Previews: PreviewProvider {
