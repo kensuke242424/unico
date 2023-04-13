@@ -253,10 +253,9 @@ struct NewEditItemView: View {
         .background {
             GeometryReader {
                 let size = $0.size
-                Image("background_2")
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: size.width, height: size.height)
+                SDWebImageView(imageURL : teamVM.team?.backgroundURL,
+                               width : size.width,
+                               height: size.height)
                     .opacity(0.1)
                     .onTapGesture { focused = nil }
             }
