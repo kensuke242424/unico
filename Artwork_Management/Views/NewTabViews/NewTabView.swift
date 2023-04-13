@@ -54,6 +54,8 @@ struct NewTabView: View {
     /// View Propertys
     @State private var inputTab = InputTab()
 
+    @AppStorage("homeTextColorMode") var homeTextColorMode: Bool = false
+
     var body: some View {
 
         GeometryReader {
@@ -358,7 +360,8 @@ struct NewTabView: View {
                         .fontWeight(.semibold)
                         .tracking(4)
                         .scaleEffect(inputTab.animationTab == tab ? 1.0 : 0.5)
-                        .foregroundColor(inputTab.animationTab == tab ? .primary : .gray)
+                        .foregroundColor(homeTextColorMode ? .white : .black)
+//                        .foregroundColor(inputTab.animationTab == tab ? .primary : .gray)
                         .frame(width: tabWidth)
                         .contentShape(Rectangle())
                         .padding(.top, 60)
@@ -445,7 +448,7 @@ struct SelectBackgroundView: View {
 
     @State private var showProgress: Bool = false
 
-    @AppStorage("darkModeState") var darkModeState: Bool = false
+    @AppStorage("homeTextColorMode") var homeTextColorMode: Bool = false
 
     var body: some View {
         VStack(spacing: 30) {
@@ -566,8 +569,8 @@ struct SelectBackgroundView: View {
                                 Toggle("", isOn: $inputTab.checkBackgroundToggle)
                             }
                             VStack {
-                                Text("ダークモード").font(.footnote).offset(x: 15)
-                                Toggle("", isOn: $darkModeState)
+                                Text("文字色を反転").font(.footnote).offset(x: 15)
+                                Toggle("", isOn: $homeTextColorMode)
                             }
                         }
                         .frame(width: 80)

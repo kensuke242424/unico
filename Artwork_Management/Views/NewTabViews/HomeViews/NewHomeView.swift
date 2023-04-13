@@ -17,6 +17,8 @@ struct NewHomeView: View {
     
     @State private var inputTime = InputTimesView()
     @State private var animationContent: Bool = true
+
+    @AppStorage("homeTextColorMode") var homeTextColorMode: Bool = false
     
     var body: some View {
         GeometryReader {
@@ -25,6 +27,7 @@ struct NewHomeView: View {
             VStack {
                 if animationContent {
                     NowTimeView(size)
+                        .foregroundColor(homeTextColorMode ? .white : .black)
                         .opacity(1 - min((-inputTab.scrollProgress * 2), 1))
                         .blur(radius: inputTab.checkBackgroundAnimation ||
                                       !inputTab.showSelectBackground ? 0 : 2)
@@ -32,6 +35,7 @@ struct NewHomeView: View {
                 }
                 if animationContent {
                     TeamView(size)
+                        .foregroundColor(homeTextColorMode ? .white : .black)
                         .opacity(1 - min((-inputTab.scrollProgress * 2), 1))
                         .blur(radius: inputTab.checkBackgroundAnimation ||
                                       !inputTab.showSelectBackground ? 0 : 2)

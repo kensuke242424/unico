@@ -49,7 +49,7 @@ struct RootView: View {
     
     @State private var preloads: PreloadProperty = PreloadProperty()
 
-    @AppStorage("darkModeState") var darkModeState: Bool = false
+    @AppStorage("homeTextColorMode") var homeTextColorMode: Bool = false
 
     var body: some View {
 
@@ -80,7 +80,6 @@ struct RootView: View {
                 CustomLoadingView()
             }
         }
-        .preferredColorScheme(darkModeState ? .dark : .light)
         /// プリロードView
         /// 一度ロードしたViewはキャッシュが作られて初回時のView表示が軽くなる仕様を使う
         .background {
