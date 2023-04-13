@@ -15,12 +15,18 @@ struct UserEntryRecommendationView: View {
     
     var body: some View {
         
-        VStack(spacing: 60) {
+        VStack(spacing: 40) {
+
+            LogoMark()
+                .frame(height: 30)
+                .scaleEffect(0.45)
+                .opacity(0.4)
+                .padding(.bottom)
             
             // アカウント登録時の機能説明を保持するView
             VStack(alignment: .leading, spacing: 30) {
                 
-                VStack(alignment: .leading, spacing: 5) {
+                VStack(alignment: .leading) {
                     Text("アカウント登録をすると\n以下の機能が解放されます!!")
                 }
                 .font(.title2)
@@ -44,7 +50,7 @@ struct UserEntryRecommendationView: View {
                         .foregroundColor(.userBlue1)
                         .opacity(0.7)
                         .scaleEffect(1.4)
-                        .offset(x: 10)
+                        .offset(x: 15)
                 }
                 .offset(x: 20)
                 .padding(.vertical)
@@ -65,6 +71,7 @@ struct UserEntryRecommendationView: View {
                 Text(userVM.isAnonymous ? "アカウント登録を行いますか？" : "お試しアカウントで始めますか？")
                     .foregroundColor(.white)
                     .tracking(3)
+                    .padding(.top)
                 
                 HStack(spacing: 40) {
                     Button("戻る") {
@@ -118,9 +125,9 @@ struct UserEntryRecommendationView: View {
                     .opacity(0.9)
                     .ignoresSafeArea()
                 
-                LogoMark().scaleEffect(0.35).opacity(0.4)
-                    .offset(x: 0,
-                            y: -getRect().height / 2 + getSafeArea().top + 40)
+//                LogoMark().scaleEffect(0.35).opacity(0.4)
+//                    .offset(x: 0,
+//                            y: -getRect().height / 2 + getSafeArea().top + 40)
                     
             }
         }
