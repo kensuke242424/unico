@@ -36,165 +36,77 @@ struct UpdateTeamOrUserDataView: View {
 
     var body: some View {
 
-        ZStack {
-            LogoMark().scaleEffect(0.4).opacity(0.4)
-                .offset(x: getRect().width / 2 - 70,
-                        y: -getRect().height / 2 + getSafeArea().top + 40)
+        VStack(spacing: 30) {
 
-            VStack(spacing: 40) {
+            LogoMark()
+                .frame(height: 30)
+                .scaleEffect(0.45)
+                .opacity(0.4)
+                .padding(.bottom, 40)
 
-                Text(selectedUpdate == .user ? "ユーザ編集" : "チーム編集")
-                    .font(.title3.bold())
-                    .foregroundColor(.white)
-                    .opacity(0.7)
-                    .tracking(10)
-
-                VStack(spacing: 10) {
-                    if inputUpdate.savingWait {
-                        HStack(spacing: 10) {
-                            Text("保存中です...")
-                            ProgressView()
-                        }
-                    } else {
-                        Text(selectedUpdate == .user ? "ユーザ情報を入力してください。" : "チーム情報を入力してください。")
-                    }
-                }
-                .font(.caption)
-                .tracking(3)
-                .opacity(0.7)
+            Text(selectedUpdate == .user ? "ユーザ編集" : "チーム編集")
+                .font(.title3.bold())
                 .foregroundColor(.white)
-                .padding(.bottom, 8)
-                
-                if let captureImage = inputUpdate.captureImage {
-                    UIImageCircleIcon(photoImage: captureImage, size: 150)
-                        .onTapGesture { inputUpdate.isShowPickerView.toggle() }
+                .opacity(0.7)
+                .tracking(10)
+
+            VStack(spacing: 10) {
+                if inputUpdate.savingWait {
+                    HStack(spacing: 10) {
+                        Text("保存中です...")
+                        ProgressView()
+                    }
                 } else {
-                    if let iconURL = inputUpdate.defaultIconData.url {
-                        SDWebImageCircleIcon(imageURL: iconURL, width: 150, height: 150)
-                            .onTapGesture { inputUpdate.isShowPickerView.toggle() }
-                    } else {
-                        if selectedUpdate == .user {
-                            PersonCircleIcon(size: 150)
-                                .onTapGesture { inputUpdate.isShowPickerView.toggle() }
-                        } else if selectedUpdate == .team {
-                            CubeCircleIcon(size: 150)
-                                .onTapGesture { inputUpdate.isShowPickerView.toggle() }
-                        }
+                    Text(selectedUpdate == .user ? "ユーザ情報を入力してください。" : "チーム情報を入力してください。")
+                }
+            }
+            .font(.caption)
+            .tracking(3)
+            .opacity(0.7)
+            .foregroundColor(.white)
+            .padding(.bottom, 8)
+
+            CaptureImageIcon(image: inputUpdate.captureImage)
+                .onTapGesture { inputUpdate.isShowPickerView.toggle() }
+
+
+            TextField("", text: $inputUpdate.nameText)
+                .frame(width: 230)
+                .foregroundColor(.white)
+                .focused($showKyboard, equals: .check)
+                .textInputAutocapitalization(.never)
+                .multilineTextAlignment(.center)
+                .background {
+                    ZStack {
+                        Text(showKyboard == nil && inputUpdate.nameText.isEmpty ?
+                             selectedUpdate == .user ?
+                             "ユーザ名を入力" : "チーム名を入力" : "")
+                        .foregroundColor(.white.opacity(0.3))
+                        Rectangle().foregroundColor(.white.opacity(0.3)).frame(height: 1)
+                            .offset(y: 20)
                     }
                 }
 
-                TextField("", text: $inputUpdate.nameText)
-                    .frame(width: 230)
-                    .foregroundColor(.white)
-                    .focused($showKyboard, equals: .check)
-                    .textInputAutocapitalization(.never)
-                    .multilineTextAlignment(.center)
-                    .background {
-                        ZStack {
-                            Text(showKyboard == nil && inputUpdate.nameText.isEmpty ?
-                                 selectedUpdate == .user ?
-                                 "ユーザ名を入力" : "チーム名を入力" : "")
-                                .foregroundColor(.white.opacity(0.3))
-                            Rectangle().foregroundColor(.white.opacity(0.3)).frame(height: 1)
-                                .offset(y: 20)
-                        }
-                    }
-
-                Button("保存する") {
-
-                    guard let team = teamVM.team else { return }
-                    guard let user = userVM.user else { return }
-
-                    switch selectedUpdate {
-
-                    case .start:
-                        print("")
-
-                    case .user:
-                        Task {
-                            withAnimation(.spring(response: 0.3)) {
-                                inputUpdate.savingWait.toggle()
-                            }
-                            /// アイコンデータのアップロード保存
-                            /// 新しいアイコンデータが存在するかどうかで処理を分岐する
-                            if let updateIconImage = inputUpdate.captureImage {
-                                let updateIconData = await userVM.uploadUserImage(updateIconImage)
-                                let updateMemberData = JoinMember(memberUID: user.id,
-                                                                  name     : inputUpdate.nameText,
-                                                                  iconURL  : updateIconData.url)
-                                /// 自身のユーザーデータ更新と、所属するチームが保持する自身のデータを更新
-                                try await userVM.updateUserNameAndIcon(name: inputUpdate.nameText, data: updateIconData)
-                                try await teamVM.updateTeamJoinMemberData(data: updateMemberData, joins: user.joins)
-                            } else {
-                                let updateMemberData = JoinMember(memberUID: user.id,
-                                                                  name     : inputUpdate.nameText,
-                                                                  iconURL  : inputUpdate.defaultIconData.url)
-                                /// 自身のユーザーデータ更新と、所属するチームが保持する自身のデータを更新
-                                try await userVM.updateUserNameAndIcon(name: inputUpdate.nameText, data: inputUpdate.defaultIconData)
-                                try await teamVM.updateTeamJoinMemberData(data: updateMemberData, joins: user.joins)
-                            }
-                            
-                            // 編集画面を閉じる
-                            hapticSuccessNotification()
-                            withAnimation(.spring(response: 0.3)) {
-                                selectedUpdate = .start
-                                inputUpdate.savingWait.toggle()
-                            }
-                        } // Task ここまで
-
-                    case .team:
-                        Task {
-                            withAnimation(.spring(response: 0.3)) {
-                                inputUpdate.savingWait.toggle()
-                            }
-                            
-                            if let updateIconImage = inputUpdate.captureImage {
-                                let uploadIconData = await teamVM.uploadTeamImage(updateIconImage)
-                                let updateTeamData = JoinTeam(teamID : team.id,
-                                                              name   : inputUpdate.nameText,
-                                                              iconURL: uploadIconData.url)
-                                /// チームデータ更新と、所属するユーザーメンバーが保持するチームデータを更新
-                                try await teamVM.updateTeamNameAndIcon(name: inputUpdate.nameText, data: uploadIconData)
-                                try await userVM.updateUserJoinTeamData(data: updateTeamData, members: team.members)
-                            } else {
-                                let updateTeamData = JoinTeam(teamID : team.id,
-                                                              name   : inputUpdate.nameText,
-                                                              iconURL: inputUpdate.defaultIconData.url)
-                                /// チームデータ更新と、所属するユーザーメンバーが保持するチームデータを更新
-                                try await teamVM.updateTeamNameAndIcon(name: inputUpdate.nameText, data: inputUpdate.defaultIconData)
-                                try await userVM.updateUserJoinTeamData(data: updateTeamData, members: team.members)
-                            }
-                            // 編集画面を閉じる
-                            hapticSuccessNotification()
-                            withAnimation(.spring(response: 0.3)) {
-                                selectedUpdate = .start
-                                inputUpdate.savingWait.toggle()
-                            }
-                        } // Task ここまで
-                    }
-                }
+            UpdateButton()
                 .padding(.top)
-                .buttonStyle(.borderedProminent)
                 .opacity(inputUpdate.savingWait ? 0.2 : 1.0)
-                .disabled(inputUpdate.savingWait ? true : false)
 
-                Button {
-                    withAnimation(.spring(response: 0.3)) { selectedUpdate = .start }
-                } label: {
-                    Label("キャンセル", systemImage: "multiply.circle.fill")
-                        .foregroundColor(.white).opacity(0.7)
-                }
-                .offset(y: 30)
-                .opacity(inputUpdate.savingWait ? 0.2 : 1.0)
-                .disabled(inputUpdate.savingWait ? true : false)
+            Button {
+                withAnimation(.spring(response: 0.3)) { selectedUpdate = .start }
+            } label: {
+                Label("キャンセル", systemImage: "multiply.circle.fill")
+                    .foregroundColor(.white).opacity(0.7)
+            }
+            .opacity(inputUpdate.savingWait ? 0.2 : 1.0)
+            .disabled(inputUpdate.savingWait ? true : false)
+            .padding(.top)
 
-            }
-            .sheet(isPresented: $inputUpdate.isShowPickerView) {
-                PHPickerView(captureImage: $inputUpdate.captureImage,
-                             isShowSheet: $inputUpdate.isShowPickerView)
-            }
-        } // ZStack
+        }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .sheet(isPresented: $inputUpdate.isShowPickerView) {
+            PHPickerView(captureImage: $inputUpdate.captureImage,
+                         isShowSheet: $inputUpdate.isShowPickerView)
+        }
         .background {
             Color.userBlue1
                 .frame(width: getRect().width, height: getRect().height)
@@ -207,10 +119,6 @@ struct UpdateTeamOrUserDataView: View {
                 .opacity(0.9)
                 .ignoresSafeArea()
                 .onTapGesture { showKyboard = nil }
-            
-            LogoMark().scaleEffect(0.4).opacity(0.4)
-                .offset(x: getRect().width / 2 - 70,
-                        y: -getRect().height / 2 + getSafeArea().top + 40)
         }
 
         .onAppear {
@@ -221,11 +129,106 @@ struct UpdateTeamOrUserDataView: View {
                 
             } else if selectedUpdate == .team {
                 inputUpdate.defaultIconData = (url     : teamVM.team?.iconURL,
-                                              filePath : teamVM.team?.iconPath)
+                                               filePath : teamVM.team?.iconPath)
                 inputUpdate.nameText = teamVM.team?.name ?? ""
             }
         }
     } // body
+    @ViewBuilder
+    func CaptureImageIcon(image: UIImage?) -> some View {
+        if let captureImage = inputUpdate.captureImage {
+            UIImageCircleIcon(photoImage: captureImage, size: 150)
+        } else {
+            if let iconURL = inputUpdate.defaultIconData.url {
+                SDWebImageCircleIcon(imageURL: iconURL, width: 150, height: 150)
+            } else {
+                // 既存の画像がなければ、「チーム」「ユーザー」それぞれの初期アイコンを表示
+                if selectedUpdate == .user {
+                    PersonCircleIcon(size: 150)
+                } else if selectedUpdate == .team {
+                    CubeCircleIcon(size: 150)
+                }
+            }
+        }
+    }
+    @ViewBuilder
+    func UpdateButton() -> some View {
+        Button("保存する") {
+
+            guard let team = teamVM.team else { return }
+            guard let user = userVM.user else { return }
+
+            switch selectedUpdate {
+
+            case .start:
+                print("")
+
+            case .user:
+                Task {
+                    withAnimation(.spring(response: 0.3)) {
+                        inputUpdate.savingWait.toggle()
+                    }
+                    /// アイコンデータのアップロード保存
+                    /// 新しいアイコンデータが存在するかどうかで処理を分岐する
+                    if let updateIconImage = inputUpdate.captureImage {
+                        let updateIconData = await userVM.uploadUserImage(updateIconImage)
+                        let updateMemberData = JoinMember(memberUID: user.id,
+                                                          name     : inputUpdate.nameText,
+                                                          iconURL  : updateIconData.url)
+                        /// 自身のユーザーデータ更新と、所属するチームが保持する自身のデータを更新
+                        try await userVM.updateUserNameAndIcon(name: inputUpdate.nameText, data: updateIconData)
+                        try await teamVM.updateTeamJoinMemberData(data: updateMemberData, joins: user.joins)
+                    } else {
+                        let updateMemberData = JoinMember(memberUID: user.id,
+                                                          name     : inputUpdate.nameText,
+                                                          iconURL  : inputUpdate.defaultIconData.url)
+                        /// 自身のユーザーデータ更新と、所属するチームが保持する自身のデータを更新
+                        try await userVM.updateUserNameAndIcon(name: inputUpdate.nameText, data: inputUpdate.defaultIconData)
+                        try await teamVM.updateTeamJoinMemberData(data: updateMemberData, joins: user.joins)
+                    }
+
+                    // 編集画面を閉じる
+                    hapticSuccessNotification()
+                    withAnimation(.spring(response: 0.3)) {
+                        selectedUpdate = .start
+                        inputUpdate.savingWait.toggle()
+                    }
+                } // Task ここまで
+
+            case .team:
+                Task {
+                    withAnimation(.spring(response: 0.3)) {
+                        inputUpdate.savingWait.toggle()
+                    }
+
+                    if let updateIconImage = inputUpdate.captureImage {
+                        let uploadIconData = await teamVM.uploadTeamImage(updateIconImage)
+                        let updateTeamData = JoinTeam(teamID : team.id,
+                                                      name   : inputUpdate.nameText,
+                                                      iconURL: uploadIconData.url)
+                        /// チームデータ更新と、所属するユーザーメンバーが保持するチームデータを更新
+                        try await teamVM.updateTeamNameAndIcon(name: inputUpdate.nameText, data: uploadIconData)
+                        try await userVM.updateUserJoinTeamData(data: updateTeamData, members: team.members)
+                    } else {
+                        let updateTeamData = JoinTeam(teamID : team.id,
+                                                      name   : inputUpdate.nameText,
+                                                      iconURL: inputUpdate.defaultIconData.url)
+                        /// チームデータ更新と、所属するユーザーメンバーが保持するチームデータを更新
+                        try await teamVM.updateTeamNameAndIcon(name: inputUpdate.nameText, data: inputUpdate.defaultIconData)
+                        try await userVM.updateUserJoinTeamData(data: updateTeamData, members: team.members)
+                    }
+                    // 編集画面を閉じる
+                    hapticSuccessNotification()
+                    withAnimation(.spring(response: 0.3)) {
+                        selectedUpdate = .start
+                        inputUpdate.savingWait.toggle()
+                    }
+                } // Task ここまで
+            }
+        }
+        .buttonStyle(.borderedProminent)
+        .disabled(inputUpdate.savingWait ? true : false)
+    }
 } // View
 
 struct UpdateTeamDataView_Previews: PreviewProvider {

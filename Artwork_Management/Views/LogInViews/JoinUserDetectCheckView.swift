@@ -38,17 +38,13 @@ struct JoinUserDetectCheckView: View {
                     inputUserIDFocused = nil
                 }
 
-//            LogoMark().scaleEffect(0.35).opacity(0.4)
-//                .offset(x: 0,
-//                        y: -getRect().height / 2 + getSafeArea().top + 40)
-
             VStack(spacing: 30) {
 
                 LogoMark()
                     .frame(height: 30)
                     .scaleEffect(0.45)
                     .opacity(0.4)
-                    .padding(.bottom)
+                    .padding(.bottom, 30)
 
                 // Infomation Text...
                 VStack(spacing: 30) {
@@ -90,9 +86,10 @@ struct JoinUserDetectCheckView: View {
                             }
                         }
                     }
-                    .font(.caption).tracking(3).opacity(0.6)
+                    .font(.caption)
+                    .tracking(3)
+                    .opacity(0.6)
                     .foregroundColor(.white)
-                    .frame(height: 60)
                 }
 
                 // search fase view...
@@ -116,10 +113,11 @@ struct JoinUserDetectCheckView: View {
                     }
                 } label: {
                     Label("閉じる", systemImage: "multiply.circle.fill")
-                        .foregroundColor(.white).opacity(0.7)
+                        .foregroundColor(.white)
+                        .opacity(0.7)
                 }
-                .offset(y: 50)
                 .opacity(isAgreed ? 0.0 : 1.0)
+                .padding(.top)
 
                 .alert("エラー", isPresented: $teamVM.showErrorAlert) {
                     Button("OK") {
@@ -170,7 +168,7 @@ struct JoinUserDetectCheckView: View {
 
     func startFaseView() -> some View {
 
-        VStack(spacing: 50) {
+        VStack {
             // Input QRCode view...
             VStack {
                 Text("QRコードを読む")
@@ -188,6 +186,7 @@ struct JoinUserDetectCheckView: View {
                         .foregroundColor(.white)
                 }
             }
+            .padding(.bottom, 40)
 
             // Input userID view...
             VStack(spacing: 40) {
