@@ -212,7 +212,9 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
     @State private var createFaseLineImprove: CGFloat = 0.0
     
     @FocusState private var showEmailKyboard: ShowKyboard?
+
     @FocusState private var showUserNameKyboard: ShowKyboard?
+    @State private var textFieldOffset: Bool = false
     
     var body: some View {
         
@@ -374,11 +376,10 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     } // alert
                     
                 }
-                
                 // メールアドレス登録選択時に出現するアドレス入力ハーフシートView
                 inputAdressHalfSheet()
-                
-            }
+            } // Group
+            .offset(y: textFieldOffset ? -100 : 0)
             
         } // ZStack
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -479,6 +480,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                  logInVM.createAccountFase == .success ? 0.5 :
                                  0.2)
                         .ignoresSafeArea()
+                        .onTapGesture(perform: { showUserNameKyboard = nil })
                 }
             }
         }
@@ -1157,6 +1159,17 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             } else {
                 withAnimation(.easeInOut(duration: 0.25)) {
                     inputLogIn.keyboardOffset = 0
+                }
+            }
+        }
+        .onChange(of: showUserNameKyboard) { newValue in
+            if newValue == .check {
+                withAnimation {
+                    textFieldOffset = true
+                }
+            } else {
+                withAnimation {
+                    textFieldOffset = false
                 }
             }
         }

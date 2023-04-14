@@ -27,6 +27,8 @@ struct JoinUserDetectCheckView: View {
     @State private var detectedUser: User?
 
     @FocusState var inputUserIDFocused: InputUserIDFocused?
+    /// キーボード出現時、Viewを上にずらす
+    @State private var showKeyboardOffset: Bool = false
 
     var body: some View {
 
@@ -128,6 +130,7 @@ struct JoinUserDetectCheckView: View {
                     Text(teamVM.alertMessage)
                 } // alert
             }
+            .offset(y: showKeyboardOffset ? -100 : 0)
         }
         // QRコードを読み取るためのカメラView
         .sheet(isPresented: $isShowQRReader) {
@@ -162,6 +165,14 @@ struct JoinUserDetectCheckView: View {
                         withAnimation(.spring(response: 0.8, blendDuration: 1)) { joinUserCheckFase = .start }
                     }
                 }
+            }
+        }
+        // キーボードの表示状態を監視
+        .onChange(of: inputUserIDFocused) { newValue in
+            if newValue == .check {
+                withAnimation { showKeyboardOffset = true }
+            } else {
+                withAnimation { showKeyboardOffset = false }
             }
         }
     } // body

@@ -105,7 +105,7 @@ struct UpdateTeamOrUserDataView: View {
 
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .offset(y: showKeyboardOffset ? -80 : 0)
+        .offset(y: showKeyboardOffset ? -100 : 0)
         .onChange(of: showKyboard) { newValue in
             if newValue == .check {
                 withAnimation { showKeyboardOffset = true }

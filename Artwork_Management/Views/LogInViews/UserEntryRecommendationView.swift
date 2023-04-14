@@ -79,7 +79,7 @@ struct UserEntryRecommendationView: View {
                             isShow.toggle()
                         }
                     }
-                    .buttonStyle(.borderedProminent)
+                    .buttonStyle(.bordered)
                     Button(userVM.isAnonymous ? "\(Image(systemName: "envelope.fill")) 登録" : "お試しで始める") {
                         
                         if userVM.isAnonymous {
@@ -114,7 +114,6 @@ struct UserEntryRecommendationView: View {
         .frame(width: getRect().width - 50, height: getRect().height)
         .background {
             ZStack {
-                
                 Color.userBlue1
                     .frame(width: getRect().width, height: getRect().height)
                     .opacity(0.7)
@@ -124,11 +123,6 @@ struct UserEntryRecommendationView: View {
                     .frame(width: getRect().width, height: getRect().height)
                     .opacity(0.9)
                     .ignoresSafeArea()
-                
-//                LogoMark().scaleEffect(0.35).opacity(0.4)
-//                    .offset(x: 0,
-//                            y: -getRect().height / 2 + getSafeArea().top + 40)
-                    
             }
         }
     }
