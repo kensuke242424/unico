@@ -462,7 +462,7 @@ struct SystemSideMenu: View {
                         Text("他の所属チームはありません")
                             .tracking(2)
                     }
-                    .foregroundColor(.white)
+//                    .foregroundColor(.white)
                     .opacity(0.5)
                     
                 } else {
