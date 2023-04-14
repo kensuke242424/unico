@@ -377,9 +377,19 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     
                 }
                 // メールアドレス登録選択時に出現するアドレス入力ハーフシートView
-                inputAdressHalfSheet()
+                if logInVM.showEmailHalfSheet {
+                    inputAdressHalfSheet()
+                }
+
             } // Group
             .offset(y: textFieldOffset ? -100 : 0)
+            .onChange(of: showUserNameKyboard) { newValue in
+                if newValue == .check {
+                    withAnimation { textFieldOffset = true }
+                } else {
+                    withAnimation { textFieldOffset = false }
+                }
+            }
             
         } // ZStack
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -931,6 +941,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         }
                     
                     Button {
+                        withAnimation { showUserNameKyboard = nil }
                         withAnimation(.spring(response: 0.9)) {
                             inputLogIn.createAccountTitle = false
                             inputLogIn.createAccountShowContents = false
@@ -1159,17 +1170,6 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             } else {
                 withAnimation(.easeInOut(duration: 0.25)) {
                     inputLogIn.keyboardOffset = 0
-                }
-            }
-        }
-        .onChange(of: showUserNameKyboard) { newValue in
-            if newValue == .check {
-                withAnimation {
-                    textFieldOffset = true
-                }
-            } else {
-                withAnimation {
-                    textFieldOffset = false
                 }
             }
         }
