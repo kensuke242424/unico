@@ -181,13 +181,16 @@ struct AccountSystemView: View {
             }
             Spacer()
         }
+        .sheet(isPresented: $showEntryAccount) {
+            UserEntryRecommendationView(isShow: $showEntryAccount)
+        }
         .navigationTitle("アカウント")
         .customSystemBackground()
         .customBackButton()
         .overlay {
             if showEntryAccount {
-                UserEntryRecommendationView(isShow: $showEntryAccount)
-                    .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
+//                UserEntryRecommendationView(isShow: $showEntryAccount)
+//                    .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
             }
         }
         .overlay {
