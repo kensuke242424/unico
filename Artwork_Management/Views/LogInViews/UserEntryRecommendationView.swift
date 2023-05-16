@@ -12,10 +12,18 @@ struct UserEntryRecommendationView: View {
     @EnvironmentObject var logInVM: LogInViewModel
     @EnvironmentObject var userVM : UserViewModel
     @Binding var isShow: Bool
+
+    /// ユーザー登録ビューの画面遷移を管理するプロパティ
+    @StateObject var userEntryNavigationVM = UserEntryNavigationViewModel()
+
+    private enum UserEntryPath {
+        case root
+        case inputAddress
+    }
     
     var body: some View {
 
-        NavigationStack {
+        NavigationStack(path: $userEntryNavigationVM.path) {
             VStack(spacing: 40) {
 
                 LogoMark()
@@ -127,7 +135,6 @@ struct UserEntryRecommendationView: View {
                 }
             }
         }
-
     }
 }
 

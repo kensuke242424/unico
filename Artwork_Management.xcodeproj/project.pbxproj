@@ -47,6 +47,7 @@
 		BE41783D29B4535800434CFC /* AnimationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE41783C29B4535800434CFC /* AnimationExtension.swift */; };
 		BE41784029B4AB3100434CFC /* FirebaseDynamicLinks in Frameworks */ = {isa = PBXBuildFile; productRef = BE41783F29B4AB3100434CFC /* FirebaseDynamicLinks */; };
 		BE41784229B4AB7E00434CFC /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = BE41784129B4AB7E00434CFC /* FirebaseAnalytics */; };
+		BE4663D82A13B54A0072C025 /* UserEntryNavigationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE4663D72A13B54A0072C025 /* UserEntryNavigationViewModel.swift */; };
 		BE6E007429CD5CCA009CBD38 /* NavigationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6E007329CD5CCA009CBD38 /* NavigationViewModel.swift */; };
 		BEAAD8F829CDCE3300C53138 /* DeletedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAAD8F729CDCE3300C53138 /* DeletedView.swift */; };
 		BEAAD8FA29CDEF6200C53138 /* DefaultEmailCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAAD8F929CDEF6200C53138 /* DefaultEmailCheckView.swift */; };
@@ -165,6 +166,7 @@
 		BE392FF229C2135300BB5700 /* ScrollOffsetModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollOffsetModifier.swift; sourceTree = "<group>"; };
 		BE3CD65A29B72B0700C19442 /* ProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressViewModel.swift; sourceTree = "<group>"; };
 		BE41783C29B4535800434CFC /* AnimationExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationExtension.swift; sourceTree = "<group>"; };
+		BE4663D72A13B54A0072C025 /* UserEntryNavigationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserEntryNavigationViewModel.swift; sourceTree = "<group>"; };
 		BE6E007329CD5CCA009CBD38 /* NavigationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationViewModel.swift; sourceTree = "<group>"; };
 		BEAAD8F729CDCE3300C53138 /* DeletedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeletedView.swift; sourceTree = "<group>"; };
 		BEAAD8F929CDEF6200C53138 /* DefaultEmailCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultEmailCheckView.swift; sourceTree = "<group>"; };
@@ -462,6 +464,7 @@
 			isa = PBXGroup;
 			children = (
 				BE6E007329CD5CCA009CBD38 /* NavigationViewModel.swift */,
+				BE4663D72A13B54A0072C025 /* UserEntryNavigationViewModel.swift */,
 				E0455FDD292B2B83004F677D /* LogInViewModel.swift */,
 				E01AA3A629177A76000FCD37 /* UserViewModel.swift */,
 				E0DE98D728E2DBB800471AB4 /* TeamViewModel.swift */,
@@ -753,6 +756,7 @@
 				E09F09BC28EAF33500D07669 /* FocusedLineRow.swift in Sources */,
 				E0455FEA292D1947004F677D /* GradientBackbround.swift in Sources */,
 				E0B328932924A42100E94BC3 /* ManageCustomizeSideMenu.swift in Sources */,
+				BE4663D82A13B54A0072C025 /* UserEntryNavigationViewModel.swift in Sources */,
 				BE20B04129BADFC90078169B /* AccountSystemView.swift in Sources */,
 				E0B3288C2921577F00E94BC3 /* ElementSwitchingPickerView.swift in Sources */,
 				E09F09CB28EFEA8700D07669 /* EditItemPhotoArea.swift in Sources */,
