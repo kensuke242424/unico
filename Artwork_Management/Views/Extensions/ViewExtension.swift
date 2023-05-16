@@ -24,4 +24,16 @@ extension View {
     func getRect() -> CGRect {
         return UIScreen.main.bounds
     }
+    
+    func customBackButton() -> some View {
+        self.modifier(CustomBackButton())
+    }
+    
+    func customSystemBackground() -> some View {
+        self
+            .background {
+                Color.userBlue1
+                    .ignoresSafeArea()
+            }
+    }
 }

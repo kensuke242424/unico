@@ -15,9 +15,15 @@ extension DateFormatter {
     }
 
     // テンプレートの定義(例)
+    // Hours(時), minutes(分), seconds(秒)
+    /// H = 24時間表記、　h = 12時間表記
     enum Template: String {
+        case ampm = "a"       // PM,午後
         case date = "yMd"     // 2017/1/1
-        case time = "Hms"     // 12:39:22
+        case Hms = "Hms"     // 12:39:22
+        case Hm = "Hm"     // 17:39(24時間表記)
+        case hm = "hm"     // 11:39(12時間表記)
+        
         case full = "yMdkHms" // 2017/1/1 12:39:22
         case onlyHour = "k"   // 17時
         case era = "GG"       // "西暦" (default) or "平成" (本体設定で和暦を指定している場合)

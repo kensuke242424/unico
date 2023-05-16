@@ -3,13 +3,14 @@
 個人で音楽、絵、グッズ、雑貨など製作をしている販売者が使えるアプリを開発中です。
 以下の機能を実装予定です。
 
-・アイテムのコレクションライブラリ機能
-・アイテム在庫の増減管理機能
-・アイテムの売上計上及び閲覧機能
+◯サインイン
+![unico サインイン](https://user-images.githubusercontent.com/100055504/212525883-e7cff001-6774-4ed2-b3a7-03c1f389d7a6.gif)
 
-<img width="735" alt="スクリーンショット 2022-09-26 18 37 36" src="https://user-images.githubusercontent.com/100055504/192244566-c70b72d8-b693-4917-823b-efd2ad0d02e1.png">
-<img width="696" alt="スクリーンショット 2022-09-26 18 37 43" src="https://user-images.githubusercontent.com/100055504/192244585-3efab9fd-2811-4374-bb5f-e50eb99f579f.png">
-<img width="661" alt="スクリーンショット 2022-09-26 18 37 48" src="https://user-images.githubusercontent.com/100055504/192244596-212d8931-5266-4e0c-8122-dd9046960c67.png">
 
-# [ 開発工程issue ]
-<img width="1333" alt="スクリーンショット 2022-09-26 18 42 38" src="https://user-images.githubusercontent.com/100055504/192245320-dc1b1f90-e43a-4109-a26c-0136cb07909d.png">
+**◯チーム作成**
+![unico チーム作成](https://user-images.githubusercontent.com/100055504/212525893-aaab889e-79b2-4741-a509-2818e53d9e6b.gif)
+
+**◯全体像**
+![unico 全体像](https://user-images.githubusercontent.com/100055504/212526335-9cb856f1-3d77-442b-858e-67952fdb54ef.gif)
+
+

@@ -5,13 +5,12 @@
 //  Created by 中川賢亮 on 2022/10/11.
 //
 
-import Foundation
+import SwiftUI
 
 enum ButtonStyle {
     case library
     case stock
     case manege
-    case account
 }
 
 class ButtonViewModel: ObservableObject {
@@ -30,20 +29,16 @@ class ButtonViewModel: ObservableObject {
         switch style {
 
         case .library:
-            return ButtonIcon(icon: change ?  "" : "",
-                              badge: change ?  "" : "")
+            return ButtonIcon(icon: change ?  "magnifyingglass" : "magnifyingglass",
+                              badge: change ?  "circlebadge.fill" : "circlebadge.fill")
 
         case .stock:
             return ButtonIcon(icon: change ?  "magnifyingglass" : "magnifyingglass",
-                              badge: change ?  "" : "")
+                              badge: change ?  "circlebadge.fill" : "circlebadge.fill")
 
         case .manege:
-            return ButtonIcon(icon: change ? "shippingbox.fill" : "shippingbox.fill",
-                              badge: change ? "plus.circle.fill" : "plus.circle.fill")
-
-        case .account:
-            return ButtonIcon(icon: change ?  "" : "",
-                              badge: change ?  "" : "")
+            return ButtonIcon(icon: change ? "chart.bar.xaxis" : "chart.bar.xaxis",
+                              badge: change ? "circlebadge.fill" : "circlebadge.fill")
         } // switch
     } // func buttonStyleIcon
 
@@ -62,12 +57,21 @@ class ButtonViewModel: ObservableObject {
         case 2:
             buttonStyle = .manege
             return buttonStyle
-        case 3:
-            buttonStyle = .account
-            return buttonStyle
         default:
             return buttonStyle
         }
     } // func buttonStyleChenged
+}
 
+// デバイスの振動によるフィードバック
+public func hapticSuccessNotification() {
+        let g = UINotificationFeedbackGenerator()
+        g.prepare()
+        g.notificationOccurred(.success)
+    }
+
+public func hapticErrorNotification() {
+    let generator = UINotificationFeedbackGenerator()
+    generator.prepare()
+    generator.notificationOccurred(.error)
 }

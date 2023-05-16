@@ -6,14 +6,25 @@
 //
 
 import SwiftUI
+import FirebaseFirestore
+import FirebaseFirestoreSwift
 
-struct Tag: Identifiable, Equatable {
-    var id = UUID()
+struct Tag: Identifiable, Equatable, Codable, Hashable {
+    @DocumentID var id = UUID().uuidString
+    var oderIndex: Int
     var tagName: String
     var tagColor: UsedColor
 }
 
-enum UsedColor: CaseIterable {
+var testTag: [Tag] {
+    [
+        Tag(oderIndex: 0, tagName: "サンプルタグ1", tagColor: .gray),
+        Tag(oderIndex: 1, tagName: "サンプルタグ2", tagColor: .gray),
+        Tag(oderIndex: 2, tagName: "サンプルタグ3", tagColor: .gray),
+    ]
+}
+
+enum UsedColor: CaseIterable, Codable {
 
     case red
     case blue

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SDWebImageSwiftUI
 
 struct CartItemsSheet: View {
 
@@ -14,9 +15,7 @@ struct CartItemsSheet: View {
         case additional
     }
 
-    @StateObject var itemVM: ItemViewModel
-    @Binding var inputStock: InputStock
-    @Binding var inputHome: InputHome
+    @StateObject var cartVM: CartViewModel
 
     let halfSheetScroll: HalfSheetScroll
     private let listLimit: Int = 0
@@ -32,17 +31,14 @@ struct CartItemsSheet: View {
 
             // NOTE: アイテム取引かごシート表示時のアイテム表示数をプロパティ「listLimit」の値分で制限します。
             //       リミット数以降の要素はスクロールにより表示します。
-            if inputStock.resultCartAmount != 0 {
-                ForEach(Array(itemVM.items.enumerated()), id: \.element) { offset, element in
+            if cartVM.resultCartAmount != 0 {
+                ForEach(Array(cartVM.cartItems.enumerated()), id: \.element) { offset, element in
 
                     if listLimit > offset {
                         if element.amount > 0 {
-                            CartItemRow(itemVM: itemVM,
-                                          inputStock: $inputStock,
-                                          inputHome: $inputHome,
-                                          itemRow: element)
+                            CartItemRow(cartVM: cartVM,
+                                        itemRow: element)
                         }
-
                     } // if
                 } // ForEach
             } else {
@@ -53,15 +49,13 @@ struct CartItemsSheet: View {
 
         case .additional:
 
-            if inputStock.resultCartAmount > listLimit {
-                ForEach(Array(itemVM.items.enumerated()), id: \.element) { offset, element in
+            if cartVM.resultCartAmount > listLimit {
+                ForEach(Array(cartVM.cartItems.enumerated()), id: \.element) { offset, element in
 
                     if listLimit <= offset {
                         if element.amount > 0 {
-                            CartItemRow(itemVM: itemVM,
-                                          inputStock: $inputStock,
-                                          inputHome: $inputHome,
-                                          itemRow: element)
+                            CartItemRow(cartVM: cartVM,
+                                        itemRow: element)
                         }
 
                     } // if listLimit
@@ -76,10 +70,8 @@ struct CartItemsSheet: View {
 // ✅ カスタムView: かご内の一要素分のレイアウト
 struct CartItemRow: View {
 
-    @StateObject var itemVM: ItemViewModel
-    @Binding var inputStock: InputStock
-    @Binding var inputHome: InputHome
-
+    @StateObject var cartVM: CartViewModel
+    
     let itemRow: Item
 
     @State private var basketItemCount: Int = 0
@@ -94,13 +86,13 @@ struct CartItemRow: View {
                 .background(.gray)
 
             HStack {
-
-                ShowItemPhoto(photo: itemRow.photo, size: 100)
+                
+                CartItemPhoto(photoURL: itemRow.photoURL)
 
                 Spacer()
 
                 VStack(alignment: .trailing, spacing: 30) {
-                    Text("\(itemRow.name)")
+                    Text(itemRow.name == "" ? "No Name" : itemRow.name)
                         .foregroundColor(.black)
                         .opacity(0.8)
                         .font(.title3.bold())
@@ -111,7 +103,7 @@ struct CartItemRow: View {
                         HStack(alignment: .bottom) {
                             Text("¥")
                                 .foregroundColor(.black)
-                            Text(String(itemRow.price))
+                            Text(itemRow.price != 0 ? String(itemRow.price) : "-")
                                 .foregroundColor(.black)
                                 .font(.title3)
                                 .fontWeight(.heavy)
@@ -120,8 +112,8 @@ struct CartItemRow: View {
                         // マイナスボタン
                         Button {
 
-                            if let newActionIndex = itemVM.items.firstIndex(where: { $0.id == itemRow.id }) {
-                                inputHome.actionItemIndex = newActionIndex
+                            if let newActionIndex = cartVM.cartItems.firstIndex(where: { $0.id == itemRow.id }) {
+                                cartVM.actionItemIndex = newActionIndex
                                 print("newActionIndex: \(newActionIndex)")
                             } else {
                                 print("カート内-ボタンのアクションIndexの取得に失敗しました")
@@ -129,14 +121,14 @@ struct CartItemRow: View {
                             } // if let
 
                             // カート内アイテム数カウントが１だった時、アイテムを削除するかをユーザに確認します。
-                            if itemVM.items[inputHome.actionItemIndex].amount == 1 {
+                            if cartVM.cartItems[cartVM.actionItemIndex].amount == 1 {
                                 isShowAlert.toggle()
                                 return
                             }
 
-                            itemVM.items[inputHome.actionItemIndex].amount -= 1
-                            inputStock.resultCartPrice -= itemVM.items[inputHome.actionItemIndex].price
-                            inputStock.resultCartAmount -= 1
+                            cartVM.cartItems[cartVM.actionItemIndex].amount -= 1
+                            cartVM.resultCartPrice -= cartVM.cartItems[cartVM.actionItemIndex].price
+                            cartVM.resultCartAmount -= 1
 
                             if countUpDisable {
                                 countUpDisable.toggle()
@@ -155,13 +147,13 @@ struct CartItemRow: View {
                         // プラスボタン
                         Button {
 
-                            if let newActionIndex = itemVM.items.firstIndex(where: { $0.id == itemRow.id }) {
+                            if let newActionIndex = cartVM.cartItems.firstIndex(where: { $0.id == itemRow.id }) {
 
-                                inputHome.actionItemIndex = newActionIndex
+                                cartVM.actionItemIndex = newActionIndex
 
-                                itemVM.items[newActionIndex].amount += 1
-                                inputStock.resultCartPrice += itemVM.items[newActionIndex].price
-                                inputStock.resultCartAmount += 1
+                                cartVM.cartItems[newActionIndex].amount += 1
+                                cartVM.resultCartPrice += cartVM.cartItems[newActionIndex].price
+                                cartVM.resultCartAmount += 1
                                 if itemRow.amount == itemRow.inventory {
                                     countUpDisable.toggle()
                                 }
@@ -182,24 +174,56 @@ struct CartItemRow: View {
                     .alert("確認", isPresented: $isShowAlert) {
                         Button("削除", role: .destructive) {
                             // データ削除処理
-                            itemVM.items[inputHome.actionItemIndex].amount -= 1
-                            inputStock.resultCartPrice -= itemVM.items[inputHome.actionItemIndex].price
-                            inputStock.resultCartAmount -= 1
+                            cartVM.cartItems[cartVM.actionItemIndex].amount -= 1
+                            cartVM.resultCartPrice -= cartVM.cartItems[cartVM.actionItemIndex].price
+                            cartVM.resultCartAmount -= 1
                         }
                     } message: {
-                        Text("かごからアイテムを削除しますか？")
+                        Text("かごから\(itemRow.name)を削除しますか？")
                     }
                 } // VStack
             } // HStack
         } // VStack(全体)
     } // body
 } // view
-//
+
+
+/// Viewの更新から切り離せるか試してみた
+struct CartItemPhoto: View {
+    let photoURL: URL?
+    var body: some View {
+        
+        if let photoURL {
+            WebImage(url: photoURL)
+                .resizable()
+                .scaledToFill()
+                .frame(width: 100, height: 100)
+                .clipShape(RoundedRectangle(cornerRadius: 5))
+        } else {
+            RoundedRectangle(cornerRadius: 10)
+                .foregroundColor(Color.gray)
+                .frame(width: 100, height: 100)
+                .overlay {
+                    VStack {
+                        Image(systemName: "cube.transparent.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 40)
+                            .foregroundColor(.white)
+                        Text("No Image.")
+                            .font(.subheadline)
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+                            .opacity(0.7)
+                    }
+                }
+        }
+    }
+}
+
 struct CartItemsSheet_Previews: PreviewProvider {
     static var previews: some View {
-        CartItemsSheet(itemVM: ItemViewModel(),
-                       inputStock: .constant(InputStock()),
-                       inputHome: .constant(InputHome()),
+        CartItemsSheet(cartVM: CartViewModel(),
                        halfSheetScroll: .additional)
     }
 }

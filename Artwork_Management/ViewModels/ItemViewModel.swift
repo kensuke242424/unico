@@ -5,146 +5,318 @@
 //  Created by 中川賢亮 on 2022/09/24.
 //
 
-import Foundation
 import SwiftUI
+import FirebaseStorage
+import FirebaseFirestore
+import FirebaseFirestoreSwift
 
 class ItemViewModel: ObservableObject {
 
-    // NOTE: アイテム、タグのテストデータです
-     @Published var items: [Item] =
-    [
-        Item(tag: "Clothes", tagColor: "赤", name: "カッターシャツ(白)", detail: "シャツ(白)のアイテム紹介テキストです。", photo: "cloth_sample1",
-             cost: 1000, price: 2800, amount: 0, sales: 128000, inventory: 2, totalAmount: 150, totalInventory: 250, createTime: Date(), updateTime: Date()),
-        Item(tag: "Clothes", tagColor: "赤", name: "トップス(黒)", detail: "トップス(黒)のアイテム紹介テキストです。", photo: "cloth_sample2",
-             cost: 1000, price: 3800, amount: 0, sales: 80000, inventory: 4, totalAmount: 150, totalInventory: 250, createTime: Date(), updateTime: Date()),
-        Item(tag: "Clothes", tagColor: "赤", name: "Tシャツ(黒)", detail: "Tシャツ(黒)のアイテム紹介テキストです。", photo: "cloth_sample4",
-             cost: 1000, price: 3200, amount: 0, sales: 107000, inventory: 402, totalAmount: 150, totalInventory: 250, createTime: Date(), updateTime: Date()),
-        Item(tag: "Shoes", tagColor: "青", name: "シューズ(灰)", detail: "シューズ1のアイテム紹介テキストです。", photo: "shoes_sample1",
-             cost: 1000, price: 8800, amount: 0, sales: 182000, inventory: 199, totalAmount: 150, totalInventory: 250, createTime: Date(), updateTime: Date()),
-        Item(tag: "Shoes", tagColor: "青", name: "シューズ(赤)", detail: "シューズ2のアイテム紹介テキストです。", photo: "shoes_sample2",
-             cost: 1000, price: 13100, amount: 0, sales: 105000, inventory: 43, totalAmount: 150, totalInventory: 250, createTime: Date(), updateTime: Date()),
-        Item(tag: "Shoes", tagColor: "青", name: "シューズ(白)", detail: "シューズ3のアイテム紹介テキストです。", photo: "shoes_sample3",
-             cost: 1000, price: 10700, amount: 0, sales: 185000, inventory: 97, totalAmount: 150, totalInventory: 250, createTime: Date(), updateTime: Date()),
-        Item(tag: "Goods", tagColor: "黄", name: "オリジナルキャップ", detail: "グッズ「オリジナルキャップ」のアイテム紹介テキストです。", photo: "goods_sample6",
-             cost: 1000, price: 4300, amount: 0, sales: 59000, inventory: 88, totalAmount: 150, totalInventory: 250, createTime: Date(), updateTime: Date()),
-        Item(tag: "Goods", tagColor: "黄", name: "トートバッグ(黒)", detail: "グッズ「トートバッグ」のアイテム紹介テキストです。", photo: "goods_sample5",
-             cost: 1000, price: 2500, amount: 0, sales: 39000, inventory: 105, totalAmount: 150, totalInventory: 250, createTime: Date(), updateTime: Date()),
-        Item(tag: "Goods", tagColor: "黄", name: "マグカップ", detail: "グッズ「マグカップ」のアイテム紹介テキストです。", photo: "goods_sample3",
-             cost: 1000, price: 2000, amount: 0, sales: 22000, inventory: 97, totalAmount: 150, totalInventory: 250, createTime: Date(), updateTime: Date())
-    ]
+    init() { print("<<<<<<<<<  ItemViewModel_init  >>>>>>>>>") }
 
-    @Published var tags: [Tag] =
-    [
-        Tag(tagName: "ALL", tagColor: .gray),
-        Tag(tagName: "Clothes", tagColor: .red),
-        Tag(tagName: "Shoes", tagColor: .blue),
-        Tag(tagName: "タオル", tagColor: .blue),
-        Tag(tagName: "Goods", tagColor: .yellow),
-        Tag(tagName: "未グループ", tagColor: .gray)
-    ]
+    var listener: ListenerRegistration?
+    var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
 
-    // ✅ NOTE: アイテム配列を各項目に沿ってソートするメソッド
-    func itemsSort(sort: SortType, items: [Item]) -> [Item] {
+    @Published var items: [Item] = []
+    // アイテムの中にタグが未グループのものがあるかどうか
+    var unsetTag: Bool {
+        let result = self.items.contains(where: { $0.tag == "未グループ" })
+        print("タグ未グループアイテムの有無: \(result)")
+        return result
+    }
 
-        print("＝＝＝＝＝＝＝＝itemsSortメソッド実行＝＝＝＝＝＝＝＝＝＝")
+    func fetchItem(teamID: String) async {
 
-        // NOTE: 更新可能なvar値として再格納しています
-        var varItems = items
+        print("fetchItem実行")
 
-        switch sort {
-
-        case .salesUp:
-            varItems.sort { $0.sales > $1.sales }
-        case .salesDown:
-            varItems.sort { $0.sales < $1.sales }
-        case .createAtUp:
-            print("createAtUp ⇨ Timestampが格納され次第、実装します。")
-        case .updateAtUp:
-            print("updateAtUp ⇨ Timestampが格納され次第、実装します。")
-        case .start:
-            print("起動時の初期値です")
+        guard let itemsRef = db?.collection("teams").document(teamID).collection("items") else {
+            print("error: guard let tagsRef")
+            return
         }
 
-        return varItems
-    } // func itemsSortr
+        listener = itemsRef.addSnapshotListener { (snap, _) in
 
-    // ✅ NOTE: 新規アイテム作成時に選択したタグの登録カラーを取り出します。
-    func searchSelectTagColor(selectTagName: String, tags: [Tag]) -> UsedColor {
+            guard let documents = snap?.documents else {
+                print("Error: guard let documents = snap?.documents")
+                return
+            }
 
-        print("＝＝＝＝＝＝＝searchSelectTagColor_実行＝＝＝＝＝＝＝＝＝")
+            // 取得できたアイテムをデコーダブル ⇨ Itemモデルを参照 ⇨ 「items」に詰めていく
+            // with: ⇨ ServerTimestampを扱う際のオプションを指定
+            self.items = documents.compactMap { (snap) -> Item? in
 
-        let filterTag = tags.filter { $0.tagName == selectTagName }
+                return try? snap.data(as: Item.self, with: .estimate)
+            }
+        }
+        print("fetchItem完了")
+    }
 
-        print("　filterで取得したタグデータ: \(filterTag)")
+    func addItem(itemData: Item, tag: String, teamID: String) {
 
-        if let firstFilterTag = filterTag.first {
+        print("addItem実行")
 
-            print("　現在選択タグ「\(selectTagName)」の登録タグColor: \(firstFilterTag.tagColor)")
+        guard let itemsRef = db?.collection("teams").document(teamID).collection("items") else {
+            print("error: guard let tagsRef")
+            return
+        }
 
-            return firstFilterTag.tagColor
+        do {
+            _ = try itemsRef.addDocument(from: itemData)
+        } catch {
+            print("Error: try db!.collection(collectionID).addDocument(from: itemData)")
+        }
+        print("addItem完了")
+    }
 
+    func updateItem(updateData: Item, defaultDataID: String, teamID: String) {
+
+        print("updateItem実行")
+
+        print(defaultDataID)
+
+        guard let updateItemRef = db?.collection("teams").document(teamID).collection("items").document(defaultDataID) else {
+            print("error: guard let updateItemRef")
+            return
+        }
+
+        do {
+
+            try updateItemRef.setData(from: updateData)
+
+        } catch {
+            print("updateItem失敗")
+        }
+        print("updateItem完了")
+    }
+
+    func deleteItem(deleteItem: Item, teamID: String) {
+
+        guard let itemID = deleteItem.id else { return }
+        guard let itemRef = db?.collection("teams").document(teamID).collection("items").document(itemID) else {
+            print("error: deleteItem_guard let ItemRef")
+            return
+        }
+
+        itemRef.delete()
+    }
+    
+    func updateFavorite(_ item: Item) {
+        print("updateFavoriteメソッド実行")
+
+        guard let itemsRef = db?.collection("teams").document(item.teamID).collection("items") else {
+            print("error: guard let itemsRef")
+            return
+        }
+        guard let itemID = item.id else { return }
+        
+        var item = item
+        item.favorite.toggle()
+
+        do {
+            try itemsRef.document(itemID).setData(from: item)
+        } catch {
+            hapticErrorNotification()
+            print("updateFavoriteメソッド失敗")
+        }
+        hapticSuccessNotification()
+        print("updateFavoriteメソッド完了")
+    }
+    
+    func resizeUIImage(image: UIImage?, width: CGFloat) -> UIImage? {
+        
+        if let originalImage = image {
+            // オリジナル画像のサイズからアスペクト比を計算
+            let aspectScale = originalImage.size.height / originalImage.size.width
+            
+            // widthからアスペクト比を元にリサイズ後のサイズを取得
+            let resizedSize = CGSize(width: width * 3, height: width * Double(aspectScale) * 3)
+            
+            // リサイズ後のUIImageを生成して返却
+            UIGraphicsBeginImageContext(resizedSize)
+            /// MEMO: 保存後の画像heightに少しだけ隙間ができるので、resizedSize.height + 1で対応してる
+            originalImage.draw(in: CGRect(x: 0, y: 0, width: resizedSize.width, height: resizedSize.height + 1))
+            let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
+            UIGraphicsEndImageContext()
+            
+            return resizedImage
         } else {
-            print("　firstFilterTagの取得に失敗しました")
-            return.gray
+            return nil
         }
-    } // func castStringIntoColor
+    }
 
-    // ✅ メソッド: 変更内容をもとに、tags内の対象データのタグネーム、タグカラーを更新します。
-    func updateTagsData(itemVM: ItemViewModel,
-                        defaultTag: Tag,
-                        newTagName: String,
-                        newTagColor: UsedColor) {
+    func uploadItemImage(_ image: UIImage?, _ teamID: String) async -> (url: URL?, filePath: String?) {
+        
+        print("uploadImage実行")
+        guard let imageData = image?.jpegData(compressionQuality: 0.8) else {
+            return (url: nil, filePath: nil)
+        }
 
-        print("ーーーーーーー　updateTagsDataメソッド_実行　ーーーーーーーーー")
+        do {
+            let storage = Storage.storage()
+            let reference = storage.reference()
+            let filePath = "/teams/\(teamID)/items/\(Date()).jpeg"
+            let imageRef = reference.child(filePath)
+            _ = try await imageRef.putDataAsync(imageData)
+            let url = try await imageRef.downloadURL()
+            print("uploadImage完了")
 
-        // NOTE: for where文で更新対象要素を選出し、enumurated()でデータとインデックスを両方取得します。
-        for (index, tagData) in itemVM.tags.enumerated()
-        where tagData.tagName == defaultTag.tagName {
+            return (url: url, filePath: filePath)
+        } catch {
+            print("uploadImage失敗")
+            return (url: nil, filePath: nil)
+        }
+    }
 
-            itemVM.tags[index] = Tag(tagName: newTagName,
-                                     tagColor: newTagColor)
+    func deleteImage(path: String?) {
 
-            print("更新されたitemVM.tags: \(itemVM.tags[index])")
+        guard let path = path else { return }
 
-        } // for where
-    } // func updateTagsData
+        let storage = Storage.storage()
+        let reference = storage.reference()
+        let imageRef = reference.child(path)
 
-    // ✅ メソッド: 変更内容をもとに、items内の対象データのタグネーム、タグカラーを更新します。
-    func updateItemsTagData(itemVM: ItemViewModel,
-                            defaultTag: Tag,
-                            newTagName: String,
-                            newTagColorString: String) {
+        imageRef.delete { error in
+            if let error = error {
+                print(error)
+            } else {
+                print("imageRef.delete succsess!")
+            }
+        }
+    }
+    
+    func deleteAllItemImages() async {
+        let storage = Storage.storage()
+        let reference = storage.reference()
+        
+        for item in items {
+            guard let itemPath = item.photoPath else { continue }
+            let imageRef = reference.child(itemPath)
+            imageRef.delete { error in
+                if let error = error {
+                    print("画像の削除に失敗しました: \(error.localizedDescription)")
+                } else {
+                    print("\(item.name)の画像削除に成功しました")
+                }
+            }
+        }
+    }
 
-        print("ーーーーーーー　updateItemsTagDataメソッド_実行　ーーーーーーーーー")
+    func resetAmount() {
 
-        // NOTE: アイテムデータ内の更新対象タグを取り出して、同じタググループアイテムをまとめて更新します。
-        for (index, itemData) in itemVM.items.enumerated()
-        where itemData.tag == defaultTag.tagName {
+        for index in items.indices where items[index].amount != 0 {
+            items[index].amount = 0
+        }
+        print("resetAmount完了")
+    }
 
-            itemVM.items[index].tag = newTagName
-            itemVM.items[index].tagColor = newTagColorString
+    func updateCommerseItems(teamID: String) {
 
-            print("更新されたitemVM.items: \(itemVM.items[index])")
+        print("updateCommerse実行")
 
-        } // for where
-    } // func updateItemsTagData
+        guard let itemsRef = db?.collection("teams").document(teamID).collection("items") else {
+            print("error: guard let tagsRef")
+            return
+        }
+
+        for item in items where item.amount != 0 {
+
+            guard let itemID = item.id else {
+                print("Error: 「\(item.name)」 guard let = item.id")
+                continue
+            }
+
+            var item = item
+
+            item.updateTime = nil // nilを代入することで、保存時にTimestamp発火
+            item.sales += item.price * item.amount
+            item.inventory -= item.amount
+            item.totalAmount += item.amount
+            item.amount = 0
+
+            do {
+                try itemsRef.document(itemID).setData(from: item)
+            } catch {
+                print("Error: 「\(item.name)」try reference.document(itemID).setData(from: item)")
+            }
+        }
+        print("updateCommerse完了")
+    }
+
+    func itemsUpDownOderSort() {
+
+        items.reverse()
+    }
+
+    func itemsValueSort(order: UpDownOrder, status: IndicatorValueStatus) {
+
+        switch order {
+
+        case .up:
+
+            switch status {
+            case .stock:
+                items.sort(by: { $0.inventory > $1.inventory })
+            case .price:
+                items.sort(by: { $0.price > $1.price })
+            case .sales:
+                items.sort(by: { $0.sales > $1.sales })
+            }
+
+        case .down:
+
+            switch status {
+            case .stock:
+                items.sort(by: { $0.inventory < $1.inventory })
+            case .price:
+                items.sort(by: { $0.price < $1.price })
+            case .sales:
+                items.sort(by: { $0.sales < $1.sales })
+            }
+        }
+    }
+
+    func itemsNameSort(order: UpDownOrder) {
+
+        switch order {
+
+        case .up:
+            items.sort(by: { $0.name > $1.name })
+
+        case .down:
+            items.sort(by: { $0.name < $1.name })
+        }
+    }
+
+    func itemsCreateTimeSort(order: UpDownOrder) {
+
+        switch order {
+        case .up:
+            items.sort { before, after in
+                before.createTime!.dateValue() > after.createTime!.dateValue() ? true : false
+            }
+        case .down:
+            items.sort { before, after in
+                before.createTime!.dateValue() < after.createTime!.dateValue() ? true : false
+            }
+        }
+    }
+
+    func itemsUpdateTimeSort(order: UpDownOrder) {
+        switch order {
+        case .up:
+            items.sort { before, after in
+                before.updateTime!.dateValue() > after.updateTime!.dateValue() ? true : false
+            }
+        case .down:
+            items.sort { before, after in
+                before.updateTime!.dateValue() < after.updateTime!.dateValue() ? true : false
+            }
+        }
+    }
+
+    deinit {
+        print("<<<<<<<<<  ItemViewModel_deinit  >>>>>>>>>")
+        listener?.remove()
+    }
 
 } // class
-
-struct TestItem {
-
-    var testItem: Item = Item(tag: "Clothes",
-                              tagColor: "赤",
-                              name: "カッターシャツ(白)",
-                              detail: "シャツ(白)のアイテム紹介テキストです。",
-                              photo: "cloth_sample1",
-                              cost: 1000,
-                              price: 2800,
-                              amount: 0,
-                              sales: 128000,
-                              inventory: 2,
-                              totalAmount: 120,
-                              totalInventory: 200,
-                              createTime: Date(),
-                              updateTime: Date())
-}
