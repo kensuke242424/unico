@@ -447,6 +447,9 @@ struct SelectBackgroundView: View {
 
     @EnvironmentObject var teamVM: TeamViewModel
     @Binding var inputTab: InputTab
+//    @Binding var select: SelectBackground
+//    @Binding var isShow: Bool = false
+//    @Binding var captureImage: UIImage
 
     @State private var showContents: Bool = false
     @State private var showProgress: Bool = false
@@ -472,7 +475,6 @@ struct SelectBackgroundView: View {
                         .opacity(inputTab.checkBackgroundAnimation ? 0 : 0.6)
                 }
                 .padding(.bottom, 5)
-
 
                 ScrollBackgroundImages()
                     .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
