@@ -39,13 +39,14 @@ enum InputAddressFocused {
 }
 
 enum AddressSignInFase {
-    case start, check, failure, notExist, success
+    case start, check, failure, exist, notExist, success
     
     var checkIcon: Image {
         switch self {
         case .start: return Image(systemName: "")
         case .check: return Image(systemName: "")
         case .failure: return Image(systemName: "multiply.circle.fill")
+        case .exist: return Image(systemName: "multiply.circle.fill")
         case .notExist: return Image(systemName: "multiply.circle.fill")
         case .success: return Image(systemName: "checkmark.seal.fill")
         }
@@ -56,6 +57,7 @@ enum AddressSignInFase {
         case .start: return Image(systemName: "")
         case .check: return Image(systemName: "")
         case .failure: return Image(systemName: "xmark.circle.fill")
+        case .exist: return Image(systemName: "xmark.circle.fill")
         case .notExist: return Image(systemName: "xmark.circle.fill")
         case .success: return Image(systemName: "checkmark.circle.fill")
         }
@@ -66,6 +68,7 @@ enum AddressSignInFase {
         case .start: return ""
         case .check: return "check..."
         case .failure: return "failure!!"
+        case .exist: return "exist Account!!"
         case .notExist: return "not Account!!"
         case .success: return "succsess!!"
         }
@@ -73,7 +76,7 @@ enum AddressSignInFase {
     
     var messageText: (text1: String, text2: String) {
         switch self {
-        case .start   : return ("メールアドレスに本人確認メールを送ります。"  ,
+        case .start   : return ("メールアドレス宛に認証メールを送ります。"  ,
                                 "届いたメールからunicoへアクセスしてください。")
             
         case .check   : return ("メールアドレスをチェックしています..."          ,
@@ -81,6 +84,9 @@ enum AddressSignInFase {
             
         case .failure : return ("認証メールの送信に失敗しました。"              ,
                                 "アドレスを確認して、再度試してみてください。"     )
+
+        case .exist   : return ("このアドレスにはすでにアカウントが存在します。" ,
+                                ""                                        )
             
         case .notExist: return ("このアドレスにはアカウントが存在しませんでした。" ,
                                 ""                                        )

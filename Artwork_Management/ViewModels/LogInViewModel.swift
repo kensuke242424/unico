@@ -165,6 +165,9 @@ class LogInViewModel: ObservableObject {
                     // アカウントが既に存在することをアラートで伝えて、既存データへのログインを促す
                     self.logInAlertMessage = .existEmailAddressAccount
                     self.isShowLogInFlowAlert.toggle()
+                    withAnimation(.spring(response: 0.3)) {
+                        self.addressSignInFase = .exist
+                    }
                     
                     hapticErrorNotification()
                 }
