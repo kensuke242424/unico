@@ -219,6 +219,7 @@ struct RootView: View {
                         logInVM.showEmailSheetBackground = false
                     }
                     print("メールリンクで受け取ったユーザーのメールアドレス: \(email)")
+                    print("メールリンクによって行う処理の種類: \(logInVM.handleUseReceivedEmailLink)")
                     
                     switch logInVM.handleUseReceivedEmailLink {
                     case .signIn:
@@ -234,8 +235,10 @@ struct RootView: View {
                                                                  link: incomingURL.absoluteString)
                     case .entryAccount:
                         if userVM.isAnonymous {
-                            logInVM.addressReauthenticateByEmailLink(email: email,
-                                                                     link: incomingURL.absoluteString)
+                            logInVM.entryAccountByEmailLink(email: email,
+                                                            link: incomingURL.absoluteString)
+//                            logInVM.addressReauthenticateByEmailLink(email: email,
+//                                                                     link: incomingURL.absoluteString)
                         }
                     case .deleteAccount:
                         logInVM.addressReauthenticateByEmailLink(email: email,

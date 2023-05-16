@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Firebase
 
 struct UserEntryRecommendationView: View {
 
@@ -100,6 +101,8 @@ struct UserEntryRecommendationView: View {
 
                         } else {
                             // アプリをまだ始めてなくて、ログイン画面からのアクセスの場合の処理
+                            // すでにアカウントを作成しログイン済みの場合は弾く
+                            if Auth.auth().currentUser != nil { return }
                             logInVM.resultSignInType = .signUp
                             logInVM.signInAnonymously()
 
@@ -149,7 +152,7 @@ struct UserEntryRecommendationView: View {
 
                 BlurView(style: .systemThinMaterialDark)
                     .frame(width: getRect().width, height: getRect().height)
-                    .opacity(0.9)
+                    .opacity(0.5)
                     .ignoresSafeArea()
             }
         }
