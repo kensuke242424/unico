@@ -196,10 +196,10 @@ struct InputLogIn {
     var selectBackground            : SelectBackground = .sample1
     
     /// Sheetやアラートなどのプレゼンテーションを管理するプロパティ
-    var isShowPickerView             : Bool = false
-    var isShowUserEntryRecommendation: Bool = false
-    var isShowGoBackLogInAlert       : Bool = false
-    var captureError                 : Bool = false
+    var isShowPickerView                 : Bool = false
+    var isShowAnonymousEntryRecomendation: Bool = false
+    var isShowGoBackLogInAlert           : Bool = false
+    var captureError                     : Bool = false
 }
 
 // ✅ ログイン画面の親Viewです。
@@ -400,8 +400,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         } // ZStack
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .overlay {
-            if inputLogIn.isShowUserEntryRecommendation {
-                UserEntryRecommendationView(isShow: $inputLogIn.isShowUserEntryRecommendation)
+            if inputLogIn.isShowAnonymousEntryRecomendation {
+                AnonymousEntryRecomendationView(isShow: $inputLogIn.isShowAnonymousEntryRecomendation)
                     .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
             }
             
@@ -743,7 +743,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 // お試しログイン選択時の処理
                 hapticSuccessNotification()
                 withAnimation(.easeInOut(duration: 0.4)) {
-                    inputLogIn.isShowUserEntryRecommendation.toggle()
+                    inputLogIn.isShowAnonymousEntryRecomendation.toggle()
                 }
             } label: {
                 ZStack {
