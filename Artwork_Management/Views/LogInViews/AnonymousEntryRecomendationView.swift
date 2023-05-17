@@ -1,19 +1,19 @@
 //
-//  UserEntryRecommendationView.swift
+//  AnonymousEntryRecomendationView.swift
 //  Artwork_Management
 //
-//  Created by Kensuke Nakagawa on 2023/03/13.
+//  Created by Kensuke Nakagawa on 2023/05/17.
 //
 
 import SwiftUI
 import Firebase
 
-struct UserEntryRecommendationView: View {
+struct AnonymousEntryRecomendationView: View {
 
     private enum UserEntryPath {
         case inputAddress
     }
-    
+
     @EnvironmentObject var logInVM: LogInViewModel
     @EnvironmentObject var userVM : UserViewModel
     @Binding var isShow: Bool
@@ -21,8 +21,6 @@ struct UserEntryRecommendationView: View {
     /// ユーザー登録ビューの画面遷移を管理するプロパティ
     @StateObject var userEntryNavigationVM = UserEntryNavigationViewModel()
 
-    @State private var showExistEntryAlert: Bool = false
-    
     var body: some View {
 
         VStack(spacing: 40) {
@@ -55,7 +53,6 @@ struct UserEntryRecommendationView: View {
                 .foregroundColor(.white)
                 .tracking(1)
                 .background {
-
                     RoundedRectangle(cornerRadius: 10)
                         .foregroundColor(.userBlue1)
                         .opacity(0.7)
@@ -73,12 +70,11 @@ struct UserEntryRecommendationView: View {
 
                 }
                 .font(.footnote)
-
             }
 
             // 下部の選択ボタンを保有するView
             VStack(spacing: 30) {
-                Text("アカウント登録を行いますか？")
+                Text("お試しアカウントで始めますか？")
                     .foregroundColor(.white)
                     .tracking(3)
                     .padding(.top)
@@ -90,48 +86,35 @@ struct UserEntryRecommendationView: View {
                         }
                     }
                     .buttonStyle(.bordered)
-                    Button("\(Image(systemName: "envelope.fill")) 登録") {
+                    Button("お試しで始める") {
 
-                        // すでにアカウント登録済みの場合はアラートを表示して処理終了
-                        if Auth.auth().currentUser != nil {
-                            showExistEntryAlert.toggle()
-                            return
-                        }
+                        if userVM.isAnonymous {
+                            // すでにお試しアカウントでアプリを始めている場合の処理
+                            withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
+                                logInVM.handleUseReceivedEmailLink = .entryAccount
+                                /// ⬇︎関係ない値のように見えるが、メソッドのハンドリングに使われる値のため、消さない！！
+                                logInVM.userSelectedSignInType = .signUp
+                                logInVM.showEmailHalfSheet.toggle()
+                            }
 
-                        withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
-                            logInVM.handleUseReceivedEmailLink = .entryAccount
-                            /// ⬇︎関係ない値のように見えるが、メソッドのハンドリングに使われる値のため、消さない！！
-                            logInVM.userSelectedSignInType = .signUp
-                            logInVM.showEmailHalfSheet.toggle()
+                        } else {
+                            // アプリをまだ始めてなくて、ログイン画面からのアクセスの場合の処理
+                            // すでにアカウントを作成しログイン済みの場合は弾く
+                            if Auth.auth().currentUser != nil { return }
+                            logInVM.resultSignInType = .signUp
+                            logInVM.signInAnonymously()
+
+                            withAnimation(.easeInOut(duration: 0.5)) {
+                                isShow.toggle()
+                            }
+                            withAnimation(.spring(response: 0.8).delay(0.5)) {
+                                logInVM.userSelectedSignInType = .signUp
+                                logInVM.createAccountFase      = .check
+                                logInVM.selectProviderType     = .trial
+                            }
                         }
                     }
                     .buttonStyle(.borderedProminent)
-                }
-            }
-            // 登録済みのユーザーが登録ボタンを押した場合に表示するアラート
-            .alert("登録済み", isPresented: $showExistEntryAlert) {
-                Button("OK") {
-                    showExistEntryAlert.toggle()
-                }
-            } message: {
-                Text("\(userVM.user?.name ?? "No Name")さんのアカウントはすでに登録済みです。")
-            }
-            // アカウント登録の結果をユーザーに知らせるアラート
-            .alert(logInVM.resultAccountLink ? "登録完了" : "登録失敗",
-                   isPresented: $logInVM.showAccountLinkAlert) {
-                Button("OK") {
-                    logInVM.showAccountLinkAlert.toggle()
-                }
-            } message: {
-                if logInVM.resultAccountLink {
-                    Text("アカウントの登録に成功しました！引き続き、unicoをよろしくお願い致します。")
-                } else {
-                    Text("アカウント登録時にエラーが発生しました。もう一度試してみてください。")
-                }
-            } // alert
-            .onChange(of: logInVM.resultAccountLink) { result in
-                if result == true {
-                    userVM.isAnonymousCheck()
                 }
             }
         }
@@ -157,9 +140,9 @@ struct UserEntryRecommendationView: View {
     }
 }
 
-struct UserEntryRecommendationView_Previews: PreviewProvider {
+struct AnonymousEntryRecomendationView_Previews: PreviewProvider {
     static var previews: some View {
-        UserEntryRecommendationView(isShow: .constant(true))
+        AnonymousEntryRecomendationView(isShow: .constant(true))
             .environmentObject(LogInViewModel())
             .environmentObject(UserViewModel())
     }

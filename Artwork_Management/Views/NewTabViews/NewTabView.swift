@@ -643,7 +643,7 @@ struct SelectBackgroundView: View {
                         Toggle("", isOn: $inputTab.checkBackgroundToggle)
                     }
                     VStack {
-                        Text("文字色を反転").font(.footnote).offset(x: 15)
+                        Text("ダークモード").font(.footnote).offset(x: 15)
                         Toggle("", isOn: $homeTextColorMode)
                     }
                 }
@@ -663,7 +663,7 @@ struct SelectBackgroundView: View {
             }
         }
     }
-} // View
+} // SelectBackgroundView
 
 struct NewTabView_Previews: PreviewProvider {
 

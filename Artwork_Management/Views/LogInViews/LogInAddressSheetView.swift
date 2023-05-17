@@ -68,6 +68,7 @@ struct LogInAddressSheetView: View {
                                     logInVM.addressSignInFase.checkIcon
                                         .foregroundColor(
                                             logInVM.addressSignInFase == .failure ||
+                                            logInVM.addressSignInFase == .exist   ||
                                             logInVM.addressSignInFase == .notExist ? .red : .green)
                                 }
                                 Text(logInVM.addressSignInFase.checkText)
@@ -189,11 +190,11 @@ struct LogInAddressSheetView: View {
             .offset(y: inputLogIn.keyboardOffset)
             .onChange(of: showEmailKyboard) { newValue in
                 if newValue == true {
-                    withAnimation(.spring(response: 0.35)) {
+                    withAnimation(.spring(response: 0.5)) {
                         inputLogIn.keyboardOffset = -UIScreen.main.bounds.height / 3
                     }
                 } else {
-                    withAnimation(.spring(response: 0.35)) {
+                    withAnimation(.spring(response: 0.5)) {
                         inputLogIn.keyboardOffset = 0
                     }
                 }

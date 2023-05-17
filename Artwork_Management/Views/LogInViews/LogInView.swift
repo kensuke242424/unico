@@ -39,13 +39,14 @@ enum InputAddressFocused {
 }
 
 enum AddressSignInFase {
-    case start, check, failure, notExist, success
+    case start, check, failure, exist, notExist, success
     
     var checkIcon: Image {
         switch self {
         case .start: return Image(systemName: "")
         case .check: return Image(systemName: "")
         case .failure: return Image(systemName: "multiply.circle.fill")
+        case .exist: return Image(systemName: "multiply.circle.fill")
         case .notExist: return Image(systemName: "multiply.circle.fill")
         case .success: return Image(systemName: "checkmark.seal.fill")
         }
@@ -56,6 +57,7 @@ enum AddressSignInFase {
         case .start: return Image(systemName: "")
         case .check: return Image(systemName: "")
         case .failure: return Image(systemName: "xmark.circle.fill")
+        case .exist: return Image(systemName: "xmark.circle.fill")
         case .notExist: return Image(systemName: "xmark.circle.fill")
         case .success: return Image(systemName: "checkmark.circle.fill")
         }
@@ -66,6 +68,7 @@ enum AddressSignInFase {
         case .start: return ""
         case .check: return "check..."
         case .failure: return "failure!!"
+        case .exist: return "exist Account!!"
         case .notExist: return "not Account!!"
         case .success: return "succsess!!"
         }
@@ -73,7 +76,7 @@ enum AddressSignInFase {
     
     var messageText: (text1: String, text2: String) {
         switch self {
-        case .start   : return ("メールアドレスに本人確認メールを送ります。"  ,
+        case .start   : return ("メールアドレス宛に認証メールを送ります。"  ,
                                 "届いたメールからunicoへアクセスしてください。")
             
         case .check   : return ("メールアドレスをチェックしています..."          ,
@@ -81,6 +84,9 @@ enum AddressSignInFase {
             
         case .failure : return ("認証メールの送信に失敗しました。"              ,
                                 "アドレスを確認して、再度試してみてください。"     )
+
+        case .exist   : return ("このアドレスにはすでにアカウントが存在します。" ,
+                                ""                                        )
             
         case .notExist: return ("このアドレスにはアカウントが存在しませんでした。" ,
                                 ""                                        )
@@ -190,10 +196,10 @@ struct InputLogIn {
     var selectBackground            : SelectBackground = .sample1
     
     /// Sheetやアラートなどのプレゼンテーションを管理するプロパティ
-    var isShowPickerView             : Bool = false
-    var isShowUserEntryRecommendation: Bool = false
-    var isShowGoBackLogInAlert       : Bool = false
-    var captureError                 : Bool = false
+    var isShowPickerView                 : Bool = false
+    var isShowAnonymousEntryRecomendation: Bool = false
+    var isShowGoBackLogInAlert           : Bool = false
+    var captureError                     : Bool = false
 }
 
 // ✅ ログイン画面の親Viewです。
@@ -210,6 +216,11 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
     @State private var logInNavigationPath: [Navigation] = []
     @State private var inputLogIn: InputLogIn = InputLogIn()
     @State private var createFaseLineImprove: CGFloat = 0.0
+
+    // バックグラウンド選択フェーズで用いるプロパティ
+    @State private var checkBackgroundToggle   : Bool = false
+    @State private var checkBackgroundAnimation: Bool = false
+    @AppStorage("homeTextColorMode") var homeTextColorMode: Bool = true
     
     @FocusState private var showEmailKyboard: ShowKyboard?
 
@@ -233,7 +244,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             .opacity(logInVM.createAccountFase == .fase3 ? 1.0 : 0.0)
             .onTapGesture { inputLogIn.isShowPickerView.toggle() }
             
-            LogoMark()
+            LargeLogoMark()
                 .scaleEffect(logInVM.userSelectedSignInType == .signUp ? 0.4 : 1.0)
                 .offset(y: logInVM.userSelectedSignInType == .signUp ? -getRect().height / 2.5 : -getRect().height / 4)
                 .offset(x: logInVM.userSelectedSignInType == .signUp ? getRect().width / 3 : 0)
@@ -315,8 +326,9 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         }
                     } label: {
                         Text("< 戻る")
+                            .foregroundColor(homeTextColorMode ? .white : .black)
                             .fontWeight(.semibold)
-                            .foregroundColor(.white.opacity(0.7))
+                            .opacity(0.7)
                     }
                     .disabled(logInVM.addressSignInFase == .success ||
                               logInVM.addressSignInFase == .check ? true : false)
@@ -348,7 +360,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                              logInVM.createAccountFase == .fase1 ||
                              logInVM.createAccountFase == .check ||
                              logInVM.createAccountFase == .success ? 0.0 : 1.0)
-                    .foregroundColor(.white.opacity(0.5))
+                    .opacity(0.5)
                     .offset(x: -getRect().width / 2 + 40, y: getRect().height / 2 - 60 )
                     .alert("確認", isPresented: $inputLogIn.isShowGoBackLogInAlert) {
                         
@@ -377,8 +389,24 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     
                 }
                 // メールアドレス登録選択時に出現するアドレス入力ハーフシートView
+                if logInVM.showEmailSheetBackground {
+                    Color.black
+                        .opacity(0.7)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
+                                logInVM.showEmailHalfSheet.toggle()
+                                showEmailKyboard = nil
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                                logInVM.showEmailSheetBackground.toggle()
+                                logInVM.addressSignInFase = .start
+                            }
+                        }
+                }
                 if logInVM.showEmailHalfSheet {
                     inputAdressHalfSheet()
+                        .transition(.offset(y: getRect().height / 2))
                 }
 
             } // Group
@@ -394,8 +422,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         } // ZStack
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .overlay {
-            if inputLogIn.isShowUserEntryRecommendation {
-                UserEntryRecommendationView(isShow: $inputLogIn.isShowUserEntryRecommendation)
+            if inputLogIn.isShowAnonymousEntryRecomendation {
+                AnonymousEntryRecomendationView(isShow: $inputLogIn.isShowAnonymousEntryRecomendation)
                     .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
             }
             
@@ -447,7 +475,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             case .notExistEmailAddressAccount:
                 Button("OK") {}
                 
-            case .notEmailCurrentMatches:
+            case .notEmailCurrentMatches     :
                 Button("OK") {}
                 
             case .other                      :
@@ -474,14 +502,14 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             .resizable()
                             .scaledToFill()
                             .frame(width: proxy.size.width, height: proxy.size.height)
-                            .blur(radius: inputLogIn.checkBackgroundEffect ? 0 : 2)
+                            .blur(radius: inputLogIn.checkBackgroundEffect ? 0 : 2, opaque: true)
                             .ignoresSafeArea()
                     } else {
                         Image(inputLogIn.selectBackground.imageName)
                             .resizable()
                             .scaledToFill()
                             .frame(width: proxy.size.width, height: proxy.size.height)
-                            .blur(radius: inputLogIn.checkBackgroundEffect ? 0 : 2)
+                            .blur(radius: inputLogIn.checkBackgroundEffect ? 0 : 2, opaque: true)
                             .ignoresSafeArea()
                     }
                     Color(.black)
@@ -498,11 +526,11 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         .onChange(of: logInVM.createAccountFase) { newFaseValue in
             withAnimation(.spring(response: 1.0)) {
                 switch newFaseValue {
-                case .start: createFaseLineImprove = 0
-                case .fase1: createFaseLineImprove = 0
-                case .fase2: createFaseLineImprove = 100
-                case .fase3: createFaseLineImprove = 200
-                case .check: createFaseLineImprove = 200
+                case .start  : createFaseLineImprove = 0
+                case .fase1  : createFaseLineImprove = 0
+                case .fase2  : createFaseLineImprove = 100
+                case .fase3  : createFaseLineImprove = 200
+                case .check  : createFaseLineImprove = 200
                 case .success: createFaseLineImprove = 200
                 }
             }
@@ -636,13 +664,17 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
     @ViewBuilder
     func signInTitle(title: String) -> some View {
         HStack {
-            Rectangle().foregroundColor(.white.opacity(0.4)).frame(width: 60, height: 1)
+            Rectangle()
+                .opacity(0.4)
+                .frame(width: 60, height: 1)
             Text(title)
                 .tracking(10)
                 .font(.subheadline)
-                .foregroundColor(.white.opacity(0.7))
+                .opacity(0.7)
                 .padding(.horizontal)
-            Rectangle().foregroundColor(.white.opacity(0.4)).frame(width: 60, height: 1)
+            Rectangle()
+                .opacity(0.4)
+                .frame(width: 60, height: 1)
         }
     }
     func firstSelectButtons() -> some View {
@@ -651,7 +683,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             Text("アカウントをお持ちですか？")
                 .tracking(10)
                 .font(.subheadline)
-                .foregroundColor(.white.opacity(0.5))
+                .opacity(0.8)
                 .padding(.bottom, 40)
             
             Button {
@@ -730,14 +762,14 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             }
             
             Text("または")
-                .foregroundColor(.white).opacity(0.7)
+                .opacity(0.7)
                 .tracking(2)
 
             Button {
                 // お試しログイン選択時の処理
                 hapticSuccessNotification()
                 withAnimation(.easeInOut(duration: 0.4)) {
-                    inputLogIn.isShowUserEntryRecommendation.toggle()
+                    inputLogIn.isShowAnonymousEntryRecomendation.toggle()
                 }
             } label: {
                 ZStack {
@@ -801,7 +833,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 }
             } // Group
             .tracking(5)
-            .font(.subheadline).foregroundColor(.white.opacity(0.8))
+            .font(.subheadline)
             .opacity(inputLogIn.checkBackgroundOpacity)
             .opacity(inputLogIn.createAccountTitle ? 1.0 : 0.0)
             
@@ -886,12 +918,48 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     .opacity(inputLogIn.checkBackgroundOpacity)
                     .overlay(alignment: .trailing) {
                         VStack {
-                            Text("確認する").font(.footnote).offset(x: 15)
-                            Toggle("", isOn: $inputLogIn.checkBackgroundOpacityToggle)
+//                            Text("確認する").font(.footnote).offset(x: 15)
+//                            Toggle("", isOn: $inputLogIn.checkBackgroundOpacityToggle)
+
+
+                                HStack {
+                                    Spacer()
+                                    ZStack {
+                                        BlurView(style: .systemThickMaterial)
+                                            .frame(width: 90, height: 160)
+                                            .clipShape(RoundedRectangle(cornerRadius: 15))
+                                            .opacity(0.8)
+
+                                        VStack(spacing: 20) {
+                                            VStack {
+                                                Text("背景を確認").font(.footnote).offset(x: 15)
+                                                Toggle("", isOn: $checkBackgroundToggle)
+                                            }
+                                            VStack {
+                                                Text("ダークモード").font(.footnote).offset(x: 15)
+                                                Toggle("", isOn: $homeTextColorMode)
+                                            }
+                                        }
+                                        .frame(width: 80)
+                                        .padding(.trailing, 30)
+                                        .onChange(of: checkBackgroundToggle) { newValue in
+                                            if newValue {
+                                                withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+                                                    checkBackgroundAnimation = true
+                                                }
+                                            } else {
+                                                withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+                                                    checkBackgroundAnimation = false
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
                         }
                         .frame(width: 80)
-                        .offset(x: 130)
-                        .onChange(of: inputLogIn.checkBackgroundOpacityToggle) { newValue in
+                        .offset(x: 130, y: 50)
+                        .onChange(of: checkBackgroundToggle) { newValue in
                             if newValue {
                                 withAnimation(.easeIn(duration: 0.2)) { inputLogIn.checkBackgroundOpacity = 0.0 }
                                 withAnimation(.easeIn(duration: 0.2)) { inputLogIn.checkBackgroundEffect.toggle() }
@@ -919,7 +987,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     .onTapGesture { inputLogIn.isShowPickerView.toggle() }
                     .overlay(alignment: .top) {
                         Text("ユーザ情報は後から変更できます。").font(.caption)
-                            .foregroundColor(.white.opacity(0.5))
+                            .opacity(0.7)
                             .frame(width: 200)
                             .offset(y: -30)
                     }
@@ -927,15 +995,16 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     
                     TextField("", text: $inputLogIn.createUserNameText)
                         .frame(width: 230)
-                        .foregroundColor(.white)
                         .focused($showUserNameKyboard, equals: .check)
                         .textInputAutocapitalization(.never)
                         .multilineTextAlignment(.center)
                         .background {
                             ZStack {
                                 Text(showUserNameKyboard == nil && inputLogIn.createUserNameText.isEmpty ? "名前を入力" : "")
-                                    .foregroundColor(.white.opacity(0.4))
-                                Rectangle().foregroundColor(.white.opacity(0.7)).frame(height: 1)
+                                    .opacity(0.6)
+                                Rectangle()
+                                    .opacity(0.7)
+                                    .frame(height: 1)
                                     .offset(y: 20)
                             }
                         }
@@ -990,7 +1059,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 .overlay {
                     VStack {
                         HStack {
-                            Text(logInVM.userSelectedSignInType == .logIn ?  "Mail Address  ログイン" : "Mail Address  ユーザー登録")
+                            Text(logInVM.userSelectedSignInType == .logIn ?  "Mail Address  ログイン" : "メールアドレス  ユーザー登録")
                                 .font(.title3).fontWeight(.bold)
                             
                             Spacer()
@@ -1172,14 +1241,6 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     inputLogIn.keyboardOffset = 0
                 }
             }
-        }
-        
-        .background {
-            Color.black.opacity(logInVM.showEmailSheetBackground ? 0.7 : 0.0)
-                .ignoresSafeArea()
-                .onTapGesture {
-                    showEmailKyboard = nil
-                }
         }
     }
     

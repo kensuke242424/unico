@@ -151,8 +151,9 @@ class LogInViewModel: ObservableObject {
                 return
             }
             /// Authの判定後、ユーザが選択したサインインタイプによってさらに処理がスイッチ分岐する
+            /// アカウントが既に存在していた場合の処理
             if let providers = providers, providers.count > 0 {
-                // アカウントが既に存在していた場合の処理
+
                 switch self.userSelectedSignInType {
                     
                 case .start :
@@ -165,12 +166,15 @@ class LogInViewModel: ObservableObject {
                     // アカウントが既に存在することをアラートで伝えて、既存データへのログインを促す
                     self.logInAlertMessage = .existEmailAddressAccount
                     self.isShowLogInFlowAlert.toggle()
+                    withAnimation(.spring(response: 0.3)) {
+                        self.addressSignInFase = .exist
+                    }
                     
                     hapticErrorNotification()
                 }
-                
+            // アカウントが存在しなかった場合の処理
             } else {
-                // アカウントが存在しなかった場合の処理
+
                 switch self.userSelectedSignInType {
                     
                 case .start :
