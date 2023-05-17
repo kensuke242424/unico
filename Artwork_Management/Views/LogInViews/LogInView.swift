@@ -383,8 +383,24 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     
                 }
                 // メールアドレス登録選択時に出現するアドレス入力ハーフシートView
+                if logInVM.showEmailSheetBackground {
+                    Color.black
+                        .opacity(0.7)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
+                                logInVM.showEmailHalfSheet.toggle()
+                                showEmailKyboard = nil
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                                logInVM.showEmailSheetBackground.toggle()
+                                logInVM.addressSignInFase = .start
+                            }
+                        }
+                }
                 if logInVM.showEmailHalfSheet {
                     inputAdressHalfSheet()
+                        .transition(.offset(y: getRect().height / 2))
                 }
 
             } // Group
@@ -453,7 +469,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             case .notExistEmailAddressAccount:
                 Button("OK") {}
                 
-            case .notEmailCurrentMatches:
+            case .notEmailCurrentMatches     :
                 Button("OK") {}
                 
             case .other                      :
@@ -504,11 +520,11 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         .onChange(of: logInVM.createAccountFase) { newFaseValue in
             withAnimation(.spring(response: 1.0)) {
                 switch newFaseValue {
-                case .start: createFaseLineImprove = 0
-                case .fase1: createFaseLineImprove = 0
-                case .fase2: createFaseLineImprove = 100
-                case .fase3: createFaseLineImprove = 200
-                case .check: createFaseLineImprove = 200
+                case .start  : createFaseLineImprove = 0
+                case .fase1  : createFaseLineImprove = 0
+                case .fase2  : createFaseLineImprove = 100
+                case .fase3  : createFaseLineImprove = 200
+                case .check  : createFaseLineImprove = 200
                 case .success: createFaseLineImprove = 200
                 }
             }
@@ -996,7 +1012,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 .overlay {
                     VStack {
                         HStack {
-                            Text(logInVM.userSelectedSignInType == .logIn ?  "Mail Address  ログイン" : "Mail Address  ユーザー登録")
+                            Text(logInVM.userSelectedSignInType == .logIn ?  "Mail Address  ログイン" : "メールアドレス  ユーザー登録")
                                 .font(.title3).fontWeight(.bold)
                             
                             Spacer()
@@ -1178,14 +1194,6 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     inputLogIn.keyboardOffset = 0
                 }
             }
-        }
-        
-        .background {
-            Color.black.opacity(logInVM.showEmailSheetBackground ? 0.7 : 0.0)
-                .ignoresSafeArea()
-                .onTapGesture {
-                    showEmailKyboard = nil
-                }
         }
     }
     
