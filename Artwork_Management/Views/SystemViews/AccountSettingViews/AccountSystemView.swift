@@ -87,24 +87,14 @@ struct AccountSystemView: View {
                         
                     case .entryAccount:
                         Button {
-                            if userVM.isAnonymous {
-                                withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
-                                    showEntryAccount.toggle()
-                                }
-                            } else {
-                                showExistAccountAlert.toggle()
+                            withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
+                                showEntryAccount.toggle()
                             }
                         } label: {
                             ListRowView(icon : listRow.icon,
                                         title: listRow.title,
                                         text : listRow.infomation)
                         }
-                        .alert("登録済み", isPresented: $showExistAccountAlert) {
-                            Button("OK") { showExistAccountAlert.toggle()
-                            }
-                        } message: {
-                            Text("\(userVM.user?.name ?? "No Name")さんのアカウントはすでに登録済みです。")
-                        } // alert
                         .alert(logInVM.resultAccountLink ? "登録完了" : "登録失敗",
                                isPresented: $logInVM.showAccountLinkAlert) {
                             Button("OK") {
@@ -181,17 +171,11 @@ struct AccountSystemView: View {
             }
             Spacer()
         }
-        .sheet(isPresented: $showEntryAccount) {
-            UserEntryRecommendationView(isShow: $showEntryAccount)
-        }
         .navigationTitle("アカウント")
         .customSystemBackground()
         .customBackButton()
-        .overlay {
-            if showEntryAccount {
-//                UserEntryRecommendationView(isShow: $showEntryAccount)
-//                    .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
-            }
+        .sheet(isPresented: $showEntryAccount) {
+            UserEntryRecommendationView(isShow: $showEntryAccount)
         }
         .overlay {
             if logInVM.showEmailHalfSheet {

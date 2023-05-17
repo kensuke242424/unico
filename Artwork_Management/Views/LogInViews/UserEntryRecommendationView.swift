@@ -20,6 +20,8 @@ struct UserEntryRecommendationView: View {
 
     /// ユーザー登録ビューの画面遷移を管理するプロパティ
     @StateObject var userEntryNavigationVM = UserEntryNavigationViewModel()
+
+    @State private var showExistEntryAlert: Bool = false
     
     var body: some View {
 
@@ -76,7 +78,7 @@ struct UserEntryRecommendationView: View {
 
             // 下部の選択ボタンを保有するView
             VStack(spacing: 30) {
-                Text(userVM.isAnonymous ? "アカウント登録を行いますか？" : "お試しアカウントで始めますか？")
+                Text("アカウント登録を行いますか？")
                     .foregroundColor(.white)
                     .tracking(3)
                     .padding(.top)
@@ -88,37 +90,33 @@ struct UserEntryRecommendationView: View {
                         }
                     }
                     .buttonStyle(.bordered)
-                    Button(userVM.isAnonymous ? "\(Image(systemName: "envelope.fill")) 登録" : "お試しで始める") {
+                    Button("\(Image(systemName: "envelope.fill")) 登録") {
 
-                        if userVM.isAnonymous {
-                            // すでにお試しアカウントでアプリを始めている場合の処理
-                            withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
-                                logInVM.handleUseReceivedEmailLink = .entryAccount
-                                /// ⬇︎関係ない値のように見えるが、メソッドのハンドリングに使われる値のため、消さない！！
-                                logInVM.userSelectedSignInType = .signUp
-                                logInVM.showEmailHalfSheet.toggle()
-                            }
+                        // すでにアカウント登録済みの場合はアラートを表示して処理終了
+                        if Auth.auth().currentUser != nil {
+                            showExistEntryAlert.toggle()
+                            return
+                        }
 
-                        } else {
-                            // アプリをまだ始めてなくて、ログイン画面からのアクセスの場合の処理
-                            // すでにアカウントを作成しログイン済みの場合は弾く
-                            if Auth.auth().currentUser != nil { return }
-                            logInVM.resultSignInType = .signUp
-                            logInVM.signInAnonymously()
-
-                            withAnimation(.easeInOut(duration: 0.5)) {
-                                isShow.toggle()
-                            }
-                            withAnimation(.spring(response: 0.8).delay(0.5)) {
-                                logInVM.userSelectedSignInType = .signUp
-                                logInVM.createAccountFase      = .check
-                                logInVM.selectProviderType     = .trial
-                            }
+                        withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
+                            logInVM.handleUseReceivedEmailLink = .entryAccount
+                            /// ⬇︎関係ない値のように見えるが、メソッドのハンドリングに使われる値のため、消さない！！
+                            logInVM.userSelectedSignInType = .signUp
+                            logInVM.showEmailHalfSheet.toggle()
                         }
                     }
                     .buttonStyle(.borderedProminent)
                 }
             }
+            // 登録済みのユーザーが登録ボタンを押した場合に表示するアラート
+            .alert("登録済み", isPresented: $showExistEntryAlert) {
+                Button("OK") {
+                    showExistEntryAlert.toggle()
+                }
+            } message: {
+                Text("\(userVM.user?.name ?? "No Name")さんのアカウントはすでに登録済みです。")
+            }
+            // アカウント登録の結果をユーザーに知らせるアラート
             .alert(logInVM.resultAccountLink ? "登録完了" : "登録失敗",
                    isPresented: $logInVM.showAccountLinkAlert) {
                 Button("OK") {
