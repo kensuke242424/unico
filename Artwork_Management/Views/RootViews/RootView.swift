@@ -70,6 +70,7 @@ struct RootView: View {
                     .environment(\.resizableSheetCenter, resizableSheetCenter)
             }
         } // ZStack
+        .preferredColorScheme(homeTextColorMode ? .dark : .light)
         .overlay {
             if progressVM.showCubesProgress {
                 CubesProgressView()

@@ -216,6 +216,11 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
     @State private var logInNavigationPath: [Navigation] = []
     @State private var inputLogIn: InputLogIn = InputLogIn()
     @State private var createFaseLineImprove: CGFloat = 0.0
+
+    // バックグラウンド選択フェーズで用いるプロパティ
+    @State private var checkBackgroundToggle   : Bool = false
+    @State private var checkBackgroundAnimation: Bool = false
+    @AppStorage("homeTextColorMode") var homeTextColorMode: Bool = true
     
     @FocusState private var showEmailKyboard: ShowKyboard?
 
@@ -239,7 +244,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             .opacity(logInVM.createAccountFase == .fase3 ? 1.0 : 0.0)
             .onTapGesture { inputLogIn.isShowPickerView.toggle() }
             
-            LogoMark()
+            LargeLogoMark()
                 .scaleEffect(logInVM.userSelectedSignInType == .signUp ? 0.4 : 1.0)
                 .offset(y: logInVM.userSelectedSignInType == .signUp ? -getRect().height / 2.5 : -getRect().height / 4)
                 .offset(x: logInVM.userSelectedSignInType == .signUp ? getRect().width / 3 : 0)
@@ -321,8 +326,9 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         }
                     } label: {
                         Text("< 戻る")
+                            .foregroundColor(homeTextColorMode ? .white : .black)
                             .fontWeight(.semibold)
-                            .foregroundColor(.white.opacity(0.7))
+                            .opacity(0.7)
                     }
                     .disabled(logInVM.addressSignInFase == .success ||
                               logInVM.addressSignInFase == .check ? true : false)
@@ -354,7 +360,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                              logInVM.createAccountFase == .fase1 ||
                              logInVM.createAccountFase == .check ||
                              logInVM.createAccountFase == .success ? 0.0 : 1.0)
-                    .foregroundColor(.white.opacity(0.5))
+                    .opacity(0.5)
                     .offset(x: -getRect().width / 2 + 40, y: getRect().height / 2 - 60 )
                     .alert("確認", isPresented: $inputLogIn.isShowGoBackLogInAlert) {
                         
@@ -496,14 +502,14 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             .resizable()
                             .scaledToFill()
                             .frame(width: proxy.size.width, height: proxy.size.height)
-                            .blur(radius: inputLogIn.checkBackgroundEffect ? 0 : 2)
+                            .blur(radius: inputLogIn.checkBackgroundEffect ? 0 : 2, opaque: true)
                             .ignoresSafeArea()
                     } else {
                         Image(inputLogIn.selectBackground.imageName)
                             .resizable()
                             .scaledToFill()
                             .frame(width: proxy.size.width, height: proxy.size.height)
-                            .blur(radius: inputLogIn.checkBackgroundEffect ? 0 : 2)
+                            .blur(radius: inputLogIn.checkBackgroundEffect ? 0 : 2, opaque: true)
                             .ignoresSafeArea()
                     }
                     Color(.black)
@@ -658,13 +664,17 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
     @ViewBuilder
     func signInTitle(title: String) -> some View {
         HStack {
-            Rectangle().foregroundColor(.white.opacity(0.4)).frame(width: 60, height: 1)
+            Rectangle()
+                .opacity(0.4)
+                .frame(width: 60, height: 1)
             Text(title)
                 .tracking(10)
                 .font(.subheadline)
-                .foregroundColor(.white.opacity(0.7))
+                .opacity(0.7)
                 .padding(.horizontal)
-            Rectangle().foregroundColor(.white.opacity(0.4)).frame(width: 60, height: 1)
+            Rectangle()
+                .opacity(0.4)
+                .frame(width: 60, height: 1)
         }
     }
     func firstSelectButtons() -> some View {
@@ -673,7 +683,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             Text("アカウントをお持ちですか？")
                 .tracking(10)
                 .font(.subheadline)
-                .foregroundColor(.white.opacity(0.5))
+                .opacity(0.8)
                 .padding(.bottom, 40)
             
             Button {
@@ -752,7 +762,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             }
             
             Text("または")
-                .foregroundColor(.white).opacity(0.7)
+                .opacity(0.7)
                 .tracking(2)
 
             Button {
@@ -823,7 +833,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 }
             } // Group
             .tracking(5)
-            .font(.subheadline).foregroundColor(.white.opacity(0.8))
+            .font(.subheadline)
             .opacity(inputLogIn.checkBackgroundOpacity)
             .opacity(inputLogIn.createAccountTitle ? 1.0 : 0.0)
             
@@ -908,12 +918,48 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     .opacity(inputLogIn.checkBackgroundOpacity)
                     .overlay(alignment: .trailing) {
                         VStack {
-                            Text("確認する").font(.footnote).offset(x: 15)
-                            Toggle("", isOn: $inputLogIn.checkBackgroundOpacityToggle)
+//                            Text("確認する").font(.footnote).offset(x: 15)
+//                            Toggle("", isOn: $inputLogIn.checkBackgroundOpacityToggle)
+
+
+                                HStack {
+                                    Spacer()
+                                    ZStack {
+                                        BlurView(style: .systemThickMaterial)
+                                            .frame(width: 90, height: 160)
+                                            .clipShape(RoundedRectangle(cornerRadius: 15))
+                                            .opacity(0.8)
+
+                                        VStack(spacing: 20) {
+                                            VStack {
+                                                Text("背景を確認").font(.footnote).offset(x: 15)
+                                                Toggle("", isOn: $checkBackgroundToggle)
+                                            }
+                                            VStack {
+                                                Text("ダークモード").font(.footnote).offset(x: 15)
+                                                Toggle("", isOn: $homeTextColorMode)
+                                            }
+                                        }
+                                        .frame(width: 80)
+                                        .padding(.trailing, 30)
+                                        .onChange(of: checkBackgroundToggle) { newValue in
+                                            if newValue {
+                                                withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+                                                    checkBackgroundAnimation = true
+                                                }
+                                            } else {
+                                                withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+                                                    checkBackgroundAnimation = false
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
                         }
                         .frame(width: 80)
-                        .offset(x: 130)
-                        .onChange(of: inputLogIn.checkBackgroundOpacityToggle) { newValue in
+                        .offset(x: 130, y: 50)
+                        .onChange(of: checkBackgroundToggle) { newValue in
                             if newValue {
                                 withAnimation(.easeIn(duration: 0.2)) { inputLogIn.checkBackgroundOpacity = 0.0 }
                                 withAnimation(.easeIn(duration: 0.2)) { inputLogIn.checkBackgroundEffect.toggle() }
@@ -941,7 +987,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     .onTapGesture { inputLogIn.isShowPickerView.toggle() }
                     .overlay(alignment: .top) {
                         Text("ユーザ情報は後から変更できます。").font(.caption)
-                            .foregroundColor(.white.opacity(0.5))
+                            .opacity(0.7)
                             .frame(width: 200)
                             .offset(y: -30)
                     }
@@ -949,15 +995,16 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     
                     TextField("", text: $inputLogIn.createUserNameText)
                         .frame(width: 230)
-                        .foregroundColor(.white)
                         .focused($showUserNameKyboard, equals: .check)
                         .textInputAutocapitalization(.never)
                         .multilineTextAlignment(.center)
                         .background {
                             ZStack {
                                 Text(showUserNameKyboard == nil && inputLogIn.createUserNameText.isEmpty ? "名前を入力" : "")
-                                    .foregroundColor(.white.opacity(0.4))
-                                Rectangle().foregroundColor(.white.opacity(0.7)).frame(height: 1)
+                                    .opacity(0.6)
+                                Rectangle()
+                                    .opacity(0.7)
+                                    .frame(height: 1)
                                     .offset(y: 20)
                             }
                         }
