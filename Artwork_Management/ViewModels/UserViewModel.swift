@@ -134,26 +134,27 @@ class UserViewModel: ObservableObject {
         }
     }
 
-    func updateUserNameAndIcon(name updateName: String, data iconData: (url: URL?, filePath: String?)) async throws {
+    func updateUserNameAndIcon(name updateName: String, data updateIconData: (url: URL?, filePath: String?)) async throws {
 
-        // 取得アイコンデータurlがnilだったら処理終了
-        guard iconData.url != nil else { return }
-        guard var user else { throw CustomError.userEmpty }
-        guard let userRef = db?.collection("users").document(user.id) else { throw CustomError.getDocument }
+        // 取得アイコンデータurlがnilであれば更新しない
+        guard var userDataSource = user else { throw CustomError.userEmpty }
+        guard let userRef = db?.collection("users").document(userDataSource.id) else { throw CustomError.getDocument }
 
         do {
-            // 更新前の元々のアイコンパスを保持しておく。更新成功が確認できてから前データを削除する
-            let defaultIconPath = user.iconPath
-            user.name = updateName
-            user.iconURL = iconData.url
-            user.iconPath = iconData.filePath
+            // 更新前の元々のアイコンパスを保持しておく。更新成功後のデフォルトデータ削除に使う
+            let defaultIconPath = userDataSource.iconPath
+            userDataSource.name     = updateName
+            userDataSource.iconURL  = updateIconData.url
+            userDataSource.iconPath = updateIconData.filePath
 
-            _ = try userRef.setData(from: user)
-            // ⬆︎のsetDataが成功したら、前のアイコンデータをfirestorageから削除
-            await deleteUserImageData(path: defaultIconPath)
+            _ = try userRef.setData(from: userDataSource)
+            // アイコンデータは変えていない場合、削除処理をスキップする
+            if defaultIconPath != updateIconData.filePath {
+                await deleteUserImageData(path: defaultIconPath)
+            }
         } catch {
             // アイコンデータ更新失敗のため、保存予定だったアイコンデータをfirestorageから削除
-            await deleteUserImageData(path: iconData.filePath)
+            await deleteUserImageData(path: updateIconData.filePath)
             print("error: updateTeamNameAndIcon_do_try_catch")
         }
     }
