@@ -312,6 +312,7 @@ struct SystemSideMenu: View {
                                             .onTapGesture {
                                                 inputSideMenu.showUserEntrySheet.toggle()
                                             }
+                                            .offset(x: -3)
 
 
                                         Label("ログアウト", systemImage: "door.right.hand.open")
