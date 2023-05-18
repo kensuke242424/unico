@@ -179,7 +179,7 @@ struct CartItemRow: View {
                             cartVM.resultCartAmount -= 1
                         }
                     } message: {
-                        Text("かごから\(itemRow.name)を削除しますか？")
+                        Text("かごから\(itemRow.name == "" ? "No Name" : itemRow.name)を削除しますか？")
                     }
                 } // VStack
             } // HStack
