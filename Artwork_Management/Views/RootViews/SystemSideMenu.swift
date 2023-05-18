@@ -303,12 +303,12 @@ struct SystemSideMenu: View {
 
                                     VStack(alignment: .leading, spacing: 40) {
 
-                                        Label("ユーザー情報変更", systemImage: "person.text.rectangle")
+                                        Label("ユーザー情報変更", systemImage: "person.fill")
                                             .onTapGesture {
                                                 withAnimation(.spring(response: 0.5)) { inputTab.selectedUpdateData = .user }
                                             }
 
-                                        Label("ユーザー登録", systemImage: "person.text.rectangle")
+                                        Label("アカウント登録", systemImage: "person.crop.square.filled.and.at.rectangle.fill")
                                             .onTapGesture {
                                                 inputSideMenu.showUserEntrySheet.toggle()
                                             }

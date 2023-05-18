@@ -93,7 +93,7 @@ struct UserEntryRecommendationView: View {
                     Button("\(Image(systemName: "envelope.fill")) 登録") {
 
                         // すでにアカウント登録済みの場合はアラートを表示して処理終了
-                        if Auth.auth().currentUser != nil {
+                        if !userVM.isAnonymous {
                             showExistEntryAlert.toggle()
                             return
                         }
