@@ -396,10 +396,10 @@ struct NewItemsView: View {
                                         .matchedGeometryEffect(id: "ACTIVETAG", in: animation)
                                 } else {
                                     Capsule()
-                                        .fill(Color.gray.opacity(0.5))
+                                        .fill(Color.gray.opacity(0.6))
                                 }
                             }
-                            .foregroundColor(activeTag == tag ? .white : .white.opacity(0.6))
+                            .foregroundColor(activeTag == tag ? .white : .white.opacity(0.7))
                             .onTapGesture {
                                 withAnimation(.interactiveSpring(response: 0.5, dampingFraction: 0.7, blendDuration: 0.7)) {
                                     activeTag = tag
@@ -420,7 +420,7 @@ struct NewItemsView: View {
                 }
             } label: {
                 Image(systemName: "plus.app.fill")
-                    .foregroundColor(Color.gray)
+                    .foregroundColor(.blue)
                     .shadow(radius: 1, x: 1, y: 1)
                     .shadow(radius: 1, x: 1, y: 1)
             }
