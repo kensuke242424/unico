@@ -32,6 +32,10 @@ struct InputSideMenu {
     // 操作チームを変更するハーフモーダルを管理
     var showChangeTeamSheet: Bool = false
     var teamsListSheetEdit: Bool = false
+
+    // ユーザー登録シートモーダルの管理プロパティ
+    var showUserEntrySheet: Bool = false
+
     // ユーザーが移動先に選択したチームが格納される
     var selectedTeam: JoinTeam?
 }
@@ -53,7 +57,7 @@ struct SystemSideMenu: View {
     @State private var inputSideMenu: InputSideMenu = InputSideMenu()
 
     @GestureState var dragOffset: CGFloat = 0.0
-    let menuHeight: CGFloat = 60
+    let menuRowHeight: CGFloat = 60
 
     var body: some View {
 
@@ -127,7 +131,7 @@ struct SystemSideMenu: View {
                                             .onTapGesture { navigationVM.path.append(EditItemPath.create) }
                                     }
                                     .foregroundColor(.white)
-                                    .frame(width: 210, height: menuHeight, alignment: .topLeading)
+                                    .frame(width: 210, height: menuRowHeight, alignment: .topLeading)
                                     .offset(x: 20, y: 30)
                                 }
                             }
@@ -216,7 +220,7 @@ struct SystemSideMenu: View {
                                         } // List
                                         .environment(\.editMode, $inputSideMenu.editMode)
                                         .frame(width: UIScreen.main.bounds.width * 0.58,
-                                               height: menuHeight + (40 * CGFloat(tagVM.tags.count - 2)))
+                                               height: menuRowHeight + (40 * CGFloat(tagVM.tags.count - 2)))
                                         .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
                                         .scrollContentBackground(.hidden)
                                         .offset(x: -10)
@@ -225,7 +229,7 @@ struct SystemSideMenu: View {
                                         Text("登録タグはありません")
                                             .font(.subheadline).foregroundColor(.white)
                                             .opacity(0.7)
-                                            .frame(height: menuHeight)
+                                            .frame(height: menuRowHeight)
                                             .offset(y: 30)
 
                                     } // if tagVM.tags.count > 2
@@ -284,7 +288,7 @@ struct SystemSideMenu: View {
                                     } // VStack
                                     .foregroundColor(.white)
                                     // メニュー一つ分のheight = コンテンツ数 * 60
-                                    .frame(width: 210, height: menuHeight * 5, alignment: .topLeading)
+                                    .frame(width: 210, height: menuRowHeight * 5, alignment: .topLeading)
                                     .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
                                     .offset(x: 20, y: 30)
                                 }
@@ -299,10 +303,16 @@ struct SystemSideMenu: View {
 
                                     VStack(alignment: .leading, spacing: 40) {
 
-                                        Label("ユーザ情報変更", systemImage: "person.text.rectangle")
+                                        Label("ユーザー情報変更", systemImage: "person.text.rectangle")
                                             .onTapGesture {
                                                 withAnimation(.spring(response: 0.5)) { inputTab.selectedUpdateData = .user }
                                             }
+
+                                        Label("ユーザー登録", systemImage: "person.text.rectangle")
+                                            .onTapGesture {
+                                                inputSideMenu.showUserEntrySheet.toggle()
+                                            }
+
 
                                         Label("ログアウト", systemImage: "door.right.hand.open")
                                             .foregroundColor(.orange)
@@ -311,7 +321,7 @@ struct SystemSideMenu: View {
                                     } // VStack
                                     .foregroundColor(.white)
                                     // メニュー一つ分のheight = コンテンツ数 * 60
-                                    .frame(width: 210, height: menuHeight * 2, alignment: .topLeading)
+                                    .frame(width: 210, height: menuRowHeight * 3, alignment: .topLeading)
                                     .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
                                     .offset(x: 20, y: 30)
                                     .alert("確認", isPresented: $inputSideMenu.isShowLogOutAlert) {
@@ -353,7 +363,7 @@ struct SystemSideMenu: View {
                                     } // VStack
                                     .foregroundColor(.white)
                                     // メニュー一つ分のheight = コンテンツ数 * 60
-                                    .frame(width: 210, height: menuHeight, alignment: .topLeading)
+                                    .frame(width: 210, height: menuRowHeight, alignment: .topLeading)
                                     .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
                                     .offset(x: 20, y: 30)
 
@@ -377,6 +387,9 @@ struct SystemSideMenu: View {
         .sheet(isPresented: $inputSideMenu.showChangeTeamSheet) {
             ChangeTeamSheetView(teams: userVM.user?.joins ?? [])
                 .presentationDetents([.medium])
+        }
+        .sheet(isPresented: $inputSideMenu.showUserEntrySheet) {
+            UserEntryRecommendationView(isShow: $inputSideMenu.showUserEntrySheet)
         }
         .alert("", isPresented: $inputSideMenu.isShowChangeTeamAlert) {
             Button("戻る") {}
