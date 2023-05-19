@@ -121,6 +121,9 @@ struct UserEntryRecommendationView: View {
                    isPresented: $logInVM.showAccountLinkAlert) {
                 Button("OK") {
                     logInVM.showAccountLinkAlert.toggle()
+                    if logInVM.resultAccountLink {
+                        isShow.toggle()
+                    }
                 }
             } message: {
                 if logInVM.resultAccountLink {
