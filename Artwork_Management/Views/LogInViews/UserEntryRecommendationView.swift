@@ -76,10 +76,27 @@ struct UserEntryRecommendationView: View {
 
             // 下部の選択ボタンを保有するView
             VStack(spacing: 30) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(.gray.gradient)
+                        .opacity(0.2)
+
+                    HStack {
+                        Rectangle()
+                            .fill(.white)
+                            .frame(width: 20, height: 20)
+                            .padding(5)
+
+                        AttributedRulesText(getAttributeString())
+
+                    }
+                    .padding(8)
+                }
+                .frame(height: 60)
+
                 Text("アカウント登録を行いますか？")
                     .foregroundColor(.white)
                     .tracking(3)
-                    .padding(.top)
 
                 HStack(spacing: 40) {
                     Button("戻る") {
@@ -152,6 +169,46 @@ struct UserEntryRecommendationView: View {
                     .ignoresSafeArea()
             }
         }
+    }
+
+    // TODO: 利用規約とプライバシーポリシーのリンク先が作成できたらリンクを更新
+    func getAttributeString() -> NSAttributedString {
+        let baseString = "利用規約とプライバシーポリシーを確認した上で、規約に同意します。"
+        let attributedString = NSMutableAttributedString(string: baseString)
+
+        attributedString.addAttribute(NSAttributedString.Key.foregroundColor,
+                                      value: UIColor.white,
+                                      range: NSMakeRange(0, baseString.count))
+        attributedString.addAttribute(.link,
+                                      value: UIApplication.openSettingsURLString,
+                                      range: NSString(string: baseString).range(of: "利用規約"))
+        attributedString.addAttribute(.link,
+                                      value: "https://www.google.co.jp/",
+                                      range: NSString(string: baseString).range(of: "プライバシーポリシー"))
+        return attributedString
+    }
+}
+
+/// リンク付きのテキストを作成するためにUITextViewを使用
+struct AttributedRulesText: UIViewRepresentable {
+    /// 属性付きのテキスト
+    var attributedText: NSAttributedString
+
+    init(_ attributedText: NSAttributedString) {
+        self.attributedText = attributedText
+    }
+
+    func makeUIView(context: Context) -> UITextView {
+        let textView = UITextView()
+        textView.textColor = UIColor.gray
+        textView.backgroundColor = .clear
+        textView.isEditable = false
+        textView.isSelectable = true
+        return textView
+    }
+
+    func updateUIView(_ textView: UITextView, context: Context) {
+        textView.attributedText = attributedText
     }
 }
 
