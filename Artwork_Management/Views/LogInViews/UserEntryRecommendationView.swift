@@ -78,40 +78,8 @@ struct UserEntryRecommendationView: View {
 
             // 下部の選択ボタンを保有するView
             VStack(spacing: 30) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(.white.gradient)
 
-                    HStack {
-                        Rectangle()
-                            .stroke(Color.black, lineWidth: 1)
-                            .frame(width: 15, height: 15)
-                            .overlay {
-                                if checkAgree {
-                                    Image(systemName: "checkmark")
-                                        .fontWeight(.bold)
-                                        .offset(y: -2)
-                                }
-                            }
-                            .background {
-                                if checkAgree {
-                                    Rectangle()
-                                        .fill(.green)
-                                        .opacity(0.7)
-                                }
-                            }
-                            .onTapGesture(perform: {
-                                checkAgree.toggle()
-                                hapticSuccessNotification()
-                            })
-                            .padding(5)
-
-                        TermsAndPrivacyView()
-
-                    }
-                    .padding(8)
-                }
-                .frame(height: 60)
+                TermsAndPrivacyView(isCheck: $checkAgree)
 
                 Text("アカウント登録を行いますか？")
                     .foregroundColor(.white)

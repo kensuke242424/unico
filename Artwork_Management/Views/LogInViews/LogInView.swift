@@ -199,6 +199,10 @@ struct InputLogIn {
     var isShowPickerView                 : Bool = false
     var isShowAnonymousEntryRecomendation: Bool = false
     var isShowGoBackLogInAlert           : Bool = false
+
+    var checkTermsAgree: Bool = false
+    var showNotYetAgreeAlert: Bool = false
+
     var captureError                     : Bool = false
 }
 
@@ -334,6 +338,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                               logInVM.addressSignInFase == .check ? true : false)
                     .disabled(logInVM.createAccountFase == .success ||
                               logInVM.createAccountFase == .check ? true : false)
+                    .buttonStyle(.bordered)
+                    .foregroundColor(homeTextColorMode ? .white : .black)
                     .opacity(inputLogIn.checkBackgroundOpacity)
                     .opacity(logInVM.addressSignInFase == .success ||
                              logInVM.addressSignInFase == .check ? 0.2 : 1.0)
@@ -354,6 +360,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             Image(systemName: "house.fill")
                         }
                     }
+                    .buttonStyle(.bordered)
+                    .foregroundColor(homeTextColorMode ? .white : .black)
                     .disabled(logInVM.addressSignInFase == .success ? true : false)
                     .opacity(logInVM.addressSignInFase == .success ? 0.2 : 1.0)
                     .opacity(logInVM.createAccountFase == .start ||
@@ -738,8 +746,17 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
     }
     func logInSelectButtons() -> some View {
         VStack(spacing: 25) {
+
+            if logInVM.userSelectedSignInType == .signUp {
+                TermsAndPrivacyView(isCheck: $inputLogIn.checkTermsAgree)
+            }
             
             Button {
+                if !inputLogIn.checkTermsAgree {
+                    inputLogIn.showNotYetAgreeAlert.toggle()
+                    return
+                }
+
                 withAnimation(.easeIn(duration: 0.25)) {
                     logInVM.showEmailSheetBackground.toggle()
                 }
@@ -759,6 +776,11 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         .tracking(2)
                         .foregroundColor(.white)
                 }
+            }
+            .alert("", isPresented: $inputLogIn.showNotYetAgreeAlert) {
+                Button("OK") {}
+            } message: {
+                Text("利用規約とプライバシーポリシーの同意が必要です。")
             }
             
             Text("または")
@@ -919,43 +941,40 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     .opacity(inputLogIn.checkBackgroundOpacity)
                     .overlay(alignment: .trailing) {
                         VStack {
-//                            Text("確認する").font(.footnote).offset(x: 15)
-//                            Toggle("", isOn: $inputLogIn.checkBackgroundOpacityToggle)
 
+                            HStack {
+                                Spacer()
+                                ZStack {
+                                    BlurView(style: .systemThickMaterial)
+                                        .frame(width: 90, height: 160)
+                                        .clipShape(RoundedRectangle(cornerRadius: 15))
+                                        .opacity(0.8)
 
-                                HStack {
-                                    Spacer()
-                                    ZStack {
-                                        BlurView(style: .systemThickMaterial)
-                                            .frame(width: 90, height: 160)
-                                            .clipShape(RoundedRectangle(cornerRadius: 15))
-                                            .opacity(0.8)
-
-                                        VStack(spacing: 20) {
-                                            VStack {
-                                                Text("背景を確認").font(.footnote).offset(x: 15)
-                                                Toggle("", isOn: $checkBackgroundToggle)
-                                            }
-                                            VStack {
-                                                Text("ダークモード").font(.footnote).offset(x: 15)
-                                                Toggle("", isOn: $homeTextColorMode)
-                                            }
+                                    VStack(spacing: 20) {
+                                        VStack {
+                                            Text("背景を確認").font(.footnote).offset(x: 15)
+                                            Toggle("", isOn: $checkBackgroundToggle)
                                         }
-                                        .frame(width: 80)
-                                        .padding(.trailing, 30)
-                                        .onChange(of: checkBackgroundToggle) { newValue in
-                                            if newValue {
-                                                withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                                                    checkBackgroundAnimation = true
-                                                }
-                                            } else {
-                                                withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                                                    checkBackgroundAnimation = false
-                                                }
+                                        VStack {
+                                            Text("ダークモード").font(.footnote).offset(x: 15)
+                                            Toggle("", isOn: $homeTextColorMode)
+                                        }
+                                    }
+                                    .frame(width: 80)
+                                    .padding(.trailing, 30)
+                                    .onChange(of: checkBackgroundToggle) { newValue in
+                                        if newValue {
+                                            withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+                                                checkBackgroundAnimation = true
+                                            }
+                                        } else {
+                                            withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+                                                checkBackgroundAnimation = false
                                             }
                                         }
                                     }
                                 }
+                            }
 
                         }
                         .frame(width: 80)
@@ -972,7 +991,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     }
                     .offset(y: 20)
                     
-                /// ユーザー情報「名前」「アイコン」を入力するフェーズ
+                    /// ユーザー情報「名前」「アイコン」を入力するフェーズ
                 case .fase2:
                     Group {
                         if let captureImage = inputLogIn.captureUserIconImage {
