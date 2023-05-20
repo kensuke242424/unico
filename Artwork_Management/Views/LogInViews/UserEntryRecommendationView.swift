@@ -22,6 +22,9 @@ struct UserEntryRecommendationView: View {
     @StateObject var userEntryNavigationVM = UserEntryNavigationViewModel()
 
     @State private var showExistEntryAlert: Bool = false
+
+    @State private var checkAgree: Bool = false
+    @State private var showNotYetAgreeAlert: Bool = false
     
     var body: some View {
 
@@ -71,23 +74,39 @@ struct UserEntryRecommendationView: View {
 
                 }
                 .font(.footnote)
-
             }
 
             // 下部の選択ボタンを保有するView
             VStack(spacing: 30) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 10)
-                        .fill(.gray.gradient)
-                        .opacity(0.2)
+                        .fill(.white.gradient)
 
                     HStack {
                         Rectangle()
-                            .fill(.white)
-                            .frame(width: 20, height: 20)
+                            .stroke(Color.black, lineWidth: 1)
+                            .frame(width: 15, height: 15)
+                            .overlay {
+                                if checkAgree {
+                                    Image(systemName: "checkmark")
+                                        .fontWeight(.bold)
+                                        .offset(y: -2)
+                                }
+                            }
+                            .background {
+                                if checkAgree {
+                                    Rectangle()
+                                        .fill(.green)
+                                        .opacity(0.7)
+                                }
+                            }
+                            .onTapGesture(perform: {
+                                checkAgree.toggle()
+                                hapticSuccessNotification()
+                            })
                             .padding(5)
 
-                        AttributedRulesText(getAttributeString())
+                        TermsAndPrivacyView()
 
                     }
                     .padding(8)
@@ -108,8 +127,13 @@ struct UserEntryRecommendationView: View {
                     Button("\(Image(systemName: "envelope.fill")) 登録") {
 
                         // すでにアカウント登録済みの場合はアラートを表示して処理終了
-                        if Auth.auth().currentUser != nil {
+                        if !userVM.isAnonymous {
                             showExistEntryAlert.toggle()
+                            return
+                        }
+
+                        if !checkAgree {
+                            showNotYetAgreeAlert.toggle()
                             return
                         }
 
@@ -130,6 +154,11 @@ struct UserEntryRecommendationView: View {
                 }
             } message: {
                 Text("\(userVM.user?.name ?? "No Name")さんのアカウントはすでに登録済みです。")
+            }
+            .alert("", isPresented: $showNotYetAgreeAlert) {
+                Button("OK") {}
+            } message: {
+                Text("利用規約とプライバシーポリシーの同意が必要です。")
             }
             // アカウント登録の結果をユーザーに知らせるアラート
             .alert(logInVM.resultAccountLink ? "登録完了" : "登録失敗",
@@ -169,46 +198,6 @@ struct UserEntryRecommendationView: View {
                     .ignoresSafeArea()
             }
         }
-    }
-
-    // TODO: 利用規約とプライバシーポリシーのリンク先が作成できたらリンクを更新
-    func getAttributeString() -> NSAttributedString {
-        let baseString = "利用規約とプライバシーポリシーを確認した上で、規約に同意します。"
-        let attributedString = NSMutableAttributedString(string: baseString)
-
-        attributedString.addAttribute(NSAttributedString.Key.foregroundColor,
-                                      value: UIColor.white,
-                                      range: NSMakeRange(0, baseString.count))
-        attributedString.addAttribute(.link,
-                                      value: UIApplication.openSettingsURLString,
-                                      range: NSString(string: baseString).range(of: "利用規約"))
-        attributedString.addAttribute(.link,
-                                      value: "https://www.google.co.jp/",
-                                      range: NSString(string: baseString).range(of: "プライバシーポリシー"))
-        return attributedString
-    }
-}
-
-/// リンク付きのテキストを作成するためにUITextViewを使用
-struct AttributedRulesText: UIViewRepresentable {
-    /// 属性付きのテキスト
-    var attributedText: NSAttributedString
-
-    init(_ attributedText: NSAttributedString) {
-        self.attributedText = attributedText
-    }
-
-    func makeUIView(context: Context) -> UITextView {
-        let textView = UITextView()
-        textView.textColor = UIColor.gray
-        textView.backgroundColor = .clear
-        textView.isEditable = false
-        textView.isSelectable = true
-        return textView
-    }
-
-    func updateUIView(_ textView: UITextView, context: Context) {
-        textView.attributedText = attributedText
     }
 }
 

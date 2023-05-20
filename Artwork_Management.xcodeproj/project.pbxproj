@@ -49,6 +49,7 @@
 		BE41784229B4AB7E00434CFC /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = BE41784129B4AB7E00434CFC /* FirebaseAnalytics */; };
 		BE4663D82A13B54A0072C025 /* UserEntryNavigationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE4663D72A13B54A0072C025 /* UserEntryNavigationViewModel.swift */; };
 		BE4663F42A150A440072C025 /* AnonymousEntryRecomendationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE4663F32A150A440072C025 /* AnonymousEntryRecomendationView.swift */; };
+		BE4664142A18BAD20072C025 /* TermsAndPrivacyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE4664132A18BAD20072C025 /* TermsAndPrivacyView.swift */; };
 		BE6E007429CD5CCA009CBD38 /* NavigationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6E007329CD5CCA009CBD38 /* NavigationViewModel.swift */; };
 		BEAAD8F829CDCE3300C53138 /* DeletedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAAD8F729CDCE3300C53138 /* DeletedView.swift */; };
 		BEAAD8FA29CDEF6200C53138 /* DefaultEmailCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAAD8F929CDEF6200C53138 /* DefaultEmailCheckView.swift */; };
@@ -169,6 +170,7 @@
 		BE41783C29B4535800434CFC /* AnimationExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationExtension.swift; sourceTree = "<group>"; };
 		BE4663D72A13B54A0072C025 /* UserEntryNavigationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserEntryNavigationViewModel.swift; sourceTree = "<group>"; };
 		BE4663F32A150A440072C025 /* AnonymousEntryRecomendationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnonymousEntryRecomendationView.swift; sourceTree = "<group>"; };
+		BE4664132A18BAD20072C025 /* TermsAndPrivacyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermsAndPrivacyView.swift; sourceTree = "<group>"; };
 		BE6E007329CD5CCA009CBD38 /* NavigationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationViewModel.swift; sourceTree = "<group>"; };
 		BEAAD8F729CDCE3300C53138 /* DeletedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeletedView.swift; sourceTree = "<group>"; };
 		BEAAD8F929CDEF6200C53138 /* DefaultEmailCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultEmailCheckView.swift; sourceTree = "<group>"; };
@@ -555,6 +557,7 @@
 				E0F0180D2975A9E10063C96B /* JoinUserDetectCheckView.swift */,
 				BE254F9229BF1104004FE9AE /* UserEntryRecommendationView.swift */,
 				BE4663F32A150A440072C025 /* AnonymousEntryRecomendationView.swift */,
+				BE4664132A18BAD20072C025 /* TermsAndPrivacyView.swift */,
 			);
 			path = LogInViews;
 			sourceTree = "<group>";
@@ -736,6 +739,7 @@
 				E09F09C728EE266600D07669 /* InputFormTitle.swift in Sources */,
 				BE41783D29B4535800434CFC /* AnimationExtension.swift in Sources */,
 				E0455FE6292CA002004F677D /* ColorCubeView.swift in Sources */,
+				BE4664142A18BAD20072C025 /* TermsAndPrivacyView.swift in Sources */,
 				E0BFE1C629745AEB005481CA /* QRReader.swift in Sources */,
 				E04ACF4128E6DD600054A6C4 /* ShowsItemDetail.swift in Sources */,
 				E0455FE2292C5B1C004F677D /* CubesProgressView.swift in Sources */,
