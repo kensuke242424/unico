@@ -231,26 +231,27 @@ class TeamViewModel: ObservableObject {
         }
     }
 
-    func updateTeamNameAndIcon(name updateName: String, data iconData: (url: URL?, filePath: String?)) async throws {
+    func updateTeamNameAndIcon(name updateName: String, data updateIconData: (url: URL?, filePath: String?)) async throws {
 
         // 取得アイコンデータurlがnilだったら処理終了
-        guard iconData.url != nil else { return }
-        guard var team else { throw CustomError.teamEmpty }
-        guard let teamRef = db?.collection("teams").document(team.id) else { throw CustomError.getDocument }
+        guard var teamDataSource = team else { throw CustomError.teamEmpty }
+        guard let teamRef = db?.collection("teams").document(teamDataSource.id) else { throw CustomError.getDocument }
 
         do {
             // 更新前の元々のアイコンパスを保持しておく。更新成功が確認できてから前データを削除する
-            let defaultIconPath = team.iconPath
-            team.name = updateName
-            team.iconURL = iconData.url
-            team.iconPath = iconData.filePath
+            let defaultIconPath = teamDataSource.iconPath
+            teamDataSource.name = updateName
+            teamDataSource.iconURL = updateIconData.url
+            teamDataSource.iconPath = updateIconData.filePath
 
-            _ = try teamRef.setData(from: team)
-            // ⬆︎のsetDataが成功したら、前のアイコンデータをfirestorageから削除
-            await deleteTeamImageData(path: defaultIconPath)
+            _ = try teamRef.setData(from: teamDataSource)
+            // アイコンデータは変えていない場合、削除処理をスキップする
+            if defaultIconPath != updateIconData.filePath {
+                await deleteTeamImageData(path: defaultIconPath)
+            }
         } catch {
             // アイコンデータ更新失敗のため、保存予定だったアイコンデータをfirestorageから削除
-            await deleteTeamImageData(path: iconData.filePath)
+            await deleteTeamImageData(path: updateIconData.filePath)
             print("error: updateTeamNameAndIcon_do_try_catch")
         }
     }

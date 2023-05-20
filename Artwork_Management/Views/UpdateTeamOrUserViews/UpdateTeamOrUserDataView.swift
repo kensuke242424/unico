@@ -193,7 +193,7 @@ struct UpdateTeamOrUserDataView: View {
                                                           name     : inputUpdate.nameText,
                                                           iconURL  : inputUpdate.defaultIconData.url)
                         /// 自身のユーザーデータ更新と、所属するチームが保持する自身のデータを更新
-                        try await userVM.updateUserNameAndIcon(name: inputUpdate.nameText, data: inputUpdate.defaultIconData)
+                        try await userVM.updateUserNameAndIcon(name: updateMemberData.name, data: inputUpdate.defaultIconData)
                         try await teamVM.updateTeamJoinMemberData(data: updateMemberData, joins: user.joins)
                     }
 
