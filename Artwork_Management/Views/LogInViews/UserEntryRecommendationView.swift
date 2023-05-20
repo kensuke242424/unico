@@ -20,10 +20,8 @@ struct UserEntryRecommendationView: View {
 
     /// ユーザー登録ビューの画面遷移を管理するプロパティ
     @StateObject var userEntryNavigationVM = UserEntryNavigationViewModel()
-
     @State private var showExistEntryAlert: Bool = false
-
-    @State private var checkAgree: Bool = false
+    @State private var checkTermsAgree: Bool = false
     @State private var showNotYetAgreeAlert: Bool = false
     
     var body: some View {
@@ -79,7 +77,7 @@ struct UserEntryRecommendationView: View {
             // 下部の選択ボタンを保有するView
             VStack(spacing: 30) {
 
-                TermsAndPrivacyView(isCheck: $checkAgree)
+                TermsAndPrivacyView(isCheck: $checkTermsAgree)
 
                 Text("アカウント登録を行いますか？")
                     .foregroundColor(.white)
@@ -92,6 +90,7 @@ struct UserEntryRecommendationView: View {
                         }
                     }
                     .buttonStyle(.bordered)
+                    .foregroundColor(.white)
                     Button("\(Image(systemName: "envelope.fill")) 登録") {
 
                         // すでにアカウント登録済みの場合はアラートを表示して処理終了
@@ -100,7 +99,7 @@ struct UserEntryRecommendationView: View {
                             return
                         }
 
-                        if !checkAgree {
+                        if !checkTermsAgree {
                             showNotYetAgreeAlert.toggle()
                             return
                         }

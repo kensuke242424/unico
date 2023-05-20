@@ -9,7 +9,7 @@ import SwiftUI
 import Firebase
 
 struct AnonymousEntryRecomendationView: View {
-
+    
     private enum UserEntryPath {
         case inputAddress
     }
@@ -84,6 +84,8 @@ struct AnonymousEntryRecomendationView: View {
                         }
                     }
                     .buttonStyle(.bordered)
+                    .foregroundColor(.white)
+
                     Button("お試しで始める") {
 
                         if userVM.isAnonymous {
