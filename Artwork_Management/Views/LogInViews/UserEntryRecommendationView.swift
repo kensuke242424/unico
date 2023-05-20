@@ -52,7 +52,7 @@ struct UserEntryRecommendationView: View {
                 }
                 .font(.subheadline)
                 .fontWeight(.semibold)
-                .foregroundColor(.white)
+                .foregroundColor(.yellow)
                 .tracking(1)
                 .background {
 
@@ -66,8 +66,6 @@ struct UserEntryRecommendationView: View {
                 .padding(.vertical)
 
                 VStack(alignment: .leading, spacing: 20) {
-                    Text("※お試しアカウントの期間は作成した日から30日間です。\n  30日後、自動的にデータが削除されます。")
-                        .foregroundColor(.orange.opacity(0.8))
                     Text("※アカウント登録はお試し期間中いつでも可能です。\n  登録が完了すると、お試しアカウントから\n  登録済みアカウントに切り替わります。管理していた\n  アイテムやデータは全て引き継がれます。")
                         .foregroundColor(.white.opacity(0.8))
 
