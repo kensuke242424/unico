@@ -514,7 +514,7 @@ struct SystemSideMenu: View {
                                         } // alert
                                         .alert("", isPresented: $inputSideMenu.showdeletedAllTeamAlert) {
                                             Button("OK") {
-                                                // 他のチームデータをfetch
+                                                // TODO: 他のチームデータをfetch
                                                 // 他のチームが存在しなければ、チーム作成画面へ遷移
                                             }
                                         } message: {
@@ -539,7 +539,7 @@ struct SystemSideMenu: View {
                                     Task {
                                         inputSideMenu.showChangeTeamSheet = false
                                         await userVM.updateLastLogInTeam(selected: inputSideMenu.selectedTeam)
-                                        withAnimation(.spring(response: 0.5)) { logInVM.rootNavigation = .fetch }
+                                        withAnimation(.spring(response: 0.2)) { logInVM.rootNavigation = .fetch }
                                     }
                                 }
                             } message: {

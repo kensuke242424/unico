@@ -9,7 +9,7 @@ import SwiftUI
 import Firebase
 
 struct AnonymousEntryRecomendationView: View {
-    
+
     private enum UserEntryPath {
         case inputAddress
     }

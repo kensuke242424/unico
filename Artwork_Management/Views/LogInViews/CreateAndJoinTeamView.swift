@@ -34,9 +34,11 @@ struct CreateAndJoinTeamView: View {
     @State private var userQRCodeImage: UIImage?
     @State private var joinedTeamData: JoinTeam?
     @State private var uploadImageData: (url: URL?, filePath: String?)
+
     @State private var isShowPickerView: Bool = false
     @State private var isShowSignUpSheetView: Bool = false
     @State private var isShowGoBackAlert: Bool = false
+
     @State private var captureError: Bool = false
     @State private var selectedTeamCard: SelectedTeamCard = .start
     @State private var selectTeamFase: SelectTeamFase = .start
@@ -167,7 +169,7 @@ struct CreateAndJoinTeamView: View {
                                 }
                             }
                         }
-                        .font(.caption).tracking(3).opacity(0.6)
+                        .font(.caption).tracking(3).opacity(0.8)
                         .frame(height: 60)
                         .padding(.top, 20)
                     }
@@ -431,6 +433,9 @@ struct CreateAndJoinTeamView: View {
         .sheet(isPresented: $isShowPickerView) {
             PHPickerView(captureImage: $captureIconUIImage, isShowSheet: $isShowPickerView)
         }
+        .sheet(isPresented: $isShowSignUpSheetView) {
+            UserEntryRecommendationView(isShow: $isShowSignUpSheetView)
+        }
 
         .onAppear {
             // currentUserのuidをQRコードに変換
@@ -471,17 +476,27 @@ struct CreateAndJoinTeamView: View {
                     .foregroundColor(.black)
                     .opacity(selectedTeamCard == .join ? 0.8 : 0.3)
                     .frame(width: getRect().width * 0.4, height: getRect().height * 0.25)
-                
-                VStack(spacing: 5) {
-                    Text("この機能は")
-                    Text("ユーザ登録が")
-                    Text("必要です")
+
+                VStack(spacing: 20) {
+
+                    VStack(spacing: 5) {
+                        Text("この機能は")
+                        Text("ユーザ登録が")
+                        Text("必要です")
+                    }
+                    .font(.footnote)
+                    .fontWeight(.bold)
+                    .tracking(4)
+                    .foregroundColor(.white)
+
+                    Button("登録する") {
+                        // エントリーシート画面の表示
+                        isShowSignUpSheetView.toggle()
+                    }
+                    .font(.caption2)
+                    .buttonStyle(.borderedProminent)
                 }
-                .foregroundColor(.white)
-                .font(.footnote).tracking(4)
                 .opacity(selectedTeamCard == .join ? 0.6 : 0.0)
-                
-                
             }
         }
         .clipShape(RoundedRectangle(cornerRadius: 10))
@@ -544,13 +559,13 @@ struct CreateAndJoinTeamView: View {
                         UIImageCircleIcon(photoImage: captureIconUIImage, size: 150)
                     } else {
                         Image(systemName: "photo.circle.fill").resizable().scaledToFit()
-                            .foregroundColor(.white.opacity(0.5)).frame(width: 150)
+                            .foregroundColor(.white.opacity(0.8)).frame(width: 150)
                     }
                 }
                 .onTapGesture { isShowPickerView.toggle() }
                 .overlay(alignment: .top) {
                     Text("チーム情報は後から変更できます。").font(.caption)
-                    .foregroundColor(.white.opacity(0.3))
+                    .foregroundColor(.white.opacity(0.6))
                     .frame(width: 200)
                     .offset(y: -30)
                 }
@@ -563,8 +578,8 @@ struct CreateAndJoinTeamView: View {
                     .background {
                         ZStack {
                             Text(createNameFocused == nil && inputTeamName.isEmpty ? "チーム名を入力" : "")
-                                .foregroundColor(.white.opacity(0.3))
-                            Rectangle().foregroundColor(.white.opacity(0.3)).frame(height: 1)
+                                .foregroundColor(.white.opacity(0.6))
+                            Rectangle().foregroundColor(.white.opacity(0.8)).frame(height: 1)
                                 .offset(y: 20)
                         }
                     }
