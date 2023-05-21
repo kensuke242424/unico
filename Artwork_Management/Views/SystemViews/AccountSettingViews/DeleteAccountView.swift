@@ -38,8 +38,12 @@ struct DeleteAccountView: View {
     @EnvironmentObject var logInVM: LogInViewModel
     
     @State private var inputEmailAddress: String = ""
+
+    @State private var showEmailLinkHalfSheet: Bool = false
+    @State private var showFinalCheckDeletionAlert: Bool = false
     
     var body: some View {
+
         VStack(spacing: 30) {
 
             VStack(alignment: .leading) {
@@ -86,31 +90,51 @@ struct DeleteAccountView: View {
                     }
                 }
             
-            Button("メールを送信") {
+            Button("データ削除へ進む") {
                 Task {
-                    withAnimation(.easeInOut(duration: 0.2)) {
-                        logInVM.deleteAccountCheckFase = .check
-                    }
+                    // ユーザーのメールアドレスが認証済み状態かどうか確認
+                    let verifiedCheckResult = logInVM.verifiedEmailCheck()
 
-                    /// 入力されたアドレスが、登録アドレスと一致するか検証するメソッド
-                    let matchesCheckResult = await logInVM.verifyInputEmailMatchesCurrent(email: inputEmailAddress)
-
-                    if matchesCheckResult {
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            logInVM.deleteAccountCheckFase = .sendEmail
-                        }
+                    if verifiedCheckResult {
+//                        showFinalCheckDeletionAlert.toggle()
+//                        withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
+//                            logInVM.showEmailHalfSheet.toggle()
+//                        }
+                    } else {
                         // リンクメールを送る前に、認証リンクがどのように使われるかハンドルするために
                         // 「handleUseReceivedEmailLink」に値を設定しておく必要がある
                         logInVM.handleUseReceivedEmailLink = .deleteAccount
-                        logInVM.sendEmailLink(email: inputEmailAddress)
-                    } else {
-                        hapticErrorNotification()
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            logInVM.deleteAccountCheckFase = .notMatches
-                        }
+                        showEmailLinkHalfSheet.toggle()
                     }
+
+                    // ⬆︎の処理が問題なければ⬇︎の処理は消す
+//                    if matchesCheckResult {
+//                        withAnimation(.easeInOut(duration: 0.2)) {
+//                            logInVM.deleteAccountCheckFase = .sendEmail
+//                        }
+                        // リンクメールを送る前に、認証リンクがどのように使われるかハンドルするために
+                        // 「handleUseReceivedEmailLink」に値を設定しておく必要がある
+//                        logInVM.handleUseReceivedEmailLink = .deleteAccount
+//                        logInVM.sendEmailLink(email: inputEmailAddress)
+//                    } else {
+//                        hapticErrorNotification()
+//                        withAnimation(.easeInOut(duration: 0.2)) {
+//                            logInVM.deleteAccountCheckFase = .notMatches
+//                        }
+//                    }
                 }
             }
+            .alert("確認", isPresented: $showFinalCheckDeletionAlert) {
+                Button("データ削除", role: .destructive) {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        showFinalCheckDeletionAlert.toggle()
+                        logInVM.deleteAccountCheckFase = .check
+                    }
+                }
+            } message: {
+                Text("アカウントデータを削除します。本当によろしいですか？")
+            }
+
             HStack(spacing: 10) {
                 Text(logInVM.deleteAccountCheckFase.faseText)
                     .foregroundColor(logInVM.deleteAccountCheckFase == .notMatches ||
@@ -128,6 +152,11 @@ struct DeleteAccountView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.horizontal, 20)
+        .overlay {
+            if logInVM.showEmailHalfSheet {
+                LogInAddressSheetView()
+            }
+        }
         .customSystemBackground()
         .customBackButton()
         .navigationTitle("アカウントの削除")

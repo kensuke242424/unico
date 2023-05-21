@@ -28,7 +28,7 @@ struct LogInAddressSheetView: View {
                     .overlay {
                         VStack {
                             HStack {
-                                Text(logInVM.userSelectedSignInType == .logIn ?  "Mail Address  ログイン" : "Mail Address  ユーザー登録")
+                                Text("メールアドレス認証")
                                     .font(.title3).fontWeight(.bold)
                                 
                                 Spacer()

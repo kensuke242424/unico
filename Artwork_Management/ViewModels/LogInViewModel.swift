@@ -132,6 +132,19 @@ class LogInViewModel: ObservableObject {
             return false
         }
     }
+
+    /// ユーザーの登録メールアドレスが認証済みかどうかをBool値で返すメソッド
+    func verifiedEmailCheck() -> Bool {
+        guard let verifiedCheck = Auth.auth().currentUser?.isEmailVerified else { return false }
+        if verifiedCheck {
+            print("メールアドレスは認証済みであることを確認しました")
+            return true
+        } else {
+            print("メールアドレスが認証できませんでした")
+            return false
+
+        }
+    }
     
     func existEmailCheckAndSendMailLink(_ email: String) {
         
@@ -331,7 +344,7 @@ class LogInViewModel: ObservableObject {
     /// 再認証に成功したら、handleUseReceivedEmailLinkの状態によって適切な処理を行う
     func addressReauthenticateByEmailLink(email: String, link: String) {
         guard let user = Auth.auth().currentUser else { return }
-        let credential = EmailAuthProvider.credential(withEmail:email, link:link)
+        let credential = EmailAuthProvider.credential(withEmail: email, link: link)
 
         // アカウントの再認証が成功したら新規メールアドレス入力画面へ移動する
         user.reauthenticate(with: credential) { authData, error in
