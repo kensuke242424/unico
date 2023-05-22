@@ -41,6 +41,9 @@ struct DeleteAccountView: View {
 
     @State private var showEmailLinkHalfSheet: Bool = false
     @State private var showFinalCheckDeletionAlert: Bool = false
+
+    // ビューが現在表示されているかどうかを検知する
+    @Environment(\.isPresented) private var isPresented
     
     var body: some View {
 
@@ -48,18 +51,18 @@ struct DeleteAccountView: View {
 
             VStack(alignment: .leading) {
                 Text("※ unicoに登録されているアカウントデータ及び、\n「アイテム」「ユーザー」「チーム」データを削除します。")
-                    .foregroundColor(.white)
+                    .foregroundColor(.red)
                     .padding(.vertical)
                     
                 Text("※ チーム内に他のメンバーが存在する場合、チーム内の\n 「アイテム」「タグ」を含めたチームデータは消去されずに\n   残ります。")
                     .foregroundColor(.orange)
             }
-            .font(.caption)
-            .opacity(0.6)
+            .font(.footnote)
+            .opacity(0.8)
             .multilineTextAlignment(.leading)
             
             
-            Text("アカウント削除を実行するために、あなたが当アカウントのユーザー本人であることを確認します。現在unicoに登録されているメールアドレスを入力して、本人確認メールからログインしてください。")
+            Text("あなたが当アカウントのユーザー本人であることを確認する再認証が必要な場合があります。アドレス入力画面が表示された場合は、現在unicoに登録されているメールアドレスを入力して、届いた認証メールからログインしてください。")
                 .font(.subheadline)
                 .fontWeight(.semibold)
                 .foregroundColor(.white)
@@ -67,44 +70,20 @@ struct DeleteAccountView: View {
                 .multilineTextAlignment(.leading)
                 .padding(.top)
             
-            Text("メールリンクからの本人認証が完了した時点で、アカウントの削除が実行されます。")
-                .foregroundColor(.red)
-                .font(.caption)
-                .opacity(0.7)
-                .multilineTextAlignment(.leading)
-            
-            TextField("", text: $inputEmailAddress)
-                .textInputAutocapitalization(.never)
-                .foregroundColor(.black)
-                .padding()
-                .background {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(.white)
-                            .opacity(0.8)
-                            .frame(height: 32)
-                        
-                        Text(inputEmailAddress.isEmpty ? "登録メールアドレスを入力" : "")
-                            .foregroundColor(.black)
-                            .opacity(0.4)
-                    }
-                }
-            
-            Button("データ削除へ進む") {
+            Button("データ削除へ進む", role: .destructive) {
                 Task {
                     // ユーザーのメールアドレスが認証済み状態かどうか確認
                     let verifiedCheckResult = logInVM.verifiedEmailCheck()
 
                     if verifiedCheckResult {
-//                        showFinalCheckDeletionAlert.toggle()
-//                        withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
-//                            logInVM.showEmailHalfSheet.toggle()
-//                        }
+                        showFinalCheckDeletionAlert.toggle()
                     } else {
                         // リンクメールを送る前に、認証リンクがどのように使われるかハンドルするために
                         // 「handleUseReceivedEmailLink」に値を設定しておく必要がある
                         logInVM.handleUseReceivedEmailLink = .deleteAccount
-                        showEmailLinkHalfSheet.toggle()
+                        withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
+                            logInVM.showEmailHalfSheet = true
+                        }
                     }
 
                     // ⬆︎の処理が問題なければ⬇︎の処理は消す
@@ -164,6 +143,15 @@ struct DeleteAccountView: View {
         .onChange(of: logInVM.deleteAccountCheckFase) { newValue in
             if newValue == .success {
                 navigationVM.path.append(SystemAccountPath.deletedData)
+            }
+        }
+        .onChange(of: isPresented) { newValue in
+            if !newValue {
+                print("アカウント削除画面、破棄")
+                // 画面破棄の際に、メール認証シートが表示中であれば連動して閉じる
+                withAnimation(.spring(response: 0.1, dampingFraction: 1.0, blendDuration: 0.5)) {
+                    logInVM.showEmailHalfSheet = false
+                }
             }
         }
     }
