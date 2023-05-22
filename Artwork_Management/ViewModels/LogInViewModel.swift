@@ -55,8 +55,14 @@ class LogInViewModel: ObservableObject {
     // アカウントのメールアドレス設定関連の操作フローを管理するプロパティ
     @Published var defaultEmailCheckFase: DefaultEmailCheckFase = .start
     @Published var updateEmailCheckFase: UpdateEmailCheckFase = .success
-    @Published var deleteAccountCheckFase: DeleteAccountCheckFase = .start
+    @Published var deleteAccountCheckFase: DeleteAccountCheckFase = .waitDelete
     @Published var addressReauthenticateResult: Bool = false
+
+    // アカウント削除時に必要な値
+    // リンクからの再認証が成功した後、ユーザーに最終確認を行うため、
+    // 再認証によって受け取った値を保持しておく
+    var receivedAddressByLink: String = ""
+    var receivedLink: String = ""
 
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
     var listenerHandle: AuthStateDidChangeListenerHandle?
@@ -342,7 +348,7 @@ class LogInViewModel: ObservableObject {
     
     /// メールリンクからcredentialを作成してアカウント再認証を行う。
     /// 再認証に成功したら、handleUseReceivedEmailLinkの状態によって適切な処理を行う
-    func addressReauthenticateByEmailLink(email: String, link: String) {
+    func addressReauthenticateByEmailLink(email: String, link: String, handle: HandleUseReceivedEmailLink) {
         guard let user = Auth.auth().currentUser else { return }
         let credential = EmailAuthProvider.credential(withEmail: email, link: link)
 
@@ -352,18 +358,11 @@ class LogInViewModel: ObservableObject {
                 print("アカウント再認証失敗: \(error.localizedDescription)")
                 self.defaultEmailCheckFase = .failure
             } else {
-                
-                switch self.handleUseReceivedEmailLink {
-                case .signIn: print("handleUseReceivedEmailLink_処理なし")
-                case .signUp: print("handleUseReceivedEmailLink_処理なし")
-                case .updateEmail:
-                    self.addressReauthenticateResult = true
-                case .entryAccount:
-                    self.entryAccountByEmailLink(email: email, link: link)
-                case .deleteAccount:
-                    self.deleteAccountWithEmailLink(email: email, link: link)
-                }
-                
+                // 各ビューのonChangeへ処理が移行(メールアドレス更新、アカウント削除)
+                // 再認証によって受け取った値を保持しておく(アカウント削除時、最終確認アラートを挟むため)
+                self.receivedAddressByLink = email
+                self.receivedLink = link
+                self.addressReauthenticateResult = true
             }
         }
     }
@@ -492,8 +491,10 @@ class LogInViewModel: ObservableObject {
         }
     }
     
-    func deleteAccountWithEmailLink(email: String, link: String) {
-        let credential = EmailAuthProvider.credential(withEmail:email, link:link)
+    func deleteAccountWithEmailLink() {
+        // 再認証成功時に保持していたアドレスとリンクを使ってcredentialを作成
+        let credential = EmailAuthProvider.credential(withEmail: self.receivedAddressByLink,
+                                                      link     : self.receivedLink)
         guard let user = Auth.auth().currentUser else { return }
         user.reauthenticate(with: credential) { authData, error in
             if let error {

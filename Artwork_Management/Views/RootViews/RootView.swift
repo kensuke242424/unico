@@ -199,11 +199,10 @@ struct RootView: View {
         }
         /// 📩メールリンク経由からURLを受け取った時に発火
         .onOpenURL { url in
-            
+            print("メールリンクからのログインを確認")
             // handle the URL that must be opened
             // メールリンクからのログイン時、遷移リンクURLを検知して受け取る
             let incomingURL = url
-            print("Incoming URL is: \(incomingURL)")
             // 受け取ったメールリンクURLを使ってダイナミックリンクを生成
             let linkHandled = DynamicLinks.dynamicLinks().handleUniversalLink(incomingURL) { (dynamicLink, error) in
                 guard error == nil else {
@@ -213,6 +212,7 @@ struct RootView: View {
                 // ダイナミックリンクが有効かチェック
                 // リンクが有効だった場合、メールリンクからのサインインメソッド実行
                 let defaults = UserDefaults.standard
+                let link = incomingURL.absoluteString
                 if let email = defaults.string(forKey: "Email") {
                     withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
                         // View側で開かれているアドレス入力ハーフシートを閉じる
@@ -225,25 +225,25 @@ struct RootView: View {
                     switch logInVM.handleUseReceivedEmailLink {
                     case .signIn:
                         logInVM.resultSignInType = .signIn
-                        logInVM.signInEmailLink(email: email, link: incomingURL.absoluteString)
+                        logInVM.signInEmailLink(email: email, link: link)
                         
                     case .signUp:
                         logInVM.resultSignInType = .signUp
-                        logInVM.signInEmailLink(email: email, link: incomingURL.absoluteString)
+                        logInVM.signInEmailLink(email: email, link: link)
                         
                     case .updateEmail:
                         logInVM.addressReauthenticateByEmailLink(email: email,
-                                                                 link: incomingURL.absoluteString)
+                                                                 link: link,
+                                                                 handle: .updateEmail)
                     case .entryAccount:
                         if userVM.isAnonymous {
                             logInVM.entryAccountByEmailLink(email: email,
-                                                            link: incomingURL.absoluteString)
-//                            logInVM.addressReauthenticateByEmailLink(email: email,
-//                                                                     link: incomingURL.absoluteString)
+                                                            link: link)
                         }
                     case .deleteAccount:
                         logInVM.addressReauthenticateByEmailLink(email: email,
-                                                                 link: incomingURL.absoluteString)
+                                                                 link: link,
+                                                                 handle: .deleteAccount)
                     } // switch
                     
                 } else {

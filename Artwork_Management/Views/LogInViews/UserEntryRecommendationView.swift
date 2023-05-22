@@ -143,6 +143,7 @@ struct UserEntryRecommendationView: View {
                     Text("アカウント登録時にエラーが発生しました。もう一度試してみてください。")
                 }
             } // alert
+            // アカウントの登録を検知したら、匿名状態を確認するメソッドを実行して状態を更新する(ビューを更新するため)
             .onChange(of: logInVM.resultAccountLink) { result in
                 if result == true {
                     userVM.isAnonymousCheck()

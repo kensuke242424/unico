@@ -175,6 +175,7 @@ struct LogInAddressSheetView: View {
                                 withAnimation(.spring(response: 0.3)) {
                                     logInVM.addressSignInFase = .check
                                 }
+                                logInVM.userSelectedSignInType = .logIn
                                 logInVM.existEmailCheckAndSendMailLink(inputLogIn.address)
                             }
                             .buttonStyle(.borderedProminent)
