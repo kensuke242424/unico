@@ -169,7 +169,7 @@ struct LogInAddressSheetView: View {
                                     }
                                 }
                             
-                            // アドレス認証を行うボタン
+                            // リンクメール送信ボタン
                             Button(logInVM.addressSignInFase == .start || logInVM.addressSignInFase == .check ? "メールを送信" : "もう一度送る") {
                                 
                                 withAnimation(.spring(response: 0.3)) {
