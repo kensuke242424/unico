@@ -345,8 +345,8 @@ class TeamViewModel: ObservableObject {
             }
         } // for in
     }
-    
-    func deleteAllTeamDocuments(selected selectedTeam: JoinTeam) async {
+    /// ユーザーが選択したチームのデータを削除する
+    func deleteSelectedTeamDocuments(selected selectedTeam: JoinTeam) async {
         guard let teamRef = db?.collection("teams").document(selectedTeam.teamID) else {
             print("error: deleteAllTeamDocumentsでリファレンスを取得できませんでした")
             return
@@ -356,7 +356,16 @@ class TeamViewModel: ObservableObject {
         } catch {
             print("チームドキュメントの削除に失敗しました")
         }
-        
+    }
+
+    /// アカウント削除時に実行されるメソッド。削除実行アカウントが所属するチームの関連データを削除する
+    /// ✅所属チームのメンバーが削除アカウントのユーザーのみだった場合 ⇨ チームデータを全て消去
+    /// ✅所属チームのメンバーが削除アカウントのユーザー以外にも在籍している場合 ⇨ 関連ユーザーデータのみ削除
+    func deleteAccountRelatedTeamData(uid userID: String, joins: [JoinTeam]) {
+
+        for teamRow in joins {
+            
+        }
     }
 
     deinit {

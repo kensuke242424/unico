@@ -71,7 +71,6 @@ struct DeleteAccountView: View {
                     Button("データ削除", role: .destructive) {
                         // 削除実行画面へ遷移
                         navigationVM.path.append(SystemAccountPath.excutionDelete)
-
                     }
                 } message: {
                     Text("アカウントを削除します。本当によろしいですか？")

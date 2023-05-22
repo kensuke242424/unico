@@ -10,6 +10,9 @@ import SwiftUI
 struct DeletingView: View {
 
     @EnvironmentObject var logInVM: LogInViewModel
+    @EnvironmentObject var teamVM: TeamViewModel
+    @EnvironmentObject var userVM: UserViewModel
+
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
@@ -40,11 +43,16 @@ struct DeletingView: View {
                 dismiss()
             }
         }
+        .onAppear {
+            // この画面に遷移した時点で、データ削除を開始する
+            excutionDeleteAll()
+        }
     }
-}
 
-struct DeletingView_Previews: PreviewProvider {
-    static var previews: some View {
-        DeletingView()
+    private func excutionDeleteAll() {
+        Task {
+            logInVM.deleteAccountWithEmailLink()
+            
+        }
     }
 }

@@ -502,7 +502,7 @@ struct SystemSideMenu: View {
                                                     
                                                     await teamVM.deleteAllTeamImages()
                                                     await itemVM.deleteAllItemImages()
-                                                    await teamVM.deleteAllTeamDocuments(selected: selectedTeam)
+                                                    await teamVM.deleteSelectedTeamDocuments(selected: selectedTeam)
                                                     inputSideMenu.showdeletedAllTeamProgress = false
                                                     //TODO: 削除完了アラートが表示されないぞ？？？
                                                     inputSideMenu.showdeletedAllTeamAlert = true
