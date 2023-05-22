@@ -129,7 +129,7 @@ struct UpdateAddressView: View {
                 ).tint(.blue)
             }
         }
-        .navigationTitle("メールアドレスの変更")
+        .customNavigationTitle(title: "メールアドレスの変更")
     }
 }
 

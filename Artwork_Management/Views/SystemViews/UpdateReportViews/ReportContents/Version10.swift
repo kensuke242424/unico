@@ -17,7 +17,8 @@ struct Version10: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .foregroundColor(.white)
         .customSystemBackground()
-        .navigationTitle(varsion)
+        .customBackButton()
+        .customNavigationTitle(title: varsion)
     }
 }
 

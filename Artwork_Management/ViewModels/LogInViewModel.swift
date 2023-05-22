@@ -55,7 +55,7 @@ class LogInViewModel: ObservableObject {
     // アカウントのメールアドレス設定関連の操作フローを管理するプロパティ
     @Published var defaultEmailCheckFase: DefaultEmailCheckFase = .start
     @Published var updateEmailCheckFase: UpdateEmailCheckFase = .success
-    @Published var deleteAccountCheckFase: DeleteAccountCheckFase = .waitDelete
+    @Published var deleteAccountCheckFase: DeleteAccountCheckFase = .start
     @Published var addressReauthenticateResult: Bool = false
 
     // アカウント削除時に必要な値

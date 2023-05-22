@@ -119,7 +119,7 @@ struct DefaultEmailCheckView: View {
         .ignoresSafeArea()
         .customSystemBackground()
         .customBackButton()
-        .navigationTitle("メールアドレスの変更")
+        .customNavigationTitle(title: "メールアドレスの変更")
         // メールリンクによる再認証結果「addressReauthenticateResult」のtrueを検知したら、アドレス更新画面へ遷移
         .onChange(of: logInVM.addressReauthenticateResult) { newValue in
             if newValue {

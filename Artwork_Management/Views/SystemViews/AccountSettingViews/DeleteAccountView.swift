@@ -10,28 +10,13 @@ import FirebaseAuth
 import AuthenticationServices
 
 enum DeleteAccountCheckFase {
-    case start, failure, waitDelete, success
-    
-    var faseText: String {
-        switch self {
-        case .start:
-            return ""
-        case .failure:
-            return "エラーが発生しました。"
-        case .waitDelete:
-            return "アカウントの削除を実行しています..."
-        case .success:
-            return "アカウントの削除が完了しました。"
-        }
-    }
+    case start, failure, excution
 }
 
 struct DeleteAccountView: View {
     
     @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var logInVM: LogInViewModel
-    
-    @State private var inputEmailAddress: String = ""
 
     @State private var showEmailLinkHalfSheet: Bool = false
     @State private var showFinalCheckDeletionAlert: Bool = false
@@ -84,26 +69,19 @@ struct DeleteAccountView: View {
                 }
                 .alert("確認", isPresented: $showFinalCheckDeletionAlert) {
                     Button("データ削除", role: .destructive) {
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            showFinalCheckDeletionAlert.toggle()
-                            logInVM.deleteAccountCheckFase = .waitDelete
-                            logInVM.deleteAccountWithEmailLink()
-                        }
+                        // 削除実行画面へ遷移
+                        navigationVM.path.append(SystemAccountPath.excutionDelete)
+
                     }
                 } message: {
                     Text("アカウントを削除します。本当によろしいですか？")
                 }
 
-            HStack(spacing: 10) {
-                Text(logInVM.deleteAccountCheckFase.faseText)
-                    .foregroundColor(logInVM.deleteAccountCheckFase == .failure ? .red : .white)
-                
-                if logInVM.deleteAccountCheckFase == .waitDelete {
-                   ProgressView()
-                }
+            if logInVM.deleteAccountCheckFase == .failure {
+                Text("アカウント削除時にエラーが発生しました。")
+                    .foregroundColor(.orange)
             }
-            
-            
+
             Spacer()
             
         }
@@ -116,7 +94,8 @@ struct DeleteAccountView: View {
         }
         .customSystemBackground()
         .customBackButton()
-        .navigationTitle("アカウントの削除")
+        .customNavigationTitle(title: "アカウントの削除")
+        .toolbarColorScheme(.dark)
         // アカウント削除画面から離れた際に、メール認証シートが表示中であれば連動して閉じる
         .onChange(of: isPresented) { newValue in
             if !newValue {
@@ -135,11 +114,15 @@ struct DeleteAccountView: View {
                 showFinalCheckDeletionAlert.toggle()
             }
         }
-        // アカウント削除を検知したら、DeletedViewへ遷移
+        // アカウント削除の最終確認が取れたら、DeletingViewへ遷移
         .onChange(of: logInVM.deleteAccountCheckFase) { newValue in
-            if newValue == .success {
-                navigationVM.path.append(SystemAccountPath.deletedData)
+            if newValue == .excution {
+                navigationVM.path.append(SystemAccountPath.excutionDelete)
             }
+        }
+        // 再認証結果通知プロパティの初期化
+        .onDisappear() {
+            logInVM.addressReauthenticateResult = false
         }
     }
 }

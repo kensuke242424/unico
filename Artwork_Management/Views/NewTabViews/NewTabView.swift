@@ -238,8 +238,11 @@ struct NewTabView: View {
                         
                     case .deleteAccount:
                         DeleteAccountView()
+
+                    case .excutionDelete:
+                        DeletingView()
                         
-                    case .deletedData:
+                    case .deletedAccount:
                         DeletedView()
                     }
                 }

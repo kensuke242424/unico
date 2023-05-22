@@ -42,7 +42,7 @@ struct DeletedView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .customSystemBackground()
         .navigationBarBackButtonHidden()
-        .navigationTitle("アカウント削除完了")
+        .customNavigationTitle(title: "アカウント削除完了")
         .navigationBarTitleDisplayMode(.inline)
         
     }

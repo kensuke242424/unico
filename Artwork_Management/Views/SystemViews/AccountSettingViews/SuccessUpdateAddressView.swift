@@ -37,7 +37,7 @@ struct SuccessUpdateAddressView: View {
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .navigationTitle("更新完了")
+        .customNavigationTitle(title: "更新完了")
         .customSystemBackground()
     }
 }

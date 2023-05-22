@@ -26,6 +26,12 @@ enum SystemPath {
 }
 
 enum SystemAccountPath {
-    case root, defaultEmailCheck, updateEmail, successUpdateEmail, deleteAccount, deletedData
+    case root,
+         defaultEmailCheck,
+         updateEmail,
+         successUpdateEmail,
+         deleteAccount,
+         excutionDelete,
+         deletedAccount
 }
 

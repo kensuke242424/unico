@@ -171,7 +171,7 @@ struct AccountSystemView: View {
             }
             Spacer()
         }
-        .navigationTitle("アカウント")
+        .customNavigationTitle(title: "アカウント")
         .customSystemBackground()
         .customBackButton()
         .sheet(isPresented: $showEntryAccount) {

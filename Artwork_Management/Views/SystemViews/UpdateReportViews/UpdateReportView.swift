@@ -54,8 +54,9 @@ struct UpdateReportView: View {
         .foregroundColor(.white)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.horizontal, 20)
-        .navigationTitle("お知らせ")
+        .customNavigationTitle(title: "お知らせ")
         .customSystemBackground()
+        .customBackButton()
     }
 }
 

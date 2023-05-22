@@ -28,6 +28,10 @@ extension View {
     func customBackButton() -> some View {
         self.modifier(CustomBackButton())
     }
+
+    func customNavigationTitle(title: String) -> some View {
+        self.modifier(CustomNavigationTitle(title: title))
+    }
     
     func customSystemBackground() -> some View {
         self

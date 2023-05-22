@@ -200,7 +200,7 @@ struct SystemView: View {
             Spacer()
             
         } // VStack
-        .navigationTitle("設定メニュー")
+        .customNavigationTitle(title: "設定メニュー")
         .customSystemBackground()
         .customBackButton()
         
