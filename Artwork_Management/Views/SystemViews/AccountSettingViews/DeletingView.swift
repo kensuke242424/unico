@@ -12,6 +12,7 @@ struct DeletingView: View {
     @EnvironmentObject var logInVM: LogInViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
+    @EnvironmentObject var navigationVM: NavigationViewModel
 
     @Environment(\.dismiss) var dismiss
 
@@ -37,22 +38,44 @@ struct DeletingView: View {
         .navigationBarBackButtonHidden()
         .customNavigationTitle(title: "削除実行中")
         .navigationBarTitleDisplayMode(.inline)
-        // アカウント削除の失敗を検知したら、一つ前のページに戻る
-        .onChange(of: logInVM.deleteAccountCheckFase) { fase in
-            if fase == .failure {
-                dismiss()
-            }
-        }
         .onAppear {
             // この画面に遷移した時点で、データ削除を開始する
-            excutionDeleteAll()
+            Task {
+
+                guard let userID = userVM.user?.id else { return }
+                guard let joinsTeam = userVM.user?.joins else { return }
+
+                do {
+                    _ = try await logInVM.deleteAccountWithEmailLink()
+                    _ = try await teamVM.deleteAccountRelatedTeamData(uid: userID, joinsTeam: joinsTeam)
+                    _ = try await userVM.deleteAccountRelatedUserData()
+
+                    navigationVM.path.append(SystemAccountPath.deletedAccount)
+
+                } catch {
+                    // アカウントデータの削除に失敗したら、一つ前のページに戻る
+                    logInVM.deleteAccountCheckFase = .failure
+                    dismiss()
+                }
+            }
         }
     }
 
     private func excutionDeleteAll() {
         Task {
-            logInVM.deleteAccountWithEmailLink()
-            
+            guard let userID = userVM.user?.id else { return }
+            guard let joinsTeam = userVM.user?.joins else { return }
+
+            do {
+                _ = try await logInVM.deleteAccountWithEmailLink()
+                _ = try await teamVM.deleteAccountRelatedTeamData(uid: userID,
+                                                                  joinsTeam: joinsTeam)
+
+            } catch {
+                // アカウントデータの削除に失敗したら、一つ前のページに戻る
+                logInVM.deleteAccountCheckFase = .failure
+                dismiss()
+            }
         }
     }
 }

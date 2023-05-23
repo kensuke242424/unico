@@ -752,7 +752,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             }
             
             Button {
-                if !inputLogIn.checkTermsAgree {
+                if logInVM.userSelectedSignInType == .signUp && !inputLogIn.checkTermsAgree {
                     inputLogIn.showNotYetAgreeAlert.toggle()
                     return
                 }

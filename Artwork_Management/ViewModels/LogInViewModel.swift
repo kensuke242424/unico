@@ -491,29 +491,23 @@ class LogInViewModel: ObservableObject {
         }
     }
     
-    func deleteAccountWithEmailLink() {
+    func deleteAccountWithEmailLink() async throws {
         // 再認証成功時に保持していたアドレスとリンクを使ってcredentialを作成
         let credential = EmailAuthProvider.credential(withEmail: self.receivedAddressByLink,
                                                       link     : self.receivedLink)
-        guard let user = Auth.auth().currentUser else { return }
-        user.reauthenticate(with: credential) { authData, error in
-            if let error {
-                print("アカウント再認証失敗: \(error.localizedDescription)")
-                self.defaultEmailCheckFase = .failure
-                return
+        guard let user = Auth.auth().currentUser else { throw CustomError.userEmpty }
+
+        do {
+            _ = try await user.delete()
+            print("アカウント削除完了")
+        } catch {
+            DispatchQueue.main.async {
+                self.deleteAccountCheckFase = .failure
             }
-            // ユーザーの再認証成功。アカウント削除処理実行
-            user.delete { error in
-                if let error = error {
-                    print("アカウント削除失敗: \(error.localizedDescription)")
-                    self.defaultEmailCheckFase = .failure
-                } else {
-                    // Account deleted.
-                    print("アカウント削除完了")
-                    self.defaultEmailCheckFase = .success
-                }
-            }
+            print("アカウント削除失敗: \(error.localizedDescription)")
+            throw CustomError.deleteAccount
         }
+
     }
     
     // サインイン要求で nonce の SHA256 ハッシュを送信すると、Apple はそれを応答で変更せずに渡します。

@@ -12,7 +12,7 @@ import FirebaseFirestore
 import FirebaseFirestoreSwift
 
 enum CustomError: Error {
-    case uidEmpty, getRef, fetch, setData, updateData, getDocument,getUserDocument, photoUrlEmpty, userEmpty, teamEmpty, getDetectUser, inputTextEmpty, memberDuplication, addTeamIDToJoinedUser, createAnonymous, existUserDocument, existAccountEmail
+    case uidEmpty, getRef, fetch, setData, updateData, getDocument,getUserDocument, photoUrlEmpty, userEmpty, teamEmpty, getDetectUser, inputTextEmpty, memberDuplication, addTeamIDToJoinedUser, createAnonymous, existUserDocument, existAccountEmail, deleteAccount
 }
 
 class UserViewModel: ObservableObject {
@@ -272,6 +272,21 @@ class UserViewModel: ObservableObject {
             return nil
         }
     }
+
+    // アカウント削除対象ユーザーのユーザードキュメントを削除する
+    func deleteAccountRelatedUserData() async throws {
+
+        // ユーザが所属している各チームのid配列を使ってクエリを叩く
+        guard let userID = user?.id else { throw CustomError.uidEmpty }
+        guard let userRef = db?.collection("users").document(userID) else { throw CustomError.getRef }
+
+        do {
+            _ = try await userRef.getDocument().reference.delete()
+        } catch {
+            throw CustomError.deleteAccount
+        }
+    }
+        
 
     deinit {
         listener?.remove()

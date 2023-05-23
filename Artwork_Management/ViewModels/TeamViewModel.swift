@@ -361,10 +361,46 @@ class TeamViewModel: ObservableObject {
     /// アカウント削除時に実行されるメソッド。削除実行アカウントが所属するチームの関連データを削除する
     /// ✅所属チームのメンバーが削除アカウントのユーザーのみだった場合 ⇨ チームデータを全て消去
     /// ✅所属チームのメンバーが削除アカウントのユーザー以外にも在籍している場合 ⇨ 関連ユーザーデータのみ削除
-    func deleteAccountRelatedTeamData(uid userID: String, joins: [JoinTeam]) {
+    func deleteAccountRelatedTeamData(uid userID: String, joinsTeam: [JoinTeam]) async throws {
 
-        for teamRow in joins {
-            
+        var joinsTeamID: [String] = []
+        // ユーザが参加している各チームのid文字列データを配列に格納(whereFieldクエリで使う)
+        for joinTeam in joinsTeam {
+            joinsTeamID.append(joinTeam.teamID)
+        }
+
+        // ユーザが所属している各チームのid配列を使ってクエリを叩く
+        guard let joinTeamRefs = db?.collection("teams")
+            .whereField("id", in: joinsTeamID) else {
+            print("deleteAccountRelatedTeamDataでのクエリに失敗しました")
+            throw CustomError.getRef
+        }
+
+        do {
+            let snapshot = try await joinTeamRefs.getDocuments()
+
+            for teamRowDocument in snapshot.documents {
+
+                do {
+                    // 所属チーム一つ分のドキュメント取得
+                    var teamData = try teamRowDocument.data(as: Team.self)
+                    guard let teamRowRef = db?.collection("teams").document(teamData.id) else {
+                        print("\(teamData.name)チームのリファレンス取得に失敗しました")
+                        continue
+                    }
+
+                    if teamData.members.count == 1 &&
+                        teamData.members.first?.memberUID == userID {
+                        // 削除対象ユーザーの他にチームメンバーが居なかった場合、全データをFirestoreから削除
+                        _ = try await teamRowDocument.reference.delete()
+
+                    } else {
+                        // 削除対象ユーザーの他にもチーム所属者がいた場合、削除ユーザーのみmembersから処理し、保存
+                        teamData.members.removeAll(where: { $0.memberUID == userID })
+                        try teamRowRef.setData(from: teamData)
+                    }
+                }
+            }
         }
     }
 

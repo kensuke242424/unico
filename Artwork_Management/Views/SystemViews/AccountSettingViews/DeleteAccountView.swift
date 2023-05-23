@@ -41,7 +41,7 @@ struct DeleteAccountView: View {
                 .multilineTextAlignment(.leading)
 
 
-                Text("あなたが当アカウントのユーザー本人であることを確認する再認証が必要な場合があります。アドレス入力画面が表示された場合は、現在unicoに登録されているメールアドレスを入力して、届いた認証メールからログインしてください。")
+                Text("アカウント削除を実行するために、ユーザーの再認証を行います。現在unicoに登録されているメールアドレスを入力して、届いた認証メールからログインしてください。")
                     .font(.subheadline)
                     .fontWeight(.semibold)
                     .foregroundColor(.white)
@@ -51,20 +51,20 @@ struct DeleteAccountView: View {
 
                 Button("データ削除へ進む", role: .destructive) {
                     Task {
-                        // ユーザーのメールアドレスが認証済み状態かどうか確認
-                        let verifiedCheckResult = logInVM.verifiedEmailCheck()
-
-                        if verifiedCheckResult {
-                            showFinalCheckDeletionAlert.toggle()
-                            // 試しデバッグ用
-                        } else {
+//                        // ユーザーのメールアドレスが認証済み状態かどうか確認
+//                        let verifiedCheckResult = logInVM.verifiedEmailCheck()
+//
+//                        if verifiedCheckResult {
+//                            showFinalCheckDeletionAlert.toggle()
+//                            // 試しデバッグ用
+//                        } else {
                             // リンクメールを送る前に、認証リンクがどのように使われるかハンドルするために
                             // 「handleUseReceivedEmailLink」に値を設定しておく必要がある
                             logInVM.handleUseReceivedEmailLink = .deleteAccount
                             withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
                                 logInVM.showEmailHalfSheet = true
                             }
-                        }
+//                        }
                     }
                 }
                 .alert("確認", isPresented: $showFinalCheckDeletionAlert) {
