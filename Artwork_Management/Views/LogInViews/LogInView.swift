@@ -211,6 +211,8 @@ struct InputLogIn {
 struct LogInView: View { // swiftlint:disable:this type_body_length
     
     @Environment(\.colorScheme) var colorScheme: ColorScheme
+    @Environment(\.isPresented) private var isPresented
+
     @EnvironmentObject var progress: ProgressViewModel
     
     @EnvironmentObject var logInVM: LogInViewModel
@@ -476,7 +478,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 Button("ログイン") {
                     withAnimation(.spring(response: 0.5)) {
                         logInVM.resultSignInType = .signIn
-                        logInVM.sendEmailLink(email: inputLogIn.address)
+                        logInVM.sendEmailLink(email: inputLogIn.address, useType: .signIn)
                     }
                 }
                 
@@ -665,6 +667,18 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         }
         .onAppear {
             userVM.isAnonymousCheck()
+        }
+        .onChange(of: isPresented) { newValue in
+
+//            if newValue {
+
+                print(newValue)
+
+//            }
+//            logInVM.userSelectedSignInType = .start
+//            logInVM.createAccountFase = .start
+//            logInVM.addressSignInFase = .start
+//            logInVM.selectProviderType = .start
         }
         
     } // body
@@ -1232,12 +1246,13 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                 
                             case .logIn :
                                 logInVM.handleUseReceivedEmailLink = .signIn
-                                logInVM.existEmailCheckAndSendMailLink(inputLogIn.address)
+                                logInVM.existEmailCheckAndSendMailLink(inputLogIn.address,
+                                                                       selected: .logIn)
                                 
                             case .signUp:
                                 logInVM.handleUseReceivedEmailLink = .signUp
-                                logInVM.existEmailCheckAndSendMailLink(inputLogIn.address)
-                                
+                                logInVM.existEmailCheckAndSendMailLink(inputLogIn.address,
+                                                                       selected: .signUp)
                             }
                         }
                         .buttonStyle(.borderedProminent)

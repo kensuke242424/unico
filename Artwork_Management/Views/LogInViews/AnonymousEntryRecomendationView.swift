@@ -119,11 +119,6 @@ struct AnonymousEntryRecomendationView: View {
             }
         }
         .frame(width: getRect().width - 50, height: getRect().height)
-        .overlay {
-            if logInVM.showEmailHalfSheet {
-                LogInAddressSheetView()
-            }
-        }
         .background {
             ZStack {
                 Color.userBlue1

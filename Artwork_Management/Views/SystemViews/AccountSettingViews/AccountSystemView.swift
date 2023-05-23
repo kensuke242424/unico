@@ -179,7 +179,7 @@ struct AccountSystemView: View {
         }
         .overlay {
             if logInVM.showEmailHalfSheet {
-                LogInAddressSheetView()
+                LogInAddressSheetView(useType: .entry)
             }
         }
     }

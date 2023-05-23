@@ -152,7 +152,7 @@ class LogInViewModel: ObservableObject {
         }
     }
     
-    func existEmailCheckAndSendMailLink(_ email: String) {
+    func existEmailCheckAndSendMailLink(_ email: String, selected: UserSelectedSignInType) {
         
         /// 受け取ったメールアドレスを使って、Auth内から既存アカウントの有無を調べる
         Auth.auth().fetchSignInMethods(forEmail: email) { (providers, error) in
@@ -173,13 +173,13 @@ class LogInViewModel: ObservableObject {
             /// アカウントが既に存在していた場合の処理
             if let providers = providers, providers.count > 0 {
 
-                switch self.userSelectedSignInType {
+                switch selected {
                     
                 case .start :
                     print("処理なし")
                     
                 case .logIn :
-                    self.sendEmailLink(email: email)
+                    self.sendEmailLink(email: email, useType: .signIn)
                     
                 case .signUp:
                     // アカウントが既に存在することをアラートで伝えて、既存データへのログインを促す
@@ -210,7 +210,7 @@ class LogInViewModel: ObservableObject {
                     hapticErrorNotification()
 
                 case .signUp:
-                    self.sendEmailLink(email: email)
+                    self.sendEmailLink(email: email, useType: .signUp)
                     
                 }
             }
@@ -272,9 +272,13 @@ class LogInViewModel: ObservableObject {
             throw CustomError.setData
         }
     }
+
+    enum EmailLinkUseType {
+        case signUp, logIn, entry
+    }
     
     // ダイナミックリンクによってメールアドレス認証でのサインインをするため、ユーザにメールを送信するメソッド
-    func sendEmailLink(email: String) {
+    func sendEmailLink(email: String, useType: HandleUseReceivedEmailLink) {
         
         withAnimation(.easeInOut(duration: 0.3)) {
             self.addressSignInFase = .check
@@ -303,7 +307,9 @@ class LogInViewModel: ObservableObject {
             // TODO: ⬇︎の処理まだできてない。どうやってリンク側のアドレスを取得するかまだわかってない。
             // リンクから再度アプリに戻ってきた後の処理で、リンクから飛んできたアドレスと保存アドレスの差分がないかチェック
             UserDefaults.standard.set(email, forKey: "Email")
-            
+
+            // 呼び出し側で指定されたリンクの用途をプロパティに渡す
+            self.handleUseReceivedEmailLink = useType
             withAnimation(.easeInOut(duration: 0.7)) {
                 self.addressSignInFase = .success
             }

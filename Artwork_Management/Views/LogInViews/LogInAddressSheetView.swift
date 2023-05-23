@@ -17,6 +17,12 @@ struct LogInAddressSheetView: View {
     @State private var inputLogIn: InputLogIn = InputLogIn()
     
     @State private var offsetAnimation: Bool = false
+
+    // どの用途で入力アドレスをハンドリングするのかを呼び出し元で渡す
+    enum InputAddressUseType {
+        case signUp, logIn, entry
+    }
+    let useType: InputAddressUseType
     
     var body: some View {
             VStack {
@@ -175,8 +181,16 @@ struct LogInAddressSheetView: View {
                                 withAnimation(.spring(response: 0.3)) {
                                     logInVM.addressSignInFase = .check
                                 }
-                                logInVM.userSelectedSignInType = .logIn
-                                logInVM.existEmailCheckAndSendMailLink(inputLogIn.address)
+
+                                switch useType {
+                                case .signUp:
+                                    logInVM.existEmailCheckAndSendMailLink(inputLogIn.address, selected: .signUp)
+                                case.logIn:
+                                    logInVM.existEmailCheckAndSendMailLink(inputLogIn.address, selected: .logIn)
+                                case .entry:
+                                    logInVM.sendEmailLink(email: inputLogIn.address, useType: .entryAccount)
+                                }
+
                             }
                             .buttonStyle(.borderedProminent)
                             .disabled(inputLogIn.sendAddressButtonDisabled)
@@ -232,6 +246,6 @@ struct LogInAddressSheetView: View {
 
 struct LogInAddressSheetView_Previews: PreviewProvider {
     static var previews: some View {
-        LogInAddressSheetView()
+        LogInAddressSheetView(useType: .logIn)
     }
 }

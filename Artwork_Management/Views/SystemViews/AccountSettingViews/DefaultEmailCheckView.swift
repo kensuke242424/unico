@@ -91,7 +91,7 @@ struct DefaultEmailCheckView: View {
                         }
                         // リンクメールを送る前に、認証リンクがどのように使われるかハンドルするために
                         // 「handleUseReceivedEmailLink」に値を設定しておく必要がある
-                        logInVM.sendEmailLink(email: inputEmailAddress)
+                        logInVM.sendEmailLink(email: inputEmailAddress, useType: .updateEmail)
                     } else {
                         hapticErrorNotification()
                         withAnimation(.easeInOut(duration: 0.2)) {

@@ -88,7 +88,7 @@ struct DeleteAccountView: View {
         .padding(.horizontal, 20)
         .overlay {
             if logInVM.showEmailHalfSheet {
-                LogInAddressSheetView()
+                LogInAddressSheetView(useType: .logIn)
             }
         }
         .customSystemBackground()
