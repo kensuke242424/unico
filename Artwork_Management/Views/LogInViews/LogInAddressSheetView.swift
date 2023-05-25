@@ -221,6 +221,10 @@ struct LogInAddressSheetView: View {
                     }
                 }
             }
+            .onDisappear {
+                // ビューの初期化
+                logInVM.addressSignInFase = .start
+            }
             
             .background {
                 if logInVM.showEmailHalfSheet {
