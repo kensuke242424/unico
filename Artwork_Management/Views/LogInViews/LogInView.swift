@@ -1245,12 +1245,12 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                 print("処理なし")
                                 
                             case .logIn :
-                                logInVM.handleUseReceivedEmailLink = .signIn
+//                                logInVM.handleUseReceivedEmailLink = .signIn
                                 logInVM.existEmailCheckAndSendMailLink(inputLogIn.address,
                                                                        selected: .logIn)
                                 
                             case .signUp:
-                                logInVM.handleUseReceivedEmailLink = .signUp
+//                                logInVM.handleUseReceivedEmailLink = .signUp
                                 logInVM.existEmailCheckAndSendMailLink(inputLogIn.address,
                                                                        selected: .signUp)
                             }

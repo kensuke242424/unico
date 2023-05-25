@@ -17,6 +17,7 @@ struct DeleteAccountView: View {
     
     @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var logInVM: LogInViewModel
+    @EnvironmentObject var userVM: UserViewModel
 
     @State private var showEmailLinkHalfSheet: Bool = false
     @State private var showFinalCheckDeletionAlert: Bool = false
@@ -40,6 +41,11 @@ struct DeleteAccountView: View {
                 .opacity(0.8)
                 .multilineTextAlignment(.leading)
 
+            VStack(alignment: .leading, spacing: 5) {
+                Text("【アカウント登録済みユーザーの場合】")
+                    .font(.headline)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
 
                 Text("アカウント削除を実行するために、ユーザーの再認証を行います。現在unicoに登録されているメールアドレスを入力して、届いた認証メールからログインしてください。")
                     .font(.subheadline)
@@ -48,33 +54,27 @@ struct DeleteAccountView: View {
                     .opacity(0.7)
                     .multilineTextAlignment(.leading)
                     .padding(.top)
+            }
 
-                Button("データ削除へ進む", role: .destructive) {
-                    Task {
-//                        // ユーザーのメールアドレスが認証済み状態かどうか確認
-//                        let verifiedCheckResult = logInVM.verifiedEmailCheck()
-//
-//                        if verifiedCheckResult {
-//                            showFinalCheckDeletionAlert.toggle()
-//                            // 試しデバッグ用
-//                        } else {
-                            // リンクメールを送る前に、認証リンクがどのように使われるかハンドルするために
-                            // 「handleUseReceivedEmailLink」に値を設定しておく必要がある
-                            logInVM.handleUseReceivedEmailLink = .deleteAccount
-                            withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
-                                logInVM.showEmailHalfSheet = true
-                            }
-//                        }
+
+            Button("データ削除へ進む", role: .destructive) {
+
+                if userVM.isAnonymous {
+                    showFinalCheckDeletionAlert.toggle()
+                } else {
+                    withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
+                        logInVM.showEmailHalfSheet = true
                     }
                 }
-                .alert("確認", isPresented: $showFinalCheckDeletionAlert) {
-                    Button("データ削除", role: .destructive) {
-                        // 削除実行画面へ遷移
-                        navigationVM.path.append(SystemAccountPath.excutionDelete)
-                    }
-                } message: {
-                    Text("アカウントを削除します。本当によろしいですか？")
+            }
+            .alert("確認", isPresented: $showFinalCheckDeletionAlert) {
+                Button("データ削除", role: .destructive) {
+                    // 削除実行画面へ遷移
+                    navigationVM.path.append(SystemAccountPath.excutionDelete)
                 }
+            } message: {
+                Text("アカウントを削除します。本当によろしいですか？")
+            }
 
             if logInVM.deleteAccountCheckFase == .failure {
                 Text("アカウント削除時にエラーが発生しました。")
@@ -88,7 +88,7 @@ struct DeleteAccountView: View {
         .padding(.horizontal, 20)
         .overlay {
             if logInVM.showEmailHalfSheet {
-                LogInAddressSheetView(useType: .logIn)
+                LogInAddressSheetView(useType: .deleteAccount)
             }
         }
         .customSystemBackground()

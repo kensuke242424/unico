@@ -154,7 +154,7 @@ struct UserEntryRecommendationView: View {
         .frame(width: getRect().width - 50, height: getRect().height)
         .overlay {
             if logInVM.showEmailHalfSheet {
-                LogInAddressSheetView(useType: .entry)
+                LogInAddressSheetView(useType: .entryAccount)
             }
         }
         .background {

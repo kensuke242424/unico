@@ -11,6 +11,7 @@ struct DeletedView: View {
     
     
     @EnvironmentObject var logInVM: LogInViewModel
+    @EnvironmentObject var navigationVM: NavigationViewModel
 
     var body: some View {
         
@@ -44,6 +45,11 @@ struct DeletedView: View {
         .navigationBarBackButtonHidden()
         .customNavigationTitle(title: "アカウント削除完了")
         .navigationBarTitleDisplayMode(.inline)
+        .onDisappear {
+            print("アカウント削除画面の破棄を検知。ログイン画面に戻る")
+            navigationVM.path.removeLast(navigationVM.path.count)
+            logInVM.deleteAccountCheckFase = .start
+        }
         
     }
 }

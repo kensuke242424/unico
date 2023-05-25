@@ -22,7 +22,7 @@ struct LogInAddressSheetView: View {
     enum InputAddressUseType {
         case signUp, logIn, entry
     }
-    let useType: InputAddressUseType
+    let useType: HandleUseReceivedEmailLink
     
     var body: some View {
             VStack {
@@ -185,10 +185,14 @@ struct LogInAddressSheetView: View {
                                 switch useType {
                                 case .signUp:
                                     logInVM.existEmailCheckAndSendMailLink(inputLogIn.address, selected: .signUp)
-                                case.logIn:
+                                case.signIn:
                                     logInVM.existEmailCheckAndSendMailLink(inputLogIn.address, selected: .logIn)
-                                case .entry:
+                                case .entryAccount:
                                     logInVM.sendEmailLink(email: inputLogIn.address, useType: .entryAccount)
+                                case .updateEmail:
+                                    logInVM.sendEmailLink(email: inputLogIn.address, useType: .updateEmail)
+                                case .deleteAccount:
+                                    logInVM.sendEmailLink(email: inputLogIn.address, useType: .deleteAccount)
                                 }
 
                             }
@@ -250,6 +254,6 @@ struct LogInAddressSheetView: View {
 
 struct LogInAddressSheetView_Previews: PreviewProvider {
     static var previews: some View {
-        LogInAddressSheetView(useType: .logIn)
+        LogInAddressSheetView(useType: .signIn)
     }
 }

@@ -14,6 +14,10 @@ import FirebaseStorage
 import FirebaseFirestore
 import FirebaseFirestoreSwift
 
+enum HandleUseReceivedEmailLink {
+    case signIn, signUp, entryAccount, updateEmail, deleteAccount
+}
+
 class LogInViewModel: ObservableObject {
 
     init() {
@@ -24,9 +28,7 @@ class LogInViewModel: ObservableObject {
     /// LogInViewから次の画面へのナビゲーションを総括管理するプロパティ
     @Published var rootNavigation: RootNavigation = .logIn
     
-    enum HandleUseReceivedEmailLink {
-        case signIn, signUp, entryAccount, updateEmail, deleteAccount
-    }
+
     // メールリンクによって受け取ったユーザリンクをどのように扱うかをハンドルするプロパティ
     @Published var handleUseReceivedEmailLink: HandleUseReceivedEmailLink = .signIn
     
@@ -194,7 +196,7 @@ class LogInViewModel: ObservableObject {
             // アカウントが存在しなかった場合の処理
             } else {
 
-                switch self.userSelectedSignInType {
+                switch selected {
                     
                 case .start :
                     print("処理なし")

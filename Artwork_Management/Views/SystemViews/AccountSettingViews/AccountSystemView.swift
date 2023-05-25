@@ -177,11 +177,6 @@ struct AccountSystemView: View {
         .sheet(isPresented: $showEntryAccount) {
             UserEntryRecommendationView(isShow: $showEntryAccount)
         }
-        .overlay {
-            if logInVM.showEmailHalfSheet {
-                LogInAddressSheetView(useType: .entry)
-            }
-        }
     }
 }
 
