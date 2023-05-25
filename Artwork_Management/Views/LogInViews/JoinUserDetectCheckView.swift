@@ -24,6 +24,7 @@ struct JoinUserDetectCheckView: View {
     @State private var inputUserIDText: String = ""
     @State private var isShowQRReader: Bool = false
     @State private var isAgreed: Bool = false
+    @State private var showContent: Bool = false
     @State private var detectedUser: User?
 
     @FocusState var inputUserIDFocused: InputUserIDFocused?
@@ -56,79 +57,85 @@ struct JoinUserDetectCheckView: View {
                         .opacity(0.7)
                         .tracking(10)
 
-                    Group {
-                        switch joinUserCheckFase {
+                    if showContent {
+                        Group {
+                            switch joinUserCheckFase {
 
-                        case .start:
-                            VStack(spacing: 10) {
-                                Text("以下の方法でチームに招待します。")
-                                    .padding(.bottom, 8)
-                                VStack(alignment: .leading, spacing: 10) {
-                                    Text("方法1: カメラでQRコードを読み込む。")
-                                    Text("方法2: 相手のユーザIDを入力する。")
-                                }
-                                .fontWeight(.bold)
-                            }
-
-                        case .check:
-                            VStack(spacing: 10) {
-                                Text("ユーザーを探しています...")
-                            }
-
-                        case .agree:
-                            if !isAgreed {
+                            case .start:
                                 VStack(spacing: 10) {
-                                    Text("ユーザーが見つかりました。")
+                                    Text("以下の方法でチームに招待します。")
                                         .padding(.bottom, 8)
                                     VStack(alignment: .leading, spacing: 10) {
-                                        Text("こちらのユーザーをチームに招待しますか？")
+                                        Text("方法1: カメラでQRコードを読み込む。")
+                                        Text("方法2: 相手のユーザIDを入力する。")
                                     }
                                     .fontWeight(.bold)
                                 }
+
+                            case .check:
+                                VStack(spacing: 10) {
+                                    Text("ユーザーを探しています...")
+                                }
+
+                            case .agree:
+                                if !isAgreed {
+                                    VStack(spacing: 10) {
+                                        Text("ユーザーが見つかりました。")
+                                            .padding(.bottom, 8)
+                                        VStack(alignment: .leading, spacing: 10) {
+                                            Text("こちらのユーザーをチームに招待しますか？")
+                                        }
+                                        .fontWeight(.bold)
+                                    }
+                                }
                             }
                         }
+                        .font(.caption)
+                        .tracking(3)
+                        .opacity(0.6)
+                        .foregroundColor(.white)
                     }
-                    .font(.caption)
-                    .tracking(3)
-                    .opacity(0.6)
-                    .foregroundColor(.white)
-                }
+                } // if showContent
 
                 // search fase view...
-                Group {
-                    switch joinUserCheckFase {
-                    case .start:
-                        startFaseView()
-                    case .check:
-                        ProgressView()
-                    case .agree:
-                        agreeFaseView()
+                if showContent {
+                    Group {
+                        switch joinUserCheckFase {
+                        case .start:
+                            startFaseView()
+                        case .check:
+                            ProgressView()
+                        case .agree:
+                            agreeFaseView()
+                        }
                     }
-                }
-                .frame(height: 250)
-                .padding(.top, 30)
+                    .frame(height: 250)
+                    .padding(.top, 30)
 
-                Button {
-                    qrReader.stopSession()
-                    withAnimation(.spring(response: 0.5, blendDuration: 1)) {
-                        teamVM.isShowSearchedNewMemberJoinTeam.toggle()
+                    Button {
+                        qrReader.stopSession()
+                        withAnimation { showContent.toggle() }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            withAnimation(.spring(response: 0.5, blendDuration: 1)) {
+                                teamVM.isShowSearchedNewMemberJoinTeam.toggle()
+                            }
+                        }
+                    } label: {
+                        Label("キャンセル", systemImage: "multiply.circle.fill")
+                            .foregroundColor(.white)
+                            .opacity(0.7)
                     }
-                } label: {
-                    Label("閉じる", systemImage: "multiply.circle.fill")
-                        .foregroundColor(.white)
-                        .opacity(0.7)
-                }
-                .opacity(isAgreed ? 0.0 : 1.0)
-                .padding(.top)
-
-                .alert("エラー", isPresented: $teamVM.showErrorAlert) {
-                    Button("OK") {
-                        teamVM.alertMessage = ""
-                        teamVM.showErrorAlert.toggle()
-                    }
-                } message: {
-                    Text(teamVM.alertMessage)
-                } // alert
+                    .alert("エラー", isPresented: $teamVM.showErrorAlert) {
+                        Button("OK") {
+                            teamVM.alertMessage = ""
+                            teamVM.showErrorAlert.toggle()
+                        }
+                    } message: {
+                        Text(teamVM.alertMessage)
+                    } // alert
+                    .opacity(isAgreed ? 0.0 : 1.0)
+                    .padding(.top)
+                } // if showContent
             }
             .offset(y: showKeyboardOffset ? -100 : 0)
         }
@@ -173,6 +180,13 @@ struct JoinUserDetectCheckView: View {
                 withAnimation { showKeyboardOffset = true }
             } else {
                 withAnimation { showKeyboardOffset = false }
+            }
+        }
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                withAnimation {
+                    showContent.toggle()
+                }
             }
         }
     } // body
