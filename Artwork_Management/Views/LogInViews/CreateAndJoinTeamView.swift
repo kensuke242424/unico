@@ -93,7 +93,7 @@ struct CreateAndJoinTeamView: View {
 
                             case .fase1:
                                 VStack(spacing: 10) {
-                                    Text("他のユーザのチームに参加します。")
+                                    Text("他のユーザーのチームに参加します。")
                                     Text("複数人でアイテムの共有、管理が可能です。")
                                     Text("相手チームからのメンバー承認が必要です。")
                                 }
@@ -104,7 +104,7 @@ struct CreateAndJoinTeamView: View {
                                         .padding(.bottom, 8)
                                     VStack(alignment: .leading, spacing: 10) {
                                         Text("方法1: QRコードを相手に読み込んでもらう。")
-                                        Text("方法2: ユーザIDをコピーして相手に渡す。")
+                                        Text("方法2: ユーザーIDをコピーして相手に渡す。")
                                     }
                                     .fontWeight(.bold)
                                 }
@@ -220,14 +220,14 @@ struct CreateAndJoinTeamView: View {
                                         }
 
                                         VStack {
-                                            Text("あなたのユーザID")
+                                            Text("あなたのユーザーID")
                                                 .opacity(0.6).tracking(4)
                                                 .font(.subheadline)
                                             ZStack {
                                                 RoundedRectangle(cornerRadius: 3)
                                                     .foregroundColor(.black)
                                                     .padding(.horizontal, 40)
-                                                Text(userVM.uid ?? "ユーザIDが見つかりません")
+                                                Text(userVM.uid ?? "ユーザーIDが見つかりません")
                                                     .textSelection(.enabled)
                                                     .padding(8)
                                             }

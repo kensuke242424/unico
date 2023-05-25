@@ -26,7 +26,10 @@ struct UpdateTeamOrUserDataView: View {
         var savingWait: Bool = false
     }
 
+    // ビューの表示を管理するプロパティ群
     @Binding var selectedUpdate: SelectedUpdateData
+    @State private var showContent: Bool = false
+
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     
@@ -46,63 +49,68 @@ struct UpdateTeamOrUserDataView: View {
                 .opacity(0.4)
                 .padding(.bottom, 40)
 
-            Text(selectedUpdate == .user ? "ユーザ編集" : "チーム編集")
+            Text(selectedUpdate == .user ? "ユーザー編集" : "チーム編集")
                 .font(.title3.bold())
                 .foregroundColor(.white)
                 .opacity(0.7)
                 .tracking(10)
 
-            VStack(spacing: 10) {
-                if inputUpdate.savingWait {
-                    HStack(spacing: 10) {
-                        Text("保存中です...")
-                        ProgressView()
+            if showContent {
+
+                VStack(spacing: 10) {
+                    if inputUpdate.savingWait {
+                        HStack(spacing: 10) {
+                            Text("保存中です...")
+                            ProgressView()
+                        }
+                    } else {
+                        Text(selectedUpdate == .user ? "ユーザー情報を入力してください。" : "チーム情報を入力してください。")
                     }
-                } else {
-                    Text(selectedUpdate == .user ? "ユーザ情報を入力してください。" : "チーム情報を入力してください。")
                 }
-            }
-            .font(.caption)
-            .tracking(3)
-            .opacity(0.7)
-            .foregroundColor(.white)
-            .padding(.bottom, 8)
-
-            CaptureImageIcon(image: inputUpdate.captureImage)
-                .onTapGesture { inputUpdate.isShowPickerView.toggle() }
-
-
-            TextField("", text: $inputUpdate.nameText)
-                .frame(width: 230)
+                .font(.caption)
+                .tracking(3)
+                .opacity(0.7)
                 .foregroundColor(.white)
-                .focused($showKyboard, equals: .check)
-                .textInputAutocapitalization(.never)
-                .multilineTextAlignment(.center)
-                .background {
-                    ZStack {
-                        Text(showKyboard == nil && inputUpdate.nameText.isEmpty ?
-                             selectedUpdate == .user ?
-                             "ユーザ名を入力" : "チーム名を入力" : "")
-                        .foregroundColor(.white.opacity(0.3))
-                        Rectangle().foregroundColor(.white.opacity(0.3)).frame(height: 1)
-                            .offset(y: 20)
+                .padding(.bottom, 8)
+
+                CaptureImageIcon(image: inputUpdate.captureImage)
+                    .onTapGesture { inputUpdate.isShowPickerView.toggle() }
+
+
+                TextField("", text: $inputUpdate.nameText)
+                    .frame(width: 230)
+                    .foregroundColor(.white)
+                    .focused($showKyboard, equals: .check)
+                    .textInputAutocapitalization(.never)
+                    .multilineTextAlignment(.center)
+                    .background {
+                        ZStack {
+                            Text(showKyboard == nil && inputUpdate.nameText.isEmpty ?
+                                 selectedUpdate == .user ?
+                                 "ユーザー名を入力" : "チーム名を入力" : "")
+                            .foregroundColor(.white.opacity(0.3))
+                            Rectangle().foregroundColor(.white.opacity(0.3)).frame(height: 1)
+                                .offset(y: 20)
+                        }
                     }
+
+                UpdateButton()
+                    .padding(.top)
+                    .opacity(inputUpdate.savingWait ? 0.2 : 1.0)
+
+                Button {
+                    withAnimation { showContent.toggle() }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        withAnimation(.spring(response: 0.3)) { selectedUpdate = .start }
+                    }
+                } label: {
+                    Label("キャンセル", systemImage: "multiply.circle.fill")
+                        .foregroundColor(.white).opacity(0.7)
                 }
-
-            UpdateButton()
-                .padding(.top)
                 .opacity(inputUpdate.savingWait ? 0.2 : 1.0)
-
-            Button {
-                withAnimation(.spring(response: 0.3)) { selectedUpdate = .start }
-            } label: {
-                Label("キャンセル", systemImage: "multiply.circle.fill")
-                    .foregroundColor(.white).opacity(0.7)
+                .disabled(inputUpdate.savingWait ? true : false)
+                .padding(.top)
             }
-            .opacity(inputUpdate.savingWait ? 0.2 : 1.0)
-            .disabled(inputUpdate.savingWait ? true : false)
-            .padding(.top)
-
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .offset(y: showKeyboardOffset ? -100 : 0)
@@ -141,6 +149,11 @@ struct UpdateTeamOrUserDataView: View {
                 inputUpdate.defaultIconData = (url     : teamVM.team?.iconURL,
                                                filePath : teamVM.team?.iconPath)
                 inputUpdate.nameText = teamVM.team?.name ?? ""
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                withAnimation {
+                    showContent.toggle()
+                }
             }
         }
     } // body

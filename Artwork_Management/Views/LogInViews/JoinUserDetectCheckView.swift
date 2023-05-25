@@ -72,16 +72,16 @@ struct JoinUserDetectCheckView: View {
 
                         case .check:
                             VStack(spacing: 10) {
-                                Text("ユーザを探しています...")
+                                Text("ユーザーを探しています...")
                             }
 
                         case .agree:
                             if !isAgreed {
                                 VStack(spacing: 10) {
-                                    Text("ユーザが見つかりました。")
+                                    Text("ユーザーが見つかりました。")
                                         .padding(.bottom, 8)
                                     VStack(alignment: .leading, spacing: 10) {
-                                        Text("こちらのユーザをチームに招待しますか？")
+                                        Text("こちらのユーザーをチームに招待しますか？")
                                     }
                                     .fontWeight(.bold)
                                 }
@@ -209,7 +209,7 @@ struct JoinUserDetectCheckView: View {
                     .multilineTextAlignment(.center)
                     .background {
                         ZStack {
-                            Text(inputUserIDFocused == nil && inputUserIDText.isEmpty ? "ユーザIDを貼り付け" : "")
+                            Text(inputUserIDFocused == nil && inputUserIDText.isEmpty ? "ユーザーIDを貼り付け" : "")
                                 .foregroundColor(.white.opacity(0.3))
                             Rectangle().foregroundColor(.white.opacity(0.3)).frame(height: 1)
                                 .offset(y: 20)
@@ -221,7 +221,7 @@ struct JoinUserDetectCheckView: View {
                         do {
                             if inputUserIDText.isEmpty {
                                 teamVM.showErrorAlert.toggle()
-                                teamVM.alertMessage = "ユーザIDを入力してください"
+                                teamVM.alertMessage = "ユーザーIDを入力してください"
                                 return
                             }
 
@@ -234,8 +234,8 @@ struct JoinUserDetectCheckView: View {
                             }
 
                         } catch {
-                            print("uid検索の結果、Firestoreにユーザが存在しませんでした")
-                            teamVM.alertMessage = "入力したidのユーザは見つかりませんでした。"
+                            print("uid検索の結果、Firestoreにユーザーが存在しませんでした")
+                            teamVM.alertMessage = "入力したidのユーザーは見つかりませんでした。"
                             teamVM.showErrorAlert.toggle()
                             joinUserCheckFase = .start
                             return
@@ -286,11 +286,11 @@ struct JoinUserDetectCheckView: View {
                                     }
                                 } catch CustomError.memberDuplication {
                                     hapticErrorNotification()
-                                    teamVM.alertMessage = "こちらのユーザは既にチームに所属しています。"
+                                    teamVM.alertMessage = "こちらのユーザーは既にチームに所属しています。"
                                     teamVM.showErrorAlert.toggle()
                                 } catch {
                                     hapticErrorNotification()
-                                    teamVM.alertMessage = "ユーザの紹介に失敗しました。もう一度試してみてください。"
+                                    teamVM.alertMessage = "ユーザーの紹介に失敗しました。もう一度試してみてください。"
                                     teamVM.showErrorAlert.toggle()
                                 }
                             }
