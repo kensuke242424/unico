@@ -179,6 +179,7 @@ struct NewTabView: View {
                             .ignoresSafeArea()
                         EditTagView(passTag: $inputTab.selectedTag,
                                     show   : $tagVM.showEdit)
+                        .transition(AnyTransition.opacity.combined(with: .offset(y: 50)))
                     }
                 }
                 /// チームへの招待View

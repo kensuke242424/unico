@@ -75,8 +75,9 @@ struct AccountSystemView: View {
     @State private var showEntryAccount     : Bool = false
     
     // アラートを管理するプロパティ
-    @State private var showLogOutAlert      : Bool = false
-    @State private var showExistAccountAlert: Bool = false
+    @State private var showLogOutAlert         : Bool = false
+    @State private var showExistAccountAlert   : Bool = false
+    @State private var showNotEntryAccountAlert: Bool = false
     
     var body: some View {
         
@@ -95,6 +96,11 @@ struct AccountSystemView: View {
                                         title: listRow.title,
                                         text : listRow.infomation)
                         }
+                        .onChange(of: logInVM.resultAccountLink) { result in
+                            if result == true {
+                                userVM.isAnonymousCheck()
+                            }
+                        }
                         .alert(logInVM.resultAccountLink ? "登録完了" : "登録失敗",
                                isPresented: $logInVM.showAccountLinkAlert) {
                             Button("OK") {
@@ -108,20 +114,25 @@ struct AccountSystemView: View {
                                 Text("アカウント登録時にエラーが発生しました。もう一度試してみてください。")
                             }
                         } // alert
-                        .onChange(of: logInVM.resultAccountLink) { result in
-                            if result == true {
-                                userVM.isAnonymousCheck()
-                            }
-                        }
+
                         
                     case .addressChange:
                         Button {
-                            navigationVM.path.append(SystemAccountPath.defaultEmailCheck)
+                            if userVM.isAnonymous {
+                                showNotEntryAccountAlert.toggle()
+                            } else {
+                                navigationVM.path.append(SystemAccountPath.defaultEmailCheck)
+                            }
                         } label: {
                             ListRowView(icon : listRow.icon,
                                         title: listRow.title,
                                         text : listRow.infomation
                             )
+                        }
+                        .alert("未登録", isPresented: $showNotEntryAccountAlert) {
+                            Button("OK") {}
+                        } message: {
+                            Text("お使いのアカウントはお試し中です。メールアドレスは登録されていません。")
                         }
                         
                     case .logOut:

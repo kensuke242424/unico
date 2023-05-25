@@ -457,7 +457,8 @@ struct SystemSideMenu: View {
                                         stiffness      : 100,
                                         damping        : 80,
                                         initialVelocity: 0.1),
-                                        value          : dragOffset)
+                                        value          : dragOffset
+        )
 
     } // body
     
@@ -476,7 +477,6 @@ struct SystemSideMenu: View {
                         Text("他の所属チームはありません")
                             .tracking(2)
                     }
-//                    .foregroundColor(.white)
                     .opacity(0.5)
                     
                 } else {

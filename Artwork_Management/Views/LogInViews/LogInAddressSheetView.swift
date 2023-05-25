@@ -177,7 +177,8 @@ struct LogInAddressSheetView: View {
                             
                             // リンクメール送信ボタン
                             Button(logInVM.addressSignInFase == .start || logInVM.addressSignInFase == .check ? "メールを送信" : "もう一度送る") {
-                                
+
+                                // アドレス処理の結果ビュー更新は各メソッド先で行なっている
                                 withAnimation(.spring(response: 0.3)) {
                                     logInVM.addressSignInFase = .check
                                 }

@@ -18,6 +18,7 @@ struct EditTagView: View {
     @Binding var show: Bool
     
     @State private var tagName     : String = ""
+    @State private var openContent : Bool = true
     @State private var nameEmpty   : Bool = true
     @State private var containsName: Bool = false
     
@@ -25,110 +26,111 @@ struct EditTagView: View {
     
     var body: some View {
         VStack(spacing: 40) {
-            
-            VStack {
-                HStack {
-                    Image(systemName: "tag.fill")
+
+            if openContent {
+                VStack {
+                    HStack {
+                        Image(systemName: "tag.fill")
+                            .font(.title3)
+                        Text(passTag == nil ? "新規タグ" : "タグ編集")
+                            .font(.title)
+                            .tracking(4)
+                            .fontWeight(.semibold)
+                    }
+
+                    Rectangle()
+                        .fill(colorScheme == .light ?
+                              Color.black.gradient : Color.white.gradient)
+                        .frame(width: 260, height: 1)
+
+                    if containsName {
+                        Text("※同じ名前のタグが存在します")
+                            .font(.caption)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.red)
+                            .padding(.top)
+                    }
+
+                    TextField("タグの名前を入力", text: $tagName)
                         .font(.title3)
-                    Text(passTag == nil ? "新規タグ" : "タグ編集")
-                        .font(.title)
-                        .tracking(4)
-                        .fontWeight(.semibold)
-                }
-                
-                Rectangle()
-                    .fill(colorScheme == .light ?
-                          Color.black.gradient : Color.white.gradient)
-                    .frame(width: 260, height: 1)
-                
-                if containsName {
-                    Text("※同じ名前のタグが存在します")
-                        .font(.caption)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.red)
-                        .padding(.top)
-                }
-                
-                TextField("タグの名前を入力", text: $tagName)
-                    .font(.title3)
-                    .focused($focused, equals: true)
-                    .textInputAutocapitalization(.never)
-                    .textFieldStyle(.roundedBorder)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
-                    .padding(.vertical, 10)
-                
-                Button(passTag == nil ? "追加" : "完了") {
-                    
-                    if let defaultTag = passTag {
-                        var updateTagData     = defaultTag
-                        updateTagData.tagName = tagName
-                        
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            tagVM.updateTagData(updateData : updateTagData,
-                                                defaultData: defaultTag,
-                                                teamID     : teamVM.team!.id)
-                            
-                            self.passTag = updateTagData
-                            show = false
-                        }
-                        
-                    } else {
-                        let createTagData = Tag(oderIndex: tagVM.tags.count,
-                                                tagName  : tagName,
-                                                tagColor : .gray)
-                        
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            tagVM.addTag(tagData: createTagData, teamID: teamVM.team!.id)
-                            self.passTag = createTagData
-                            show = false
+                        .focused($focused, equals: true)
+                        .textInputAutocapitalization(.never)
+                        .textFieldStyle(.roundedBorder)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+                        .padding(.vertical, 10)
+
+                    Button(passTag == nil ? "追加" : "完了") {
+
+                        if let defaultTag = passTag {
+                            var updateTagData     = defaultTag
+                            updateTagData.tagName = tagName
+
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                tagVM.updateTagData(updateData : updateTagData,
+                                                    defaultData: defaultTag,
+                                                    teamID     : teamVM.team!.id)
+
+                                self.passTag = updateTagData
+                                show = false
+                            }
+
+                        } else {
+                            let createTagData = Tag(oderIndex: tagVM.tags.count,
+                                                    tagName  : tagName,
+                                                    tagColor : .gray)
+
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                tagVM.addTag(tagData: createTagData, teamID: teamVM.team!.id)
+                                self.passTag = createTagData
+                                show = false
+                            }
                         }
                     }
-                }
-                .buttonStyle(.borderedProminent)
-                .transition(.slide)
-                .disabled(nameEmpty)
-                .disabled(containsName)
-                .onChange(of: tagName) { newValue in
-                    if newValue.isEmpty {
-                        nameEmpty = true
-                    } else {
-                        nameEmpty = false
+                    .buttonStyle(.borderedProminent)
+                    .transition(.slide)
+                    .disabled(nameEmpty)
+                    .disabled(containsName)
+                    .onChange(of: tagName) { newValue in
+                        if newValue.isEmpty {
+                            nameEmpty = true
+                        } else {
+                            nameEmpty = false
+                        }
+                    }
+                    .onChange(of: tagName) { newValue in
+                        if passTag?.tagName != tagName &&
+                           tagVM.tags.contains(where: {$0.tagName == tagName}) {
+                            withAnimation(.easeInOut(duration: 0.3)) { containsName = true }
+                        } else {
+                            withAnimation(.easeInOut(duration: 0.3)) { containsName = false }
+                        }
                     }
                 }
-                .onChange(of: tagName) { newValue in
-                    if passTag?.tagName != tagName &&
-                       tagVM.tags.contains(where: {$0.tagName == tagName}) {
-                        withAnimation(.easeInOut(duration: 0.3)) { containsName = true }
-                    } else {
-                        withAnimation(.easeInOut(duration: 0.3)) { containsName = false }
-                    }
+                .frame(width: 300, height: 250)
+                .background {
+                    RoundedRectangle(cornerRadius: 50)
+                        .fill(colorScheme == .light ?
+                              Color.white.gradient : Color.black.gradient)
+                        .shadow(radius: 1, x: 1, y: 1)
+                        .shadow(radius: 1, x: 1, y: 1)
+                        .shadow(radius: 1, x: 1, y: 1)
                 }
-            }
-            .frame(width: 300, height: 250)
-            .background {
-                RoundedRectangle(cornerRadius: 50)
-                    .fill(colorScheme == .light ?
-                          Color.white.gradient : Color.black.gradient)
-                    .shadow(radius: 1, x: 1, y: 1)
-                    .shadow(radius: 1, x: 1, y: 1)
-                    .shadow(radius: 1, x: 1, y: 1)
-            }
-            .onTapGesture { focused = nil }
-            
-            Button {
-                /// dismiss
-                withAnimation(.easeInOut(duration: 0.3)) { show = false }
-            } label: {
-                Label("閉じる", systemImage: "xmark.circle.fill")
-            }
-            .fontWeight(.semibold)
-            .foregroundColor(.white)
-            .padding(.top)
+                .onTapGesture { focused = nil }
+
+                Button {
+                    /// dismiss
+                    withAnimation(.easeInOut(duration: 0.3)) { show = false }
+                } label: {
+                    Label("閉じる", systemImage: "xmark.circle.fill")
+                }
+                .fontWeight(.semibold)
+                .foregroundColor(.white)
+                .padding(.top)
+            } // if showContent
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .offset(y: 30)
-        .transition(AnyTransition.opacity.combined(with: .offset(y: 50)))
         .background {
             Color.gray
                 .opacity(0.001)
@@ -138,6 +140,9 @@ struct EditTagView: View {
         .onAppear {
             if let passTag {
                 tagName = passTag.tagName
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                withAnimation(.easeInOut(duration: 0.3)) { openContent = true }
             }
         }
     }
