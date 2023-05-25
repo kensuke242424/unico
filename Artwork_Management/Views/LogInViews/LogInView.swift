@@ -199,11 +199,11 @@ struct InputLogIn {
     var isShowPickerView                 : Bool = false
     var isShowAnonymousEntryRecomendation: Bool = false
     var isShowGoBackLogInAlert           : Bool = false
+    var captureError                     : Bool = false
 
-    var checkTermsAgree: Bool = false
+    var checkTermsAgree: Bool = true
     var showNotYetAgreeAlert: Bool = false
 
-    var captureError                     : Bool = false
 }
 
 // ✅ ログイン画面の親Viewです。

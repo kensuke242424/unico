@@ -15,23 +15,24 @@ struct TermsAndPrivacyView: View {
                 .fill(.white.gradient)
 
             HStack {
+
                 Rectangle()
-                    .stroke(Color.black, lineWidth: 1)
+                    .fill(isCheck ? .green : .white)
                     .frame(width: 15, height: 15)
                     .overlay {
                         if isCheck {
                             Image(systemName: "checkmark")
+                                .resizable()
+                                .frame(width: 12, height: 12)
                                 .foregroundColor(.black)
                                 .fontWeight(.bold)
-                                .offset(y: -2)
+                                .offset(y: -1)
                         }
                     }
-                    .background {
-                        if isCheck {
-                            Rectangle()
-                                .fill(.green)
-                                .opacity(0.7)
-                        }
+                    .overlay {
+                        Rectangle()
+                            .stroke(Color.black, lineWidth: 1)
+                            .frame(width: 15, height: 15)
                     }
                     .onTapGesture(perform: {
                         isCheck.toggle()

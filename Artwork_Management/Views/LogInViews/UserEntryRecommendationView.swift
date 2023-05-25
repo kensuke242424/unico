@@ -21,7 +21,7 @@ struct UserEntryRecommendationView: View {
     /// ユーザー登録ビューの画面遷移を管理するプロパティ
     @StateObject var userEntryNavigationVM = UserEntryNavigationViewModel()
     @State private var showExistEntryAlert: Bool = false
-    @State private var checkTermsAgree: Bool = false
+    @State private var checkTermsAgree: Bool = true
     @State private var showNotYetAgreeAlert: Bool = false
     
     var body: some View {
@@ -112,6 +112,7 @@ struct UserEntryRecommendationView: View {
                         }
                     }
                     .buttonStyle(.borderedProminent)
+                    .disabled(checkTermsAgree ? false : true)
                 }
             }
             // 登録済みのユーザーが登録ボタンを押した場合に表示するアラート

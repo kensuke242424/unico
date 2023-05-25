@@ -20,6 +20,8 @@ struct AnonymousEntryRecomendationView: View {
 
     /// ユーザー登録ビューの画面遷移を管理するプロパティ
     @StateObject var userEntryNavigationVM = UserEntryNavigationViewModel()
+    /// 利用規約とプライバシーポリシーへの同意を管理するチェックボタンに使用するプロパティ
+    @State private var checkTermsAgree: Bool = true
 
     var body: some View {
 
@@ -72,6 +74,9 @@ struct AnonymousEntryRecomendationView: View {
 
             // 下部の選択ボタンを保有するView
             VStack(spacing: 30) {
+
+                TermsAndPrivacyView(isCheck: $checkTermsAgree)
+
                 Text("今はアカウント登録せずに\nお試しアカウントで始めますか？")
                     .foregroundColor(.white)
                     .tracking(3)
@@ -115,6 +120,7 @@ struct AnonymousEntryRecomendationView: View {
                         }
                     }
                     .buttonStyle(.borderedProminent)
+                    .disabled(checkTermsAgree ? false : true)
                 }
             }
         }
