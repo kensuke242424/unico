@@ -64,7 +64,7 @@ struct SystemSideMenu: View {
         ZStack {
             // Blur View...
             BlurView(style: .systemUltraThinMaterialDark)
-            userVM.user?.userColor.color1
+            userVM.memberColor.color1
                 .opacity(0.7)
                 .blur(radius: 15)
                 .overlay(alignment: .topLeading) {

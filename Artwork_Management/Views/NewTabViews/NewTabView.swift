@@ -295,12 +295,14 @@ struct NewTabView: View {
                         main: {
                             CartItemsSheet(
                                 cartVM: cartVM,
-                                halfSheetScroll: .main)
+                                halfSheetScroll: .main,
+                                memberColor: userVM.memberColor)
                         },
                         additional: {
                             CartItemsSheet(
                                 cartVM: cartVM,
-                                halfSheetScroll: .additional)
+                                halfSheetScroll: .additional,
+                                memberColor: userVM.memberColor)
                             
                             Spacer()
                                 .frame(height: 100)
@@ -325,7 +327,8 @@ struct NewTabView: View {
                 
                 CommerceSheet(cartVM: cartVM,
                               inputTab: $inputTab,
-                              teamID: teamVM.team!.id)
+                              teamID: teamVM.team!.id,
+                              memberColor: userVM.memberColor)
                 
             } // builder.content
             .supportedState([.medium])

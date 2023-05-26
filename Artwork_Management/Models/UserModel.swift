@@ -40,7 +40,7 @@ struct ImageData: Codable {
     var path: String?
 }
 
-// ユーザそれぞれが個々に選ぶアプリ全体のカラー
+// ユーザーそれぞれが個々に選ぶアプリ全体のテーマカラー
 enum MemberColor: CaseIterable, Codable {
     case red
     case blue

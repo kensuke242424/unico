@@ -11,9 +11,12 @@ import ResizableSheet
 // NOTE: 取引対象のアイテムの決済を完了するシートです。
 struct CommerceSheet: View {
 
+    @EnvironmentObject var userVM: UserViewModel
+
     @StateObject var cartVM: CartViewModel
     @Binding var inputTab: InputTab
     let teamID: String
+    let memberColor: MemberColor
 
     @State private var commerceButtonDisable: Bool = false
     @State private var commerceButtonOpacity: CGFloat =  1.0
@@ -42,14 +45,14 @@ struct CommerceSheet: View {
                         .overlay(alignment: .topTrailing) {
                             if cartVM.resultCartAmount <= 50 {
                                 Image(systemName: "\(commerseResults().amount).circle.fill")
-                                    .foregroundColor(.customLightBlue2)
+                                    .foregroundColor(memberColor.color3)
                                     .offset(y: -8)
                             } else {
                                 Image(systemName: "50.circle.fill").offset(y: -8)
-                                    .foregroundColor(.customLightBlue2)
+                                    .foregroundColor(memberColor.color3)
                                     .overlay(alignment: .topTrailing) {
                                         Text("＋")
-                                            .foregroundColor(.customLightBlue2)
+                                            .foregroundColor(memberColor.color3)
                                             .font(.caption)
                                             .offset(x: 7, y: -12)
                                     }
@@ -78,7 +81,7 @@ struct CommerceSheet: View {
                     },
                     label: {
                         RoundedRectangle(cornerRadius: 20)
-                            .foregroundColor(.customlMiddlePurple1)
+                            .foregroundColor(memberColor.color3)
                             .frame(width: 80, height: 50)
                             .shadow(radius: 2, x: 3, y: 3)
                             .overlay {

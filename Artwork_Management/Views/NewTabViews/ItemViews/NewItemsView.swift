@@ -189,7 +189,7 @@ struct NewItemsView: View {
                         Text("\(item.inventory)")
                     }
                     .font(.callout)
-                    .foregroundColor(.orange)
+                    .foregroundColor(userVM.memberColor.color3)
                     .padding(.top, 20)
                     
                     HStack {
@@ -392,7 +392,7 @@ struct NewItemsView: View {
                             .background {
                                 if activeTag == tag {
                                     Capsule()
-                                        .fill(Color.blue)
+                                        .foregroundColor(userVM.memberColor.color2)
                                         .matchedGeometryEffect(id: "ACTIVETAG", in: animation)
                                 } else {
                                     Capsule()
@@ -420,7 +420,7 @@ struct NewItemsView: View {
                 }
             } label: {
                 Image(systemName: "plus.app.fill")
-                    .foregroundColor(.blue)
+                    .foregroundColor(userVM.memberColor.color2)
                     .shadow(radius: 1, x: 1, y: 1)
                     .shadow(radius: 1, x: 1, y: 1)
             }

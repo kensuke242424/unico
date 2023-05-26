@@ -13,6 +13,7 @@ struct DetailView: View {
     @Environment(\.colorScheme) var colorScheme
     
     @EnvironmentObject var navigationVM: NavigationViewModel
+    @EnvironmentObject var userVM: UserViewModel
     
     @StateObject var itemVM: ItemViewModel
     @StateObject var cartVM: CartViewModel
@@ -89,7 +90,7 @@ struct DetailView: View {
                             Text("\(item.inventory)")
                         }
                         .font(.callout)
-                        .foregroundColor(.orange)
+                        .foregroundColor(userVM.memberColor.colorAccent)
                         .padding(.top, 10)
                         
                         HStack {
@@ -163,7 +164,7 @@ struct DetailView: View {
                     } label: {
                         Label("Cart", systemImage: "cart.fill.badge.plus")
                             .font(.callout)
-                            .foregroundColor(.orange)
+                            .foregroundColor(userVM.memberColor.colorAccent)
                     }
                     .frame(maxWidth: .infinity)
                     .disabled(checkHaveNotInventory(item))
@@ -259,7 +260,7 @@ struct DetailView: View {
                         .padding(.vertical, 10)
                         .background {
                             Capsule()
-                                .fill(Color.orange.gradient)
+                                .foregroundColor(userVM.memberColor.colorAccent)
                         }
                         .foregroundColor(.white)
                 }

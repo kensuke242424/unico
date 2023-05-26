@@ -18,6 +18,7 @@ struct CartItemsSheet: View {
     @StateObject var cartVM: CartViewModel
 
     let halfSheetScroll: HalfSheetScroll
+    let memberColor: MemberColor
     private let listLimit: Int = 0
 
     var body: some View {
@@ -37,7 +38,8 @@ struct CartItemsSheet: View {
                     if listLimit > offset {
                         if element.amount > 0 {
                             CartItemRow(cartVM: cartVM,
-                                        itemRow: element)
+                                        itemRow: element,
+                                        memberColor: memberColor)
                         }
                     } // if
                 } // ForEach
@@ -55,7 +57,8 @@ struct CartItemsSheet: View {
                     if listLimit <= offset {
                         if element.amount > 0 {
                             CartItemRow(cartVM: cartVM,
-                                        itemRow: element)
+                                        itemRow: element,
+                                        memberColor: memberColor)
                         }
 
                     } // if listLimit
@@ -70,9 +73,12 @@ struct CartItemsSheet: View {
 // ✅ カスタムView: かご内の一要素分のレイアウト
 struct CartItemRow: View {
 
+    @EnvironmentObject var userVM: UserViewModel
+
     @StateObject var cartVM: CartViewModel
     
     let itemRow: Item
+    let memberColor: MemberColor
 
     @State private var basketItemCount: Int = 0
     @State private var isShowAlert: Bool = false
@@ -138,7 +144,7 @@ struct CartItemRow: View {
                             Image(systemName: "minus.circle.fill")
                                 .resizable()
                                 .frame(width: 22, height: 22)
-                                .foregroundColor(.customlDarkPurple1)
+                                .foregroundColor(memberColor.color2)
                         }
                         Text(String(itemRow.amount))
                             .foregroundColor(.black)
@@ -165,7 +171,7 @@ struct CartItemRow: View {
                             Image(systemName: "plus.circle.fill")
                                 .resizable()
                                 .frame(width: 22, height: 22)
-                                .foregroundColor(.customlDarkPurple1)
+                                .foregroundColor(memberColor.color2)
                                 .opacity(countUpDisable ? 0.3 : 1.0)
                         }
                         .disabled(countUpDisable)
@@ -224,6 +230,7 @@ struct CartItemPhoto: View {
 struct CartItemsSheet_Previews: PreviewProvider {
     static var previews: some View {
         CartItemsSheet(cartVM: CartViewModel(),
-                       halfSheetScroll: .additional)
+                       halfSheetScroll: .additional,
+                       memberColor: .blue)
     }
 }
