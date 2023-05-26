@@ -247,7 +247,7 @@ struct NewEditItemView: View {
                     .opacity(0.7)
                     .ignoresSafeArea()
                 EditTagView(passTag: $input.selectionTag, show: $input.showTagEdit)
-                    .ignoresSafeArea()
+                    .transition(AnyTransition.opacity.combined(with: .offset(y: 50)))
             }
         }
         .background {

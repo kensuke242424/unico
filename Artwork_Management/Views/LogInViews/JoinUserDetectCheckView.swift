@@ -34,8 +34,10 @@ struct JoinUserDetectCheckView: View {
     var body: some View {
 
         ZStack {
-            Color(.black).opacity(0.7)
-                .background(.ultraThinMaterial).opacity(0.9)
+            Color(.black)
+                .opacity(0.8)
+                .background(.ultraThinMaterial)
+                .opacity(0.9)
                 .ignoresSafeArea()
                 .onTapGesture {
                     inputUserIDFocused = nil
@@ -325,6 +327,13 @@ struct JoinUserDetectCheckView: View {
 
 struct JoinUserCheckView_Previews: PreviewProvider {
     static var previews: some View {
+
         JoinUserDetectCheckView(teamVM: TeamViewModel())
+            .background {
+                Image("background_1")
+                    .resizable()
+                    .scaledToFill()
+                    .ignoresSafeArea()
+            }
     }
 }

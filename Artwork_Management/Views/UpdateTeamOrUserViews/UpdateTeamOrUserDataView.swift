@@ -126,14 +126,9 @@ struct UpdateTeamOrUserDataView: View {
                          isShowSheet: $inputUpdate.isShowPickerView)
         }
         .background {
-            Color.userBlue1
-                .frame(width: getRect().width, height: getRect().height)
-                .opacity(0.7)
-                .ignoresSafeArea()
-                .onTapGesture { showKyboard = nil }
-
-            BlurView(style: .systemThinMaterialDark)
-                .frame(width: getRect().width, height: getRect().height)
+            Color(.black)
+                .opacity(0.8)
+                .background(.ultraThinMaterial)
                 .opacity(0.9)
                 .ignoresSafeArea()
                 .onTapGesture { showKyboard = nil }
@@ -213,8 +208,14 @@ struct UpdateTeamOrUserDataView: View {
                     // 編集画面を閉じる
                     hapticSuccessNotification()
                     withAnimation(.spring(response: 0.3)) {
-                        selectedUpdate = .start
+
+                    }
+                    withAnimation {
+                        showContent.toggle()
                         inputUpdate.savingWait.toggle()
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        withAnimation(.spring(response: 0.3)) { selectedUpdate = .start }
                     }
                 } // Task ここまで
 
@@ -243,8 +244,14 @@ struct UpdateTeamOrUserDataView: View {
                     // 編集画面を閉じる
                     hapticSuccessNotification()
                     withAnimation(.spring(response: 0.3)) {
-                        selectedUpdate = .start
+
+                    }
+                    withAnimation {
+                        showContent.toggle()
                         inputUpdate.savingWait.toggle()
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        withAnimation(.spring(response: 0.3)) { selectedUpdate = .start }
                     }
                 } // Task ここまで
             }
