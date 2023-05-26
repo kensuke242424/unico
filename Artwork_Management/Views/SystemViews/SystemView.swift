@@ -13,6 +13,7 @@ struct SystemView: View {
     
     enum SystemListContents: CaseIterable {
         case infomation
+        case setting
         case account
         case twitter
         case query
@@ -26,6 +27,9 @@ struct SystemView: View {
                 
             case .infomation:
                 return "cube.transparent"
+
+            case .setting:
+                return "gear"
                 
             case .account:
                 return "person"
@@ -56,6 +60,9 @@ struct SystemView: View {
                 
             case .infomation:
                 return "お知らせ"
+
+            case .setting:
+                return "アプリ設定"
                 
             case .account:
                 return "アカウント"
@@ -85,6 +92,9 @@ struct SystemView: View {
                 
             case .infomation:
                 return "アプリのアップデートやお知らせを記載しています。"
+
+            case .setting:
+                return "アプリケーションの各種設定を行います。"
                 
             case .account:
                 return "アカウント情報の確認や変更、削除を含めた操作を行います。"
@@ -125,6 +135,15 @@ struct SystemView: View {
                 case .infomation:
                     Button {
                         navigationVM.path.append(UpdateReportPath.root)
+                    } label: {
+                        ListRowView(icon : listRow.icon,
+                                    title: listRow.title,
+                                    text : listRow.infomation)
+                    }
+
+                case .setting:
+                    Button {
+                        navigationVM.path.append(ApplicationSettingPath.root)
                     } label: {
                         ListRowView(icon : listRow.icon,
                                     title: listRow.title,

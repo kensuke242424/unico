@@ -35,3 +35,7 @@ enum SystemAccountPath {
          deletedAccount
 }
 
+enum ApplicationSettingPath {
+    case root
+}
+

@@ -253,6 +253,12 @@ struct NewTabView: View {
                         UpdateReportView()
                     }
                 }
+                .navigationDestination(for: ApplicationSettingPath.self) { settingPath in
+                    switch settingPath {
+                    case .root:
+                        UpdateReportView()
+                    }
+                }
             } // NavigationStack
         } // GeometryReader
         // 🧺アイテム取引かごのシート画面
