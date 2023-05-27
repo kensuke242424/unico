@@ -322,6 +322,12 @@ struct NewItemsView: View {
                 Image(systemName: "heart")
             }
         }
+        .particleEffect(systemImage: "heart.fill",
+                        font: .title,
+                        status: item.favorite,
+                        activeTint: .red,
+                        inActiveTint: .white
+        )
         .foregroundColor(.red)
         .offset(x: 2, y: -40)
     }

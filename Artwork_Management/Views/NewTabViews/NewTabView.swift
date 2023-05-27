@@ -214,13 +214,24 @@ struct NewTabView: View {
                     case .edit:
                         NewEditItemView(itemVM: itemVM,
                                         passItem: itemVM.items[cartVM.actionItemIndex])
-                        
                     }
                 }
                 .navigationDestination(for: SystemPath.self) { systemPath in
                     switch systemPath {
                     case .root:
                         SystemView(itemVM: itemVM)
+                    }
+                }
+                .navigationDestination(for: UpdateReportPath.self) { reportPath in
+                    switch reportPath {
+                    case .root:
+                        UpdateReportView()
+                    }
+                }
+                .navigationDestination(for: ApplicationSettingPath.self) { settingPath in
+                    switch settingPath {
+                    case .root:
+                        ApplicationSettingView()
                     }
                 }
                 .navigationDestination(for: SystemAccountPath.self) { accountPath in
@@ -245,18 +256,6 @@ struct NewTabView: View {
                         
                     case .deletedAccount:
                         DeletedView()
-                    }
-                }
-                .navigationDestination(for: UpdateReportPath.self) { reportPath in
-                    switch reportPath {
-                    case .root:
-                        UpdateReportView()
-                    }
-                }
-                .navigationDestination(for: ApplicationSettingPath.self) { settingPath in
-                    switch settingPath {
-                    case .root:
-                        UpdateReportView()
                     }
                 }
             } // NavigationStack

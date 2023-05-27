@@ -152,7 +152,7 @@ struct DetailView: View {
                     Button {
                         itemVM.updateFavorite(item)
                     } label: {
-                        Label("Like", systemImage: item.favorite ? "heart.fill" : "suit.heart")
+                        Label("お気に入り", systemImage: item.favorite ? "heart.fill" : "suit.heart")
                             .font(.callout)
                             .foregroundColor(item.favorite ? .red : .gray)
                     }
@@ -162,9 +162,9 @@ struct DetailView: View {
                     Button {
                         cartVM.addCartItem(item: item)
                     } label: {
-                        Label("Cart", systemImage: "cart.fill.badge.plus")
+                        Label("カート追加", systemImage: "cart.fill.badge.plus")
                             .font(.callout)
-                            .foregroundColor(userVM.memberColor.colorAccent)
+                            .foregroundColor(checkHaveNotInventory(item) ? .gray : .orange)
                     }
                     .frame(maxWidth: .infinity)
                     .disabled(checkHaveNotInventory(item))

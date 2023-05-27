@@ -26,8 +26,8 @@ class UserViewModel: ObservableObject {
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
     var uid: String? { return Auth.auth().currentUser?.uid }
     var memberColor: MemberColor {
-//        return user?.userColor ?? MemberColor.blue
-        return MemberColor.yellow
+        return user?.userColor ?? MemberColor.blue
+//        return MemberColor.yellow
     }
 
     @Published var user: User?
