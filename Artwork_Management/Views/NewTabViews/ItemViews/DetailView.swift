@@ -90,7 +90,7 @@ struct DetailView: View {
                             Text("\(item.inventory)")
                         }
                         .font(.callout)
-                        .foregroundColor(userVM.memberColor.color3)
+                        .foregroundColor(.orange)
                         .padding(.top, 10)
                         
                         HStack {
@@ -260,7 +260,7 @@ struct DetailView: View {
                         .padding(.vertical, 10)
                         .background {
                             Capsule()
-                                .foregroundColor(userVM.memberColor.colorAccent)
+                                .foregroundColor(userVM.memberColor.color3)
                         }
                         .foregroundColor(.white)
                 }

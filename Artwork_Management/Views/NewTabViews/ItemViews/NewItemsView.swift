@@ -189,7 +189,7 @@ struct NewItemsView: View {
                         Text("\(item.inventory)")
                     }
                     .font(.callout)
-                    .foregroundColor(userVM.memberColor.color3)
+                    .foregroundColor(.orange)
                     .padding(.top, 20)
                     
                     HStack {
