@@ -85,7 +85,7 @@ struct NewEditItemView: View {
             let size = $0.size
             /// 親View側のスクロールViewを参照したsizeを元にしたカードのサイズ
             let cardWidth : CGFloat = size.width / 2 - 15
-            let cardHeight: CGFloat = 220
+            let cardHeight: CGFloat = 200
             
             VStack(spacing: 20) {
                 
