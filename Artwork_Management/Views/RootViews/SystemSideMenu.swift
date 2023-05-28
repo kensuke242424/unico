@@ -153,6 +153,12 @@ struct SystemSideMenu: View {
                                             }, label: {
                                                 Text(inputSideMenu.editMode.isEditing ? "終了" : "編集")
                                             })
+                                            .background(
+                                                Capsule()
+                                                    .fill(.black)
+                                                    .scaleEffect(1.3)
+                                                    .opacity(0.2)
+                                            )
                                             .offset(x: 20)
                                         }
                                         
@@ -164,7 +170,13 @@ struct SystemSideMenu: View {
                                         } label: {
                                             Image(systemName: "plus.square")
                                         }
-                                        .offset(x: 30)
+                                        .background(
+                                            Circle()
+                                                .fill(.black)
+                                                .scaleEffect(1.5)
+                                                .opacity(0.2)
+                                        )
+                                        .offset(x: 35)
                                     }
                                 } // HStack
                                 
