@@ -13,23 +13,19 @@ struct SystemView: View {
     
     enum SystemListContents: CaseIterable {
         case infomation
-        case setting
         case account
         case twitter
-        case query
         case review
         case share
+        case query
         case rules
         case privacy
         
         var icon: String {
             switch self {
-                
+
             case .infomation:
                 return "cube.transparent"
-
-            case .setting:
-                return "gear"
                 
             case .account:
                 return "person"
@@ -37,15 +33,14 @@ struct SystemView: View {
             case .twitter:
                 return ""
                 
-            case .query:
-                return "envelope.open"
-            
-                
             case .review:
                 return "star.bubble"
                 
             case .share:
                 return "square.and.arrow.up"
+
+            case .query:
+                return "envelope.open"
                 
             case .rules:
                 return "network.badge.shield.half.filled"
@@ -57,12 +52,9 @@ struct SystemView: View {
         
         var title: String {
             switch self {
-                
+
             case .infomation:
                 return "お知らせ"
-
-            case .setting:
-                return "アプリ設定"
                 
             case .account:
                 return "アカウント"
@@ -70,14 +62,14 @@ struct SystemView: View {
             case .twitter:
                 return "公式Twitter"
                 
-            case .query:
-                return "お問い合わせ"
-                
             case .review:
                 return "アプリへのレビューを書く"
                 
             case .share:
                 return "アプリをシェア"
+
+            case .query:
+                return "お問い合わせ"
                 
             case .rules:
                 return "利用規約"
@@ -89,27 +81,24 @@ struct SystemView: View {
         
         var infomation: String {
             switch self {
-                
+
             case .infomation:
                 return "アプリのアップデートやお知らせを記載しています。"
-
-            case .setting:
-                return "アプリケーションの各種設定を行います。"
                 
             case .account:
                 return "アカウント情報の確認や変更、削除を含めた操作を行います。"
                 
             case .twitter:
                 return "unicoの公式Twitterへ移動します。"
-                
-            case .query:
-                return "アプリのご利用に関してお問い合わせを行います。"
-                
+
             case .review:
                 return "App Storeにてunicoのレビュー評価を行います。"
                 
             case .share:
                 return "シェア画面から他の人にunicoアプリをシェアします。"
+
+            case .query:
+                return "アプリのご利用に関してお問い合わせを行います。"
                 
             case .rules:
                 return "アプリの利用規約について記載しています。"
@@ -132,24 +121,6 @@ struct SystemView: View {
                 
                 switch listRow {
                     
-                case .infomation:
-                    Button {
-                        navigationVM.path.append(UpdateReportPath.root)
-                    } label: {
-                        ListRowView(icon : listRow.icon,
-                                    title: listRow.title,
-                                    text : listRow.infomation)
-                    }
-
-                case .setting:
-                    Button {
-                        navigationVM.path.append(ApplicationSettingPath.root)
-                    } label: {
-                        ListRowView(icon : listRow.icon,
-                                    title: listRow.title,
-                                    text : listRow.infomation)
-                    }
-                    
                 case .account:
                     Button {
                         navigationVM.path.append(SystemAccountPath.root)
@@ -169,15 +140,6 @@ struct SystemView: View {
                                     text : listRow.infomation)
                     }
                     
-                case .query:
-                    NavigationLink {
-                        EmptyView()
-                    } label: {
-                        ListRowView(icon : listRow.icon,
-                                    title: listRow.title,
-                                    text : listRow.infomation)
-                    }
-                    
                 case .review:
                     Button {
                         logInVM.reviewApp()
@@ -190,6 +152,24 @@ struct SystemView: View {
                 case .share:
                     Button {
                         logInVM.shareApp()
+                    } label: {
+                        ListRowView(icon : listRow.icon,
+                                    title: listRow.title,
+                                    text : listRow.infomation)
+                    }
+
+                case .infomation:
+                    Button {
+                        navigationVM.path.append(UpdateReportPath.root)
+                    } label: {
+                        ListRowView(icon : listRow.icon,
+                                    title: listRow.title,
+                                    text : listRow.infomation)
+                    }
+                    
+                case .query:
+                    NavigationLink {
+                        EmptyView()
                     } label: {
                         ListRowView(icon : listRow.icon,
                                     title: listRow.title,

@@ -54,7 +54,7 @@ struct NewTabView: View {
     /// View Propertys
     @State private var inputTab = InputTab()
 
-    @AppStorage("homeTextColorMode") var homeTextColorMode: Bool = false
+    @AppStorage("applicationDarkMode") var applicationDarkMode: Bool = false
 
     var body: some View {
 
@@ -375,7 +375,7 @@ struct NewTabView: View {
                         .fontWeight(.semibold)
                         .tracking(4)
                         .scaleEffect(inputTab.animationTab == tab ? 1.0 : 0.5)
-                        .foregroundColor(homeTextColorMode ? .white : .black)
+                        .foregroundColor(applicationDarkMode ? .white : .black)
                         .opacity(inputTab.animationTab == tab ? 1 : 0.2)
                         .frame(width: tabWidth)
                         .contentShape(Rectangle())
@@ -466,7 +466,7 @@ struct SelectBackgroundView: View {
     @State private var showContents: Bool = false
     @State private var showProgress: Bool = false
 
-    @AppStorage("homeTextColorMode") var homeTextColorMode: Bool = false
+    @AppStorage("applicationDarkMode") var applicationDarkMode: Bool = false
 
     var body: some View {
 
@@ -656,7 +656,7 @@ struct SelectBackgroundView: View {
                     }
                     VStack {
                         Text("ダークモード").font(.footnote).offset(x: 15)
-                        Toggle("", isOn: $homeTextColorMode)
+                        Toggle("", isOn: $applicationDarkMode)
                     }
                 }
                 .frame(width: 80)

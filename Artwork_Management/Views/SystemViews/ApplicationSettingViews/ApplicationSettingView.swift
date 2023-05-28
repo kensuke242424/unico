@@ -10,7 +10,9 @@ import SwiftUI
 struct ApplicationSettingView: View {
     @EnvironmentObject var userVM: UserViewModel
     @State private var darkModeToggle: Bool = false
-    @State private var selectedColor: MemberColor?
+    @State private var selectedColor: ThemeColor?
+
+    @AppStorage("applicationDarkMode") var applicationDarkMode: Bool = false
 
     var body: some View {
         ScrollView {
@@ -21,6 +23,7 @@ struct ApplicationSettingView: View {
                         .font(.title)
                         .fontWeight(.bold)
                         .padding(.leading, 10)
+                        .padding(.top)
 
                     Text(
     """
@@ -65,25 +68,29 @@ struct ApplicationSettingView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .foregroundColor(.white)
 
-        }
+        } // VStack
         .customNavigationTitle(title: "アプリ設定")
         .customSystemBackground()
         .customBackButton()
 
         .onAppear {
+            // 既存の設定を初期値として代入
             selectedColor = userVM.memberColor
+            darkModeToggle = applicationDarkMode
         }
         .onDisappear {
-
-        } // VStack
-    } // SCrollView
+            // 画面破棄時に選択内容を保存
+            userVM.updateUserThemeColor(selected: selectedColor ?? .blue)
+            applicationDarkMode = darkModeToggle
+        } // SCrollView
+    }
 
     @ViewBuilder
     func SelectionColorList() -> some View {
         VStack(alignment: .leading, spacing: 0) {
 
             List(selection: $selectedColor) {
-                ForEach(MemberColor.allCases, id: \.self) { color in
+                ForEach(ThemeColor.allCases, id: \.self) { color in
                     HStack(spacing: 30) {
                         if selectedColor == color {
                             Image(systemName: "checkmark.circle.fill")
@@ -103,7 +110,7 @@ struct ApplicationSettingView: View {
             }
             .scrollContentBackground(.hidden)
             .environment(\.editMode, .constant(.active))
-            .frame(height: CGFloat(MemberColor.allCases.count) * 50)
+            .frame(height: CGFloat(ThemeColor.allCases.count) * 50)
         }
     }
 }

@@ -244,7 +244,7 @@ class LogInViewModel: ObservableObject {
     func setNewUserDocument(name     : String,
                                password : String?,
                                imageData: (url: URL?, filePath: String?),
-                               color: MemberColor) async throws {
+                               color: ThemeColor) async throws {
 
         print("setSignUpUserDocument実行")
 

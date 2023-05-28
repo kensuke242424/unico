@@ -16,7 +16,7 @@ struct CommerceSheet: View {
     @StateObject var cartVM: CartViewModel
     @Binding var inputTab: InputTab
     let teamID: String
-    let memberColor: MemberColor
+    let memberColor: ThemeColor
 
     @State private var commerceButtonDisable: Bool = false
     @State private var commerceButtonOpacity: CGFloat =  1.0

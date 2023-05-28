@@ -45,7 +45,7 @@ fileprivate struct ParticleModifier: ViewModifier {
                 }
                 .onAppear {
                     if particles.isEmpty {
-                        for _ in 1...5 {
+                        for _ in 1...4 {
                             let particle = Particle()
                             particles.append(particle)
                         }
@@ -66,12 +66,12 @@ fileprivate struct ParticleModifier: ViewModifier {
                             let progress: CGFloat = CGFloat(index) / total
 
                             let maxX: CGFloat = (progress > 0.5) ? 50 : -50
-                            let maxY: CGFloat = 30
+                            let maxY: CGFloat = 20
 
                             let randomX: CGFloat = ((progress > 0.5 ? progress - 0.5 : progress) * maxX)
                             let randomY: CGFloat = ((progress > 0.5 ? progress - 0.5 : progress) * maxY)
 
-                            let randomScale: CGFloat = .random(in: 0.35...1)
+                            let randomScale: CGFloat = .random(in: 0.25...0.5)
 
                             withAnimation(.interactiveSpring(response: 0.6,
                                                              dampingFraction: 0.7, blendDuration: 0.7)) {

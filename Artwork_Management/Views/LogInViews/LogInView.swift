@@ -182,7 +182,7 @@ struct InputLogIn {
     var password                : String = ""
     var captureUserIconImage    : UIImage?
     var captureBackgroundImage  : UIImage?
-    var selectUserColor         : MemberColor = .blue
+    var selectUserColor         : ThemeColor = .blue
     
     /// Viewの表示・非表示やアニメーションをコントロールするプロパティ
     var checkBackgroundOpacity      : CGFloat = 1.0
@@ -226,7 +226,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
     // バックグラウンド選択フェーズで用いるプロパティ
     @State private var checkBackgroundToggle   : Bool = false
     @State private var checkBackgroundAnimation: Bool = false
-    @AppStorage("homeTextColorMode") var homeTextColorMode: Bool = true
+    @AppStorage("applicationDarkMode") var applicationDarkMode: Bool = true
     
     @FocusState private var showEmailKyboard: ShowKyboard?
 
@@ -332,7 +332,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         }
                     } label: {
                         Text("< 戻る")
-                            .foregroundColor(homeTextColorMode ? .white : .black)
+                            .foregroundColor(applicationDarkMode ? .white : .black)
                             .fontWeight(.semibold)
                             .opacity(0.7)
                     }
@@ -341,7 +341,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     .disabled(logInVM.createAccountFase == .success ||
                               logInVM.createAccountFase == .check ? true : false)
                     .buttonStyle(.bordered)
-                    .foregroundColor(homeTextColorMode ? .white : .black)
+                    .foregroundColor(applicationDarkMode ? .white : .black)
                     .opacity(inputLogIn.checkBackgroundOpacity)
                     .opacity(logInVM.addressSignInFase == .success ||
                              logInVM.addressSignInFase == .check ? 0.2 : 1.0)
@@ -363,7 +363,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         }
                     }
                     .buttonStyle(.bordered)
-                    .foregroundColor(homeTextColorMode ? .white : .black)
+                    .foregroundColor(applicationDarkMode ? .white : .black)
                     .disabled(logInVM.addressSignInFase == .success ? true : false)
                     .opacity(logInVM.addressSignInFase == .success ? 0.2 : 1.0)
                     .opacity(logInVM.createAccountFase == .start ||
@@ -971,7 +971,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                         }
                                         VStack {
                                             Text("ダークモード").font(.footnote).offset(x: 15)
-                                            Toggle("", isOn: $homeTextColorMode)
+                                            Toggle("", isOn: $applicationDarkMode)
                                         }
                                     }
                                     .frame(width: 80)

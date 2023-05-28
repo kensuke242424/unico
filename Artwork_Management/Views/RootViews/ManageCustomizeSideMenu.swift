@@ -90,7 +90,7 @@ struct ManageCustomizeSideMenu: View {
                 .ignoresSafeArea()
 
             Rectangle()
-                .foregroundColor(Color.customDarkGray2).opacity(0.6)
+//                .foregroundColor(Color.customDarkGray2).opacity(0.6)
                 .background(BlurView(style: .systemUltraThinMaterialDark)).opacity(0.8)
                 .clipShape(RoundedRectangle(cornerRadius: 20))
                 .frame(height: 540)

@@ -42,7 +42,7 @@ struct ShowsItemDetail: View {
                 .frame(width: screenSize.width * 0.75, height: screenSize.height * 0.55)
                 .opacity(0.9)
                 .overlay {
-                    Color.customDarkBlue2.opacity(0.5)
+                    Color.red.opacity(0.5)
                         .blur(radius: 20)
                         .overlay(alignment: .bottom) {
 

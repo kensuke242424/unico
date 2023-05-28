@@ -64,7 +64,7 @@ struct SystemSideMenu: View {
         ZStack {
             // Blur View...
             BlurView(style: .systemUltraThinMaterialDark)
-            userVM.memberColor.color1
+            userVM.memberColor.color2
                 .opacity(0.7)
                 .blur(radius: 15)
                 .overlay(alignment: .topLeading) {
@@ -358,6 +358,9 @@ struct SystemSideMenu: View {
 
                                     VStack(alignment: .leading, spacing: 40) {
                                         
+                                        Label("アプリ設定", systemImage: "paintbrush.pointed.fill")
+                                            .onTapGesture { navigationVM.path.append(ApplicationSettingPath.root) }
+
                                         Label("システム設定", systemImage: "gearshape.fill")
                                             .onTapGesture { navigationVM.path.append(SystemPath.root) }
 

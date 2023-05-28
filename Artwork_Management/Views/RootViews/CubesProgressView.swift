@@ -10,7 +10,7 @@ import SwiftUI
 struct CubesProgressView: View {
 
     private let columnsV: [GridItem] = Array(repeating: .init(.flexible()), count: 4)
-    @State private var memberColor: MemberColor = .gray
+    @State private var memberColor: ThemeColor = .gray
 
     var body: some View {
 
@@ -25,7 +25,7 @@ struct CubesProgressView: View {
 
                 LazyVGrid(columns: columnsV, spacing: 40) {
                     ForEach(0 ..< 4, id: \.self) { index in
-                        if let randomColor = MemberColor.allCases.randomElement() {
+                        if let randomColor = ThemeColor.allCases.randomElement() {
                             ColorCubeRow(colorRow: randomColor,
                                          startTime: Double(index) * 0.5, colorSet: $memberColor)
                         }

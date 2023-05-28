@@ -27,7 +27,7 @@ struct GradientBackbround: View {
 }
 
 struct GradientBackbround_Previews: PreviewProvider {
-    static let memberColor: MemberColor = .brawn
+    static let memberColor: ThemeColor = .brawn
     static var previews: some View {
         GradientBackbround(color1: memberColor.color1, color2: memberColor.colorAccent)
     }

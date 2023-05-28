@@ -9,13 +9,13 @@ import SwiftUI
 
 struct ColorCubeView: View {
 
-    @Binding var colorSet: MemberColor
+    @Binding var colorSet: ThemeColor
 
     private let columnsV: [GridItem] = Array(repeating: .init(.flexible()), count: 4)
     var body: some View {
 
         LazyVGrid(columns: columnsV, spacing: 40) {
-            ForEach(MemberColor.allCases, id: \.self) { colorRow in
+            ForEach(ThemeColor.allCases, id: \.self) { colorRow in
 
                 ColorCubeRow(colorRow: colorRow,
                              startTime: Double(colorRow.index) * 0.5,
@@ -29,9 +29,9 @@ struct ColorCubeView: View {
 
 struct ColorCubeRow: View {
 
-    let colorRow: MemberColor
+    let colorRow: ThemeColor
     let startTime: Double
-    @Binding var colorSet: MemberColor
+    @Binding var colorSet: ThemeColor
 
     @State var offsetYLoopBounce: CGFloat = -30
     @State var offsetYTapBounce: CGFloat = 0

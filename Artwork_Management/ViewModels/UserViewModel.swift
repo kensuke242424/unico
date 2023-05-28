@@ -25,8 +25,8 @@ class UserViewModel: ObservableObject {
     var listener: ListenerRegistration?
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
     var uid: String? { return Auth.auth().currentUser?.uid }
-    var memberColor: MemberColor {
-        return user?.userColor ?? MemberColor.blue
+    var memberColor: ThemeColor {
+        return user?.userColor ?? ThemeColor.blue
 //        return MemberColor.yellow
     }
 
@@ -172,6 +172,20 @@ class UserViewModel: ObservableObject {
             _ = try userRef.setData(from: user)
         } catch {
             print("新しいメールアドレスのFirebaseへの保存に失敗しました")
+            return
+        }
+    }
+
+    /// ユーザーのテーマカラーを更新するメソッド
+    func updateUserThemeColor(selected selectedColor: ThemeColor) {
+        guard var user else { return }
+        guard let userRef = db?.collection("users").document(user.id) else { return }
+
+        do {
+            user.userColor = selectedColor
+            _ = try userRef.setData(from: user)
+        } catch {
+            print("ユーザーテーマカラーのFirebaseへの保存に失敗しました")
             return
         }
     }

@@ -49,7 +49,7 @@ struct RootView: View {
     
     @State private var preloads: PreloadProperty = PreloadProperty()
 
-    @AppStorage("homeTextColorMode") var homeTextColorMode: Bool = false
+    @AppStorage("applicationDarkMode") var applicationDarkMode: Bool = false
 
     var body: some View {
 
@@ -70,7 +70,7 @@ struct RootView: View {
                     .environment(\.resizableSheetCenter, resizableSheetCenter)
             }
         } // ZStack
-        .preferredColorScheme(homeTextColorMode ? .dark : .light)
+        .preferredColorScheme(applicationDarkMode ? .dark : .light)
         .overlay {
             if progressVM.showCubesProgress {
                 CubesProgressView()

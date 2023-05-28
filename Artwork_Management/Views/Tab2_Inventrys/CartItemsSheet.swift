@@ -18,7 +18,7 @@ struct CartItemsSheet: View {
     @StateObject var cartVM: CartViewModel
 
     let halfSheetScroll: HalfSheetScroll
-    let memberColor: MemberColor
+    let memberColor: ThemeColor
     private let listLimit: Int = 0
 
     var body: some View {
@@ -78,7 +78,7 @@ struct CartItemRow: View {
     @StateObject var cartVM: CartViewModel
     
     let itemRow: Item
-    let memberColor: MemberColor
+    let memberColor: ThemeColor
 
     @State private var basketItemCount: Int = 0
     @State private var isShowAlert: Bool = false

@@ -24,7 +24,7 @@ struct User: Identifiable, Codable, Equatable {
     var password: String?
     var iconURL: URL?
     var iconPath: String?
-    var userColor: MemberColor
+    var userColor: ThemeColor
     var joins: [JoinTeam]
     var lastLogIn: String?
 }
@@ -41,7 +41,7 @@ struct ImageData: Codable {
 }
 
 // ユーザーそれぞれが個々に選ぶアプリ全体のテーマカラー
-enum MemberColor: CaseIterable, Codable {
+enum ThemeColor: CaseIterable, Codable {
     case red
     case blue
     case purple
@@ -50,6 +50,45 @@ enum MemberColor: CaseIterable, Codable {
     case brawn
     case pink
     case gray
+
+    var light: Color {
+        switch self {
+        case .red: return .userRed1
+        case .blue: return .userBlue1
+        case .purple: return .userPurple1
+        case .green: return .userGreen1
+        case .yellow: return .userYellow1
+        case .brawn: return .userBrawn1
+        case .pink: return .userPink1
+        case .gray: return .userGray1
+        }
+    }
+
+    var medium: Color {
+        switch self {
+        case .red: return .userRed1
+        case .blue: return .userBlue1
+        case .purple: return .userPurple1
+        case .green: return .userGreen1
+        case .yellow: return .userYellow1
+        case .brawn: return .userBrawn1
+        case .pink: return .userPink1
+        case .gray: return .userGray1
+        }
+    }
+
+    var dark: Color {
+        switch self {
+        case .red: return .userRed1
+        case .blue: return .userBlue1
+        case .purple: return .userPurple1
+        case .green: return .userGreen1
+        case .yellow: return .userYellow1
+        case .brawn: return .userBrawn1
+        case .pink: return .userPink1
+        case .gray: return .userGray1
+        }
+    }
 
     var color1: Color {
         switch self {
