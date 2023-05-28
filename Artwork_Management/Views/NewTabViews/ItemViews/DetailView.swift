@@ -162,7 +162,7 @@ struct DetailView: View {
                     Button {
                         cartVM.addCartItem(item: item)
                     } label: {
-                        Label("カート追加", systemImage: "cart.fill.badge.plus")
+                        Label("カートに追加", systemImage: "cart.fill.badge.plus")
                             .font(.callout)
                             .foregroundColor(checkHaveNotInventory(item) ? .gray : .orange)
                     }

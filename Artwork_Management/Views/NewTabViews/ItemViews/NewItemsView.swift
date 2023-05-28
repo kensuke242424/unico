@@ -425,10 +425,16 @@ struct NewItemsView: View {
                     tagVM.showEdit = true
                 }
             } label: {
-                Image(systemName: "plus.app.fill")
-                    .foregroundColor(userVM.memberColor.color2)
-                    .shadow(radius: 1, x: 1, y: 1)
-                    .shadow(radius: 1, x: 1, y: 1)
+                ZStack {
+                    Image(systemName: "plus.app.fill")
+                        .foregroundColor(userVM.memberColor.color2)
+                        .shadow(radius: 1, x: 1, y: 1)
+                        .shadow(radius: 1, x: 1, y: 1)
+
+                    Image(systemName: "plus")
+                        .font(.caption2)
+                        .foregroundColor(.white)
+                }
             }
             .padding(.leading, 5)
             .padding(.trailing, 15)
