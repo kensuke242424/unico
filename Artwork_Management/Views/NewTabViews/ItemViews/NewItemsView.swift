@@ -398,7 +398,7 @@ struct NewItemsView: View {
                             .background {
                                 if activeTag == tag {
                                     Capsule()
-                                        .foregroundColor(userVM.memberColor.color2)
+                                        .foregroundColor(userVM.memberColor.color3)
                                         .matchedGeometryEffect(id: "ACTIVETAG", in: animation)
                                 } else {
                                     Capsule()
@@ -427,7 +427,7 @@ struct NewItemsView: View {
             } label: {
                 ZStack {
                     Image(systemName: "plus.app.fill")
-                        .foregroundColor(userVM.memberColor.color2)
+                        .foregroundColor(userVM.memberColor.color3)
                         .shadow(radius: 1, x: 1, y: 1)
                         .shadow(radius: 1, x: 1, y: 1)
 

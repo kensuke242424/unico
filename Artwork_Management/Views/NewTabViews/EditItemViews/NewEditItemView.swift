@@ -329,24 +329,25 @@ struct NewEditItemView: View {
                             }
 
                             // NOTE: アイテムを更新
-                            let updateItemData = (Item(createTime: passItem.createTime,
-                                                           tag        : input.selectionTagName,
-                                                           teamID     : teamVM.team!.id,
-                                                           name       : input.name,
-                                                           author     : input.author,
-                                                           detail     : input.detail != "" ? input.detail : "メモなし",
-                                                           photoURL   : input.photoURL,
-                                                           photoPath  : input.photoPath,
-                                                           favorite   : false,
-                                                           cost       : Int( input.cost) ?? 0,
-                                                           price      : Int(input.price) ?? 0,
-                                                           amount     : 0,
-                                                           sales      : Int(input.sales) ?? 0,
-                                                           inventory  : editInventory,
-                                                           totalAmount: passItem.totalAmount,
-                                                           totalInventory: passItem.inventory < editInventory ?
-                                                           passItem.totalInventory + (editInventory - passItem.inventory) :
-                                                            passItem.totalInventory - (passItem.inventory - editInventory) ))
+                            let updateItemData = (Item(createTime : passItem.createTime,
+                                                       updateTime : nil,
+                                                       tag        : input.selectionTagName,
+                                                       teamID     : teamVM.team!.id,
+                                                       name       : input.name,
+                                                       author     : input.author,
+                                                       detail     : input.detail != "" ? input.detail : "メモなし",
+                                                       photoURL   : input.photoURL,
+                                                       photoPath  : input.photoPath,
+                                                       favorite   : false,
+                                                       cost       : Int( input.cost) ?? 0,
+                                                       price      : Int(input.price) ?? 0,
+                                                       amount     : 0,
+                                                       sales      : Int(input.sales) ?? 0,
+                                                       inventory  : editInventory,
+                                                       totalAmount: passItem.totalAmount,
+                                                       totalInventory: passItem.inventory < editInventory ?
+                                                       passItem.totalInventory + (editInventory - passItem.inventory) :
+                                                        passItem.totalInventory - (passItem.inventory - editInventory) ))
 
                             itemVM.updateItem(updateData: updateItemData, defaultDataID: defaultDataID, teamID: teamVM.team!.id)
                             withAnimation(.easeIn(duration: 0.1)) { input.showProgress = false }

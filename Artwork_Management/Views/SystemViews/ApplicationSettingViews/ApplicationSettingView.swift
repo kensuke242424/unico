@@ -16,7 +16,7 @@ struct ApplicationSettingView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 50) {
+            VStack(spacing: 30) {
 
                 VStack(alignment: .leading, spacing: 0) {
                     Text("モード設定")
@@ -102,7 +102,7 @@ struct ApplicationSettingView: View {
                         }
 
                         Rectangle()
-                            .fill(color.color4)
+                            .fill(color.color3)
                             .frame(width: 100, height: 20)
                     }
                 }

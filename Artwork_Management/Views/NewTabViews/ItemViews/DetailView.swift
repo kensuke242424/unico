@@ -90,7 +90,7 @@ struct DetailView: View {
                             Text("\(item.inventory)")
                         }
                         .font(.callout)
-                        .foregroundColor(userVM.memberColor.colorAccent)
+                        .foregroundColor(userVM.memberColor.color3)
                         .padding(.top, 10)
                         
                         HStack {
@@ -339,15 +339,16 @@ struct DetailView: View {
         .frame(maxWidth: .infinity)
         .font(.callout)
         .fontWeight(.light)
-        .opacity(0.6)
+        .opacity(0.8)
         .tracking(1)
         .lineLimit(1)
         .padding(.vertical, 10)
     }
-    
+
+    // 取得アイテムのタイムスタンプを◯年◯月◯日になおす
     func asTimesString(_ time: Timestamp?) -> String {
         
-        if let time = item.createTime {
+        if let time {
             let formatter = DateFormatter()
             formatter.setTemplate(.date, .jaJP)
             return formatter.string(from: time.dateValue())
