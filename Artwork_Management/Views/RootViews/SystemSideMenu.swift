@@ -158,6 +158,7 @@ struct SystemSideMenu: View {
                                                     .fill(.black)
                                                     .scaleEffect(1.3)
                                                     .opacity(0.2)
+                                                    .shadow(color: .black, radius: 3, x: 1, y: 1)
                                             )
                                             .offset(x: 20)
                                         }
@@ -175,6 +176,7 @@ struct SystemSideMenu: View {
                                                 .fill(.black)
                                                 .scaleEffect(1.5)
                                                 .opacity(0.2)
+                                                .shadow(color: .black, radius: 3, x: 1, y: 1)
                                         )
                                         .offset(x: 35)
                                     }

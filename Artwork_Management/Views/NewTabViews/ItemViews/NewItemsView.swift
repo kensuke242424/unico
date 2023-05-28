@@ -39,6 +39,9 @@ struct NewItemsView: View {
     @State private var selectedItem      : Item?
     @State private var animateCurrentItem: Bool = false
     @State private var filterFavorite    : Bool = false
+
+    /// アイテムカードの高さ
+    let cardHeight: CGFloat = 200
     
     var body: some View {
         GeometryReader {
@@ -117,7 +120,8 @@ struct NewItemsView: View {
                            inputTab: $inputTab,
                            show: $showDetailView,
                            animation: animation,
-                           item: itemVM.items[cartVM.actionItemIndex])
+                           item: itemVM.items[cartVM.actionItemIndex],
+                           cardHeight: cardHeight)
                     .transition(.asymmetric(insertion: .identity, removal: .offset(y: 0)))
                     .onAppear { print("カード詳細onAppear") }
                     .onDisappear { print("カード詳細onDisappear") }
@@ -159,13 +163,14 @@ struct NewItemsView: View {
     
     /// 最後のカードが上部に残るためのボトムパディング
     func bottomPadding(_ size: CGSize = .zero) -> CGFloat {
-        let cardHeight: CGFloat = 220
+        let cardHeight: CGFloat = 200
         let scrollViewHeight: CGFloat = size.height
         return scrollViewHeight - cardHeight - 110
     }
     
     @ViewBuilder
     func ItemsCardView(_ item: Item) -> some View {
+
         GeometryReader {
             let size = $0.size
             let rect = $0.frame(in: .named("SCROLLVIEW"))
@@ -272,7 +277,7 @@ struct NewItemsView: View {
             .frame(width: size.width)
             .rotation3DEffect(.init(degrees: convertOffsetToRotation(rect)), axis: (x: 1, y: 0, z: 0), anchor: .bottom, anchorZ: 1, perspective: 0.5)
         }
-        .frame(height: 220)
+        .frame(height: cardHeight)
     }
     
     func checkHaveNotInventory(_ item: Item) -> Bool {

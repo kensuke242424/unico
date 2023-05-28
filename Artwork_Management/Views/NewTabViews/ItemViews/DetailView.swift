@@ -21,6 +21,7 @@ struct DetailView: View {
     @Binding var show: Bool
     var animation: Namespace.ID
     var item: Item
+    let cardHeight: CGFloat
     /// View Properties
     @State private var animationContent: Bool = false
     @State private var offsetAnimation: Bool = false
@@ -108,7 +109,7 @@ struct DetailView: View {
                     .opacity(offsetAnimation ? 1 : 0)
                 }
             }
-            .frame(height: 220)
+            .frame(height: cardHeight)
             .zIndex(1)
             
             Rectangle()
@@ -391,6 +392,7 @@ struct DetailView_Previews: PreviewProvider {
                    inputTab: .constant(InputTab()),
                    show: .constant(true),
                    animation: animation,
-                   item: testItem.first!)
+                   item: testItem.first!,
+                   cardHeight: 200)
     }
 }
