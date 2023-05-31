@@ -12,6 +12,7 @@ struct InputTab {
     // 各設定Viewの表示を管理するプロパティ
     var showSideMenu       : Bool = false
     var showEntryAccount   : Bool = false
+    var isActiveEditHome   : Bool = false
     var selectedUpdateData : SelectedUpdateData = .start
     
     /// NavigationPathによるエディット画面遷移時に渡す
@@ -146,6 +147,14 @@ struct NewTabView: View {
                                                height: proxy.size.height)
                                 .ignoresSafeArea()
                                 .blur(radius: min((-inputTab.scrollProgress * 4), 4), opaque: true)
+                                .blur(radius: inputTab.isActiveEditHome ? 5 : 0, opaque: true)
+                                .overlay {
+                                    if inputTab.isActiveEditHome {
+                                        Color.black
+                                            .opacity(0.2)
+                                            .ignoresSafeArea()
+                                    }
+                                }
                             }
                         }
                     }
@@ -370,16 +379,18 @@ struct NewTabView: View {
             let tabWidth = size.width / 3
             HStack {
                 ForEach(Tab.allCases, id: \.rawValue) { tab in
-                    Text(tab == .home && inputTab.showSelectBackground ? "背景変更中" : tab.rawValue)
-                        .font(.title3)
-                        .fontWeight(.semibold)
-                        .tracking(4)
-                        .scaleEffect(inputTab.animationTab == tab ? 1.0 : 0.5)
-                        .foregroundColor(applicationDarkMode ? .white : .black)
-                        .opacity(inputTab.animationTab == tab ? 1 : 0.2)
-                        .frame(width: tabWidth)
-                        .contentShape(Rectangle())
-                        .padding(.top, 60)
+                    Text(tab == .home && inputTab.showSelectBackground ? "背景変更中" :
+                            tab == .home && inputTab.isActiveEditHome ? "ホーム編集中" :
+                            tab.rawValue)
+                    .font(.title3)
+                    .fontWeight(.semibold)
+                    .tracking(4)
+                    .scaleEffect(inputTab.animationTab == tab ? 1.0 : 0.5)
+                    .foregroundColor(applicationDarkMode ? .white : .black)
+                    .opacity(inputTab.animationTab == tab ? 1 : 0.2)
+                    .frame(width: tabWidth)
+                    .contentShape(Rectangle())
+                    .padding(.top, 60)
                 }
             }
             .frame(width: CGFloat(Tab.allCases.count) * tabWidth)

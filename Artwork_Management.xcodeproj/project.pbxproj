@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		BE07F1282A220AD5007ED1C4 /* Particle.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE07F1272A220AD5007ED1C4 /* Particle.swift */; };
 		BE07F12A2A220B10007ED1C4 /* ParticleEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE07F1292A220B10007ED1C4 /* ParticleEffect.swift */; };
+		BE07F1722A2732D4007ED1C4 /* CustomMagnificationGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE07F1712A2732D4007ED1C4 /* CustomMagnificationGesture.swift */; };
+		BE07F1742A2732EE007ED1C4 /* CustomDragGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE07F1732A2732EE007ED1C4 /* CustomDragGesture.swift */; };
 		BE0E580B29C4055900F5E42F /* NewEditItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE0E580A29C4055900F5E42F /* NewEditItemView.swift */; };
 		BE17B97129C9977100F08915 /* SDWebImageCircleIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE17B97029C9977100F08915 /* SDWebImageCircleIcon.swift */; };
 		BE17B97329CB033100F08915 /* PreloadViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE17B97229CB033100F08915 /* PreloadViewModel.swift */; };
@@ -138,6 +140,8 @@
 /* Begin PBXFileReference section */
 		BE07F1272A220AD5007ED1C4 /* Particle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Particle.swift; sourceTree = "<group>"; };
 		BE07F1292A220B10007ED1C4 /* ParticleEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticleEffect.swift; sourceTree = "<group>"; };
+		BE07F1712A2732D4007ED1C4 /* CustomMagnificationGesture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomMagnificationGesture.swift; sourceTree = "<group>"; };
+		BE07F1732A2732EE007ED1C4 /* CustomDragGesture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomDragGesture.swift; sourceTree = "<group>"; };
 		BE0E580A29C4055900F5E42F /* NewEditItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewEditItemView.swift; sourceTree = "<group>"; };
 		BE17B97029C9977100F08915 /* SDWebImageCircleIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDWebImageCircleIcon.swift; sourceTree = "<group>"; };
 		BE17B97229CB033100F08915 /* PreloadViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreloadViewModel.swift; sourceTree = "<group>"; };
@@ -341,6 +345,8 @@
 			children = (
 				BE392FF229C2135300BB5700 /* ScrollOffsetModifier.swift */,
 				BE07F1292A220B10007ED1C4 /* ParticleEffect.swift */,
+				BE07F1712A2732D4007ED1C4 /* CustomMagnificationGesture.swift */,
+				BE07F1732A2732EE007ED1C4 /* CustomDragGesture.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -829,6 +835,7 @@
 				BEAAD8F829CDCE3300C53138 /* DeletedView.swift in Sources */,
 				BE245BC729C5637A00539A04 /* NewItemAsyncImage.swift in Sources */,
 				BE07F12A2A220B10007ED1C4 /* ParticleEffect.swift in Sources */,
+				BE07F1722A2732D4007ED1C4 /* CustomMagnificationGesture.swift in Sources */,
 				E09F09C528ED5DEA00D07669 /* SideMenuEditTagView.swift in Sources */,
 				E0DE335029288D07008C7147 /* TeamModel.swift in Sources */,
 				E0A3B996292EFCE600209ADC /* CreateAndJoinTeamView.swift in Sources */,
@@ -843,6 +850,7 @@
 				E0003D0328FD3BB0007308B0 /* TagTitle.swift in Sources */,
 				E01E13942920EE850001F2DA /* EmptyItemView.swift in Sources */,
 				BE245BD429C5DA9E00539A04 /* SDWebImageView.swift in Sources */,
+				BE07F1742A2732EE007ED1C4 /* CustomDragGesture.swift in Sources */,
 				BE254FBF29C0C396004FE9AE /* CubeCircleIcon.swift in Sources */,
 				E01E1390291D168B0001F2DA /* SystemSideMenu.swift in Sources */,
 				BE254F9329BF1104004FE9AE /* UserEntryRecommendationView.swift in Sources */,

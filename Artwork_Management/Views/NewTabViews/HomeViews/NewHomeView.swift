@@ -8,21 +8,41 @@
 import SwiftUI
 
 struct NewHomeView: View {
-    
+
+    private struct NowTimeParts {
+        var transitionOffset: CGSize = .zero
+        var initialOffset: CGSize = .zero
+        var transitionScale: CGFloat = 1.0
+        var initialScale: CGFloat = 1.0
+    }
+
+    private struct TeamNewsParts {
+        var transitionOffset: CGSize = .zero
+        var initialOffset: CGSize = .zero
+        var transitionScale: CGFloat = 1.0
+        var initialScale: CGFloat = 1.0
+    }
+
     @EnvironmentObject var teamVM: TeamViewModel
     @StateObject var itemVM: ItemViewModel
-    
+
     /// Tab親Viewから受け取った状態変数群
     @Binding var inputTab: InputTab
     
     @State private var inputTime = InputTimesView()
+
+    /// View Property
     @State private var animationContent: Bool = true
+    @State private var nowTime = NowTimeParts()
+    @State private var teamNews = TeamNewsParts()
 
     @AppStorage("applicationDarkMode") var applicationDarkMode: Bool = false
     
     var body: some View {
+
         GeometryReader {
             let size = $0.size
+            let rect = $0.frame(in: .global)
             
             VStack {
                 if animationContent {
@@ -32,19 +52,53 @@ struct NewHomeView: View {
                         .blur(radius: inputTab.checkBackgroundAnimation ||
                                       !inputTab.showSelectBackground ? 0 : 2)
                         .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 20)))
+                        .scaleEffect(nowTime.transitionScale)
+                        .offset(nowTime.transitionOffset)
+                        .customDragGesture(
+                            active: $inputTab.isActiveEditHome,
+                            transition: $nowTime.transitionOffset,
+                            initial: $nowTime.initialOffset
+                        )
+                        .customMagnificationGesture(
+                            active: $inputTab.isActiveEditHome,
+                            transition: $nowTime.transitionScale,
+                            initial: $nowTime.initialScale
+                        )
                 }
+
                 if animationContent {
-                    TeamView(size)
+                    TeamNewsView(size)
                         .foregroundColor(applicationDarkMode ? .white : .black)
                         .opacity(1 - min((-inputTab.scrollProgress * 2), 1))
                         .blur(radius: inputTab.checkBackgroundAnimation ||
                                       !inputTab.showSelectBackground ? 0 : 2)
                         .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 20)))
+                        .scaleEffect(teamNews.transitionScale)
+                        .offset(teamNews.transitionOffset)
+                        .customDragGesture(
+                            active: $inputTab.isActiveEditHome,
+                            transition: $teamNews.transitionOffset,
+                            initial: $teamNews.initialOffset
+                        )
+                        .customMagnificationGesture(
+                            active: $inputTab.isActiveEditHome,
+                            transition: $teamNews.transitionScale,
+                            initial: $teamNews.initialScale
+                        )
                 }
                 
             } // VStack
             .frame(width: size.width, height: size.height)
             .offset(y: -50)
+            .overlay {
+                Button("編集する") {
+                    withAnimation {
+                        inputTab.isActiveEditHome.toggle()
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+                .offset(y: size.height / 3)
+            }
         }
         .ignoresSafeArea()
     }
@@ -79,14 +133,28 @@ struct NewHomeView: View {
             .onReceive(inputTime.timer) { _ in
                 inputTime.nowDate = Date()
             }
+            .background {
+                GeometryReader { geometry in
+                    BlurView(style: .systemThinMaterial)
+                        .clipShape(
+                            RoundedRectangle(cornerRadius: 10)
+                        )
+                        .scaleEffect(1.2)
+                        .opacity(0.5)
+                        .compositingGroup()
+                        .shadow(color: .black, radius: 3, x: 1, y: 1)
+                }
+            }
+
             Spacer()
+
         } // HStack
         .frame(maxWidth: .infinity)
         .padding(.trailing, size.width / 2)
         .padding([.leading, .bottom], 15)
     }
     
-    func TeamView(_ size: CGSize) -> some View {
+    func TeamNewsView(_ size: CGSize) -> some View {
         // チーム情報一覧
         HStack {
             Spacer()
@@ -121,6 +189,17 @@ struct NewHomeView: View {
                 .offset(x: 20, y: 35)
                 .tracking(5)
             } // ZStack
+            .background {
+                BlurView(style: .systemThinMaterial)
+                    .clipShape(
+                        RoundedRectangle(cornerRadius: 10)
+                    )
+                    .scaleEffect(1.35)
+                    .opacity(0.5)
+                    .offset(y: 20)
+                    .compositingGroup()
+                    .shadow(color: .black, radius: 3, x: 1, y: 1)
+            }
         } // HStack
         .padding(.trailing, 20)
     }
