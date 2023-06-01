@@ -82,17 +82,20 @@ struct NewTabView: View {
                                 inputTab.scrollProgress = max(min(pageProgress, 0), -CGFloat(Tab.allCases.count - 1))
                                 inputTab.animationOpacity = 1 - -inputTab.scrollProgress
                             }
-                        
-                        NewItemsView(itemVM: itemVM,  cartVM: cartVM, inputTab: $inputTab)
-                            .tag(Tab.item)
-                            .offsetX(inputTab.selectionTab == Tab.item) { rect in
-                                let minX = rect.minX
-                                let pageOffset = minX - (size.width * CGFloat(Tab.item.index))
-                                let pageProgress = pageOffset / size.width
-                                
-                                inputTab.scrollProgress = max(min(pageProgress, 0), -CGFloat(Tab.allCases.count - 1))
-                                inputTab.animationOpacity = -inputTab.scrollProgress
-                            }
+                        /// ホーム画面編集中は他のタブ要素を隠してタブ移動を無効化する
+                        if !inputTab.isActiveEditHome {
+                            NewItemsView(itemVM: itemVM,  cartVM: cartVM, inputTab: $inputTab)
+                                .tag(Tab.item)
+                                .offsetX(inputTab.selectionTab == Tab.item) { rect in
+                                    let minX = rect.minX
+                                    let pageOffset = minX - (size.width * CGFloat(Tab.item.index))
+                                    let pageProgress = pageOffset / size.width
+
+                                    inputTab.scrollProgress = max(min(pageProgress, 0), -CGFloat(Tab.allCases.count - 1))
+                                    inputTab.animationOpacity = -inputTab.scrollProgress
+                                }
+                        }
+
                     }
                     .tabViewStyle(.page(indexDisplayMode: .never))
                 }
@@ -380,7 +383,7 @@ struct NewTabView: View {
             HStack {
                 ForEach(Tab.allCases, id: \.rawValue) { tab in
                     Text(tab == .home && inputTab.showSelectBackground ? "背景変更中" :
-                            tab == .home && inputTab.isActiveEditHome ? "ホーム編集中" :
+                            tab == .home && inputTab.isActiveEditHome ? "編集中" :
                             tab.rawValue)
                     .font(.title3)
                     .fontWeight(.semibold)
@@ -412,6 +415,7 @@ struct NewTabView: View {
                                     inputTab.showSideMenu.toggle()
                                 }
                             }
+                            /// 匿名使用中に表示するラベル
                             .overlay(alignment: .bottom) {
                                 if userVM.isAnonymous {
                                     ZStack {
@@ -426,6 +430,7 @@ struct NewTabView: View {
                                     .offset(y: 30)
                                 }
                             }
+                            .allowsHitTesting(inputTab.isActiveEditHome ? false : true)
                     }
                     Spacer()
                     /// Itemタブに移動した時に表示するアイテム追加タブボタン
