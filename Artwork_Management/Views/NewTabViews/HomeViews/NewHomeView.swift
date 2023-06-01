@@ -107,51 +107,61 @@ struct NewHomeView: View {
     // HStack+Spacerを入れておかないと秒数によって微妙に時計が動いてしまう🤔
     func NowTimeView(_ size: CGSize) -> some View {
         HStack {
-            VStack(alignment: .leading, spacing: 8) {
-                
-                Text(inputTime.hm)
-                    .italic()
-                    .tracking(8)
-                    .font(.title2)
-                    .fontWeight(.semibold)
-                    .padding(.bottom)
-                    .opacity(0.8)
-                
-                Text("\(inputTime.week).")
-                    .italic()
-                    .tracking(5)
-                    .font(.subheadline)
-                    .opacity(0.8)
-                
-                Text(inputTime.dateStyle)
-                    .font(.subheadline)
-                    .italic()
-                    .tracking(5)
-                    .padding(.leading)
-                    .opacity(0.8)
-            } // VStack
-            .onReceive(inputTime.timer) { _ in
-                inputTime.nowDate = Date()
-            }
-            .background {
-                GeometryReader { geometry in
-                    BlurView(style: .systemThinMaterial)
-                        .clipShape(
-                            RoundedRectangle(cornerRadius: 10)
-                        )
-                        .scaleEffect(1.2)
+
+                VStack(alignment: .leading, spacing: 8) {
+
+                    Text(inputTime.hm)
+                        .italic()
+                        .tracking(8)
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                        .padding(.bottom)
+                        .opacity(0.8)
+
+                    Text("\(inputTime.week).")
+                        .italic()
+                        .tracking(5)
+                        .font(.subheadline)
+                        .opacity(0.8)
+
+                    Text(inputTime.dateStyle)
+                        .font(.subheadline)
+                        .italic()
+                        .tracking(5)
+                        .padding(.leading)
+                        .opacity(0.8)
+                } // VStack
+                .padding(.vertical, 10)
+                .padding(.horizontal, 15)
+                .onReceive(inputTime.timer) { _ in
+                    inputTime.nowDate = Date()
+                }
+                .background {
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(.ultraThinMaterial)
                         .opacity(0.5)
                         .compositingGroup()
                         .shadow(color: .black, radius: 3, x: 1, y: 1)
                 }
-            }
+                .contextMenu {
+                    Button(inputTab.isActiveEditHome ? "編集を終了" : "Homeを編集する") {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            withAnimation {
+                                inputTab.isActiveEditHome.toggle()
+                            }
+                        }
+                    }
+                    Button("非表示") {
+
+                    }
+                }
 
             Spacer()
 
         } // HStack
         .frame(maxWidth: .infinity)
         .padding(.trailing, size.width / 2)
-        .padding([.leading, .bottom], 15)
+
     }
     
     func TeamNewsView(_ size: CGSize) -> some View {
@@ -189,19 +199,32 @@ struct NewHomeView: View {
                 .offset(x: 20, y: 35)
                 .tracking(5)
             } // ZStack
+            .padding(.top, 10)
+            .padding(.bottom, 45)
+            .padding(.leading, 10)
+            .padding(.trailing, 15)
             .background {
-                BlurView(style: .systemThinMaterial)
-                    .clipShape(
-                        RoundedRectangle(cornerRadius: 10)
-                    )
-                    .scaleEffect(1.35)
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(.ultraThinMaterial)
                     .opacity(0.5)
-                    .offset(y: 20)
                     .compositingGroup()
                     .shadow(color: .black, radius: 3, x: 1, y: 1)
             }
+            .contextMenu {
+                Button(inputTab.isActiveEditHome ? "編集を終了" : "Homeを編集する") {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        withAnimation {
+                            inputTab.isActiveEditHome.toggle()
+                        }
+                    }
+                }
+                Button("非表示") {
+
+                }
+            }
+
         } // HStack
-        .padding(.trailing, 20)
+//        .padding(.trailing, 20)
     }
     
     func teamMembersIcon(members: [JoinMember]) -> some View {
