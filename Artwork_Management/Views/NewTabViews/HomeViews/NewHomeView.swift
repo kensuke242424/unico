@@ -86,10 +86,8 @@ struct NewHomeView: View {
                             initial: $teamNews.initialScale
                         )
                 }
-                
             } // VStack
             .frame(width: size.width, height: size.height)
-            .offset(y: -50)
             .overlay {
                 Button("編集する") {
                     withAnimation {
@@ -105,111 +103,54 @@ struct NewHomeView: View {
     
     // 🕛時刻のレイアウト
     // HStack+Spacerを入れておかないと秒数によって微妙に時計が動いてしまう🤔
-    func NowTimeView(_ size: CGSize) -> some View {
-        HStack {
+    func NowTimeView(_ homeSize: CGSize) -> some View {
 
-                VStack(alignment: .leading, spacing: 8) {
+        let partsWidth: CGFloat = 195
+        let partsHeight: CGFloat = 110
 
-                    Text(inputTime.hm)
-                        .italic()
-                        .tracking(8)
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                        .padding(.bottom)
-                        .opacity(0.8)
+            return VStack {
+                GeometryReader {
+                    let size = $0.size
+                    let rect = $0.frame(in: .global)
 
-                    Text("\(inputTime.week).")
-                        .italic()
-                        .tracking(5)
-                        .font(.subheadline)
-                        .opacity(0.8)
+                    VStack(alignment: .leading, spacing: 8) {
 
-                    Text(inputTime.dateStyle)
-                        .font(.subheadline)
-                        .italic()
-                        .tracking(5)
-                        .padding(.leading)
-                        .opacity(0.8)
-                } // VStack
-                .padding(.vertical, 10)
-                .padding(.horizontal, 15)
-                .onReceive(inputTime.timer) { _ in
-                    inputTime.nowDate = Date()
-                }
-                .background {
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(.ultraThinMaterial)
-                        .opacity(0.5)
-                        .compositingGroup()
-                        .shadow(color: .black, radius: 3, x: 1, y: 1)
-                }
-                .contextMenu {
-                    Button(inputTab.isActiveEditHome ? "編集を終了" : "Homeを編集する") {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            withAnimation {
-                                inputTab.isActiveEditHome.toggle()
-                            }
-                        }
+                        Text(inputTime.hm)
+                            .italic()
+                            .tracking(8)
+                            .font(.title2)
+                            .fontWeight(.semibold)
+                            .padding(.bottom)
+                            .opacity(0.8)
+
+                        Text("\(inputTime.week).")
+                            .italic()
+                            .tracking(5)
+                            .font(.subheadline)
+                            .opacity(0.8)
+
+                        Text(inputTime.dateStyle)
+                            .font(.subheadline)
+                            .italic()
+                            .tracking(5)
+                            .padding(.leading)
+                            .opacity(0.8)
                     }
-                    Button("非表示") {
-
+                    .frame(maxWidth: size.width, maxHeight: size.height)
+                    .onReceive(inputTime.timer) { _ in
+                        inputTime.nowDate = Date()
                     }
-                }
 
-            Spacer()
-
-        } // HStack
-        .frame(maxWidth: .infinity)
-        .padding(.trailing, size.width / 2)
-
-    }
-    
-    func TeamNewsView(_ size: CGSize) -> some View {
-        // チーム情報一覧
-        HStack {
-            Spacer()
-
-            ZStack {
-                VStack(alignment: .leading, spacing: 60) {
-
-                    Group {
-                        Text("Useday.  ")
-                        Text("Items.  ")
-                        Text("Member.  ")
-                    }
-                    .font(.footnote)
-                    .tracking(5)
-                    .opacity(0.8)
-
-                } // VStack
-                
-                VStack(alignment: .trailing, spacing: 60) {
-                    
-                    Text("55 day")
-                        .font(.footnote)
-                        .opacity(0.8)
-                    
-                    Text("\(itemVM.items.count) item")
-                        .font(.footnote)
-                        .opacity(0.8)
-                    
-                    // Team members Icon...
-                    teamMembersIcon(members: teamVM.team!.members)
-                }
-                .offset(x: 20, y: 35)
-                .tracking(5)
-            } // ZStack
-            .padding(.top, 10)
-            .padding(.bottom, 45)
-            .padding(.leading, 10)
-            .padding(.trailing, 15)
+                } // GeometryReader
+            } // VStack
             .background {
                 RoundedRectangle(cornerRadius: 10)
                     .fill(.ultraThinMaterial)
-                    .opacity(0.5)
+                    .opacity(0.8)
                     .compositingGroup()
-                    .shadow(color: .black, radius: 3, x: 1, y: 1)
+                    .shadow(radius: 3, x: 1, y: 1)
             }
+            .frame(width: partsWidth, height: partsHeight)
             .contextMenu {
                 Button(inputTab.isActiveEditHome ? "編集を終了" : "Homeを編集する") {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -222,9 +163,80 @@ struct NewHomeView: View {
 
                 }
             }
+            .position(
+                x: partsWidth / 2,
+                y: homeSize.height / 2 - 150
+            )
+    }
 
-        } // HStack
-//        .padding(.trailing, 20)
+    /// チームに関する情報を一覧で表示するHomeパーツ
+    func TeamNewsView(_ homeSize: CGSize) -> some View {
+
+        let partsWidth: CGFloat = 135
+        let partsHeight: CGFloat = 240
+
+        return VStack {
+            GeometryReader {
+                let size = $0.size
+                let local = $0.frame(in: .local)
+                let global = $0.frame(in: .global)
+
+                ZStack {
+                    VStack(alignment: .leading, spacing: 60) {
+
+                        Group {
+                            Text("Useday.  ")
+                            Text("Items.  ")
+                            Text("Member.  ")
+                        }
+                        .font(.footnote)
+                        .tracking(5)
+                        .opacity(0.8)
+
+                    } // VStack
+
+                    VStack(alignment: .trailing, spacing: 60) {
+
+                        //TODO: 実際の使用日数を計算で割り出す
+                        Text("55 day")
+                            .font(.footnote)
+                            .opacity(0.8)
+
+                        Text("\(itemVM.items.count) item")
+                            .font(.footnote)
+                            .opacity(0.8)
+
+                        // Team members Icon...
+                        teamMembersIcon(members: teamVM.team!.members)
+                    }
+                    .offset(x: 20, y: 35)
+                    .tracking(5)
+                } // ZStack
+            } // GeometryReader
+        } // VStack
+        .padding(.top, 10)
+        .padding(.leading, 10)
+        .background {
+            RoundedRectangle(cornerRadius: 10)
+                .fill(.ultraThinMaterial)
+                .opacity(0.8)
+                .compositingGroup()
+                .shadow(radius: 3, x: 1, y: 1)
+        }
+        .frame(width: partsWidth, height: partsHeight)
+        .contextMenu {
+            Button(inputTab.isActiveEditHome ? "編集を終了" : "Homeを編集する") {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    withAnimation {
+                        inputTab.isActiveEditHome.toggle()
+                    }
+                }
+            }
+            Button("非表示") {
+
+            }
+        }
+        .position(x: homeSize.width - partsWidth / 2)
     }
     
     func teamMembersIcon(members: [JoinMember]) -> some View {
