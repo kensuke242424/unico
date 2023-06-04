@@ -52,6 +52,7 @@ struct NewHomeView: View {
             let rect = $0.frame(in: .global)
             
             VStack {
+
                 if animationContent {
                     NowTimeView(size)
                         .foregroundColor(applicationDarkMode ? .white : .black)
@@ -96,17 +97,85 @@ struct NewHomeView: View {
             } // VStack
             .frame(width: size.width, height: size.height)
             .overlay {
-                Button("編集する") {
-                    withAnimation {
-                        homeVM.isActiveEdit.toggle()
+                VStack(spacing: 20) {
+
+                    HStack(spacing: 40) {
+                        Button {
+                            withAnimation(.interactiveSpring(response: 0.7,
+                                                             dampingFraction: 1,
+                                                             blendDuration: 1)) {
+                                nowTime.initialOffset = .zero
+                                nowTime.transitionOffset = .zero
+                                nowTime.initialScale = 1
+                                nowTime.transitionScale = 1
+                                nowTime.backState = false
+                                nowTime.desplayState = true
+
+                                teamNews.initialOffset = .zero
+                                teamNews.transitionOffset = .zero
+                                teamNews.initialScale = 1
+                                teamNews.transitionScale = 1
+                                teamNews.backState = false
+                                teamNews.desplayState = true
+                            }
+                        } label: {
+                            Circle()
+                                .fill(.gray.gradient)
+                                .frame(width: 60)
+                                .shadow(radius: 3, x: 3, y: 3)
+                                .shadow(radius: 3, x: 3, y: 3)
+                                .overlay {
+                                    Image(systemName: "arrow.counterclockwise")
+                                        .foregroundColor(.white)
+                                }
+                        }
+
+                        Button {
+                            withAnimation {
+                                homeVM.isActiveEdit.toggle()
+                            }
+                        } label: {
+                            Circle()
+                                .fill(.blue.gradient)
+                                .frame(width: 60)
+                                .shadow(radius: 3, x: 3, y: 3)
+                                .shadow(radius: 3, x: 3, y: 3)
+                                .overlay {
+                                    Image(systemName: "checkmark")
+                                        .foregroundColor(.white)
+                                }
+                        }
                     }
+
+                    Button {
+                        //  TODO: パーツを編集前の状態に戻して終了
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            homeVM.isActiveEdit = false
+                        }
+                    } label: {
+                        Label("キャンセル", systemImage: "xmark.circle.fill")
+                            .foregroundColor(.white)
+                    }
+                    .padding(.top)
                 }
-                .buttonStyle(.borderedProminent)
+
                 .offset(y: size.height / 3)
+            }
+            .overlay {
+                if homeVM.isActiveEdit {
+                    Text("""
+                         位置の調整・・・スワイプ
+                         拡大と縮小・・・ピンチアウト
+                         """
+                    )
+                    .font(.footnote)
+                    .foregroundColor(.white.opacity(0.7))
+                    .tracking(5)
+                    .offset(y: -size.height / 2 + 50)
+                }
             }
         }
         .ignoresSafeArea()
-        
     }
     
     // 🕛時刻のレイアウト
@@ -158,7 +227,9 @@ struct NewHomeView: View {
                     .compositingGroup()
                     .shadow(radius: 3, x: 1, y: 1)
                     .opacity(0.8)
-                    .opacity(nowTime.backState ? 1 : 0)
+                    .opacity(nowTime.backState ? 1 :
+                                homeVM.isActiveEdit ? 0.4 : 0
+                    )
             }
             .frame(width: partsWidth, height: partsHeight)
             .opacity(nowTime.desplayState ? 1 :
@@ -170,7 +241,7 @@ struct NewHomeView: View {
                                           back: $nowTime.backState
                 )
                 .frame(maxWidth: .infinity, alignment: .trailing)
-                .offset(x: -5, y: -40)
+                .offset(x: -10, y: -40)
             }
             .position(
                 x: partsWidth / 2,
@@ -232,7 +303,9 @@ struct NewHomeView: View {
                 .compositingGroup()
                 .shadow(radius: 3, x: 1, y: 1)
                 .opacity(0.8)
-                .opacity(teamNews.backState ? 1 : 0)
+                .opacity(teamNews.backState ? 1 :
+                            homeVM.isActiveEdit ? 0.4 : 0
+                )
         }
         .frame(width: partsWidth, height: partsHeight)
         .opacity(teamNews.desplayState ? 1 :
@@ -244,7 +317,7 @@ struct NewHomeView: View {
                                       back: $teamNews.backState
             )
             .frame(maxWidth: .infinity, alignment: .trailing)
-            .offset(x: -5, y: -40)
+            .offset(x: -10, y: -40)
 
         }
         .position(x: homeSize.width - partsWidth / 2)
