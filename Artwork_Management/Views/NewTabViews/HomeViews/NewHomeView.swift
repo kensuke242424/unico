@@ -16,6 +16,7 @@ struct NewHomeView: View {
         var initialScale: CGFloat = 1.0
         var desplayState: Bool = true
         var backState: Bool = false
+        var pressingAnimation: Bool = false
     }
 
     private struct TeamNewsParts {
@@ -25,6 +26,7 @@ struct NewHomeView: View {
         var initialScale: CGFloat = 1.0
         var desplayState: Bool = true
         var backState: Bool = false
+        var pressingAnimation: Bool = false
     }
 
     @EnvironmentObject var teamVM: TeamViewModel
@@ -61,6 +63,7 @@ struct NewHomeView: View {
                                       !inputTab.showSelectBackground ? 0 : 2)
                         .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 20)))
                         .scaleEffect(nowTime.transitionScale)
+                        .scaleEffect(nowTime.pressingAnimation ? 1.02 : 1)
                         .offset(nowTime.transitionOffset)
                         .customDragGesture(
                             active: $homeVM.isActiveEdit,
@@ -72,6 +75,11 @@ struct NewHomeView: View {
                             transition: $nowTime.transitionScale,
                             initial: $nowTime.initialScale
                         )
+                        .customLongPressGesture(
+                            pressing: $nowTime.pressingAnimation,
+                            backState: $inputTab.pressingAnimation,
+                            perform: $homeVM.isActiveEdit
+                        )
                 }
 
                 if animationContent {
@@ -82,6 +90,7 @@ struct NewHomeView: View {
                                       !inputTab.showSelectBackground ? 0 : 2)
                         .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 20)))
                         .scaleEffect(teamNews.transitionScale)
+                        .scaleEffect(teamNews.pressingAnimation ? 1.02 : 1)
                         .offset(teamNews.transitionOffset)
                         .customDragGesture(
                             active: $homeVM.isActiveEdit,
@@ -93,87 +102,93 @@ struct NewHomeView: View {
                             transition: $teamNews.transitionScale,
                             initial: $teamNews.initialScale
                         )
+                        .customLongPressGesture(
+                            pressing: $teamNews.pressingAnimation,
+                            backState: $inputTab.pressingAnimation,
+                            perform: $homeVM.isActiveEdit
+                        )
                 }
             } // VStack
+            /// Homeパーツのロングプレスを検知し、親ビューにステートを知らせる
             .frame(width: size.width, height: size.height)
-            .overlay {
-                VStack(spacing: 20) {
-
-                    HStack(spacing: 40) {
-                        Button {
-                            withAnimation(.interactiveSpring(response: 0.7,
-                                                             dampingFraction: 1,
-                                                             blendDuration: 1)) {
-                                nowTime.initialOffset = .zero
-                                nowTime.transitionOffset = .zero
-                                nowTime.initialScale = 1
-                                nowTime.transitionScale = 1
-                                nowTime.backState = false
-                                nowTime.desplayState = true
-
-                                teamNews.initialOffset = .zero
-                                teamNews.transitionOffset = .zero
-                                teamNews.initialScale = 1
-                                teamNews.transitionScale = 1
-                                teamNews.backState = false
-                                teamNews.desplayState = true
-                            }
-                        } label: {
-                            Circle()
-                                .fill(.gray.gradient)
-                                .frame(width: 60)
-                                .shadow(radius: 3, x: 3, y: 3)
-                                .shadow(radius: 3, x: 3, y: 3)
-                                .overlay {
-                                    Image(systemName: "arrow.counterclockwise")
-                                        .foregroundColor(.white)
-                                }
-                        }
-
-                        Button {
-                            withAnimation {
-                                homeVM.isActiveEdit.toggle()
-                            }
-                        } label: {
-                            Circle()
-                                .fill(.blue.gradient)
-                                .frame(width: 60)
-                                .shadow(radius: 3, x: 3, y: 3)
-                                .shadow(radius: 3, x: 3, y: 3)
-                                .overlay {
-                                    Image(systemName: "checkmark")
-                                        .foregroundColor(.white)
-                                }
-                        }
-                    }
-
-                    Button {
-                        //  TODO: パーツを編集前の状態に戻して終了
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            homeVM.isActiveEdit = false
-                        }
-                    } label: {
-                        Label("キャンセル", systemImage: "xmark.circle.fill")
-                            .foregroundColor(.white)
-                    }
-                    .padding(.top)
-                }
-
-                .offset(y: size.height / 3)
-            }
             .overlay {
                 if homeVM.isActiveEdit {
                     Text("""
-                         位置の調整・・・スワイプ
+                         位置の調整・・・ドラッグ
                          拡大と縮小・・・ピンチアウト
                          """
                     )
                     .font(.footnote)
                     .foregroundColor(.white.opacity(0.7))
                     .tracking(5)
-                    .offset(y: -size.height / 2 + 50)
+                    .offset(y: -size.height / 2 + 60)
                 }
             }
+            .overlay {
+                if homeVM.isActiveEdit {
+                    VStack(spacing: 20) {
+
+                        HStack(spacing: 40) {
+                            Button {
+                                withAnimation(.interactiveSpring(response: 0.7,
+                                                                 dampingFraction: 1,
+                                                                 blendDuration: 1)) {
+                                    nowTime.initialOffset = .zero
+                                    nowTime.transitionOffset = .zero
+                                    nowTime.initialScale = 1
+                                    nowTime.transitionScale = 1
+
+                                    teamNews.initialOffset = .zero
+                                    teamNews.transitionOffset = .zero
+                                    teamNews.initialScale = 1
+                                    teamNews.transitionScale = 1
+                                }
+                            } label: {
+                                Circle()
+                                    .fill(.gray.gradient)
+                                    .frame(width: 60)
+                                    .shadow(radius: 3, x: 3, y: 3)
+                                    .shadow(radius: 3, x: 3, y: 3)
+                                    .overlay {
+                                        Image(systemName: "arrow.counterclockwise")
+                                            .foregroundColor(.white)
+                                    }
+                            }
+
+                            Button {
+                                // TODO: 設定をユーザーのjoinTeamデータ内に保存
+                                withAnimation(.spring(response: 0.7, blendDuration: 1)) {
+                                    homeVM.isActiveEdit = false
+                                }
+                            } label: {
+                                Circle()
+                                    .fill(.blue.gradient)
+                                    .frame(width: 60)
+                                    .shadow(radius: 3, x: 3, y: 3)
+                                    .shadow(radius: 3, x: 3, y: 3)
+                                    .overlay {
+                                        Image(systemName: "checkmark")
+                                            .foregroundColor(.white)
+                                    }
+                            }
+                        }
+
+                        Button {
+                            //  TODO: パーツを編集前の状態に戻して終了
+                            withAnimation(.spring(response: 0.7, blendDuration: 1)) {
+                                homeVM.isActiveEdit = false
+                            }
+                        } label: {
+                            Label("キャンセル", systemImage: "xmark.circle.fill")
+                                .foregroundColor(.white)
+                        }
+                        .padding(.top)
+                    }
+                    .offset(y: size.height / 3)
+                }
+
+            }
+
         }
         .ignoresSafeArea()
     }
@@ -228,7 +243,8 @@ struct NewHomeView: View {
                     .shadow(radius: 3, x: 1, y: 1)
                     .opacity(0.8)
                     .opacity(nowTime.backState ? 1 :
-                                homeVM.isActiveEdit ? 0.4 : 0
+                                nowTime.pressingAnimation ? 0.6 :
+                                homeVM.isActiveEdit ? 0.1 : 0
                     )
             }
             .frame(width: partsWidth, height: partsHeight)
@@ -304,7 +320,8 @@ struct NewHomeView: View {
                 .shadow(radius: 3, x: 1, y: 1)
                 .opacity(0.8)
                 .opacity(teamNews.backState ? 1 :
-                            homeVM.isActiveEdit ? 0.4 : 0
+                            teamNews.pressingAnimation ? 0.6 :
+                            homeVM.isActiveEdit ? 0.1 : 0
                 )
         }
         .frame(width: partsWidth, height: partsHeight)

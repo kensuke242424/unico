@@ -13,6 +13,7 @@ struct InputTab {
     var showSideMenu       : Bool = false
     var showEntryAccount   : Bool = false
     var isActiveEditHome   : Bool = false
+    var pressingAnimation  : Bool = false
     var selectedUpdateData : SelectedUpdateData = .start
     
     /// NavigationPathによるエディット画面遷移時に渡す
@@ -149,6 +150,7 @@ struct NewTabView: View {
                                 .ignoresSafeArea()
                                 .blur(radius: min((-inputTab.scrollProgress * 4), 4), opaque: true)
                                 .blur(radius: homeVM.isActiveEdit ? 5 : 0, opaque: true)
+                                .blur(radius: inputTab.pressingAnimation ? 6 : 0, opaque: true)
                                 .overlay {
                                     if homeVM.isActiveEdit {
                                         Color.black
