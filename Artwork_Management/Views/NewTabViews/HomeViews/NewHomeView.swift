@@ -14,6 +14,8 @@ struct NewHomeView: View {
         var initialOffset: CGSize = .zero
         var transitionScale: CGFloat = 1.0
         var initialScale: CGFloat = 1.0
+        var desplayState: Bool = true
+        var backState: Bool = false
     }
 
     private struct TeamNewsParts {
@@ -21,9 +23,12 @@ struct NewHomeView: View {
         var initialOffset: CGSize = .zero
         var transitionScale: CGFloat = 1.0
         var initialScale: CGFloat = 1.0
+        var desplayState: Bool = true
+        var backState: Bool = false
     }
 
     @EnvironmentObject var teamVM: TeamViewModel
+    @EnvironmentObject var homeVM: HomeViewModel
     @StateObject var itemVM: ItemViewModel
 
     /// Tab親Viewから受け取った状態変数群
@@ -35,6 +40,8 @@ struct NewHomeView: View {
     @State private var animationContent: Bool = true
     @State private var nowTime = NowTimeParts()
     @State private var teamNews = TeamNewsParts()
+
+    @State private var isActiveEditHome : Bool = false
 
     @AppStorage("applicationDarkMode") var applicationDarkMode: Bool = false
     
@@ -55,12 +62,12 @@ struct NewHomeView: View {
                         .scaleEffect(nowTime.transitionScale)
                         .offset(nowTime.transitionOffset)
                         .customDragGesture(
-                            active: $inputTab.isActiveEditHome,
+                            active: $homeVM.isActiveEdit,
                             transition: $nowTime.transitionOffset,
                             initial: $nowTime.initialOffset
                         )
                         .customMagnificationGesture(
-                            active: $inputTab.isActiveEditHome,
+                            active: $homeVM.isActiveEdit,
                             transition: $nowTime.transitionScale,
                             initial: $nowTime.initialScale
                         )
@@ -76,12 +83,12 @@ struct NewHomeView: View {
                         .scaleEffect(teamNews.transitionScale)
                         .offset(teamNews.transitionOffset)
                         .customDragGesture(
-                            active: $inputTab.isActiveEditHome,
+                            active: $homeVM.isActiveEdit,
                             transition: $teamNews.transitionOffset,
                             initial: $teamNews.initialOffset
                         )
                         .customMagnificationGesture(
-                            active: $inputTab.isActiveEditHome,
+                            active: $homeVM.isActiveEdit,
                             transition: $teamNews.transitionScale,
                             initial: $teamNews.initialScale
                         )
@@ -91,7 +98,7 @@ struct NewHomeView: View {
             .overlay {
                 Button("編集する") {
                     withAnimation {
-                        inputTab.isActiveEditHome.toggle()
+                        homeVM.isActiveEdit.toggle()
                     }
                 }
                 .buttonStyle(.borderedProminent)
@@ -99,16 +106,18 @@ struct NewHomeView: View {
             }
         }
         .ignoresSafeArea()
+        
     }
     
     // 🕛時刻のレイアウト
     // HStack+Spacerを入れておかないと秒数によって微妙に時計が動いてしまう🤔
+    @ViewBuilder
     func NowTimeView(_ homeSize: CGSize) -> some View {
 
         let partsWidth: CGFloat = 195
         let partsHeight: CGFloat = 110
 
-            return VStack {
+             VStack {
                 GeometryReader {
                     let size = $0.size
                     let rect = $0.frame(in: .global)
@@ -146,22 +155,22 @@ struct NewHomeView: View {
             .background {
                 RoundedRectangle(cornerRadius: 10)
                     .fill(.ultraThinMaterial)
-                    .opacity(0.8)
                     .compositingGroup()
                     .shadow(radius: 3, x: 1, y: 1)
+                    .opacity(0.8)
+                    .opacity(nowTime.backState ? 1 : 0)
             }
             .frame(width: partsWidth, height: partsHeight)
-            .contextMenu {
-                Button(inputTab.isActiveEditHome ? "編集を終了" : "Homeを編集する") {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        withAnimation {
-                            inputTab.isActiveEditHome.toggle()
-                        }
-                    }
-                }
-                Button("非表示") {
-
-                }
+            .opacity(nowTime.desplayState ? 1 :
+                        homeVM.isActiveEdit ? 0.3 : 0
+            )
+            .overlay(alignment: .topLeading) {
+                CustomizeHomePartsButtons(show: homeVM.isActiveEdit,
+                                          desplay: $nowTime.desplayState,
+                                          back: $nowTime.backState
+                )
+                .frame(maxWidth: .infinity, alignment: .trailing)
+                .offset(x: -5, y: -40)
             }
             .position(
                 x: partsWidth / 2,
@@ -170,12 +179,13 @@ struct NewHomeView: View {
     }
 
     /// チームに関する情報を一覧で表示するHomeパーツ
+    @ViewBuilder
     func TeamNewsView(_ homeSize: CGSize) -> some View {
 
         let partsWidth: CGFloat = 135
         let partsHeight: CGFloat = 240
 
-        return VStack {
+         VStack {
             GeometryReader {
                 let size = $0.size
                 let local = $0.frame(in: .local)
@@ -219,26 +229,27 @@ struct NewHomeView: View {
         .background {
             RoundedRectangle(cornerRadius: 10)
                 .fill(.ultraThinMaterial)
-                .opacity(0.8)
                 .compositingGroup()
                 .shadow(radius: 3, x: 1, y: 1)
+                .opacity(0.8)
+                .opacity(teamNews.backState ? 1 : 0)
         }
         .frame(width: partsWidth, height: partsHeight)
-        .contextMenu {
-            Button(inputTab.isActiveEditHome ? "編集を終了" : "Homeを編集する") {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                    withAnimation {
-                        inputTab.isActiveEditHome.toggle()
-                    }
-                }
-            }
-            Button("非表示") {
+        .opacity(teamNews.desplayState ? 1 :
+                    homeVM.isActiveEdit ? 0.3 : 0
+        )
+        .overlay(alignment: .topLeading) {
+            CustomizeHomePartsButtons(show: homeVM.isActiveEdit,
+                                      desplay: $teamNews.desplayState,
+                                      back: $teamNews.backState
+            )
+            .frame(maxWidth: .infinity, alignment: .trailing)
+            .offset(x: -5, y: -40)
 
-            }
         }
         .position(x: homeSize.width - partsWidth / 2)
     }
-    
+    @ViewBuilder
     func teamMembersIcon(members: [JoinMember]) -> some View {
         Group {
             if members.count <= 2 {
@@ -258,7 +269,54 @@ struct NewHomeView: View {
             }
         }
     } // teamMembersIcon
-    
+
+}
+
+struct CustomizeHomePartsButtons: View {
+
+    var show: Bool
+    @Binding var desplay: Bool
+    @Binding var back: Bool
+
+    var body: some View {
+        if show {
+            HStack(spacing: 10) {
+                Button {
+                    withAnimation {
+                        desplay.toggle()
+                    }
+
+                } label: {
+                    Circle()
+                        .fill(.white.gradient)
+                        .frame(width: 30)
+                        .shadow(radius: 3, x: 1, y: 1)
+                        .overlay {
+                            Image(systemName: "wand.and.rays.inverse")
+                                .foregroundColor(.gray)
+                        }
+                }
+                .opacity(desplay ? 1 : 0.6)
+
+                Button {
+                    withAnimation {
+                        back.toggle()
+                    }
+                } label: {
+                    Circle()
+                        .fill(.white.gradient)
+                        .frame(width: 30)
+                        .shadow(radius: 3, x: 1, y: 1)
+                        .overlay {
+                            Image(systemName: "rectangle.dashed")
+                                .foregroundColor(.gray)
+                        }
+                }
+                .opacity(back ? 1 : 0.6)
+            }
+            .transition(AnyTransition.opacity.combined(with: .offset(y: 20)))
+        } // if
+    }
 }
 
 struct HomeView_Previews: PreviewProvider {

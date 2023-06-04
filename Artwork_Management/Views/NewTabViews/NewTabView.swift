@@ -48,11 +48,12 @@ struct NewTabView: View {
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var tagVM : TagViewModel
+    @EnvironmentObject var homeVM: HomeViewModel
     
     @StateObject var itemVM: ItemViewModel
     @StateObject var cartVM: CartViewModel
     
-    /// View Propertys
+    /// View Properties
     @State private var inputTab = InputTab()
 
     @AppStorage("applicationDarkMode") var applicationDarkMode: Bool = false
@@ -150,11 +151,11 @@ struct NewTabView: View {
                                                height: proxy.size.height)
                                 .ignoresSafeArea()
                                 .blur(radius: min((-inputTab.scrollProgress * 4), 4), opaque: true)
-                                .blur(radius: inputTab.isActiveEditHome ? 5 : 0, opaque: true)
+                                .blur(radius: homeVM.isActiveEdit ? 5 : 0, opaque: true)
                                 .overlay {
-                                    if inputTab.isActiveEditHome {
+                                    if homeVM.isActiveEdit {
                                         Color.black
-                                            .opacity(0.2)
+                                            .opacity(0.4)
                                             .ignoresSafeArea()
                                     }
                                 }
@@ -383,7 +384,7 @@ struct NewTabView: View {
             HStack {
                 ForEach(Tab.allCases, id: \.rawValue) { tab in
                     Text(tab == .home && inputTab.showSelectBackground ? "背景変更中" :
-                            tab == .home && inputTab.isActiveEditHome ? "編集中" :
+                            tab == .home && homeVM.isActiveEdit ? "編集中" :
                             tab.rawValue)
                     .font(.title3)
                     .fontWeight(.semibold)

@@ -30,6 +30,7 @@ struct ArtworkManagementApp: App {
                 .environmentObject(TeamViewModel())
                 .environmentObject(UserViewModel())
                 .environmentObject(TagViewModel())
+                .environmentObject(HomeViewModel())
                 .environmentObject(ProgressViewModel())
                 .environmentObject(PreloadViewModel())
         }
