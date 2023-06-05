@@ -119,7 +119,7 @@ struct NewHomeView: View {
                          """
                     )
                     .font(.footnote)
-                    .foregroundColor(.white.opacity(0.7))
+                    .foregroundColor(.white.opacity(0.5))
                     .tracking(5)
                     .offset(y: -size.height / 2 + 60)
                 }

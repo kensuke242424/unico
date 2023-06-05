@@ -21,10 +21,10 @@ struct CustomLongPressGesture: ViewModifier {
                     if pressing {
                         if perform { return }
 
-                        withAnimation(.easeIn(duration: 0.5)) {
+                        withAnimation(.spring(response: 1.0, blendDuration: 1)) {
                             self.backState = true
                         }
-                        withAnimation(.easeIn(duration: 0.8)) {
+                        withAnimation(.spring(response: 1.2, blendDuration: 1)) {
                             self.pressing = true
 
                         }
@@ -37,7 +37,7 @@ struct CustomLongPressGesture: ViewModifier {
                 },
                 perform: {
                     hapticErrorNotification()
-                    withAnimation(.spring(response: 0.7, blendDuration: 1)) {
+                    withAnimation(.spring(response: 0.9, blendDuration: 1)) {
                         self.perform = true
                     }
             })
