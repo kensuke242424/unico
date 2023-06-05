@@ -112,9 +112,15 @@ struct NewHomeView: View {
                         )
                 }
             } // VStack
+            /// 保存しているユーザーのHomeパーツ設定をViewプロパティに代入
             .onAppear {
+                let currentTeamIndex = userVM.getCurrentTeamIndex()
                 guard let user = userVM.user else { return }
-                //
+                guard let getIndex = currentTeamIndex else { return }
+                print("nowTime: \(user.joins[getIndex].homeEdits.nowTime)")
+                print("teamNews: \(user.joins[getIndex].homeEdits.teamNews)")
+                nowTime = user.joins[getIndex].homeEdits.nowTime
+                teamNews = user.joins[getIndex].homeEdits.teamNews
             }
             /// Homeパーツのロングプレスを検知し、親ビューにステートを知らせる
             .frame(width: size.width, height: size.height)
@@ -164,6 +170,10 @@ struct NewHomeView: View {
 
                             Button {
                                 // TODO: 設定をユーザーのjoinTeamデータ内に保存
+                                print("\(nowTime)")
+                                print("\(teamNews)")
+                                userVM.updateCurrentTeamHomeEdits(data: HomePartsEditData(nowTime: nowTime,
+                                                                                   teamNews: teamNews))
                                 withAnimation(.spring(response: 0.7, blendDuration: 1)) {
                                     homeVM.isActiveEdit = false
                                 }
@@ -193,9 +203,7 @@ struct NewHomeView: View {
                     }
                     .offset(y: size.height / 3)
                 }
-
             }
-
         }
         .ignoresSafeArea()
     }
