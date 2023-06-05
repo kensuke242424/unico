@@ -7,29 +7,32 @@
 
 import SwiftUI
 
+/// Homeの時計パーツのユーザー設定を管理する
+struct NowTimeParts: Codable, Hashable {
+    var transitionOffset: CGSize = .zero
+    var initialOffset: CGSize = .zero
+    var transitionScale: CGFloat = 1.0
+    var initialScale: CGFloat = 1.0
+    var desplayState: Bool = true
+    var backState: Bool = false
+    var pressingAnimation: Bool = false
+}
+
+/// Homeのチーム情報パーツのユーザー設定を管理する
+struct TeamNewsParts: Codable, Hashable {
+    var transitionOffset: CGSize = .zero
+    var initialOffset: CGSize = .zero
+    var transitionScale: CGFloat = 1.0
+    var initialScale: CGFloat = 1.0
+    var desplayState: Bool = true
+    var backState: Bool = false
+    var pressingAnimation: Bool = false
+}
+
 struct NewHomeView: View {
 
-    private struct NowTimeParts {
-        var transitionOffset: CGSize = .zero
-        var initialOffset: CGSize = .zero
-        var transitionScale: CGFloat = 1.0
-        var initialScale: CGFloat = 1.0
-        var desplayState: Bool = true
-        var backState: Bool = false
-        var pressingAnimation: Bool = false
-    }
-
-    private struct TeamNewsParts {
-        var transitionOffset: CGSize = .zero
-        var initialOffset: CGSize = .zero
-        var transitionScale: CGFloat = 1.0
-        var initialScale: CGFloat = 1.0
-        var desplayState: Bool = true
-        var backState: Bool = false
-        var pressingAnimation: Bool = false
-    }
-
     @EnvironmentObject var teamVM: TeamViewModel
+    @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var homeVM: HomeViewModel
     @StateObject var itemVM: ItemViewModel
 
@@ -109,6 +112,10 @@ struct NewHomeView: View {
                         )
                 }
             } // VStack
+            .onAppear {
+                guard let user = userVM.user else { return }
+                //
+            }
             /// Homeパーツのロングプレスを検知し、親ビューにステートを知らせる
             .frame(width: size.width, height: size.height)
             .overlay {
