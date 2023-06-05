@@ -33,6 +33,14 @@ struct JoinTeam: Codable, Hashable {
     var teamID: String
     var name: String
     var iconURL: URL?
+    var homeEdits = HomePartsEditData(nowTime: NowTimeParts(),
+                                     teamNews: TeamNewsParts())
+}
+
+/// Homeの各パーツ設定をまとめたデータモデル
+struct HomePartsEditData: Codable, Hashable {
+    var nowTime: NowTimeParts
+    var teamNews: TeamNewsParts
 }
 
 struct ImageData: Codable {

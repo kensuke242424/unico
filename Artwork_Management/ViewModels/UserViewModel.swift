@@ -102,6 +102,32 @@ class UserViewModel: ObservableObject {
         }
     }
 
+    /// 参加チーム群の配列から現在操作しているチームのインデックスを取得するメソッド
+    func getCurrentTeamIndex() -> Int? {
+        guard let user else { return nil }
+        var getIndex: Int?
+
+        getIndex = user.joins.firstIndex(where: { $0.teamID == user.lastLogIn })
+        print("currentTeamIndex: \(getIndex)")
+        return getIndex
+    }
+
+    /// Homeのパーツ編集設定をFirestoreのドキュメントに保存するメソッド
+    /// 現在操作しているチームのJoinTeamデータモデルに保存される
+    func updateCurrentTeamHomeEdits(data EditsData: HomePartsEditData) {
+        guard var user = user else { return }
+        guard let userRef = db?.collection("users").document(user.id) else { return }
+
+        do {
+            let currentTeamIndex = getCurrentTeamIndex()
+            guard let currentTeamIndex else { return }
+            user.joins[currentTeamIndex].homeEdits = EditsData
+            try userRef.setData(from: user)
+        } catch {
+            print("ERROR: Homeパーツ設定の保存に失敗しました。")
+        }
+    }
+
     func addNewJoinTeam(newJoinTeam: JoinTeam) async throws {
 
         guard let uid = uid, var user = user else { throw CustomError.uidEmpty }

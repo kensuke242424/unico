@@ -13,6 +13,7 @@ struct InputTab {
     var showSideMenu       : Bool = false
     var showEntryAccount   : Bool = false
     var isActiveEditHome   : Bool = false
+    var pressingAnimation  : Bool = false
     var selectedUpdateData : SelectedUpdateData = .start
     
     /// NavigationPathによるエディット画面遷移時に渡す
@@ -48,11 +49,12 @@ struct NewTabView: View {
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var tagVM : TagViewModel
+    @EnvironmentObject var homeVM: HomeViewModel
     
     @StateObject var itemVM: ItemViewModel
     @StateObject var cartVM: CartViewModel
     
-    /// View Propertys
+    /// View Properties
     @State private var inputTab = InputTab()
 
     @AppStorage("applicationDarkMode") var applicationDarkMode: Bool = false
@@ -82,20 +84,17 @@ struct NewTabView: View {
                                 inputTab.scrollProgress = max(min(pageProgress, 0), -CGFloat(Tab.allCases.count - 1))
                                 inputTab.animationOpacity = 1 - -inputTab.scrollProgress
                             }
-                        /// ホーム画面編集中は他のタブ要素を隠してタブ移動を無効化する
-                        if !inputTab.isActiveEditHome {
-                            NewItemsView(itemVM: itemVM,  cartVM: cartVM, inputTab: $inputTab)
-                                .tag(Tab.item)
-                                .offsetX(inputTab.selectionTab == Tab.item) { rect in
-                                    let minX = rect.minX
-                                    let pageOffset = minX - (size.width * CGFloat(Tab.item.index))
-                                    let pageProgress = pageOffset / size.width
 
-                                    inputTab.scrollProgress = max(min(pageProgress, 0), -CGFloat(Tab.allCases.count - 1))
-                                    inputTab.animationOpacity = -inputTab.scrollProgress
-                                }
-                        }
+                        NewItemsView(itemVM: itemVM,  cartVM: cartVM, inputTab: $inputTab)
+                            .tag(Tab.item)
+                            .offsetX(inputTab.selectionTab == Tab.item) { rect in
+                                let minX = rect.minX
+                                let pageOffset = minX - (size.width * CGFloat(Tab.item.index))
+                                let pageProgress = pageOffset / size.width
 
+                                inputTab.scrollProgress = max(min(pageProgress, 0), -CGFloat(Tab.allCases.count - 1))
+                                inputTab.animationOpacity = -inputTab.scrollProgress
+                            }
                     }
                     .tabViewStyle(.page(indexDisplayMode: .never))
                 }
@@ -150,11 +149,12 @@ struct NewTabView: View {
                                                height: proxy.size.height)
                                 .ignoresSafeArea()
                                 .blur(radius: min((-inputTab.scrollProgress * 4), 4), opaque: true)
-                                .blur(radius: inputTab.isActiveEditHome ? 5 : 0, opaque: true)
+                                .blur(radius: homeVM.isActiveEdit ? 5 : 0, opaque: true)
+                                .blur(radius: inputTab.pressingAnimation ? 6 : 0, opaque: true)
                                 .overlay {
-                                    if inputTab.isActiveEditHome {
+                                    if homeVM.isActiveEdit {
                                         Color.black
-                                            .opacity(0.2)
+                                            .opacity(0.4)
                                             .ignoresSafeArea()
                                     }
                                 }
@@ -383,7 +383,7 @@ struct NewTabView: View {
             HStack {
                 ForEach(Tab.allCases, id: \.rawValue) { tab in
                     Text(tab == .home && inputTab.showSelectBackground ? "背景変更中" :
-                            tab == .home && inputTab.isActiveEditHome ? "編集中" :
+                            tab == .home && homeVM.isActiveEdit ? "編集中" :
                             tab.rawValue)
                     .font(.title3)
                     .fontWeight(.semibold)
@@ -430,7 +430,7 @@ struct NewTabView: View {
                                     .offset(y: 30)
                                 }
                             }
-                            .allowsHitTesting(inputTab.isActiveEditHome ? false : true)
+                            .allowsHitTesting(homeVM.isActiveEdit ? false : true)
                     }
                     Spacer()
                     /// Itemタブに移動した時に表示するアイテム追加タブボタン

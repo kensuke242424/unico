@@ -48,6 +48,8 @@ struct SystemSideMenu: View {
     
     @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var progress: ProgressViewModel
+    @EnvironmentObject var homeVM: HomeViewModel
+
     @EnvironmentObject var logInVM : LogInViewModel
     @EnvironmentObject var teamVM  : TeamViewModel
     @EnvironmentObject var userVM  : UserViewModel
@@ -293,7 +295,7 @@ struct SystemSideMenu: View {
                                                     inputTab.showSideMenu = false
                                                 }
                                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                                    withAnimation(.spring(response: 0.5, blendDuration: 1)) {
+                                                    withAnimation(.spring(response: 0.7, blendDuration: 1)) {
                                                         inputTab.showSelectBackground.toggle()
                                                     }
                                                 }
@@ -373,15 +375,29 @@ struct SystemSideMenu: View {
                                     VStack(alignment: .leading, spacing: 40) {
                                         
                                         Label("アプリ設定", systemImage: "paintbrush.pointed.fill")
-                                            .onTapGesture { navigationVM.path.append(ApplicationSettingPath.root) }
+                                            .onTapGesture { navigationVM.path.append(ApplicationSettingPath.root)
+                                            }
+
+                                        Label("ホーム編集", systemImage: "house.fill")
+                                            .onTapGesture {
+                                                withAnimation(.spring(response: 0.4, blendDuration: 1)) {
+                                                    inputTab.showSideMenu = false
+                                                }
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                                    withAnimation(.spring(response: 0.7, blendDuration: 1)) {
+                                                        homeVM.isActiveEdit.toggle()
+                                                    }
+                                                }
+                                            }
 
                                         Label("システム設定", systemImage: "gearshape.fill")
-                                            .onTapGesture { navigationVM.path.append(SystemPath.root) }
+                                            .onTapGesture { navigationVM.path.append(SystemPath.root)
+                                            }
 
                                     } // VStack
                                     .foregroundColor(.white)
                                     // メニュー一つ分のheight = コンテンツ数 * 60
-                                    .frame(width: 210, height: menuRowHeight, alignment: .topLeading)
+                                    .frame(width: 210, height: menuRowHeight * 3, alignment: .topLeading)
                                     .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
                                     .offset(x: 20, y: 30)
 

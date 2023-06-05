@@ -7,23 +7,33 @@
 
 import SwiftUI
 
+/// Homeの時計パーツのユーザー設定を管理する
+struct NowTimeParts: Codable, Hashable {
+    var transitionOffset: CGSize = .zero
+    var initialOffset: CGSize = .zero
+    var transitionScale: CGFloat = 1.0
+    var initialScale: CGFloat = 1.0
+    var desplayState: Bool = true
+    var backState: Bool = false
+    var pressingAnimation: Bool = false
+}
+
+/// Homeのチーム情報パーツのユーザー設定を管理する
+struct TeamNewsParts: Codable, Hashable {
+    var transitionOffset: CGSize = .zero
+    var initialOffset: CGSize = .zero
+    var transitionScale: CGFloat = 1.0
+    var initialScale: CGFloat = 1.0
+    var desplayState: Bool = true
+    var backState: Bool = false
+    var pressingAnimation: Bool = false
+}
+
 struct NewHomeView: View {
 
-    private struct NowTimeParts {
-        var transitionOffset: CGSize = .zero
-        var initialOffset: CGSize = .zero
-        var transitionScale: CGFloat = 1.0
-        var initialScale: CGFloat = 1.0
-    }
-
-    private struct TeamNewsParts {
-        var transitionOffset: CGSize = .zero
-        var initialOffset: CGSize = .zero
-        var transitionScale: CGFloat = 1.0
-        var initialScale: CGFloat = 1.0
-    }
-
     @EnvironmentObject var teamVM: TeamViewModel
+    @EnvironmentObject var userVM: UserViewModel
+    @EnvironmentObject var homeVM: HomeViewModel
     @StateObject var itemVM: ItemViewModel
 
     /// Tab親Viewから受け取った状態変数群
@@ -36,6 +46,8 @@ struct NewHomeView: View {
     @State private var nowTime = NowTimeParts()
     @State private var teamNews = TeamNewsParts()
 
+    @State private var isActiveEditHome : Bool = false
+
     @AppStorage("applicationDarkMode") var applicationDarkMode: Bool = false
     
     var body: some View {
@@ -45,6 +57,7 @@ struct NewHomeView: View {
             let rect = $0.frame(in: .global)
             
             VStack {
+
                 if animationContent {
                     NowTimeView(size)
                         .foregroundColor(applicationDarkMode ? .white : .black)
@@ -53,16 +66,22 @@ struct NewHomeView: View {
                                       !inputTab.showSelectBackground ? 0 : 2)
                         .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 20)))
                         .scaleEffect(nowTime.transitionScale)
+                        .scaleEffect(nowTime.pressingAnimation ? 1.02 : 1)
                         .offset(nowTime.transitionOffset)
                         .customDragGesture(
-                            active: $inputTab.isActiveEditHome,
+                            active: $homeVM.isActiveEdit,
                             transition: $nowTime.transitionOffset,
                             initial: $nowTime.initialOffset
                         )
                         .customMagnificationGesture(
-                            active: $inputTab.isActiveEditHome,
+                            active: $homeVM.isActiveEdit,
                             transition: $nowTime.transitionScale,
                             initial: $nowTime.initialScale
+                        )
+                        .customLongPressGesture(
+                            pressing: $nowTime.pressingAnimation,
+                            backState: $inputTab.pressingAnimation,
+                            perform: $homeVM.isActiveEdit
                         )
                 }
 
@@ -74,30 +93,116 @@ struct NewHomeView: View {
                                       !inputTab.showSelectBackground ? 0 : 2)
                         .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 20)))
                         .scaleEffect(teamNews.transitionScale)
+                        .scaleEffect(teamNews.pressingAnimation ? 1.02 : 1)
                         .offset(teamNews.transitionOffset)
                         .customDragGesture(
-                            active: $inputTab.isActiveEditHome,
+                            active: $homeVM.isActiveEdit,
                             transition: $teamNews.transitionOffset,
                             initial: $teamNews.initialOffset
                         )
                         .customMagnificationGesture(
-                            active: $inputTab.isActiveEditHome,
+                            active: $homeVM.isActiveEdit,
                             transition: $teamNews.transitionScale,
                             initial: $teamNews.initialScale
                         )
+                        .customLongPressGesture(
+                            pressing: $teamNews.pressingAnimation,
+                            backState: $inputTab.pressingAnimation,
+                            perform: $homeVM.isActiveEdit
+                        )
                 }
-                
             } // VStack
+            /// 保存しているユーザーのHomeパーツ設定をViewプロパティに代入
+            .onAppear {
+                let currentTeamIndex = userVM.getCurrentTeamIndex()
+                guard let user = userVM.user else { return }
+                guard let getIndex = currentTeamIndex else { return }
+                print("nowTime: \(user.joins[getIndex].homeEdits.nowTime)")
+                print("teamNews: \(user.joins[getIndex].homeEdits.teamNews)")
+                nowTime = user.joins[getIndex].homeEdits.nowTime
+                teamNews = user.joins[getIndex].homeEdits.teamNews
+            }
+            /// Homeパーツのロングプレスを検知し、親ビューにステートを知らせる
             .frame(width: size.width, height: size.height)
-            .offset(y: -50)
             .overlay {
-                Button("編集する") {
-                    withAnimation {
-                        inputTab.isActiveEditHome.toggle()
-                    }
+                if homeVM.isActiveEdit {
+                    Text("""
+                         位置の調整・・・ドラッグ
+                         拡大と縮小・・・ピンチアウト
+                         """
+                    )
+                    .font(.footnote)
+                    .foregroundColor(.white.opacity(0.5))
+                    .tracking(5)
+                    .offset(y: -size.height / 2 + 60)
                 }
-                .buttonStyle(.borderedProminent)
-                .offset(y: size.height / 3)
+            }
+            .overlay {
+                if homeVM.isActiveEdit {
+                    VStack(spacing: 20) {
+
+                        HStack(spacing: 40) {
+                            Button {
+                                withAnimation(.interactiveSpring(response: 0.7,
+                                                                 dampingFraction: 1,
+                                                                 blendDuration: 1)) {
+                                    nowTime.initialOffset = .zero
+                                    nowTime.transitionOffset = .zero
+                                    nowTime.initialScale = 1
+                                    nowTime.transitionScale = 1
+
+                                    teamNews.initialOffset = .zero
+                                    teamNews.transitionOffset = .zero
+                                    teamNews.initialScale = 1
+                                    teamNews.transitionScale = 1
+                                }
+                            } label: {
+                                Circle()
+                                    .fill(.gray.gradient)
+                                    .frame(width: 60)
+                                    .shadow(radius: 3, x: 3, y: 3)
+                                    .shadow(radius: 3, x: 3, y: 3)
+                                    .overlay {
+                                        Image(systemName: "arrow.counterclockwise")
+                                            .foregroundColor(.white)
+                                    }
+                            }
+
+                            Button {
+                                // TODO: 設定をユーザーのjoinTeamデータ内に保存
+                                print("\(nowTime)")
+                                print("\(teamNews)")
+                                userVM.updateCurrentTeamHomeEdits(data: HomePartsEditData(nowTime: nowTime,
+                                                                                   teamNews: teamNews))
+                                withAnimation(.spring(response: 0.7, blendDuration: 1)) {
+                                    homeVM.isActiveEdit = false
+                                }
+                            } label: {
+                                Circle()
+                                    .fill(.blue.gradient)
+                                    .frame(width: 60)
+                                    .shadow(radius: 3, x: 3, y: 3)
+                                    .shadow(radius: 3, x: 3, y: 3)
+                                    .overlay {
+                                        Image(systemName: "checkmark")
+                                            .foregroundColor(.white)
+                                    }
+                            }
+                        }
+
+                        Button {
+                            //  TODO: パーツを編集前の状態に戻して終了
+                            withAnimation(.spring(response: 0.7, blendDuration: 1)) {
+                                homeVM.isActiveEdit = false
+                            }
+                        } label: {
+                            Label("キャンセル", systemImage: "xmark.circle.fill")
+                                .foregroundColor(.white)
+                        }
+                        .padding(.top)
+                    }
+                    .offset(y: size.height / 3)
+                }
             }
         }
         .ignoresSafeArea()
@@ -105,105 +210,151 @@ struct NewHomeView: View {
     
     // 🕛時刻のレイアウト
     // HStack+Spacerを入れておかないと秒数によって微妙に時計が動いてしまう🤔
-    func NowTimeView(_ size: CGSize) -> some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 8) {
-                
-                Text(inputTime.hm)
-                    .italic()
-                    .tracking(8)
-                    .font(.title2)
-                    .fontWeight(.semibold)
-                    .padding(.bottom)
-                    .opacity(0.8)
-                
-                Text("\(inputTime.week).")
-                    .italic()
-                    .tracking(5)
-                    .font(.subheadline)
-                    .opacity(0.8)
-                
-                Text(inputTime.dateStyle)
-                    .font(.subheadline)
-                    .italic()
-                    .tracking(5)
-                    .padding(.leading)
-                    .opacity(0.8)
-            } // VStack
-            .onReceive(inputTime.timer) { _ in
-                inputTime.nowDate = Date()
-            }
-            .background {
-                GeometryReader { geometry in
-                    BlurView(style: .systemThinMaterial)
-                        .clipShape(
-                            RoundedRectangle(cornerRadius: 10)
-                        )
-                        .scaleEffect(1.2)
-                        .opacity(0.5)
-                        .compositingGroup()
-                        .shadow(color: .black, radius: 3, x: 1, y: 1)
-                }
-            }
+    @ViewBuilder
+    func NowTimeView(_ homeSize: CGSize) -> some View {
 
-            Spacer()
+        let partsWidth: CGFloat = 195
+        let partsHeight: CGFloat = 110
 
-        } // HStack
-        .frame(maxWidth: .infinity)
-        .padding(.trailing, size.width / 2)
-        .padding([.leading, .bottom], 15)
-    }
-    
-    func TeamNewsView(_ size: CGSize) -> some View {
-        // チーム情報一覧
-        HStack {
-            Spacer()
+             VStack {
+                GeometryReader {
+                    let size = $0.size
+                    let rect = $0.frame(in: .global)
 
-            ZStack {
-                VStack(alignment: .leading, spacing: 60) {
+                    VStack(alignment: .leading, spacing: 8) {
 
-                    Group {
-                        Text("Useday.  ")
-                        Text("Items.  ")
-                        Text("Member.  ")
+                        Text(inputTime.hm)
+                            .italic()
+                            .tracking(8)
+                            .font(.title2)
+                            .fontWeight(.semibold)
+                            .padding(.bottom)
+                            .opacity(0.8)
+
+                        Text("\(inputTime.week).")
+                            .italic()
+                            .tracking(5)
+                            .font(.subheadline)
+                            .opacity(0.8)
+
+                        Text(inputTime.dateStyle)
+                            .font(.subheadline)
+                            .italic()
+                            .tracking(5)
+                            .padding(.leading)
+                            .opacity(0.8)
                     }
-                    .font(.footnote)
-                    .tracking(5)
-                    .opacity(0.8)
+                    .frame(maxWidth: size.width, maxHeight: size.height)
+                    .onReceive(inputTime.timer) { _ in
+                        inputTime.nowDate = Date()
+                    }
 
-                } // VStack
-                
-                VStack(alignment: .trailing, spacing: 60) {
-                    
-                    Text("55 day")
-                        .font(.footnote)
-                        .opacity(0.8)
-                    
-                    Text("\(itemVM.items.count) item")
-                        .font(.footnote)
-                        .opacity(0.8)
-                    
-                    // Team members Icon...
-                    teamMembersIcon(members: teamVM.team!.members)
-                }
-                .offset(x: 20, y: 35)
-                .tracking(5)
-            } // ZStack
+                } // GeometryReader
+            } // VStack
             .background {
-                BlurView(style: .systemThinMaterial)
-                    .clipShape(
-                        RoundedRectangle(cornerRadius: 10)
-                    )
-                    .scaleEffect(1.35)
-                    .opacity(0.5)
-                    .offset(y: 20)
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(.ultraThinMaterial)
                     .compositingGroup()
-                    .shadow(color: .black, radius: 3, x: 1, y: 1)
+                    .shadow(radius: 3, x: 1, y: 1)
+                    .opacity(0.8)
+                    .opacity(nowTime.backState ? 1 :
+                                nowTime.pressingAnimation ? 0.6 :
+                                homeVM.isActiveEdit ? 0.1 : 0
+                    )
             }
-        } // HStack
-        .padding(.trailing, 20)
+            .frame(width: partsWidth, height: partsHeight)
+            .opacity(nowTime.desplayState ? 1 :
+                        homeVM.isActiveEdit ? 0.3 : 0
+            )
+            .overlay(alignment: .topLeading) {
+                CustomizeHomePartsButtons(show: homeVM.isActiveEdit,
+                                          desplay: $nowTime.desplayState,
+                                          back: $nowTime.backState
+                )
+                .frame(maxWidth: .infinity, alignment: .trailing)
+                .offset(x: -10, y: -40)
+            }
+            .position(
+                x: partsWidth / 2,
+                y: homeSize.height / 2 - 150
+            )
     }
-    
+
+    /// チームに関する情報を一覧で表示するHomeパーツ
+    @ViewBuilder
+    func TeamNewsView(_ homeSize: CGSize) -> some View {
+
+        let partsWidth: CGFloat = 135
+        let partsHeight: CGFloat = 240
+
+         VStack {
+            GeometryReader {
+                let size = $0.size
+                let local = $0.frame(in: .local)
+                let global = $0.frame(in: .global)
+
+                ZStack {
+                    VStack(alignment: .leading, spacing: 60) {
+
+                        Group {
+                            Text("Useday.  ")
+                            Text("Items.  ")
+                            Text("Member.  ")
+                        }
+                        .font(.footnote)
+                        .tracking(5)
+                        .opacity(0.8)
+
+                    } // VStack
+
+                    VStack(alignment: .trailing, spacing: 60) {
+
+                        //TODO: 実際の使用日数を計算で割り出す
+                        Text("55 day")
+                            .font(.footnote)
+                            .opacity(0.8)
+
+                        Text("\(itemVM.items.count) item")
+                            .font(.footnote)
+                            .opacity(0.8)
+
+                        // Team members Icon...
+                        teamMembersIcon(members: teamVM.team!.members)
+                    }
+                    .offset(x: 20, y: 35)
+                    .tracking(5)
+                } // ZStack
+            } // GeometryReader
+        } // VStack
+        .padding(.top, 10)
+        .padding(.leading, 10)
+        .background {
+            RoundedRectangle(cornerRadius: 10)
+                .fill(.ultraThinMaterial)
+                .compositingGroup()
+                .shadow(radius: 3, x: 1, y: 1)
+                .opacity(0.8)
+                .opacity(teamNews.backState ? 1 :
+                            teamNews.pressingAnimation ? 0.6 :
+                            homeVM.isActiveEdit ? 0.1 : 0
+                )
+        }
+        .frame(width: partsWidth, height: partsHeight)
+        .opacity(teamNews.desplayState ? 1 :
+                    homeVM.isActiveEdit ? 0.3 : 0
+        )
+        .overlay(alignment: .topLeading) {
+            CustomizeHomePartsButtons(show: homeVM.isActiveEdit,
+                                      desplay: $teamNews.desplayState,
+                                      back: $teamNews.backState
+            )
+            .frame(maxWidth: .infinity, alignment: .trailing)
+            .offset(x: -10, y: -40)
+
+        }
+        .position(x: homeSize.width - partsWidth / 2)
+    }
+    @ViewBuilder
     func teamMembersIcon(members: [JoinMember]) -> some View {
         Group {
             if members.count <= 2 {
@@ -223,7 +374,54 @@ struct NewHomeView: View {
             }
         }
     } // teamMembersIcon
-    
+
+}
+
+struct CustomizeHomePartsButtons: View {
+
+    var show: Bool
+    @Binding var desplay: Bool
+    @Binding var back: Bool
+
+    var body: some View {
+        if show {
+            HStack(spacing: 10) {
+                Button {
+                    withAnimation {
+                        desplay.toggle()
+                    }
+
+                } label: {
+                    Circle()
+                        .fill(.white.gradient)
+                        .frame(width: 30)
+                        .shadow(radius: 3, x: 1, y: 1)
+                        .overlay {
+                            Image(systemName: "wand.and.rays.inverse")
+                                .foregroundColor(.gray)
+                        }
+                }
+                .opacity(desplay ? 1 : 0.6)
+
+                Button {
+                    withAnimation {
+                        back.toggle()
+                    }
+                } label: {
+                    Circle()
+                        .fill(.white.gradient)
+                        .frame(width: 30)
+                        .shadow(radius: 3, x: 1, y: 1)
+                        .overlay {
+                            Image(systemName: "rectangle.dashed")
+                                .foregroundColor(.gray)
+                        }
+                }
+                .opacity(back ? 1 : 0.6)
+            }
+            .transition(AnyTransition.opacity.combined(with: .offset(y: 20)))
+        } // if
+    }
 }
 
 struct HomeView_Previews: PreviewProvider {
