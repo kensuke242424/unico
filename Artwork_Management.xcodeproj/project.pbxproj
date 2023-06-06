@@ -67,6 +67,8 @@
 		BEB669A12A2A370A008FC9DE /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEB669A02A2A370A008FC9DE /* HomeViewModel.swift */; };
 		BEB669CB2A2CD105008FC9DE /* CustomLongPressGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEB669CA2A2CD105008FC9DE /* CustomLongPressGesture.swift */; };
 		BEB669EE2A2DF49E008FC9DE /* CGSizeExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEB669ED2A2DF49E008FC9DE /* CGSizeExtension.swift */; };
+		BECEBE572A2F9B260059B0DC /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = BECEBE562A2F9B260059B0DC /* Introspect */; };
+		BECEBE592A2F9B260059B0DC /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = BECEBE582A2F9B260059B0DC /* SwiftUIIntrospect */; };
 		E0003D0328FD3BB0007308B0 /* TagTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0003D0228FD3BB0007308B0 /* TagTitle.swift */; };
 		E01AA3A129167F02000FCD37 /* ResizableSheet in Frameworks */ = {isa = PBXBuildFile; productRef = E01AA3A029167F02000FCD37 /* ResizableSheet */; };
 		E01AA3A32916C674000FCD37 /* TagModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E01AA3A22916C674000FCD37 /* TagModel.swift */; };
@@ -277,7 +279,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				BE41784229B4AB7E00434CFC /* FirebaseAnalytics in Frameworks */,
+				BECEBE572A2F9B260059B0DC /* Introspect in Frameworks */,
 				E01AA3A129167F02000FCD37 /* ResizableSheet in Frameworks */,
+				BECEBE592A2F9B260059B0DC /* SwiftUIIntrospect in Frameworks */,
 				E099CD2D291B395E00057543 /* FirebaseAuth in Frameworks */,
 				E099CD2F291B395E00057543 /* FirebaseFirestore in Frameworks */,
 				BE245BD229C5DA4F00539A04 /* SDWebImageSwiftUI in Frameworks */,
@@ -690,6 +694,8 @@
 				BE41783F29B4AB3100434CFC /* FirebaseDynamicLinks */,
 				BE41784129B4AB7E00434CFC /* FirebaseAnalytics */,
 				BE245BD129C5DA4F00539A04 /* SDWebImageSwiftUI */,
+				BECEBE562A2F9B260059B0DC /* Introspect */,
+				BECEBE582A2F9B260059B0DC /* SwiftUIIntrospect */,
 			);
 			productName = Artwork_Management;
 			productReference = E08F272128DDA08E00329C5E /* Artwork_Management.app */;
@@ -723,6 +729,7 @@
 				E01AA39F29167F02000FCD37 /* XCRemoteSwiftPackageReference "ResizableSheet" */,
 				E099CD2B291B395E00057543 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				BE245BD029C5DA4F00539A04 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
+				BECEBE552A2F9B260059B0DC /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
 			);
 			productRefGroup = E08F272228DDA08E00329C5E /* Products */;
 			projectDirPath = "";
@@ -1110,6 +1117,14 @@
 				minimumVersion = 2.0.0;
 			};
 		};
+		BECEBE552A2F9B260059B0DC /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/siteline/SwiftUI-Introspect.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.6.0;
+			};
+		};
 		E01AA39F29167F02000FCD37 /* XCRemoteSwiftPackageReference "ResizableSheet" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/mtj0928/ResizableSheet.git";
@@ -1143,6 +1158,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E099CD2B291B395E00057543 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAnalytics;
+		};
+		BECEBE562A2F9B260059B0DC /* Introspect */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BECEBE552A2F9B260059B0DC /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */;
+			productName = Introspect;
+		};
+		BECEBE582A2F9B260059B0DC /* SwiftUIIntrospect */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BECEBE552A2F9B260059B0DC /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */;
+			productName = SwiftUIIntrospect;
 		};
 		E01AA3A029167F02000FCD37 /* ResizableSheet */ = {
 			isa = XCSwiftPackageProductDependency;

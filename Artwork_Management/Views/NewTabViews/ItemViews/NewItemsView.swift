@@ -7,6 +7,7 @@
 
 import SwiftUI
 import ResizableSheet
+import Introspect
 
 struct InputCart {
     var doCommerce: Bool = false
@@ -496,6 +497,11 @@ struct NewItemsView: View {
                 } // HStack
                 .padding(.leading, 15)
             } // ScrollView
+            /// スクロール時の引っ掛かりを無くす
+            .introspectScrollView { scrollView in
+                 scrollView.isDirectionalLockEnabled = true
+                 scrollView.bounces = false
+            }
             
             /// Add Tag
             Button {
