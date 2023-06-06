@@ -55,12 +55,15 @@ class TeamViewModel: ObservableObject {
                     return
                 }
                 print("teamRealtimeListener開始")
-                do {
-                    let teamData = try snap.data(as: Team.self)
-                    self.team = teamData
-                    print("teamRealtimeListenerによりチームデータを更新")
-                } catch {
-                    print("teamRealtimeListener_Error: try snap?.data(as: Team.self)")
+                
+                withAnimation {
+                    do {
+                        let teamData = try snap.data(as: Team.self)
+                        self.team = teamData
+                        print("teamRealtimeListenerによりチームデータを更新")
+                    } catch {
+                        print("teamRealtimeListener_Error: try snap?.data(as: Team.self)")
+                    }
                 }
             }
         }

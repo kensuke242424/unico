@@ -84,8 +84,8 @@ struct NewEditItemView: View {
         GeometryReader {
             let size = $0.size
             /// 親View側のスクロールViewを参照したsizeを元にしたカードのサイズ
-            let cardWidth : CGFloat = size.width / 2 - 15
-            let cardHeight: CGFloat = 200
+            let cardWidth : CGFloat = size.width / 2
+            let cardHeight: CGFloat = size.width / 2
             
             VStack(spacing: 20) {
                 
@@ -96,7 +96,7 @@ struct NewEditItemView: View {
                     ZStack {
                         SelectItemPhotoBackground(photoImage: input.captureImage,
                                                   photoURL: passItem?.photoURL,
-                                                  height: 250)
+                                                  height: size.width / 2 + 50)
                         
                         if let captureImage = input.captureImage {
                             NewItemUIImage(image: captureImage,

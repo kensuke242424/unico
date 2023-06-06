@@ -44,7 +44,7 @@ struct NewItemsView: View {
     @State private var showImpossibleAlert: Bool = false
 
     /// アイテムカードの高さ
-    let cardHeight: CGFloat = 200
+    @State var cardHeight: CGFloat = 0
     
     var body: some View {
         GeometryReader {
@@ -202,9 +202,9 @@ struct NewItemsView: View {
     
     /// 最後のカードが上部に残るためのボトムパディング
     func bottomPadding(_ size: CGSize = .zero) -> CGFloat {
-        let cardHeight: CGFloat = 200
+        let cardHeight: CGFloat = size.width / 2
         let scrollViewHeight: CGFloat = size.height
-        return scrollViewHeight - cardHeight - 110
+        return scrollViewHeight - cardHeight - 100
     }
     
     @ViewBuilder
@@ -215,8 +215,7 @@ struct NewItemsView: View {
             let rect = $0.frame(in: .named("SCROLLVIEW"))
             
             HStack(spacing: -25) {
-                /// Book Detail Card
-                /// このカードを置くと、カバー画像を愛でることができます。
+                /// Item Detail Card
                 VStack(alignment: .leading, spacing: 8) {
                     Text(item.name == "" ? "No Name" : item.name)
                         .font(.title3)
@@ -247,7 +246,7 @@ struct NewItemsView: View {
                     .foregroundColor(.black)
                 }
                 .padding(20)
-                .frame(width: size.width / 2, height: size.height * 0.8, alignment: .leading)
+                .frame(width: size.width / 2, height: size.height * 0.85, alignment: .leading)
                 .background {
                     RoundedRectangle(cornerRadius: 10, style: .continuous)
                         .fill(.white)
@@ -295,13 +294,14 @@ struct NewItemsView: View {
                 }
                 .offset(x: animateCurrentItem && selectedItem?.id == item.id ? -20 : 0)
                 .opacity(showDetailView ? 0 : 1)
+                .onAppear { cardHeight = size.width / 2 }
                 
                 /// Book Cover Imager
                 ZStack {
                     if !(showDetailView && selectedItem?.id == item.id) {
                         SDWebImageView(imageURL: item.photoURL,
                                           width: size.width / 2,
-                                          height: size.height)
+                                          height: size.width / 2)
                             /// Matched Geometry ID
                             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                             .transition(.asymmetric(insertion: .slide, removal: .identity))
@@ -470,7 +470,7 @@ struct NewItemsView: View {
                                     }
 
                                 } label: {
-                                    Label("アイテムを編集する", systemImage: "pencil.line")
+                                    Label("タグを編集する", systemImage: "pencil.line")
                                 }
 
                                 Button("Delete", role: .destructive) {
@@ -499,22 +499,22 @@ struct NewItemsView: View {
             
             /// Add Tag
             Button {
-                
                 withAnimation(.easeInOut(duration: 0.3)) {
                     inputTab.selectedTag = nil
                     tagVM.showEdit = true
                 }
             } label: {
-                ZStack {
-                    Image(systemName: "plus.app.fill")
-                        .foregroundColor(userVM.memberColor.color3)
-                        .shadow(radius: 1, x: 1, y: 1)
-                        .shadow(radius: 1, x: 1, y: 1)
-
-                    Image(systemName: "plus")
-                        .font(.caption2)
-                        .foregroundColor(.white)
-                }
+                Image(systemName: "plus")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 7)
+                    .foregroundColor(.gray)
+                    .padding(6)
+                    .background {
+                        Circle()
+                        .fill(.white.gradient)
+                        .shadow(radius: 3, x: 1, y: 1)
+                    }
             }
             .padding(.leading, 5)
             .padding(.trailing, 15)

@@ -377,7 +377,7 @@ struct NewHomeView: View {
 
 }
 
-struct CustomizeHomePartsButtons: View {
+fileprivate struct CustomizeHomePartsButtons: View {
 
     var show: Bool
     @Binding var desplay: Bool

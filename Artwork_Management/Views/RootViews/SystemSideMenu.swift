@@ -148,39 +148,45 @@ struct SystemSideMenu: View {
                                     if inputSideMenu.tag {
                                         
                                         if tagVM.tags.count > 2 {
-                                            Button(action: {
+                                            Button {
                                                 withAnimation {
                                                     inputSideMenu.editMode = inputSideMenu.editMode.isEditing ? .inactive : .active
                                                 }
-                                            }, label: {
-                                                Text(inputSideMenu.editMode.isEditing ? "終了" : "編集")
-                                            })
-                                            .background(
-                                                Capsule()
-                                                    .fill(.black)
-                                                    .scaleEffect(1.3)
-                                                    .opacity(0.2)
-                                                    .shadow(color: .black, radius: 3, x: 1, y: 1)
-                                            )
+                                            } label: {
+                                                Image(systemName: inputSideMenu.editMode.isEditing ? "gearshape.fill" : "gearshape")
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .frame(width: 18)
+                                                    .foregroundColor(.gray)
+                                                    .padding(4)
+                                                    .background {
+                                                        Circle()
+                                                        .fill(.white.gradient)
+                                                        .shadow(radius: 3, x: 1, y: 1)
+                                                    }
+                                            }
                                             .offset(x: 20)
                                         }
-                                        
+
                                         Button {
                                             withAnimation(.easeInOut(duration: 0.3)) {
                                                 inputTab.selectedTag = nil
                                                 tagVM.showEdit = true
                                             }
                                         } label: {
-                                            Image(systemName: "plus.square")
+                                            Image(systemName: "plus")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 12)
+                                                .foregroundColor(.gray)
+                                                .padding(6)
+                                                .background {
+                                                    Circle()
+                                                    .fill(.white.gradient)
+                                                    .shadow(radius: 3, x: 1, y: 1)
+                                                }
                                         }
-                                        .background(
-                                            Circle()
-                                                .fill(.black)
-                                                .scaleEffect(1.5)
-                                                .opacity(0.2)
-                                                .shadow(color: .black, radius: 3, x: 1, y: 1)
-                                        )
-                                        .offset(x: 35)
+                                        .offset(x: 27)
                                     }
                                 } // HStack
                                 
@@ -197,7 +203,9 @@ struct SystemSideMenu: View {
                                                     HStack {
                                                         Image(systemName: "tag.fill")
                                                             .font(.caption)
-                                                            .foregroundColor(tag.tagColor.color)
+                                                            .foregroundColor(
+                                                                userVM.user?.userColor.colorAccent ?? .gray
+                                                            )
                                                             .opacity(0.6)
                                                         
                                                         Text(tag.tagName)
