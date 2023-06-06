@@ -41,17 +41,16 @@ class TagViewModel: ObservableObject {
                 return
             }
 
-            withAnimation {
             self.tags = documents.compactMap { (snap) -> Tag? in
 
-                    do {
-                        return try snap.data(as: Tag.self, with: .estimate)
-                    } catch {
-                        print("Error: try snap.data(as: Tag.self, with: .estimate)")
-                        return Tag(oderIndex: 1, tagName: "???", tagColor: .gray)
-                    }
+                do {
+                    return try snap.data(as: Tag.self, with: .estimate)
+                } catch {
+                    print("Error: try snap.data(as: Tag.self, with: .estimate)")
+                    return Tag(oderIndex: 1, tagName: "???", tagColor: .gray)
                 }
             }
+            
 
             self.tags.sort { $0.oderIndex < $1.oderIndex }
 

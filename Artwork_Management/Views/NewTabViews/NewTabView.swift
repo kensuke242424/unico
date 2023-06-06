@@ -7,6 +7,7 @@
 
 import SwiftUI
 import ResizableSheet
+import Introspect
 
 struct InputTab {
     // 各設定Viewの表示を管理するプロパティ
@@ -95,8 +96,12 @@ struct NewTabView: View {
                                 inputTab.scrollProgress = max(min(pageProgress, 0), -CGFloat(Tab.allCases.count - 1))
                                 inputTab.animationOpacity = -inputTab.scrollProgress
                             }
-                    }
+                    } // TabView
                     .tabViewStyle(.page(indexDisplayMode: .never))
+                    .introspectScrollView { scrollView in
+                         scrollView.isDirectionalLockEnabled = true
+                         scrollView.bounces = false
+                    }
                 }
                 .sheet(isPresented: $inputTab.showPickerView) {
                     PHPickerView(captureImage: $inputTab.captureBackgroundImage,

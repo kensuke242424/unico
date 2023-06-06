@@ -46,6 +46,12 @@ struct NewItemsView: View {
 
     /// アイテムカードの高さ
     @State var cardHeight: CGFloat = 0
+
+    var selectedItemName: String {
+        guard let selectedItem else { return "" }
+        let getName = selectedItem.name != "" ? selectedItem.name : "No Name"
+        return getName
+    }
     
     var body: some View {
         GeometryReader {
@@ -69,8 +75,6 @@ struct NewItemsView: View {
                             })) { item in
                             ItemsCardView(item)
                                     .opacity(showDetailView && inputTab.selectedItem != item ? 0 : 1)
-                                    .onAppear {print("ItemCardsView_onAppear: \(item.name)") }
-                                    .onDisappear {print("ItemCardsView_onDisapper: \(item.name)") }
                                     .onTapGesture {
                                         withAnimation(.easeInOut(duration: 0.25)) {
                                             guard let actionIndex = getActionIndex(item) else {
@@ -124,7 +128,7 @@ struct NewItemsView: View {
                                         }
                                         .foregroundColor(.red)
                                     } message: {
-                                        Text("\(selectedItem?.name ?? itemVM.emptyName)を削除しますか？")
+                                        Text("\(selectedItemName)を削除しますか？")
                                     } // alert
                             } // ForEath
                         
