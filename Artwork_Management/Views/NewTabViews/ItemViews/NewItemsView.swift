@@ -40,6 +40,9 @@ struct NewItemsView: View {
     @State private var animateCurrentItem: Bool = false
     @State private var filterFavorite    : Bool = false
 
+    @State private var showDeleteAlert: Bool = false
+    @State private var showImpossibleAlert: Bool = false
+
     /// アイテムカードの高さ
     let cardHeight: CGFloat = 200
     
@@ -64,29 +67,65 @@ struct NewItemsView: View {
                                 
                             })) { item in
                             ItemsCardView(item)
-                                .onAppear {print("ItemCardsView_onAppear: \(item.name)") }
-                                .onDisappear {print("ItemCardsView_onDisapper: \(item.name)") }
-                                .onTapGesture {
-                                    withAnimation(.easeInOut(duration: 0.25)) {
-                                        guard let actionIndex = getActionIndex(item) else {
-                                            return
+                                    .opacity(showDetailView && inputTab.selectedItem != item ? 0 : 1)
+                                    .onAppear {print("ItemCardsView_onAppear: \(item.name)") }
+                                    .onDisappear {print("ItemCardsView_onDisapper: \(item.name)") }
+                                    .onTapGesture {
+                                        withAnimation(.easeInOut(duration: 0.25)) {
+                                            guard let actionIndex = getActionIndex(item) else {
+                                                return
+                                            }
+                                            cartVM.actionItemIndex = actionIndex
+                                            animateCurrentItem        = true
+                                            showDarkBackground        = true
+                                            /// ✅ アニメーションにチラつきがあったため、二箇所で管理
+                                            selectedItem = item
+                                            inputTab.selectedItem = item
                                         }
-                                        cartVM.actionItemIndex = actionIndex
-                                        animateCurrentItem        = true
-                                        showDarkBackground        = true
-                                        /// ✅ アニメーションにチラつきがあったため、二箇所で管理
-                                        selectedItem = item
-                                        inputTab.selectedItem = item
-                                    }
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                                        withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.7, blendDuration: 0.7)) {
-                                            showDetailView.toggle()
-                                            inputTab.reportShowDetail = true
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                                            withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.7, blendDuration: 0.7)) {
+                                                showDetailView.toggle()
+                                                inputTab.reportShowDetail = true
+                                            }
                                         }
                                     }
-                                }
-                                .opacity(showDetailView && inputTab.selectedItem != item ? 0 : 1)
-                        } // ForEath
+                                    .contextMenu {
+                                        Button {
+                                            // アイテム編集
+                                            selectedItem = item
+                                            inputTab.selectedItem = item
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                                                navigationVM.path.append(EditItemPath.edit)
+                                            }
+                                        } label: {
+                                            Label("アイテムを編集する", systemImage: "pencil.line")
+                                        }
+                                        Button("Delete", role: .destructive) {
+                                            // アイテム削除
+                                            selectedItem = item
+                                            inputTab.selectedItem = item
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                                showDeleteAlert.toggle()
+                                            }
+                                        }
+                                    }
+                                    .alert("確認", isPresented: $showDeleteAlert) {
+                                        Button("削除", role: .destructive) {
+                                            // 一瞬ずらさないとアラートが瞬間だけ再表示されてしまう
+                                            guard let selectedItem else { return }
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                                Task {
+                                                    itemVM.deleteImage(path: selectedItem.photoPath)
+                                                    itemVM.deleteItem(deleteItem: selectedItem,
+                                                                      teamID: selectedItem.teamID)
+                                                }
+                                            }
+                                        }
+                                        .foregroundColor(.red)
+                                    } message: {
+                                        Text("\(selectedItem?.name ?? itemVM.emptyName)を削除しますか？")
+                                    } // alert
+                            } // ForEath
                         
                         if itemVM.items.isEmpty {
                             AddItemScrollContainerView(size: size)
@@ -122,9 +161,9 @@ struct NewItemsView: View {
                            animation: animation,
                            item: itemVM.items[cartVM.actionItemIndex],
                            cardHeight: cardHeight)
-                    .transition(.asymmetric(insertion: .identity, removal: .offset(y: 0)))
-                    .onAppear { print("カード詳細onAppear") }
-                    .onDisappear { print("カード詳細onDisappear") }
+                .transition(.asymmetric(insertion: .identity, removal: .offset(y: 0)))
+                .onAppear { print("カード詳細onAppear") }
+                .onDisappear { print("カード詳細onDisappear") }
             }
         }
         .overlay(alignment: .bottomTrailing) {
@@ -416,6 +455,42 @@ struct NewItemsView: View {
                                     activeTag = tag
                                 }
                             }
+                            .contextMenu {
+                                Button {
+                                    // タグ編集
+                                    if tag.tagName == "全て" || tag.tagName == "未グループ" {
+                                        showImpossibleAlert.toggle()
+                                        return
+                                    }
+                                    inputTab.selectedTag = tag
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                        withAnimation(.easeInOut(duration: 0.3)) {
+                                            tagVM.showEdit.toggle()
+                                        }
+                                    }
+
+                                } label: {
+                                    Label("アイテムを編集する", systemImage: "pencil.line")
+                                }
+
+                                Button("Delete", role: .destructive) {
+                                    // タグ削除
+                                    if tag.tagName == "全て" || tag.tagName == "未グループ" {
+                                        showImpossibleAlert.toggle()
+                                        return
+                                    }
+                                    withAnimation(.easeInOut(duration: 0.3)) {
+                                        tagVM.tags.removeAll(where: {$0 == tag})
+                                        tagVM.deleteTag(deleteTag: tag,
+                                                        teamID: teamVM.team!.id)
+                                    }
+                                }
+                            }
+                            .alert("", isPresented: $showImpossibleAlert) {
+                                Button("OK") {}
+                            } message: {
+                                Text("このタグは削除できません。")
+                            } // alert
                         
                     } // ForEath
                 } // HStack

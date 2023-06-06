@@ -41,13 +41,15 @@ class TagViewModel: ObservableObject {
                 return
             }
 
+            withAnimation {
             self.tags = documents.compactMap { (snap) -> Tag? in
 
-                do {
-                    return try snap.data(as: Tag.self, with: .estimate)
-                } catch {
-                    print("Error: try snap.data(as: Tag.self, with: .estimate)")
-                    return Tag(oderIndex: 1, tagName: "???", tagColor: .gray)
+                    do {
+                        return try snap.data(as: Tag.self, with: .estimate)
+                    } catch {
+                        print("Error: try snap.data(as: Tag.self, with: .estimate)")
+                        return Tag(oderIndex: 1, tagName: "???", tagColor: .gray)
+                    }
                 }
             }
 
@@ -110,7 +112,7 @@ class TagViewModel: ObservableObject {
         }
 
     }
-
+    /// タグの削除と同時に、紐づいていたアイテムのタグを「未グループ」に更新するメソッド
     func deleteTag(deleteTag: Tag, teamID: String) {
 
         guard let tagID = deleteTag.id else { return }
