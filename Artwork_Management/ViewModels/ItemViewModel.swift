@@ -24,6 +24,7 @@ class ItemViewModel: ObservableObject {
         print("タグ未グループアイテムの有無: \(result)")
         return result
     }
+    let emptyName: String = "No Name"
 
     func fetchItem(teamID: String) async {
 
@@ -43,9 +44,11 @@ class ItemViewModel: ObservableObject {
 
             // 取得できたアイテムをデコーダブル ⇨ Itemモデルを参照 ⇨ 「items」に詰めていく
             // with: ⇨ ServerTimestampを扱う際のオプションを指定
-            self.items = documents.compactMap { (snap) -> Item? in
+            withAnimation {
+                self.items = documents.compactMap { (snap) -> Item? in
 
-                return try? snap.data(as: Item.self, with: .estimate)
+                    return try? snap.data(as: Item.self, with: .estimate)
+                }
             }
         }
         print("fetchItem完了")
