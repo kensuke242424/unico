@@ -49,7 +49,7 @@ struct RootView: View {
     
     @State private var preloads: PreloadProperty = PreloadProperty()
 
-    @AppStorage("applicationDarkMode") var applicationDarkMode: Bool = false
+    @AppStorage("applicationDarkMode") var applicationDarkMode: Bool = true
 
     var body: some View {
 
