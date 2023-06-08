@@ -185,8 +185,11 @@ struct NewTabView: View {
                 }
                 /// サイドメニューView
                 .overlay {
-                    SystemSideMenu(itemVM: itemVM, inputTab: $inputTab)
-                        .offset(x: inputTab.showSideMenu ? 0 : -size.width)
+                    if inputTab.showSideMenu {
+                        SystemSideMenu(itemVM: itemVM, inputTab: $inputTab)
+                            .transition(AnyTransition.opacity.combined(with: .offset(x: -size.width)))
+//                            .offset(x: inputTab.showSideMenu ? 0 : -size.width)
+                    }
                 }
                 /// 🏷タグの追加や編集を行うView
                 .overlay {
@@ -480,9 +483,6 @@ struct SelectBackgroundView: View {
 
     @EnvironmentObject var teamVM: TeamViewModel
     @Binding var inputTab: InputTab
-//    @Binding var select: SelectBackground
-//    @Binding var isShow: Bool = false
-//    @Binding var captureImage: UIImage
 
     @State private var showContents: Bool = false
     @State private var showProgress: Bool = false

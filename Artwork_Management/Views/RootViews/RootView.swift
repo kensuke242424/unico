@@ -143,6 +143,7 @@ struct RootView: View {
                         /// ホーム画面へ遷移
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                             withAnimation(.spring(response: 1)) {
+                                progressVM.showCubesProgress = false
                                 logInVM.rootNavigation = .home
                                 /// ログインが完了したら、LogInViewの操作フローを初期化
                                 logInVM.createAccountFase          = .start

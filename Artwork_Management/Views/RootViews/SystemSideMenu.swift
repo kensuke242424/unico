@@ -47,7 +47,7 @@ struct SystemSideMenu: View {
     @StateObject var itemVM: ItemViewModel
     
     @EnvironmentObject var navigationVM: NavigationViewModel
-    @EnvironmentObject var progress: ProgressViewModel
+    @EnvironmentObject var progressVM: ProgressViewModel
     @EnvironmentObject var homeVM: HomeViewModel
 
     @EnvironmentObject var logInVM : LogInViewModel
@@ -86,6 +86,27 @@ struct SystemSideMenu: View {
                         .padding(.trailing, 90)
                         .padding(.top, getSafeArea().top + 10)
                 }
+                .alert("", isPresented: $inputSideMenu.isShowChangeTeamAlert) {
+                    Button("キャンセル") {}
+                    Button("移動する") {
+                        // フェッチするチームデータを管理するUserModel内のlastLogInの値を更新後に、再fetchを実行
+                        Task {
+                            inputSideMenu.showChangeTeamSheet = false
+                            await userVM.updateLastLogInTeam(selected: inputSideMenu.selectedTeam)
+                            withAnimation(.spring(response: 0.5)) {
+                                progressVM.showCubesProgress = true
+                                inputTab.showSideMenu = false
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                withAnimation(.spring(response: 0.2)) {
+                                    logInVM.rootNavigation = .fetch
+                                }
+                            }
+                        }
+                    }
+                } message: {
+                    Text("\(inputSideMenu.selectedTeam?.name ?? "No Name")に移動しますか？")
+                } // team change Alert
 
             VStack {
 
@@ -357,9 +378,9 @@ struct SystemSideMenu: View {
                                     .alert("確認", isPresented: $inputSideMenu.isShowLogOutAlert) {
                                         Button("戻る") { inputSideMenu.isShowLogOutAlert.toggle() }
                                         Button("ログアウト") {
-                                            progress.showLoading.toggle()
+                                            progressVM.showLoading.toggle()
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                                                progress.showLoading.toggle()
+                                                progressVM.showLoading.toggle()
                                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                                     withAnimation(.easeIn(duration: 0.5)) {
                                                         logInVM.rootNavigation = .logIn
@@ -437,18 +458,6 @@ struct SystemSideMenu: View {
         }
         .sheet(isPresented: $inputSideMenu.showUserEntrySheet) {
             UserEntryRecommendationView(isShow: $inputSideMenu.showUserEntrySheet)
-        }
-        .alert("", isPresented: $inputSideMenu.isShowChangeTeamAlert) {
-            Button("戻る") {}
-            Button("移動する") {
-                // lastLogInの値を更新してからfetch処理を実行
-                Task {
-                    await userVM.updateLastLogInTeam(selected: inputSideMenu.selectedTeam)
-                    withAnimation(.spring(response: 0.5)) { logInVM.rootNavigation = .fetch }
-                }
-            }
-        } message: {
-            Text("\(inputSideMenu.selectedTeam?.name ?? "No Name")に移動しますか？")
         }
         // NOTE: ローカルのタグ順番操作をfirestoreに保存
         .onChange(of: inputSideMenu.editMode) { newEdit in
@@ -537,35 +546,6 @@ struct SystemSideMenu: View {
                                             inputSideMenu.selectedTeam = teamRow
                                             inputSideMenu.showdeleteTeamAlert.toggle()
                                         }
-                                        .alert("確認", isPresented: $inputSideMenu.showdeleteTeamAlert) {
-                                            Button("削除する", role: .destructive) {
-                                                
-                                                Task {
-                                                    guard let selectedTeam = inputSideMenu.selectedTeam else { return }
-                                                    inputSideMenu.showdeletedAllTeamProgress = true
-                                                    try await userVM.deleteMembersJoinTeam(selected: selectedTeam,
-                                                                                           members : teamVM.team!.members)
-                                                    
-                                                    await teamVM.deleteAllTeamImages()
-                                                    await itemVM.deleteAllItemImages()
-                                                    await teamVM.deleteSelectedTeamDocuments(selected: selectedTeam)
-                                                    inputSideMenu.showdeletedAllTeamProgress = false
-                                                    //TODO: 削除完了アラートが表示されないぞ？？？
-                                                    inputSideMenu.showdeletedAllTeamAlert = true
-                                                    
-                                                }
-                                            }
-                                        } message: {
-                                            Text("チーム内のアイテム、タグ、メンバー情報を含めた全てのデータを消去します。チーム削除を実行しますか？")
-                                        } // alert
-                                        .alert("", isPresented: $inputSideMenu.showdeletedAllTeamAlert) {
-                                            Button("OK") {
-                                                // TODO: 他のチームデータをfetch
-                                                // 他のチームが存在しなければ、チーム作成画面へ遷移
-                                            }
-                                        } message: {
-                                            Text("チームデータの消去が完了しました")
-                                        } // alert
                                 }
                                 SDWebImageCircleIcon(imageURL: teamRow.iconURL,
                                                      width: 50, height: 50)
@@ -578,22 +558,59 @@ struct SystemSideMenu: View {
                                 inputSideMenu.selectedTeam = teamRow
                                 inputSideMenu.isShowChangeTeamAlert.toggle()
                             }
-                            .alert("", isPresented: $inputSideMenu.isShowChangeTeamAlert) {
-                                Button("キャンセル") {}
-                                Button("移動する") {
-                                    // フェッチするチームデータを管理するUserModel内のlastLogInの値を更新後に、再fetchを実行
-                                    Task {
-                                        inputSideMenu.showChangeTeamSheet = false
-                                        await userVM.updateLastLogInTeam(selected: inputSideMenu.selectedTeam)
-                                        withAnimation(.spring(response: 0.2)) { logInVM.rootNavigation = .fetch }
-                                    }
-                                }
-                            } message: {
-                                Text("\(inputSideMenu.selectedTeam?.name ?? "No Name")に移動しますか？")
-                            }
                         } // ForEath
                     } // List
                     .offset(y: -30)
+                    .alert("確認", isPresented: $inputSideMenu.showdeleteTeamAlert) {
+                        Button("削除する", role: .destructive) {
+
+                            Task {
+                                guard let selectedTeam = inputSideMenu.selectedTeam else { return }
+                                inputSideMenu.showdeletedAllTeamProgress = true
+                                try await userVM.deleteMembersJoinTeam(selected: selectedTeam,
+                                                                       members : teamVM.team!.members)
+
+                                await teamVM.deleteAllTeamImages()
+                                await itemVM.deleteAllItemImages()
+                                await teamVM.deleteSelectedTeamDocuments(selected: selectedTeam)
+                                inputSideMenu.showdeletedAllTeamProgress = false
+                                //TODO: 削除完了アラートが表示されないぞ？？？
+                                inputSideMenu.showdeletedAllTeamAlert = true
+
+                            }
+                        }
+                    } message: {
+                        Text("チーム内のアイテム、タグ、メンバー情報を含めた全てのデータを消去します。チーム削除を実行しますか？")
+                    } // alert
+                    .alert("", isPresented: $inputSideMenu.showdeletedAllTeamAlert) {
+                        Button("OK") {
+                            // TODO: 他のチームデータをfetch
+                            // 他のチームが存在しなければ、チーム作成画面へ遷移
+                        }
+                    } message: {
+                        Text("チームデータの消去が完了しました")
+                    } // team delete Alert
+                    .alert("", isPresented: $inputSideMenu.isShowChangeTeamAlert) {
+                        Button("キャンセル") {}
+                        Button("移動する") {
+                            // フェッチするチームデータを管理するUserModel内のlastLogInの値を更新後に、再fetchを実行
+                            Task {
+                                inputSideMenu.showChangeTeamSheet = false
+                                await userVM.updateLastLogInTeam(selected: inputSideMenu.selectedTeam)
+                                withAnimation(.spring(response: 0.5)) {
+                                    progressVM.showCubesProgress = true
+                                    inputTab.showSideMenu = false
+                                }
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                    withAnimation(.spring(response: 0.2)) {
+                                        logInVM.rootNavigation = .fetch
+                                    }
+                                }
+                            }
+                        }
+                    } message: {
+                        Text("\(inputSideMenu.selectedTeam?.name ?? "No Name")に移動しますか？")
+                    } // team change Alert
                 }
             }
             .toolbar {
