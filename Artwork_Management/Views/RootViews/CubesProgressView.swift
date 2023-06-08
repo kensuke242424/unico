@@ -9,8 +9,6 @@ import SwiftUI
 
 struct CubesProgressView: View {
 
-    @EnvironmentObject var userVM: UserViewModel
-
     private let columnsV: [GridItem] = Array(repeating: .init(.flexible()), count: 4)
     @State private var memberColor: ThemeColor = .blue
     @State private var cubeColors: [ThemeColor] = []
@@ -58,6 +56,5 @@ struct CubesProgressView: View {
 struct StandByView_Previews: PreviewProvider {
     static var previews: some View {
         CubesProgressView()
-            .environmentObject(UserViewModel())
     }
 }
