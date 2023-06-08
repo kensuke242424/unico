@@ -90,6 +90,7 @@ struct RootView: View {
                     NewEditItemView(itemVM: itemVM, passItem: nil)
                     CreateAndJoinTeamView()
                     PHPickerView(captureImage: $preloads.captureImage, isShowSheet: $preloads.showSheet)
+                    NewItemsView(itemVM: itemVM,  cartVM: cartVM, inputTab: $preloadVM.inputTab)
                 }
                 .opacity(0)
             }

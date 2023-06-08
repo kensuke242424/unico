@@ -13,6 +13,7 @@ class PreloadViewModel: ObservableObject {
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
     @Published var itemVM: ItemViewModel?
+    @Published var inputTab = InputTab()
 
     /// 背景画像のプリロード発火を管理するプロパティ
     /// 実際のロードを受け持つSDWebImageはビュー側で定義する

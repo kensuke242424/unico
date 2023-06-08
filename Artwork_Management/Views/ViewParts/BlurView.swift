@@ -22,3 +22,9 @@ struct BlurView: UIViewRepresentable {
         //
     }
 }
+
+struct BlurView_Previews: PreviewProvider {
+    static var previews: some View {
+        BlurView(style: .systemChromeMaterialDark)
+    }
+}

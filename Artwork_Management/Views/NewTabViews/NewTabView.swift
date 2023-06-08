@@ -146,16 +146,17 @@ struct NewTabView: View {
                                                width : proxy.size.width,
                                                height: proxy.size.height)
                                 .ignoresSafeArea()
-//                                .blur(radius: inputTab.animationTab == .home ? 0 : 4, opaque: true)
-                                .blur(radius: min((-inputTab.scrollProgress * 4), 4), opaque: true)
                                 .blur(radius: homeVM.isActiveEdit ? 5 : 0, opaque: true)
                                 .blur(radius: inputTab.pressingAnimation ? 6 : 0, opaque: true)
                                 .overlay {
                                     if homeVM.isActiveEdit {
-                                        Color.black
-                                            .opacity(0.4)
+                                        Color.black.opacity(0.4)
                                             .ignoresSafeArea()
                                     }
+                                }
+                                .overlay {
+                                    BlurMaskingImageView(imageURL: teamVM.team?.backgroundURL)
+                                        .opacity(inputTab.animationTab != .home ? 1 : 0)
                                 }
                             }
                         }
@@ -390,10 +391,17 @@ struct NewTabView: View {
                     .tracking(4)
                     .scaleEffect(inputTab.animationTab == tab ? 1.0 : 0.5)
                     .foregroundColor(applicationDarkMode ? .white : .black)
-                    .opacity(inputTab.animationTab == tab ? 1 : 0.2)
+                    .opacity(inputTab.animationTab == tab ? 1 : 0.5)
                     .frame(width: tabWidth)
                     .contentShape(Rectangle())
                     .padding(.top, 60)
+                    .onTapGesture(perform: {
+                        if tab == .home && inputTab.selectionTab == .item {
+                            inputTab.selectionTab = .item
+                        } else if tab == .item && inputTab.selectionTab == .home {
+                            inputTab.selectionTab = .home
+                        }
+                    })
                 }
             }
             .frame(width: CGFloat(Tab.allCases.count) * tabWidth)
@@ -463,9 +471,8 @@ struct NewTabView: View {
             Color.clear
                 .overlay {
                     BlurView(style: .systemUltraThinMaterial)
+                        .opacity(inputTab.animationTab == .home ? 0 : 1)
                         .ignoresSafeArea()
-//                        .opacity(inputTab.animationTab == .home ? 0 : 1)
-                        .opacity(min(-inputTab.scrollProgress, 1))
                 }
         )
     }
@@ -598,7 +605,7 @@ struct SelectBackgroundView: View {
     @ViewBuilder
     func ScrollBackgroundImages() -> some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 30) {
+            LazyHStack(spacing: 30) {
                 ForEach(SelectBackground.allCases, id: \.self) { value in
                     Group {
                         if value == .original {

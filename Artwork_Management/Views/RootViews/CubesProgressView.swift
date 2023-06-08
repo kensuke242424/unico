@@ -19,8 +19,10 @@ struct CubesProgressView: View {
 
             GradientBackbround(color1: memberColor.color1,
                                color2: memberColor.colorAccent)
+            .frame(width: getRect().width, height: getRect().height)
             .opacity(0.5)
             .background(.thickMaterial)
+            .ignoresSafeArea()
 
             VStack(spacing: 70) {
 
@@ -40,7 +42,6 @@ struct CubesProgressView: View {
                 .frame(width: getRect().width - 60)
             } // VStack
         }
-        .preferredColorScheme(.dark)
         // カラーをランダムで取り出し、キューブビューに割り当てる
         .onAppear {
             for _ in 0...3 {
