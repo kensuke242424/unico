@@ -166,11 +166,6 @@ struct SystemSideMenu: View {
                                                     }
                                             }
                                             .offset(x: 20)
-                                            .onChange(of: inputTab.showSideMenu) { newValue in
-                                                if !newValue {
-                                                    inputSideMenu.editMode = .inactive
-                                                }
-                                            }
                                         }
 
                                         Button {
@@ -194,6 +189,11 @@ struct SystemSideMenu: View {
                                         .offset(x: 27)
                                     }
                                 } // HStack
+                                .onChange(of: inputSideMenu.tag) { newValue in
+                                    if !newValue {
+                                        inputSideMenu.editMode = .inactive
+                                    }
+                                }
                                 
                                 if inputSideMenu.tag {
                                     
@@ -248,7 +248,7 @@ struct SystemSideMenu: View {
                                             .onMove(perform: rowReplace)
                                         } // List
                                         .environment(\.editMode, $inputSideMenu.editMode)
-                                        .frame(width: UIScreen.main.bounds.width * 0.58,
+                                        .frame(width: UIScreen.main.bounds.width / 2 + 70,
                                                height: menuRowHeight + (40 * CGFloat(tagVM.tags.count - 2)))
                                         .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
                                         .scrollContentBackground(.hidden)
