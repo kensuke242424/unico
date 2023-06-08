@@ -36,6 +36,14 @@ struct InputTab {
     var animationOpacity: CGFloat = 1
     var animationScale  : CGFloat = 1
     var scrollProgress  : CGFloat = .zero
+    var tabIndex: Int {
+        switch selectionTab {
+        case .home:
+            return 0
+        case .item:
+            return 1
+        }
+    }
     /// MEMO: ItemsTab内でDetailが開かれている間はTopNavigateBarを隠すためのプロパティ
     var reportShowDetail: Bool = false
     
@@ -77,25 +85,9 @@ struct NewTabView: View {
                     TabView(selection: $inputTab.selectionTab) {
                         NewHomeView(itemVM: itemVM, inputTab: $inputTab)
                             .tag(Tab.home)
-                            .offsetX(inputTab.selectionTab == Tab.home) { rect in
-                                let minX = rect.minX
-                                let pageOffset = minX - (size.width * CGFloat(Tab.home.index))
-                                let pageProgress = pageOffset / size.width
-                                
-                                inputTab.scrollProgress = max(min(pageProgress, 0), -CGFloat(Tab.allCases.count - 1))
-                                inputTab.animationOpacity = 1 - -inputTab.scrollProgress
-                            }
 
                         NewItemsView(itemVM: itemVM,  cartVM: cartVM, inputTab: $inputTab)
                             .tag(Tab.item)
-                            .offsetX(inputTab.selectionTab == Tab.item) { rect in
-                                let minX = rect.minX
-                                let pageOffset = minX - (size.width * CGFloat(Tab.item.index))
-                                let pageProgress = pageOffset / size.width
-
-                                inputTab.scrollProgress = max(min(pageProgress, 0), -CGFloat(Tab.allCases.count - 1))
-                                inputTab.animationOpacity = -inputTab.scrollProgress
-                            }
                     } // TabView
                     .tabViewStyle(.page(indexDisplayMode: .never))
                     .introspectScrollView { scrollView in
@@ -107,14 +99,15 @@ struct NewTabView: View {
                     PHPickerView(captureImage: $inputTab.captureBackgroundImage,
                                  isShowSheet : $inputTab.showPickerView)
                 }
+                /// TabViewに紐づけているプロパティをアニメーションのトリガーとして使えないため
                 .onChange(of: inputTab.selectionTab) { _ in
                     switch inputTab.selectionTab {
                     case .home:
-                        withAnimation(.easeInOut(duration: 0.2)) {
+                        withAnimation(.spring(response: 0.4)) {
                             inputTab.animationTab = .home
                         }
                     case .item:
-                        withAnimation(.spring(response: 0.2)) {
+                        withAnimation(.spring(response: 0.4)) {
                             inputTab.animationTab = .item
                         }
                     }
@@ -153,6 +146,7 @@ struct NewTabView: View {
                                                width : proxy.size.width,
                                                height: proxy.size.height)
                                 .ignoresSafeArea()
+//                                .blur(radius: inputTab.animationTab == .home ? 0 : 4, opaque: true)
                                 .blur(radius: min((-inputTab.scrollProgress * 4), 4), opaque: true)
                                 .blur(radius: homeVM.isActiveEdit ? 5 : 0, opaque: true)
                                 .blur(radius: inputTab.pressingAnimation ? 6 : 0, opaque: true)
@@ -185,11 +179,8 @@ struct NewTabView: View {
                 }
                 /// サイドメニューView
                 .overlay {
-                    if inputTab.showSideMenu {
                         SystemSideMenu(itemVM: itemVM, inputTab: $inputTab)
-                            .transition(AnyTransition.opacity.combined(with: .offset(x: -size.width)))
-//                            .offset(x: inputTab.showSideMenu ? 0 : -size.width)
-                    }
+                            .offset(x: inputTab.showSideMenu ? 0 : -size.width)
                 }
                 /// 🏷タグの追加や編集を行うView
                 .overlay {
@@ -384,6 +375,7 @@ struct NewTabView: View {
 
     } // body
     @ViewBuilder
+    /// タブビューのカスタムトップナビゲーションバー
     func TabTopBarView() -> some View {
         GeometryReader {
             let size = $0.size
@@ -406,7 +398,7 @@ struct NewTabView: View {
             }
             .frame(width: CGFloat(Tab.allCases.count) * tabWidth)
             .padding(.leading, tabWidth)
-            .offset(x: inputTab.scrollProgress * tabWidth)
+            .offset(x: CGFloat(inputTab.animationTab.index) * -tabWidth)
             .overlay {
                 HStack {
                     /// Homeタブに移動した時に表示するチームアイコン
@@ -472,6 +464,7 @@ struct NewTabView: View {
                 .overlay {
                     BlurView(style: .systemUltraThinMaterial)
                         .ignoresSafeArea()
+//                        .opacity(inputTab.animationTab == .home ? 0 : 1)
                         .opacity(min(-inputTab.scrollProgress, 1))
                 }
         )
