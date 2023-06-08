@@ -40,7 +40,7 @@ struct RootView: View {
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var tagVM: TagViewModel
     @EnvironmentObject var preloadVM: PreloadViewModel
-    
+
     @StateObject var itemVM: ItemViewModel = ItemViewModel()
     @StateObject var cartVM: CartViewModel = CartViewModel()
 
@@ -272,5 +272,6 @@ struct RootView_Previews: PreviewProvider {
             .environmentObject(ItemViewModel())
             .environmentObject(TagViewModel())
             .environmentObject(ProgressViewModel())
+            .environmentObject(PreloadViewModel())
     }
 }
