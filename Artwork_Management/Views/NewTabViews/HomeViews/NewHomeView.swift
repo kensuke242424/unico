@@ -54,7 +54,6 @@ struct NewHomeView: View {
 
         GeometryReader {
             let size = $0.size
-            let rect = $0.frame(in: .global)
             
             VStack {
 
@@ -192,13 +191,6 @@ struct NewHomeView: View {
                             guard let user = userVM.user else { return }
                             guard let getIndex = currentTeamIndex else { return }
 
-//                            withAnimation(.interactiveSpring(response: 0.7,
-//                                                             dampingFraction: 1,
-//                                                             blendDuration: 1)) {
-//                                nowTime = user.joins[getIndex].homeEdits.nowTime
-//                                teamNews = user.joins[getIndex].homeEdits.teamNews
-//                            }
-
                             withAnimation(.spring(response: 0.7, blendDuration: 1)) {
                                 nowTime = user.joins[getIndex].homeEdits.nowTime
                                 teamNews = user.joins[getIndex].homeEdits.teamNews
@@ -299,8 +291,6 @@ struct NewHomeView: View {
          VStack {
             GeometryReader {
                 let size = $0.size
-                let local = $0.frame(in: .local)
-                let global = $0.frame(in: .global)
 
                 ZStack {
                     VStack(alignment: .leading, spacing: 60) {

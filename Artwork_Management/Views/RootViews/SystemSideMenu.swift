@@ -156,7 +156,7 @@ struct SystemSideMenu: View {
                                                 Image(systemName: inputSideMenu.editMode.isEditing ? "gearshape.fill" : "gearshape")
                                                     .resizable()
                                                     .scaledToFit()
-                                                    .frame(width: 18)
+                                                    .frame(width: 16)
                                                     .foregroundColor(.gray)
                                                     .padding(4)
                                                     .background {
@@ -177,7 +177,7 @@ struct SystemSideMenu: View {
                                             Image(systemName: "plus")
                                                 .resizable()
                                                 .scaledToFit()
-                                                .frame(width: 12)
+                                                .frame(width: 10)
                                                 .foregroundColor(.gray)
                                                 .padding(6)
                                                 .background {
@@ -243,7 +243,7 @@ struct SystemSideMenu: View {
                                             .onMove(perform: rowReplace)
                                         } // List
                                         .environment(\.editMode, $inputSideMenu.editMode)
-                                        .frame(width: UIScreen.main.bounds.width * 0.58,
+                                        .frame(width: UIScreen.main.bounds.width * 0.6,
                                                height: menuRowHeight + (40 * CGFloat(tagVM.tags.count - 2)))
                                         .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
                                         .scrollContentBackground(.hidden)
@@ -714,8 +714,8 @@ struct SideMenuShape: Shape {
             path.move(to: CGPoint(x: width, y: 0))
 
             path.addCurve(to: CGPoint(x: width, y: height + 100),
-                          control1: CGPoint(x: width + 150, y: height / 3),
-                          control2: CGPoint(x: width - 150, y: height / 2))
+                          control1: CGPoint(x: width + 100, y: height / 3),
+                          control2: CGPoint(x: width - 100, y: height / 2))
 
         }
     }

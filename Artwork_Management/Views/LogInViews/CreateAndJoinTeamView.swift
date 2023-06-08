@@ -173,7 +173,7 @@ struct CreateAndJoinTeamView: View {
                         .frame(height: 60)
                         .padding(.top, 20)
                     }
-                    .padding(.bottom, 40)
+                    .padding(.bottom, selectTeamFase == .success ? 0 : 40)
                 }
 
                 // create team contents...
@@ -372,9 +372,6 @@ struct CreateAndJoinTeamView: View {
                         resizedBackgroundImage = logInVM.resizeUIImage(image: UIImage(named: pickUpRandomBackground.imageName),
                                                                        width: getRect().width * 4)
                         
-                        print("resizedIconImage: \(resizedIconImage)")
-                        print("resizedBackgroundImage: \(resizedBackgroundImage)")
-                        
                         /// リサイズ処理した画像をFirestorageに保存
                         let uplaodIconImageData       = await teamVM.firstUploadTeamImage(resizedIconImage,
                                                                                           id: createTeamID)
@@ -404,7 +401,7 @@ struct CreateAndJoinTeamView: View {
                         try await teamVM.addTeam(teamData: teamData)
                         try await userVM.addNewJoinTeam(newJoinTeam: joinTeamData)
 
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                             withAnimation(.spring(response: 1)) {
                                 selectTeamFase = .success
                             }

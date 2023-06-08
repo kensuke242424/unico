@@ -58,7 +58,7 @@ struct NewTabView: View {
     /// View Properties
     @State private var inputTab = InputTab()
 
-    @AppStorage("applicationDarkMode") var applicationDarkMode: Bool = false
+    @AppStorage("applicationDarkMode") var applicationDarkMode: Bool = true
 
     var body: some View {
 
@@ -487,7 +487,7 @@ struct SelectBackgroundView: View {
     @State private var showContents: Bool = false
     @State private var showProgress: Bool = false
 
-    @AppStorage("applicationDarkMode") var applicationDarkMode: Bool = false
+    @AppStorage("applicationDarkMode") var applicationDarkMode: Bool = true
 
     var body: some View {
 
