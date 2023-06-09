@@ -356,9 +356,9 @@ struct CreateAndJoinTeamView: View {
                         var resizedIconImage      : UIImage?
                         var resizedBackgroundImage: UIImage?
                         // チーム作成時にリソースからランダムで背景をピックアップする。(.originalにImagenameは無いため、除かれる)
-                        var pickUpRandomBackground: SelectBackground = .original
-                        while pickUpRandomBackground == SelectBackground.original {
-                            pickUpRandomBackground = SelectBackground.allCases.randomElement()!
+                        var pickUpRandomBackground: TeamBackgroundContents = .original
+                        while pickUpRandomBackground == TeamBackgroundContents.original {
+                            pickUpRandomBackground = TeamBackgroundContents.allCases.randomElement()!
                             print("ランダム選出された背景: \(pickUpRandomBackground.imageName)")
                         }
 
@@ -400,6 +400,7 @@ struct CreateAndJoinTeamView: View {
                         
                         try await teamVM.addTeam(teamData: teamData)
                         try await userVM.addNewJoinTeam(newJoinTeam: joinTeamData)
+                            await teamVM.setSampleItem(teamID: teamData.id)
 
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                             withAnimation(.spring(response: 1)) {

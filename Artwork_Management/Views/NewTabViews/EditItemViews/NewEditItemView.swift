@@ -495,7 +495,7 @@ struct NewEditItemView: View {
 
 struct NewEditItemView_Previews: PreviewProvider {
     static var previews: some View {
-        NewEditItemView(itemVM: ItemViewModel(), passItem: testItem.first)
+        NewEditItemView(itemVM: ItemViewModel(), passItem: sampleItems.first)
             .environmentObject(TagViewModel())
     }
 }

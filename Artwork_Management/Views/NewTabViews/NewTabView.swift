@@ -28,7 +28,7 @@ struct InputTab {
     var showSelectBackground: Bool = false
     var checkBackgroundToggle: Bool = false
     var checkBackgroundAnimation: Bool = false
-    var selectBackground: SelectBackground = .original
+    var selectBackground: TeamBackgroundContents = .original
     
     /// タブViewのアニメーションを管理するプロパティ
     var selectionTab    : Tab = .home
@@ -606,7 +606,7 @@ struct SelectBackgroundView: View {
     func ScrollBackgroundImages() -> some View {
         ScrollView(.horizontal, showsIndicators: false) {
             LazyHStack(spacing: 30) {
-                ForEach(SelectBackground.allCases, id: \.self) { value in
+                ForEach(TeamBackgroundContents.allCases, id: \.self) { value in
                     Group {
                         if value == .original {
                             Group {
