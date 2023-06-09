@@ -200,7 +200,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
     @EnvironmentObject var teamVM : TeamViewModel
     @EnvironmentObject var userVM : UserViewModel
 
-    @StateObject var backgroundVM: BackgroundViewMOdel
+    @EnvironmentObject var backgroundVM: BackgroundViewModel
     
     @State private var logInNavigationPath: [Navigation] = []
     @State private var inputLogIn: InputLogIn = InputLogIn()
@@ -1328,6 +1328,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
 
 struct LogInView_Previews: PreviewProvider {
     static var previews: some View {
-        LogInView(backgroundVM: BackgroundViewModel())
+        LogInView()
+            .environmentObject(BackgroundViewModel())
     }
 }

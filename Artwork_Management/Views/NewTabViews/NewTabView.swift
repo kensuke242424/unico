@@ -60,10 +60,10 @@ struct NewTabView: View {
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var tagVM : TagViewModel
     @EnvironmentObject var homeVM: HomeViewModel
-    
+    @EnvironmentObject var backgroundVM: BackgroundViewModel
+
     @StateObject var itemVM: ItemViewModel
     @StateObject var cartVM: CartViewModel
-    @StateObject var backgroundVM: BackgroundViewMOdel
     
     /// View Properties
     @State private var inputTab = InputTab()
@@ -79,8 +79,8 @@ struct NewTabView: View {
                 
                 VStack {
                     TabTopBarView()
-                        .blur(radius: inputTab.checkBackgroundAnimation ||
-                                      !inputTab.showSelectBackground ? 0 : 2)
+                        .blur(radius: backgroundVM.checkBackgroundAnimation ||
+                                      !backgroundVM.showSelectBackground ? 0 : 2)
                     
                     Spacer(minLength: 0)
                     
@@ -97,11 +97,13 @@ struct NewTabView: View {
                          scrollView.bounces = false
                     }
                 }
-                .sheet(isPresented: $inputTab.showPickerView) {
-                    PHPickerView(captureImage: $inputTab.captureBackgroundImage,
-                                 isShowSheet : $inputTab.showPickerView)
+                /// 背景編集でオリジナル画像を選択時に発火
+                .sheet(isPresented: $backgroundVM.showPickerView) {
+                    PHPickerView(captureImage: $backgroundVM.captureBackgroundImage,
+                                 isShowSheet : $backgroundVM.showPickerView)
                 }
                 /// TabViewに紐づけているプロパティをアニメーションのトリガーとして使えないため
+                ///  タブのステートとタブ切り替えによるアニメーションのステートを切り分けている
                 .onChange(of: inputTab.selectionTab) { _ in
                     switch inputTab.selectionTab {
                     case .home:
@@ -177,7 +179,7 @@ struct NewTabView: View {
                                 // FIXME: これを入れておかないと下層のViewにタップが貫通してしまう🤔
                             })
 
-                        SelectBackgroundView(inputTab: $inputTab, backgroundVM: backgroundVM)
+                        SelectBackgroundView()
                     }
                 }
                 /// サイドメニューView
@@ -501,5 +503,6 @@ struct NewTabView_Previews: PreviewProvider {
             .environmentObject(TeamViewModel())
             .environmentObject(UserViewModel())
             .environmentObject(TagViewModel())
+            .environmentObject(BackgroundViewModel())
     }
 }

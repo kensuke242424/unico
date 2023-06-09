@@ -57,7 +57,7 @@ struct RootView: View {
         ZStack {
             switch logInVM.rootNavigation {
             case .logIn:
-                LogInView(backgroundVM: backgroundVM)
+                LogInView()
 
             case .fetch:
                 CubesProgressView()
@@ -67,7 +67,7 @@ struct RootView: View {
                 CreateAndJoinTeamView()
 
             case .home:
-                NewTabView(itemVM: itemVM, cartVM: cartVM, backgroundVM: backgroundVM)
+                NewTabView(itemVM: itemVM, cartVM: cartVM)
                     .environment(\.resizableSheetCenter, resizableSheetCenter)
             }
         } // ZStack

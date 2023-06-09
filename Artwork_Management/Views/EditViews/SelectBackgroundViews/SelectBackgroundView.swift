@@ -10,9 +10,7 @@ import SwiftUI
 struct SelectBackgroundView: View {
 
     @EnvironmentObject var teamVM: TeamViewModel
-    @StateObject var backgroundVM: BackgroundViewModel
-
-    @Binding var inputTab: InputTab
+    @EnvironmentObject var backgroundVM: BackgroundViewModel
 
     @State private var showContents: Bool = false
     @State private var showProgress: Bool = false
@@ -29,19 +27,19 @@ struct SelectBackgroundView: View {
                     Text("背景を選択してください")
                         .tracking(5)
                         .foregroundColor(.white)
-                        .opacity(inputTab.checkBackgroundAnimation ? 0 : 0.8)
+                        .opacity(backgroundVM.checkBackgroundAnimation ? 0 : 0.8)
 
                     Text("チーム: \(teamVM.team?.name ?? "No Name")")
                         .tracking(3)
                         .font(.caption)
                         .foregroundColor(.white)
-                        .opacity(inputTab.checkBackgroundAnimation ? 0 : 0.6)
+                        .opacity(backgroundVM.checkBackgroundAnimation ? 0 : 0.6)
                 }
                 .padding(.bottom, 5)
 
                 ScrollBackgroundImages()
                     .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
-                    .opacity(inputTab.checkBackgroundAnimation ? 0 : 1)
+                    .opacity(backgroundVM.checkBackgroundAnimation ? 0 : 1)
 
                 VStack(spacing: 40) {
                     Button("保存") {
@@ -50,10 +48,10 @@ struct SelectBackgroundView: View {
                         Task {
                             do {
                                 var updateBackgroundImage: UIImage?
-                                if inputTab.selectBackgroundCategory == .original {
-                                    updateBackgroundImage = inputTab.captureBackgroundImage
+                                if backgroundVM.selectBackgroundCategory == .original {
+                                    updateBackgroundImage = backgroundVM.captureBackgroundImage
                                 } else {
-                                    updateBackgroundImage = inputTab.selectedBackgroundImage
+                                    updateBackgroundImage = backgroundVM.selectedBackgroundImage
                                 }
                                 if let updateBackgroundImage {
                                     let defaultImagePath = teamVM.team?.backgroundPath
@@ -70,9 +68,9 @@ struct SelectBackgroundView: View {
                                 }
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                                     withAnimation(.spring(response: 0.5, blendDuration: 1)) {
-                                        inputTab.captureBackgroundImage = nil
-                                        inputTab.selectBackgroundCategory = .original
-                                        inputTab.showSelectBackground = false
+                                        backgroundVM.captureBackgroundImage = nil
+                                        backgroundVM.selectBackgroundCategory = .original
+                                        backgroundVM.showSelectBackground = false
                                     }
                                 }
                             } catch {
@@ -82,9 +80,9 @@ struct SelectBackgroundView: View {
                                 }
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                                     withAnimation(.spring(response: 0.5, blendDuration: 1)) {
-                                        inputTab.captureBackgroundImage = nil
-                                        inputTab.selectBackgroundCategory = .original
-                                        inputTab.showSelectBackground = false
+                                        backgroundVM.captureBackgroundImage = nil
+                                        backgroundVM.selectBackgroundCategory = .original
+                                        backgroundVM.showSelectBackground = false
                                     }
                                 }
                             }
@@ -99,14 +97,14 @@ struct SelectBackgroundView: View {
                             }
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                                 withAnimation(.spring(response: 0.5, blendDuration: 1)) {
-                                    inputTab.captureBackgroundImage = nil
-                                    inputTab.selectBackgroundCategory = .original
-                                    inputTab.showSelectBackground = false
+                                    backgroundVM.captureBackgroundImage = nil
+                                    backgroundVM.selectBackgroundCategory = .original
+                                    backgroundVM.showSelectBackground = false
                                 }
                             }
                         }
                 }
-                .opacity(inputTab.checkBackgroundAnimation ? 0 : 1)
+                .opacity(backgroundVM.checkBackgroundAnimation ? 0 : 1)
                 .overlay {
                     CustomizeToggleButtons()
                         .offset(x: getRect().width / 3)
@@ -136,7 +134,7 @@ struct SelectBackgroundView: View {
     func ScrollBackgroundImages() -> some View {
         ScrollView(.horizontal, showsIndicators: false) {
             LazyHStack(spacing: 30) {
-                ForEach(inputTab.selectBackgroundCategory.imageContents, id: \.self) { value in
+                ForEach(backgroundVM.selectBackgroundCategory.imageContents, id: \.self) { value in
                     Group {
 //                        if value == .original {
 //                            Group {
@@ -166,15 +164,15 @@ struct SelectBackgroundView: View {
 //                        }
                     } // Group
                     .clipped()
-                    .scaleEffect(inputTab.selectedBackgroundImage == value ? 1.15 : 1.0)
+                    .scaleEffect(backgroundVM.selectedBackgroundImage == value ? 1.15 : 1.0)
                     .overlay(alignment: .topTrailing) {
                         Image(systemName: "checkmark.seal.fill")
                             .resizable()
                             .scaledToFit()
                             .foregroundColor(.green)
                             .frame(width: 30, height: 30)
-                            .scaleEffect(inputTab.selectedBackgroundImage == value ? 1.0 : 1.15)
-                            .opacity(inputTab.selectedBackgroundImage == value ? 1.0 : 0.0)
+                            .scaleEffect(backgroundVM.selectedBackgroundImage == value ? 1.0 : 1.15)
+                            .opacity(backgroundVM.selectedBackgroundImage == value ? 1.0 : 0.0)
                             .offset(x: 15, y: -20)
                     }
                     //TODO: 両サイドの間隔開ける
@@ -182,7 +180,7 @@ struct SelectBackgroundView: View {
 //                    .padding(.trailing, value == .sample4 ? 40 : 0)
                     .onTapGesture {
                         withAnimation(.spring(response: 0.5)) {
-                            inputTab.selectedBackgroundImage = value
+                            backgroundVM.selectedBackgroundImage = value
                         }
                     }
                 }
@@ -204,7 +202,7 @@ struct SelectBackgroundView: View {
                 VStack(spacing: 20) {
                     VStack {
                         Text("背景を確認").font(.footnote).offset(x: 15)
-                        Toggle("", isOn: $inputTab.checkBackgroundToggle)
+                        Toggle("", isOn: $backgroundVM.checkBackgroundToggle)
                     }
                     VStack {
                         Text("ダークモード").font(.footnote).offset(x: 15)
@@ -213,14 +211,14 @@ struct SelectBackgroundView: View {
                 }
                 .frame(width: 80)
                 .padding(.trailing, 30)
-                .onChange(of: inputTab.checkBackgroundToggle) { newValue in
+                .onChange(of: backgroundVM.checkBackgroundToggle) { newValue in
                     if newValue {
                         withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                            inputTab.checkBackgroundAnimation = true
+                            backgroundVM.checkBackgroundAnimation = true
                         }
                     } else {
                         withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                            inputTab.checkBackgroundAnimation = false
+                            backgroundVM.checkBackgroundAnimation = false
                         }
                     }
                 }
@@ -231,6 +229,7 @@ struct SelectBackgroundView: View {
 
 struct SelectBackgroundView_Previews: PreviewProvider {
     static var previews: some View {
-        SelectBackgroundView(inputTab: .constant(InputTab()), backgroundVM: BackgroundViewModel())
+        SelectBackgroundView()
+            .environmentObject(BackgroundViewModel())
     }
 }
