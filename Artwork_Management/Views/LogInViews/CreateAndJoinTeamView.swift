@@ -356,11 +356,8 @@ struct CreateAndJoinTeamView: View {
                         var resizedIconImage      : UIImage?
                         var resizedBackgroundImage: UIImage?
                         // チーム作成時にリソースからランダムで背景をピックアップする。(.originalにImagenameは無いため、除かれる)
-                        var pickUpRandomBackground: TeamBackgroundContents = .original
-                        while pickUpRandomBackground == TeamBackgroundContents.original {
-                            pickUpRandomBackground = TeamBackgroundContents.allCases.randomElement()!
-                            print("ランダム選出された背景: \(pickUpRandomBackground.imageName)")
-                        }
+                        var pickUpBackgroundCategory = TeamBackgroundContents.allCases.randomElement()!
+                        var pickUpBackground = pickUpBackgroundCategory.imageContents.randomElement()
 
                         // 60 -> アイコンwidth
                         if let captureIconUIImage {
@@ -369,7 +366,7 @@ struct CreateAndJoinTeamView: View {
                         }
                         /// オリジナル背景ではなくサンプル背景を選択していた場合は、付属のImageをUIImageに直してからリサイズ
                         
-                        resizedBackgroundImage = logInVM.resizeUIImage(image: UIImage(named: pickUpRandomBackground.imageName),
+                        resizedBackgroundImage = logInVM.resizeUIImage(image: pickUpBackground,
                                                                        width: getRect().width * 4)
                         
                         /// リサイズ処理した画像をFirestorageに保存

@@ -43,6 +43,7 @@ struct RootView: View {
 
     @StateObject var itemVM: ItemViewModel = ItemViewModel()
     @StateObject var cartVM: CartViewModel = CartViewModel()
+    @StateObject var backgroundVM: BackgroundViewModel = BackgroundViewModel()
 
     @State private var isShowStandBy: Bool = false
     @State private var showLogInAlert: Bool = false
@@ -56,7 +57,7 @@ struct RootView: View {
         ZStack {
             switch logInVM.rootNavigation {
             case .logIn:
-                LogInView()
+                LogInView(backgroundVM: backgroundVM)
 
             case .fetch:
                 CubesProgressView()
@@ -66,7 +67,7 @@ struct RootView: View {
                 CreateAndJoinTeamView()
 
             case .home:
-                NewTabView(itemVM: itemVM, cartVM: cartVM)
+                NewTabView(itemVM: itemVM, cartVM: cartVM, backgroundVM: backgroundVM)
                     .environment(\.resizableSheetCenter, resizableSheetCenter)
             }
         } // ZStack

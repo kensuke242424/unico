@@ -174,7 +174,7 @@ struct InputLogIn {
     var createAccountShowContents   : Bool = false
     var repeatAnimation             : Bool = false
     var sendAddressButtonDisabled   : Bool = true
-    var selectBackground            : TeamBackgroundContents = .sample1
+    var selectBackground            : TeamBackgroundContents = .music
     
     /// Sheetやアラートなどのプレゼンテーションを管理するプロパティ
     var isShowPickerView                 : Bool = false
@@ -199,6 +199,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
     @EnvironmentObject var logInVM: LogInViewModel
     @EnvironmentObject var teamVM : TeamViewModel
     @EnvironmentObject var userVM : UserViewModel
+
+    @StateObject var backgroundVM: BackgroundViewMOdel
     
     @State private var logInNavigationPath: [Navigation] = []
     @State private var inputLogIn: InputLogIn = InputLogIn()
@@ -336,6 +338,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 // ログイン画面最初のページまで戻るボタン
                 if logInVM.userSelectedSignInType != .start {
                     Button {
+                        //TODO: 6/10 このボタン効いてない？
+                        print("最初まで戻るボタンをタップ")
                         inputLogIn.isShowGoBackLogInAlert.toggle()
                     } label: {
                         HStack {
@@ -493,14 +497,14 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             .resizable()
                             .scaledToFill()
                             .frame(width: proxy.size.width, height: proxy.size.height)
-                            .blur(radius: inputLogIn.checkBackgroundEffect ? 0 : 2, opaque: true)
+                            .blur(radius: inputLogIn.checkBackgroundEffect ? 0 : 4, opaque: true)
                             .ignoresSafeArea()
                     } else {
                         Image(inputLogIn.selectBackground.imageName)
                             .resizable()
                             .scaledToFill()
                             .frame(width: proxy.size.width, height: proxy.size.height)
-                            .blur(radius: inputLogIn.checkBackgroundEffect ? 0 : 2, opaque: true)
+                            .blur(radius: inputLogIn.checkBackgroundEffect ? 0 : 4, opaque: true)
                             .ignoresSafeArea()
                     }
                     Color(.black)
@@ -870,24 +874,24 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             HStack(spacing: 30) {
                                 ForEach(TeamBackgroundContents.allCases, id: \.self) { value in
                                     Group {
-                                        if value == .original {
-                                            Image(uiImage: inputLogIn.captureBackgroundImage ?? UIImage())
+//                                        if value == .original {
+//                                            Image(uiImage: inputLogIn.captureBackgroundImage ?? UIImage())
+//                                                .resizable()
+//                                                .scaledToFill()
+//                                                .frame(width: 120, height: 250)
+//                                                .border(.blue, width: 1)
+//                                                .overlay {
+//                                                    Button("写真を挿入") {
+//                                                        inputLogIn.isShowPickerView.toggle()
+//                                                    }
+//                                                    .buttonStyle(.borderedProminent)
+//                                                }
+//                                        } else {
+                                        Image(uiImage: value)
                                                 .resizable()
                                                 .scaledToFill()
                                                 .frame(width: 120, height: 250)
-                                                .border(.blue, width: 1)
-                                                .overlay {
-                                                    Button("写真を挿入") {
-                                                        inputLogIn.isShowPickerView.toggle()
-                                                    }
-                                                    .buttonStyle(.borderedProminent)
-                                                }
-                                        } else {
-                                            Image(value.imageName)
-                                                .resizable()
-                                                .scaledToFill()
-                                                .frame(width: 120, height: 250)
-                                        }
+//                                        }
                                     }
                                     .clipped()
                                     .scaleEffect(inputLogIn.selectBackground == value ? 1.2 : 1.0)
@@ -1324,6 +1328,6 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
 
 struct LogInView_Previews: PreviewProvider {
     static var previews: some View {
-        LogInView()
+        LogInView(backgroundVM: BackgroundViewModel())
     }
 }

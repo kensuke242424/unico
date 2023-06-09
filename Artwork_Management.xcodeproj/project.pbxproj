@@ -47,6 +47,8 @@
 		BE2B808129E42CE70081439C /* CustomToggleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE2B808029E42CE60081439C /* CustomToggleButton.swift */; };
 		BE30B5C62A3217D80034755B /* BlurMuskingImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE30B5C52A3217D80034755B /* BlurMuskingImageView.swift */; };
 		BE30B5CC2A335D550034755B /* Background.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE30B5CB2A335D550034755B /* Background.swift */; };
+		BE30B5D22A33CB6B0034755B /* SelectBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE30B5D12A33CB6B0034755B /* SelectBackgroundView.swift */; };
+		BE30B5D42A33D2430034755B /* BackgroundViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE30B5D32A33D2430034755B /* BackgroundViewModel.swift */; };
 		BE392FF029C20E6900BB5700 /* Tab.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE392FEF29C20E6900BB5700 /* Tab.swift */; };
 		BE392FF329C2135300BB5700 /* ScrollOffsetModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE392FF229C2135300BB5700 /* ScrollOffsetModifier.swift */; };
 		BE3CD65B29B72B0700C19442 /* ProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3CD65A29B72B0700C19442 /* ProgressViewModel.swift */; };
@@ -184,6 +186,8 @@
 		BE2B808029E42CE60081439C /* CustomToggleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomToggleButton.swift; sourceTree = "<group>"; };
 		BE30B5C52A3217D80034755B /* BlurMuskingImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurMuskingImageView.swift; sourceTree = "<group>"; };
 		BE30B5CB2A335D550034755B /* Background.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Background.swift; sourceTree = "<group>"; };
+		BE30B5D12A33CB6B0034755B /* SelectBackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectBackgroundView.swift; sourceTree = "<group>"; };
+		BE30B5D32A33D2430034755B /* BackgroundViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundViewModel.swift; sourceTree = "<group>"; };
 		BE392FEF29C20E6900BB5700 /* Tab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tab.swift; sourceTree = "<group>"; };
 		BE392FF229C2135300BB5700 /* ScrollOffsetModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollOffsetModifier.swift; sourceTree = "<group>"; };
 		BE3CD65A29B72B0700C19442 /* ProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressViewModel.swift; sourceTree = "<group>"; };
@@ -314,7 +318,6 @@
 				BE1F271D29C162B300AD55DF /* NewTabView.swift */,
 				BE1F272029C166A400AD55DF /* HomeViews */,
 				BE1F272129C166B200AD55DF /* ItemViews */,
-				BE0E580929C4050600F5E42F /* EditItemViews */,
 			);
 			path = NewTabViews;
 			sourceTree = "<group>";
@@ -352,6 +355,23 @@
 				BEAAD94529D068C000C53138 /* SuccessUpdateAddressView.swift */,
 			);
 			path = AccountSettingViews;
+			sourceTree = "<group>";
+		};
+		BE30B5CF2A33CA890034755B /* EditViews */ = {
+			isa = PBXGroup;
+			children = (
+				BE30B5D02A33CB520034755B /* SelectBackgroundViews */,
+				BE0E580929C4050600F5E42F /* EditItemViews */,
+			);
+			path = EditViews;
+			sourceTree = "<group>";
+		};
+		BE30B5D02A33CB520034755B /* SelectBackgroundViews */ = {
+			isa = PBXGroup;
+			children = (
+				BE30B5D12A33CB6B0034755B /* SelectBackgroundView.swift */,
+			);
+			path = SelectBackgroundViews;
 			sourceTree = "<group>";
 		};
 		BE392FF129C2133B00BB5700 /* Helpers */ = {
@@ -491,6 +511,7 @@
 		E08F273228DDB3B200329C5E /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				BE30B5CF2A33CA890034755B /* EditViews */,
 				BE1F271F29C1669400AD55DF /* NewTabViews */,
 				BEAB502C29A7C5E300ECCB4F /* PageTabNavigateViews */,
 				E094B788298EB7C700A2E33C /* UpdateTeamOrUserViews */,
@@ -521,6 +542,7 @@
 				BE245BCC29C5865300539A04 /* CartViewModel.swift */,
 				BE17B97229CB033100F08915 /* PreloadViewModel.swift */,
 				BEB669A02A2A370A008FC9DE /* HomeViewModel.swift */,
+				BE30B5D32A33D2430034755B /* BackgroundViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -852,6 +874,7 @@
 				E05130E228F341620092FE46 /* RootView.swift in Sources */,
 				BE245BE329C825DE00539A04 /* EditTagView.swift in Sources */,
 				BE24374B29BE3A3F000C2D01 /* UIImageRectIcon.swift in Sources */,
+				BE30B5D22A33CB6B0034755B /* SelectBackgroundView.swift in Sources */,
 				BE599F922A20F68100821E01 /* ApplicationSettingView.swift in Sources */,
 				E08F272528DDA08E00329C5E /* Artwork_ManagementApp.swift in Sources */,
 				BE20B04829BAEFDB0078169B /* UpdateAddressView.swift in Sources */,
@@ -866,6 +889,7 @@
 				E0DE335029288D07008C7147 /* TeamModel.swift in Sources */,
 				E0A3B996292EFCE600209ADC /* CreateAndJoinTeamView.swift in Sources */,
 				E01E1392291F961A0001F2DA /* TagViewModel.swift in Sources */,
+				BE30B5D42A33D2430034755B /* BackgroundViewModel.swift in Sources */,
 				BE245BE129C75DDF00539A04 /* SavingProgressView.swift in Sources */,
 				E0796ADD28F5F2830094E50C /* CartItemsSheet.swift in Sources */,
 				E094F10028E20F1000D3C845 /* LogInView.swift in Sources */,
