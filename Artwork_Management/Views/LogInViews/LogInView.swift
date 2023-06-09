@@ -156,25 +156,6 @@ enum LogInAlert {
     }
 }
 
-enum TeamBackgroundContents: CaseIterable {
-    case original, sample1, sample2, sample3, sample4
-    
-    var imageName: String {
-        switch self {
-        case .original:
-            return ""
-        case .sample1:
-            return "background_1"
-        case .sample2:
-            return "background_2"
-        case .sample3:
-            return "background_3"
-        case .sample4:
-            return "background_4"
-        }
-    }
-}
-
 struct InputLogIn {
     /// 新規ユーザーデータの入力用プロパティ
     var createUserNameText      : String = ""

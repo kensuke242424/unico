@@ -46,6 +46,7 @@
 		BE254FC129C0CA0B004FE9AE /* PersonCircleIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE254FC029C0CA0B004FE9AE /* PersonCircleIcon.swift */; };
 		BE2B808129E42CE70081439C /* CustomToggleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE2B808029E42CE60081439C /* CustomToggleButton.swift */; };
 		BE30B5C62A3217D80034755B /* BlurMuskingImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE30B5C52A3217D80034755B /* BlurMuskingImageView.swift */; };
+		BE30B5CC2A335D550034755B /* Background.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE30B5CB2A335D550034755B /* Background.swift */; };
 		BE392FF029C20E6900BB5700 /* Tab.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE392FEF29C20E6900BB5700 /* Tab.swift */; };
 		BE392FF329C2135300BB5700 /* ScrollOffsetModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE392FF229C2135300BB5700 /* ScrollOffsetModifier.swift */; };
 		BE3CD65B29B72B0700C19442 /* ProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3CD65A29B72B0700C19442 /* ProgressViewModel.swift */; };
@@ -182,6 +183,7 @@
 		BE254FC029C0CA0B004FE9AE /* PersonCircleIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonCircleIcon.swift; sourceTree = "<group>"; };
 		BE2B808029E42CE60081439C /* CustomToggleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomToggleButton.swift; sourceTree = "<group>"; };
 		BE30B5C52A3217D80034755B /* BlurMuskingImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurMuskingImageView.swift; sourceTree = "<group>"; };
+		BE30B5CB2A335D550034755B /* Background.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Background.swift; sourceTree = "<group>"; };
 		BE392FEF29C20E6900BB5700 /* Tab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tab.swift; sourceTree = "<group>"; };
 		BE392FF229C2135300BB5700 /* ScrollOffsetModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollOffsetModifier.swift; sourceTree = "<group>"; };
 		BE3CD65A29B72B0700C19442 /* ProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressViewModel.swift; sourceTree = "<group>"; };
@@ -532,6 +534,7 @@
 				E01AA3A22916C674000FCD37 /* TagModel.swift */,
 				E0796AD428F4850D0094E50C /* ButtonModel.swift */,
 				BE1F272E29C17AC000AD55DF /* Book.swift */,
+				BE30B5CB2A335D550034755B /* Background.swift */,
 				BE392FEF29C20E6900BB5700 /* Tab.swift */,
 				BE07F1272A220AD5007ED1C4 /* Particle.swift */,
 			);
@@ -843,6 +846,7 @@
 				E0A7DE4B290B9E0A008C3F3F /* ShowItemUIImagePhoto.swift in Sources */,
 				E08F273E28DDB65F00329C5E /* HomeTabView.swift in Sources */,
 				E0455FDE292B2B83004F677D /* LogInViewModel.swift in Sources */,
+				BE30B5CC2A335D550034755B /* Background.swift in Sources */,
 				BE20B04629BAEF2F0078169B /* DeleteAccountView.swift in Sources */,
 				E0DE33522928F48D008C7147 /* CustomLoadingView.swift in Sources */,
 				E05130E228F341620092FE46 /* RootView.swift in Sources */,
