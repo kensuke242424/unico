@@ -54,7 +54,6 @@ struct NewHomeView: View {
 
         GeometryReader {
             let size = $0.size
-            let rect = $0.frame(in: .global)
             
             VStack {
 
@@ -169,9 +168,6 @@ struct NewHomeView: View {
                             }
 
                             Button {
-                                // TODO: 設定をユーザーのjoinTeamデータ内に保存
-                                print("\(nowTime)")
-                                print("\(teamNews)")
                                 userVM.updateCurrentTeamHomeEdits(data: HomePartsEditData(nowTime: nowTime,
                                                                                    teamNews: teamNews))
                                 withAnimation(.spring(response: 0.7, blendDuration: 1)) {
@@ -191,8 +187,13 @@ struct NewHomeView: View {
                         }
 
                         Button {
-                            //  TODO: パーツを編集前の状態に戻して終了
+                            let currentTeamIndex = userVM.getCurrentTeamIndex()
+                            guard let user = userVM.user else { return }
+                            guard let getIndex = currentTeamIndex else { return }
+
                             withAnimation(.spring(response: 0.7, blendDuration: 1)) {
+                                nowTime = user.joins[getIndex].homeEdits.nowTime
+                                teamNews = user.joins[getIndex].homeEdits.teamNews
                                 homeVM.isActiveEdit = false
                             }
                         } label: {
@@ -290,8 +291,6 @@ struct NewHomeView: View {
          VStack {
             GeometryReader {
                 let size = $0.size
-                let local = $0.frame(in: .local)
-                let global = $0.frame(in: .global)
 
                 ZStack {
                     VStack(alignment: .leading, spacing: 60) {
@@ -377,7 +376,7 @@ struct NewHomeView: View {
 
 }
 
-struct CustomizeHomePartsButtons: View {
+fileprivate struct CustomizeHomePartsButtons: View {
 
     var show: Bool
     @Binding var desplay: Bool

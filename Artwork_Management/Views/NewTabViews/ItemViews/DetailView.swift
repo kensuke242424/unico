@@ -392,7 +392,7 @@ struct DetailView_Previews: PreviewProvider {
                    inputTab: .constant(InputTab()),
                    show: .constant(true),
                    animation: animation,
-                   item: testItem.first!,
+                   item: sampleItems.first!,
                    cardHeight: 200)
     }
 }

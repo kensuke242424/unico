@@ -47,7 +47,7 @@ struct SystemSideMenu: View {
     @StateObject var itemVM: ItemViewModel
     
     @EnvironmentObject var navigationVM: NavigationViewModel
-    @EnvironmentObject var progress: ProgressViewModel
+    @EnvironmentObject var progressVM: ProgressViewModel
     @EnvironmentObject var homeVM: HomeViewModel
 
     @EnvironmentObject var logInVM : LogInViewModel
@@ -86,6 +86,27 @@ struct SystemSideMenu: View {
                         .padding(.trailing, 90)
                         .padding(.top, getSafeArea().top + 10)
                 }
+                .alert("", isPresented: $inputSideMenu.isShowChangeTeamAlert) {
+                    Button("キャンセル") {}
+                    Button("移動する") {
+                        // フェッチするチームデータを管理するUserModel内のlastLogInの値を更新後に、再fetchを実行
+                        Task {
+                            inputSideMenu.showChangeTeamSheet = false
+                            await userVM.updateLastLogInTeam(selected: inputSideMenu.selectedTeam)
+                            withAnimation(.spring(response: 0.5)) {
+                                progressVM.showCubesProgress = true
+                                inputTab.showSideMenu = false
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                withAnimation(.spring(response: 0.2)) {
+                                    logInVM.rootNavigation = .fetch
+                                }
+                            }
+                        }
+                    }
+                } message: {
+                    Text("\(inputSideMenu.selectedTeam?.name ?? "No Name")に移動しますか？")
+                } // team change Alert
 
             VStack {
 
@@ -148,41 +169,52 @@ struct SystemSideMenu: View {
                                     if inputSideMenu.tag {
                                         
                                         if tagVM.tags.count > 2 {
-                                            Button(action: {
+                                            Button {
                                                 withAnimation {
                                                     inputSideMenu.editMode = inputSideMenu.editMode.isEditing ? .inactive : .active
                                                 }
-                                            }, label: {
-                                                Text(inputSideMenu.editMode.isEditing ? "終了" : "編集")
-                                            })
-                                            .background(
-                                                Capsule()
-                                                    .fill(.black)
-                                                    .scaleEffect(1.3)
-                                                    .opacity(0.2)
-                                                    .shadow(color: .black, radius: 3, x: 1, y: 1)
-                                            )
+                                            } label: {
+                                                Image(systemName: inputSideMenu.editMode.isEditing ? "gearshape.fill" : "gearshape")
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .frame(width: 16)
+                                                    .foregroundColor(.gray)
+                                                    .padding(4)
+                                                    .background {
+                                                        Circle()
+                                                        .fill(.white.gradient)
+                                                        .shadow(radius: 3, x: 1, y: 1)
+                                                    }
+                                            }
                                             .offset(x: 20)
                                         }
-                                        
+
                                         Button {
                                             withAnimation(.easeInOut(duration: 0.3)) {
                                                 inputTab.selectedTag = nil
                                                 tagVM.showEdit = true
                                             }
                                         } label: {
-                                            Image(systemName: "plus.square")
+                                            Image(systemName: "plus")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 10)
+                                                .foregroundColor(.gray)
+                                                .padding(6)
+                                                .background {
+                                                    Circle()
+                                                    .fill(.white.gradient)
+                                                    .shadow(radius: 3, x: 1, y: 1)
+                                                }
                                         }
-                                        .background(
-                                            Circle()
-                                                .fill(.black)
-                                                .scaleEffect(1.5)
-                                                .opacity(0.2)
-                                                .shadow(color: .black, radius: 3, x: 1, y: 1)
-                                        )
-                                        .offset(x: 35)
+                                        .offset(x: 27)
                                     }
                                 } // HStack
+                                .onChange(of: inputSideMenu.tag) { newValue in
+                                    if !newValue {
+                                        inputSideMenu.editMode = .inactive
+                                    }
+                                }
                                 
                                 if inputSideMenu.tag {
                                     
@@ -197,7 +229,9 @@ struct SystemSideMenu: View {
                                                     HStack {
                                                         Image(systemName: "tag.fill")
                                                             .font(.caption)
-                                                            .foregroundColor(tag.tagColor.color)
+                                                            .foregroundColor(
+                                                                userVM.user?.userColor.colorAccent ?? .gray
+                                                            )
                                                             .opacity(0.6)
                                                         
                                                         Text(tag.tagName)
@@ -235,7 +269,7 @@ struct SystemSideMenu: View {
                                             .onMove(perform: rowReplace)
                                         } // List
                                         .environment(\.editMode, $inputSideMenu.editMode)
-                                        .frame(width: UIScreen.main.bounds.width * 0.58,
+                                        .frame(width: UIScreen.main.bounds.width / 2 + 70,
                                                height: menuRowHeight + (40 * CGFloat(tagVM.tags.count - 2)))
                                         .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
                                         .scrollContentBackground(.hidden)
@@ -344,9 +378,9 @@ struct SystemSideMenu: View {
                                     .alert("確認", isPresented: $inputSideMenu.isShowLogOutAlert) {
                                         Button("戻る") { inputSideMenu.isShowLogOutAlert.toggle() }
                                         Button("ログアウト") {
-                                            progress.showLoading.toggle()
+                                            progressVM.showLoading.toggle()
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                                                progress.showLoading.toggle()
+                                                progressVM.showLoading.toggle()
                                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                                     withAnimation(.easeIn(duration: 0.5)) {
                                                         logInVM.rootNavigation = .logIn
@@ -411,7 +445,7 @@ struct SystemSideMenu: View {
                         .padding([.leading, .top])
 
                     } // ScrollView
-                    .frame(width: UIScreen.main.bounds.width / 2 + 50)
+                    .frame(width: UIScreen.main.bounds.width / 2 + 100)
                     Spacer()
                 }
             } // VStack
@@ -424,18 +458,6 @@ struct SystemSideMenu: View {
         }
         .sheet(isPresented: $inputSideMenu.showUserEntrySheet) {
             UserEntryRecommendationView(isShow: $inputSideMenu.showUserEntrySheet)
-        }
-        .alert("", isPresented: $inputSideMenu.isShowChangeTeamAlert) {
-            Button("戻る") {}
-            Button("移動する") {
-                // lastLogInの値を更新してからfetch処理を実行
-                Task {
-                    await userVM.updateLastLogInTeam(selected: inputSideMenu.selectedTeam)
-                    withAnimation(.spring(response: 0.5)) { logInVM.rootNavigation = .fetch }
-                }
-            }
-        } message: {
-            Text("\(inputSideMenu.selectedTeam?.name ?? "No Name")に移動しますか？")
         }
         // NOTE: ローカルのタグ順番操作をfirestoreに保存
         .onChange(of: inputSideMenu.editMode) { newEdit in
@@ -524,35 +546,6 @@ struct SystemSideMenu: View {
                                             inputSideMenu.selectedTeam = teamRow
                                             inputSideMenu.showdeleteTeamAlert.toggle()
                                         }
-                                        .alert("確認", isPresented: $inputSideMenu.showdeleteTeamAlert) {
-                                            Button("削除する", role: .destructive) {
-                                                
-                                                Task {
-                                                    guard let selectedTeam = inputSideMenu.selectedTeam else { return }
-                                                    inputSideMenu.showdeletedAllTeamProgress = true
-                                                    try await userVM.deleteMembersJoinTeam(selected: selectedTeam,
-                                                                                           members : teamVM.team!.members)
-                                                    
-                                                    await teamVM.deleteAllTeamImages()
-                                                    await itemVM.deleteAllItemImages()
-                                                    await teamVM.deleteSelectedTeamDocuments(selected: selectedTeam)
-                                                    inputSideMenu.showdeletedAllTeamProgress = false
-                                                    //TODO: 削除完了アラートが表示されないぞ？？？
-                                                    inputSideMenu.showdeletedAllTeamAlert = true
-                                                    
-                                                }
-                                            }
-                                        } message: {
-                                            Text("チーム内のアイテム、タグ、メンバー情報を含めた全てのデータを消去します。チーム削除を実行しますか？")
-                                        } // alert
-                                        .alert("", isPresented: $inputSideMenu.showdeletedAllTeamAlert) {
-                                            Button("OK") {
-                                                // TODO: 他のチームデータをfetch
-                                                // 他のチームが存在しなければ、チーム作成画面へ遷移
-                                            }
-                                        } message: {
-                                            Text("チームデータの消去が完了しました")
-                                        } // alert
                                 }
                                 SDWebImageCircleIcon(imageURL: teamRow.iconURL,
                                                      width: 50, height: 50)
@@ -565,22 +558,59 @@ struct SystemSideMenu: View {
                                 inputSideMenu.selectedTeam = teamRow
                                 inputSideMenu.isShowChangeTeamAlert.toggle()
                             }
-                            .alert("", isPresented: $inputSideMenu.isShowChangeTeamAlert) {
-                                Button("キャンセル") {}
-                                Button("移動する") {
-                                    // フェッチするチームデータを管理するUserModel内のlastLogInの値を更新後に、再fetchを実行
-                                    Task {
-                                        inputSideMenu.showChangeTeamSheet = false
-                                        await userVM.updateLastLogInTeam(selected: inputSideMenu.selectedTeam)
-                                        withAnimation(.spring(response: 0.2)) { logInVM.rootNavigation = .fetch }
-                                    }
-                                }
-                            } message: {
-                                Text("\(inputSideMenu.selectedTeam?.name ?? "No Name")に移動しますか？")
-                            }
                         } // ForEath
                     } // List
                     .offset(y: -30)
+                    .alert("確認", isPresented: $inputSideMenu.showdeleteTeamAlert) {
+                        Button("削除する", role: .destructive) {
+
+                            Task {
+                                guard let selectedTeam = inputSideMenu.selectedTeam else { return }
+                                inputSideMenu.showdeletedAllTeamProgress = true
+                                try await userVM.deleteMembersJoinTeam(selected: selectedTeam,
+                                                                       members : teamVM.team!.members)
+
+                                await teamVM.deleteAllTeamImages()
+                                await itemVM.deleteAllItemImages()
+                                await teamVM.deleteSelectedTeamDocuments(selected: selectedTeam)
+                                inputSideMenu.showdeletedAllTeamProgress = false
+                                //TODO: 削除完了アラートが表示されないぞ？？？
+                                inputSideMenu.showdeletedAllTeamAlert = true
+
+                            }
+                        }
+                    } message: {
+                        Text("チーム内のアイテム、タグ、メンバー情報を含めた全てのデータを消去します。チーム削除を実行しますか？")
+                    } // alert
+                    .alert("", isPresented: $inputSideMenu.showdeletedAllTeamAlert) {
+                        Button("OK") {
+                            // TODO: 他のチームデータをfetch
+                            // 他のチームが存在しなければ、チーム作成画面へ遷移
+                        }
+                    } message: {
+                        Text("チームデータの消去が完了しました")
+                    } // team delete Alert
+                    .alert("", isPresented: $inputSideMenu.isShowChangeTeamAlert) {
+                        Button("キャンセル") {}
+                        Button("移動する") {
+                            // フェッチするチームデータを管理するUserModel内のlastLogInの値を更新後に、再fetchを実行
+                            Task {
+                                inputSideMenu.showChangeTeamSheet = false
+                                await userVM.updateLastLogInTeam(selected: inputSideMenu.selectedTeam)
+                                withAnimation(.spring(response: 0.5)) {
+                                    progressVM.showCubesProgress = true
+                                    inputTab.showSideMenu = false
+                                }
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                    withAnimation(.spring(response: 0.2)) {
+                                        logInVM.rootNavigation = .fetch
+                                    }
+                                }
+                            }
+                        }
+                    } message: {
+                        Text("\(inputSideMenu.selectedTeam?.name ?? "No Name")に移動しますか？")
+                    } // team change Alert
                 }
             }
             .toolbar {
@@ -706,8 +736,8 @@ struct SideMenuShape: Shape {
             path.move(to: CGPoint(x: width, y: 0))
 
             path.addCurve(to: CGPoint(x: width, y: height + 100),
-                          control1: CGPoint(x: width + 150, y: height / 3),
-                          control2: CGPoint(x: width - 150, y: height / 2))
+                          control1: CGPoint(x: width + 100, y: height / 3),
+                          control2: CGPoint(x: width - 100, y: height / 2))
 
         }
     }

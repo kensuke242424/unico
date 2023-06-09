@@ -40,7 +40,7 @@ struct RootView: View {
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var tagVM: TagViewModel
     @EnvironmentObject var preloadVM: PreloadViewModel
-    
+
     @StateObject var itemVM: ItemViewModel = ItemViewModel()
     @StateObject var cartVM: CartViewModel = CartViewModel()
 
@@ -49,7 +49,7 @@ struct RootView: View {
     
     @State private var preloads: PreloadProperty = PreloadProperty()
 
-    @AppStorage("applicationDarkMode") var applicationDarkMode: Bool = false
+    @AppStorage("applicationDarkMode") var applicationDarkMode: Bool = true
 
     var body: some View {
 
@@ -90,6 +90,7 @@ struct RootView: View {
                     NewEditItemView(itemVM: itemVM, passItem: nil)
                     CreateAndJoinTeamView()
                     PHPickerView(captureImage: $preloads.captureImage, isShowSheet: $preloads.showSheet)
+                    NewItemsView(itemVM: itemVM,  cartVM: cartVM, inputTab: $preloadVM.inputTab)
                 }
                 .opacity(0)
             }
@@ -143,6 +144,7 @@ struct RootView: View {
                         /// ホーム画面へ遷移
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                             withAnimation(.spring(response: 1)) {
+                                progressVM.showCubesProgress = false
                                 logInVM.rootNavigation = .home
                                 /// ログインが完了したら、LogInViewの操作フローを初期化
                                 logInVM.createAccountFase          = .start
@@ -271,5 +273,6 @@ struct RootView_Previews: PreviewProvider {
             .environmentObject(ItemViewModel())
             .environmentObject(TagViewModel())
             .environmentObject(ProgressViewModel())
+            .environmentObject(PreloadViewModel())
     }
 }

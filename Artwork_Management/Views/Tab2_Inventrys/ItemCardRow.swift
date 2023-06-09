@@ -171,7 +171,7 @@ struct ItemCardRow_Previews: PreviewProvider {
         ItemCardRow(itemVM: ItemViewModel(),
                     inputHome: .constant(InputHome()),
                     inputStock: .constant(InputCart()),
-                    itemRow: testItem.first!)
+                    itemRow: sampleItems.first!)
         .previewLayout(.sizeThatFits)
     }
 }

@@ -7,6 +7,7 @@
 
 import SwiftUI
 import ResizableSheet
+import Introspect
 
 struct InputTab {
     // 各設定Viewの表示を管理するプロパティ
@@ -27,7 +28,7 @@ struct InputTab {
     var showSelectBackground: Bool = false
     var checkBackgroundToggle: Bool = false
     var checkBackgroundAnimation: Bool = false
-    var selectBackground: SelectBackground = .original
+    var selectBackground: TeamBackgroundContents = .original
     
     /// タブViewのアニメーションを管理するプロパティ
     var selectionTab    : Tab = .home
@@ -35,6 +36,14 @@ struct InputTab {
     var animationOpacity: CGFloat = 1
     var animationScale  : CGFloat = 1
     var scrollProgress  : CGFloat = .zero
+    var tabIndex: Int {
+        switch selectionTab {
+        case .home:
+            return 0
+        case .item:
+            return 1
+        }
+    }
     /// MEMO: ItemsTab内でDetailが開かれている間はTopNavigateBarを隠すためのプロパティ
     var reportShowDetail: Bool = false
     
@@ -57,7 +66,7 @@ struct NewTabView: View {
     /// View Properties
     @State private var inputTab = InputTab()
 
-    @AppStorage("applicationDarkMode") var applicationDarkMode: Bool = false
+    @AppStorage("applicationDarkMode") var applicationDarkMode: Bool = true
 
     var body: some View {
 
@@ -76,40 +85,29 @@ struct NewTabView: View {
                     TabView(selection: $inputTab.selectionTab) {
                         NewHomeView(itemVM: itemVM, inputTab: $inputTab)
                             .tag(Tab.home)
-                            .offsetX(inputTab.selectionTab == Tab.home) { rect in
-                                let minX = rect.minX
-                                let pageOffset = minX - (size.width * CGFloat(Tab.home.index))
-                                let pageProgress = pageOffset / size.width
-                                
-                                inputTab.scrollProgress = max(min(pageProgress, 0), -CGFloat(Tab.allCases.count - 1))
-                                inputTab.animationOpacity = 1 - -inputTab.scrollProgress
-                            }
 
                         NewItemsView(itemVM: itemVM,  cartVM: cartVM, inputTab: $inputTab)
                             .tag(Tab.item)
-                            .offsetX(inputTab.selectionTab == Tab.item) { rect in
-                                let minX = rect.minX
-                                let pageOffset = minX - (size.width * CGFloat(Tab.item.index))
-                                let pageProgress = pageOffset / size.width
-
-                                inputTab.scrollProgress = max(min(pageProgress, 0), -CGFloat(Tab.allCases.count - 1))
-                                inputTab.animationOpacity = -inputTab.scrollProgress
-                            }
-                    }
+                    } // TabView
                     .tabViewStyle(.page(indexDisplayMode: .never))
+                    .introspectScrollView { scrollView in
+                         scrollView.isDirectionalLockEnabled = true
+                         scrollView.bounces = false
+                    }
                 }
                 .sheet(isPresented: $inputTab.showPickerView) {
                     PHPickerView(captureImage: $inputTab.captureBackgroundImage,
                                  isShowSheet : $inputTab.showPickerView)
                 }
+                /// TabViewに紐づけているプロパティをアニメーションのトリガーとして使えないため
                 .onChange(of: inputTab.selectionTab) { _ in
                     switch inputTab.selectionTab {
                     case .home:
-                        withAnimation(.easeInOut(duration: 0.2)) {
+                        withAnimation(.spring(response: 0.4)) {
                             inputTab.animationTab = .home
                         }
                     case .item:
-                        withAnimation(.spring(response: 0.2)) {
+                        withAnimation(.spring(response: 0.4)) {
                             inputTab.animationTab = .item
                         }
                     }
@@ -148,15 +146,17 @@ struct NewTabView: View {
                                                width : proxy.size.width,
                                                height: proxy.size.height)
                                 .ignoresSafeArea()
-                                .blur(radius: min((-inputTab.scrollProgress * 4), 4), opaque: true)
                                 .blur(radius: homeVM.isActiveEdit ? 5 : 0, opaque: true)
                                 .blur(radius: inputTab.pressingAnimation ? 6 : 0, opaque: true)
                                 .overlay {
                                     if homeVM.isActiveEdit {
-                                        Color.black
-                                            .opacity(0.4)
+                                        Color.black.opacity(0.4)
                                             .ignoresSafeArea()
                                     }
+                                }
+                                .overlay {
+                                    BlurMaskingImageView(imageURL: teamVM.team?.backgroundURL)
+                                        .opacity(inputTab.animationTab != .home ? 1 : 0)
                                 }
                             }
                         }
@@ -180,8 +180,8 @@ struct NewTabView: View {
                 }
                 /// サイドメニューView
                 .overlay {
-                    SystemSideMenu(itemVM: itemVM, inputTab: $inputTab)
-                        .offset(x: inputTab.showSideMenu ? 0 : -size.width)
+                        SystemSideMenu(itemVM: itemVM, inputTab: $inputTab)
+                            .offset(x: inputTab.showSideMenu ? 0 : -size.width)
                 }
                 /// 🏷タグの追加や編集を行うView
                 .overlay {
@@ -376,6 +376,7 @@ struct NewTabView: View {
 
     } // body
     @ViewBuilder
+    /// タブビューのカスタムトップナビゲーションバー
     func TabTopBarView() -> some View {
         GeometryReader {
             let size = $0.size
@@ -390,15 +391,22 @@ struct NewTabView: View {
                     .tracking(4)
                     .scaleEffect(inputTab.animationTab == tab ? 1.0 : 0.5)
                     .foregroundColor(applicationDarkMode ? .white : .black)
-                    .opacity(inputTab.animationTab == tab ? 1 : 0.2)
+                    .opacity(inputTab.animationTab == tab ? 1 : 0.5)
                     .frame(width: tabWidth)
                     .contentShape(Rectangle())
                     .padding(.top, 60)
+                    .onTapGesture(perform: {
+                        if tab == .home && inputTab.selectionTab == .item {
+                            inputTab.selectionTab = .item
+                        } else if tab == .item && inputTab.selectionTab == .home {
+                            inputTab.selectionTab = .home
+                        }
+                    })
                 }
             }
             .frame(width: CGFloat(Tab.allCases.count) * tabWidth)
             .padding(.leading, tabWidth)
-            .offset(x: inputTab.scrollProgress * tabWidth)
+            .offset(x: CGFloat(inputTab.animationTab.index) * -tabWidth)
             .overlay {
                 HStack {
                     /// Homeタブに移動した時に表示するチームアイコン
@@ -463,8 +471,8 @@ struct NewTabView: View {
             Color.clear
                 .overlay {
                     BlurView(style: .systemUltraThinMaterial)
+                        .opacity(inputTab.animationTab == .home ? 0 : 1)
                         .ignoresSafeArea()
-                        .opacity(min(-inputTab.scrollProgress, 1))
                 }
         )
     }
@@ -475,14 +483,11 @@ struct SelectBackgroundView: View {
 
     @EnvironmentObject var teamVM: TeamViewModel
     @Binding var inputTab: InputTab
-//    @Binding var select: SelectBackground
-//    @Binding var isShow: Bool = false
-//    @Binding var captureImage: UIImage
 
     @State private var showContents: Bool = false
     @State private var showProgress: Bool = false
 
-    @AppStorage("applicationDarkMode") var applicationDarkMode: Bool = false
+    @AppStorage("applicationDarkMode") var applicationDarkMode: Bool = true
 
     var body: some View {
 
@@ -600,8 +605,8 @@ struct SelectBackgroundView: View {
     @ViewBuilder
     func ScrollBackgroundImages() -> some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 30) {
-                ForEach(SelectBackground.allCases, id: \.self) { value in
+            LazyHStack(spacing: 30) {
+                ForEach(TeamBackgroundContents.allCases, id: \.self) { value in
                     Group {
                         if value == .original {
                             Group {

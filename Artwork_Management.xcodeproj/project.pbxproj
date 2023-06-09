@@ -45,6 +45,7 @@
 		BE254FBF29C0C396004FE9AE /* CubeCircleIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE254FBE29C0C396004FE9AE /* CubeCircleIcon.swift */; };
 		BE254FC129C0CA0B004FE9AE /* PersonCircleIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE254FC029C0CA0B004FE9AE /* PersonCircleIcon.swift */; };
 		BE2B808129E42CE70081439C /* CustomToggleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE2B808029E42CE60081439C /* CustomToggleButton.swift */; };
+		BE30B5C62A3217D80034755B /* BlurMuskingImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE30B5C52A3217D80034755B /* BlurMuskingImageView.swift */; };
 		BE392FF029C20E6900BB5700 /* Tab.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE392FEF29C20E6900BB5700 /* Tab.swift */; };
 		BE392FF329C2135300BB5700 /* ScrollOffsetModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE392FF229C2135300BB5700 /* ScrollOffsetModifier.swift */; };
 		BE3CD65B29B72B0700C19442 /* ProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3CD65A29B72B0700C19442 /* ProgressViewModel.swift */; };
@@ -67,6 +68,8 @@
 		BEB669A12A2A370A008FC9DE /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEB669A02A2A370A008FC9DE /* HomeViewModel.swift */; };
 		BEB669CB2A2CD105008FC9DE /* CustomLongPressGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEB669CA2A2CD105008FC9DE /* CustomLongPressGesture.swift */; };
 		BEB669EE2A2DF49E008FC9DE /* CGSizeExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEB669ED2A2DF49E008FC9DE /* CGSizeExtension.swift */; };
+		BECEBE572A2F9B260059B0DC /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = BECEBE562A2F9B260059B0DC /* Introspect */; };
+		BECEBE592A2F9B260059B0DC /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = BECEBE582A2F9B260059B0DC /* SwiftUIIntrospect */; };
 		E0003D0328FD3BB0007308B0 /* TagTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0003D0228FD3BB0007308B0 /* TagTitle.swift */; };
 		E01AA3A129167F02000FCD37 /* ResizableSheet in Frameworks */ = {isa = PBXBuildFile; productRef = E01AA3A029167F02000FCD37 /* ResizableSheet */; };
 		E01AA3A32916C674000FCD37 /* TagModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E01AA3A22916C674000FCD37 /* TagModel.swift */; };
@@ -178,6 +181,7 @@
 		BE254FBE29C0C396004FE9AE /* CubeCircleIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CubeCircleIcon.swift; sourceTree = "<group>"; };
 		BE254FC029C0CA0B004FE9AE /* PersonCircleIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonCircleIcon.swift; sourceTree = "<group>"; };
 		BE2B808029E42CE60081439C /* CustomToggleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomToggleButton.swift; sourceTree = "<group>"; };
+		BE30B5C52A3217D80034755B /* BlurMuskingImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurMuskingImageView.swift; sourceTree = "<group>"; };
 		BE392FEF29C20E6900BB5700 /* Tab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tab.swift; sourceTree = "<group>"; };
 		BE392FF229C2135300BB5700 /* ScrollOffsetModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollOffsetModifier.swift; sourceTree = "<group>"; };
 		BE3CD65A29B72B0700C19442 /* ProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressViewModel.swift; sourceTree = "<group>"; };
@@ -277,7 +281,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				BE41784229B4AB7E00434CFC /* FirebaseAnalytics in Frameworks */,
+				BECEBE572A2F9B260059B0DC /* Introspect in Frameworks */,
 				E01AA3A129167F02000FCD37 /* ResizableSheet in Frameworks */,
+				BECEBE592A2F9B260059B0DC /* SwiftUIIntrospect in Frameworks */,
 				E099CD2D291B395E00057543 /* FirebaseAuth in Frameworks */,
 				E099CD2F291B395E00057543 /* FirebaseFirestore in Frameworks */,
 				BE245BD229C5DA4F00539A04 /* SDWebImageSwiftUI in Frameworks */,
@@ -646,6 +652,7 @@
 				E0455FE5292CA001004F677D /* ColorCubeView.swift */,
 				E0455FE9292D1947004F677D /* GradientBackbround.swift */,
 				E0A7DE4F290DAB40008C3F3F /* BlurView.swift */,
+				BE30B5C52A3217D80034755B /* BlurMuskingImageView.swift */,
 				E09F09C828EE3B4900D07669 /* UsefulButton.swift */,
 				E0FCADA329708B9800BA6A75 /* LogoMark.swift */,
 				BE254FBE29C0C396004FE9AE /* CubeCircleIcon.swift */,
@@ -690,6 +697,8 @@
 				BE41783F29B4AB3100434CFC /* FirebaseDynamicLinks */,
 				BE41784129B4AB7E00434CFC /* FirebaseAnalytics */,
 				BE245BD129C5DA4F00539A04 /* SDWebImageSwiftUI */,
+				BECEBE562A2F9B260059B0DC /* Introspect */,
+				BECEBE582A2F9B260059B0DC /* SwiftUIIntrospect */,
 			);
 			productName = Artwork_Management;
 			productReference = E08F272128DDA08E00329C5E /* Artwork_Management.app */;
@@ -723,6 +732,7 @@
 				E01AA39F29167F02000FCD37 /* XCRemoteSwiftPackageReference "ResizableSheet" */,
 				E099CD2B291B395E00057543 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				BE245BD029C5DA4F00539A04 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
+				BECEBE552A2F9B260059B0DC /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
 			);
 			productRefGroup = E08F272228DDA08E00329C5E /* Products */;
 			projectDirPath = "";
@@ -778,6 +788,7 @@
 				BE599F6D2A1B25DF00821E01 /* customNavigationTitle.swift in Sources */,
 				BE41783D29B4535800434CFC /* AnimationExtension.swift in Sources */,
 				E0455FE6292CA002004F677D /* ColorCubeView.swift in Sources */,
+				BE30B5C62A3217D80034755B /* BlurMuskingImageView.swift in Sources */,
 				BE4664142A18BAD20072C025 /* TermsAndPrivacyText.swift in Sources */,
 				E0BFE1C629745AEB005481CA /* QRReader.swift in Sources */,
 				E04ACF4128E6DD600054A6C4 /* ShowsItemDetail.swift in Sources */,
@@ -1110,6 +1121,14 @@
 				minimumVersion = 2.0.0;
 			};
 		};
+		BECEBE552A2F9B260059B0DC /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/siteline/SwiftUI-Introspect.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.6.0;
+			};
+		};
 		E01AA39F29167F02000FCD37 /* XCRemoteSwiftPackageReference "ResizableSheet" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/mtj0928/ResizableSheet.git";
@@ -1143,6 +1162,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E099CD2B291B395E00057543 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAnalytics;
+		};
+		BECEBE562A2F9B260059B0DC /* Introspect */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BECEBE552A2F9B260059B0DC /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */;
+			productName = Introspect;
+		};
+		BECEBE582A2F9B260059B0DC /* SwiftUIIntrospect */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BECEBE552A2F9B260059B0DC /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */;
+			productName = SwiftUIIntrospect;
 		};
 		E01AA3A029167F02000FCD37 /* ResizableSheet */ = {
 			isa = XCSwiftPackageProductDependency;

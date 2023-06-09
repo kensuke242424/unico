@@ -173,7 +173,7 @@ struct CreateAndJoinTeamView: View {
                         .frame(height: 60)
                         .padding(.top, 20)
                     }
-                    .padding(.bottom, 40)
+                    .padding(.bottom, selectTeamFase == .success ? 0 : 40)
                 }
 
                 // create team contents...
@@ -356,9 +356,9 @@ struct CreateAndJoinTeamView: View {
                         var resizedIconImage      : UIImage?
                         var resizedBackgroundImage: UIImage?
                         // チーム作成時にリソースからランダムで背景をピックアップする。(.originalにImagenameは無いため、除かれる)
-                        var pickUpRandomBackground: SelectBackground = .original
-                        while pickUpRandomBackground == SelectBackground.original {
-                            pickUpRandomBackground = SelectBackground.allCases.randomElement()!
+                        var pickUpRandomBackground: TeamBackgroundContents = .original
+                        while pickUpRandomBackground == TeamBackgroundContents.original {
+                            pickUpRandomBackground = TeamBackgroundContents.allCases.randomElement()!
                             print("ランダム選出された背景: \(pickUpRandomBackground.imageName)")
                         }
 
@@ -371,9 +371,6 @@ struct CreateAndJoinTeamView: View {
                         
                         resizedBackgroundImage = logInVM.resizeUIImage(image: UIImage(named: pickUpRandomBackground.imageName),
                                                                        width: getRect().width * 4)
-                        
-                        print("resizedIconImage: \(resizedIconImage)")
-                        print("resizedBackgroundImage: \(resizedBackgroundImage)")
                         
                         /// リサイズ処理した画像をFirestorageに保存
                         let uplaodIconImageData       = await teamVM.firstUploadTeamImage(resizedIconImage,
@@ -403,8 +400,9 @@ struct CreateAndJoinTeamView: View {
                         
                         try await teamVM.addTeam(teamData: teamData)
                         try await userVM.addNewJoinTeam(newJoinTeam: joinTeamData)
+                            await teamVM.setSampleItem(teamID: teamData.id)
 
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                             withAnimation(.spring(response: 1)) {
                                 selectTeamFase = .success
                             }

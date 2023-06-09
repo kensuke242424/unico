@@ -74,16 +74,19 @@ class UserViewModel: ObservableObject {
                     return
                 }
                 print("userRealtimeListener開始")
-                do {
-                    let userData = try snap.data(as: User.self)
-                    self.user = userData
-                    print("userRealtimeListenerによりチームデータを更新")
-                    DispatchQueue.main.async {
-                        self.isAnonymousCheck()
-                        self.updatedUser.toggle()
+
+                withAnimation {
+                    do {
+                        let userData = try snap.data(as: User.self)
+                        self.user = userData
+                        print("userRealtimeListenerによりチームデータを更新")
+                        DispatchQueue.main.async {
+                            self.isAnonymousCheck()
+                            self.updatedUser.toggle()
+                        }
+                    } catch {
+                        print("userRealtimeListener_Error: try snap?.data(as: User.self)")
                     }
-                } catch {
-                    print("userRealtimeListener_Error: try snap?.data(as: User.self)")
                 }
             }
         }

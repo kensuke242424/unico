@@ -156,7 +156,7 @@ enum LogInAlert {
     }
 }
 
-enum SelectBackground: CaseIterable {
+enum TeamBackgroundContents: CaseIterable {
     case original, sample1, sample2, sample3, sample4
     
     var imageName: String {
@@ -193,7 +193,7 @@ struct InputLogIn {
     var createAccountShowContents   : Bool = false
     var repeatAnimation             : Bool = false
     var sendAddressButtonDisabled   : Bool = true
-    var selectBackground            : SelectBackground = .sample1
+    var selectBackground            : TeamBackgroundContents = .sample1
     
     /// Sheetやアラートなどのプレゼンテーションを管理するプロパティ
     var isShowPickerView                 : Bool = false
@@ -640,6 +640,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         /// userDocument側にも新規作成したチームのidを保存しておく(addNewJoinTeam)
                         try await teamVM.addTeam(teamData: teamData)
                         try await userVM.addNewJoinTeam(newJoinTeam: joinTeamData)
+                        await teamVM.setSampleItem(teamID: teamData.id)
                         
                         /// データ生成の成功を知らせるアニメーションの後、データのフェッチとログイン開始
                         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
@@ -886,7 +887,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 30) {
-                                ForEach(SelectBackground.allCases, id: \.self) { value in
+                                ForEach(TeamBackgroundContents.allCases, id: \.self) { value in
                                     Group {
                                         if value == .original {
                                             Image(uiImage: inputLogIn.captureBackgroundImage ?? UIImage())

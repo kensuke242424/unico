@@ -55,12 +55,15 @@ class TeamViewModel: ObservableObject {
                     return
                 }
                 print("teamRealtimeListener開始")
-                do {
-                    let teamData = try snap.data(as: Team.self)
-                    self.team = teamData
-                    print("teamRealtimeListenerによりチームデータを更新")
-                } catch {
-                    print("teamRealtimeListener_Error: try snap?.data(as: Team.self)")
+                
+                withAnimation {
+                    do {
+                        let teamData = try snap.data(as: Team.self)
+                        self.team = teamData
+                        print("teamRealtimeListenerによりチームデータを更新")
+                    } catch {
+                        print("teamRealtimeListener_Error: try snap?.data(as: Team.self)")
+                    }
                 }
             }
         }
@@ -97,6 +100,30 @@ class TeamViewModel: ObservableObject {
             team.members.append(detectMemberData)
             _ = try teamsRef.setData(from: team)
         }
+    }
+
+    /// チーム作成時にデフォルトのサンプルアイテムを追加するメソッド。
+    func setSampleItem(itemsData: [Item] = sampleItems, teamID: String) async {
+        print("addSampleItem実行")
+
+        guard let itemsRef = db?.collection("teams").document(teamID).collection("items") else {
+            print("error: guard let tagsRef")
+            return
+        }
+
+        for itemData in itemsData {
+            do {
+                /// サンプルアイテムデータのteamIDとタグを更新する
+                var itemData = itemData
+                itemData.teamID = teamID
+
+                _ = try itemsRef.addDocument(from: itemData)
+
+            } catch {
+                print("Error: addDocument(from: \(itemData.name)")
+            }
+        }
+        print("addSampleItem完了")
     }
 
     // メンバー招待画面で取得した相手のユーザIDを使ってFirestoreのusersからデータをフェッチ
@@ -392,6 +419,7 @@ class TeamViewModel: ObservableObject {
                     if teamData.members.count == 1 &&
                         teamData.members.first?.memberUID == userID {
                         // 削除対象ユーザーの他にチームメンバーが居なかった場合、全データをFirestoreから削除
+                        await self.deleteTeamImageData(path: teamData.backgroundPath)
                         _ = try await teamRowDocument.reference.delete()
 
                     } else {

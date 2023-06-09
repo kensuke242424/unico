@@ -31,34 +31,6 @@ struct Item: Identifiable, Equatable, Hashable, Codable {
     var totalInventory: Int
 }
 
-//Text(item.tag != "" ?
-//          "タグ　　　:　　 \(item.tag)" :
-//          "タグ　　　:　　 未グループ")
-//    .padding(.bottom, 12)
-//
-//Text("在庫　　　:　　 \(item.inventory) 個")
-//
-//Text(item.price != 0 ?
-//     "価格　　　:　　 ¥ \(item.price)" :
-//     "価格　　　:　　   -")
-//    .padding(.bottom, 12)
-//
-//Text(item.sales != 0 ?
-//     "総売上　　:　　 ¥ \(item.sales)" :
-//     "総売上　　:　　   -")
-//
-//Text(item.totalAmount != 0 ?
-//     "総売個数　:　　 \(item.totalAmount) 個" :
-//     "総売個数　:　　   -")
-//
-//Text(item.totalInventory != 0 ?
-//     "総在庫数　:　　 \(item.totalInventory) 個":
-//     "総仕入れ　:　　   -")
-//    .padding(.bottom, 12)
-//
-//Text("登録日　　:　　 \(asTimesString(item.createTime))")
-//Text("最終更新　:　　 \(asTimesString(item.updateTime))")
-
 extension Item {
     func description() -> String {
         
@@ -80,30 +52,53 @@ extension Item {
     }
 }
 
-struct ItemImageData: Codable {
-    var image: Data
-}
-
-enum Mode {
-    case dark
-    case light
-}
-
-var testItem: [Item] =
+var sampleItems: [Item] =
 [
-    Item(tag: "Clothes",
+    Item(tag: "goods",
              teamID: "",
-             name: "cloth_sample2",
-             author: "Anonymous User",
-             detail: "文がいくつか集まり、かつ、まとまった内容を表すもの。内容のうえで前の文と密接な関係をもつと考えられる文は、そのまま続いて書き継がれ、前の文と隔たりが意識されたとき、次の文は行を改めて書かれる。すなわち、段落がつけられるということであり、これは、書き手がまとまった内容を段落ごとにまとめようとするからである。この、一つの段落にまとめられる、いくつかの文の集まりを一文章というが、よりあいまいに、いくつかの文をまとめて取り上げるときにそれを文章と称したり、文と同意義としたりすることもあるなど文章はことばの単位として厳密なものでないことが多い。。",
-             photoURL: nil,
+             name: "サンプル１",
+             author: "ユニコ太郎",
+             detail: "ここにアイテムの詳細メモが入ります。",
+             photoURL: URL(string: "https://firebasestorage.googleapis.com/v0/b/unico-cc222.appspot.com/o/sample%2Fgoods_sample6.jpg?alt=media&token=99a780be-3b48-4a6e-a5bf-4af27cd4d64b&_gl=1*1pgnkik*_ga*Njc5ODMwMzQzLjE2NzY5Nzg1MDE.*_ga_CW55HF8NVT*MTY4NjI5NDAzNi41OS4xLjE2ODYyOTY4MDMuMC4wLjA."),
              photoPath: nil,
              favorite: false,
              cost: 1000,
              price: 2800,
              amount: 0,
-             sales: 128000,
-             inventory: 2,
-             totalAmount: 120,
+             sales: 28000,
+             inventory: 50,
+             totalAmount: 0,
+             totalInventory: 0),
+
+    Item(tag: "goods",
+             teamID: "",
+             name: "サンプル２",
+             author: "ユニコ太郎",
+             detail: "ここにアイテムの詳細メモが入ります。",
+         photoURL: URL(string: "https://firebasestorage.googleapis.com/v0/b/unico-cc222.appspot.com/o/sample%2Fgoods_sample5.jpg?alt=media&token=c0b304f2-59cc-4bb2-a8a3-b7eafb695d2b&_gl=1*qhrcnt*_ga*Njc5ODMwMzQzLjE2NzY5Nzg1MDE.*_ga_CW55HF8NVT*MTY4NjI5NDAzNi41OS4xLjE2ODYyOTgwNDQuMC4wLjA."),
+             photoPath: nil,
+             favorite: false,
+             cost: 1000,
+             price: 2000,
+             amount: 0,
+             sales: 40000,
+             inventory: 180,
+             totalAmount: 20,
              totalInventory: 200),
+
+    Item(tag: "goods",
+             teamID: "",
+             name: "サンプル３",
+             author: "ユニコ太郎",
+             detail: "ここにアイテムの詳細メモが入ります。",
+         photoURL: URL(string: "https://firebasestorage.googleapis.com/v0/b/unico-cc222.appspot.com/o/sample%2Fcloth_sample2.jpg?alt=media&token=cd980c1f-f2d5-46bf-bdf6-cdea9bd1e776&_gl=1*yduooq*_ga*Njc5ODMwMzQzLjE2NzY5Nzg1MDE.*_ga_CW55HF8NVT*MTY4NjI5NDAzNi41OS4xLjE2ODYyOTg0NDEuMC4wLjA."),
+             photoPath: nil,
+             favorite: false,
+             cost: 2000,
+             price: 3500,
+             amount: 0,
+             sales: 35000,
+             inventory: 90,
+             totalAmount: 10,
+             totalInventory: 100),
 ]
