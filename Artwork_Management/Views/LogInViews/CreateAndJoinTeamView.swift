@@ -28,6 +28,8 @@ struct CreateAndJoinTeamView: View {
     @EnvironmentObject var logInVM: LogInViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
+    @EnvironmentObject var tagVM: TagViewModel
+    @EnvironmentObject var backgroundVM: BackgroundViewModel
 
     @State private var inputTeamName: String = ""
     @State private var captureIconUIImage: UIImage?
@@ -349,30 +351,50 @@ struct CreateAndJoinTeamView: View {
                 
                 Task {
                     do {
-                        if inputTeamName.isEmpty { inputTeamName = "No Name" }
+                        let userName = userVM.user?.name ?? "名無し"
+                        if inputTeamName.isEmpty { inputTeamName = "\(userName)のチーム" }
                         
                         // 背景、アイコン画像をリサイズして保存していく
                         let createTeamID = UUID().uuidString
-                        var resizedIconImage      : UIImage?
-                        var resizedBackgroundImage: UIImage?
-                        // チーム作成時にリソースからランダムで背景をピックアップする。(.originalにImagenameは無いため、除かれる)
-                        let pickUpBackgroundCategory = TeamBackgroundContents.allCases.randomElement()
-                        let pickUpBackground = UIImage(named: pickUpBackgroundCategory?.imageContents.randomElement() ?? "")
+                        var iconImageContainer      : UIImage?
+                        var backgroundImageContainer: UIImage?
 
-                        // 60 -> アイコンwidth
+                        // アイコン画像が入力されていれば、リサイズ処理をしてコンテナに格納
                         if let captureIconUIImage {
-                            resizedIconImage = logInVM.resizeUIImage(image: captureIconUIImage,
+                            iconImageContainer = logInVM.resizeUIImage(image: captureIconUIImage,
                                                                     width: 60)
                         }
-                        /// オリジナル背景ではなくサンプル背景を選択していた場合は、付属のImageをUIImageに直してからリサイズ
-                        
-                        resizedBackgroundImage = logInVM.resizeUIImage(image: pickUpBackground,
-                                                                       width: getRect().width * 4)
-                        
-                        /// リサイズ処理した画像をFirestorageに保存
-                        let uplaodIconImageData       = await teamVM.firstUploadTeamImage(resizedIconImage,
+
+                        // 選択カテゴリがオリジナル&背景画像データが入力されていれば、リサイズ処理をしてコンテナに格納
+                        if backgroundVM.selectBackgroundCategory == .original {
+                            if let captureBackgroundUIImage = backgroundVM.captureBackgroundImage {
+
+                                let resizedBackgroundUIImage = logInVM.resizeUIImage(image: captureBackgroundUIImage,
+                                                                                 width: getRect().width * 4)
+                                backgroundImageContainer = resizedBackgroundUIImage
+
+                            } else {
+                                /// 入力背景画像がnilだった場合、サンプル画像から一つランダムで選出し、コンテナに格納
+                                let randomPickUpBackground = teamVM.getRandomBackgroundUIImage()
+                                backgroundImageContainer = randomPickUpBackground
+                            }
+
+                        } else {
+                            /// サンプル背景はリサイズ済みのため、リサイズ処理はしない
+                            if let selectedBackgroundUIImage = backgroundVM.selectedBackgroundImage {
+                                backgroundImageContainer = selectedBackgroundUIImage
+
+                            } else {
+                                /// 入力背景画像がnilだった場合、サンプル画像から一つランダムで選出し、コンテナに格納
+                                let randomPickUpBackground = teamVM.getRandomBackgroundUIImage()
+                                backgroundImageContainer = randomPickUpBackground
+                            }
+                        }
+
+                        /// 準備したチームアイコン&背景画像をFirestorageに保存
+                        let uplaodIconImageData       = await teamVM.firstUploadTeamImage(iconImageContainer,
                                                                                           id: createTeamID)
-                        let uplaodBackgroundImageData = await teamVM.firstUploadTeamImage(resizedBackgroundImage,
+                        let uplaodBackgroundImageData = await teamVM.firstUploadTeamImage(backgroundImageContainer,
                                                                                           id: createTeamID)
                         
                         // チームデータに格納するログインユーザのユーザデータ
@@ -398,6 +420,7 @@ struct CreateAndJoinTeamView: View {
                         try await teamVM.addTeam(teamData: teamData)
                         try await userVM.addNewJoinTeam(newJoinTeam: joinTeamData)
                             await teamVM.setSampleItem(teamID: teamData.id)
+                            tagVM.addTag(tagData: tagVM.sampleTag, teamID: teamData.id)
 
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                             withAnimation(.spring(response: 1)) {

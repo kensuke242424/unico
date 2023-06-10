@@ -21,6 +21,9 @@ class TagViewModel: ObservableObject {
     @Published var tags: [Tag] = []
     @Published var showEdit: Bool = false
 
+    /// チーム作成時にデフォルトで挿入するサンプルタグ
+    let sampleTag = Tag(oderIndex: 1, tagName: "goods", tagColor: .gray)
+
     func fetchTag(teamID: String) async {
 
         print("fetchTag実行")

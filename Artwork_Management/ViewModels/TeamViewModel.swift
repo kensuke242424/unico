@@ -240,6 +240,20 @@ class TeamViewModel: ObservableObject {
         }
     }
 
+    /// デフォルト付属の背景イメージデータ群から一つのUIImageをランダムで取り出すメソッド
+    func getRandomBackgroundUIImage() -> UIImage? {
+
+        let pickUpBackground: UIImage?
+        let pickUpBackgroundCategory = TeamBackgroundContents.allCases.randomElement()
+
+        guard let getCategory = pickUpBackgroundCategory else { return nil }
+        guard let getImageString = getCategory.imageContents.randomElement() else {return nil }
+        pickUpBackground = UIImage(named: getImageString)
+        print(pickUpBackground)
+
+        return pickUpBackground
+    }
+
     func updateTeamBackgroundImage(data: (url: URL?, filePath: String?)) async throws {
 
         guard var team else { throw CustomError.teamEmpty }

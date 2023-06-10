@@ -199,6 +199,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
     @EnvironmentObject var logInVM: LogInViewModel
     @EnvironmentObject var teamVM : TeamViewModel
     @EnvironmentObject var userVM : UserViewModel
+    @EnvironmentObject var tagVM : TagViewModel
 
     @EnvironmentObject var backgroundVM: BackgroundViewModel
     
@@ -569,41 +570,47 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             logInVM.createAccountFase = .check
                         }
                         
-                        // 背景、アイコン画像をリサイズして保存していく
-                        var resizedIconImage      : UIImage?
-                        var resizedBackgroundImage: UIImage?
+                        // 背景画像&アイコン画像のデータ容器
+                        var iconImageContainer      : UIImage?
+                        var backgroundImageContainer: UIImage?
+
                         // チームIDを作成しておく。背景画像をFireStorage保存時に使う
                         let createTeamID = UUID().uuidString
-                        
-                        // 60 -> アイコンwidth
+
+                        /// ーーーーアイコン画像処理ーーーー
+                        /// オリジナルアイコン画像が入力されている場合は、リサイズ処理しコンテナに格納
                         if let captureIconUIImage = inputLogIn.captureUserIconImage {
-                            resizedIconImage = logInVM.resizeUIImage(image: captureIconUIImage,
+                            iconImageContainer = logInVM.resizeUIImage(image: captureIconUIImage,
                                                                     width: 60)
                         }
-                        /// オリジナル背景ではなくサンプル背景を選択していた場合は、付属のImageをUIImageに直してからリサイズ
-                        if let captureBackgroundImage = inputLogIn.captureBackgroundImage {
-                            resizedBackgroundImage = logInVM.resizeUIImage(image: captureBackgroundImage,
-                                                                          width: getRect().width * 4)
+
+                        /// ーーーー背景画像処理ーーーー
+                        /// /// オリジナル背景画像が入力されている場合は、リサイズ処理しコンテナに格納
+                        if let captureBackgroundImage = backgroundVM.captureBackgroundImage {
+
+                            iconImageContainer = logInVM.resizeUIImage(image: captureBackgroundImage,
+                                                                       width: getRect().width * 4)
+                        /// サンプル背景はリサイズ済みのため、リサイズ処理を飛ばす
+                        /// 選択画像がnilの場合は、サンプル画像を代わりに挿入
                         } else {
-                            let convertBackgroundUIImage = backgroundVM.selectedBackgroundImage ?? UIImage()
-                            resizedBackgroundImage = logInVM.resizeUIImage(image: convertBackgroundUIImage,
-                                                                          width: getRect().width * 4)
+                            let selectedBackgroundImage = backgroundVM.selectedBackgroundImage ?? UIImage(named: "music_1")
+                            backgroundImageContainer = selectedBackgroundImage
                         }
-                        
-                        /// リサイズ処理した画像をFirestorageに保存
-                        let uplaodIconImageData       = await userVM.uploadUserImage(resizedIconImage)
-                        let uplaodBackgroundImageData = await teamVM.firstUploadTeamImage(resizedBackgroundImage,
+
+                        /// ーーーー用意した画像データのアップロード処理ーーーー
+                        let uplaodIconImageData       = await userVM.uploadUserImage(iconImageContainer)
+                        let uplaodBackgroundImageData = await teamVM.firstUploadTeamImage(backgroundImageContainer,
                                                                                           id: createTeamID)
-                        
-                        /// ユーザーの入力値をもとにユーザーデータを作成し、Firestoreに保存⬇︎
+
                         if inputLogIn.createUserNameText == "" {
                             inputLogIn.createUserNameText = "名無し"
                         }
-                        
+
+                        /// ユーザーの入力値をもとにユーザーデータを作成し、Firestoreに保存⬇︎
                         try await logInVM.setNewUserDocument(name     : inputLogIn.createUserNameText,
-                                                                password : inputLogIn.password,
-                                                                imageData: uplaodIconImageData,
-                                                                color    : inputLogIn.selectUserColor)
+                                                             password : inputLogIn.password,
+                                                             imageData: uplaodIconImageData,
+                                                             color    : inputLogIn.selectUserColor)
                         
                         // Firestoreに保存したデータをローカルに引っ張ってくる
                         try await userVM.fetchUser()
@@ -626,15 +633,16 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         try await teamVM.addTeam(teamData: teamData)
                         try await userVM.addNewJoinTeam(newJoinTeam: joinTeamData)
                         await teamVM.setSampleItem(teamID: teamData.id)
+                        tagVM.addTag(tagData: tagVM.sampleTag, teamID: teamData.id)
                         
                         /// データ生成の成功を知らせるアニメーションの後、データのフェッチとログイン開始
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                             withAnimation(.spring(response: 1.3)) {
                                 hapticSuccessNotification()
                                 logInVM.createAccountFase = .success
                             }
                         }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
                             withAnimation(.spring(response: 0.7)) {
                                 logInVM.rootNavigation = .fetch
                             }

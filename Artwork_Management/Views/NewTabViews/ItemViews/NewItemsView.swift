@@ -9,6 +9,8 @@ import SwiftUI
 import ResizableSheet
 import Introspect
 
+/// アイテムの在庫処理時のカート内の状態を管理する
+/// このプロパティ群に値が検知されると、カートハーフモーダルが出現する
 struct InputCart {
     var doCommerce: Bool = false
     var resultCartAmount: Int = 0

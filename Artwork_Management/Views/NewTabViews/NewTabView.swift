@@ -167,6 +167,14 @@ struct NewTabView: View {
                 }
                 /// サイドメニューView
                 .overlay {
+                    if inputTab.showSideMenu {
+                        Color.black.opacity(0.3).ignoresSafeArea()
+                            .onTapGesture(perform: {
+                                withAnimation(.spring(response: 0.5)) {
+                                    inputTab.showSideMenu.toggle()
+                                }
+                            })
+                    }
                         SystemSideMenu(itemVM: itemVM, inputTab: $inputTab)
                             .offset(x: inputTab.showSideMenu ? 0 : -size.width)
                 }

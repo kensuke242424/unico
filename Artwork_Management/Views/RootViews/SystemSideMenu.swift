@@ -314,7 +314,12 @@ struct SystemSideMenu: View {
                                                 Button("戻る") {}
                                                 Button("はい") {
                                                     withAnimation(.spring(response: 0.5)) {
-                                                        logInVM.rootNavigation = .join
+                                                        inputTab.showSideMenu = false
+                                                    }
+                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                                        withAnimation(.spring(response: 0.7)) {
+                                                            logInVM.rootNavigation = .join
+                                                        }
                                                     }
                                                 }
                                             } message: {

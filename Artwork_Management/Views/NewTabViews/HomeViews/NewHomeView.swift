@@ -117,8 +117,7 @@ struct NewHomeView: View {
                 let currentTeamIndex = userVM.getCurrentTeamIndex()
                 guard let user = userVM.user else { return }
                 guard let getIndex = currentTeamIndex else { return }
-                print("nowTime: \(user.joins[getIndex].homeEdits.nowTime)")
-                print("teamNews: \(user.joins[getIndex].homeEdits.teamNews)")
+
                 nowTime = user.joins[getIndex].homeEdits.nowTime
                 teamNews = user.joins[getIndex].homeEdits.teamNews
             }
