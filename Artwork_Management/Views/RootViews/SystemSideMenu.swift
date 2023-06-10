@@ -49,6 +49,7 @@ struct SystemSideMenu: View {
     @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var progressVM: ProgressViewModel
     @EnvironmentObject var homeVM: HomeViewModel
+    @EnvironmentObject var backgroundVM: BackgroundViewModel
 
     @EnvironmentObject var logInVM : LogInViewModel
     @EnvironmentObject var teamVM  : TeamViewModel
@@ -330,7 +331,7 @@ struct SystemSideMenu: View {
                                                 }
                                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                                                     withAnimation(.spring(response: 0.7, blendDuration: 1)) {
-                                                        inputTab.showSelectBackground.toggle()
+                                                        backgroundVM.showSelectBackground.toggle()
                                                     }
                                                 }
                                             }

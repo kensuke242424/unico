@@ -34,6 +34,7 @@ struct NewHomeView: View {
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var homeVM: HomeViewModel
+    @EnvironmentObject var backgroundVM: BackgroundViewModel
     @StateObject var itemVM: ItemViewModel
 
     /// Tab親Viewから受け取った状態変数群
@@ -61,8 +62,8 @@ struct NewHomeView: View {
                     NowTimeView(size)
                         .foregroundColor(applicationDarkMode ? .white : .black)
                         .opacity(1 - min((-inputTab.scrollProgress * 2), 1))
-                        .blur(radius: inputTab.checkBackgroundAnimation ||
-                                      !inputTab.showSelectBackground ? 0 : 2)
+                        .blur(radius: backgroundVM.checkBackgroundAnimation ||
+                                      !backgroundVM.showSelectBackground ? 0 : 2)
                         .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 20)))
                         .scaleEffect(nowTime.transitionScale)
                         .scaleEffect(nowTime.pressingAnimation ? 1.02 : 1)
@@ -88,8 +89,8 @@ struct NewHomeView: View {
                     TeamNewsView(size)
                         .foregroundColor(applicationDarkMode ? .white : .black)
                         .opacity(1 - min((-inputTab.scrollProgress * 2), 1))
-                        .blur(radius: inputTab.checkBackgroundAnimation ||
-                                      !inputTab.showSelectBackground ? 0 : 2)
+                        .blur(radius: backgroundVM.checkBackgroundAnimation ||
+                                      !backgroundVM.showSelectBackground ? 0 : 2)
                         .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 20)))
                         .scaleEffect(teamNews.transitionScale)
                         .scaleEffect(teamNews.pressingAnimation ? 1.02 : 1)
@@ -427,6 +428,7 @@ struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
         NewHomeView(itemVM: ItemViewModel(),
                     inputTab: .constant(InputTab()))
+        .environmentObject(BackgroundViewModel())
         .background {
             Image("background_4")
                 .resizable()

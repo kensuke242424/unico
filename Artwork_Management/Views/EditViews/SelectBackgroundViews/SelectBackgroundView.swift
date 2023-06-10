@@ -134,36 +134,44 @@ struct SelectBackgroundView: View {
     func ScrollBackgroundImages() -> some View {
         ScrollView(.horizontal, showsIndicators: false) {
             LazyHStack(spacing: 30) {
+                Spacer().frame(width: 40)
                 ForEach(backgroundVM.selectBackgroundCategory.imageContents, id: \.self) { value in
                     Group {
-//                        if value == .original {
-//                            Group {
-//                                if let captureNewImage = inputTab.captureBackgroundImage {
-//                                    Image(uiImage: captureNewImage)
-//                                        .resizable()
-//                                        .scaledToFill()
-//                                        .frame(width: 120, height: 250)
-//                                } else {
-//                                    SDWebImageView(imageURL: teamVM.team?.backgroundURL,
-//                                                   width: 120,
-//                                                   height: 250)
-//                                }
-//                            }
-//                            .overlay {
-//                                Button("写真を挿入") {
-//                                    inputTab.showPickerView.toggle()
-//                                }
-//                                .font(.footnote)
-//                                .buttonStyle(.borderedProminent)
-//                            }
-//                        } else {
                         Image(uiImage: value)
                                 .resizable()
                                 .scaledToFill()
+                                .allowsHitTesting(false)
                                 .frame(width: 120, height: 250)
-//                        }
+                                .shadow(radius: 5, x: 2, y: 2)
+                                .shadow(radius: 5, x: 2, y: 2)
+                                .shadow(radius: 5, x: 2, y: 2)
+                                .clipShape(RoundedRectangle(cornerRadius: 20))
+                                .onTapGesture {
+                                    withAnimation(.spring(response: 0.5)) {
+                                        print("写真タップ")
+                                        backgroundVM.selectedBackgroundImage = value
+                                    }
+                                }
+                                /// タップ範囲調整のため、本体の画像タップ判定はfalseにして
+                                /// こちらで処理する
+                                .overlay {
+                                    Rectangle()
+                                        .frame(width: 120, height: 250)
+                                        .opacity(0.01)
+                                        .onTapGesture {
+                                            withAnimation(.spring(response: 0.5)) {
+                                                backgroundVM.selectedBackgroundImage = value
+                                            }
+                                        }
+                                }
+                                .overlay {
+                                    RoundedRectangle(cornerRadius: 20)
+                                        .stroke(lineWidth: 1)
+                                        .fill(.gray.gradient)
+                                }
+
                     } // Group
-                    .clipped()
+
                     .scaleEffect(backgroundVM.selectedBackgroundImage == value ? 1.15 : 1.0)
                     .overlay(alignment: .topTrailing) {
                         Image(systemName: "checkmark.seal.fill")
@@ -175,15 +183,8 @@ struct SelectBackgroundView: View {
                             .opacity(backgroundVM.selectedBackgroundImage == value ? 1.0 : 0.0)
                             .offset(x: 15, y: -20)
                     }
-                    //TODO: 両サイドの間隔開ける
-//                    .padding(.leading, value == .original ? 40 : 0)
-//                    .padding(.trailing, value == .sample4 ? 40 : 0)
-                    .onTapGesture {
-                        withAnimation(.spring(response: 0.5)) {
-                            backgroundVM.selectedBackgroundImage = value
-                        }
-                    }
                 }
+                Spacer().frame(width: 40)
             }
             .frame(height: 300)
         } // ScrollView

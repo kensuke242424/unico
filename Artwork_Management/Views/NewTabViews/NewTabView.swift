@@ -120,30 +120,13 @@ struct NewTabView: View {
                     ZStack {
                         GeometryReader { proxy in
                             // ーーー　背景編集モード時　ーーー
-                            if inputTab.showSelectBackground {
-                                if inputTab.selectBackground == .original {
-                                    if let captureNewImage = inputTab.captureBackgroundImage {
-                                        Image(uiImage: captureNewImage)
-                                            .resizable()
-                                            .scaledToFill()
-                                            .frame(width: proxy.size.width, height: proxy.size.height)
-                                            .blur(radius: inputTab.checkBackgroundAnimation ? 0 : 3, opaque: true)
-                                            .ignoresSafeArea()
-                                    } else {
-                                        SDWebImageView(imageURL : teamVM.team?.backgroundURL,
-                                                       width : proxy.size.width,
-                                                       height: proxy.size.height)
-                                        .blur(radius: inputTab.checkBackgroundAnimation ? 0 : 3, opaque: true)
-                                    }
-
-                                } else {
-                                    Image(inputTab.selectBackground.imageName)
+                            if backgroundVM.showSelectBackground {
+                                    Image(uiImage: backgroundVM.selectedBackgroundImage ?? UIImage())
                                         .resizable()
                                         .scaledToFill()
                                         .frame(width: proxy.size.width, height: proxy.size.height)
-                                        .blur(radius: inputTab.checkBackgroundAnimation ? 0 : 3, opaque: true)
+                                        .blur(radius: backgroundVM.checkBackgroundAnimation ? 0 : 3, opaque: true)
                                         .ignoresSafeArea()
-                                }
                             // ーーー　通常時　ーーー
                             } else {
                                 SDWebImageView(imageURL : teamVM.team?.backgroundURL,
@@ -153,14 +136,14 @@ struct NewTabView: View {
                                 .blur(radius: homeVM.isActiveEdit ? 5 : 0, opaque: true)
                                 .blur(radius: inputTab.pressingAnimation ? 6 : 0, opaque: true)
                                 .overlay {
+                                    BlurMaskingImageView(imageURL: teamVM.team?.backgroundURL)
+                                        .opacity(inputTab.animationTab != .home ? 1 : 0)
+                                }
+                                .overlay {
                                     if homeVM.isActiveEdit {
                                         Color.black.opacity(0.4)
                                             .ignoresSafeArea()
                                     }
-                                }
-                                .overlay {
-                                    BlurMaskingImageView(imageURL: teamVM.team?.backgroundURL)
-                                        .opacity(inputTab.animationTab != .home ? 1 : 0)
                                 }
                             }
                         }
@@ -168,12 +151,12 @@ struct NewTabView: View {
                 } // background
                 // チームの背景を変更編集するView
                 .overlay {
-                    if inputTab.showSelectBackground {
+                    if backgroundVM.showSelectBackground {
 
                         Color.black
-                            .blur(radius: inputTab.checkBackgroundAnimation ||
-                                          !inputTab.showSelectBackground ? 0 : 2)
-                            .opacity(inputTab.checkBackgroundAnimation ? 0.1 : 0.5)
+                            .blur(radius: backgroundVM.checkBackgroundAnimation ||
+                                          !backgroundVM.showSelectBackground ? 0 : 2)
+                            .opacity(backgroundVM.checkBackgroundAnimation ? 0.1 : 0.5)
                             .ignoresSafeArea()
                             .onTapGesture(perform: {
                                 // FIXME: これを入れておかないと下層のViewにタップが貫通してしまう🤔
@@ -387,7 +370,7 @@ struct NewTabView: View {
             let tabWidth = size.width / 3
             HStack {
                 ForEach(Tab.allCases, id: \.rawValue) { tab in
-                    Text(tab == .home && inputTab.showSelectBackground ? "背景変更中" :
+                    Text(tab == .home && backgroundVM.showSelectBackground ? "背景変更中" :
                             tab == .home && homeVM.isActiveEdit ? "編集中" :
                             tab.rawValue)
                     .font(.title3)
@@ -496,7 +479,7 @@ struct NewTabView_Previews: PreviewProvider {
                    windowScene.flatMap(ResizableSheetCenter.resolve(for:))
                }
 
-        return NewTabView(itemVM: ItemViewModel(), cartVM: CartViewModel(), backgroundVM: BackgroundViewModel())
+        return NewTabView(itemVM: ItemViewModel(), cartVM: CartViewModel())
             .environment(\.resizableSheetCenter, resizableSheetCenter)
             .environmentObject(NavigationViewModel())
             .environmentObject(LogInViewModel())

@@ -492,21 +492,21 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         .background {
             ZStack {
                 GeometryReader { proxy in
-                    if inputLogIn.selectBackground == .original {
-                        Image(uiImage: inputLogIn.captureBackgroundImage ?? UIImage())
+//                    if inputLogIn.selectBackground == .original {
+//                        Image(uiImage: inputLogIn.captureBackgroundImage ?? UIImage())
+//                            .resizable()
+//                            .scaledToFill()
+//                            .frame(width: proxy.size.width, height: proxy.size.height)
+//                            .blur(radius: inputLogIn.checkBackgroundEffect ? 0 : 4, opaque: true)
+//                            .ignoresSafeArea()
+//                    } else {
+                    Image(uiImage: backgroundVM.selectedBackgroundImage ?? UIImage())
                             .resizable()
                             .scaledToFill()
                             .frame(width: proxy.size.width, height: proxy.size.height)
                             .blur(radius: inputLogIn.checkBackgroundEffect ? 0 : 4, opaque: true)
                             .ignoresSafeArea()
-                    } else {
-                        Image(inputLogIn.selectBackground.imageName)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: proxy.size.width, height: proxy.size.height)
-                            .blur(radius: inputLogIn.checkBackgroundEffect ? 0 : 4, opaque: true)
-                            .ignoresSafeArea()
-                    }
+//                    }
                     Color(.black)
                         .frame(width: proxy.size.width, height: proxy.size.height)
                         .opacity(inputLogIn.checkBackgroundEffect      ? 0.0 :
@@ -585,7 +585,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             resizedBackgroundImage = logInVM.resizeUIImage(image: captureBackgroundImage,
                                                                           width: getRect().width * 4)
                         } else {
-                            let convertBackgroundUIImage = UIImage(named: inputLogIn.selectBackground.imageName)
+                            let convertBackgroundUIImage = backgroundVM.selectedBackgroundImage ?? UIImage()
                             resizedBackgroundImage = logInVM.resizeUIImage(image: convertBackgroundUIImage,
                                                                           width: getRect().width * 4)
                         }
@@ -867,129 +867,131 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     
                 // Fase1: 背景写真を選んでもらうフェーズ
                 case .fase1:
+
+                    SelectBackgroundView()
                     
-                    VStack(spacing: 30) {
-                        
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 30) {
-                                ForEach(TeamBackgroundContents.allCases, id: \.self) { value in
-                                    Group {
-//                                        if value == .original {
-//                                            Image(uiImage: inputLogIn.captureBackgroundImage ?? UIImage())
+//                    VStack(spacing: 30) {
+//
+//                        ScrollView(.horizontal, showsIndicators: false) {
+//                            HStack(spacing: 30) {
+//                                ForEach(TeamBackgroundContents.allCases, id: \.self) { value in
+//                                    Group {
+////                                        if value == .original {
+////                                            Image(uiImage: inputLogIn.captureBackgroundImage ?? UIImage())
+////                                                .resizable()
+////                                                .scaledToFill()
+////                                                .frame(width: 120, height: 250)
+////                                                .border(.blue, width: 1)
+////                                                .overlay {
+////                                                    Button("写真を挿入") {
+////                                                        inputLogIn.isShowPickerView.toggle()
+////                                                    }
+////                                                    .buttonStyle(.borderedProminent)
+////                                                }
+////                                        } else {
+//                                        Image(uiImage: value)
 //                                                .resizable()
 //                                                .scaledToFill()
 //                                                .frame(width: 120, height: 250)
-//                                                .border(.blue, width: 1)
-//                                                .overlay {
-//                                                    Button("写真を挿入") {
-//                                                        inputLogIn.isShowPickerView.toggle()
-//                                                    }
-//                                                    .buttonStyle(.borderedProminent)
-//                                                }
-//                                        } else {
-                                        Image(uiImage: value)
-                                                .resizable()
-                                                .scaledToFill()
-                                                .frame(width: 120, height: 250)
+////                                        }
+//                                    }
+//                                    .clipped()
+//                                    .scaleEffect(inputLogIn.selectBackground == value ? 1.2 : 1.0)
+//                                    .overlay(alignment: .topTrailing) {
+//                                        Image(systemName: "checkmark.seal.fill")
+//                                            .resizable()
+//                                            .scaledToFit()
+//                                            .foregroundColor(.green)
+//                                            .frame(width: 30, height: 30)
+//                                            .scaleEffect(inputLogIn.selectBackground == value ? 1.0 : 1.2)
+//                                            .opacity(inputLogIn.selectBackground == value ? 1.0 : 0.0)
+//                                            .offset(x: 20, y: -30)
+//                                    }
+//                                    .padding(.leading, value == .original ? 40 : 0)
+//                                    .padding(.trailing, value == .sample4 ? 40 : 0)
+//                                    .onTapGesture {
+//                                        withAnimation(.spring(response: 0.5)) {
+//                                            inputLogIn.selectBackground = value
 //                                        }
-                                    }
-                                    .clipped()
-                                    .scaleEffect(inputLogIn.selectBackground == value ? 1.2 : 1.0)
-                                    .overlay(alignment: .topTrailing) {
-                                        Image(systemName: "checkmark.seal.fill")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .foregroundColor(.green)
-                                            .frame(width: 30, height: 30)
-                                            .scaleEffect(inputLogIn.selectBackground == value ? 1.0 : 1.2)
-                                            .opacity(inputLogIn.selectBackground == value ? 1.0 : 0.0)
-                                            .offset(x: 20, y: -30)
-                                    }
-                                    .padding(.leading, value == .original ? 40 : 0)
-                                    .padding(.trailing, value == .sample4 ? 40 : 0)
-                                    .onTapGesture {
-                                        withAnimation(.spring(response: 0.5)) {
-                                            inputLogIn.selectBackground = value
-                                        }
-                                    }
-                                }
-                            }
-                            .frame(height: 310)
-                        }
-                    } // VStack
-                    .opacity(inputLogIn.checkBackgroundOpacity)
-                    .offset(y: 20)
-                    
-                    Button("次へ") {
-                        withAnimation(.spring(response: 1.0)) {
-                            inputLogIn.createAccountTitle = false
-                            inputLogIn.createAccountShowContents = false
-                            logInVM.createAccountFase = .fase2
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                            withAnimation(.spring(response: 0.8)) {
-                                inputLogIn.createAccountTitle = true
-                            }
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                            withAnimation(.spring(response: 0.8)) {
-                                inputLogIn.createAccountShowContents = true
-                            }
-                        }
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .opacity(inputLogIn.checkBackgroundOpacity)
-                    .overlay(alignment: .trailing) {
-                        VStack {
-
-                            HStack {
-                                Spacer()
-                                ZStack {
-                                    BlurView(style: .systemThickMaterial)
-                                        .frame(width: 90, height: 160)
-                                        .clipShape(RoundedRectangle(cornerRadius: 15))
-                                        .opacity(0.8)
-
-                                    VStack(spacing: 20) {
-                                        VStack {
-                                            Text("背景を確認").font(.footnote).offset(x: 15)
-                                            Toggle("", isOn: $checkBackgroundToggle)
-                                        }
-                                        VStack {
-                                            Text("ダークモード").font(.footnote).offset(x: 15)
-                                            Toggle("", isOn: $applicationDarkMode)
-                                        }
-                                    }
-                                    .frame(width: 80)
-                                    .padding(.trailing, 30)
-                                    .onChange(of: checkBackgroundToggle) { newValue in
-                                        if newValue {
-                                            withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                                                checkBackgroundAnimation = true
-                                            }
-                                        } else {
-                                            withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                                                checkBackgroundAnimation = false
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                        }
-                        .frame(width: 80)
-                        .offset(x: 130, y: 50)
-                        .onChange(of: checkBackgroundToggle) { newValue in
-                            if newValue {
-                                withAnimation(.easeIn(duration: 0.2)) { inputLogIn.checkBackgroundOpacity = 0.0 }
-                                withAnimation(.easeIn(duration: 0.2)) { inputLogIn.checkBackgroundEffect.toggle() }
-                            } else {
-                                withAnimation(.easeIn(duration: 0.2)) { inputLogIn.checkBackgroundOpacity = 1.0 }
-                                withAnimation(.easeIn(duration: 0.2)) { inputLogIn.checkBackgroundEffect.toggle() }
-                            }
-                        }
-                    }
-                    .offset(y: 20)
+//                                    }
+//                                }
+//                            }
+//                            .frame(height: 310)
+//                        }
+//                    } // VStack
+//                    .opacity(inputLogIn.checkBackgroundOpacity)
+//                    .offset(y: 20)
+//
+//                    Button("次へ") {
+//                        withAnimation(.spring(response: 1.0)) {
+//                            inputLogIn.createAccountTitle = false
+//                            inputLogIn.createAccountShowContents = false
+//                            logInVM.createAccountFase = .fase2
+//                        }
+//                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+//                            withAnimation(.spring(response: 0.8)) {
+//                                inputLogIn.createAccountTitle = true
+//                            }
+//                        }
+//                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+//                            withAnimation(.spring(response: 0.8)) {
+//                                inputLogIn.createAccountShowContents = true
+//                            }
+//                        }
+//                    }
+//                    .buttonStyle(.borderedProminent)
+//                    .opacity(inputLogIn.checkBackgroundOpacity)
+//                    .overlay(alignment: .trailing) {
+//                        VStack {
+//
+//                            HStack {
+//                                Spacer()
+//                                ZStack {
+//                                    BlurView(style: .systemThickMaterial)
+//                                        .frame(width: 90, height: 160)
+//                                        .clipShape(RoundedRectangle(cornerRadius: 15))
+//                                        .opacity(0.8)
+//
+//                                    VStack(spacing: 20) {
+//                                        VStack {
+//                                            Text("背景を確認").font(.footnote).offset(x: 15)
+//                                            Toggle("", isOn: $checkBackgroundToggle)
+//                                        }
+//                                        VStack {
+//                                            Text("ダークモード").font(.footnote).offset(x: 15)
+//                                            Toggle("", isOn: $applicationDarkMode)
+//                                        }
+//                                    }
+//                                    .frame(width: 80)
+//                                    .padding(.trailing, 30)
+//                                    .onChange(of: checkBackgroundToggle) { newValue in
+//                                        if newValue {
+//                                            withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+//                                                checkBackgroundAnimation = true
+//                                            }
+//                                        } else {
+//                                            withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+//                                                checkBackgroundAnimation = false
+//                                            }
+//                                        }
+//                                    }
+//                                }
+//                            }
+//
+//                        }
+//                        .frame(width: 80)
+//                        .offset(x: 130, y: 50)
+//                        .onChange(of: checkBackgroundToggle) { newValue in
+//                            if newValue {
+//                                withAnimation(.easeIn(duration: 0.2)) { inputLogIn.checkBackgroundOpacity = 0.0 }
+//                                withAnimation(.easeIn(duration: 0.2)) { inputLogIn.checkBackgroundEffect.toggle() }
+//                            } else {
+//                                withAnimation(.easeIn(duration: 0.2)) { inputLogIn.checkBackgroundOpacity = 1.0 }
+//                                withAnimation(.easeIn(duration: 0.2)) { inputLogIn.checkBackgroundEffect.toggle() }
+//                            }
+//                        }
+//                    }
+//                    .offset(y: 20)
                     
                     /// ユーザー情報「名前」「アイコン」を入力するフェーズ
                 case .fase2:

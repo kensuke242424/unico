@@ -129,7 +129,6 @@ struct Backgrounds {
     static let technology: [UIImage] =
     [
         UIImage(named: "technology_1")!,
-        UIImage(named: "technology_2")!,
         UIImage(named: "technology_3")!,
         UIImage(named: "technology_4")!,
         UIImage(named: "technology_5")!,
