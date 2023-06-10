@@ -10,18 +10,20 @@ import SwiftUI
 /// アプリ内のデフォルトで用意されている背景画像サンプル。
 /// リサイズをおこなうため、UIImageで定義
 enum TeamBackgroundContents: CaseIterable {
-    case original, music, art, cafe, cool, cute, dark, technology
+    case original, music, art, cafe, beautiful, cool, cute, dark, technology
 
-    var imageContents: [UIImage] {
+    var imageContents: [String] {
         switch self {
         case .original:
-            return [UIImage()]
+            return []
         case .music:
             return Backgrounds.music
         case .art:
             return Backgrounds.art
         case .cafe:
             return Backgrounds.cafe
+        case .beautiful:
+            return Backgrounds.beautiful
         case .cool:
             return Backgrounds.cool
         case .cute:
@@ -36,107 +38,129 @@ enum TeamBackgroundContents: CaseIterable {
 
 struct Backgrounds {
 
-    static let cool: [UIImage] =
+    static let cool: [String] =
     [
-        UIImage(named: "cool_1")!,
-        UIImage(named: "cool_2")!,
-        UIImage(named: "cool_3")!,
-        UIImage(named: "cool_4")!,
-        UIImage(named: "cool_5")!,
-        UIImage(named: "cool_6")!,
-        UIImage(named: "cool_7")!,
-        UIImage(named: "cool_8")!,
-        UIImage(named: "cool_9")!
+        "cool_1",
+        "cool_2",
+        "cool_3",
+        "cool_4",
+        "cool_5",
+        "cool_6",
+        "cool_7",
+        "cool_8",
+        "cool_9",
+        "cool_10",
+        "cool_11",
+        "cool_12",
     ]
 
-    static let art: [UIImage] =
+    static let art: [String] =
     [
-        UIImage(named: "art_1")!,
-        UIImage(named: "art_2")!,
-        UIImage(named: "art_3")!,
-        UIImage(named: "art_4")!,
-        UIImage(named: "art_5")!,
-        UIImage(named: "art_6")!,
-        UIImage(named: "art_7")!,
-        UIImage(named: "art_8")!,
-        UIImage(named: "art_9")!,
-        UIImage(named: "art_10")!
+        "art_1",
+        "art_2",
+        "art_3",
+        "art_4",
+        "art_5",
+        "art_6",
+        "art_7",
+        "art_8",
+        "art_9",
+        "art_10",
+        "art_11",
     ]
 
-    static let cafe: [UIImage] =
+    static let cafe: [String] =
     [
-        UIImage(named: "cafe_1")!,
-        UIImage(named: "cafe_2")!,
-        UIImage(named: "cafe_3")!,
-        UIImage(named: "cafe_4")!,
-        UIImage(named: "cafe_5")!,
-        UIImage(named: "cafe_6")!,
-        UIImage(named: "cafe_7")!,
-        UIImage(named: "cafe_8")!,
-        UIImage(named: "cafe_9")!,
-        UIImage(named: "cafe_10")!
+        "cafe_1",
+        "cafe_2",
+        "cafe_3",
+        "cafe_4",
+        "cafe_5",
+        "cafe_6",
+        "cafe_7",
+        "cafe_8",
+        "cafe_9",
+        "cafe_10",
     ]
 
-    static let cute: [UIImage] =
+    static let cute: [String] =
     [
-        UIImage(named: "cute_1")!,
-        UIImage(named: "cute_2")!,
-        UIImage(named: "cute_3")!,
-        UIImage(named: "cute_4")!,
-        UIImage(named: "cute_5")!,
-        UIImage(named: "cute_6")!,
-        UIImage(named: "cute_7")!,
-        UIImage(named: "cute_8")!,
-        UIImage(named: "cute_9")!,
-        UIImage(named: "cute_10")!,
-        UIImage(named: "cute_11")!,
-        UIImage(named: "cute_12")!,
+        "cute_1",
+        "cute_2",
+        "cute_3",
+        "cute_4",
+        "cute_5",
+        "cute_6",
+        "cute_7",
+        "cute_8",
+        "cute_9",
+        "cute_10",
+        "cute_11",
+        "cute_12",
+        "cute_13",
     ]
 
-    static let dark: [UIImage] =
+    static let dark: [String] =
     [
-        UIImage(named: "dark_1")!,
-        UIImage(named: "dark_2")!,
-        UIImage(named: "dark_3")!,
-        UIImage(named: "dark_4")!,
-        UIImage(named: "dark_5")!,
-        UIImage(named: "dark_6")!,
-        UIImage(named: "dark_7")!,
-        UIImage(named: "dark_8")!,
-        UIImage(named: "dark_9")!,
-        UIImage(named: "dark_10")!
+        "dark_1",
+        "dark_2",
+        "dark_3",
+        "dark_4",
+        "dark_5",
+        "dark_6",
+        "dark_7",
+        "dark_8",
+        "dark_9",
+        "dark_10",
+        "dark_11",
     ]
 
-    static let music: [UIImage] =
+    static let music: [String] =
     [
-        UIImage(named: "music_1")!,
-        UIImage(named: "music_2")!,
-        UIImage(named: "music_3")!,
-        UIImage(named: "music_4")!,
-        UIImage(named: "music_5")!,
-        UIImage(named: "music_6")!,
-        UIImage(named: "music_7")!,
-        UIImage(named: "music_8")!,
-        UIImage(named: "music_9")!,
-        UIImage(named: "music_10")!,
-        UIImage(named: "music_11")!,
-        UIImage(named: "music_12")!,
-        UIImage(named: "music_13")!,
-        UIImage(named: "music_14")!,
-        UIImage(named: "music_15")!,
+        "music_1",
+        "music_2",
+        "music_3",
+        "music_4",
+        "music_5",
+        "music_6",
+        "music_7",
+        "music_8",
+        "music_9",
+        "music_10",
+        "music_11",
+        "music_12",
+        "music_13",
+        "music_14",
     ]
 
-    static let technology: [UIImage] =
+    static let beautiful: [String] =
     [
-        UIImage(named: "technology_1")!,
-        UIImage(named: "technology_3")!,
-        UIImage(named: "technology_4")!,
-        UIImage(named: "technology_5")!,
-        UIImage(named: "technology_6")!,
-        UIImage(named: "technology_7")!,
-        UIImage(named: "technology_8")!,
-        UIImage(named: "technology_9")!,
-        UIImage(named: "technology_10")!,
-        UIImage(named: "technology_11")!,
+        "beautiful_1",
+        "beautiful_2",
+        "beautiful_3",
+        "beautiful_4",
+        "beautiful_5",
+        "beautiful_6",
+        "beautiful_7",
+        "beautiful_8",
+        "beautiful_9",
+        "beautiful_10",
+        "beautiful_11",
+    ]
+
+    static let technology: [String] =
+    [
+        "technology_1",
+        "technology_3",
+        "technology_4",
+        "technology_5",
+        "technology_6",
+        "technology_7",
+        "technology_8",
+        "technology_9",
+        "technology_10",
+        "technology_11",
+        "technology_12",
+        "technology_13",
     ]
 }

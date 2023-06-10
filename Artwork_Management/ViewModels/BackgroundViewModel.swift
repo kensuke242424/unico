@@ -8,6 +8,7 @@
 import SwiftUI
 
 class BackgroundViewModel: ObservableObject {
+
     /// バックグラウンドを管理するプロパティ
     @Published var teamBackground: URL?
     @Published var captureBackgroundImage: UIImage?
@@ -15,6 +16,6 @@ class BackgroundViewModel: ObservableObject {
     @Published var showSelectBackground: Bool = false
     @Published var checkBackgroundToggle: Bool = false
     @Published var checkBackgroundAnimation: Bool = false
-    @Published var selectBackgroundCategory: TeamBackgroundContents = .technology
+    @Published var selectBackgroundCategory: TeamBackgroundContents = .music
     @Published var selectedBackgroundImage: UIImage?
 }

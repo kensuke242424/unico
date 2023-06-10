@@ -55,9 +55,9 @@ struct SelectBackgroundView: View {
                                 }
                                 if let updateBackgroundImage {
                                     let defaultImagePath = teamVM.team?.backgroundPath
-                                    let resizedImage = teamVM.resizeUIImage(image: updateBackgroundImage,
-                                                                            width: getRect().width * 4)
-                                    let uploadImageData = await teamVM.uploadTeamImage(resizedImage)
+//                                    let resizedImage = teamVM.resizeUIImage(image: updateBackgroundImage,
+//                                                                            width: getRect().width * 4)
+                                    let uploadImageData = await teamVM.uploadTeamImage(updateBackgroundImage)
                                     let _ = try await teamVM.updateTeamBackgroundImage(data: uploadImageData)
                                     // 新規背景画像の保存が完了したら、以前の背景データを削除
                                     let _ = await teamVM.deleteTeamImageData(path: defaultImagePath)
@@ -69,7 +69,7 @@ struct SelectBackgroundView: View {
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                                     withAnimation(.spring(response: 0.5, blendDuration: 1)) {
                                         backgroundVM.captureBackgroundImage = nil
-                                        backgroundVM.selectBackgroundCategory = .original
+//                                        backgroundVM.selectBackgroundCategory = .original
                                         backgroundVM.showSelectBackground = false
                                     }
                                 }
@@ -98,7 +98,7 @@ struct SelectBackgroundView: View {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                                 withAnimation(.spring(response: 0.5, blendDuration: 1)) {
                                     backgroundVM.captureBackgroundImage = nil
-                                    backgroundVM.selectBackgroundCategory = .original
+//                                    backgroundVM.selectBackgroundCategory = .original
                                     backgroundVM.showSelectBackground = false
                                 }
                             }
@@ -132,35 +132,29 @@ struct SelectBackgroundView: View {
 
     @ViewBuilder
     func ScrollBackgroundImages() -> some View {
-        ScrollView(.horizontal, showsIndicators: false) {
+        ScrollView(.horizontal, showsIndicators: true) {
             LazyHStack(spacing: 30) {
                 Spacer().frame(width: 40)
-                ForEach(backgroundVM.selectBackgroundCategory.imageContents, id: \.self) { value in
+                ForEach(backgroundVM.selectBackgroundCategory.imageContents, id: \.self) { imageString in
                     Group {
-                        Image(uiImage: value)
+                        Image(imageString)
                                 .resizable()
                                 .scaledToFill()
                                 .allowsHitTesting(false)
-                                .frame(width: 120, height: 250)
+                                .frame(width: 110, height: 220)
                                 .shadow(radius: 5, x: 2, y: 2)
                                 .shadow(radius: 5, x: 2, y: 2)
                                 .shadow(radius: 5, x: 2, y: 2)
                                 .clipShape(RoundedRectangle(cornerRadius: 20))
-                                .onTapGesture {
-                                    withAnimation(.spring(response: 0.5)) {
-                                        print("写真タップ")
-                                        backgroundVM.selectedBackgroundImage = value
-                                    }
-                                }
                                 /// タップ範囲調整のため、本体の画像タップ判定はfalseにして
                                 /// こちらで処理する
                                 .overlay {
                                     Rectangle()
-                                        .frame(width: 120, height: 250)
+                                        .frame(width: 110, height: 220)
                                         .opacity(0.01)
                                         .onTapGesture {
                                             withAnimation(.spring(response: 0.5)) {
-                                                backgroundVM.selectedBackgroundImage = value
+                                                backgroundVM.selectedBackgroundImage = UIImage(named: imageString)
                                             }
                                         }
                                 }
@@ -172,15 +166,15 @@ struct SelectBackgroundView: View {
 
                     } // Group
 
-                    .scaleEffect(backgroundVM.selectedBackgroundImage == value ? 1.15 : 1.0)
+//                    .scaleEffect(backgroundVM.selectedBackgroundImage == imageString ? 1.15 : 1.0)
                     .overlay(alignment: .topTrailing) {
                         Image(systemName: "checkmark.seal.fill")
                             .resizable()
                             .scaledToFit()
                             .foregroundColor(.green)
                             .frame(width: 30, height: 30)
-                            .scaleEffect(backgroundVM.selectedBackgroundImage == value ? 1.0 : 1.15)
-                            .opacity(backgroundVM.selectedBackgroundImage == value ? 1.0 : 0.0)
+//                            .scaleEffect(backgroundVM.selectedBackgroundImage == imageString ? 1.0 : 1.15)
+//                            .opacity(backgroundVM.selectedBackgroundImage == imageString ? 1.0 : 0.0)
                             .offset(x: 15, y: -20)
                     }
                 }

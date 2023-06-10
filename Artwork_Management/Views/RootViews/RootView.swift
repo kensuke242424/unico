@@ -92,6 +92,7 @@ struct RootView: View {
                     CreateAndJoinTeamView()
                     PHPickerView(captureImage: $preloads.captureImage, isShowSheet: $preloads.showSheet)
                     NewItemsView(itemVM: itemVM,  cartVM: cartVM, inputTab: $preloadVM.inputTab)
+//                    SelectBackgroundView()
                 }
                 .opacity(0)
             }
