@@ -136,6 +136,9 @@ struct SelectBackgroundView: View {
             LazyHStack(spacing: 30) {
                 Spacer().frame(width: 40)
                 ForEach(backgroundVM.selectBackgroundCategory.imageContents, id: \.self) { imageString in
+
+                    let backgroundUIImageRow = UIImage(named: imageString)
+
                     Group {
                         Image(imageString)
                                 .resizable()
@@ -154,7 +157,7 @@ struct SelectBackgroundView: View {
                                         .opacity(0.01)
                                         .onTapGesture {
                                             withAnimation(.spring(response: 0.5)) {
-                                                backgroundVM.selectedBackgroundImage = UIImage(named: imageString)
+                                                backgroundVM.selectedBackgroundImage = backgroundUIImageRow
                                             }
                                         }
                                 }
@@ -166,15 +169,15 @@ struct SelectBackgroundView: View {
 
                     } // Group
 
-//                    .scaleEffect(backgroundVM.selectedBackgroundImage == imageString ? 1.15 : 1.0)
+                    .scaleEffect(backgroundVM.selectedBackgroundImage == backgroundUIImageRow ? 1.15 : 1.0)
                     .overlay(alignment: .topTrailing) {
                         Image(systemName: "checkmark.seal.fill")
                             .resizable()
                             .scaledToFit()
                             .foregroundColor(.green)
                             .frame(width: 30, height: 30)
-//                            .scaleEffect(backgroundVM.selectedBackgroundImage == imageString ? 1.0 : 1.15)
-//                            .opacity(backgroundVM.selectedBackgroundImage == imageString ? 1.0 : 0.0)
+                            .scaleEffect(backgroundVM.selectedBackgroundImage == backgroundUIImageRow ? 1.0 : 1.15)
+                            .opacity(backgroundVM.selectedBackgroundImage == backgroundUIImageRow ? 1.0 : 0.0)
                             .offset(x: 15, y: -20)
                     }
                 }
