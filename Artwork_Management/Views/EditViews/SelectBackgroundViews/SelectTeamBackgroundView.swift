@@ -7,10 +7,12 @@
 
 import SwiftUI
 
-struct SelectBackgroundView: View {
+struct SelectTeamBackgroundView: View {
 
     @EnvironmentObject var teamVM: TeamViewModel
+    @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var backgroundVM: BackgroundViewModel
+    @Namespace private var animation
 
     @State private var showContents: Bool = false
     @State private var showProgress: Bool = false
@@ -223,11 +225,107 @@ struct SelectBackgroundView: View {
             }
         }
     }
+
+    @ViewBuilder
+    func BackgroundCategoriesTagView() -> some View {
+        HStack {
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    // MEMO: 未グループタグのアイテムがあるかどうかで「未グループ」タグの表示を切り替える
+                    ForEach(TeamBackgroundContents.allCases, id: \.self) { category in
+
+                        Text(category.categoryName)
+                            .font(.caption)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 5)
+                            .background {
+                                if backgroundVM.selectBackgroundCategory == category {
+                                    Capsule()
+                                        .foregroundColor(userVM.memberColor.color3)
+                                        .matchedGeometryEffect(id: "ACTIVETAG", in: animation)
+                                } else {
+                                    Capsule()
+                                        .fill(Color.gray.opacity(0.6))
+                                }
+                            }
+                            .foregroundColor(backgroundVM.selectBackgroundCategory == category ? .white : .white.opacity(0.7))
+                            .onTapGesture {
+                                withAnimation(.interactiveSpring(response: 0.5, dampingFraction: 0.7, blendDuration: 0.7)) {
+                                    backgroundVM.selectBackgroundCategory = category
+                                }
+                            }
+                    } // ForEath
+                } // HStack
+                .padding(.leading, 15)
+            } // ScrollView
+            /// スクロール時の引っ掛かりを無くす
+            .introspectScrollView { scrollView in
+                 scrollView.isDirectionalLockEnabled = true
+                 scrollView.bounces = false
+            }
+        }
+        .padding(.top)
+    }
 } // SelectBackgroundView
+
+fileprivate struct BackgroundCategoriesTagView: View {
+
+    @EnvironmentObject var userVM: UserViewModel
+    let tags: [Tag]
+
+    @State private var activeTag: Tag?
+    @Namespace private var animation
+
+    var body: some View {
+
+        HStack {
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    // MEMO: 未グループタグのアイテムがあるかどうかで「未グループ」タグの表示を切り替える
+                    ForEach(tags) { tag in
+
+                        Text(tag.tagName)
+                            .font(.caption)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 5)
+                            .background {
+                                if activeTag == tag {
+                                    Capsule()
+                                        .foregroundColor(userVM.memberColor.color3)
+                                        .matchedGeometryEffect(id: "ACTIVETAG", in: animation)
+                                } else {
+                                    Capsule()
+                                        .fill(Color.gray.opacity(0.6))
+                                }
+                            }
+                            .foregroundColor(activeTag == tag ? .white : .white.opacity(0.7))
+                            .onTapGesture {
+                                withAnimation(.interactiveSpring(response: 0.5, dampingFraction: 0.7, blendDuration: 0.7)) {
+                                    activeTag = tag
+                                }
+                            }
+                    } // ForEath
+                } // HStack
+                .padding(.leading, 15)
+            } // ScrollView
+            /// スクロール時の引っ掛かりを無くす
+            .introspectScrollView { scrollView in
+                 scrollView.isDirectionalLockEnabled = true
+                 scrollView.bounces = false
+            }
+        }
+        .padding(.top)
+    }
+
+}
 
 struct SelectBackgroundView_Previews: PreviewProvider {
     static var previews: some View {
-        SelectBackgroundView()
+        SelectTeamBackgroundView()
+            .environmentObject(TeamViewModel())
+            .environmentObject(UserViewModel())
             .environmentObject(BackgroundViewModel())
     }
 }
