@@ -74,7 +74,6 @@ class ItemViewModel: ObservableObject {
     func updateItem(updateData: Item, defaultDataID: String, teamID: String) {
 
         print("updateItem実行")
-
         print(defaultDataID)
 
         guard let updateItemRef = db?.collection("teams").document(teamID).collection("items").document(defaultDataID) else {

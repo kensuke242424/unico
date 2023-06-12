@@ -175,7 +175,7 @@ struct NewItemsView: View {
         }
         .overlay(alignment: .bottomTrailing) {
             
-            FilterFavoriteItemButton()
+            FilteringFavoriteItemButton()
                 .padding(.trailing, 40)
                 .padding(.bottom, 20)
                 .opacity(showDetailView ? 0 : 1)
@@ -384,7 +384,7 @@ struct NewItemsView: View {
     }
     
     @ViewBuilder
-    func FilterFavoriteItemButton() -> some View {
+    func FilteringFavoriteItemButton() -> some View {
         ZStack {
             Capsule()
                 .frame(width: 40, height: 12)

@@ -121,7 +121,7 @@ struct NewTabView: View {
                         GeometryReader { proxy in
                             // ーーー　背景編集モード時　ーーー
                             if backgroundVM.showSelectBackground {
-                                    Image(uiImage: backgroundVM.selectedBackgroundImage ?? UIImage())
+                                Image(backgroundVM.selectionBackground?.imageName ?? "")
                                         .resizable()
                                         .scaledToFill()
                                         .frame(width: proxy.size.width, height: proxy.size.height)
@@ -162,7 +162,7 @@ struct NewTabView: View {
                                 // FIXME: これを入れておかないと下層のViewにタップが貫通してしまう🤔
                             })
 
-                        SelectBackgroundView()
+                        SelectTeamBackgroundView()
                     }
                 }
                 /// サイドメニューView

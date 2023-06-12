@@ -40,10 +40,10 @@ struct RootView: View {
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var tagVM: TagViewModel
     @EnvironmentObject var preloadVM: PreloadViewModel
+    @EnvironmentObject var backgroundVM: BackgroundViewModel
 
     @StateObject var itemVM: ItemViewModel = ItemViewModel()
     @StateObject var cartVM: CartViewModel = CartViewModel()
-    @StateObject var backgroundVM: BackgroundViewModel = BackgroundViewModel()
 
     @State private var isShowStandBy: Bool = false
     @State private var showLogInAlert: Bool = false
@@ -187,6 +187,7 @@ struct RootView: View {
 
         // Auth check...
         .onAppear {
+
             if Auth.auth().currentUser != nil {
                 print("RootView_onAppear_currentUserが存在します。fetchを開始")
                 logInVM.rootNavigation = .fetch

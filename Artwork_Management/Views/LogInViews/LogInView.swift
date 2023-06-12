@@ -501,7 +501,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
 //                            .blur(radius: inputLogIn.checkBackgroundEffect ? 0 : 4, opaque: true)
 //                            .ignoresSafeArea()
 //                    } else {
-                    Image(uiImage: backgroundVM.selectedBackgroundImage ?? UIImage())
+                    Image(backgroundVM.selectionBackground?.imageName ?? "music_1")
                             .resizable()
                             .scaledToFill()
                             .frame(width: proxy.size.width, height: proxy.size.height)
@@ -593,7 +593,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         /// サンプル背景はリサイズ済みのため、リサイズ処理を飛ばす
                         /// 選択画像がnilの場合は、サンプル画像を代わりに挿入
                         } else {
-                            let selectedBackgroundImage = backgroundVM.selectedBackgroundImage ?? UIImage(named: "music_1")
+                            let imageName = backgroundVM.selectionBackground?.imageName ?? ""
+                            let selectedBackgroundImage = UIImage(named: imageName) ?? UIImage(named: "music_1")
                             backgroundImageContainer = selectedBackgroundImage
                         }
 
@@ -876,7 +877,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 // Fase1: 背景写真を選んでもらうフェーズ
                 case .fase1:
 
-                    SelectBackgroundView()
+                    SelectTeamBackgroundView()
                     
 //                    VStack(spacing: 30) {
 //

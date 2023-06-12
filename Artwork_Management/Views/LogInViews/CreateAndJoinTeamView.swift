@@ -380,15 +380,9 @@ struct CreateAndJoinTeamView: View {
                             }
 
                         } else {
-                            /// サンプル背景はリサイズ済みのため、リサイズ処理はしない
-                            if let selectedBackgroundUIImage = backgroundVM.selectedBackgroundImage {
-                                backgroundImageContainer = selectedBackgroundUIImage
-
-                            } else {
-                                /// 入力背景画像がnilだった場合、サンプル画像から一つランダムで選出し、コンテナに格納
-                                let randomPickUpBackground = teamVM.getRandomBackgroundUIImage()
-                                backgroundImageContainer = randomPickUpBackground
-                            }
+                            /// 入力背景画像がnilだった場合、サンプル画像から一つランダムで選出し、コンテナに格納
+                            let randomPickUpBackground = teamVM.getRandomBackgroundUIImage()
+                            backgroundImageContainer = randomPickUpBackground
                         }
 
                         /// 準備したチームアイコン&背景画像をFirestorageに保存

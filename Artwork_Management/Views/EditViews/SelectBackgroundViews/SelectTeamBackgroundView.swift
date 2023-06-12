@@ -12,16 +12,19 @@ struct SelectTeamBackgroundView: View {
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var backgroundVM: BackgroundViewModel
-    @Namespace private var animation
+    @Namespace private var tagAnimation
 
     @State private var showContents: Bool = false
     @State private var showProgress: Bool = false
+
+    @State private var activeTag: CategoryTag?
 
     @AppStorage("applicationDarkMode") var applicationDarkMode: Bool = true
 
     var body: some View {
 
         VStack(spacing: 30) {
+
             Spacer()
 
             if showContents {
@@ -39,6 +42,9 @@ struct SelectTeamBackgroundView: View {
                 }
                 .padding(.bottom, 5)
 
+                CategoriesTagView()
+                    .opacity(backgroundVM.checkBackgroundAnimation ? 0 : 1)
+
                 ScrollBackgroundImages()
                     .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
                     .opacity(backgroundVM.checkBackgroundAnimation ? 0 : 1)
@@ -46,19 +52,23 @@ struct SelectTeamBackgroundView: View {
                 VStack(spacing: 40) {
                     Button("保存") {
                         withAnimation(.easeIn(duration: 0.15)) { showProgress = true }
-                        // 新しい背景が選択されていた場合、更新処理を実行する
+
                         Task {
                             do {
                                 var updateBackgroundImage: UIImage?
+                                // 新しい背景が選択されていた場合、更新処理を実行する
                                 if backgroundVM.selectBackgroundCategory == .original {
                                     updateBackgroundImage = backgroundVM.captureBackgroundImage
+
+                                    // サンプル画像選択時、UIImageに変換して格納
                                 } else {
-                                    updateBackgroundImage = backgroundVM.selectedBackgroundImage
+                                    let imageName = backgroundVM.selectionBackground?.imageName ?? ""
+                                    let selectedBackgroundUIImage = UIImage(named: imageName)
+                                    updateBackgroundImage = selectedBackgroundUIImage
                                 }
+
                                 if let updateBackgroundImage {
                                     let defaultImagePath = teamVM.team?.backgroundPath
-//                                    let resizedImage = teamVM.resizeUIImage(image: updateBackgroundImage,
-//                                                                            width: getRect().width * 4)
                                     let uploadImageData = await teamVM.uploadTeamImage(updateBackgroundImage)
                                     let _ = try await teamVM.updateTeamBackgroundImage(data: uploadImageData)
                                     // 新規背景画像の保存が完了したら、以前の背景データを削除
@@ -123,7 +133,25 @@ struct SelectTeamBackgroundView: View {
                     .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
             }
         }
+        .onChange(of: activeTag) { newTag in
+            if let newTag {
+
+                Task {
+                    await backgroundVM.resetSelectBackgroundImages()
+                }
+
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    Task {
+                        await backgroundVM.fetchCategoryBackgroundImage(category: newTag.name)
+                    }
+                }
+            }
+        }
         .onAppear {
+            if let tag = backgroundVM.categoryTag.first {
+                activeTag = tag
+            }
+
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 withAnimation(.spring(response: 1, blendDuration: 1)) {
                     showContents.toggle()
@@ -136,56 +164,57 @@ struct SelectTeamBackgroundView: View {
     func ScrollBackgroundImages() -> some View {
         ScrollView(.horizontal, showsIndicators: true) {
             LazyHStack(spacing: 30) {
-                Spacer().frame(width: 40)
-                ForEach(backgroundVM.selectBackgroundCategory.imageContents, id: \.self) { imageString in
+                Spacer().frame(width: 2)
 
-                    let backgroundUIImageRow = UIImage(named: imageString)
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(.gray.gradient)
+                    .frame(width: 110, height: 220)
 
-                    Group {
-                        Image(imageString)
-                                .resizable()
-                                .scaledToFill()
-                                .allowsHitTesting(false)
-                                .frame(width: 110, height: 220)
-                                .shadow(radius: 5, x: 2, y: 2)
-                                .shadow(radius: 5, x: 2, y: 2)
-                                .shadow(radius: 5, x: 2, y: 2)
-                                .clipShape(RoundedRectangle(cornerRadius: 20))
-                                /// タップ範囲調整のため、本体の画像タップ判定はfalseにして
-                                /// こちらで処理する
-                                .overlay {
-                                    Rectangle()
-                                        .frame(width: 110, height: 220)
-                                        .opacity(0.01)
-                                        .onTapGesture {
-                                            withAnimation(.spring(response: 0.5)) {
-                                                backgroundVM.selectedBackgroundImage = backgroundUIImageRow
-                                            }
-                                        }
+                ForEach(backgroundVM.categoryBackgrounds, id: \.self) { background in
+
+                    SDWebImageView(imageURL: background.imageURL,
+                                   width: 110,
+                                   height: 220)
+                    .shadow(radius: 5, x: 2, y: 2)
+                    .shadow(radius: 5, x: 2, y: 2)
+                    .shadow(radius: 5, x: 2, y: 2)
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                    /// タップ範囲調整のため、本体の画像タップ判定はfalseにして
+                    /// こちらで処理する
+                    .overlay {
+                        Rectangle()
+                            .frame(width: 110, height: 220)
+                            .opacity(0.01)
+                            .onTapGesture {
+                                withAnimation(.spring(response: 0.5)) {
+                                    backgroundVM.selectionBackground = background
                                 }
-                                .overlay {
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .stroke(lineWidth: 1)
-                                        .fill(.gray.gradient)
-                                }
-
-                    } // Group
-
-                    .scaleEffect(backgroundVM.selectedBackgroundImage == backgroundUIImageRow ? 1.15 : 1.0)
+                            }
+                    }
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 20)
+                            .stroke(lineWidth: 1)
+                            .fill(.gray.gradient)
+                    }
+//                    .transition(.opacity.combined(with: .offset(x: 0, y: 2)))
+                    .scaleEffect(backgroundVM.selectionBackground == background ? 1.15 : 1.0)
                     .overlay(alignment: .topTrailing) {
-                        Image(systemName: "checkmark.seal.fill")
+                        Image(systemName: "circlebadge.fill")
                             .resizable()
                             .scaledToFit()
                             .foregroundColor(.green)
-                            .frame(width: 30, height: 30)
-                            .scaleEffect(backgroundVM.selectedBackgroundImage == backgroundUIImageRow ? 1.0 : 1.15)
-                            .opacity(backgroundVM.selectedBackgroundImage == backgroundUIImageRow ? 1.0 : 0.0)
-                            .offset(x: 15, y: -20)
+                            .frame(width: 20, height: 20)
+                            .padding(1)
+                            .background(Circle().fill(.white.gradient))
+                            .scaleEffect(backgroundVM.selectionBackground == background ? 1.0 : 1.15)
+                            .opacity(backgroundVM.selectionBackground == background ? 1.0 : 0.0)
+                            .offset(x: 15, y: -25)
                     }
                 }
                 Spacer().frame(width: 40)
             }
-            .frame(height: 300)
+            .frame(width: 100, height: 280)
+            .border(.red)
         } // ScrollView
     }
 
@@ -226,106 +255,64 @@ struct SelectTeamBackgroundView: View {
         }
     }
 
+    /// 背景画像のカテゴリ選択を管理するタグビュー
     @ViewBuilder
-    func BackgroundCategoriesTagView() -> some View {
+    func CategoriesTagView() -> some View {
         HStack {
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
-                    // MEMO: 未グループタグのアイテムがあるかどうかで「未グループ」タグの表示を切り替える
-                    ForEach(TeamBackgroundContents.allCases, id: \.self) { category in
 
-                        Text(category.categoryName)
-                            .font(.caption)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 5)
-                            .background {
-                                if backgroundVM.selectBackgroundCategory == category {
-                                    Capsule()
-                                        .foregroundColor(userVM.memberColor.color3)
-                                        .matchedGeometryEffect(id: "ACTIVETAG", in: animation)
-                                } else {
-                                    Capsule()
-                                        .fill(Color.gray.opacity(0.6))
+                    ForEach(backgroundVM.categoryTag) { tag in
+
+                        Text(tag.name)
+                                .font(.title3)
+                                .foregroundColor(activeTag == tag ? .white : .white.opacity(0.7))
+                                .padding(.horizontal, 15)
+                                .padding(.vertical, 5)
+                                .background {
+                                    if activeTag == tag {
+                                        Capsule()
+                                            .foregroundColor(userVM.memberColor.color3)
+                                            .matchedGeometryEffect(id: "ACTIVETA", in: tagAnimation)
+                                    } else {
+                                        Capsule()
+                                            .fill(Color.gray.opacity(0.6))
+                                    }
                                 }
-                            }
-                            .foregroundColor(backgroundVM.selectBackgroundCategory == category ? .white : .white.opacity(0.7))
-                            .onTapGesture {
-                                withAnimation(.interactiveSpring(response: 0.5, dampingFraction: 0.7, blendDuration: 0.7)) {
-                                    backgroundVM.selectBackgroundCategory = category
+                                .contentShape(Capsule())
+                                .onTapGesture {
+                                    print("aaa")
+                                    withAnimation(.interactiveSpring(response: 0.5,
+                                                                     dampingFraction: 0.7,
+                                                                     blendDuration: 0.7)) {
+                                        activeTag = tag
+                                    }
                                 }
-                            }
                     } // ForEath
                 } // HStack
-                .padding(.leading, 15)
+                .padding(.horizontal, 15)
             } // ScrollView
-            /// スクロール時の引っ掛かりを無くす
-            .introspectScrollView { scrollView in
-                 scrollView.isDirectionalLockEnabled = true
-                 scrollView.bounces = false
-            }
         }
         .padding(.top)
     }
 } // SelectBackgroundView
 
-fileprivate struct BackgroundCategoriesTagView: View {
-
-    @EnvironmentObject var userVM: UserViewModel
-    let tags: [Tag]
-
-    @State private var activeTag: Tag?
-    @Namespace private var animation
-
-    var body: some View {
-
-        HStack {
-
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
-                    // MEMO: 未グループタグのアイテムがあるかどうかで「未グループ」タグの表示を切り替える
-                    ForEach(tags) { tag in
-
-                        Text(tag.tagName)
-                            .font(.caption)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 5)
-                            .background {
-                                if activeTag == tag {
-                                    Capsule()
-                                        .foregroundColor(userVM.memberColor.color3)
-                                        .matchedGeometryEffect(id: "ACTIVETAG", in: animation)
-                                } else {
-                                    Capsule()
-                                        .fill(Color.gray.opacity(0.6))
-                                }
-                            }
-                            .foregroundColor(activeTag == tag ? .white : .white.opacity(0.7))
-                            .onTapGesture {
-                                withAnimation(.interactiveSpring(response: 0.5, dampingFraction: 0.7, blendDuration: 0.7)) {
-                                    activeTag = tag
-                                }
-                            }
-                    } // ForEath
-                } // HStack
-                .padding(.leading, 15)
-            } // ScrollView
-            /// スクロール時の引っ掛かりを無くす
-            .introspectScrollView { scrollView in
-                 scrollView.isDirectionalLockEnabled = true
-                 scrollView.bounces = false
-            }
-        }
-        .padding(.top)
-    }
-
-}
-
 struct SelectBackgroundView_Previews: PreviewProvider {
     static var previews: some View {
+
         SelectTeamBackgroundView()
             .environmentObject(TeamViewModel())
             .environmentObject(UserViewModel())
             .environmentObject(BackgroundViewModel())
+            .background {
+                Image("music_1")
+                    .resizable()
+                    .scaledToFill()
+                    .overlay {
+                        Color.black.opacity(0.7)
+                    }
+                    .ignoresSafeArea()
+            }
     }
 }
