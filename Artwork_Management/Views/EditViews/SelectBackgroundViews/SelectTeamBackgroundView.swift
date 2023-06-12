@@ -169,6 +169,18 @@ struct SelectTeamBackgroundView: View {
                 RoundedRectangle(cornerRadius: 20)
                     .fill(.gray.gradient)
                     .frame(width: 110, height: 220)
+                    .opacity(0.7)
+                    .overlay {
+                        Image(systemName: "photo.artframe")
+                            .resizable().scaledToFit()
+                            .frame(width: 25)
+                            .padding(20)
+                            .background(
+                                Circle()
+                                    .fill(.blue.gradient)
+                                    .shadow(radius: 5, x: 2, y: 2)
+                            )
+                    }
 
                 ForEach(backgroundVM.categoryBackgrounds, id: \.self) { background in
 
@@ -213,7 +225,7 @@ struct SelectTeamBackgroundView: View {
                 }
                 Spacer().frame(width: 40)
             }
-            .frame(width: 100, height: 280)
+            .frame(height: 280)
             .border(.red)
         } // ScrollView
     }
