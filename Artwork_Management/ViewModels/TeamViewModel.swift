@@ -244,7 +244,7 @@ class TeamViewModel: ObservableObject {
     func getRandomBackgroundUIImage() -> UIImage? {
 
         let pickUpBackground: UIImage?
-        let pickUpBackgroundCategory = TeamBackgroundContents.allCases.randomElement()
+        let pickUpBackgroundCategory = BackgroundCategory.allCases.randomElement()
 
         guard let getCategory = pickUpBackgroundCategory else { return nil }
         guard let getImageString = getCategory.imageContents.randomElement() else {return nil }

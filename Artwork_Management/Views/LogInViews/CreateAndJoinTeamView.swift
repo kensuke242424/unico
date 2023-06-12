@@ -366,8 +366,8 @@ struct CreateAndJoinTeamView: View {
                         }
 
                         // 選択カテゴリがオリジナル&背景画像データが入力されていれば、リサイズ処理をしてコンテナに格納
-                        if backgroundVM.selectBackgroundCategory == .original {
-                            if let captureBackgroundUIImage = backgroundVM.captureBackgroundImage {
+                        if backgroundVM.selectCategory == .original {
+                            if let captureBackgroundUIImage = backgroundVM.captureUIImage {
 
                                 let resizedBackgroundUIImage = logInVM.resizeUIImage(image: captureBackgroundUIImage,
                                                                                  width: getRect().width * 4)

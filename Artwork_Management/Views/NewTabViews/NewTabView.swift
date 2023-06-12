@@ -28,7 +28,7 @@ struct InputTab {
     var showSelectBackground: Bool = false
     var checkBackgroundToggle: Bool = false
     var checkBackgroundAnimation: Bool = false
-    var selectBackgroundCategory: TeamBackgroundContents = .music
+    var selectBackgroundCategory: BackgroundCategory = .music
     var selectedBackgroundImage: UIImage?
     
     /// タブViewのアニメーションを管理するプロパティ
@@ -79,7 +79,7 @@ struct NewTabView: View {
                 
                 VStack {
                     TabTopBarView()
-                        .blur(radius: backgroundVM.checkBackgroundAnimation ||
+                        .blur(radius: backgroundVM.checkMode ||
                                       !backgroundVM.showSelectBackground ? 0 : 2)
                     
                     Spacer(minLength: 0)
@@ -99,7 +99,7 @@ struct NewTabView: View {
                 }
                 /// 背景編集でオリジナル画像を選択時に発火
                 .sheet(isPresented: $backgroundVM.showPickerView) {
-                    PHPickerView(captureImage: $backgroundVM.captureBackgroundImage,
+                    PHPickerView(captureImage: $backgroundVM.captureUIImage,
                                  isShowSheet : $backgroundVM.showPickerView)
                 }
                 /// TabViewに紐づけているプロパティをアニメーションのトリガーとして使えないため
@@ -121,11 +121,11 @@ struct NewTabView: View {
                         GeometryReader { proxy in
                             // ーーー　背景編集モード時　ーーー
                             if backgroundVM.showSelectBackground {
-                                Image(backgroundVM.selectionBackground?.imageName ?? "")
+                                Image(backgroundVM.selectBackground?.imageName ?? "")
                                         .resizable()
                                         .scaledToFill()
                                         .frame(width: proxy.size.width, height: proxy.size.height)
-                                        .blur(radius: backgroundVM.checkBackgroundAnimation ? 0 : 3, opaque: true)
+                                        .blur(radius: backgroundVM.checkMode ? 0 : 3, opaque: true)
                                         .ignoresSafeArea()
                             // ーーー　通常時　ーーー
                             } else {
@@ -154,9 +154,9 @@ struct NewTabView: View {
                     if backgroundVM.showSelectBackground {
 
                         Color.black
-                            .blur(radius: backgroundVM.checkBackgroundAnimation ||
+                            .blur(radius: backgroundVM.checkMode ||
                                           !backgroundVM.showSelectBackground ? 0 : 2)
-                            .opacity(backgroundVM.checkBackgroundAnimation ? 0.1 : 0.5)
+                            .opacity(backgroundVM.checkMode ? 0.1 : 0.5)
                             .ignoresSafeArea()
                             .onTapGesture(perform: {
                                 // FIXME: これを入れておかないと下層のViewにタップが貫通してしまう🤔

@@ -19,13 +19,13 @@ class BackgroundViewModel: ObservableObject {
 
     /// バックグラウンドを管理するプロパティ
     @Published var teamBackground: URL?
-    @Published var captureBackgroundImage: UIImage?
+    @Published var captureUIImage: UIImage?
     @Published var showPickerView: Bool = false
     @Published var showSelectBackground: Bool = false
-    @Published var checkBackgroundToggle: Bool = false
-    @Published var checkBackgroundAnimation: Bool = false
-    @Published var selectBackgroundCategory: TeamBackgroundContents = .art
-    @Published var selectionBackground: Background?
+    @Published var checkModeToggle: Bool = false
+    @Published var checkMode: Bool = false
+    @Published var selectCategory: BackgroundCategory = .music
+    @Published var selectBackground: Background?
 
     let categoryTag: [CategoryTag] =
     [
@@ -138,7 +138,7 @@ class BackgroundViewModel: ObservableObject {
         print("settingAllBackgrounds実行")
         guard let backgroundRef = db?.collection("backgrounds") else { return }
 
-        TeamBackgroundContents.allCases.forEach { category in
+        BackgroundCategory.allCases.forEach { category in
             print("\(category.categoryName)カテゴリ背景グループの保存開始")
 
             category.imageContents.forEach { imageName in
@@ -173,7 +173,7 @@ class BackgroundViewModel: ObservableObject {
 }
 
 /// アプリ内のデフォルトで用意されている背景画像サンプルの静的データを管理するenum
-enum TeamBackgroundContents: CaseIterable {
+enum BackgroundCategory: CaseIterable {
     case original, music, art, cafe, beautiful, cool, cute, dark, technology
 
     var categoryName: String {

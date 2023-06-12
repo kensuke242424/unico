@@ -174,7 +174,7 @@ struct InputLogIn {
     var createAccountShowContents   : Bool = false
     var repeatAnimation             : Bool = false
     var sendAddressButtonDisabled   : Bool = true
-    var selectBackground            : TeamBackgroundContents = .music
+    var selectBackground            : BackgroundCategory = .music
     
     /// Sheetやアラートなどのプレゼンテーションを管理するプロパティ
     var isShowPickerView                 : Bool = false
@@ -501,7 +501,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
 //                            .blur(radius: inputLogIn.checkBackgroundEffect ? 0 : 4, opaque: true)
 //                            .ignoresSafeArea()
 //                    } else {
-                    Image(backgroundVM.selectionBackground?.imageName ?? "music_1")
+                    Image(backgroundVM.selectBackground?.imageName ?? "music_1")
                             .resizable()
                             .scaledToFill()
                             .frame(width: proxy.size.width, height: proxy.size.height)
@@ -586,14 +586,14 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
 
                         /// ーーーー背景画像処理ーーーー
                         /// /// オリジナル背景画像が入力されている場合は、リサイズ処理しコンテナに格納
-                        if let captureBackgroundImage = backgroundVM.captureBackgroundImage {
+                        if let captureBackgroundImage = backgroundVM.captureUIImage {
 
                             iconImageContainer = logInVM.resizeUIImage(image: captureBackgroundImage,
                                                                        width: getRect().width * 4)
                         /// サンプル背景はリサイズ済みのため、リサイズ処理を飛ばす
                         /// 選択画像がnilの場合は、サンプル画像を代わりに挿入
                         } else {
-                            let imageName = backgroundVM.selectionBackground?.imageName ?? ""
+                            let imageName = backgroundVM.selectBackground?.imageName ?? ""
                             let selectedBackgroundImage = UIImage(named: imageName) ?? UIImage(named: "music_1")
                             backgroundImageContainer = selectedBackgroundImage
                         }

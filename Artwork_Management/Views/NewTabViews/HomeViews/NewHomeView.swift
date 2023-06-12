@@ -62,7 +62,7 @@ struct NewHomeView: View {
                     NowTimeView(size)
                         .foregroundColor(applicationDarkMode ? .white : .black)
                         .opacity(1 - min((-inputTab.scrollProgress * 2), 1))
-                        .blur(radius: backgroundVM.checkBackgroundAnimation ||
+                        .blur(radius: backgroundVM.checkMode ||
                                       !backgroundVM.showSelectBackground ? 0 : 2)
                         .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 20)))
                         .scaleEffect(nowTime.transitionScale)
@@ -89,7 +89,7 @@ struct NewHomeView: View {
                     TeamNewsView(size)
                         .foregroundColor(applicationDarkMode ? .white : .black)
                         .opacity(1 - min((-inputTab.scrollProgress * 2), 1))
-                        .blur(radius: backgroundVM.checkBackgroundAnimation ||
+                        .blur(radius: backgroundVM.checkMode ||
                                       !backgroundVM.showSelectBackground ? 0 : 2)
                         .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 20)))
                         .scaleEffect(teamNews.transitionScale)

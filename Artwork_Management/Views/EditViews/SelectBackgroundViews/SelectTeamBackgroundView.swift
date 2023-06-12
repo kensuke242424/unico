@@ -17,8 +17,6 @@ struct SelectTeamBackgroundView: View {
     @State private var showContents: Bool = false
     @State private var showProgress: Bool = false
 
-    @State private var activeTag: CategoryTag?
-
     @AppStorage("applicationDarkMode") var applicationDarkMode: Bool = true
 
     var body: some View {
@@ -32,22 +30,22 @@ struct SelectTeamBackgroundView: View {
                     Text("背景を選択してください")
                         .tracking(5)
                         .foregroundColor(.white)
-                        .opacity(backgroundVM.checkBackgroundAnimation ? 0 : 0.8)
+                        .opacity(backgroundVM.checkMode ? 0 : 0.8)
 
                     Text("チーム: \(teamVM.team?.name ?? "No Name")")
                         .tracking(3)
                         .font(.caption)
                         .foregroundColor(.white)
-                        .opacity(backgroundVM.checkBackgroundAnimation ? 0 : 0.6)
+                        .opacity(backgroundVM.checkMode ? 0 : 0.6)
                 }
                 .padding(.bottom, 5)
 
                 CategoriesTagView()
-                    .opacity(backgroundVM.checkBackgroundAnimation ? 0 : 1)
+                    .opacity(backgroundVM.checkMode ? 0 : 1)
 
                 ScrollBackgroundImages()
                     .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
-                    .opacity(backgroundVM.checkBackgroundAnimation ? 0 : 1)
+                    .opacity(backgroundVM.checkMode ? 0 : 1)
 
                 VStack(spacing: 40) {
                     Button("保存") {
@@ -55,21 +53,21 @@ struct SelectTeamBackgroundView: View {
 
                         Task {
                             do {
-                                var updateBackgroundImage: UIImage?
+                                var updateImage: UIImage?
                                 // 新しい背景が選択されていた場合、更新処理を実行する
-                                if backgroundVM.selectBackgroundCategory == .original {
-                                    updateBackgroundImage = backgroundVM.captureBackgroundImage
+                                if backgroundVM.selectCategory == .original {
+                                    updateImage = backgroundVM.captureUIImage
 
                                     // サンプル画像選択時、UIImageに変換して格納
                                 } else {
-                                    let imageName = backgroundVM.selectionBackground?.imageName ?? ""
-                                    let selectedBackgroundUIImage = UIImage(named: imageName)
-                                    updateBackgroundImage = selectedBackgroundUIImage
+                                    let imageName = backgroundVM.selectBackground?.imageName ?? ""
+                                    let selectedUIImage = UIImage(named: imageName)
+                                    updateImage = selectedUIImage
                                 }
 
-                                if let updateBackgroundImage {
+                                if let updateImage {
                                     let defaultImagePath = teamVM.team?.backgroundPath
-                                    let uploadImageData = await teamVM.uploadTeamImage(updateBackgroundImage)
+                                    let uploadImageData = await teamVM.uploadTeamImage(updateImage)
                                     let _ = try await teamVM.updateTeamBackgroundImage(data: uploadImageData)
                                     // 新規背景画像の保存が完了したら、以前の背景データを削除
                                     let _ = await teamVM.deleteTeamImageData(path: defaultImagePath)
@@ -80,7 +78,7 @@ struct SelectTeamBackgroundView: View {
                                 }
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                                     withAnimation(.spring(response: 0.5, blendDuration: 1)) {
-                                        backgroundVM.captureBackgroundImage = nil
+                                        backgroundVM.captureUIImage = nil
 //                                        backgroundVM.selectBackgroundCategory = .original
                                         backgroundVM.showSelectBackground = false
                                     }
@@ -92,8 +90,8 @@ struct SelectTeamBackgroundView: View {
                                 }
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                                     withAnimation(.spring(response: 0.5, blendDuration: 1)) {
-                                        backgroundVM.captureBackgroundImage = nil
-                                        backgroundVM.selectBackgroundCategory = .original
+                                        backgroundVM.captureUIImage = nil
+                                        backgroundVM.selectCategory = .original
                                         backgroundVM.showSelectBackground = false
                                     }
                                 }
@@ -109,14 +107,14 @@ struct SelectTeamBackgroundView: View {
                             }
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                                 withAnimation(.spring(response: 0.5, blendDuration: 1)) {
-                                    backgroundVM.captureBackgroundImage = nil
+                                    backgroundVM.captureUIImage = nil
 //                                    backgroundVM.selectBackgroundCategory = .original
                                     backgroundVM.showSelectBackground = false
                                 }
                             }
                         }
                 }
-                .opacity(backgroundVM.checkBackgroundAnimation ? 0 : 1)
+                .opacity(backgroundVM.checkMode ? 0 : 1)
                 .overlay {
                     CustomizeToggleButtons()
                         .offset(x: getRect().width / 3)
@@ -133,25 +131,24 @@ struct SelectTeamBackgroundView: View {
                     .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
             }
         }
-        .onChange(of: activeTag) { newTag in
-            if let newTag {
+        .onChange(of: backgroundVM.selectCategory) { newCategory in
 
+            Task {
+                await backgroundVM.resetSelectBackgroundImages()
+            }
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                 Task {
-                    await backgroundVM.resetSelectBackgroundImages()
-                }
-
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                    Task {
-                        await backgroundVM.fetchCategoryBackgroundImage(category: newTag.name)
-                    }
+                    await backgroundVM.fetchCategoryBackgroundImage(category: newCategory.categoryName)
                 }
             }
         }
         .onAppear {
-            if let tag = backgroundVM.categoryTag.first {
-                activeTag = tag
-            }
 
+            Task {
+                let startCategory = backgroundVM.selectCategory.categoryName
+                await backgroundVM.fetchCategoryBackgroundImage(category: startCategory)
+            }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 withAnimation(.spring(response: 1, blendDuration: 1)) {
                     showContents.toggle()
@@ -199,7 +196,7 @@ struct SelectTeamBackgroundView: View {
                             .opacity(0.01)
                             .onTapGesture {
                                 withAnimation(.spring(response: 0.5)) {
-                                    backgroundVM.selectionBackground = background
+                                    backgroundVM.selectBackground = background
                                 }
                             }
                     }
@@ -209,7 +206,7 @@ struct SelectTeamBackgroundView: View {
                             .fill(.gray.gradient)
                     }
 //                    .transition(.opacity.combined(with: .offset(x: 0, y: 2)))
-                    .scaleEffect(backgroundVM.selectionBackground == background ? 1.15 : 1.0)
+                    .scaleEffect(backgroundVM.selectBackground == background ? 1.15 : 1.0)
                     .overlay(alignment: .topTrailing) {
                         Image(systemName: "circlebadge.fill")
                             .resizable()
@@ -218,15 +215,14 @@ struct SelectTeamBackgroundView: View {
                             .frame(width: 20, height: 20)
                             .padding(1)
                             .background(Circle().fill(.white.gradient))
-                            .scaleEffect(backgroundVM.selectionBackground == background ? 1.0 : 1.15)
-                            .opacity(backgroundVM.selectionBackground == background ? 1.0 : 0.0)
+                            .scaleEffect(backgroundVM.selectBackground == background ? 1.0 : 1.15)
+                            .opacity(backgroundVM.selectBackground == background ? 1.0 : 0.0)
                             .offset(x: 15, y: -25)
                     }
                 }
                 Spacer().frame(width: 40)
             }
             .frame(height: 280)
-            .border(.red)
         } // ScrollView
     }
 
@@ -243,7 +239,7 @@ struct SelectTeamBackgroundView: View {
                 VStack(spacing: 20) {
                     VStack {
                         Text("背景を確認").font(.footnote).offset(x: 15)
-                        Toggle("", isOn: $backgroundVM.checkBackgroundToggle)
+                        Toggle("", isOn: $backgroundVM.checkModeToggle)
                     }
                     VStack {
                         Text("ダークモード").font(.footnote).offset(x: 15)
@@ -252,14 +248,14 @@ struct SelectTeamBackgroundView: View {
                 }
                 .frame(width: 80)
                 .padding(.trailing, 30)
-                .onChange(of: backgroundVM.checkBackgroundToggle) { newValue in
+                .onChange(of: backgroundVM.checkModeToggle) { newValue in
                     if newValue {
                         withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                            backgroundVM.checkBackgroundAnimation = true
+                            backgroundVM.checkMode = true
                         }
                     } else {
                         withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                            backgroundVM.checkBackgroundAnimation = false
+                            backgroundVM.checkMode = false
                         }
                     }
                 }
@@ -275,32 +271,33 @@ struct SelectTeamBackgroundView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
 
-                    ForEach(backgroundVM.categoryTag) { tag in
+                    ForEach(BackgroundCategory.allCases, id: \.self) { category in
 
-                        Text(tag.name)
-                                .font(.title3)
-                                .foregroundColor(activeTag == tag ? .white : .white.opacity(0.7))
-                                .padding(.horizontal, 15)
-                                .padding(.vertical, 5)
-                                .background {
-                                    if activeTag == tag {
-                                        Capsule()
-                                            .foregroundColor(userVM.memberColor.color3)
-                                            .matchedGeometryEffect(id: "ACTIVETA", in: tagAnimation)
-                                    } else {
-                                        Capsule()
-                                            .fill(Color.gray.opacity(0.6))
-                                    }
+                        Text(category.categoryName)
+                            .tracking(3)
+                            .font(.title3)
+                            .fontWeight(.light)
+                            .foregroundColor(backgroundVM.selectCategory == category ? .white : .white.opacity(0.7))
+                            .padding(.horizontal, 15)
+                            .padding(.vertical, 5)
+                            .background {
+                                if backgroundVM.selectCategory == category {
+                                    Capsule()
+                                        .foregroundColor(userVM.memberColor.color3)
+                                        .matchedGeometryEffect(id: "ACTIVETA", in: tagAnimation)
+                                } else {
+                                    Capsule()
+                                        .fill(Color.gray.opacity(0.6))
                                 }
-                                .contentShape(Capsule())
-                                .onTapGesture {
-                                    print("aaa")
-                                    withAnimation(.interactiveSpring(response: 0.5,
-                                                                     dampingFraction: 0.7,
-                                                                     blendDuration: 0.7)) {
-                                        activeTag = tag
-                                    }
+                            }
+                            .contentShape(Capsule())
+                            .onTapGesture {
+                                withAnimation(.interactiveSpring(response: 0.5,
+                                                                 dampingFraction: 0.7,
+                                                                 blendDuration: 0.7)) {
+                                    backgroundVM.selectCategory = category
                                 }
+                            }
                     } // ForEath
                 } // HStack
                 .padding(.horizontal, 15)
