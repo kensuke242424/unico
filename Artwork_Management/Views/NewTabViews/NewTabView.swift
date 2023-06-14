@@ -119,22 +119,19 @@ struct NewTabView: View {
                 .background {
                     ZStack {
                         GeometryReader { proxy in
-                            // ーーー　背景編集モード時　ーーー
-                            if backgroundVM.showEdit && backgroundVM.selectBackground != nil {
-//                                Image(backgroundVM.selectBackground?.imageName ?? "")
-//                                        .resizable()
-//                                        .scaledToFill()
-//                                        .frame(width: proxy.size.width, height: proxy.size.height)
-//                                        .blur(radius: backgroundVM.checkMode ? 0 : 3, opaque: true)
-//                                        .ignoresSafeArea()
+                            // ーーー　背景編集モード && 背景編集モードで選択画像が存在する時　ーーー
+                            if backgroundVM.showEdit && backgroundVM.selectBackground?.imageURL != nil {
 
                                 SDWebImageView(
                                     imageURL: backgroundVM.selectBackground?.imageURL,
                                     width: proxy.size.width,
                                     height: proxy.size.height
                                 )
-                                .blur(radius: backgroundVM.checkMode ? 0 : 3, opaque: true)
-                            // ーーー　通常時　ーーー
+                                .overlay {
+                                    BlurMaskingImageView(imageURL: backgroundVM.selectBackground?.imageURL)
+                                        .opacity(backgroundVM.showEdit && !backgroundVM.checkMode ? 1 : 0)
+                                }
+                            // ーーー　通常時 && 背景編集モードで選択画像がnilの時　ーーー
                             } else {
                                 SDWebImageView(imageURL : teamVM.team?.backgroundURL,
                                                width : proxy.size.width,
@@ -144,7 +141,8 @@ struct NewTabView: View {
                                 .blur(radius: inputTab.pressingAnimation ? 6 : 0, opaque: true)
                                 .overlay {
                                     BlurMaskingImageView(imageURL: teamVM.team?.backgroundURL)
-                                        .opacity(inputTab.animationTab != .home ? 1 : 0)
+                                        .opacity(inputTab.animationTab != .home ||
+                                                 backgroundVM.showEdit ? 1 : 0)
                                 }
                                 .overlay {
                                     if homeVM.isActiveEdit {

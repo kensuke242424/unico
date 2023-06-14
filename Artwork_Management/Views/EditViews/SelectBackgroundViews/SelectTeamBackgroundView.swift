@@ -83,7 +83,7 @@ struct SelectTeamBackgroundView: View {
                                         backgroundVM.showEdit = false
                                     }
                                 }
-                                
+
                             } catch {
                                 withAnimation(.spring(response: 0.3, blendDuration: 1)) {
                                     showContents = false
