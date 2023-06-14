@@ -20,12 +20,16 @@ class BackgroundViewModel: ObservableObject {
     /// バックグラウンドを管理するプロパティ
     @Published var teamBackground: URL?
     @Published var captureUIImage: UIImage?
-    @Published var showPicker: Bool = false
-    @Published var showEdit: Bool = false
-    @Published var checkModeToggle: Bool = false
-    @Published var checkMode: Bool = false
     @Published var selectCategory: BackgroundCategory = .music
     @Published var selectBackground: Background?
+    @Published var deleteTarget: Background?
+
+    /// 背景編集モード関連のビューステートを管理するプロパティ
+    @Published var showPicker: Bool = false
+    @Published var showEdit: Bool = false
+    @Published var showDeleteAlert: Bool = false
+    @Published var checkModeToggle: Bool = false
+    @Published var checkMode: Bool = false
 
     let backgroundWidth : CGFloat = UIScreen.main.bounds.width
 
@@ -105,7 +109,7 @@ class BackgroundViewModel: ObservableObject {
         guard let backgroundUIImage = UIImage(named: imageName) else {
             return (url: nil, filePath: nil)
         }
-        guard let resizedUIImage = resizeUIImage(image: backgroundUIImage, width: backgroundWidth) else {
+        guard let resizedUIImage = resizeUIImage(image: backgroundUIImage) else {
             return (url: nil, filePath: nil)
         }
         guard let imageJpegData = resizedUIImage.jpegData(compressionQuality: 0.8) else {
@@ -128,7 +132,9 @@ class BackgroundViewModel: ObservableObject {
         }
     }
 
-    func resizeUIImage(image: UIImage?, width: CGFloat) -> UIImage? {
+    func resizeUIImage(image: UIImage?) -> UIImage? {
+
+        let width = backgroundWidth
 
         if let originalImage = image {
             // オリジナル画像のサイズからアスペクト比を計算
@@ -146,6 +152,23 @@ class BackgroundViewModel: ObservableObject {
             return resizedImage
         } else {
             return nil
+        }
+    }
+
+    func deleteBackground(path: String?) {
+
+        guard let path = path else { return }
+
+        let storage = Storage.storage()
+        let reference = storage.reference()
+        let imageRef = reference.child(path)
+
+        imageRef.delete { error in
+            if let error = error {
+                print(error)
+            } else {
+                print("Backgroundの削除完了")
+            }
         }
     }
 

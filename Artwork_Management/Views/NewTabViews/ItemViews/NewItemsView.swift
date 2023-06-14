@@ -118,7 +118,7 @@ struct NewItemsView: View {
                                     }
                                     .alert("確認", isPresented: $showDeleteAlert) {
                                         Button("削除", role: .destructive) {
-                                            // 一瞬ずらさないとアラートが瞬間だけ再表示されてしまう
+                                            // 一瞬ずらさないとアラートが瞬間だけ再表示されてしまう🧐
                                             guard let selectedItem else { return }
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                                 Task {

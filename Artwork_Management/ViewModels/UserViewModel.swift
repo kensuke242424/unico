@@ -306,6 +306,41 @@ class UserViewModel: ObservableObject {
         }
     }
 
+    func deleteCurrentTeamMyBackground(_ background: Background) {
+        guard var user = user else { return }
+        guard let userRef = db?.collection("users").document(user.id) else { return }
+
+        user.joins[self.currentTeamIndex].myBackgrounds.removeAll(where: { $0 == background })
+
+        do {
+            try userRef.setData(from: user)
+
+        } catch {
+            print("ERROR: チーム背景の保存に失敗しました。")
+        }
+    }
+
+    func resizeUIImage(image: UIImage?, width: CGFloat) -> UIImage? {
+
+        if let originalImage = image {
+            // オリジナル画像のサイズからアスペクト比を計算
+            let aspectScale = originalImage.size.height / originalImage.size.width
+
+            // widthからアスペクト比を元にリサイズ後のサイズを取得
+            let resizedSize = CGSize(width: width * 3, height: width * Double(aspectScale) * 3)
+
+            // リサイズ後のUIImageを生成して返却
+            UIGraphicsBeginImageContext(resizedSize)
+            originalImage.draw(in: CGRect(x: 0, y: 0, width: resizedSize.width, height: resizedSize.height))
+            let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
+            UIGraphicsEndImageContext()
+
+            return resizedImage
+        } else {
+            return nil
+        }
+    }
+
     func deleteUserImageData(path: String?) async {
 
         guard let path = path else { return }
@@ -350,27 +385,6 @@ class UserViewModel: ObservableObject {
                 
             } // for
         } // do
-    }
-    
-    func resizeUIImage(image: UIImage?, width: CGFloat) -> UIImage? {
-        
-        if let originalImage = image {
-            // オリジナル画像のサイズからアスペクト比を計算
-            let aspectScale = originalImage.size.height / originalImage.size.width
-            
-            // widthからアスペクト比を元にリサイズ後のサイズを取得
-            let resizedSize = CGSize(width: width * 3, height: width * Double(aspectScale) * 3)
-            
-            // リサイズ後のUIImageを生成して返却
-            UIGraphicsBeginImageContext(resizedSize)
-            originalImage.draw(in: CGRect(x: 0, y: 0, width: resizedSize.width, height: resizedSize.height))
-            let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
-            UIGraphicsEndImageContext()
-            
-            return resizedImage
-        } else {
-            return nil
-        }
     }
 
     // アカウント削除対象ユーザーのユーザードキュメントを削除する
