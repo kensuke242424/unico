@@ -32,7 +32,9 @@ struct PHPickerView: UIViewControllerRepresentable {
             result.itemProvider.loadObject(ofClass: UIImage.self) { (image, _) in
                 if let unwrapImage = image as? UIImage {
                     print("PHPickerView_UIImage取得成功: \(unwrapImage)")
-                    self.parent.captureImage = unwrapImage
+                    DispatchQueue.main.async {
+                        self.parent.captureImage = unwrapImage
+                    }
                 } else {
                     print("Error: image as? UIImage")
                 }

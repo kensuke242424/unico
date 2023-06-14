@@ -20,12 +20,14 @@ class BackgroundViewModel: ObservableObject {
     /// バックグラウンドを管理するプロパティ
     @Published var teamBackground: URL?
     @Published var captureUIImage: UIImage?
-    @Published var showPickerView: Bool = false
-    @Published var showSelectBackground: Bool = false
+    @Published var showPicker: Bool = false
+    @Published var showEdit: Bool = false
     @Published var checkModeToggle: Bool = false
     @Published var checkMode: Bool = false
     @Published var selectCategory: BackgroundCategory = .music
     @Published var selectBackground: Background?
+
+    let backgroundWidth : CGFloat = UIScreen.main.bounds.width
 
     let categoryTag: [CategoryTag] =
     [
@@ -50,12 +52,24 @@ class BackgroundViewModel: ObservableObject {
         }
     }
 
+    /// ユーザーがタグ「original」を選択した際に実行するメソッド。
+    /// userドキュメントから取得した画像データを背景管理プロパティに渡していく
+    func appendMyBackgrounds(images backgroundImages: [Background]) {
+        for myImage in backgroundImages {
+            DispatchQueue.main.async {
+                withAnimation(.easeInOut(duration: 0.5)) {
+                    self.categoryBackgrounds.append(myImage)
+                }
+            }
+        }
+    }
+
     func fetchCategoryBackgroundImage(category: String) async {
 
         let containerID = "\(category)Backgrounds"
         let upperCasedID = containerID.uppercased()
         let lowercasedID = containerID.lowercased()
-        // 所属メンバーのid配列を使ってクエリを叩く
+
         guard let categoryBackgroundRefs = db?.collection("backgrounds")
             .document(upperCasedID)
             .collection(lowercasedID) else {
@@ -91,7 +105,10 @@ class BackgroundViewModel: ObservableObject {
         guard let backgroundUIImage = UIImage(named: imageName) else {
             return (url: nil, filePath: nil)
         }
-        guard let imageJpegData = backgroundUIImage.jpegData(compressionQuality: 0.4) else {
+        guard let resizedUIImage = resizeUIImage(image: backgroundUIImage, width: backgroundWidth) else {
+            return (url: nil, filePath: nil)
+        }
+        guard let imageJpegData = resizedUIImage.jpegData(compressionQuality: 0.8) else {
             return (url: nil, filePath: nil)
         }
 
@@ -179,7 +196,7 @@ enum BackgroundCategory: CaseIterable {
     var categoryName: String {
         switch self {
         case .original:
-            return ""
+            return "original"
         case .music:
             return "music"
 

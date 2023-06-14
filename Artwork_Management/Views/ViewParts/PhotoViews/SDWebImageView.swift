@@ -35,6 +35,8 @@ struct SDWebImageView: View {
                     .frame(width: width, height: height)
                     .shadow(radius: 1, x: 2, y: 2)
                     .shadow(radius: 1, x: 2, y: 2)
+                    .animation(.easeInOut(duration: 0.5), value: imageURL)
+                    .transition(.fade(duration: 0.5))
                     .allowsHitTesting(false)
             }
             

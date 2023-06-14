@@ -80,7 +80,7 @@ struct NewTabView: View {
                 VStack {
                     TabTopBarView()
                         .blur(radius: backgroundVM.checkMode ||
-                                      !backgroundVM.showSelectBackground ? 0 : 2)
+                                      !backgroundVM.showEdit ? 0 : 2)
                     
                     Spacer(minLength: 0)
                     
@@ -98,9 +98,9 @@ struct NewTabView: View {
                     }
                 }
                 /// 背景編集でオリジナル画像を選択時に発火
-                .sheet(isPresented: $backgroundVM.showPickerView) {
+                .sheet(isPresented: $backgroundVM.showPicker) {
                     PHPickerView(captureImage: $backgroundVM.captureUIImage,
-                                 isShowSheet : $backgroundVM.showPickerView)
+                                 isShowSheet : $backgroundVM.showPicker)
                 }
                 /// TabViewに紐づけているプロパティをアニメーションのトリガーとして使えないため
                 ///  タブのステートとタブ切り替えによるアニメーションのステートを切り分けている
@@ -120,13 +120,20 @@ struct NewTabView: View {
                     ZStack {
                         GeometryReader { proxy in
                             // ーーー　背景編集モード時　ーーー
-                            if backgroundVM.showSelectBackground {
-                                Image(backgroundVM.selectBackground?.imageName ?? "")
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(width: proxy.size.width, height: proxy.size.height)
-                                        .blur(radius: backgroundVM.checkMode ? 0 : 3, opaque: true)
-                                        .ignoresSafeArea()
+                            if backgroundVM.showEdit && backgroundVM.selectBackground != nil {
+//                                Image(backgroundVM.selectBackground?.imageName ?? "")
+//                                        .resizable()
+//                                        .scaledToFill()
+//                                        .frame(width: proxy.size.width, height: proxy.size.height)
+//                                        .blur(radius: backgroundVM.checkMode ? 0 : 3, opaque: true)
+//                                        .ignoresSafeArea()
+
+                                SDWebImageView(
+                                    imageURL: backgroundVM.selectBackground?.imageURL,
+                                    width: proxy.size.width,
+                                    height: proxy.size.height
+                                )
+                                .blur(radius: backgroundVM.checkMode ? 0 : 3, opaque: true)
                             // ーーー　通常時　ーーー
                             } else {
                                 SDWebImageView(imageURL : teamVM.team?.backgroundURL,
@@ -151,11 +158,11 @@ struct NewTabView: View {
                 } // background
                 // チームの背景を変更編集するView
                 .overlay {
-                    if backgroundVM.showSelectBackground {
+                    if backgroundVM.showEdit {
 
                         Color.black
                             .blur(radius: backgroundVM.checkMode ||
-                                          !backgroundVM.showSelectBackground ? 0 : 2)
+                                          !backgroundVM.showEdit ? 0 : 2)
                             .opacity(backgroundVM.checkMode ? 0.1 : 0.5)
                             .ignoresSafeArea()
                             .onTapGesture(perform: {
@@ -378,7 +385,7 @@ struct NewTabView: View {
             let tabWidth = size.width / 3
             HStack {
                 ForEach(Tab.allCases, id: \.rawValue) { tab in
-                    Text(tab == .home && backgroundVM.showSelectBackground ? "背景変更中" :
+                    Text(tab == .home && backgroundVM.showEdit ? "背景変更中" :
                             tab == .home && homeVM.isActiveEdit ? "編集中" :
                             tab.rawValue)
                     .font(.title3)

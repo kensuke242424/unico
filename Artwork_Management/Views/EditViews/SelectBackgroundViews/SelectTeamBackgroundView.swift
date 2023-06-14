@@ -16,6 +16,7 @@ struct SelectTeamBackgroundView: View {
 
     @State private var showContents: Bool = false
     @State private var showProgress: Bool = false
+    @State private var showPicker: Bool = false
 
     @AppStorage("applicationDarkMode") var applicationDarkMode: Bool = true
 
@@ -79,10 +80,10 @@ struct SelectTeamBackgroundView: View {
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                                     withAnimation(.spring(response: 0.5, blendDuration: 1)) {
                                         backgroundVM.captureUIImage = nil
-//                                        backgroundVM.selectBackgroundCategory = .original
-                                        backgroundVM.showSelectBackground = false
+                                        backgroundVM.showEdit = false
                                     }
                                 }
+                                
                             } catch {
                                 withAnimation(.spring(response: 0.3, blendDuration: 1)) {
                                     showContents = false
@@ -91,8 +92,11 @@ struct SelectTeamBackgroundView: View {
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                                     withAnimation(.spring(response: 0.5, blendDuration: 1)) {
                                         backgroundVM.captureUIImage = nil
-                                        backgroundVM.selectCategory = .original
-                                        backgroundVM.showSelectBackground = false
+                                        backgroundVM.selectBackground = nil
+                                        backgroundVM.showEdit = false
+                                        Task {
+                                            await backgroundVM.resetSelectBackgroundImages()
+                                        }
                                     }
                                 }
                             }
@@ -108,8 +112,11 @@ struct SelectTeamBackgroundView: View {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                                 withAnimation(.spring(response: 0.5, blendDuration: 1)) {
                                     backgroundVM.captureUIImage = nil
-//                                    backgroundVM.selectBackgroundCategory = .original
-                                    backgroundVM.showSelectBackground = false
+                                    backgroundVM.selectBackground = nil
+                                    backgroundVM.showEdit = false
+                                }
+                                Task {
+                                    await backgroundVM.resetSelectBackgroundImages()
                                 }
                             }
                         }
@@ -125,26 +132,45 @@ struct SelectTeamBackgroundView: View {
 
             Spacer().frame(height: 50)
         } // VStack
+        .sheet(isPresented: $showPicker) {
+            PHPickerView(captureImage: $backgroundVM.captureUIImage, isShowSheet: $showPicker)
+        }
         .overlay {
             if showProgress {
                 SavingProgressView()
                     .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
             }
         }
-        .onChange(of: backgroundVM.selectCategory) { newCategory in
+        .onChange(of: backgroundVM.captureUIImage) { newImage in
+            guard let newImage else { return }
+            Task{
+                let backgroundWidth = backgroundVM.backgroundWidth
+                let resizedImage = backgroundVM.resizeUIImage(image: newImage, width: backgroundWidth)
 
-            Task {
-                await backgroundVM.resetSelectBackgroundImages()
+                let uploadImage = await userVM.uploadCurrentTeamMyBackground(resizedImage)
+                await userVM.addCurrentTeamMyBackground(url: uploadImage.url, path: uploadImage.filePath)
+
+//                let myBackgrounds = userVM.getCurrentTeamMyBackgrounds()
+//                backgroundVM.appendMyBackgrounds(images: myBackgrounds)
             }
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+        }
+        .onChange(of: backgroundVM.selectCategory) { newCategory in
+            /// タグ「original」を選択時、joinsに保存している現在のチームの画像データ群を取り出して
+            /// backgroundVMの背景管理プロパティに橋渡しする
+            if newCategory == .original {
                 Task {
+                    await backgroundVM.resetSelectBackgroundImages()
+                    let myBackgrounds = userVM.getCurrentTeamMyBackgrounds()
+                    backgroundVM.appendMyBackgrounds(images: myBackgrounds)
+                }
+            } else {
+                Task {
+                    await backgroundVM.resetSelectBackgroundImages()
                     await backgroundVM.fetchCategoryBackgroundImage(category: newCategory.categoryName)
                 }
             }
         }
         .onAppear {
-
             Task {
                 let startCategory = backgroundVM.selectCategory.categoryName
                 await backgroundVM.fetchCategoryBackgroundImage(category: startCategory)
@@ -163,63 +189,116 @@ struct SelectTeamBackgroundView: View {
             LazyHStack(spacing: 30) {
                 Spacer().frame(width: 2)
 
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(.gray.gradient)
-                    .frame(width: 110, height: 220)
-                    .opacity(0.7)
-                    .overlay {
-                        Image(systemName: "photo.artframe")
-                            .resizable().scaledToFit()
-                            .frame(width: 25)
-                            .padding(20)
-                            .background(
-                                Circle()
-                                    .fill(.blue.gradient)
-                                    .shadow(radius: 5, x: 2, y: 2)
-                            )
-                    }
+                let currentIndex = userVM.currentTeamIndex
 
-                ForEach(backgroundVM.categoryBackgrounds, id: \.self) { background in
+                if backgroundVM.selectCategory == .original {
 
-                    SDWebImageView(imageURL: background.imageURL,
-                                   width: 110,
-                                   height: 220)
-                    .shadow(radius: 5, x: 2, y: 2)
-                    .shadow(radius: 5, x: 2, y: 2)
-                    .shadow(radius: 5, x: 2, y: 2)
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
-                    /// タップ範囲調整のため、本体の画像タップ判定はfalseにして
-                    /// こちらで処理する
-                    .overlay {
-                        Rectangle()
-                            .frame(width: 110, height: 220)
-                            .opacity(0.01)
-                            .onTapGesture {
-                                withAnimation(.spring(response: 0.5)) {
-                                    backgroundVM.selectBackground = background
+                    ForEach(userVM.user?.joins[currentIndex].myBackgrounds ?? [], id: \.self) { background in
+                        SDWebImageView(imageURL: background.imageURL,
+                                       width: 110,
+                                       height: 220)
+                        .shadow(radius: 5, x: 2, y: 2)
+                        .shadow(radius: 5, x: 2, y: 2)
+                        .shadow(radius: 5, x: 2, y: 2)
+                        .clipShape(RoundedRectangle(cornerRadius: 20))
+                        /// タップ範囲調整のため、本体の画像タップ判定はfalseにして
+                        /// こちらで処理する
+                        .overlay {
+                            Rectangle()
+                                .frame(width: 110, height: 220)
+                                .opacity(0.01)
+                                .onTapGesture {
+                                    withAnimation(.spring(response: 0.5)) {
+                                        backgroundVM.selectBackground = background
+                                    }
                                 }
+                        }
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 20)
+                                .stroke(lineWidth: 1)
+                                .fill(.gray.gradient)
+                        }
+                        .scaleEffect(backgroundVM.selectBackground == background ? 1.15 : 1.0)
+                        .overlay(alignment: .topTrailing) {
+                            Image(systemName: "circlebadge.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .foregroundColor(.green)
+                                .frame(width: 20, height: 20)
+                                .padding(1)
+                                .background(Circle().fill(.white.gradient))
+                                .scaleEffect(backgroundVM.selectBackground == background ? 1.0 : 1.15)
+                                .opacity(backgroundVM.selectBackground == background ? 1.0 : 0.0)
+                                .offset(x: 15, y: -25)
+                        }
+                    }
+
+                    RoundedRectangle(cornerRadius: 20)
+                        .fill(.gray.gradient)
+                        .frame(width: 110, height: 220)
+                        .opacity(0.7)
+                        .overlay {
+                            Button {
+                                // 写真キャプチャ
+                                showPicker.toggle()
+                            } label: {
+                                Image(systemName: "photo.artframe")
+                                    .resizable().scaledToFit()
+                                    .foregroundColor(.white)
+                                    .frame(width: 22)
+                                    .padding(18)
+                                    .background(
+                                        Circle()
+                                            .fill(.blue.gradient)
+                                            .shadow(radius: 5, x: 2, y: 2)
+                                    )
                             }
-                    }
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 20)
-                            .stroke(lineWidth: 1)
-                            .fill(.gray.gradient)
-                    }
-//                    .transition(.opacity.combined(with: .offset(x: 0, y: 2)))
-                    .scaleEffect(backgroundVM.selectBackground == background ? 1.15 : 1.0)
-                    .overlay(alignment: .topTrailing) {
-                        Image(systemName: "circlebadge.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .foregroundColor(.green)
-                            .frame(width: 20, height: 20)
-                            .padding(1)
-                            .background(Circle().fill(.white.gradient))
-                            .scaleEffect(backgroundVM.selectBackground == background ? 1.0 : 1.15)
-                            .opacity(backgroundVM.selectBackground == background ? 1.0 : 0.0)
-                            .offset(x: 15, y: -25)
+                        }
+                } else {
+
+                    ForEach(backgroundVM.categoryBackgrounds, id: \.self) { background in
+
+                        SDWebImageView(imageURL: background.imageURL,
+                                       width: 110,
+                                       height: 220)
+                        .shadow(radius: 5, x: 2, y: 2)
+                        .shadow(radius: 5, x: 2, y: 2)
+                        .shadow(radius: 5, x: 2, y: 2)
+                        .clipShape(RoundedRectangle(cornerRadius: 20))
+                        /// タップ範囲調整のため、本体の画像タップ判定はfalseにして
+                        /// こちらで処理する
+                        .overlay {
+                            Rectangle()
+                                .frame(width: 110, height: 220)
+                                .opacity(0.01)
+                                .onTapGesture {
+                                    withAnimation(.spring(response: 0.5)) {
+                                        backgroundVM.selectBackground = background
+                                    }
+                                }
+                        }
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 20)
+                                .stroke(lineWidth: 1)
+                                .fill(.gray.gradient)
+                        }
+                        .scaleEffect(backgroundVM.selectBackground == background ? 1.15 : 1.0)
+                        .overlay(alignment: .topTrailing) {
+                            Image(systemName: "circlebadge.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .foregroundColor(.green)
+                                .frame(width: 20, height: 20)
+                                .padding(1)
+                                .background(Circle().fill(.white.gradient))
+                                .scaleEffect(backgroundVM.selectBackground == background ? 1.0 : 1.15)
+                                .opacity(backgroundVM.selectBackground == background ? 1.0 : 0.0)
+                                .offset(x: 15, y: -25)
+                        }
                     }
                 }
+
+
                 Spacer().frame(width: 40)
             }
             .frame(height: 280)

@@ -6,11 +6,13 @@
 //
 
 import SwiftUI
+import FirebaseFirestore
 import FirebaseFirestoreSwift
 
 /// Firebaseに保存するサンプル背景画像
 struct Background: Codable, Hashable {
     @DocumentID var id: String? = UUID().uuidString
+    var createTime: Date = Date()
     var category: String
     var imageName: String
     var imageURL: URL?

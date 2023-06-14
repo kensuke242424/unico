@@ -336,7 +336,7 @@ struct SystemSideMenu: View {
                                                 }
                                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                                                     withAnimation(.spring(response: 0.7, blendDuration: 1)) {
-                                                        backgroundVM.showSelectBackground.toggle()
+                                                        backgroundVM.showEdit.toggle()
                                                     }
                                                 }
                                             }
