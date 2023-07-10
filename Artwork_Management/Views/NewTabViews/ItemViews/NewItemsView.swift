@@ -151,10 +151,9 @@ struct NewItemsView: View {
                                            totalContent: sampleBooks.count)
                     }
                 }
-                /// Since we need offset from here and not from global View
                 /// グローバルビューからではなく、ここからのオフセットが必要なため
                 /// ビューの座標空間に名前を付け、
-                /// 他のコードがポイントやサイズなどの次元を名前付きの空間と相対的に操作できるようにします。
+                /// 他のコードがポイントやサイズなどの次元を名前付きの空間と相対的に操作できるようにする
                 .coordinateSpace(name: "SCROLLVIEW")
             } // VStack
             .padding(.top, 15)
@@ -519,7 +518,7 @@ struct NewItemsView: View {
                 Image(systemName: "plus")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 7)
+                    .frame(width: 8)
                     .foregroundColor(.gray)
                     .padding(6)
                     .background {

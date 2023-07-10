@@ -49,8 +49,8 @@ class BackgroundViewModel: ObservableObject {
         withAnimation(.easeInOut(duration: 0.5)) {
             DispatchQueue.main.async {
                 withAnimation {
-                    self.categoryBackgrounds.removeFirst(self.categoryBackgrounds.count)
-//                    self.categoryBackgrounds = []
+//                    self.categoryBackgrounds.removeFirst(self.categoryBackgrounds.count)
+                    self.categoryBackgrounds = []
                 }
             }
         }
@@ -85,23 +85,43 @@ class BackgroundViewModel: ObservableObject {
         do {
             let snapshot = try await categoryBackgroundRefs.getDocuments()
             let documents = snapshot.documents
-            for document in documents {
+//            for document in documents {
+            let fetchImages = documents.compactMap { document in
                 do {
-                    let data = try document.data(as: Background.self)
-                    DispatchQueue.main.async {
-                        withAnimation(.easeInOut(duration: 0.5)) {
-                            self.categoryBackgrounds.append(data)
-                        }
-                    }
-                    print("\(data.imageName)背景データの取得")
+                    let fetchImage = try document.data(as: Background.self)
+                    return fetchImage
                 } catch {
                     print("背景データの取得失敗")
+                    return nil
+                }
+            }
+
+            DispatchQueue.main.async {
+                withAnimation(.easeInOut(duration: 0.5)) {
+                    self.categoryBackgrounds = fetchImages
+//                    self.createTimeSortBackgrounds(order: .up)
                 }
             }
         } catch {
             print("背景データの取得失敗")
         }
     }
+
+    // TODO: 6.15 まだ実装できてない
+//    func createTimeSortBackgrounds(order: UpDownOrder) {
+//
+//        switch order {
+//        case .up:
+//            categoryBackgrounds.sort { before, after in
+//                before.createTime!.dateValue() > after.createTime!.dateValue() ? true : false
+//            }
+//
+//        case .down:
+//            categoryBackgrounds.sort { before, after in
+//                before.createTime!.dateValue() < after.createTime!.dateValue() ? true : false
+//            }
+//        }
+//    }
 
     func uploadBackgroundImage(category: String, imageName: String) async -> (url: URL?, filePath: String?) {
         print("uploadBackgroundImage実行")

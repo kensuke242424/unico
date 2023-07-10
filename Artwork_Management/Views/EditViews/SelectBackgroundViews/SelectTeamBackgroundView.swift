@@ -157,12 +157,18 @@ struct SelectTeamBackgroundView: View {
                 Task {
                     await backgroundVM.resetSelectBackgroundImages()
                     let myBackgrounds = userVM.getCurrentTeamMyBackgrounds()
-                    backgroundVM.appendMyBackgrounds(images: myBackgrounds)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        backgroundVM.appendMyBackgrounds(images: myBackgrounds)
+                    }
                 }
             } else {
                 Task {
                     await backgroundVM.resetSelectBackgroundImages()
-                    await backgroundVM.fetchCategoryBackgroundImage(category: newCategory.categoryName)
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    Task {
+                        await backgroundVM.fetchCategoryBackgroundImage(category: newCategory.categoryName)
+                    }
                 }
             }
         }
@@ -181,9 +187,12 @@ struct SelectTeamBackgroundView: View {
 
     @ViewBuilder
     func ScrollBackgroundImages() -> some View {
+        let contentWidth: CGFloat = 140
+        let categoryContents: CGFloat = CGFloat(backgroundVM.selectCategory.imageContents.count)
+        let myBackgroundContents: CGFloat = CGFloat(userVM.user?.joins[userVM.currentTeamIndex].myBackgrounds.count ?? 0)
         ScrollView(.horizontal, showsIndicators: true) {
             LazyHStack(spacing: 30) {
-                Spacer().frame(width: 2)
+                Spacer().frame(width: 10)
 
                 let currentIndex = userVM.currentTeamIndex
 
@@ -230,6 +239,7 @@ struct SelectTeamBackgroundView: View {
         SDWebImageView(imageURL: background.imageURL,
                        width: 110,
                        height: 220)
+//        .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 40)))
         .shadow(radius: 5, x: 2, y: 2)
         .shadow(radius: 5, x: 2, y: 2)
         .shadow(radius: 5, x: 2, y: 2)
