@@ -81,6 +81,7 @@ struct SelectTeamBackgroundView: View {
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                                     withAnimation(.spring(response: 0.5, blendDuration: 1)) {
                                         backgroundVM.captureUIImage = nil
+                                        backgroundVM.selectBackground = nil
                                         backgroundVM.showEdit = false
                                     }
                                 }

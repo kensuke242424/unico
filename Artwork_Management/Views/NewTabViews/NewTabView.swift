@@ -116,39 +116,33 @@ struct NewTabView: View {
                         }
                     }
                 }
+                /// チームルームの背景
                 .background {
                     ZStack {
                         GeometryReader { proxy in
-                            // ーーー　背景編集モード && 背景編集モードで選択画像が存在する時　ーーー
-                            if backgroundVM.showEdit && backgroundVM.selectBackground?.imageURL != nil {
-
-                                SDWebImageView(
-                                    imageURL: backgroundVM.selectBackground?.imageURL,
-                                    width: proxy.size.width,
-                                    height: proxy.size.height
-                                )
-                                .overlay {
-                                    BlurMaskingImageView(imageURL: backgroundVM.selectBackground?.imageURL)
-                                        .opacity(backgroundVM.showEdit && !backgroundVM.checkMode ? 1 : 0)
-                                }
-                            // ーーー　通常時 && 背景編集モードで選択画像がnilの時　ーーー
-                            } else {
-                                SDWebImageView(imageURL : teamVM.team?.backgroundURL,
-                                               width : proxy.size.width,
-                                               height: proxy.size.height)
-                                .ignoresSafeArea()
-                                .blur(radius: homeVM.isActiveEdit ? 5 : 0, opaque: true)
-                                .blur(radius: inputTab.pressingAnimation ? 6 : 0, opaque: true)
-                                .overlay {
-                                    BlurMaskingImageView(imageURL: teamVM.team?.backgroundURL)
-                                        .opacity(inputTab.animationTab != .home ||
-                                                 backgroundVM.showEdit ? 1 : 0)
-                                }
-                                .overlay {
-                                    if homeVM.isActiveEdit {
-                                        Color.black.opacity(0.4)
-                                            .ignoresSafeArea()
-                                    }
+                            // チーム背景編集による選択画像URLが存在する場合、そちらを優先して背景表示する
+                            SDWebImageBackground(
+                                imageURL: backgroundVM.selectBackground?.imageURL ??
+                                teamVM.team?.backgroundURL,
+                                width: proxy.size.width,
+                                height: proxy.size.height
+                            )
+                            .ignoresSafeArea()
+                            .blur(radius: homeVM.isActiveEdit ? 5 : 0, opaque: true)
+                            .blur(radius: inputTab.pressingAnimation ? 6 : 0, opaque: true)
+                            .overlay {
+                                BlurMaskingImageView(imageURL: backgroundVM.selectBackground?.imageURL)
+                                    .opacity(backgroundVM.showEdit && !backgroundVM.checkMode ? 1 : 0)
+                            }
+                            .overlay {
+                                BlurMaskingImageView(imageURL: teamVM.team?.backgroundURL)
+                                    .opacity(inputTab.animationTab != .home ||
+                                             backgroundVM.showEdit ? 1 : 0)
+                            }
+                            .overlay {
+                                if homeVM.isActiveEdit {
+                                    Color.black.opacity(0.4)
+                                        .ignoresSafeArea()
                                 }
                             }
                         }
@@ -160,7 +154,7 @@ struct NewTabView: View {
 
                         Color.black
                             .blur(radius: backgroundVM.checkMode ||
-                                          !backgroundVM.showEdit ? 0 : 2)
+                                  !backgroundVM.showEdit ? 0 : 2)
                             .opacity(backgroundVM.checkMode ? 0.1 : 0.5)
                             .ignoresSafeArea()
                             .onTapGesture(perform: {
@@ -180,8 +174,8 @@ struct NewTabView: View {
                                 }
                             })
                     }
-                        SystemSideMenu(itemVM: itemVM, inputTab: $inputTab)
-                            .offset(x: inputTab.showSideMenu ? 0 : -size.width)
+                    SystemSideMenu(itemVM: itemVM, inputTab: $inputTab)
+                        .offset(x: inputTab.showSideMenu ? 0 : -size.width)
                 }
                 /// 🏷タグの追加や編集を行うView
                 .overlay {
