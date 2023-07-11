@@ -159,7 +159,7 @@ struct NewTabView: View {
                                 // FIXME: これを入れておかないと下層のViewにタップが貫通してしまう🤔
                             })
 
-                        SelectTeamBackgroundView()
+                        EditTeamBackgroundView()
                     }
                 }
                 /// サイドメニューView

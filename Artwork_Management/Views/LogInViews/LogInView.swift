@@ -877,7 +877,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 // Fase1: 背景写真を選んでもらうフェーズ
                 case .fase1:
 
-                    SelectTeamBackgroundView()
+                    EditTeamBackgroundView()
                         .frame(height: 310)
                     
 //                    VStack(spacing: 30) {
