@@ -397,9 +397,9 @@ struct NewTabView: View {
                     .padding(.top, 60)
                     .onTapGesture(perform: {
                         if tab == .home && inputTab.selectionTab == .item {
-                            inputTab.selectionTab = .item
-                        } else if tab == .item && inputTab.selectionTab == .home {
                             inputTab.selectionTab = .home
+                        } else if tab == .item && inputTab.selectionTab == .home {
+                            inputTab.selectionTab = .item
                         }
                     })
                 }
