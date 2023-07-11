@@ -121,7 +121,7 @@ struct NewTabView: View {
                     ZStack {
                         GeometryReader { proxy in
                             // チーム背景編集による選択画像URLが存在する場合、そちらを優先して背景表示する
-                            SDWebImageBackground(
+                            SDWebImageBackgroundView(
                                 imageURL: backgroundVM.selectBackground?.imageURL ??
                                 teamVM.team?.backgroundURL,
                                 width: proxy.size.width,
@@ -130,16 +130,12 @@ struct NewTabView: View {
                             .ignoresSafeArea()
                             .blur(radius: homeVM.isActiveEdit ? 5 : 0, opaque: true)
                             .blur(radius: inputTab.pressingAnimation ? 6 : 0, opaque: true)
+                            .blur(radius: backgroundVM.showEdit && !backgroundVM.checkMode ? 6 : 0, opaque: true)
+                            // タブのスワイプ遷移時と背景へのblurが重なると、動作が重くなる
+                            // オーバーレイでブラー処理済み背景を重ねる
                             .overlay {
-                                BlurMaskingImageView(imageURL: backgroundVM.selectBackground?.imageURL ??
-                                                     teamVM.team?.backgroundURL)
-                                    .opacity(backgroundVM.showEdit && !backgroundVM.checkMode ? 1 : 0)
-                            }
-                            .overlay {
-                                BlurMaskingImageView(imageURL: backgroundVM.selectBackground?.imageURL ??
-                                                     teamVM.team?.backgroundURL)
-                                    .opacity(inputTab.animationTab != .home ||
-                                             backgroundVM.showEdit ? 1 : 0)
+                                BlurMaskingImageView(imageURL: teamVM.team?.backgroundURL)
+                                    .opacity(inputTab.animationTab == .item ? 1 : 0)
                             }
                             .overlay {
                                 if homeVM.isActiveEdit {
