@@ -550,7 +550,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 }
             }
             
-            /// ✅ 「signIn」ならfetch開始。「.signUp」なら各データの生成後にfetch開始
+            /// ✅ 「.signIn」ならfetch開始。「.signUp」なら各データの生成後にfetch開始
             switch logInVM.resultSignInType {
 
             case .signIn:
@@ -878,6 +878,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 case .fase1:
 
                     SelectTeamBackgroundView()
+                        .frame(height: 310)
                     
 //                    VStack(spacing: 30) {
 //

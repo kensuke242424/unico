@@ -244,8 +244,7 @@ struct SelectTeamBackgroundView: View {
         .shadow(radius: 5, x: 2, y: 2)
         .shadow(radius: 5, x: 2, y: 2)
         .clipShape(RoundedRectangle(cornerRadius: 20))
-        /// タップ範囲調整のため、本体の画像タップ判定はfalseにして
-        /// こちらで処理する
+        /// タップ範囲調整のため、本体の画像タップ判定はfalseにしてこちらで処理する
         .overlay {
             Rectangle()
                 .frame(width: 110, height: 220)

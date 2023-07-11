@@ -27,7 +27,6 @@ class LogInViewModel: ObservableObject {
 
     /// LogInViewから次の画面へのナビゲーションを総括管理するプロパティ
     @Published var rootNavigation: RootNavigation = .logIn
-    
 
     // メールリンクによって受け取ったユーザリンクをどのように扱うかをハンドルするプロパティ
     @Published var handleUseReceivedEmailLink: HandleUseReceivedEmailLink = .signIn

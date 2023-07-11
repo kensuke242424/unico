@@ -30,7 +30,7 @@ struct NewItemsView: View {
     
     @Binding var inputTab: InputTab
     
-    /// View Propaties
+    /// View Properties
     @Environment(\.colorScheme) var colorScheme
     @State private var activeTag: Tag?
     @State private var carouselMode: Bool = false
@@ -519,6 +519,7 @@ struct NewItemsView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: 8)
+                    .fontWeight(.bold)
                     .foregroundColor(.gray)
                     .padding(6)
                     .background {
