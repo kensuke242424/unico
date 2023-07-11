@@ -240,7 +240,6 @@ struct SelectTeamBackgroundView: View {
         SDWebImageView(imageURL: background.imageURL,
                        width: 110,
                        height: 220)
-//        .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 40)))
         .shadow(radius: 5, x: 2, y: 2)
         .shadow(radius: 5, x: 2, y: 2)
         .shadow(radius: 5, x: 2, y: 2)

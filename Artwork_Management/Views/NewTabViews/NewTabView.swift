@@ -131,11 +131,13 @@ struct NewTabView: View {
                             .blur(radius: homeVM.isActiveEdit ? 5 : 0, opaque: true)
                             .blur(radius: inputTab.pressingAnimation ? 6 : 0, opaque: true)
                             .overlay {
-                                BlurMaskingImageView(imageURL: backgroundVM.selectBackground?.imageURL)
+                                BlurMaskingImageView(imageURL: backgroundVM.selectBackground?.imageURL ??
+                                                     teamVM.team?.backgroundURL)
                                     .opacity(backgroundVM.showEdit && !backgroundVM.checkMode ? 1 : 0)
                             }
                             .overlay {
-                                BlurMaskingImageView(imageURL: teamVM.team?.backgroundURL)
+                                BlurMaskingImageView(imageURL: backgroundVM.selectBackground?.imageURL ??
+                                                     teamVM.team?.backgroundURL)
                                     .opacity(inputTab.animationTab != .home ||
                                              backgroundVM.showEdit ? 1 : 0)
                             }
