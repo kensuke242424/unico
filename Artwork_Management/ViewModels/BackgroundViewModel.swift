@@ -17,6 +17,10 @@ class BackgroundViewModel: ObservableObject {
     /// カテゴリ指定によって取得した背景サンプルデータが格納されるプロパティ
     @Published var categoryBackgrounds: [Background] = []
 
+    /// サインアップ画面において、ユーザーが自身の写真ライブラリから選択した画像を一時的に保持するプロパティ。
+    /// ユーザーデータの作成時に、自身の背景画像保管データテーブルに渡される。
+    @Published var userSelectedPhotoAtSignUp: [Background] = []
+
     /// バックグラウンドを管理するプロパティ
     @Published var teamBackground: URL?
     @Published var captureUIImage: UIImage?
@@ -122,8 +126,28 @@ class BackgroundViewModel: ObservableObject {
 //            }
 //        }
 //    }
+    /// サインアップ時に、ユーザーが写真フォルダから選択した画像をFirestorageに保存するメソッド。
+    func uploadUserBackgroundAtSignUp(_ image: UIImage?) async -> (url: URL?, filePath: String?) {
 
-    func uploadBackgroundImage(category: String, imageName: String) async -> (url: URL?, filePath: String?) {
+        guard let imageData = image?.jpegData(compressionQuality: 0.8) else {
+            return (url: nil, filePath: nil)
+        }
+
+        do {
+            let storage = Storage.storage()
+            let reference = storage.reference()
+            let filePath = "users/\(Date()).jpeg"
+            let imageRef = reference.child(filePath)
+            _ = try await imageRef.putDataAsync(imageData)
+            let url = try await imageRef.downloadURL()
+
+            return (url: url, filePath: filePath)
+        } catch {
+            return (url: nil, filePath: nil)
+        }
+    }
+
+    func uploadSampleBackgroundImage(category: String, imageName: String) async -> (url: URL?, filePath: String?) {
         print("uploadBackgroundImage実行")
 
         guard let backgroundUIImage = UIImage(named: imageName) else {
@@ -206,7 +230,7 @@ class BackgroundViewModel: ObservableObject {
                 Task {
                     do {
                         print("\(imageName)の保存開始")
-                        let uploadImageData = await self.uploadBackgroundImage(category: category.categoryName,
+                        let uploadImageData = await self.uploadSampleBackgroundImage(category: category.categoryName,
                                                                                imageName: imageName)
                         let backgroundContainer = Background(category: category.categoryName,
                                                              imageName: imageName,

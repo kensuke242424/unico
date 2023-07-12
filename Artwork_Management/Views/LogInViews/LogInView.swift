@@ -220,7 +220,6 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
     var body: some View {
         
         ZStack {
-            
             Group {
                 if let captureImage = inputLogIn.captureUserIconImage {
                     UIImageCircleIcon(photoImage: captureImage, size: 60)
@@ -243,7 +242,6 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             /// ログインフロー全体的なコンテンツをまとめたGroup
             /// View数が多いとコンパイルが通らないため現状こうしている
             Group {
-                
                 // 起動時最初のログイン画面で表示される「ログイン」「いえ、初めてです」ボタン
                 firstSelectButtons()
                     .offset(y: getRect().height / 8)
@@ -269,7 +267,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 // アカウント登録の進捗を表すインジケーター
                 if logInVM.userSelectedSignInType == .signUp {
                     createAccountIndicator()
-                        .opacity(inputLogIn.checkBackgroundOpacity)
+                        .opacity(backgroundVM.checkMode ? 0 : 1)
                         .opacity(logInVM.createAccountFase == .check ||
                                  logInVM.createAccountFase == .success ? 0 : 1)
                         .offset(y: -getRect().height / 3 + 30)
@@ -316,49 +314,42 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         }
                     } label: {
                         Text("< 戻る")
-                            .foregroundColor(applicationDarkMode ? .white : .black)
+//                            .foregroundColor(applicationDarkMode ? .white : .black)
+                            .foregroundColor(.white)
                             .fontWeight(.semibold)
                             .opacity(0.7)
                     }
+                    .buttonStyle(.bordered)
                     .disabled(logInVM.addressSignInFase == .success ||
                               logInVM.addressSignInFase == .check ? true : false)
                     .disabled(logInVM.createAccountFase == .success ||
                               logInVM.createAccountFase == .check ? true : false)
-                    .buttonStyle(.bordered)
-                    .foregroundColor(applicationDarkMode ? .white : .black)
-                    .opacity(inputLogIn.checkBackgroundOpacity)
                     .opacity(logInVM.addressSignInFase == .success ||
                              logInVM.addressSignInFase == .check ? 0.2 : 1.0)
                     .opacity(logInVM.createAccountFase == .success ||
                              logInVM.createAccountFase == .check ? 0.0 : 1.0)
                     .opacity(logInVM.createAccountFase == .fase1 &&
                              !inputLogIn.createAccountShowContents ? 0.0 : 1.0)
+                    .opacity(backgroundVM.checkMode ? 0 : 1)
                     .offset(y: getRect().height / 2 - 100)
                 }
                 
                 // ログイン画面最初のページまで戻るボタン
-                if logInVM.userSelectedSignInType != .start {
+                if logInVM.createAccountFase == .fase2 || logInVM.createAccountFase == .fase3 {
                     Button {
-                        //TODO: 6/10 このボタン効いてない？
-                        print("最初まで戻るボタンをタップ")
                         inputLogIn.isShowGoBackLogInAlert.toggle()
                     } label: {
                         HStack {
                             Text("<<")
                             Image(systemName: "house.fill")
                         }
+//                        .foregroundColor(applicationDarkMode ? .white : .black)
+                        .foregroundColor(.white)
+                        .opacity(0.6)
                     }
                     .buttonStyle(.bordered)
-                    .foregroundColor(applicationDarkMode ? .white : .black)
-                    .disabled(logInVM.addressSignInFase == .success ? true : false)
-                    .opacity(logInVM.addressSignInFase == .success ? 0.2 : 1.0)
-                    .opacity(logInVM.createAccountFase == .start ||
-                             logInVM.createAccountFase == .fase1 ||
-                             logInVM.createAccountFase == .check ||
-                             logInVM.createAccountFase == .success ? 0.0 : 1.0)
-                    .opacity(0.5)
                     .offset(x: -getRect().width / 2 + 40, y: getRect().height / 2 - 60 )
-                    .alert("確認", isPresented: $inputLogIn.isShowGoBackLogInAlert) {
+                    .alert("", isPresented: $inputLogIn.isShowGoBackLogInAlert) {
                         
                         Button {
                             inputLogIn.isShowGoBackLogInAlert.toggle()
@@ -380,7 +371,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             Text("はい")
                         }
                     } message: {
-                        Text("最初の画面に戻ります。よろしいですか？")
+                        Text("最初の画面に戻りますか？")
                     } // alert
                     
                 }
@@ -481,36 +472,52 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         } message: {
             Text(logInVM.logInAlertMessage.text)
         }
+        // ユーザーアイコンの写真ピッカー
         .sheet(isPresented: $inputLogIn.isShowPickerView) {
-            // .fase1ならバックグラウンドの画像設定、.fase2ならユーザーアイコンの画像設定
-            if logInVM.createAccountFase == .fase1 {
-                PHPickerView(captureImage: $inputLogIn.captureBackgroundImage, isShowSheet: $inputLogIn.isShowPickerView)
-            } else if logInVM.createAccountFase == .fase2 {
-                PHPickerView(captureImage: $inputLogIn.captureUserIconImage, isShowSheet: $inputLogIn.isShowPickerView)
+            PHPickerView(captureImage: $inputLogIn.captureUserIconImage,
+                         isShowSheet: $inputLogIn.isShowPickerView)
+        }
+        // 背景の写真ピッカー
+        .sheet(isPresented: $backgroundVM.showPicker) {
+            PHPickerView(captureImage: $inputLogIn.captureBackgroundImage,
+                         isShowSheet: $backgroundVM.showPicker)
+        }
+        .onChange(of: inputLogIn.captureBackgroundImage) { newImage in
+            guard let newImage else { return }
+            Task{
+                let resizedImage = backgroundVM.resizeUIImage(image: newImage)
+                let uploadImage = await backgroundVM.uploadUserBackgroundAtSignUp(resizedImage)
+                let myBackground = Background(category: "original",
+                                               imageName: "",
+                                               imageURL: uploadImage.url,
+                                               imagePath: uploadImage.filePath)
+                withAnimation {
+                    backgroundVM.userSelectedPhotoAtSignUp.append(myBackground)
+                    print(backgroundVM.userSelectedPhotoAtSignUp)
+                }
             }
         }
-        
         .background {
             ZStack {
                 GeometryReader { proxy in
-//                    if inputLogIn.selectBackground == .original {
-//                        Image(uiImage: inputLogIn.captureBackgroundImage ?? UIImage())
-//                            .resizable()
-//                            .scaledToFill()
-//                            .frame(width: proxy.size.width, height: proxy.size.height)
-//                            .blur(radius: inputLogIn.checkBackgroundEffect ? 0 : 4, opaque: true)
-//                            .ignoresSafeArea()
-//                    } else {
-                    Image(backgroundVM.selectBackground?.imageName ?? "music_1")
+                    if let selectionBackground = backgroundVM.selectBackground {
+                        SDWebImageBackgroundView(
+                            imageURL: selectionBackground.imageURL,
+                            width: proxy.size.width,
+                            height: proxy.size.height
+                        )
+                        .blur(radius: backgroundVM.checkMode ? 0 : 4, opaque: true)
+                    } else {
+                        Image("music_1")
                             .resizable()
                             .scaledToFill()
                             .frame(width: proxy.size.width, height: proxy.size.height)
-                            .blur(radius: inputLogIn.checkBackgroundEffect ? 0 : 4, opaque: true)
+                            .blur(radius: backgroundVM.checkMode ? 0 : 4, opaque: true)
                             .ignoresSafeArea()
-//                    }
+                    }
                     Color(.black)
                         .frame(width: proxy.size.width, height: proxy.size.height)
-                        .opacity(inputLogIn.checkBackgroundEffect      ? 0.0 :
+                        .opacity(backgroundVM.checkMode ? 0.0 :
                                  logInVM.createAccountFase == .success ? 0.5 :
                                  0.2)
                         .ignoresSafeArea()
@@ -660,22 +667,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 } // Task end
             }
         }
-        .onAppear {
-            userVM.isAnonymousCheck()
-        }
-        .onChange(of: isPresented) { newValue in
-
-//            if newValue {
-
-                print(newValue)
-
-//            }
-//            logInVM.userSelectedSignInType = .start
-//            logInVM.createAccountFase = .start
-//            logInVM.addressSignInFase = .start
-//            logInVM.selectProviderType = .start
-        }
-        
+        .onAppear { userVM.isAnonymousCheck() }
     } // body
     
     @ViewBuilder
@@ -827,8 +819,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     
                 case .fase1:
                     VStack(spacing: 10) {
-                        Text("まずはあなたにぴったりの")
-                        Text("デザインを決めましょう")
+                        Text("お好きな壁紙を選んでください")
+//                        Text("デザインを決めましょう")
                     }
                     .tracking(5)
                     .offset(y: 30)
@@ -866,7 +858,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             } // Group
             .tracking(5)
             .font(.subheadline)
-            .opacity(inputLogIn.checkBackgroundOpacity)
+            .opacity(backgroundVM.checkMode ? 0 : 1)
             .opacity(inputLogIn.createAccountTitle ? 1.0 : 0.0)
             
             Group {
@@ -877,131 +869,68 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 // Fase1: 背景写真を選んでもらうフェーズ
                 case .fase1:
 
-                    EditTeamBackgroundView()
-                        .frame(height: 310)
-                    
-//                    VStack(spacing: 30) {
-//
-//                        ScrollView(.horizontal, showsIndicators: false) {
-//                            HStack(spacing: 30) {
-//                                ForEach(TeamBackgroundContents.allCases, id: \.self) { value in
-//                                    Group {
-////                                        if value == .original {
-////                                            Image(uiImage: inputLogIn.captureBackgroundImage ?? UIImage())
-////                                                .resizable()
-////                                                .scaledToFill()
-////                                                .frame(width: 120, height: 250)
-////                                                .border(.blue, width: 1)
-////                                                .overlay {
-////                                                    Button("写真を挿入") {
-////                                                        inputLogIn.isShowPickerView.toggle()
-////                                                    }
-////                                                    .buttonStyle(.borderedProminent)
-////                                                }
-////                                        } else {
-//                                        Image(uiImage: value)
-//                                                .resizable()
-//                                                .scaledToFill()
-//                                                .frame(width: 120, height: 250)
-////                                        }
-//                                    }
-//                                    .clipped()
-//                                    .scaleEffect(inputLogIn.selectBackground == value ? 1.2 : 1.0)
-//                                    .overlay(alignment: .topTrailing) {
-//                                        Image(systemName: "checkmark.seal.fill")
-//                                            .resizable()
-//                                            .scaledToFit()
-//                                            .foregroundColor(.green)
-//                                            .frame(width: 30, height: 30)
-//                                            .scaleEffect(inputLogIn.selectBackground == value ? 1.0 : 1.2)
-//                                            .opacity(inputLogIn.selectBackground == value ? 1.0 : 0.0)
-//                                            .offset(x: 20, y: -30)
-//                                    }
-//                                    .padding(.leading, value == .original ? 40 : 0)
-//                                    .padding(.trailing, value == .sample4 ? 40 : 0)
-//                                    .onTapGesture {
-//                                        withAnimation(.spring(response: 0.5)) {
-//                                            inputLogIn.selectBackground = value
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                            .frame(height: 310)
-//                        }
-//                    } // VStack
-//                    .opacity(inputLogIn.checkBackgroundOpacity)
-//                    .offset(y: 20)
-//
-//                    Button("次へ") {
-//                        withAnimation(.spring(response: 1.0)) {
-//                            inputLogIn.createAccountTitle = false
-//                            inputLogIn.createAccountShowContents = false
-//                            logInVM.createAccountFase = .fase2
-//                        }
-//                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-//                            withAnimation(.spring(response: 0.8)) {
-//                                inputLogIn.createAccountTitle = true
-//                            }
-//                        }
-//                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-//                            withAnimation(.spring(response: 0.8)) {
-//                                inputLogIn.createAccountShowContents = true
-//                            }
-//                        }
-//                    }
-//                    .buttonStyle(.borderedProminent)
-//                    .opacity(inputLogIn.checkBackgroundOpacity)
-//                    .overlay(alignment: .trailing) {
-//                        VStack {
-//
-//                            HStack {
-//                                Spacer()
-//                                ZStack {
-//                                    BlurView(style: .systemThickMaterial)
-//                                        .frame(width: 90, height: 160)
-//                                        .clipShape(RoundedRectangle(cornerRadius: 15))
-//                                        .opacity(0.8)
-//
-//                                    VStack(spacing: 20) {
-//                                        VStack {
-//                                            Text("背景を確認").font(.footnote).offset(x: 15)
-//                                            Toggle("", isOn: $checkBackgroundToggle)
-//                                        }
-//                                        VStack {
-//                                            Text("ダークモード").font(.footnote).offset(x: 15)
-//                                            Toggle("", isOn: $applicationDarkMode)
-//                                        }
-//                                    }
-//                                    .frame(width: 80)
-//                                    .padding(.trailing, 30)
-//                                    .onChange(of: checkBackgroundToggle) { newValue in
-//                                        if newValue {
-//                                            withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-//                                                checkBackgroundAnimation = true
-//                                            }
-//                                        } else {
-//                                            withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-//                                                checkBackgroundAnimation = false
-//                                            }
-//                                        }
-//                                    }
-//                                }
-//                            }
-//
-//                        }
-//                        .frame(width: 80)
-//                        .offset(x: 130, y: 50)
-//                        .onChange(of: checkBackgroundToggle) { newValue in
-//                            if newValue {
-//                                withAnimation(.easeIn(duration: 0.2)) { inputLogIn.checkBackgroundOpacity = 0.0 }
-//                                withAnimation(.easeIn(duration: 0.2)) { inputLogIn.checkBackgroundEffect.toggle() }
-//                            } else {
-//                                withAnimation(.easeIn(duration: 0.2)) { inputLogIn.checkBackgroundOpacity = 1.0 }
-//                                withAnimation(.easeIn(duration: 0.2)) { inputLogIn.checkBackgroundEffect.toggle() }
-//                            }
-//                        }
-//                    }
-//                    .offset(y: 20)
+                    VStack {
+                        BackgroundCategoriesTagView()
+                            .opacity(backgroundVM.checkMode ? 0 : 1)
+                        SelectionBackgroundCards(showPicker: $backgroundVM.showPicker)
+                            .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
+                            .opacity(backgroundVM.checkMode ? 0 : 1)
+                            .onChange(of: backgroundVM.selectCategory) { newCategory in
+                                /// タグ「original」を選択時、joinsに保存している現在のチームの画像データ群を取り出して
+                                /// backgroundVMの背景管理プロパティに橋渡しする
+                                if newCategory == .original {
+                                    Task {
+                                        await backgroundVM.resetSelectBackgroundImages()
+                                        let myBackgrounds = userVM.getCurrentTeamMyBackgrounds()
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                            backgroundVM.appendMyBackgrounds(images: myBackgrounds)
+                                        }
+                                    }
+                                } else {
+                                    Task {
+                                        await backgroundVM.resetSelectBackgroundImages()
+                                    }
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                        Task {
+                                            await backgroundVM.fetchCategoryBackgroundImage(category: newCategory.categoryName)
+                                        }
+                                    }
+                                }
+                            }
+                            .onAppear {
+                                Task {
+                                    let startCategory = backgroundVM.selectCategory.categoryName
+                                    await backgroundVM.fetchCategoryBackgroundImage(category: startCategory)
+                                }
+                            }
+                        Button("次へ") {
+                            withAnimation(.spring(response: 1.0)) {
+                                inputLogIn.createAccountTitle = false
+                                inputLogIn.createAccountShowContents = false
+                                logInVM.createAccountFase = .fase2
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                                withAnimation(.spring(response: 0.8)) {
+                                    inputLogIn.createAccountTitle = true
+                                }
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                                withAnimation(.spring(response: 0.8)) {
+                                    inputLogIn.createAccountShowContents = true
+                                }
+                            }
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .opacity(backgroundVM.checkMode ? 0 : 1)
+                        .padding(.top)
+                        .overlay {
+                            EditBackgroundControlButtons()
+                                .offset(x: UIScreen.main.bounds.width / 3,
+                                        y: UIScreen.main.bounds.height / 10
+                                )
+                        }
+                    }
+                    .padding(.top, 20)
                     
                     /// ユーザー情報「名前」「アイコン」を入力するフェーズ
                 case .fase2:

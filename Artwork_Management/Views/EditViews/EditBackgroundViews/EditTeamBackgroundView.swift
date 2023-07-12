@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+/// チームルームの背景を変更編集するために用いる背景セレクトビュー。アプリサイドメニュー内のシステム項目から呼び出される。
+/// チーム背景データはユーザーごとに独立しており、他のメンバーと干渉しない。
 struct EditTeamBackgroundView: View {
 
     @EnvironmentObject var teamVM: TeamViewModel
