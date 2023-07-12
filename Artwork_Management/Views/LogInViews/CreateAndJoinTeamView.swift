@@ -196,8 +196,10 @@ struct CreateAndJoinTeamView: View {
                             switch selectedTeamCard {
                             case .start:
                                 EmptyView()
+
                             case .create:
                                 createTeamIconAndName()
+
                             case .join:
                                 if selectTeamFase != .success {
                                     VStack(spacing: 40) {
@@ -262,10 +264,10 @@ struct CreateAndJoinTeamView: View {
                         }
                     }
                     .buttonStyle(.borderedProminent)
-                    .opacity(selectTeamFase == .start || selectTeamFase == .success ? 0.0 : 1.0)
-                    .opacity(selectedTeamCard == .join && selectTeamFase == .fase2 ? 0.0 : 1.0)
+                    .opacity(selectTeamFase == .start || selectTeamFase == .success ? 0 : 1)
+                    .opacity(selectedTeamCard == .join && selectTeamFase == .fase2 ? 0 : 1)
                     .disabled(selectedTeamCard == .start || selectTeamFase == .success ? true : false)
-//                    .disabled(selectedTeamCard == .join && userVM.isAnonymous ? true : false)
+                    .disabled(selectedTeamCard == .join && userVM.isAnonymous ? true : false)
                     .padding(.top, 30)
                 }
                 
@@ -274,8 +276,9 @@ struct CreateAndJoinTeamView: View {
                         selectTeamFase = .fase1
                     }
                 }
+                .buttonStyle(.bordered)
                 .fontWeight(.semibold)
-                .foregroundColor(.white.opacity(0.7))
+                .foregroundColor(.white.opacity(0.5))
                 .opacity(selectTeamFase == .fase2 ? 1.0 : 0.0)
                 .disabled(selectTeamFase == .success ? true : false)
                 .padding(.top)
@@ -295,10 +298,11 @@ struct CreateAndJoinTeamView: View {
                     Text("<<")
                     Image(systemName: "house.fill")
                 }
+                .foregroundColor(.white.opacity(0.5))
             }
+            .buttonStyle(.bordered)
             .disabled(selectTeamFase == .success ? true : false)
-            .foregroundColor(.white.opacity(0.5))
-            .opacity(selectTeamFase == .start ? 0.0 : 1.0)
+            .opacity(selectTeamFase == .start ? 0 : 1.0)
             .offset(x: -getRect().width / 2 + 40, y: getRect().height / 2 - 60 )
             .alert("", isPresented: $isShowGoBackAlert) {
 
@@ -483,33 +487,34 @@ struct CreateAndJoinTeamView: View {
                     }
             }
             
-//            if userVM.isAnonymous {
-//                RoundedRectangle(cornerRadius: 10)
-//                    .foregroundColor(.black)
-//                    .opacity(selectedTeamCard == .join ? 0.8 : 0.3)
-//                    .frame(width: getRect().width * 0.4, height: getRect().height * 0.25)
-//
-//                VStack(spacing: 20) {
-//
-//                    VStack(spacing: 5) {
-//                        Text("この機能は")
-//                        Text("ユーザ登録が")
-//                        Text("必要です")
-//                    }
-//                    .font(.footnote)
-//                    .fontWeight(.bold)
-//                    .tracking(4)
-//                    .foregroundColor(.white)
-//
-//                    Button("登録する") {
-//                        // エントリーシート画面の表示
-//                        isShowSignUpSheetView.toggle()
-//                    }
-//                    .font(.caption2)
-//                    .buttonStyle(.borderedProminent)
-//                }
-//                .opacity(selectedTeamCard == .join ? 0.6 : 0.0)
-//            }
+            if userVM.isAnonymous {
+                RoundedRectangle(cornerRadius: 10)
+                    .foregroundColor(.black)
+                    .opacity(selectedTeamCard == .join ? 0.8 : 0)
+                    .frame(width: getRect().width * 0.4, height: getRect().height * 0.25)
+
+                VStack(spacing: 20) {
+
+                    VStack(spacing: 5) {
+                        Text("この機能は")
+                        Text("アカウント登録が")
+                        Text("必要です")
+                    }
+                    .font(.footnote)
+                    .fontWeight(.bold)
+                    .tracking(4)
+                    .foregroundColor(.white)
+                    .opacity(selectedTeamCard == .join ? 0.6 : 0)
+
+                    Button("アカウント登録") {
+                        // エントリーシート画面の表示
+                        isShowSignUpSheetView.toggle()
+                    }
+                    .font(.caption2)
+                    .buttonStyle(.borderedProminent)
+                    .opacity(selectedTeamCard == .join ? 1 : 0)
+                }
+            }
         }
         .clipShape(RoundedRectangle(cornerRadius: 10))
         .frame(width: getRect().width * 0.4, height: getRect().height * 0.25)

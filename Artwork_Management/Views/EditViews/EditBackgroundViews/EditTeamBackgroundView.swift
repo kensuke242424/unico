@@ -49,55 +49,19 @@ struct EditTeamBackgroundView: View {
 
                 VStack(spacing: 40) {
                     Button("保存") {
-                        withAnimation(.easeIn(duration: 0.15)) { showProgress = true }
-
                         Task {
                             do {
-                                var updateImage: UIImage?
-//                                // 新しい背景が選択されていた場合、更新処理を実行する
-//                                if backgroundVM.selectCategory == .original {
-//                                    updateImage = backgroundVM.captureUIImage
-//
-//                                    // サンプル画像選択時、UIImageに変換して格納
-//                                } else {
-                                    let imageName = backgroundVM.selectBackground?.imageName ?? ""
-                                    let selectedUIImage = UIImage(named: imageName)
-                                    updateImage = selectedUIImage
-//                                }
-
-                                if let updateImage {
-                                    let defaultImagePath = teamVM.team?.backgroundPath
-                                    let resizedUIImage = backgroundVM.resizeUIImage(image: updateImage)
-                                    let uploadImageData = await teamVM.uploadTeamImage(updateImage)
-                                    let _ = try await teamVM.updateTeamBackgroundImage(data: uploadImageData)
-                                    // 新規背景画像の保存が完了したら、以前の背景データを削除
-                                    let _ = await teamVM.deleteTeamImageData(path: defaultImagePath)
+                                if let selectedBackground = backgroundVM.selectBackground {
+                                    _ = try await userVM.updateCurrentTeamBackground(data: selectedBackground)
                                 }
                                 withAnimation(.spring(response: 0.3, blendDuration: 1)) {
                                     showContents = false
-                                    showProgress = false
                                 }
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                                     withAnimation(.spring(response: 0.5, blendDuration: 1)) {
                                         backgroundVM.captureUIImage = nil
                                         backgroundVM.selectBackground = nil
                                         backgroundVM.showEdit = false
-                                    }
-                                }
-
-                            } catch {
-                                withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                                    showContents = false
-                                    showProgress = false
-                                }
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                    withAnimation(.spring(response: 0.5, blendDuration: 1)) {
-                                        backgroundVM.captureUIImage = nil
-                                        backgroundVM.selectBackground = nil
-                                        backgroundVM.showEdit = false
-                                        Task {
-                                            await backgroundVM.resetSelectBackgroundImages()
-                                        }
                                     }
                                 }
                             }

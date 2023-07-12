@@ -253,7 +253,7 @@ struct NewEditItemView: View {
         .background {
             GeometryReader {
                 let size = $0.size
-                SDWebImageView(imageURL : teamVM.team?.backgroundURL,
+                SDWebImageView(imageURL : userVM.currentTeamBackground?.imageURL,
                                width : size.width,
                                height: size.height)
                     .opacity(0.1)

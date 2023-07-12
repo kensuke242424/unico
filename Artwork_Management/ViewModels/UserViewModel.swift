@@ -33,6 +33,10 @@ class UserViewModel: ObservableObject {
         guard let index else { return 0 }
         return index
     }
+    /// ユーザーが現在操作しているチームの背景データ
+    var currentTeamBackground: Background? {
+        return user?.joins[currentTeamIndex].currentBackground
+    }
 
     @Published var user: User?
     @Published var isAnonymous: Bool = false
@@ -137,6 +141,18 @@ class UserViewModel: ObservableObject {
             try userRef.setData(from: user)
         } catch {
             print("ERROR: Homeパーツ設定の保存に失敗しました。")
+        }
+    }
+
+    func updateCurrentTeamBackground(data backgroundData: Background) async throws {
+        guard var user else { throw CustomError.userEmpty }
+        guard let userRef = db?.collection("users").document(user.id) else { throw CustomError.getDocument }
+
+        do {
+            user.joins[currentTeamIndex].currentBackground = backgroundData
+            try userRef.setData(from: user)
+        } catch {
+            print("ERROR: チーム背景のアップデートに失敗しました")
         }
     }
 

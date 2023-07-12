@@ -53,10 +53,12 @@ struct SDWebImageBackgroundView: View {
             .onAppear { imageURL1 = imageURL }
 
         } else {
-            Text("No Image.")
+            Text("No Background.")
+                .tracking(5)
                 .font(.subheadline)
                 .fontWeight(.bold)
-                .opacity(0.7)
+                .opacity(0.5)
+                .frame(width: width, height: height)
         }
     }
 

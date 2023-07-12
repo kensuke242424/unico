@@ -500,21 +500,15 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         .background {
             ZStack {
                 GeometryReader { proxy in
-                    if let selectionBackground = backgroundVM.selectBackground {
+
                         SDWebImageBackgroundView(
-                            imageURL: selectionBackground.imageURL,
+                            imageURL: backgroundVM.selectBackground?.imageURL ??
+                                      backgroundVM.sampleBackground.imageURL,
                             width: proxy.size.width,
                             height: proxy.size.height
                         )
                         .blur(radius: backgroundVM.checkMode ? 0 : 4, opaque: true)
-                    } else {
-                        Image("music_1")
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: proxy.size.width, height: proxy.size.height)
-                            .blur(radius: backgroundVM.checkMode ? 0 : 4, opaque: true)
-                            .ignoresSafeArea()
-                    }
+
                     Color(.black)
                         .frame(width: proxy.size.width, height: proxy.size.height)
                         .opacity(backgroundVM.checkMode ? 0.0 :
@@ -576,8 +570,6 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         withAnimation(.spring(response: 0.8).delay(0.5)) {
                             logInVM.createAccountFase = .check
                         }
-                        
-                        /// ーーーーアイコン画像処理ーーーー
                         // 保存対象のアイコン画像データ容器
                         var iconImageContainer: UIImage?
                         /// オリジナルアイコン画像が入力されている場合は、リサイズ処理しコンテナに格納
@@ -585,7 +577,6 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             iconImageContainer = logInVM.resizeUIImage(image: captureIconUIImage,
                                                                     width: 60)
                         }
-
                         /// ーーーーアイコンデータのアップロード処理ーーーー
                         let uplaodIconImageData = await userVM.uploadUserImage(iconImageContainer)
 
@@ -596,7 +587,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                                              password : inputLogIn.password,
                                                              imageData: uplaodIconImageData,
                                                              color    : inputLogIn.selectUserColor)
-                        
+
                         // Firestoreに保存したデータをローカルに引っ張ってくる
                         try await userVM.fetchUser()
                         guard let user = userVM.user else { return }
@@ -609,17 +600,15 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         // 新規チームのIDとして使用
                         let createTeamID = UUID().uuidString
                         
-                        let teamData = Team(id: createTeamID,
-                                            name          : "\(user.name)のチーム",
-                                            backgroundURL : backgroundVM.selectBackground?.imageURL,
-                                            backgroundPath: backgroundVM.selectBackground?.imagePath,
-                                            members       : [joinMember]
-                        )
+                        let teamData = Team(id     : createTeamID,
+                                            name   : "\(user.name)のチーム",
+                                            members: [joinMember])
+
                         let joinTeamData = JoinTeam(teamID           : teamData.id,
                                                     name             : teamData.name,
-                                                    currentBackground: backgroundVM.selectBackground,
-                                                    myBackgrounds    : backgroundVM.pickMyBackgroundsAtSignUp
-                        )
+                                                    currentBackground: backgroundVM.selectBackground ??
+                                                                       backgroundVM.sampleBackground,
+                                                    myBackgrounds    : backgroundVM.pickMyBackgroundsAtSignUp)
                         
                         /// 準備したチームデータをFirestoreに保存していく
                         /// userDocument側にも新規作成したチームのidを保存しておく(addNewJoinTeam)
@@ -805,7 +794,6 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 case .fase1:
                     VStack(spacing: 10) {
                         Text("お好きな壁紙を選んでください")
-//                        Text("デザインを決めましょう")
                     }
                     .tracking(5)
                     .offset(y: 30)

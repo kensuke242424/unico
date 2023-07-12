@@ -31,8 +31,9 @@ struct InputTab {
     var selectBackgroundCategory: BackgroundCategory = .music
     var selectedBackgroundImage: UIImage?
     
-    /// タブViewのアニメーションを管理するプロパティ
+    /// タブの選択状態を管理するプロパティ
     var selectionTab    : Tab = .home
+    /// タブの切り替えによるアニメーションの状態を管理するプロパティ
     var animationTab    : Tab = .home
     var animationOpacity: CGFloat = 1
     var animationScale  : CGFloat = 1
@@ -123,7 +124,7 @@ struct NewTabView: View {
                             // チーム背景編集による選択画像URLが存在する場合、そちらを優先して背景表示する
                             SDWebImageBackgroundView(
                                 imageURL: backgroundVM.selectBackground?.imageURL ??
-                                teamVM.team?.backgroundURL,
+                                userVM.currentTeamBackground?.imageURL,
                                 width: proxy.size.width,
                                 height: proxy.size.height
                             )
@@ -134,7 +135,7 @@ struct NewTabView: View {
                             // タブのスワイプ遷移時と背景へのblurが重なると、動作が重くなる
                             // オーバーレイでブラー処理済み背景を重ねる
                             .overlay {
-                                BlurMaskingImageView(imageURL: teamVM.team?.backgroundURL)
+                                BlurMaskingImageView(imageURL: userVM.currentTeamBackground?.imageURL)
                                     .opacity(inputTab.animationTab == .item ? 1 : 0)
                             }
                             .overlay {
