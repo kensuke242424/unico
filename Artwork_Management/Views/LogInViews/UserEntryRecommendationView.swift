@@ -70,6 +70,8 @@ struct UserEntryRecommendationView: View {
                     Text("※アカウント登録はお試し期間中いつでも可能です。\n  登録が完了すると、お試しアカウントから\n  登録済みアカウントに切り替わります。管理していた\n  アイテムやデータは全て引き継がれます。")
                         .foregroundColor(.white.opacity(0.8))
 
+                    Text("※アカウント登録による料金の発生は一切ありません。")
+                        .foregroundColor(.white.opacity(0.8))
                 }
                 .font(.footnote)
             }

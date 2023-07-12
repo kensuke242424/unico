@@ -28,6 +28,8 @@ struct CreateAndJoinTeamView: View {
     @EnvironmentObject var logInVM: LogInViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
+    @EnvironmentObject var tagVM: TagViewModel
+    @EnvironmentObject var backgroundVM: BackgroundViewModel
 
     @State private var inputTeamName: String = ""
     @State private var captureIconUIImage: UIImage?
@@ -194,8 +196,10 @@ struct CreateAndJoinTeamView: View {
                             switch selectedTeamCard {
                             case .start:
                                 EmptyView()
+
                             case .create:
                                 createTeamIconAndName()
+
                             case .join:
                                 if selectTeamFase != .success {
                                     VStack(spacing: 40) {
@@ -260,10 +264,10 @@ struct CreateAndJoinTeamView: View {
                         }
                     }
                     .buttonStyle(.borderedProminent)
-                    .opacity(selectTeamFase == .start || selectTeamFase == .success ? 0.0 : 1.0)
-                    .opacity(selectedTeamCard == .join && selectTeamFase == .fase2 ? 0.0 : 1.0)
+                    .opacity(selectTeamFase == .start || selectTeamFase == .success ? 0 : 1)
+                    .opacity(selectedTeamCard == .join && selectTeamFase == .fase2 ? 0 : 1)
                     .disabled(selectedTeamCard == .start || selectTeamFase == .success ? true : false)
-//                    .disabled(selectedTeamCard == .join && userVM.isAnonymous ? true : false)
+                    .disabled(selectedTeamCard == .join && userVM.isAnonymous ? true : false)
                     .padding(.top, 30)
                 }
                 
@@ -272,8 +276,9 @@ struct CreateAndJoinTeamView: View {
                         selectTeamFase = .fase1
                     }
                 }
+                .buttonStyle(.bordered)
                 .fontWeight(.semibold)
-                .foregroundColor(.white.opacity(0.7))
+                .foregroundColor(.white.opacity(0.5))
                 .opacity(selectTeamFase == .fase2 ? 1.0 : 0.0)
                 .disabled(selectTeamFase == .success ? true : false)
                 .padding(.top)
@@ -293,10 +298,11 @@ struct CreateAndJoinTeamView: View {
                     Text("<<")
                     Image(systemName: "house.fill")
                 }
+                .foregroundColor(.white.opacity(0.5))
             }
+            .buttonStyle(.bordered)
             .disabled(selectTeamFase == .success ? true : false)
-            .foregroundColor(.white.opacity(0.5))
-            .opacity(selectTeamFase == .start ? 0.0 : 1.0)
+            .opacity(selectTeamFase == .start ? 0 : 1.0)
             .offset(x: -getRect().width / 2 + 40, y: getRect().height / 2 - 60 )
             .alert("", isPresented: $isShowGoBackAlert) {
 
@@ -349,33 +355,44 @@ struct CreateAndJoinTeamView: View {
                 
                 Task {
                     do {
-                        if inputTeamName.isEmpty { inputTeamName = "No Name" }
+                        let userName = userVM.user?.name ?? "名無し"
+                        if inputTeamName.isEmpty { inputTeamName = "\(userName)のチーム" }
                         
                         // 背景、アイコン画像をリサイズして保存していく
                         let createTeamID = UUID().uuidString
-                        var resizedIconImage      : UIImage?
-                        var resizedBackgroundImage: UIImage?
-                        // チーム作成時にリソースからランダムで背景をピックアップする。(.originalにImagenameは無いため、除かれる)
-                        var pickUpRandomBackground: TeamBackgroundContents = .original
-                        while pickUpRandomBackground == TeamBackgroundContents.original {
-                            pickUpRandomBackground = TeamBackgroundContents.allCases.randomElement()!
-                            print("ランダム選出された背景: \(pickUpRandomBackground.imageName)")
-                        }
+                        var iconImageContainer      : UIImage?
+                        var backgroundImageContainer: UIImage?
 
-                        // 60 -> アイコンwidth
+                        // アイコン画像が入力されていれば、リサイズ処理をしてコンテナに格納
                         if let captureIconUIImage {
-                            resizedIconImage = logInVM.resizeUIImage(image: captureIconUIImage,
+                            iconImageContainer = logInVM.resizeUIImage(image: captureIconUIImage,
                                                                     width: 60)
                         }
-                        /// オリジナル背景ではなくサンプル背景を選択していた場合は、付属のImageをUIImageに直してからリサイズ
-                        
-                        resizedBackgroundImage = logInVM.resizeUIImage(image: UIImage(named: pickUpRandomBackground.imageName),
-                                                                       width: getRect().width * 4)
-                        
-                        /// リサイズ処理した画像をFirestorageに保存
-                        let uplaodIconImageData       = await teamVM.firstUploadTeamImage(resizedIconImage,
+
+                        // 選択カテゴリがオリジナル&背景画像データが入力されていれば、リサイズ処理をしてコンテナに格納
+                        if backgroundVM.selectCategory == .original {
+                            if let captureBackgroundUIImage = backgroundVM.captureUIImage {
+
+                                let resizedBackgroundUIImage = logInVM.resizeUIImage(image: captureBackgroundUIImage,
+                                                                                 width: getRect().width * 4)
+                                backgroundImageContainer = resizedBackgroundUIImage
+
+                            } else {
+                                /// 入力背景画像がnilだった場合、サンプル画像から一つランダムで選出し、コンテナに格納
+                                let randomPickUpBackground = teamVM.getRandomBackgroundUIImage()
+                                backgroundImageContainer = randomPickUpBackground
+                            }
+
+                        } else {
+                            /// 入力背景画像がnilだった場合、サンプル画像から一つランダムで選出し、コンテナに格納
+                            let randomPickUpBackground = teamVM.getRandomBackgroundUIImage()
+                            backgroundImageContainer = randomPickUpBackground
+                        }
+
+                        /// 準備したチームアイコン&背景画像をFirestorageに保存
+                        let uplaodIconImageData       = await teamVM.firstUploadTeamImage(iconImageContainer,
                                                                                           id: createTeamID)
-                        let uplaodBackgroundImageData = await teamVM.firstUploadTeamImage(resizedBackgroundImage,
+                        let uplaodBackgroundImageData = await teamVM.firstUploadTeamImage(backgroundImageContainer,
                                                                                           id: createTeamID)
                         
                         // チームデータに格納するログインユーザのユーザデータ
@@ -401,6 +418,7 @@ struct CreateAndJoinTeamView: View {
                         try await teamVM.addTeam(teamData: teamData)
                         try await userVM.addNewJoinTeam(newJoinTeam: joinTeamData)
                             await teamVM.setSampleItem(teamID: teamData.id)
+                            tagVM.addTag(tagData: tagVM.sampleTag, teamID: teamData.id)
 
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                             withAnimation(.spring(response: 1)) {
@@ -469,33 +487,34 @@ struct CreateAndJoinTeamView: View {
                     }
             }
             
-//            if userVM.isAnonymous {
-//                RoundedRectangle(cornerRadius: 10)
-//                    .foregroundColor(.black)
-//                    .opacity(selectedTeamCard == .join ? 0.8 : 0.3)
-//                    .frame(width: getRect().width * 0.4, height: getRect().height * 0.25)
-//
-//                VStack(spacing: 20) {
-//
-//                    VStack(spacing: 5) {
-//                        Text("この機能は")
-//                        Text("ユーザ登録が")
-//                        Text("必要です")
-//                    }
-//                    .font(.footnote)
-//                    .fontWeight(.bold)
-//                    .tracking(4)
-//                    .foregroundColor(.white)
-//
-//                    Button("登録する") {
-//                        // エントリーシート画面の表示
-//                        isShowSignUpSheetView.toggle()
-//                    }
-//                    .font(.caption2)
-//                    .buttonStyle(.borderedProminent)
-//                }
-//                .opacity(selectedTeamCard == .join ? 0.6 : 0.0)
-//            }
+            if userVM.isAnonymous {
+                RoundedRectangle(cornerRadius: 10)
+                    .foregroundColor(.black)
+                    .opacity(selectedTeamCard == .join ? 0.8 : 0)
+                    .frame(width: getRect().width * 0.4, height: getRect().height * 0.25)
+
+                VStack(spacing: 20) {
+
+                    VStack(spacing: 5) {
+                        Text("この機能は")
+                        Text("アカウント登録が")
+                        Text("必要です")
+                    }
+                    .font(.footnote)
+                    .fontWeight(.bold)
+                    .tracking(4)
+                    .foregroundColor(.white)
+                    .opacity(selectedTeamCard == .join ? 0.6 : 0)
+
+                    Button("アカウント登録") {
+                        // エントリーシート画面の表示
+                        isShowSignUpSheetView.toggle()
+                    }
+                    .font(.caption2)
+                    .buttonStyle(.borderedProminent)
+                    .opacity(selectedTeamCard == .join ? 1 : 0)
+                }
+            }
         }
         .clipShape(RoundedRectangle(cornerRadius: 10))
         .frame(width: getRect().width * 0.4, height: getRect().height * 0.25)

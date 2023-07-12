@@ -33,6 +33,8 @@ struct JoinTeam: Codable, Hashable {
     var teamID: String
     var name: String
     var iconURL: URL?
+    var currentBackground: Background?
+    var myBackgrounds: [Background] = []
     var homeEdits = HomePartsEditData(nowTime: NowTimeParts(),
                                      teamNews: TeamNewsParts())
 }

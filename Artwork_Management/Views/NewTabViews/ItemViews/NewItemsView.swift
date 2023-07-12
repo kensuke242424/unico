@@ -9,6 +9,8 @@ import SwiftUI
 import ResizableSheet
 import Introspect
 
+/// アイテムの在庫処理時のカート内の状態を管理する
+/// このプロパティ群に値が検知されると、カートハーフモーダルが出現する
 struct InputCart {
     var doCommerce: Bool = false
     var resultCartAmount: Int = 0
@@ -28,7 +30,7 @@ struct NewItemsView: View {
     
     @Binding var inputTab: InputTab
     
-    /// View Propaties
+    /// View Properties
     @Environment(\.colorScheme) var colorScheme
     @State private var activeTag: Tag?
     @State private var carouselMode: Bool = false
@@ -116,7 +118,7 @@ struct NewItemsView: View {
                                     }
                                     .alert("確認", isPresented: $showDeleteAlert) {
                                         Button("削除", role: .destructive) {
-                                            // 一瞬ずらさないとアラートが瞬間だけ再表示されてしまう
+                                            // 一瞬ずらさないとアラートが瞬間だけ再表示されてしまう🧐
                                             guard let selectedItem else { return }
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                                 Task {
@@ -149,10 +151,9 @@ struct NewItemsView: View {
                                            totalContent: sampleBooks.count)
                     }
                 }
-                /// Since we need offset from here and not from global View
                 /// グローバルビューからではなく、ここからのオフセットが必要なため
                 /// ビューの座標空間に名前を付け、
-                /// 他のコードがポイントやサイズなどの次元を名前付きの空間と相対的に操作できるようにします。
+                /// 他のコードがポイントやサイズなどの次元を名前付きの空間と相対的に操作できるようにする
                 .coordinateSpace(name: "SCROLLVIEW")
             } // VStack
             .padding(.top, 15)
@@ -173,7 +174,7 @@ struct NewItemsView: View {
         }
         .overlay(alignment: .bottomTrailing) {
             
-            FilterFavoriteItemButton()
+            FilteringFavoriteItemButton()
                 .padding(.trailing, 40)
                 .padding(.bottom, 20)
                 .opacity(showDetailView ? 0 : 1)
@@ -382,7 +383,7 @@ struct NewItemsView: View {
     }
     
     @ViewBuilder
-    func FilterFavoriteItemButton() -> some View {
+    func FilteringFavoriteItemButton() -> some View {
         ZStack {
             Capsule()
                 .frame(width: 40, height: 12)
@@ -517,7 +518,8 @@ struct NewItemsView: View {
                 Image(systemName: "plus")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 7)
+                    .frame(width: 8)
+                    .fontWeight(.bold)
                     .foregroundColor(.gray)
                     .padding(6)
                     .background {

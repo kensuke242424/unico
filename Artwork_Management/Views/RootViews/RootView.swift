@@ -40,6 +40,7 @@ struct RootView: View {
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var tagVM: TagViewModel
     @EnvironmentObject var preloadVM: PreloadViewModel
+    @EnvironmentObject var backgroundVM: BackgroundViewModel
 
     @StateObject var itemVM: ItemViewModel = ItemViewModel()
     @StateObject var cartVM: CartViewModel = CartViewModel()
@@ -91,6 +92,7 @@ struct RootView: View {
                     CreateAndJoinTeamView()
                     PHPickerView(captureImage: $preloads.captureImage, isShowSheet: $preloads.showSheet)
                     NewItemsView(itemVM: itemVM,  cartVM: cartVM, inputTab: $preloadVM.inputTab)
+//                    SelectBackgroundView()
                 }
                 .opacity(0)
             }
@@ -185,6 +187,7 @@ struct RootView: View {
 
         // Auth check...
         .onAppear {
+
             if Auth.auth().currentUser != nil {
                 print("RootView_onAppear_currentUserが存在します。fetchを開始")
                 logInVM.rootNavigation = .fetch

@@ -20,8 +20,6 @@ struct CubesProgressView: View {
             GradientBackbround(color1: memberColor.color1,
                                color2: memberColor.colorAccent)
             .frame(width: getRect().width, height: getRect().height)
-            .opacity(0.5)
-            .background(.thickMaterial)
             .ignoresSafeArea()
 
             VStack(spacing: 70) {

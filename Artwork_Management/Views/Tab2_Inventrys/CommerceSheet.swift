@@ -73,11 +73,12 @@ struct CommerceSheet: View {
 
                 Button(
                     action: {
-
                         cartVM.updateCommerseItems(teamID: teamID)
                         cartVM.resultCartPrice = 0
                         cartVM.resultCartAmount = 0
                         cartVM.doCommerce = true
+
+                        hapticSuccessNotification()
                     },
                     label: {
                         RoundedRectangle(cornerRadius: 20)

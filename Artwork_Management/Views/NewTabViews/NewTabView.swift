@@ -28,10 +28,12 @@ struct InputTab {
     var showSelectBackground: Bool = false
     var checkBackgroundToggle: Bool = false
     var checkBackgroundAnimation: Bool = false
-    var selectBackground: TeamBackgroundContents = .original
+    var selectBackgroundCategory: BackgroundCategory = .music
+    var selectedBackgroundImage: UIImage?
     
-    /// タブViewのアニメーションを管理するプロパティ
+    /// タブの選択状態を管理するプロパティ
     var selectionTab    : Tab = .home
+    /// タブの切り替えによるアニメーションの状態を管理するプロパティ
     var animationTab    : Tab = .home
     var animationOpacity: CGFloat = 1
     var animationScale  : CGFloat = 1
@@ -59,7 +61,8 @@ struct NewTabView: View {
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var tagVM : TagViewModel
     @EnvironmentObject var homeVM: HomeViewModel
-    
+    @EnvironmentObject var backgroundVM: BackgroundViewModel
+
     @StateObject var itemVM: ItemViewModel
     @StateObject var cartVM: CartViewModel
     
@@ -77,8 +80,8 @@ struct NewTabView: View {
                 
                 VStack {
                     TabTopBarView()
-                        .blur(radius: inputTab.checkBackgroundAnimation ||
-                                      !inputTab.showSelectBackground ? 0 : 2)
+                        .blur(radius: backgroundVM.checkMode ||
+                                      !backgroundVM.showEdit ? 0 : 2)
                     
                     Spacer(minLength: 0)
                     
@@ -95,11 +98,13 @@ struct NewTabView: View {
                          scrollView.bounces = false
                     }
                 }
-                .sheet(isPresented: $inputTab.showPickerView) {
-                    PHPickerView(captureImage: $inputTab.captureBackgroundImage,
-                                 isShowSheet : $inputTab.showPickerView)
+                /// 背景編集でオリジナル画像を選択時に発火
+                .sheet(isPresented: $backgroundVM.showPicker) {
+                    PHPickerView(captureImage: $backgroundVM.captureUIImage,
+                                 isShowSheet : $backgroundVM.showPicker)
                 }
                 /// TabViewに紐づけているプロパティをアニメーションのトリガーとして使えないため
+                ///  タブのステートとタブ切り替えによるアニメーションのステートを切り分けている
                 .onChange(of: inputTab.selectionTab) { _ in
                     switch inputTab.selectionTab {
                     case .home:
@@ -112,51 +117,31 @@ struct NewTabView: View {
                         }
                     }
                 }
+                /// チームルームの背景
                 .background {
                     ZStack {
                         GeometryReader { proxy in
-                            // ーーー　背景編集モード時　ーーー
-                            if inputTab.showSelectBackground {
-                                if inputTab.selectBackground == .original {
-                                    if let captureNewImage = inputTab.captureBackgroundImage {
-                                        Image(uiImage: captureNewImage)
-                                            .resizable()
-                                            .scaledToFill()
-                                            .frame(width: proxy.size.width, height: proxy.size.height)
-                                            .blur(radius: inputTab.checkBackgroundAnimation ? 0 : 3, opaque: true)
-                                            .ignoresSafeArea()
-                                    } else {
-                                        SDWebImageView(imageURL : teamVM.team?.backgroundURL,
-                                                       width : proxy.size.width,
-                                                       height: proxy.size.height)
-                                        .blur(radius: inputTab.checkBackgroundAnimation ? 0 : 3, opaque: true)
-                                    }
-
-                                } else {
-                                    Image(inputTab.selectBackground.imageName)
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(width: proxy.size.width, height: proxy.size.height)
-                                        .blur(radius: inputTab.checkBackgroundAnimation ? 0 : 3, opaque: true)
+                            // チーム背景編集による選択画像URLが存在する場合、そちらを優先して背景表示する
+                            SDWebImageBackgroundView(
+                                imageURL: backgroundVM.selectBackground?.imageURL ??
+                                userVM.currentTeamBackground?.imageURL,
+                                width: proxy.size.width,
+                                height: proxy.size.height
+                            )
+                            .ignoresSafeArea()
+                            .blur(radius: homeVM.isActiveEdit ? 5 : 0, opaque: true)
+                            .blur(radius: inputTab.pressingAnimation ? 6 : 0, opaque: true)
+                            .blur(radius: backgroundVM.showEdit && !backgroundVM.checkMode ? 6 : 0, opaque: true)
+                            // タブのスワイプ遷移時と背景へのblurが重なると、動作が重くなる
+                            // オーバーレイでブラー処理済み背景を重ねる
+                            .overlay {
+                                BlurMaskingImageView(imageURL: userVM.currentTeamBackground?.imageURL)
+                                    .opacity(inputTab.animationTab == .item ? 1 : 0)
+                            }
+                            .overlay {
+                                if homeVM.isActiveEdit {
+                                    Color.black.opacity(0.4)
                                         .ignoresSafeArea()
-                                }
-                            // ーーー　通常時　ーーー
-                            } else {
-                                SDWebImageView(imageURL : teamVM.team?.backgroundURL,
-                                               width : proxy.size.width,
-                                               height: proxy.size.height)
-                                .ignoresSafeArea()
-                                .blur(radius: homeVM.isActiveEdit ? 5 : 0, opaque: true)
-                                .blur(radius: inputTab.pressingAnimation ? 6 : 0, opaque: true)
-                                .overlay {
-                                    if homeVM.isActiveEdit {
-                                        Color.black.opacity(0.4)
-                                            .ignoresSafeArea()
-                                    }
-                                }
-                                .overlay {
-                                    BlurMaskingImageView(imageURL: teamVM.team?.backgroundURL)
-                                        .opacity(inputTab.animationTab != .home ? 1 : 0)
                                 }
                             }
                         }
@@ -164,24 +149,32 @@ struct NewTabView: View {
                 } // background
                 // チームの背景を変更編集するView
                 .overlay {
-                    if inputTab.showSelectBackground {
+                    if backgroundVM.showEdit {
 
                         Color.black
-                            .blur(radius: inputTab.checkBackgroundAnimation ||
-                                          !inputTab.showSelectBackground ? 0 : 2)
-                            .opacity(inputTab.checkBackgroundAnimation ? 0.1 : 0.5)
+                            .blur(radius: backgroundVM.checkMode ||
+                                  !backgroundVM.showEdit ? 0 : 2)
+                            .opacity(backgroundVM.checkMode ? 0.1 : 0.5)
                             .ignoresSafeArea()
                             .onTapGesture(perform: {
                                 // FIXME: これを入れておかないと下層のViewにタップが貫通してしまう🤔
                             })
 
-                        SelectBackgroundView(inputTab: $inputTab)
+                        EditTeamBackgroundView()
                     }
                 }
                 /// サイドメニューView
                 .overlay {
-                        SystemSideMenu(itemVM: itemVM, inputTab: $inputTab)
-                            .offset(x: inputTab.showSideMenu ? 0 : -size.width)
+                    if inputTab.showSideMenu {
+                        Color.black.opacity(0.3).ignoresSafeArea()
+                            .onTapGesture(perform: {
+                                withAnimation(.spring(response: 0.5)) {
+                                    inputTab.showSideMenu.toggle()
+                                }
+                            })
+                    }
+                    SystemSideMenu(itemVM: itemVM, inputTab: $inputTab)
+                        .offset(x: inputTab.showSideMenu ? 0 : -size.width)
                 }
                 /// 🏷タグの追加や編集を行うView
                 .overlay {
@@ -383,7 +376,7 @@ struct NewTabView: View {
             let tabWidth = size.width / 3
             HStack {
                 ForEach(Tab.allCases, id: \.rawValue) { tab in
-                    Text(tab == .home && inputTab.showSelectBackground ? "背景変更中" :
+                    Text(tab == .home && backgroundVM.showEdit ? "背景変更中" :
                             tab == .home && homeVM.isActiveEdit ? "編集中" :
                             tab.rawValue)
                     .font(.title3)
@@ -397,9 +390,9 @@ struct NewTabView: View {
                     .padding(.top, 60)
                     .onTapGesture(perform: {
                         if tab == .home && inputTab.selectionTab == .item {
-                            inputTab.selectionTab = .item
-                        } else if tab == .item && inputTab.selectionTab == .home {
                             inputTab.selectionTab = .home
+                        } else if tab == .item && inputTab.selectionTab == .home {
+                            inputTab.selectionTab = .item
                         }
                     })
                 }
@@ -479,225 +472,6 @@ struct NewTabView: View {
 
 } // View
 
-struct SelectBackgroundView: View {
-
-    @EnvironmentObject var teamVM: TeamViewModel
-    @Binding var inputTab: InputTab
-
-    @State private var showContents: Bool = false
-    @State private var showProgress: Bool = false
-
-    @AppStorage("applicationDarkMode") var applicationDarkMode: Bool = true
-
-    var body: some View {
-
-        VStack(spacing: 30) {
-            Spacer()
-
-            if showContents {
-                VStack(spacing: 15) {
-                    Text("背景を選択してください")
-                        .tracking(5)
-                        .foregroundColor(.white)
-                        .opacity(inputTab.checkBackgroundAnimation ? 0 : 0.8)
-
-                    Text("チーム: \(teamVM.team?.name ?? "No Name")")
-                        .tracking(3)
-                        .font(.caption)
-                        .foregroundColor(.white)
-                        .opacity(inputTab.checkBackgroundAnimation ? 0 : 0.6)
-                }
-                .padding(.bottom, 5)
-
-                ScrollBackgroundImages()
-                    .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
-                    .opacity(inputTab.checkBackgroundAnimation ? 0 : 1)
-
-                VStack(spacing: 40) {
-                    Button("保存") {
-                        withAnimation(.easeIn(duration: 0.15)) { showProgress = true }
-                        // 新しい背景が選択されていた場合、更新処理を実行する
-                        Task {
-                            do {
-                                var updateBackgroundImage: UIImage?
-                                if inputTab.selectBackground == .original {
-                                    updateBackgroundImage = inputTab.captureBackgroundImage
-                                } else {
-                                    updateBackgroundImage = UIImage(named: inputTab.selectBackground.imageName)
-                                }
-                                if let updateBackgroundImage {
-                                    let defaultImagePath = teamVM.team?.backgroundPath
-                                    let resizedImage = teamVM.resizeUIImage(image: updateBackgroundImage,
-                                                                            width: getRect().width * 4)
-                                    let uploadImageData = await teamVM.uploadTeamImage(resizedImage)
-                                    let _ = try await teamVM.updateTeamBackgroundImage(data: uploadImageData)
-                                    // 新規背景画像の保存が完了したら、以前の背景データを削除
-                                    let _ = await teamVM.deleteTeamImageData(path: defaultImagePath)
-                                }
-                                withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                                    showContents = false
-                                    showProgress = false
-                                }
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                    withAnimation(.spring(response: 0.5, blendDuration: 1)) {
-                                        inputTab.captureBackgroundImage = nil
-                                        inputTab.selectBackground = .original
-                                        inputTab.showSelectBackground = false
-                                    }
-                                }
-                            } catch {
-                                withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                                    showContents = false
-                                    showProgress = false
-                                }
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                    withAnimation(.spring(response: 0.5, blendDuration: 1)) {
-                                        inputTab.captureBackgroundImage = nil
-                                        inputTab.selectBackground = .original
-                                        inputTab.showSelectBackground = false
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    .buttonStyle(.borderedProminent)
-                    Label("キャンセル", systemImage: "xmark.circle.fill")
-                        .foregroundColor(.white)
-                        .onTapGesture {
-                            withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                                showContents.toggle()
-                            }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                                withAnimation(.spring(response: 0.5, blendDuration: 1)) {
-                                    inputTab.captureBackgroundImage = nil
-                                    inputTab.selectBackground = .original
-                                    inputTab.showSelectBackground = false
-                                }
-                            }
-                        }
-                }
-                .opacity(inputTab.checkBackgroundAnimation ? 0 : 1)
-                .overlay {
-                    CustomizeToggleButtons()
-                        .offset(x: getRect().width / 3)
-                }
-                .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
-                .padding(.top, 50)
-            } // if showContents
-
-            Spacer().frame(height: 50)
-        } // VStack
-        .overlay {
-            if showProgress {
-                SavingProgressView()
-                    .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
-            }
-        }
-        .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                withAnimation(.spring(response: 1, blendDuration: 1)) {
-                    showContents.toggle()
-                }
-            }
-        }
-    } // body
-
-    @ViewBuilder
-    func ScrollBackgroundImages() -> some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            LazyHStack(spacing: 30) {
-                ForEach(TeamBackgroundContents.allCases, id: \.self) { value in
-                    Group {
-                        if value == .original {
-                            Group {
-                                if let captureNewImage = inputTab.captureBackgroundImage {
-                                    Image(uiImage: captureNewImage)
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(width: 120, height: 250)
-                                } else {
-                                    SDWebImageView(imageURL: teamVM.team?.backgroundURL,
-                                                   width: 120,
-                                                   height: 250)
-                                }
-                            }
-                            .overlay {
-                                Button("写真を挿入") {
-                                    inputTab.showPickerView.toggle()
-                                }
-                                .font(.footnote)
-                                .buttonStyle(.borderedProminent)
-                            }
-                        } else {
-                            Image(value.imageName)
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 120, height: 250)
-                        }
-                    } // Group
-                    .clipped()
-                    .scaleEffect(inputTab.selectBackground == value ? 1.15 : 1.0)
-                    .overlay(alignment: .topTrailing) {
-                        Image(systemName: "checkmark.seal.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .foregroundColor(.green)
-                            .frame(width: 30, height: 30)
-                            .scaleEffect(inputTab.selectBackground == value ? 1.0 : 1.15)
-                            .opacity(inputTab.selectBackground == value ? 1.0 : 0.0)
-                            .offset(x: 15, y: -20)
-                    }
-                    .padding(.leading, value == .original ? 40 : 0)
-                    .padding(.trailing, value == .sample4 ? 40 : 0)
-                    .onTapGesture {
-                        withAnimation(.spring(response: 0.5)) {
-                            inputTab.selectBackground = value
-                        }
-                    }
-                }
-            }
-            .frame(height: 300)
-        } // ScrollView
-    }
-
-    @ViewBuilder
-    func CustomizeToggleButtons() -> some View {
-        HStack {
-            Spacer()
-            ZStack {
-                BlurView(style: .systemThickMaterial)
-                    .frame(width: 90, height: 160)
-                    .clipShape(RoundedRectangle(cornerRadius: 15))
-                    .opacity(0.8)
-
-                VStack(spacing: 20) {
-                    VStack {
-                        Text("背景を確認").font(.footnote).offset(x: 15)
-                        Toggle("", isOn: $inputTab.checkBackgroundToggle)
-                    }
-                    VStack {
-                        Text("ダークモード").font(.footnote).offset(x: 15)
-                        Toggle("", isOn: $applicationDarkMode)
-                    }
-                }
-                .frame(width: 80)
-                .padding(.trailing, 30)
-                .onChange(of: inputTab.checkBackgroundToggle) { newValue in
-                    if newValue {
-                        withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                            inputTab.checkBackgroundAnimation = true
-                        }
-                    } else {
-                        withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                            inputTab.checkBackgroundAnimation = false
-                        }
-                    }
-                }
-            }
-        }
-    }
-} // SelectBackgroundView
-
 struct NewTabView_Previews: PreviewProvider {
 
     static var previews: some View {
@@ -718,5 +492,6 @@ struct NewTabView_Previews: PreviewProvider {
             .environmentObject(TeamViewModel())
             .environmentObject(UserViewModel())
             .environmentObject(TagViewModel())
+            .environmentObject(BackgroundViewModel())
     }
 }

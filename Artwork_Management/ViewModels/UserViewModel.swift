@@ -27,7 +27,15 @@ class UserViewModel: ObservableObject {
     var uid: String? { return Auth.auth().currentUser?.uid }
     var memberColor: ThemeColor {
         return user?.userColor ?? ThemeColor.blue
-//        return MemberColor.yellow
+    }
+    var currentTeamIndex: Int {
+        let index = getCurrentTeamIndex()
+        guard let index else { return 0 }
+        return index
+    }
+    /// ユーザーが現在操作しているチームの背景データ
+    var currentTeamBackground: Background? {
+        return user?.joins[currentTeamIndex].currentBackground
     }
 
     @Published var user: User?
@@ -111,8 +119,13 @@ class UserViewModel: ObservableObject {
         var getIndex: Int?
 
         getIndex = user.joins.firstIndex(where: { $0.teamID == user.lastLogIn })
-        print("currentTeamIndex: \(getIndex)")
         return getIndex
+    }
+
+    func getCurrentTeamMyBackgrounds() -> [Background] {
+        guard let user else { return [] }
+        let myBackgrounds = user.joins[currentTeamIndex].myBackgrounds
+        return myBackgrounds
     }
 
     /// Homeのパーツ編集設定をFirestoreのドキュメントに保存するメソッド
@@ -128,6 +141,18 @@ class UserViewModel: ObservableObject {
             try userRef.setData(from: user)
         } catch {
             print("ERROR: Homeパーツ設定の保存に失敗しました。")
+        }
+    }
+
+    func updateCurrentTeamBackground(data backgroundData: Background) async throws {
+        guard var user else { throw CustomError.userEmpty }
+        guard let userRef = db?.collection("users").document(user.id) else { throw CustomError.getDocument }
+
+        do {
+            user.joins[currentTeamIndex].currentBackground = backgroundData
+            try userRef.setData(from: user)
+        } catch {
+            print("ERROR: チーム背景のアップデートに失敗しました")
         }
     }
 
@@ -237,6 +262,7 @@ class UserViewModel: ObservableObject {
             for memberDocument in snapshot.documents {
 
                 do {
+
                     var memberData = try memberDocument.data(as: User.self)
 
                     // ユーザのjoins配列からアップデート対象のチームを検出する
@@ -250,6 +276,84 @@ class UserViewModel: ObservableObject {
                     }
                 }
             }
+        }
+    }
+
+    /// ユーザーが現在のチーム内で選択した背景画像をFireStorageに保存する。
+    func uploadCurrentTeamMyBackground(_ image: UIImage?) async -> (url: URL?, filePath: String?) {
+
+        guard let imageData = image?.jpegData(compressionQuality: 0.8) else {
+            return (url: nil, filePath: nil)
+        }
+        guard let user else { return (url: nil, filePath: nil) }
+
+        do {
+            let storage = Storage.storage()
+            let reference = storage.reference()
+            let filePath = "users/\(Date()).jpeg"
+            let imageRef = reference.child(filePath)
+            _ = try await imageRef.putDataAsync(imageData)
+            let url = try await imageRef.downloadURL()
+
+            return (url: url, filePath: filePath)
+        } catch {
+            return (url: nil, filePath: nil)
+        }
+    }
+
+    /// ユーザーが写真フォルダから選択したオリジナル背景をFirestoreに保存するメソッド。
+    /// 保存画像は所属チームごとに別々で管理される。
+    func addCurrentTeamMyBackground(url imageURL: URL?, path imagePath: String?) async {
+        guard var user = user else { return }
+        guard let userRef = db?.collection("users").document(user.id) else { return }
+
+        user.joins[self.currentTeamIndex].myBackgrounds.append(
+            Background(category: "original",
+                       imageName: "",
+                       imageURL: imageURL,
+                       imagePath: imagePath)
+        )
+
+        do {
+            try userRef.setData(from: user)
+
+        } catch {
+            print("ERROR: チーム背景の保存に失敗しました。")
+        }
+    }
+
+    func deleteCurrentTeamMyBackground(_ background: Background) {
+        guard var user = user else { return }
+        guard let userRef = db?.collection("users").document(user.id) else { return }
+
+        user.joins[self.currentTeamIndex].myBackgrounds.removeAll(where: { $0 == background })
+
+        do {
+            try userRef.setData(from: user)
+
+        } catch {
+            print("ERROR: チーム背景の保存に失敗しました。")
+        }
+    }
+
+    func resizeUIImage(image: UIImage?, width: CGFloat) -> UIImage? {
+
+        if let originalImage = image {
+            // オリジナル画像のサイズからアスペクト比を計算
+            let aspectScale = originalImage.size.height / originalImage.size.width
+
+            // widthからアスペクト比を元にリサイズ後のサイズを取得
+            let resizedSize = CGSize(width: width * 3, height: width * Double(aspectScale) * 3)
+
+            // リサイズ後のUIImageを生成して返却
+            UIGraphicsBeginImageContext(resizedSize)
+            originalImage.draw(in: CGRect(x: 0, y: 0, width: resizedSize.width, height: resizedSize.height))
+            let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
+            UIGraphicsEndImageContext()
+
+            return resizedImage
+        } else {
+            return nil
         }
     }
 
@@ -298,25 +402,27 @@ class UserViewModel: ObservableObject {
             } // for
         } // do
     }
-    
-    func resizeUIImage(image: UIImage?, width: CGFloat) -> UIImage? {
-        
-        if let originalImage = image {
-            // オリジナル画像のサイズからアスペクト比を計算
-            let aspectScale = originalImage.size.height / originalImage.size.width
-            
-            // widthからアスペクト比を元にリサイズ後のサイズを取得
-            let resizedSize = CGSize(width: width * 3, height: width * Double(aspectScale) * 3)
-            
-            // リサイズ後のUIImageを生成して返却
-            UIGraphicsBeginImageContext(resizedSize)
-            originalImage.draw(in: CGRect(x: 0, y: 0, width: resizedSize.width, height: resizedSize.height))
-            let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
-            UIGraphicsEndImageContext()
-            
-            return resizedImage
-        } else {
-            return nil
+
+    /// Firestorageに保存されているユーザーのオリジナル背景データを全て削除するメソッド。
+    func deleteAllMyBackgrounds() {
+        guard let user else { return }
+        let storage = Storage.storage()
+        let reference = storage.reference()
+
+        Task {
+            for joinTeam in user.joins {
+                for background in joinTeam.myBackgrounds {
+                    guard let path = background.imagePath else { continue }
+                    let imageRef = reference.child(path)
+                    imageRef.delete { error in
+                        if let error = error {
+                            print(error)
+                        } else {
+                            print("オリジナル背景データを削除しました")
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -329,6 +435,7 @@ class UserViewModel: ObservableObject {
 
         do {
             _ = try await userRef.getDocument().reference.delete()
+            deleteAllMyBackgrounds()
         } catch {
             throw CustomError.deleteAccount
         }

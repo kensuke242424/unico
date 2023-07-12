@@ -41,7 +41,6 @@ struct DeletingView: View {
         .onAppear {
             // この画面に遷移した時点で、データ削除を開始する
             Task {
-
                 guard let userID = userVM.user?.id else { return }
                 guard let joinsTeam = userVM.user?.joins else { return }
 

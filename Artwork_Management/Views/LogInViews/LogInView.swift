@@ -156,25 +156,6 @@ enum LogInAlert {
     }
 }
 
-enum TeamBackgroundContents: CaseIterable {
-    case original, sample1, sample2, sample3, sample4
-    
-    var imageName: String {
-        switch self {
-        case .original:
-            return ""
-        case .sample1:
-            return "background_1"
-        case .sample2:
-            return "background_2"
-        case .sample3:
-            return "background_3"
-        case .sample4:
-            return "background_4"
-        }
-    }
-}
-
 struct InputLogIn {
     /// 新規ユーザーデータの入力用プロパティ
     var createUserNameText      : String = ""
@@ -193,7 +174,7 @@ struct InputLogIn {
     var createAccountShowContents   : Bool = false
     var repeatAnimation             : Bool = false
     var sendAddressButtonDisabled   : Bool = true
-    var selectBackground            : TeamBackgroundContents = .sample1
+    var selectBackground            : BackgroundCategory = .music
     
     /// Sheetやアラートなどのプレゼンテーションを管理するプロパティ
     var isShowPickerView                 : Bool = false
@@ -218,6 +199,9 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
     @EnvironmentObject var logInVM: LogInViewModel
     @EnvironmentObject var teamVM : TeamViewModel
     @EnvironmentObject var userVM : UserViewModel
+    @EnvironmentObject var tagVM : TagViewModel
+
+    @EnvironmentObject var backgroundVM: BackgroundViewModel
     
     @State private var logInNavigationPath: [Navigation] = []
     @State private var inputLogIn: InputLogIn = InputLogIn()
@@ -236,7 +220,6 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
     var body: some View {
         
         ZStack {
-            
             Group {
                 if let captureImage = inputLogIn.captureUserIconImage {
                     UIImageCircleIcon(photoImage: captureImage, size: 60)
@@ -259,7 +242,6 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             /// ログインフロー全体的なコンテンツをまとめたGroup
             /// View数が多いとコンパイルが通らないため現状こうしている
             Group {
-                
                 // 起動時最初のログイン画面で表示される「ログイン」「いえ、初めてです」ボタン
                 firstSelectButtons()
                     .offset(y: getRect().height / 8)
@@ -285,7 +267,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 // アカウント登録の進捗を表すインジケーター
                 if logInVM.userSelectedSignInType == .signUp {
                     createAccountIndicator()
-                        .opacity(inputLogIn.checkBackgroundOpacity)
+                        .opacity(backgroundVM.checkMode ? 0 : 1)
                         .opacity(logInVM.createAccountFase == .check ||
                                  logInVM.createAccountFase == .success ? 0 : 1)
                         .offset(y: -getRect().height / 3 + 30)
@@ -332,28 +314,28 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         }
                     } label: {
                         Text("< 戻る")
-                            .foregroundColor(applicationDarkMode ? .white : .black)
+//                            .foregroundColor(applicationDarkMode ? .white : .black)
+                            .foregroundColor(.white)
                             .fontWeight(.semibold)
                             .opacity(0.7)
                     }
+                    .buttonStyle(.bordered)
                     .disabled(logInVM.addressSignInFase == .success ||
                               logInVM.addressSignInFase == .check ? true : false)
                     .disabled(logInVM.createAccountFase == .success ||
                               logInVM.createAccountFase == .check ? true : false)
-                    .buttonStyle(.bordered)
-                    .foregroundColor(applicationDarkMode ? .white : .black)
-                    .opacity(inputLogIn.checkBackgroundOpacity)
                     .opacity(logInVM.addressSignInFase == .success ||
                              logInVM.addressSignInFase == .check ? 0.2 : 1.0)
                     .opacity(logInVM.createAccountFase == .success ||
                              logInVM.createAccountFase == .check ? 0.0 : 1.0)
                     .opacity(logInVM.createAccountFase == .fase1 &&
                              !inputLogIn.createAccountShowContents ? 0.0 : 1.0)
+                    .opacity(backgroundVM.checkMode ? 0 : 1)
                     .offset(y: getRect().height / 2 - 100)
                 }
                 
                 // ログイン画面最初のページまで戻るボタン
-                if logInVM.userSelectedSignInType != .start {
+                if logInVM.createAccountFase == .fase2 || logInVM.createAccountFase == .fase3 {
                     Button {
                         inputLogIn.isShowGoBackLogInAlert.toggle()
                     } label: {
@@ -361,18 +343,13 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             Text("<<")
                             Image(systemName: "house.fill")
                         }
+//                        .foregroundColor(applicationDarkMode ? .white : .black)
+                        .foregroundColor(.white)
+                        .opacity(0.6)
                     }
                     .buttonStyle(.bordered)
-                    .foregroundColor(applicationDarkMode ? .white : .black)
-                    .disabled(logInVM.addressSignInFase == .success ? true : false)
-                    .opacity(logInVM.addressSignInFase == .success ? 0.2 : 1.0)
-                    .opacity(logInVM.createAccountFase == .start ||
-                             logInVM.createAccountFase == .fase1 ||
-                             logInVM.createAccountFase == .check ||
-                             logInVM.createAccountFase == .success ? 0.0 : 1.0)
-                    .opacity(0.5)
                     .offset(x: -getRect().width / 2 + 40, y: getRect().height / 2 - 60 )
-                    .alert("確認", isPresented: $inputLogIn.isShowGoBackLogInAlert) {
+                    .alert("", isPresented: $inputLogIn.isShowGoBackLogInAlert) {
                         
                         Button {
                             inputLogIn.isShowGoBackLogInAlert.toggle()
@@ -394,7 +371,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             Text("はい")
                         }
                     } message: {
-                        Text("最初の画面に戻ります。よろしいですか？")
+                        Text("最初の画面に戻りますか？")
                     } // alert
                     
                 }
@@ -495,36 +472,46 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         } message: {
             Text(logInVM.logInAlertMessage.text)
         }
+        // ユーザーアイコンの写真ピッカー
         .sheet(isPresented: $inputLogIn.isShowPickerView) {
-            // .fase1ならバックグラウンドの画像設定、.fase2ならユーザーアイコンの画像設定
-            if logInVM.createAccountFase == .fase1 {
-                PHPickerView(captureImage: $inputLogIn.captureBackgroundImage, isShowSheet: $inputLogIn.isShowPickerView)
-            } else if logInVM.createAccountFase == .fase2 {
-                PHPickerView(captureImage: $inputLogIn.captureUserIconImage, isShowSheet: $inputLogIn.isShowPickerView)
+            PHPickerView(captureImage: $inputLogIn.captureUserIconImage,
+                         isShowSheet: $inputLogIn.isShowPickerView)
+        }
+        // 背景の写真ピッカー
+        .sheet(isPresented: $backgroundVM.showPicker) {
+            PHPickerView(captureImage: $inputLogIn.captureBackgroundImage,
+                         isShowSheet: $backgroundVM.showPicker)
+        }
+        .onChange(of: inputLogIn.captureBackgroundImage) { newImage in
+            guard let newImage else { return }
+            print("ユーザー: \(userVM.user)")
+            Task {
+                let resizedImage = backgroundVM.resizeUIImage(image: newImage)
+                let uploadImage = await backgroundVM.uploadUserBackgroundAtSignUp(resizedImage)
+                let myBackground = Background(category: "original",
+                                               imageName: "",
+                                               imageURL: uploadImage.url,
+                                               imagePath: uploadImage.filePath)
+                withAnimation {
+                    backgroundVM.pickMyBackgroundsAtSignUp.append(myBackground)
+                }
             }
         }
-        
         .background {
             ZStack {
                 GeometryReader { proxy in
-                    if inputLogIn.selectBackground == .original {
-                        Image(uiImage: inputLogIn.captureBackgroundImage ?? UIImage())
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: proxy.size.width, height: proxy.size.height)
-                            .blur(radius: inputLogIn.checkBackgroundEffect ? 0 : 2, opaque: true)
-                            .ignoresSafeArea()
-                    } else {
-                        Image(inputLogIn.selectBackground.imageName)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: proxy.size.width, height: proxy.size.height)
-                            .blur(radius: inputLogIn.checkBackgroundEffect ? 0 : 2, opaque: true)
-                            .ignoresSafeArea()
-                    }
+
+                        SDWebImageBackgroundView(
+                            imageURL: backgroundVM.selectBackground?.imageURL ??
+                                      backgroundVM.sampleBackground.imageURL,
+                            width: proxy.size.width,
+                            height: proxy.size.height
+                        )
+                        .blur(radius: backgroundVM.checkMode ? 0 : 4, opaque: true)
+
                     Color(.black)
                         .frame(width: proxy.size.width, height: proxy.size.height)
-                        .opacity(inputLogIn.checkBackgroundEffect      ? 0.0 :
+                        .opacity(backgroundVM.checkMode ? 0.0 :
                                  logInVM.createAccountFase == .success ? 0.5 :
                                  0.2)
                         .ignoresSafeArea()
@@ -564,7 +551,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 }
             }
             
-            /// ✅ 「signIn」ならfetch開始。「.signUp」なら各データの生成後にfetch開始
+            /// ✅ 「.signIn」ならfetch開始。「.signUp」なら各データの生成後にfetch開始
             switch logInVM.resultSignInType {
 
             case .signIn:
@@ -577,49 +564,30 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 Task {
                     do {
                         /// 以前に作った既存のuserDocumentデータがあるかどうかをチェック
-                        /// もし存在したら、関数内で既存データへのログインを促すアラートを発火しています
+                        /// もし存在したら、関数内で既存データへのログインを促すアラートを発火し、処理終了
                         try await logInVM.existUserDocumentCheck()
                         
                         withAnimation(.spring(response: 0.8).delay(0.5)) {
                             logInVM.createAccountFase = .check
                         }
-                        
-                        // 背景、アイコン画像をリサイズして保存していく
-                        var resizedIconImage      : UIImage?
-                        var resizedBackgroundImage: UIImage?
-                        // チームIDを作成しておく。背景画像をFireStorage保存時に使う
-                        let createTeamID = UUID().uuidString
-                        
-                        // 60 -> アイコンwidth
+                        // 保存対象のアイコン画像データ容器
+                        var iconImageContainer: UIImage?
+                        /// オリジナルアイコン画像が入力されている場合は、リサイズ処理しコンテナに格納
                         if let captureIconUIImage = inputLogIn.captureUserIconImage {
-                            resizedIconImage = logInVM.resizeUIImage(image: captureIconUIImage,
+                            iconImageContainer = logInVM.resizeUIImage(image: captureIconUIImage,
                                                                     width: 60)
                         }
-                        /// オリジナル背景ではなくサンプル背景を選択していた場合は、付属のImageをUIImageに直してからリサイズ
-                        if let captureBackgroundImage = inputLogIn.captureBackgroundImage {
-                            resizedBackgroundImage = logInVM.resizeUIImage(image: captureBackgroundImage,
-                                                                          width: getRect().width * 4)
-                        } else {
-                            let convertBackgroundUIImage = UIImage(named: inputLogIn.selectBackground.imageName)
-                            resizedBackgroundImage = logInVM.resizeUIImage(image: convertBackgroundUIImage,
-                                                                          width: getRect().width * 4)
-                        }
-                        
-                        /// リサイズ処理した画像をFirestorageに保存
-                        let uplaodIconImageData       = await userVM.uploadUserImage(resizedIconImage)
-                        let uplaodBackgroundImageData = await teamVM.firstUploadTeamImage(resizedBackgroundImage,
-                                                                                          id: createTeamID)
-                        
+                        /// ーーーーアイコンデータのアップロード処理ーーーー
+                        let uplaodIconImageData = await userVM.uploadUserImage(iconImageContainer)
+
+                        if inputLogIn.createUserNameText == "" { inputLogIn.createUserNameText = "名無し" }
+
                         /// ユーザーの入力値をもとにユーザーデータを作成し、Firestoreに保存⬇︎
-                        if inputLogIn.createUserNameText == "" {
-                            inputLogIn.createUserNameText = "名無し"
-                        }
-                        
                         try await logInVM.setNewUserDocument(name     : inputLogIn.createUserNameText,
-                                                                password : inputLogIn.password,
-                                                                imageData: uplaodIconImageData,
-                                                                color    : inputLogIn.selectUserColor)
-                        
+                                                             password : inputLogIn.password,
+                                                             imageData: uplaodIconImageData,
+                                                             color    : inputLogIn.selectUserColor)
+
                         // Firestoreに保存したデータをローカルに引っ張ってくる
                         try await userVM.fetchUser()
                         guard let user = userVM.user else { return }
@@ -628,28 +596,35 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         let joinMember = JoinMember(memberUID: user.id,
                                                     name     : user.name,
                                                     iconURL  : user.iconURL)
+
+                        // 新規チームのIDとして使用
+                        let createTeamID = UUID().uuidString
                         
-                        let teamData = Team(id: createTeamID,
-                                            name          : "\(user.name)のチーム",
-                                            backgroundURL : uplaodBackgroundImageData.url,
-                                            backgroundPath: uplaodBackgroundImageData.filePath,
-                                            members       : [joinMember])
-                        let joinTeamData = JoinTeam(teamID: teamData.id, name: teamData.name)
+                        let teamData = Team(id     : createTeamID,
+                                            name   : "\(user.name)のチーム",
+                                            members: [joinMember])
+
+                        let joinTeamData = JoinTeam(teamID           : teamData.id,
+                                                    name             : teamData.name,
+                                                    currentBackground: backgroundVM.selectBackground ??
+                                                                       backgroundVM.sampleBackground,
+                                                    myBackgrounds    : backgroundVM.pickMyBackgroundsAtSignUp)
                         
                         /// 準備したチームデータをFirestoreに保存していく
                         /// userDocument側にも新規作成したチームのidを保存しておく(addNewJoinTeam)
                         try await teamVM.addTeam(teamData: teamData)
                         try await userVM.addNewJoinTeam(newJoinTeam: joinTeamData)
                         await teamVM.setSampleItem(teamID: teamData.id)
+                        tagVM.addTag(tagData: tagVM.sampleTag, teamID: teamData.id)
                         
                         /// データ生成の成功を知らせるアニメーションの後、データのフェッチとログイン開始
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                             withAnimation(.spring(response: 1.3)) {
                                 hapticSuccessNotification()
                                 logInVM.createAccountFase = .success
                             }
                         }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
                             withAnimation(.spring(response: 0.7)) {
                                 logInVM.rootNavigation = .fetch
                             }
@@ -666,22 +641,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 } // Task end
             }
         }
-        .onAppear {
-            userVM.isAnonymousCheck()
-        }
-        .onChange(of: isPresented) { newValue in
-
-//            if newValue {
-
-                print(newValue)
-
-//            }
-//            logInVM.userSelectedSignInType = .start
-//            logInVM.createAccountFase = .start
-//            logInVM.addressSignInFase = .start
-//            logInVM.selectProviderType = .start
-        }
-        
+        .onAppear { userVM.isAnonymousCheck() }
     } // body
     
     @ViewBuilder
@@ -833,8 +793,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     
                 case .fase1:
                     VStack(spacing: 10) {
-                        Text("まずはあなたにぴったりの")
-                        Text("デザインを決めましょう")
+                        Text("お好きな壁紙を選んでください")
                     }
                     .tracking(5)
                     .offset(y: 30)
@@ -872,7 +831,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             } // Group
             .tracking(5)
             .font(.subheadline)
-            .opacity(inputLogIn.checkBackgroundOpacity)
+            .opacity(backgroundVM.checkMode ? 0 : 1)
             .opacity(inputLogIn.createAccountTitle ? 1.0 : 0.0)
             
             Group {
@@ -882,129 +841,69 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     
                 // Fase1: 背景写真を選んでもらうフェーズ
                 case .fase1:
-                    
-                    VStack(spacing: 30) {
-                        
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 30) {
-                                ForEach(TeamBackgroundContents.allCases, id: \.self) { value in
-                                    Group {
-                                        if value == .original {
-                                            Image(uiImage: inputLogIn.captureBackgroundImage ?? UIImage())
-                                                .resizable()
-                                                .scaledToFill()
-                                                .frame(width: 120, height: 250)
-                                                .border(.blue, width: 1)
-                                                .overlay {
-                                                    Button("写真を挿入") {
-                                                        inputLogIn.isShowPickerView.toggle()
-                                                    }
-                                                    .buttonStyle(.borderedProminent)
-                                                }
-                                        } else {
-                                            Image(value.imageName)
-                                                .resizable()
-                                                .scaledToFill()
-                                                .frame(width: 120, height: 250)
+
+                    VStack {
+                        BackgroundCategoriesTagView()
+                            .opacity(backgroundVM.checkMode ? 0 : 1)
+                        SelectionBackgroundCards(showPicker: $backgroundVM.showPicker)
+                            .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
+                            .opacity(backgroundVM.checkMode ? 0 : 1)
+                            .onChange(of: backgroundVM.selectCategory) { newCategory in
+                                /// タグ「original」を選択時、joinsに保存している現在のチームの画像データ群を取り出して
+                                /// backgroundVMの背景管理プロパティに橋渡しする
+                                if newCategory == .original {
+                                    Task {
+                                        await backgroundVM.resetSelectBackgroundImages()
+                                        let myBackgrounds = userVM.getCurrentTeamMyBackgrounds()
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                            backgroundVM.appendMyBackgrounds(images: myBackgrounds)
                                         }
                                     }
-                                    .clipped()
-                                    .scaleEffect(inputLogIn.selectBackground == value ? 1.2 : 1.0)
-                                    .overlay(alignment: .topTrailing) {
-                                        Image(systemName: "checkmark.seal.fill")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .foregroundColor(.green)
-                                            .frame(width: 30, height: 30)
-                                            .scaleEffect(inputLogIn.selectBackground == value ? 1.0 : 1.2)
-                                            .opacity(inputLogIn.selectBackground == value ? 1.0 : 0.0)
-                                            .offset(x: 20, y: -30)
+                                } else {
+                                    Task {
+                                        await backgroundVM.resetSelectBackgroundImages()
                                     }
-                                    .padding(.leading, value == .original ? 40 : 0)
-                                    .padding(.trailing, value == .sample4 ? 40 : 0)
-                                    .onTapGesture {
-                                        withAnimation(.spring(response: 0.5)) {
-                                            inputLogIn.selectBackground = value
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                        Task {
+                                            await backgroundVM.fetchCategoryBackgroundImage(category: newCategory.categoryName)
                                         }
                                     }
                                 }
                             }
-                            .frame(height: 310)
-                        }
-                    } // VStack
-                    .opacity(inputLogIn.checkBackgroundOpacity)
-                    .offset(y: 20)
-                    
-                    Button("次へ") {
-                        withAnimation(.spring(response: 1.0)) {
-                            inputLogIn.createAccountTitle = false
-                            inputLogIn.createAccountShowContents = false
-                            logInVM.createAccountFase = .fase2
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                            withAnimation(.spring(response: 0.8)) {
-                                inputLogIn.createAccountTitle = true
-                            }
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                            withAnimation(.spring(response: 0.8)) {
-                                inputLogIn.createAccountShowContents = true
-                            }
-                        }
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .opacity(inputLogIn.checkBackgroundOpacity)
-                    .overlay(alignment: .trailing) {
-                        VStack {
-
-                            HStack {
-                                Spacer()
-                                ZStack {
-                                    BlurView(style: .systemThickMaterial)
-                                        .frame(width: 90, height: 160)
-                                        .clipShape(RoundedRectangle(cornerRadius: 15))
-                                        .opacity(0.8)
-
-                                    VStack(spacing: 20) {
-                                        VStack {
-                                            Text("背景を確認").font(.footnote).offset(x: 15)
-                                            Toggle("", isOn: $checkBackgroundToggle)
-                                        }
-                                        VStack {
-                                            Text("ダークモード").font(.footnote).offset(x: 15)
-                                            Toggle("", isOn: $applicationDarkMode)
-                                        }
-                                    }
-                                    .frame(width: 80)
-                                    .padding(.trailing, 30)
-                                    .onChange(of: checkBackgroundToggle) { newValue in
-                                        if newValue {
-                                            withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                                                checkBackgroundAnimation = true
-                                            }
-                                        } else {
-                                            withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                                                checkBackgroundAnimation = false
-                                            }
-                                        }
-                                    }
+                            .onAppear {
+                                Task {
+                                    let startCategory = backgroundVM.selectCategory.categoryName
+                                    await backgroundVM.fetchCategoryBackgroundImage(category: startCategory)
                                 }
                             }
-
-                        }
-                        .frame(width: 80)
-                        .offset(x: 130, y: 50)
-                        .onChange(of: checkBackgroundToggle) { newValue in
-                            if newValue {
-                                withAnimation(.easeIn(duration: 0.2)) { inputLogIn.checkBackgroundOpacity = 0.0 }
-                                withAnimation(.easeIn(duration: 0.2)) { inputLogIn.checkBackgroundEffect.toggle() }
-                            } else {
-                                withAnimation(.easeIn(duration: 0.2)) { inputLogIn.checkBackgroundOpacity = 1.0 }
-                                withAnimation(.easeIn(duration: 0.2)) { inputLogIn.checkBackgroundEffect.toggle() }
+                        Button("次へ") {
+                            withAnimation(.spring(response: 1.0)) {
+                                inputLogIn.createAccountTitle = false
+                                inputLogIn.createAccountShowContents = false
+                                logInVM.createAccountFase = .fase2
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                                withAnimation(.spring(response: 0.8)) {
+                                    inputLogIn.createAccountTitle = true
+                                }
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                                withAnimation(.spring(response: 0.8)) {
+                                    inputLogIn.createAccountShowContents = true
+                                }
                             }
                         }
+                        .buttonStyle(.borderedProminent)
+                        .opacity(backgroundVM.checkMode ? 0 : 1)
+                        .padding(.top)
+                        .overlay {
+                            EditBackgroundControlButtons()
+                                .offset(x: UIScreen.main.bounds.width / 3,
+                                        y: UIScreen.main.bounds.height / 10
+                                )
+                        }
                     }
-                    .offset(y: 20)
+                    .padding(.top, 20)
                     
                     /// ユーザー情報「名前」「アイコン」を入力するフェーズ
                 case .fase2:
@@ -1344,5 +1243,6 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
 struct LogInView_Previews: PreviewProvider {
     static var previews: some View {
         LogInView()
+            .environmentObject(BackgroundViewModel())
     }
 }
