@@ -484,7 +484,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         }
         .onChange(of: inputLogIn.captureBackgroundImage) { newImage in
             guard let newImage else { return }
-            Task{
+            print("ユーザー: \(userVM.user)")
+            Task {
                 let resizedImage = backgroundVM.resizeUIImage(image: newImage)
                 let uploadImage = await backgroundVM.uploadUserBackgroundAtSignUp(resizedImage)
                 let myBackground = Background(category: "original",
@@ -492,8 +493,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                                imageURL: uploadImage.url,
                                                imagePath: uploadImage.filePath)
                 withAnimation {
-                    backgroundVM.userSelectedPhotoAtSignUp.append(myBackground)
-                    print(backgroundVM.userSelectedPhotoAtSignUp)
+                    backgroundVM.pickMyBackgroundsAtSignUp.append(myBackground)
                 }
             }
         }
@@ -570,49 +570,26 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 Task {
                     do {
                         /// 以前に作った既存のuserDocumentデータがあるかどうかをチェック
-                        /// もし存在したら、関数内で既存データへのログインを促すアラートを発火しています
+                        /// もし存在したら、関数内で既存データへのログインを促すアラートを発火し、処理終了
                         try await logInVM.existUserDocumentCheck()
                         
                         withAnimation(.spring(response: 0.8).delay(0.5)) {
                             logInVM.createAccountFase = .check
                         }
                         
-                        // 背景画像&アイコン画像のデータ容器
-                        var iconImageContainer      : UIImage?
-                        var backgroundImageContainer: UIImage?
-
-                        // チームIDを作成しておく。背景画像をFireStorage保存時に使う
-                        let createTeamID = UUID().uuidString
-
                         /// ーーーーアイコン画像処理ーーーー
+                        // 保存対象のアイコン画像データ容器
+                        var iconImageContainer: UIImage?
                         /// オリジナルアイコン画像が入力されている場合は、リサイズ処理しコンテナに格納
                         if let captureIconUIImage = inputLogIn.captureUserIconImage {
                             iconImageContainer = logInVM.resizeUIImage(image: captureIconUIImage,
                                                                     width: 60)
                         }
 
-                        /// ーーーー背景画像処理ーーーー
-                        /// /// オリジナル背景画像が入力されている場合は、リサイズ処理しコンテナに格納
-                        if let captureBackgroundImage = backgroundVM.captureUIImage {
+                        /// ーーーーアイコンデータのアップロード処理ーーーー
+                        let uplaodIconImageData = await userVM.uploadUserImage(iconImageContainer)
 
-                            iconImageContainer = logInVM.resizeUIImage(image: captureBackgroundImage,
-                                                                       width: getRect().width * 4)
-                        /// サンプル背景はリサイズ済みのため、リサイズ処理を飛ばす
-                        /// 選択画像がnilの場合は、サンプル画像を代わりに挿入
-                        } else {
-                            let imageName = backgroundVM.selectBackground?.imageName ?? ""
-                            let selectedBackgroundImage = UIImage(named: imageName) ?? UIImage(named: "music_1")
-                            backgroundImageContainer = selectedBackgroundImage
-                        }
-
-                        /// ーーーー用意した画像データのアップロード処理ーーーー
-                        let uplaodIconImageData       = await userVM.uploadUserImage(iconImageContainer)
-                        let uplaodBackgroundImageData = await teamVM.firstUploadTeamImage(backgroundImageContainer,
-                                                                                          id: createTeamID)
-
-                        if inputLogIn.createUserNameText == "" {
-                            inputLogIn.createUserNameText = "名無し"
-                        }
+                        if inputLogIn.createUserNameText == "" { inputLogIn.createUserNameText = "名無し" }
 
                         /// ユーザーの入力値をもとにユーザーデータを作成し、Firestoreに保存⬇︎
                         try await logInVM.setNewUserDocument(name     : inputLogIn.createUserNameText,
@@ -628,13 +605,21 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         let joinMember = JoinMember(memberUID: user.id,
                                                     name     : user.name,
                                                     iconURL  : user.iconURL)
+
+                        // 新規チームのIDとして使用
+                        let createTeamID = UUID().uuidString
                         
                         let teamData = Team(id: createTeamID,
                                             name          : "\(user.name)のチーム",
-                                            backgroundURL : uplaodBackgroundImageData.url,
-                                            backgroundPath: uplaodBackgroundImageData.filePath,
-                                            members       : [joinMember])
-                        let joinTeamData = JoinTeam(teamID: teamData.id, name: teamData.name)
+                                            backgroundURL : backgroundVM.selectBackground?.imageURL,
+                                            backgroundPath: backgroundVM.selectBackground?.imagePath,
+                                            members       : [joinMember]
+                        )
+                        let joinTeamData = JoinTeam(teamID           : teamData.id,
+                                                    name             : teamData.name,
+                                                    currentBackground: backgroundVM.selectBackground,
+                                                    myBackgrounds    : backgroundVM.pickMyBackgroundsAtSignUp
+                        )
                         
                         /// 準備したチームデータをFirestoreに保存していく
                         /// userDocument側にも新規作成したチームのidを保存しておく(addNewJoinTeam)

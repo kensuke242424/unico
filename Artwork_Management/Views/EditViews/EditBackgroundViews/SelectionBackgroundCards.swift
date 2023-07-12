@@ -24,7 +24,7 @@ struct SelectionBackgroundCards: View {
                 if backgroundVM.selectCategory == .original {
 
                     ForEach(userVM.user?.joins[currentIndex].myBackgrounds ??
-                            backgroundVM.userSelectedPhotoAtSignUp, id: \.self) { background in
+                            backgroundVM.pickMyBackgroundsAtSignUp, id: \.self) { background in
                         BackgroundCardView(background)
                             /// オリジナル背景画像のみ、削除が可能
                             .contextMenu {

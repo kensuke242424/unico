@@ -19,7 +19,7 @@ class BackgroundViewModel: ObservableObject {
 
     /// サインアップ画面において、ユーザーが自身の写真ライブラリから選択した画像を一時的に保持するプロパティ。
     /// ユーザーデータの作成時に、自身の背景画像保管データテーブルに渡される。
-    @Published var userSelectedPhotoAtSignUp: [Background] = []
+    @Published var pickMyBackgroundsAtSignUp: [Background] = []
 
     /// バックグラウンドを管理するプロパティ
     @Published var teamBackground: URL?
