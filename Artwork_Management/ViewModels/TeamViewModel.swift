@@ -398,6 +398,33 @@ class TeamViewModel: ObservableObject {
             print("チームドキュメントの削除に失敗しました")
         }
     }
+    /// チームの保持しているアイテムドキュメントを全て削除するメソッド。
+    func deleteAllTeamItems() async {
+        guard let team else { return }
+        guard let itemsRef = db?.collection("teams").document(team.id).collection("items") else { return }
+        do {
+            let snapshot = try await itemsRef.getDocuments()
+            for document in snapshot.documents {
+                _ = try await document.reference.delete()
+            }
+        } catch {
+            print("チームアイテムの削除に失敗しました")
+        }
+    }
+
+    /// チームの保持しているタグドキュメントを全て削除するメソッド。
+    func deleteAllTeamTags() async {
+        guard let team else { return }
+        guard let itemsRef = db?.collection("teams").document(team.id).collection("tags") else { return }
+        do {
+            let snapshot = try await itemsRef.getDocuments()
+            for document in snapshot.documents {
+                _ = try await document.reference.delete()
+            }
+        } catch {
+            print("チームアイテムの削除に失敗しました")
+        }
+    }
 
     /// アカウント削除時に実行されるメソッド。削除実行アカウントが所属するチームの関連データを削除する
     /// ✅所属チームのメンバーが削除アカウントのユーザーのみだった場合 ⇨ チームデータを全て消去
@@ -433,7 +460,8 @@ class TeamViewModel: ObservableObject {
                     if teamData.members.count == 1 &&
                         teamData.members.first?.memberUID == userID {
                         // 削除対象ユーザーの他にチームメンバーが居なかった場合、全データをFirestoreから削除
-                        await self.deleteTeamImageData(path: teamData.backgroundPath)
+                        _ = await deleteAllTeamTags()
+                        _ = await deleteAllTeamItems()
                         _ = try await teamRowDocument.reference.delete()
 
                     } else {

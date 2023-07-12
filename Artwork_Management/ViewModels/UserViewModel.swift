@@ -387,6 +387,29 @@ class UserViewModel: ObservableObject {
         } // do
     }
 
+    /// Firestorageに保存されているユーザーのオリジナル背景データを全て削除するメソッド。
+    func deleteAllMyBackgrounds() {
+        guard let user else { return }
+        let storage = Storage.storage()
+        let reference = storage.reference()
+
+        Task {
+            for joinTeam in user.joins {
+                for background in joinTeam.myBackgrounds {
+                    guard let path = background.imagePath else { continue }
+                    let imageRef = reference.child(path)
+                    imageRef.delete { error in
+                        if let error = error {
+                            print(error)
+                        } else {
+                            print("オリジナル背景データを削除しました")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     // アカウント削除対象ユーザーのユーザードキュメントを削除する
     func deleteAccountRelatedUserData() async throws {
 
@@ -396,6 +419,7 @@ class UserViewModel: ObservableObject {
 
         do {
             _ = try await userRef.getDocument().reference.delete()
+            deleteAllMyBackgrounds()
         } catch {
             throw CustomError.deleteAccount
         }

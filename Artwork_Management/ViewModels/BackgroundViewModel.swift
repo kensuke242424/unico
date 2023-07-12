@@ -216,8 +216,8 @@ class BackgroundViewModel: ObservableObject {
         }
     }
 
-    /// ⚠️このメソッドは開発者のみ使用する。各サンプル背景データをFiresteoreに保存するメソッド。
-    /// ユーザー共通で一つの背景データ群をフェッチして利用する
+    /// ⚠️このメソッドは開発者のみ使用する。各サンプル背景データをFirestoreにまとめて保存するメソッド⚠️
+    /// ユーザー共通で一つのサンプル背景データ群をフェッチして利用する
     func settingAllBackgrounds() {
         print("settingAllBackgrounds実行")
         guard let backgroundRef = db?.collection("backgrounds") else { return }
@@ -295,26 +295,26 @@ enum BackgroundCategory: CaseIterable {
         case .original:
             return []
         case .music:
-            return Backgrounds.music
+            return SampleBackgroundsImageName.music
         case .art:
-            return Backgrounds.art
+            return SampleBackgroundsImageName.art
         case .cafe:
-            return Backgrounds.cafe
+            return SampleBackgroundsImageName.cafe
         case .beautiful:
-            return Backgrounds.beautiful
+            return SampleBackgroundsImageName.beautiful
         case .cool:
-            return Backgrounds.cool
+            return SampleBackgroundsImageName.cool
         case .cute:
-            return Backgrounds.cute
+            return SampleBackgroundsImageName.cute
         case .dark:
-            return Backgrounds.dark
+            return SampleBackgroundsImageName.dark
         case .technology:
-            return Backgrounds.technology
+            return SampleBackgroundsImageName.technology
         }
     }
 }
 
-struct Backgrounds {
+struct SampleBackgroundsImageName {
 
     static let cool: [String] =
     [

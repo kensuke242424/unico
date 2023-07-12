@@ -8,9 +8,10 @@
 import SwiftUI
 
 struct DeletedView: View {
-    
-    
+
     @EnvironmentObject var logInVM: LogInViewModel
+    @EnvironmentObject var userVM: UserViewModel
+    @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var navigationVM: NavigationViewModel
 
     var body: some View {
@@ -30,6 +31,10 @@ struct DeletedView: View {
             Button("ログイン画面へ戻る") {
                 withAnimation(.easeIn(duration: 0.4)) {
                     logInVM.rootNavigation = .logIn
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                        userVM.user = nil
+                        teamVM.team = nil
+                    }
                 }
             }
             .padding(.top, 40)
@@ -37,7 +42,7 @@ struct DeletedView: View {
         .overlay {
             LogoMark()
                 .scaleEffect(0.6)
-                .opacity(0.5)
+                .opacity(0.7)
                 .offset(y: -getRect().height / 4)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

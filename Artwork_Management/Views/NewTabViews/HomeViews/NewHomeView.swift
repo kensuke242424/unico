@@ -354,26 +354,27 @@ struct NewHomeView: View {
         .position(x: homeSize.width - partsWidth / 2)
     }
     @ViewBuilder
-    func teamMembersIcon(members: [JoinMember]) -> some View {
-        Group {
-            if members.count <= 2 {
-                HStack {
-                    ForEach(members, id: \.self) { member in
-                        AsyncImageCircleIcon(photoURL: member.iconURL, size: 30)
-                    }
-                }
-            } else {
-                ScrollView(.horizontal, showsIndicators: false) {
+    func teamMembersIcon(members: [JoinMember]?) -> some View {
+        if let members {
+            Group {
+                if members.count <= 2 {
                     HStack {
                         ForEach(members, id: \.self) { member in
                             AsyncImageCircleIcon(photoURL: member.iconURL, size: 30)
                         }
                     }
-                }.frame(width: 80)
+                } else {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack {
+                            ForEach(members, id: \.self) { member in
+                                AsyncImageCircleIcon(photoURL: member.iconURL, size: 30)
+                            }
+                        }
+                    }.frame(width: 80)
+                }
             }
         }
-    } // teamMembersIcon
-
+    }
 }
 
 fileprivate struct CustomizeHomePartsButtons: View {
