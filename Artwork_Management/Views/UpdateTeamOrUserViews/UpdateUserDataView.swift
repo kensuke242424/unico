@@ -1,18 +1,13 @@
 //
-//  UpdateTeamDataView.swift
+//  UpdateUserDataView.swift
 //  Artwork_Management
 //
-//  Created by 中川賢亮 on 2023/02/05.
+//  Created by Kensuke Nakagawa on 2023/07/13.
 //
 
 import SwiftUI
 
-enum SelectedUpdateData {
-    case start, user, team
-}
-
-struct UpdateTeamOrUserDataView: View {
-
+struct UpdateUserDataView: View {
     enum ShowKeyboard {
         case check
     }
@@ -27,12 +22,13 @@ struct UpdateTeamOrUserDataView: View {
     }
 
     // ビューの表示を管理するプロパティ群
+    @Binding var show: Bool
     @Binding var selectedUpdate: SelectedUpdateData
     @State private var showContent: Bool = false
 
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var teamVM: TeamViewModel
-    
+
     @FocusState var showKyboard: ShowKeyboard?
     /// キーボード出現時、Viewを上にずらす
     @State private var showKeyboardOffset: Bool = false
@@ -139,7 +135,7 @@ struct UpdateTeamOrUserDataView: View {
                 inputUpdate.defaultIconData = (url     : userVM.user?.iconURL,
                                                filePath: userVM.user?.iconPath)
                 inputUpdate.nameText = userVM.user?.name ?? ""
-                
+
             } else if selectedUpdate == .team {
                 inputUpdate.defaultIconData = (url     : teamVM.team?.iconURL,
                                                filePath : teamVM.team?.iconPath)
@@ -259,12 +255,10 @@ struct UpdateTeamOrUserDataView: View {
         .buttonStyle(.borderedProminent)
         .disabled(inputUpdate.savingWait ? true : false)
     }
-} // View
-
-struct UpdateTeamDataView_Previews: PreviewProvider {
-    static var previews: some View {
-        UpdateTeamOrUserDataView(selectedUpdate: .constant(.user))
-            .environmentObject(TeamViewModel())
-            .environmentObject(UserViewModel())
-    }
 }
+
+//struct UpdateUserDataView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        UpdateUserDataView()
+//    }
+//}

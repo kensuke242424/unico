@@ -276,7 +276,6 @@ struct CreateAndJoinTeamView: View {
                         selectTeamFase = .fase1
                     }
                 }
-                .buttonStyle(.bordered)
                 .fontWeight(.semibold)
                 .foregroundColor(.white.opacity(0.5))
                 .opacity(selectTeamFase == .fase2 ? 1.0 : 0.0)
@@ -300,7 +299,6 @@ struct CreateAndJoinTeamView: View {
                 }
                 .foregroundColor(.white.opacity(0.5))
             }
-            .buttonStyle(.bordered)
             .disabled(selectTeamFase == .success ? true : false)
             .opacity(selectTeamFase == .start ? 0 : 1.0)
             .offset(x: -getRect().width / 2 + 40, y: getRect().height / 2 - 60 )
