@@ -19,7 +19,7 @@ struct SelectionBackgroundCards: View {
             LazyHStack(spacing: 30) {
                 Spacer().frame(width: 10)
 
-                let currentIndex = userVM.currentTeamIndex
+                let currentIndex = userVM.currentTeamIndex ?? 0
 
                 if backgroundVM.selectCategory == .original {
 

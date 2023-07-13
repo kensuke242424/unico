@@ -199,7 +199,7 @@ struct NewTabView: View {
                 /// チームorユーザー情報の編集View
                 .overlay {
                     if inputTab.showUpdateTeam {
-                        UpdateTeamDataView(show: $inputTab.showUpdateTeam, selectedUpdate: $inputTab.selectedUpdateData)
+                        UpdateTeamDataView(show: $inputTab.showUpdateTeam)
                             .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
                     }
                     if inputTab.showUpdateUser {

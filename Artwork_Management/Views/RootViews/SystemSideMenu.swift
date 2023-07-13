@@ -117,7 +117,7 @@ struct SystemSideMenu: View {
                                          width   : getRect().width / 3 + 20,
                                          height  : getRect().width / 3 + 20)
                     .onTapGesture {
-                        withAnimation(.spring(response: 0.5)) { inputTab.selectedUpdateData = .team }
+                        withAnimation(.spring(response: 0.5)) { inputTab.showUpdateTeam.toggle() }
                     }
                     .overlay(alignment: .bottom) {
                         if teamVM.team!.name.count < 12 {
