@@ -172,7 +172,7 @@ struct UpdateTeamDataView: View {
                     newIconDataContainer = uploadIconData
                     updateJoinTeamContainer.iconURL = uploadIconData.url
                 }
-                // 名前に変更があればJoinTeamデータを更新
+                // 名前に変更があれば、JoinTeamデータを更新&コンテナに格納
                 if team.name != inputUpdate.nameText {
                     newNameContainer = inputUpdate.nameText
                     updateJoinTeamContainer.name = inputUpdate.nameText

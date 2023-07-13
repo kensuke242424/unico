@@ -203,7 +203,7 @@ struct NewTabView: View {
                             .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
                     }
                     if inputTab.showUpdateUser {
-                        UpdateUserDataView(show: $inputTab.showUpdateUser, selectedUpdate: $inputTab.selectedUpdateData)
+                        UpdateUserDataView(show: $inputTab.showUpdateUser)
                             .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
                     }
                 }
