@@ -106,7 +106,7 @@ struct CreateAndJoinTeamView: View {
                                         .padding(.bottom, 8)
                                     VStack(alignment: .leading, spacing: 10) {
                                         Text("方法1: QRコードを相手に読み込んでもらう。")
-                                        Text("方法2: ユーザーIDをコピーして相手に渡す。")
+                                        Text("方法2: ユーザーIDを相手にシェアする。")
                                     }
                                     .fontWeight(.bold)
                                 }
@@ -219,8 +219,8 @@ struct CreateAndJoinTeamView: View {
                                                     Image(systemName: "goforward")
                                                         .foregroundColor(.white)
                                                 }
-                                            }.padding(.top, 20)
-
+                                            }
+                                            .padding(.top, 20)
                                         }
 
                                         VStack {
@@ -235,8 +235,13 @@ struct CreateAndJoinTeamView: View {
                                                     .textSelection(.enabled)
                                                     .padding(8)
                                             }
+
                                             HStack(spacing: 40) {
                                                 Button {
+                                                    if let idString = userVM.uid {
+                                                        UIPasteboard.general.string = idString
+                                                        hapticActionNotification()
+                                                    }
 
                                                 } label: {
                                                     Image(systemName: "doc.on.doc.fill")
@@ -248,7 +253,7 @@ struct CreateAndJoinTeamView: View {
                                                     Image(systemName: "square.and.arrow.up.fill")
                                                 }
                                             }
-                                            .padding(.top)
+                                            .offset(y: 15)
                                         }
                                     }
                                 } // if selectTeamFase != .success
