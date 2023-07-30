@@ -235,6 +235,20 @@ struct CreateAndJoinTeamView: View {
                                                     .textSelection(.enabled)
                                                     .padding(8)
                                             }
+                                            HStack(spacing: 40) {
+                                                Button {
+
+                                                } label: {
+                                                    Image(systemName: "doc.on.doc.fill")
+                                                }
+                                                ShareLink(item: userVM.uid ?? "",
+                                                          subject: Text("Subject"),
+                                                          message: Text("ユーザーIDをシェアする")
+                                                ) {
+                                                    Image(systemName: "square.and.arrow.up.fill")
+                                                }
+                                            }
+                                            .padding(.top)
                                         }
                                     }
                                 } // if selectTeamFase != .success
