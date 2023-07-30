@@ -13,6 +13,8 @@ struct InputTab {
     // 各設定Viewの表示を管理するプロパティ
     var showSideMenu       : Bool = false
     var showEntryAccount   : Bool = false
+    var showUpdateTeam     : Bool = false
+    var showUpdateUser     : Bool = false
     var isActiveEditHome   : Bool = false
     var pressingAnimation  : Bool = false
     var selectedUpdateData : SelectedUpdateData = .start
@@ -194,11 +196,14 @@ struct NewTabView: View {
                             .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
                     }
                 }
-                /// チームorユーザ情報の編集View
+                /// チームorユーザー情報の編集View
                 .overlay {
-                    if inputTab.selectedUpdateData == .user ||
-                        inputTab.selectedUpdateData == .team {
-                        UpdateTeamOrUserDataView(selectedUpdate: $inputTab.selectedUpdateData)
+                    if inputTab.showUpdateTeam {
+                        UpdateTeamDataView(show: $inputTab.showUpdateTeam)
+                            .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
+                    }
+                    if inputTab.showUpdateUser {
+                        UpdateUserDataView(show: $inputTab.showUpdateUser)
                             .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
                     }
                 }

@@ -17,6 +17,8 @@ struct JoinUserDetectCheckView: View {
         case check
     }
 
+    @EnvironmentObject var userVM: UserViewModel
+
     @StateObject var qrReader: QRReader = QRReader()
     @StateObject var teamVM: TeamViewModel
 
@@ -225,7 +227,7 @@ struct JoinUserDetectCheckView: View {
                     .multilineTextAlignment(.center)
                     .background {
                         ZStack {
-                            Text(inputUserIDFocused == nil && inputUserIDText.isEmpty ? "ユーザーIDを貼り付け" : "")
+                            Text(inputUserIDFocused == nil && inputUserIDText.isEmpty ? "ユーザーIDを入力" : "")
                                 .foregroundColor(.white.opacity(0.3))
                             Rectangle().foregroundColor(.white.opacity(0.3)).frame(height: 1)
                                 .offset(y: 20)
@@ -240,14 +242,26 @@ struct JoinUserDetectCheckView: View {
                                 teamVM.alertMessage = "ユーザーIDを入力してください"
                                 return
                             }
-
-                            joinUserCheckFase = .check
-                            detectedUser = try await teamVM.detectUserFetchData(id: inputUserIDText)
-                            if detectedUser != nil {
-                                joinUserCheckFase = .agree
-                            } else {
-                                joinUserCheckFase = .start
+                            if inputUserIDText.count != 28 { // ユーザーIDは28文字
+                                teamVM.showErrorAlert.toggle()
+                                teamVM.alertMessage = "IDが正しくありません。入力IDを再度確認してください。"
+                                return
                             }
+                            if inputUserIDText == userVM.uid ?? "" {
+                                teamVM.showErrorAlert.toggle()
+                                teamVM.alertMessage = "入力したIDはあなた自身のユーザーIDです。"
+                                return
+                            }
+                            withAnimation{joinUserCheckFase = .check}
+                            detectedUser = try await teamVM.detectUserFetchData(id: inputUserIDText)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                                if detectedUser != nil {
+                                    withAnimation{ joinUserCheckFase = .agree }
+                                } else {
+                                    withAnimation{ joinUserCheckFase = .start }
+                                }
+                            }
+
 
                         } catch {
                             print("uid検索の結果、Firestoreにユーザーが存在しませんでした")

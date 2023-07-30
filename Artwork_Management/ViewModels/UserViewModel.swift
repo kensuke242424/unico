@@ -28,14 +28,13 @@ class UserViewModel: ObservableObject {
     var memberColor: ThemeColor {
         return user?.userColor ?? ThemeColor.blue
     }
-    var currentTeamIndex: Int {
+    var currentTeamIndex: Int? {
         let index = getCurrentTeamIndex()
-        guard let index else { return 0 }
         return index
     }
     /// ユーザーが現在操作しているチームの背景データ
     var currentTeamBackground: Background? {
-        return user?.joins[currentTeamIndex].currentBackground
+        return user?.joins[currentTeamIndex ?? 0].currentBackground
     }
 
     @Published var user: User?
@@ -124,7 +123,7 @@ class UserViewModel: ObservableObject {
 
     func getCurrentTeamMyBackgrounds() -> [Background] {
         guard let user else { return [] }
-        let myBackgrounds = user.joins[currentTeamIndex].myBackgrounds
+        let myBackgrounds = user.joins[currentTeamIndex ?? 0].myBackgrounds
         return myBackgrounds
     }
 
@@ -149,7 +148,7 @@ class UserViewModel: ObservableObject {
         guard let userRef = db?.collection("users").document(user.id) else { throw CustomError.getDocument }
 
         do {
-            user.joins[currentTeamIndex].currentBackground = backgroundData
+            user.joins[currentTeamIndex ?? 0].currentBackground = backgroundData
             try userRef.setData(from: user)
         } catch {
             print("ERROR: チーム背景のアップデートに失敗しました")
@@ -244,7 +243,7 @@ class UserViewModel: ObservableObject {
         }
     }
     
-    func updateUserJoinTeamData(data updateTeamData: JoinTeam, members joinMembers: [JoinMember]) async throws {
+    func updateJoinTeamNameNameAndIcon(data updatedJoinTeamData: JoinTeam, members joinMembers: [JoinMember]) async throws {
 
         var joinMembersID: [String] = []
         // チームに所属している各メンバーのid文字列データを配列に格納(whereFieldクエリで使う)
@@ -266,9 +265,10 @@ class UserViewModel: ObservableObject {
                     var memberData = try memberDocument.data(as: User.self)
 
                     // ユーザのjoins配列からアップデート対象のチームを検出する
-                    for (index, joinTeam) in memberData.joins.enumerated() where joinTeam.teamID == updateTeamData.teamID {
-                        // ユーザ内の対象チームデータを更新
-                        memberData.joins[index] = updateTeamData
+                    for (index, joinTeam) in memberData.joins.enumerated() where joinTeam.teamID == updatedJoinTeamData.teamID {
+                        // 対象JoinTeamデータの名前とアイコンを更新
+                        memberData.joins[index].name = updatedJoinTeamData.name
+                        memberData.joins[index].iconURL = updatedJoinTeamData.iconURL
                         // 更新後のユーザデータを再保存するためのリファレンスを取得
                         guard let teamRef = db?.collection("users").document(memberData.id) else { throw CustomError.getRef }
                         // リファレンスをもとにsetDataを実行
@@ -307,7 +307,7 @@ class UserViewModel: ObservableObject {
         guard var user = user else { return }
         guard let userRef = db?.collection("users").document(user.id) else { return }
 
-        user.joins[self.currentTeamIndex].myBackgrounds.append(
+        user.joins[self.currentTeamIndex ?? 0].myBackgrounds.append(
             Background(category: "original",
                        imageName: "",
                        imageURL: imageURL,
@@ -326,7 +326,7 @@ class UserViewModel: ObservableObject {
         guard var user = user else { return }
         guard let userRef = db?.collection("users").document(user.id) else { return }
 
-        user.joins[self.currentTeamIndex].myBackgrounds.removeAll(where: { $0 == background })
+        user.joins[self.currentTeamIndex ?? 0].myBackgrounds.removeAll(where: { $0 == background })
 
         do {
             try userRef.setData(from: user)

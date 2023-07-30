@@ -117,7 +117,7 @@ struct SystemSideMenu: View {
                                          width   : getRect().width / 3 + 20,
                                          height  : getRect().width / 3 + 20)
                     .onTapGesture {
-                        withAnimation(.spring(response: 0.5)) { inputTab.selectedUpdateData = .team }
+                        withAnimation(.spring(response: 0.5)) { inputTab.showUpdateTeam.toggle() }
                     }
                     .overlay(alignment: .bottom) {
                         if teamVM.team!.name.count < 12 {
@@ -298,7 +298,7 @@ struct SystemSideMenu: View {
 
                                         Label("チーム情報変更", systemImage: "cube.transparent.fill")
                                             .onTapGesture {
-                                                withAnimation(.spring(response: 0.5)) { inputTab.selectedUpdateData = .team }
+                                                withAnimation(.spring(response: 0.5)) { inputTab.showUpdateTeam.toggle() }
                                             }
 
                                         Label("メンバー招待", systemImage: "person.wave.2.fill")
@@ -361,7 +361,7 @@ struct SystemSideMenu: View {
 
                                         Label("ユーザー情報変更", systemImage: "person.fill")
                                             .onTapGesture {
-                                                withAnimation(.spring(response: 0.5)) { inputTab.selectedUpdateData = .user }
+                                                withAnimation(.spring(response: 0.5)) { inputTab.showUpdateUser.toggle() }
                                             }
 
                                         Label("アカウント登録", systemImage: "person.crop.square.filled.and.at.rectangle.fill")

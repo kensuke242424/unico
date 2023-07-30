@@ -106,7 +106,7 @@ struct CreateAndJoinTeamView: View {
                                         .padding(.bottom, 8)
                                     VStack(alignment: .leading, spacing: 10) {
                                         Text("方法1: QRコードを相手に読み込んでもらう。")
-                                        Text("方法2: ユーザーIDをコピーして相手に渡す。")
+                                        Text("方法2: ユーザーIDを相手に渡す。")
                                     }
                                     .fontWeight(.bold)
                                 }
@@ -206,12 +206,12 @@ struct CreateAndJoinTeamView: View {
                                         if let userQRCodeImage {
                                             Image(uiImage: userQRCodeImage)
                                                 .resizable()
-                                                .frame(width: 200, height: 200)
-                                                .padding(.top, 20)
+                                                .frame(width: 150, height: 150)
+                                                .padding(.top, 30)
                                         } else {
                                             ZStack {
                                                 RoundedRectangle(cornerRadius: 5)
-                                                    .frame(width: 200, height: 200)
+                                                    .frame(width: 150, height: 150)
                                                     .foregroundColor(.black.opacity(0.8))
                                                 Button {
                                                     userQRCodeImage = logInVM.generateUserQRCode(with: userVM.uid ?? "")
@@ -219,8 +219,8 @@ struct CreateAndJoinTeamView: View {
                                                     Image(systemName: "goforward")
                                                         .foregroundColor(.white)
                                                 }
-                                            }.padding(.top, 20)
-
+                                            }
+                                            .padding(.top, 30)
                                         }
 
                                         VStack {
@@ -235,6 +235,28 @@ struct CreateAndJoinTeamView: View {
                                                     .textSelection(.enabled)
                                                     .padding(8)
                                             }
+
+                                            HStack(spacing: 40) {
+                                                Button {
+                                                    if let idString = userVM.uid {
+                                                        UIPasteboard.general.string = idString
+                                                        print(idString.count)
+                                                        hapticActionNotification()
+                                                    }
+
+                                                } label: {
+                                                    Image(systemName: "doc.on.doc.fill")
+                                                }
+                                                ShareLink(item: userVM.uid ?? "",
+                                                          preview: SharePreview(
+                                                            "ユーザーIDを共有",
+                                                            image: Image("share_logo")
+                                                          )
+                                                ) {
+                                                    Image(systemName: "square.and.arrow.up.fill")
+                                                }
+                                            }
+                                            .offset(y: 15)
                                         }
                                     }
                                 } // if selectTeamFase != .success
@@ -276,7 +298,6 @@ struct CreateAndJoinTeamView: View {
                         selectTeamFase = .fase1
                     }
                 }
-                .buttonStyle(.bordered)
                 .fontWeight(.semibold)
                 .foregroundColor(.white.opacity(0.5))
                 .opacity(selectTeamFase == .fase2 ? 1.0 : 0.0)
@@ -300,7 +321,6 @@ struct CreateAndJoinTeamView: View {
                 }
                 .foregroundColor(.white.opacity(0.5))
             }
-            .buttonStyle(.bordered)
             .disabled(selectTeamFase == .success ? true : false)
             .opacity(selectTeamFase == .start ? 0 : 1.0)
             .offset(x: -getRect().width / 2 + 40, y: getRect().height / 2 - 60 )

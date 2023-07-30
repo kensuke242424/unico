@@ -172,7 +172,7 @@ struct InputImage {
 //                                   inputSideMenu: $inputSideMenu)
 //                        .offset(x: inputHome.isShowSystemSideMenu ? 0 : -UIScreen.main.bounds.width)
 //
-//                    UpdateTeamOrUserDataView(selectedUpdate: $inputHome.selectedUpdateData,
+//                    UpdateTeamDataView(selectedUpdate: $inputHome.selectedUpdateData,
 //                                             userVM: userVM,
 //                                             teamVM: teamVM)
 //                    .opacity(inputHome.selectedUpdateData == .start ? 0.0 : 1.0)

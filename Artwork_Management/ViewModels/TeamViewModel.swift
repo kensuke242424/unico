@@ -85,6 +85,16 @@ class TeamViewModel: ObservableObject {
         }
         print("addTeamAndGetID完了")
     }
+    /// 現在の操作チームデータのMembersの中から、自身のJoinMemberデータを取り出すメソッド。
+    func getMyJoinMemberData(uid: String) -> JoinMember? {
+        guard let team else { return nil }
+        var resultData: JoinMember?
+
+        for member in team.members where member.memberUID == uid {
+            resultData = member
+        }
+        return resultData
+    }
 
     func addNewTeamMember(data userData: User) async throws {
         print("addDetectedUser実行")
