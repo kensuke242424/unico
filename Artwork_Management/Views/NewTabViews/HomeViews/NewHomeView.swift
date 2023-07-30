@@ -281,7 +281,7 @@ struct NewHomeView: View {
             )
     }
 
-    /// チームに関する情報を一覧で表示するHomeパーツ
+    // 🗓️チームに関する情報を一覧で表示するHomeパーツ
     @ViewBuilder
     func TeamNewsView(_ homeSize: CGSize) -> some View {
 
@@ -296,7 +296,7 @@ struct NewHomeView: View {
                     VStack(alignment: .leading, spacing: 60) {
 
                         Group {
-                            Text("Useday.  ")
+                            Text("Usage.  ")
                             Text("Items.  ")
                             Text("Member.  ")
                         }
@@ -309,7 +309,7 @@ struct NewHomeView: View {
                     VStack(alignment: .trailing, spacing: 60) {
 
                         //TODO: 実際の使用日数を計算で割り出す
-                        Text("55 day")
+                        Text("\(teamVM.getUsageDayCount()) day")
                             .font(.footnote)
                             .opacity(0.8)
 
