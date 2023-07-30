@@ -106,7 +106,7 @@ struct CreateAndJoinTeamView: View {
                                         .padding(.bottom, 8)
                                     VStack(alignment: .leading, spacing: 10) {
                                         Text("方法1: QRコードを相手に読み込んでもらう。")
-                                        Text("方法2: ユーザーIDを相手にシェアする。")
+                                        Text("方法2: ユーザーIDを相手に渡す。")
                                     }
                                     .fontWeight(.bold)
                                 }
@@ -206,12 +206,12 @@ struct CreateAndJoinTeamView: View {
                                         if let userQRCodeImage {
                                             Image(uiImage: userQRCodeImage)
                                                 .resizable()
-                                                .frame(width: 200, height: 200)
-                                                .padding(.top, 20)
+                                                .frame(width: 150, height: 150)
+                                                .padding(.top, 30)
                                         } else {
                                             ZStack {
                                                 RoundedRectangle(cornerRadius: 5)
-                                                    .frame(width: 200, height: 200)
+                                                    .frame(width: 150, height: 150)
                                                     .foregroundColor(.black.opacity(0.8))
                                                 Button {
                                                     userQRCodeImage = logInVM.generateUserQRCode(with: userVM.uid ?? "")
@@ -220,7 +220,7 @@ struct CreateAndJoinTeamView: View {
                                                         .foregroundColor(.white)
                                                 }
                                             }
-                                            .padding(.top, 20)
+                                            .padding(.top, 30)
                                         }
 
                                         VStack {
@@ -240,6 +240,7 @@ struct CreateAndJoinTeamView: View {
                                                 Button {
                                                     if let idString = userVM.uid {
                                                         UIPasteboard.general.string = idString
+                                                        print(idString.count)
                                                         hapticActionNotification()
                                                     }
 
@@ -247,8 +248,10 @@ struct CreateAndJoinTeamView: View {
                                                     Image(systemName: "doc.on.doc.fill")
                                                 }
                                                 ShareLink(item: userVM.uid ?? "",
-                                                          subject: Text("Subject"),
-                                                          message: Text("ユーザーIDをシェアする")
+                                                          preview: SharePreview(
+                                                            "ユーザーIDを共有",
+                                                            image: Image("share_logo")
+                                                          )
                                                 ) {
                                                     Image(systemName: "square.and.arrow.up.fill")
                                                 }
