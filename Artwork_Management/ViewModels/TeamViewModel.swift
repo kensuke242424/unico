@@ -197,7 +197,7 @@ class TeamViewModel: ObservableObject {
         let nowDate = Date()
         /// チーム作成日時と現在日時の差分から利用日数を取得
         let timeInterval = createDate.distance(to: nowDate)
-        let usageDay = Int(ceil(timeInterval / 60 / 60)) // ceil -> 小数点切り上げ
+        let usageDay = Int(ceil(timeInterval / 60 / 60 / 24)) // ceil -> 小数点切り上げ
 
         return usageDay
     }
