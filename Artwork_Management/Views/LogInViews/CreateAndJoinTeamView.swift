@@ -381,38 +381,15 @@ struct CreateAndJoinTeamView: View {
                         // 背景、アイコン画像をリサイズして保存していく
                         let createTeamID = UUID().uuidString
                         var iconImageContainer      : UIImage?
-                        var backgroundImageContainer: UIImage?
+                        var backgroundContainer: Background = backgroundVM.sampleBackground
 
                         // アイコン画像が入力されていれば、リサイズ処理をしてコンテナに格納
                         if let croppedIconUIImage {
                             iconImageContainer = logInVM.resizeUIImage(image: croppedIconUIImage,
                                                                     width: 60)
                         }
-
-                        // 選択カテゴリがオリジナル&背景画像データが入力されていれば、リサイズ処理をしてコンテナに格納
-                        if backgroundVM.selectCategory == .original {
-                            if let captureBackgroundUIImage = backgroundVM.captureUIImage {
-
-                                let resizedBackgroundUIImage = logInVM.resizeUIImage(image: captureBackgroundUIImage,
-                                                                                 width: getRect().width * 4)
-                                backgroundImageContainer = resizedBackgroundUIImage
-
-                            } else {
-                                /// 入力背景画像がnilだった場合、サンプル画像から一つランダムで選出し、コンテナに格納
-                                let randomPickUpBackground = teamVM.getRandomBackgroundUIImage()
-                                backgroundImageContainer = randomPickUpBackground
-                            }
-
-                        } else {
-                            /// 入力背景画像がnilだった場合、サンプル画像から一つランダムで選出し、コンテナに格納
-                            let randomPickUpBackground = teamVM.getRandomBackgroundUIImage()
-                            backgroundImageContainer = randomPickUpBackground
-                        }
-
                         /// 準備したチームアイコン&背景画像をFirestorageに保存
                         let uplaodIconImageData       = await teamVM.firstUploadTeamImage(iconImageContainer,
-                                                                                          id: createTeamID)
-                        let uplaodBackgroundImageData = await teamVM.firstUploadTeamImage(backgroundImageContainer,
                                                                                           id: createTeamID)
                         
                         // チームデータに格納するログインユーザのユーザデータ
@@ -424,13 +401,14 @@ struct CreateAndJoinTeamView: View {
                                             name          : inputTeamName,
                                             iconURL       : uplaodIconImageData.url,
                                             iconPath      : uplaodIconImageData.filePath,
-                                            backgroundURL : uplaodBackgroundImageData.url,
-                                            backgroundPath: uplaodBackgroundImageData.filePath,
+                                            backgroundURL : backgroundContainer.imageURL,
+                                            backgroundPath: backgroundContainer.imagePath,
                                             members       : [joinMember])
                         
                         let joinTeamData = JoinTeam(teamID : createTeamID,
                                                     name   : inputTeamName,
-                                                    iconURL: uplaodIconImageData.url)
+                                                    iconURL: uplaodIconImageData.url,
+                                                    currentBackground: backgroundContainer)
                         
                         // 作成or参加したチームをView表示する用のプロパティ
                         self.joinedTeamData = joinTeamData
