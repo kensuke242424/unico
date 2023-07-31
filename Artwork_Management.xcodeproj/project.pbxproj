@@ -379,10 +379,10 @@
 		BE30B5D02A33CB520034755B /* EditBackgroundViews */ = {
 			isa = PBXGroup;
 			children = (
-				BE8734EC2A5EE99F004AA246 /* BackgroundCategoriesTagView.swift */,
-				BE8734ED2A5EE99F004AA246 /* EditBackgroundControlButtons.swift */,
 				BE8734EB2A5EE99F004AA246 /* EditTeamBackgroundView.swift */,
 				BE8734EA2A5EE99F004AA246 /* SelectionBackgroundCards.swift */,
+				BE8734EC2A5EE99F004AA246 /* BackgroundCategoriesTagView.swift */,
+				BE8734ED2A5EE99F004AA246 /* EditBackgroundControlButtons.swift */,
 			);
 			path = EditBackgroundViews;
 			sourceTree = "<group>";
