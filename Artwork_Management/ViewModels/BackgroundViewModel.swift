@@ -39,8 +39,8 @@ class BackgroundViewModel: ObservableObject {
     /// サインアップ時に背景選択が無かった場合に、初期背景として使用する
     let sampleBackground = Background(category: "music",
                                       imageName: "music_1",
-                                      imageURL: URL(string: "https://firebasestorage.googleapis.com:443/v0/b/unico-cc222.appspot.com/o/SampleBackgrounds%2Fmusic%2Fmusic_1_2023-06-14%2010:22:39%20%2B0000.jpeg?alt=media&token=57e18363-5604-4e4d-8783-27591e3100b4"),
-                                      imagePath: "/SampleBackgrounds/music/music_1_2023-06-14 10:22:39 +0000.jpeg")
+                                      imageURL: URL(string: "https://firebasestorage.googleapis.com/v0/b/unico-cc222.appspot.com/o/SampleBackgrounds%2Fmusic%2Fmusic_1_2023-07-30%2012%3A31%3A33%20%2B0000.jpeg?alt=media&token=a7c7ea84-2a68-4459-acf9-06fa583b6639"),
+                                      imagePath: "gs://unico-cc222.appspot.com/SampleBackgrounds/music/music_1_2023-07-30 12:31:33 +0000.jpeg")
 
 
     let categoryTag: [CategoryTag] =

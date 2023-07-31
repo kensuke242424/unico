@@ -190,6 +190,18 @@ class TeamViewModel: ObservableObject {
         }
     }
 
+    /// 現在操作しているチームの、作成から現在までの使用日数を算出するメソッド。
+    func getUsageDayCount() -> Int {
+        guard let team else { return 0 }
+        guard let createDate = team.createTime?.dateValue() else { return 0 }
+        let nowDate = Date()
+        /// チーム作成日時と現在日時の差分から利用日数を取得
+        let timeInterval = createDate.distance(to: nowDate)
+        let usageDay = Int(ceil(timeInterval / 60 / 60 / 24)) // ceil -> 小数点切り上げ
+
+        return usageDay
+    }
+
     /// ユーザー作成時のみ呼び出されるチーム画像保存メソッド
     /// ユーザー作成時は既存のチームIDが存在しないため、View側で生成したidを引っ張ってくる
     func firstUploadTeamImage(_ image: UIImage?, id createTeamID: String) async -> (url: URL?, filePath: String?) {
