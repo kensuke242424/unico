@@ -111,7 +111,7 @@ struct EditTeamBackgroundView: View {
             Task{
                 let resizedImage = backgroundVM.resizeUIImage(image: newImage)
                 let uploadImage = await userVM.uploadCurrentTeamMyBackground(resizedImage)
-                await userVM.addCurrentTeamMyBackground(url: uploadImage.url, path: uploadImage.filePath)
+                await userVM.addMyBackgroundToFirestore(url: uploadImage.url, path: uploadImage.filePath)
             }
         }
         .onChange(of: backgroundVM.selectCategory) { newCategory in

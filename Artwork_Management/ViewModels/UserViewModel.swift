@@ -302,12 +302,12 @@ class UserViewModel: ObservableObject {
     }
 
     /// ユーザーが写真フォルダから選択したオリジナル背景をFirestoreに保存するメソッド。
-    /// 保存画像は所属チームごとに別々で管理される。
-    func addCurrentTeamMyBackground(url imageURL: URL?, path imagePath: String?) async {
+    /// 画像はユーザーのドキュメントデータ「myBackgrounds」に保管される。
+    func addMyBackgroundToFirestore(url imageURL: URL?, path imagePath: String?) async {
         guard var user = user else { return }
         guard let userRef = db?.collection("users").document(user.id) else { return }
 
-        user.joins[self.currentTeamIndex ?? 0].myBackgrounds.append(
+        user.myBackgrounds.append(
             Background(category: "original",
                        imageName: "",
                        imageURL: imageURL,
