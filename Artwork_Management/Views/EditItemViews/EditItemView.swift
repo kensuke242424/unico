@@ -46,8 +46,8 @@ struct EditItemView: View {
 //                        .offset(y: 340)
                     VStack {
                         // ✅カスタムView 写真ゾーン
-                        EditItemPhotoArea(showImageSheet: $inputEdit.showPhotoPicker,
-                                          photoImage: inputEdit.captureImage,
+                        EditItemPhotoArea(showImageSheet: $inputEdit.showPicker,
+                                          photoImage: inputEdit.croppedImage,
                                           photoURL: inputEdit.photoURL)
 
                         InputForms(itemVM: itemVM,

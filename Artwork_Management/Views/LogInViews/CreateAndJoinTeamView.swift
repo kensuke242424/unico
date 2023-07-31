@@ -32,12 +32,12 @@ struct CreateAndJoinTeamView: View {
     @EnvironmentObject var backgroundVM: BackgroundViewModel
 
     @State private var inputTeamName: String = ""
-    @State private var captureIconUIImage: UIImage?
+    @State private var croppedIconUIImage: UIImage?
     @State private var userQRCodeImage: UIImage?
     @State private var joinedTeamData: JoinTeam?
     @State private var uploadImageData: (url: URL?, filePath: String?)
 
-    @State private var isShowPickerView: Bool = false
+    @State private var showPicker: Bool = false
     @State private var isShowSignUpSheetView: Bool = false
     @State private var isShowGoBackAlert: Bool = false
 
@@ -269,7 +269,7 @@ struct CreateAndJoinTeamView: View {
                     }
 
                     if selectTeamFase == .success {
-                        joinedTeamIconAndName(image:captureIconUIImage, name: joinedTeamData?.name)
+                        joinedTeamIconAndName(image:croppedIconUIImage, name: joinedTeamData?.name)
                     }
                 } // ZStack
                 
@@ -381,38 +381,15 @@ struct CreateAndJoinTeamView: View {
                         // 背景、アイコン画像をリサイズして保存していく
                         let createTeamID = UUID().uuidString
                         var iconImageContainer      : UIImage?
-                        var backgroundImageContainer: UIImage?
+                        var backgroundContainer: Background = backgroundVM.sampleBackground
 
                         // アイコン画像が入力されていれば、リサイズ処理をしてコンテナに格納
-                        if let captureIconUIImage {
-                            iconImageContainer = logInVM.resizeUIImage(image: captureIconUIImage,
+                        if let croppedIconUIImage {
+                            iconImageContainer = logInVM.resizeUIImage(image: croppedIconUIImage,
                                                                     width: 60)
                         }
-
-                        // 選択カテゴリがオリジナル&背景画像データが入力されていれば、リサイズ処理をしてコンテナに格納
-                        if backgroundVM.selectCategory == .original {
-                            if let captureBackgroundUIImage = backgroundVM.captureUIImage {
-
-                                let resizedBackgroundUIImage = logInVM.resizeUIImage(image: captureBackgroundUIImage,
-                                                                                 width: getRect().width * 4)
-                                backgroundImageContainer = resizedBackgroundUIImage
-
-                            } else {
-                                /// 入力背景画像がnilだった場合、サンプル画像から一つランダムで選出し、コンテナに格納
-                                let randomPickUpBackground = teamVM.getRandomBackgroundUIImage()
-                                backgroundImageContainer = randomPickUpBackground
-                            }
-
-                        } else {
-                            /// 入力背景画像がnilだった場合、サンプル画像から一つランダムで選出し、コンテナに格納
-                            let randomPickUpBackground = teamVM.getRandomBackgroundUIImage()
-                            backgroundImageContainer = randomPickUpBackground
-                        }
-
                         /// 準備したチームアイコン&背景画像をFirestorageに保存
                         let uplaodIconImageData       = await teamVM.firstUploadTeamImage(iconImageContainer,
-                                                                                          id: createTeamID)
-                        let uplaodBackgroundImageData = await teamVM.firstUploadTeamImage(backgroundImageContainer,
                                                                                           id: createTeamID)
                         
                         // チームデータに格納するログインユーザのユーザデータ
@@ -424,13 +401,14 @@ struct CreateAndJoinTeamView: View {
                                             name          : inputTeamName,
                                             iconURL       : uplaodIconImageData.url,
                                             iconPath      : uplaodIconImageData.filePath,
-                                            backgroundURL : uplaodBackgroundImageData.url,
-                                            backgroundPath: uplaodBackgroundImageData.filePath,
+                                            backgroundURL : backgroundContainer.imageURL,
+                                            backgroundPath: backgroundContainer.imagePath,
                                             members       : [joinMember])
                         
                         let joinTeamData = JoinTeam(teamID : createTeamID,
                                                     name   : inputTeamName,
-                                                    iconURL: uplaodIconImageData.url)
+                                                    iconURL: uplaodIconImageData.url,
+                                                    currentBackground: backgroundContainer)
                         
                         // 作成or参加したチームをView表示する用のプロパティ
                         self.joinedTeamData = joinTeamData
@@ -466,9 +444,9 @@ struct CreateAndJoinTeamView: View {
                 }
             }
         }
-        .sheet(isPresented: $isShowPickerView) {
-            PHPickerView(captureImage: $captureIconUIImage, isShowSheet: $isShowPickerView)
-        }
+        .cropImagePicker(option: .circle,
+                         show: $showPicker,
+                         croppedImage: $croppedIconUIImage)
         .sheet(isPresented: $isShowSignUpSheetView) {
             UserEntryRecommendationView(isShow: $isShowSignUpSheetView)
         }
@@ -592,14 +570,14 @@ struct CreateAndJoinTeamView: View {
         Group {
             VStack(spacing: 40) {
                 Group {
-                    if let captureIconUIImage {
-                        UIImageCircleIcon(photoImage: captureIconUIImage, size: 150)
+                    if let croppedIconUIImage {
+                        UIImageCircleIcon(photoImage: croppedIconUIImage, size: 150)
                     } else {
                         Image(systemName: "photo.circle.fill").resizable().scaledToFit()
                             .foregroundColor(.white.opacity(0.8)).frame(width: 150)
                     }
                 }
-                .onTapGesture { isShowPickerView.toggle() }
+                .onTapGesture { showPicker.toggle() }
                 .overlay(alignment: .top) {
                     Text("チーム情報は後から変更できます。").font(.caption)
                     .foregroundColor(.white.opacity(0.6))

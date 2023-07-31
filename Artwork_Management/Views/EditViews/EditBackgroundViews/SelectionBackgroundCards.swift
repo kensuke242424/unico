@@ -40,7 +40,10 @@ struct SelectionBackgroundCards: View {
                                     guard let deleteTargetImage = backgroundVM.deleteTarget else { return }
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                         backgroundVM.deleteBackground(path: background.imagePath)
-                                        userVM.deleteCurrentTeamMyBackground(deleteTargetImage)
+                                        userVM.deleteMyBackgroundToFirestore(deleteTargetImage)
+                                        if backgroundVM.selectBackground == background {
+                                            backgroundVM.selectBackground = nil
+                                        }
                                     }
                                 }
                                 .foregroundColor(.red)

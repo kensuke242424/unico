@@ -41,7 +41,7 @@ extension InputFormsStatus.Model {
 struct InputEditItem {
 
     /// アイテムの入力ステータス群
-    var captureImage    : UIImage? = nil
+    var croppedImage    : UIImage? = nil
     var selectionTag    : Tag?
     var selectionTagName: String = ""
     var name            : String = ""
@@ -57,7 +57,7 @@ struct InputEditItem {
     var totalInventry   : String = ""
     
     /// view表示Presentを管理する
-    var showPhotoPicker: Bool = false
+    var showPicker: Bool = false
     var showTagEdit    : Bool = false
     var showProgress   : Bool = false
 }
@@ -94,17 +94,17 @@ struct NewEditItemView: View {
                 ScrollView(showsIndicators: false) {
                     /// 📷選択写真を表示するエリア📷
                     ZStack {
-                        SelectItemPhotoBackground(photoImage: input.captureImage,
+                        SelectItemPhotoBackground(photoImage: input.croppedImage,
                                                   photoURL: passItem?.photoURL,
                                                   height: size.width / 2 + 50)
                         
-                        if let captureImage = input.captureImage {
-                            NewItemUIImage(image: captureImage,
+                        if let croppedImage = input.croppedImage {
+                            NewItemUIImage(image: croppedImage,
                                            width: cardWidth,
                                            height: cardHeight)
                             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                             .onTapGesture {
-                                input.showPhotoPicker.toggle()
+                                input.showPicker.toggle()
                                 focused = nil; detailFocused = nil
                             }
                         } else if let passItemImageURL = input.photoURL {
@@ -113,7 +113,7 @@ struct NewEditItemView: View {
                                               height: cardHeight)
                             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                             .onTapGesture {
-                                input.showPhotoPicker.toggle()
+                                input.showPicker.toggle()
                                 focused = nil; detailFocused = nil
                             }
                         } else {
@@ -121,7 +121,7 @@ struct NewEditItemView: View {
                                 .fill(.gray.gradient)
                                 .frame(width: abs(cardWidth), height: cardHeight)
                                 .onTapGesture {
-                                    input.showPhotoPicker.toggle()
+                                    input.showPicker.toggle()
                                     focused = nil; detailFocused = nil
                                 }
                                 
@@ -138,7 +138,7 @@ struct NewEditItemView: View {
                                     .foregroundColor(.white)
                             }
                             .onTapGesture {
-                                input.showPhotoPicker.toggle()
+                                input.showPicker.toggle()
                                 focused = nil; detailFocused = nil
                             }
                         }
@@ -267,10 +267,10 @@ struct NewEditItemView: View {
                     .transition(AnyTransition.opacity.combined(with: .offset(y: 20)))
             }
         }
-        .sheet(isPresented: $input.showPhotoPicker) {
-            PHPickerView(captureImage: $input.captureImage,
-                         isShowSheet: $input.showPhotoPicker)
-        }
+        // アイテムの写真ピッカー&クロップビュー
+        .cropImagePicker(option: .square,
+                         show: $input.showPicker,
+                         croppedImage: $input.croppedImage)
         /// NOTE: 親Viewから渡されたアイテムのタグをもとにTagデータを取り出し、Pickerの$String値に使う
         .onChange(of: input.selectionTag) { newTag in
             guard let newTagName = newTag?.tagName else { return }
@@ -317,11 +317,11 @@ struct NewEditItemView: View {
                             guard let teamID = teamVM.team?.id else { return }
                             let editInventory = Int(input.inventory) ?? 0
 
-                            // captureImageに新しい画像があれば、元の画像データを更新
-                            if let captureImage = input.captureImage {
+                            // croppedImageに新しい画像があれば、元の画像データを更新
+                            if let croppedImage = input.croppedImage {
                                 withAnimation(.easeIn(duration: 0.1)) { input.showProgress = true }
                                 itemVM.deleteImage(path: input.photoPath)
-                                let resizedImage = itemVM.resizeUIImage(image: captureImage,
+                                let resizedImage = itemVM.resizeUIImage(image: croppedImage,
                                                                         width: width * 2)
                                 let newImageData =  await itemVM.uploadItemImage(resizedImage, teamID)
                                 input.photoURL = newImageData.url
@@ -359,11 +359,11 @@ struct NewEditItemView: View {
                         Task {
                             guard let teamID = teamVM.team?.id else { return }
                             
-                            // captureImageに新しい画像があれば、元の画像データを更新
-                            if let captureImage = input.captureImage {
+                            // croppedImageに新しい画像があれば、元の画像データを更新
+                            if let croppedImage = input.croppedImage {
                                 withAnimation(.easeIn(duration: 0.1)) { input.showProgress = true }
                                 itemVM.deleteImage(path: input.photoPath)
-                                let resizedImage = itemVM.resizeUIImage(image: captureImage, width: width)
+                                let resizedImage = itemVM.resizeUIImage(image: croppedImage, width: width)
                                 let newImageData =  await itemVM.uploadItemImage(resizedImage, teamID)
                                 input.photoURL = newImageData.url
                                 input.photoPath = newImageData.filePath

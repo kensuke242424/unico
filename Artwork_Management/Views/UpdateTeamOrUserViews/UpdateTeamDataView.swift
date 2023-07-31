@@ -105,10 +105,10 @@ struct UpdateTeamDataView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .offset(y: showKeyboardOffset ? -100 : 0)
-        .sheet(isPresented: $inputUpdate.showPicker) {
-            PHPickerView(captureImage: $inputUpdate.captureImage,
-                         isShowSheet: $inputUpdate.showPicker)
-        }
+        // 写真ピッカー&クロップビュー
+        .cropImagePicker(option: .circle,
+                         show: $inputUpdate.showPicker,
+                         croppedImage: $inputUpdate.captureImage)
         .background {
             Color(.black)
                 .opacity(0.8)

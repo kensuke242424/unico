@@ -280,7 +280,7 @@ class UserViewModel: ObservableObject {
     }
 
     /// ユーザーが現在のチーム内で選択した背景画像をFireStorageに保存する。
-    func uploadCurrentTeamMyBackground(_ image: UIImage?) async -> (url: URL?, filePath: String?) {
+    func uploadMyBackgroundToFirestorage(_ image: UIImage?) async -> (url: URL?, filePath: String?) {
 
         guard let imageData = image?.jpegData(compressionQuality: 0.8) else {
             return (url: nil, filePath: nil)
@@ -322,11 +322,11 @@ class UserViewModel: ObservableObject {
         }
     }
 
-    func deleteCurrentTeamMyBackground(_ background: Background) {
+    func deleteMyBackgroundToFirestore(_ background: Background) {
         guard var user = user else { return }
         guard let userRef = db?.collection("users").document(user.id) else { return }
 
-        user.joins[self.currentTeamIndex ?? 0].myBackgrounds.removeAll(where: { $0 == background })
+        user.myBackgrounds.removeAll(where: { $0 == background })
 
         do {
             try userRef.setData(from: user)
