@@ -163,6 +163,8 @@ struct InputLogIn {
     var password                : String = ""
     var captureUserIconImage    : UIImage?
     var captureBackgroundImage  : UIImage?
+    var croppedUserIconImage    : UIImage?
+    var croppedBackgroundImage  : UIImage?
     var selectUserColor         : ThemeColor = .blue
     
     /// Viewの表示・非表示やアニメーションをコントロールするプロパティ
@@ -221,7 +223,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         
         ZStack {
             Group {
-                if let captureImage = inputLogIn.captureUserIconImage {
+                if let captureImage = inputLogIn.croppedUserIconImage {
                     UIImageCircleIcon(photoImage: captureImage, size: 60)
                 } else {
                     Image(systemName: "person.circle.fill").resizable().scaledToFit()
@@ -482,7 +484,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             PHPickerView(captureImage: $inputLogIn.captureBackgroundImage,
                          isShowSheet: $backgroundVM.showPicker)
         }
-        .onChange(of: inputLogIn.captureBackgroundImage) { newImage in
+        .onChange(of: inputLogIn.croppedBackgroundImage) { newImage in
             guard let newImage else { return }
             print("ユーザー: \(userVM.user)")
             Task {
@@ -573,7 +575,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         // 保存対象のアイコン画像データ容器
                         var iconImageContainer: UIImage?
                         /// オリジナルアイコン画像が入力されている場合は、リサイズ処理しコンテナに格納
-                        if let captureIconUIImage = inputLogIn.captureUserIconImage {
+                        if let captureIconUIImage = inputLogIn.croppedUserIconImage {
                             iconImageContainer = logInVM.resizeUIImage(image: captureIconUIImage,
                                                                     width: 60)
                         }
@@ -908,7 +910,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     /// ユーザー情報「名前」「アイコン」を入力するフェーズ
                 case .fase2:
                     Group {
-                        if let captureImage = inputLogIn.captureUserIconImage {
+                        if let captureImage = inputLogIn.croppedUserIconImage {
                             UIImageCircleIcon(photoImage: captureImage, size: 150)
                         } else {
                             Image(systemName: "photo.circle.fill")
@@ -974,7 +976,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     ProgressView()
                     
                 case .success:
-                    UIImageCircleIcon(photoImage: inputLogIn.captureUserIconImage, size: 140)
+                    UIImageCircleIcon(photoImage: inputLogIn.croppedUserIconImage, size: 140)
                         .transition(AnyTransition.opacity.combined(with: .offset(y: 30)))
                     
                 }

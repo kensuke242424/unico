@@ -108,10 +108,13 @@ struct UpdateUserDataView: View {
                 withAnimation { showKeyboardOffset = false }
             }
         }
-        .sheet(isPresented: $inputUpdate.isShowPickerView) {
-            PHPickerView(captureImage: $inputUpdate.captureImage,
-                         isShowSheet: $inputUpdate.isShowPickerView)
-        }
+//        .sheet(isPresented: $inputUpdate.isShowPickerView) {
+//            PHPickerView(captureImage: $inputUpdate.captureImage,
+//                         isShowSheet: $inputUpdate.isShowPickerView)
+//        }
+        .cropImagePicker(option: .circle,
+                         show: $inputUpdate.isShowPickerView,
+                         croppedImage: $inputUpdate.captureImage)
         .background {
             Color(.black)
                 .opacity(0.8)
