@@ -97,9 +97,9 @@ struct EditTeamBackgroundView: View {
 
             Spacer().frame(height: 50)
         } // VStack
-        .sheet(isPresented: $showPicker) {
-            PHPickerView(captureImage: $backgroundVM.captureUIImage, isShowSheet: $showPicker)
-        }
+        .cropImagePicker(option: .rectangle,
+                         show: $showPicker,
+                         croppedImage: $backgroundVM.captureUIImage)
         .overlay {
             if showProgress {
                 SavingProgressView()
@@ -110,7 +110,7 @@ struct EditTeamBackgroundView: View {
             guard let newImage else { return }
             Task{
                 let resizedImage = backgroundVM.resizeUIImage(image: newImage)
-                let uploadImage = await userVM.uploadCurrentTeamMyBackground(resizedImage)
+                let uploadImage = await userVM.uploadMyBackgroundToFirestorage(resizedImage)
                 await userVM.addMyBackgroundToFirestore(url: uploadImage.url, path: uploadImage.filePath)
             }
         }

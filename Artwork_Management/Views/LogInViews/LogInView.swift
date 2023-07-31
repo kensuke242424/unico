@@ -179,7 +179,7 @@ struct InputLogIn {
     var selectBackground            : BackgroundCategory = .music
     
     /// Sheetやアラートなどのプレゼンテーションを管理するプロパティ
-    var isShowPickerView                 : Bool = false
+    var showPicker                 : Bool = false
     var isShowAnonymousEntryRecomendation: Bool = false
     var isShowGoBackLogInAlert           : Bool = false
     var captureError                     : Bool = false
@@ -233,7 +233,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             .offset(x: -getRect().width / 3, y: -getRect().height / 2.5 - 5)
             .offset(x: logInVM.createAccountFase == .fase3 ? 0 : 30)
             .opacity(logInVM.createAccountFase == .fase3 ? 1.0 : 0.0)
-            .onTapGesture { inputLogIn.isShowPickerView.toggle() }
+            .onTapGesture { inputLogIn.showPicker.toggle() }
             
             LargeLogoMark()
                 .scaleEffect(logInVM.userSelectedSignInType == .signUp ? 0.4 : 1.0)
@@ -474,19 +474,17 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         } message: {
             Text(logInVM.logInAlertMessage.text)
         }
-        // ユーザーアイコンの写真ピッカー
-        .sheet(isPresented: $inputLogIn.isShowPickerView) {
-            PHPickerView(captureImage: $inputLogIn.captureUserIconImage,
-                         isShowSheet: $inputLogIn.isShowPickerView)
-        }
-        // 背景の写真ピッカー
-        .sheet(isPresented: $backgroundVM.showPicker) {
-            PHPickerView(captureImage: $inputLogIn.captureBackgroundImage,
-                         isShowSheet: $backgroundVM.showPicker)
-        }
+        // ユーザーアイコンの写真ピッカー&クロップビュー
+        .cropImagePicker(option: .circle,
+                         show: $inputLogIn.showPicker,
+                         croppedImage: $inputLogIn.croppedUserIconImage)
+        // 背景の写真ピッカー&クロップビュー
+        .cropImagePicker(option: .rectangle,
+                         show: $backgroundVM.showPicker,
+                         croppedImage: $inputLogIn.croppedBackgroundImage)
+
         .onChange(of: inputLogIn.croppedBackgroundImage) { newImage in
             guard let newImage else { return }
-            print("ユーザー: \(userVM.user)")
             Task {
                 let resizedImage = backgroundVM.resizeUIImage(image: newImage)
                 let uploadImage = await backgroundVM.uploadUserBackgroundAtSignUp(resizedImage)
@@ -920,7 +918,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                 .foregroundColor(.white)
                         }
                     }
-                    .onTapGesture { inputLogIn.isShowPickerView.toggle() }
+                    .onTapGesture { inputLogIn.showPicker.toggle() }
                     .overlay(alignment: .top) {
                         Text("ユーザ情報は後から変更できます。").font(.caption)
                             .opacity(0.7)

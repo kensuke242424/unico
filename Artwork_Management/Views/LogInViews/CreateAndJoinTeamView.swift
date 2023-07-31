@@ -32,12 +32,12 @@ struct CreateAndJoinTeamView: View {
     @EnvironmentObject var backgroundVM: BackgroundViewModel
 
     @State private var inputTeamName: String = ""
-    @State private var captureIconUIImage: UIImage?
+    @State private var croppedIconUIImage: UIImage?
     @State private var userQRCodeImage: UIImage?
     @State private var joinedTeamData: JoinTeam?
     @State private var uploadImageData: (url: URL?, filePath: String?)
 
-    @State private var isShowPickerView: Bool = false
+    @State private var showPicker: Bool = false
     @State private var isShowSignUpSheetView: Bool = false
     @State private var isShowGoBackAlert: Bool = false
 
@@ -269,7 +269,7 @@ struct CreateAndJoinTeamView: View {
                     }
 
                     if selectTeamFase == .success {
-                        joinedTeamIconAndName(image:captureIconUIImage, name: joinedTeamData?.name)
+                        joinedTeamIconAndName(image:croppedIconUIImage, name: joinedTeamData?.name)
                     }
                 } // ZStack
                 
@@ -384,8 +384,8 @@ struct CreateAndJoinTeamView: View {
                         var backgroundImageContainer: UIImage?
 
                         // アイコン画像が入力されていれば、リサイズ処理をしてコンテナに格納
-                        if let captureIconUIImage {
-                            iconImageContainer = logInVM.resizeUIImage(image: captureIconUIImage,
+                        if let croppedIconUIImage {
+                            iconImageContainer = logInVM.resizeUIImage(image: croppedIconUIImage,
                                                                     width: 60)
                         }
 
@@ -466,9 +466,9 @@ struct CreateAndJoinTeamView: View {
                 }
             }
         }
-        .sheet(isPresented: $isShowPickerView) {
-            PHPickerView(captureImage: $captureIconUIImage, isShowSheet: $isShowPickerView)
-        }
+        .cropImagePicker(option: .circle,
+                         show: $showPicker,
+                         croppedImage: $croppedIconUIImage)
         .sheet(isPresented: $isShowSignUpSheetView) {
             UserEntryRecommendationView(isShow: $isShowSignUpSheetView)
         }
@@ -592,14 +592,14 @@ struct CreateAndJoinTeamView: View {
         Group {
             VStack(spacing: 40) {
                 Group {
-                    if let captureIconUIImage {
-                        UIImageCircleIcon(photoImage: captureIconUIImage, size: 150)
+                    if let croppedIconUIImage {
+                        UIImageCircleIcon(photoImage: croppedIconUIImage, size: 150)
                     } else {
                         Image(systemName: "photo.circle.fill").resizable().scaledToFit()
                             .foregroundColor(.white.opacity(0.8)).frame(width: 150)
                     }
                 }
-                .onTapGesture { isShowPickerView.toggle() }
+                .onTapGesture { showPicker.toggle() }
                 .overlay(alignment: .top) {
                     Text("チーム情報は後から変更できます。").font(.caption)
                     .foregroundColor(.white.opacity(0.6))
