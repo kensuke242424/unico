@@ -15,7 +15,7 @@ struct UpdateUserDataView: View {
     struct InputUpdateUser {
         var nameText: String = ""
         var defaultIconData: (url: URL?, filePath: String?)
-        var isShowPickerView: Bool = false
+        var showPicker: Bool = false
         var captureImage: UIImage?
         var captureError: Bool = false
         var savingWait: Bool = false
@@ -70,7 +70,7 @@ struct UpdateUserDataView: View {
                 .padding(.bottom, 8)
 
                 CaptureImageIcon(image: inputUpdate.captureImage)
-                    .onTapGesture { inputUpdate.isShowPickerView.toggle() }
+                    .onTapGesture { inputUpdate.showPicker.toggle() }
 
                 TextField("", text: $inputUpdate.nameText)
                     .frame(width: 230)
@@ -108,12 +108,9 @@ struct UpdateUserDataView: View {
                 withAnimation { showKeyboardOffset = false }
             }
         }
-//        .sheet(isPresented: $inputUpdate.isShowPickerView) {
-//            PHPickerView(captureImage: $inputUpdate.captureImage,
-//                         isShowSheet: $inputUpdate.isShowPickerView)
-//        }
+        // 写真ピッカー&クロップビュー
         .cropImagePicker(option: .circle,
-                         show: $inputUpdate.isShowPickerView,
+                         show: $inputUpdate.showPicker,
                          croppedImage: $inputUpdate.captureImage)
         .background {
             Color(.black)
