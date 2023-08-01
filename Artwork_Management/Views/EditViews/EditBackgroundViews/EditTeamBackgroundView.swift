@@ -43,6 +43,16 @@ struct EditTeamBackgroundView: View {
                 BackgroundCategoriesTagView()
                     .opacity(backgroundVM.checkMode ? 0 : 1)
 
+                if backgroundVM.savingWait {
+                    HStack(spacing: 10) {
+                        Text("オリジナル背景を保存中です...")
+                            .font(.footnote)
+                            .tracking(5)
+                            .foregroundColor(.white.opacity(0.8))
+                        ProgressView()
+                    }
+                }
+
                 SelectionBackgroundCards(showPicker: $showPicker)
                     .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
                     .opacity(backgroundVM.checkMode ? 0 : 1)
@@ -59,7 +69,7 @@ struct EditTeamBackgroundView: View {
                                 }
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                                     withAnimation(.spring(response: 0.5, blendDuration: 1)) {
-                                        backgroundVM.captureUIImage = nil
+                                        backgroundVM.croppedUIImage = nil
                                         backgroundVM.selectBackground = nil
                                         backgroundVM.showEdit = false
                                     }
@@ -76,7 +86,7 @@ struct EditTeamBackgroundView: View {
                             }
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                                 withAnimation(.spring(response: 0.5, blendDuration: 1)) {
-                                    backgroundVM.captureUIImage = nil
+                                    backgroundVM.croppedUIImage = nil
                                     backgroundVM.selectBackground = nil
                                     backgroundVM.showEdit = false
                                 }
@@ -95,23 +105,26 @@ struct EditTeamBackgroundView: View {
                 .padding(.top, 50)
             } // if showContents
 
-            Spacer().frame(height: 50)
+            Spacer()
         } // VStack
+
         .cropImagePicker(option: .rectangle,
                          show: $showPicker,
-                         croppedImage: $backgroundVM.captureUIImage)
+                         croppedImage: $backgroundVM.croppedUIImage)
         .overlay {
             if showProgress {
                 SavingProgressView()
                     .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
             }
         }
-        .onChange(of: backgroundVM.captureUIImage) { newImage in
+        .onChange(of: backgroundVM.croppedUIImage) { newImage in
             guard let newImage else { return }
             Task{
+                withAnimation { backgroundVM.savingWait = true }
                 let resizedImage = backgroundVM.resizeUIImage(image: newImage)
                 let uploadImage = await userVM.uploadMyBackgroundToFirestorage(resizedImage)
                 await userVM.addMyBackgroundToFirestore(url: uploadImage.url, path: uploadImage.filePath)
+                withAnimation { backgroundVM.savingWait = false }
             }
         }
         .onChange(of: backgroundVM.selectCategory) { newCategory in
