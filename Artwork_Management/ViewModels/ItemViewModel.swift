@@ -17,14 +17,11 @@ class ItemViewModel: ObservableObject {
     var listener: ListenerRegistration?
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
 
+    /// View Properties...
     @Published var items: [Item] = []
-    // アイテムの中にタグが未グループのものがあるかどうか
-    var unsetTag: Bool {
-        let result = self.items.contains(where: { $0.tag == "未グループ" })
-        print("タグ未グループアイテムの有無: \(result)")
-        return result
-    }
-    let emptyName: String = "No Name"
+    @Published var selectedSortType: ItemsSortType = .name
+    @Published var selectedOder: UpDownOrder = .down
+    @Published var filterFavorite: Bool = false
 
     func fetchItem(teamID: String) async {
 
@@ -244,12 +241,11 @@ class ItemViewModel: ObservableObject {
         print("updateCommerse完了")
     }
 
-    func itemsUpDownOderSort() {
-
+    func upDownOderSort() {
         items.reverse()
     }
 
-    func itemsValueSort(order: UpDownOrder, status: IndicatorValueStatus) {
+    func valueSort(order: UpDownOrder, status: IndicatorValueStatus) {
 
         switch order {
 
@@ -277,9 +273,9 @@ class ItemViewModel: ObservableObject {
         }
     }
 
-    func itemsNameSort(order: UpDownOrder) {
+    func nameSort() {
 
-        switch order {
+        switch self.selectedOder {
 
         case .up:
             items.sort(by: { $0.name > $1.name })
@@ -289,9 +285,9 @@ class ItemViewModel: ObservableObject {
         }
     }
 
-    func itemsCreateTimeSort(order: UpDownOrder) {
+    func createTimeSort() {
 
-        switch order {
+        switch self.selectedOder {
         case .up:
             items.sort { before, after in
                 before.createTime!.dateValue() > after.createTime!.dateValue() ? true : false
@@ -303,8 +299,8 @@ class ItemViewModel: ObservableObject {
         }
     }
 
-    func itemsUpdateTimeSort(order: UpDownOrder) {
-        switch order {
+    func updateTimeSort() {
+        switch self.selectedOder {
         case .up:
             items.sort { before, after in
                 before.updateTime!.dateValue() > after.updateTime!.dateValue() ? true : false

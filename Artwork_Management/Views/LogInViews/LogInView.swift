@@ -500,6 +500,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         .background {
             ZStack {
                 GeometryReader { proxy in
+                    Color.black.ignoresSafeArea()
 
                         SDWebImageBackgroundView(
                             imageURL: backgroundVM.selectBackground?.imageURL ??

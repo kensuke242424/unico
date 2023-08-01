@@ -14,7 +14,7 @@ struct NowTimeParts: Codable, Hashable {
     var transitionScale: CGFloat = 1.0
     var initialScale: CGFloat = 1.0
     var desplayState: Bool = true
-    var backState: Bool = false
+    var backState: Bool = true
     var pressingAnimation: Bool = false
 }
 
@@ -25,7 +25,7 @@ struct TeamNewsParts: Codable, Hashable {
     var transitionScale: CGFloat = 1.0
     var initialScale: CGFloat = 1.0
     var desplayState: Bool = true
-    var backState: Bool = false
+    var backState: Bool = true
     var pressingAnimation: Bool = false
 }
 

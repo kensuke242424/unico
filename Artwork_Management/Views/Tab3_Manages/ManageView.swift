@@ -170,61 +170,61 @@ struct ManageView: View {
             .animation(.spring(response: 0.5), value: inputManage.isTagGroup)
 
             // items sort...
-            .onChange(of: inputManage.indicatorValueStatus) { _ in
-
-                if inputManage.sortType == .value {
-                    withAnimation(.spring(response: 0.7)) {
-                        itemVM.itemsValueSort(order: inputManage.upDownOrder, status: inputManage.indicatorValueStatus)
-                    }
-                }
-            }
-            .onChange(of: inputManage.sortType) { _ in
-
-                switch inputManage.sortType {
-                case .value:
-                    withAnimation(.spring(response: 0.7)) {
-                        itemVM.itemsValueSort(order: inputManage.upDownOrder, status: inputManage.indicatorValueStatus)
-                    }
-                case .name:
-                    withAnimation(.spring(response: 0.7)) {
-                        itemVM.itemsNameSort(order: inputManage.upDownOrder)
-                    }
-                case .createTime:
-                    withAnimation(.spring(response: 0.7)) {
-                        itemVM.itemsCreateTimeSort(order: inputManage.upDownOrder)
-                    }
-                case .updateTime:
-                    withAnimation(.spring(response: 0.7)) {
-                        itemVM.itemsUpdateTimeSort(order: inputManage.upDownOrder)
-                    }
-                }
-            }
-            .onChange(of: inputManage.upDownOrder) { _ in
-                withAnimation(.spring(response: 0.7)) {
-                    itemVM.itemsUpDownOderSort()
-                }
-            }
-
-            .onAppear {
-                switch inputManage.sortType {
-                case .value:
-                    withAnimation(.spring(response: 0.7)) {
-                        itemVM.itemsValueSort(order: inputManage.upDownOrder, status: inputManage.indicatorValueStatus)
-                    }
-                case .name:
-                    withAnimation(.spring(response: 0.7)) {
-                        itemVM.itemsNameSort(order: inputManage.upDownOrder)
-                    }
-                case .createTime:
-                    withAnimation(.spring(response: 0.7)) {
-                        itemVM.itemsCreateTimeSort(order: inputManage.upDownOrder)
-                    }
-                case .updateTime:
-                    withAnimation(.spring(response: 0.7)) {
-                        itemVM.itemsUpdateTimeSort(order: inputManage.upDownOrder)
-                    }
-                }
-            }
+//            .onChange(of: inputManage.indicatorValueStatus) { _ in
+//
+//                if inputManage.sortType == .value {
+//                    withAnimation(.spring(response: 0.7)) {
+//                        itemVM.itemsValueSort(order: inputManage.upDownOrder, status: inputManage.indicatorValueStatus)
+//                    }
+//                }
+//            }
+//            .onChange(of: inputManage.sortType) { _ in
+//
+//                switch inputManage.sortType {
+//                case .value:
+//                    withAnimation(.spring(response: 0.7)) {
+//                        itemVM.itemsValueSort(order: inputManage.upDownOrder, status: inputManage.indicatorValueStatus)
+//                    }
+//                case .name:
+//                    withAnimation(.spring(response: 0.7)) {
+//                        itemVM.itemsNameSort(order: inputManage.upDownOrder)
+//                    }
+//                case .createTime:
+//                    withAnimation(.spring(response: 0.7)) {
+//                        itemVM.itemsCreateTimeSort(order: inputManage.upDownOrder)
+//                    }
+//                case .updateTime:
+//                    withAnimation(.spring(response: 0.7)) {
+//                        itemVM.itemsUpdateTimeSort(order: inputManage.upDownOrder)
+//                    }
+//                }
+//            }
+//            .onChange(of: inputManage.upDownOrder) { _ in
+//                withAnimation(.spring(response: 0.7)) {
+//                    itemVM.itemsUpDownOderSort()
+//                }
+//            }
+//
+//            .onAppear {
+//                switch inputManage.sortType {
+//                case .value:
+//                    withAnimation(.spring(response: 0.7)) {
+//                        itemVM.itemsValueSort(order: inputManage.upDownOrder, status: inputManage.indicatorValueStatus)
+//                    }
+//                case .name:
+//                    withAnimation(.spring(response: 0.7)) {
+//                        itemVM.itemsNameSort(order: inputManage.upDownOrder)
+//                    }
+//                case .createTime:
+//                    withAnimation(.spring(response: 0.7)) {
+//                        itemVM.itemsCreateTimeSort(order: inputManage.upDownOrder)
+//                    }
+//                case .updateTime:
+//                    withAnimation(.spring(response: 0.7)) {
+//                        itemVM.itemsUpdateTimeSort(order: inputManage.upDownOrder)
+//                    }
+//                }
+//            }
 
         } // NavigationView
     } // body

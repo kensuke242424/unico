@@ -60,6 +60,7 @@
 		BE6E007429CD5CCA009CBD38 /* NavigationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6E007329CD5CCA009CBD38 /* NavigationViewModel.swift */; };
 		BE74E91B2A77E5D800C1A5F2 /* CustomImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE74E91A2A77E5D800C1A5F2 /* CustomImagePicker.swift */; };
 		BE74E91D2A77EE9B00C1A5F2 /* Crop.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE74E91C2A77EE9B00C1A5F2 /* Crop.swift */; };
+		BE74E9212A78B2CE00C1A5F2 /* ItemSortManuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE74E9202A78B2CE00C1A5F2 /* ItemSortManuView.swift */; };
 		BE8734DB2A5D53F1004AA246 /* SDWebImageBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8734DA2A5D53F1004AA246 /* SDWebImageBackgroundView.swift */; };
 		BE8734EE2A5EE99F004AA246 /* SelectionBackgroundCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8734EA2A5EE99F004AA246 /* SelectionBackgroundCards.swift */; };
 		BE8734EF2A5EE99F004AA246 /* EditTeamBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8734EB2A5EE99F004AA246 /* EditTeamBackgroundView.swift */; };
@@ -204,6 +205,7 @@
 		BE6E007329CD5CCA009CBD38 /* NavigationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationViewModel.swift; sourceTree = "<group>"; };
 		BE74E91A2A77E5D800C1A5F2 /* CustomImagePicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CustomImagePicker.swift; path = ../../../../../Try_Tutorial/PhotoCroppingSampleApp/PhotoCroppingSampleApp/View/CustomImagePicker.swift; sourceTree = "<group>"; };
 		BE74E91C2A77EE9B00C1A5F2 /* Crop.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Crop.swift; path = ../../../Try_Tutorial/PhotoCroppingSampleApp/PhotoCroppingSampleApp/Model/Crop.swift; sourceTree = "<group>"; };
+		BE74E9202A78B2CE00C1A5F2 /* ItemSortManuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemSortManuView.swift; sourceTree = "<group>"; };
 		BE8734DA2A5D53F1004AA246 /* SDWebImageBackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDWebImageBackgroundView.swift; sourceTree = "<group>"; };
 		BE8734EA2A5EE99F004AA246 /* SelectionBackgroundCards.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectionBackgroundCards.swift; sourceTree = "<group>"; };
 		BE8734EB2A5EE99F004AA246 /* EditTeamBackgroundView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditTeamBackgroundView.swift; sourceTree = "<group>"; };
@@ -353,6 +355,7 @@
 				BE1F272829C16E0800AD55DF /* ScrollViewDetector.swift */,
 				BE1F272A29C16E2000AD55DF /* CustomCorners.swift */,
 				BE1F272C29C16E4200AD55DF /* DetailView.swift */,
+				BE74E9202A78B2CE00C1A5F2 /* ItemSortManuView.swift */,
 			);
 			path = ItemViews;
 			sourceTree = "<group>";
@@ -853,6 +856,7 @@
 				E01AA3A32916C674000FCD37 /* TagModel.swift in Sources */,
 				E08F273C28DDB61A00329C5E /* LibraryView.swift in Sources */,
 				BE254FBD29C092F5004FE9AE /* AsyncImageBackground.swift in Sources */,
+				BE74E9212A78B2CE00C1A5F2 /* ItemSortManuView.swift in Sources */,
 				E0FCADA429708B9800BA6A75 /* LogoMark.swift in Sources */,
 				E01AA3A9291780DD000FCD37 /* UIImageExtension.swift in Sources */,
 				E08F273828DDB51600329C5E /* ManageView.swift in Sources */,
