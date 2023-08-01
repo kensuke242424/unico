@@ -17,7 +17,7 @@ struct ItemSortManuView: View {
     let userColor: ThemeColor
 
     /// View properties
-    @State private var isOpen: Bool = false
+    @State private var isOpen: Bool = true
     @GestureState var dragOffset:CGSize = .zero
     @Namespace private var animation
 
@@ -41,8 +41,8 @@ struct ItemSortManuView: View {
                         .gesture(
                             DragGesture()
                                 .updating(self.$dragOffset, body: { (value, state, _) in
-                                    state = CGSize(width: value.translation.width / 2,
-                                                   height: value.translation.height / 2)
+                                    state = CGSize(width: value.translation.width / 3,
+                                                   height: value.translation.height / 3)
                                 })
                                 .onEnded { value in
                                     if value.translation.height > 100 {
@@ -111,7 +111,7 @@ struct ItemSortManuView: View {
     }
     @ViewBuilder
     func SortMenu() -> some View {
-        VStack(alignment: .leading, spacing: 30) {
+        VStack(alignment: .leading, spacing: 25) {
 
             VStack(alignment: .leading) {
                 Text("並び替え").tracking(7).font(.title2)
@@ -119,7 +119,7 @@ struct ItemSortManuView: View {
             }
 
             /// アイテムのソートタイプメニュー
-            VStack(alignment: .leading, spacing: 25) {
+            VStack(alignment: .leading, spacing: 15) {
                 ForEach(ItemsSortType.allCases, id: \.self) { sort in
                     HStack(spacing: 20) {
                         Circle().stroke(lineWidth: 1)
@@ -131,6 +131,14 @@ struct ItemSortManuView: View {
                             }
 
                         Text(sort.text).tracking(3)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .padding(5)
+                    .background {
+                        Capsule()
+                            .foregroundColor(userColor.color1)
+                            .opacity(itemVM.selectedSortType == sort ? 0.4 : 0.01)
+                            .shadow(radius: 5, x: 2, y: 2)
                     }
                     .onTapGesture {
                         withAnimation {
@@ -139,7 +147,7 @@ struct ItemSortManuView: View {
                     }
                 }
             }
-            .offset(x: 20)
+            .padding(.horizontal, 20)
 
             Divider().background(Color.white)
 
@@ -158,6 +166,14 @@ struct ItemSortManuView: View {
                             }
 
                         Text(order.text).tracking(3)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .padding(5)
+                    .background {
+                        Capsule(style: .continuous)
+                            .foregroundColor(userColor.color1)
+                            .opacity(itemVM.selectedOder == order ? 0.4 : 0.01)
+                            .shadow(radius: 5, x: 2, y: 2)
                     }
                     .onTapGesture {
                         withAnimation {
@@ -180,6 +196,13 @@ struct ItemSortManuView: View {
 
                 Text("お気に入りのみ表示").tracking(2)
             }
+            .padding(7)
+            .background {
+                Capsule()
+                    .foregroundColor(userColor.color1)
+                    .opacity(itemVM.filterFavorite ? 0.4 : 0.01)
+                    .shadow(radius: 5, x: 2, y: 2)
+            }
             .onTapGesture {
                 withAnimation(.spring(response: 0.5)) {
                     itemVM.filterFavorite.toggle()
@@ -191,13 +214,12 @@ struct ItemSortManuView: View {
         .foregroundColor(.white)
         .padding(20)
         .padding(.top)
-        .opacity(isOpen ? 1 : 0)
     }
 }
 
 struct SortItemView_Previews: PreviewProvider {
     static var previews: some View {
-        ItemSortManuView(userColor: .gray,
+        ItemSortManuView(userColor: .blue,
                          itemVM: ItemViewModel()
         )
     }
