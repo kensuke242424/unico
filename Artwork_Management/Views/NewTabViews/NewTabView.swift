@@ -102,7 +102,7 @@ struct NewTabView: View {
                 }
                 /// 背景編集でオリジナル画像を選択時に発火
                 .sheet(isPresented: $backgroundVM.showPicker) {
-                    PHPickerView(captureImage: $backgroundVM.captureUIImage,
+                    PHPickerView(captureImage: $backgroundVM.croppedUIImage,
                                  isShowSheet : $backgroundVM.showPicker)
                 }
                 /// TabViewに紐づけているプロパティをアニメーションのトリガーとして使えないため
@@ -164,6 +164,7 @@ struct NewTabView: View {
                             })
 
                         EditTeamBackgroundView()
+                            .offset(y: 40)
                     }
                 }
                 /// サイドメニューView

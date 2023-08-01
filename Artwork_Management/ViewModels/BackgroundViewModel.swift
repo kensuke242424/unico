@@ -23,7 +23,7 @@ class BackgroundViewModel: ObservableObject {
 
     /// バックグラウンドを管理するプロパティ
     @Published var teamBackground: URL?
-    @Published var captureUIImage: UIImage?
+    @Published var croppedUIImage: UIImage?
     @Published var selectCategory: BackgroundCategory = .music
     @Published var selectBackground: Background?
     @Published var deleteTarget: Background?
@@ -34,6 +34,7 @@ class BackgroundViewModel: ObservableObject {
     @Published var showDeleteAlert: Bool = false
     @Published var checkModeToggle: Bool = false
     @Published var checkMode: Bool = false
+    @Published var savingWait: Bool = false
 
     let backgroundWidth : CGFloat = UIScreen.main.bounds.width
     /// サインアップ時に背景選択が無かった場合に、初期背景として使用する

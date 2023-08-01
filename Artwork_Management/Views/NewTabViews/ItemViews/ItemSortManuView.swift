@@ -17,7 +17,7 @@ struct ItemSortManuView: View {
     let userColor: ThemeColor
 
     /// View properties
-    @State private var isOpen: Bool = true
+    @State private var isOpen: Bool = false
     @GestureState var dragOffset:CGSize = .zero
     @Namespace private var animation
 
