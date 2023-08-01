@@ -135,3 +135,5 @@ struct SortItemView_Previews: PreviewProvider {
         ItemSortManuView(userColor: .gray)
     }
 }
+
+

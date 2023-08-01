@@ -52,6 +52,37 @@ extension Item {
     }
 }
 
+enum UpDownOrder: CaseIterable {
+    case up, down
+
+    var text: String {
+        switch self {
+        case .up: return "昇順"
+        case .down: return "降り順"
+        }
+    }
+
+    var icon: Image {
+        switch self {
+        case .up: return Image(systemName: "arrow.up.square.fill")
+        case .down: return Image(systemName: "arrow.down.app.fill")
+        }
+    }
+}
+
+enum ItemsSortType: CaseIterable {
+    case name, updateTime, createTime, sales
+
+    var text: String {
+        switch self {
+        case .name: return "名前"
+        case .createTime: return "追加日"
+        case .updateTime: return "更新日"
+        case .sales: return "売り上げ"
+        }
+    }
+}
+
 var sampleItems: [Item] =
 [
     Item(tag: "goods",

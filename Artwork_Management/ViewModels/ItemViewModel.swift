@@ -17,7 +17,10 @@ class ItemViewModel: ObservableObject {
     var listener: ListenerRegistration?
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
 
+    /// View Properties...
     @Published var items: [Item] = []
+    @Published var selectedSortType: ItemsSortType = .name
+    @Published var selectedOder: UpDownOrder = .up
 
     func fetchItem(teamID: String) async {
 

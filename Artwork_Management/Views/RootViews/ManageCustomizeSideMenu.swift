@@ -7,30 +7,6 @@
 
 import SwiftUI
 
-enum UpDownOrder: CaseIterable {
-    case up, down
-
-    var icon: Image {
-        switch self {
-        case .up: return Image(systemName: "arrow.up.square.fill")
-        case .down: return Image(systemName: "arrow.down.app.fill")
-        }
-    }
-}
-
-enum ItemsSortType: CaseIterable {
-    case value, name, updateTime, createTime
-
-    var text: String {
-        switch self {
-        case .value: return "データ順"
-        case .name: return "名前順"
-        case .createTime: return "作成した日"
-        case .updateTime: return "最終更新日"
-        }
-    }
-}
-
 enum IndicatorWidthLimit: CaseIterable {
     case medium, lerge
 
@@ -70,7 +46,7 @@ enum IndicatorValueStatus: CaseIterable {
 }
 
 struct InputManageCustomizeSideMenu {
-    var sortType: ItemsSortType = .value
+    var sortType: ItemsSortType = .sales
     var upDownOrder: UpDownOrder = .up
     var indicatorWidthLimit: IndicatorWidthLimit = .medium
     var indicatorValueStatus: IndicatorValueStatus = .sales
