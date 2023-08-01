@@ -180,6 +180,9 @@ struct NewItemsView: View {
                 .opacity(showDetailView ? 0 : 1)
             
         }
+        .overlay {
+            ItemSortManuView(userColor: userVM.user?.userColor ?? .blue)
+        }
         .background {
             ZStack {
                 GeometryReader { proxy in
