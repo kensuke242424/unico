@@ -41,7 +41,6 @@ struct NewItemsView: View {
     @State private var showDarkBackground: Bool = false
     @State private var selectedItem      : Item?
     @State private var animateCurrentItem: Bool = false
-    @State private var filterFavorite    : Bool = false
 
     @State private var showDeleteAlert: Bool = false
     @State private var showImpossibleAlert: Bool = false
@@ -67,7 +66,7 @@ struct NewItemsView: View {
                 ScrollView(.vertical, showsIndicators: false) {
                     LazyVStack(spacing: 35) {
                         ForEach(itemVM.items.filter(
-                            filterFavorite ?
+                            itemVM.filterFavorite ?
                             {   $0.favorite == true &&
                                 ($0.tag == activeTag?.tagName ||
                                 activeTag?.tagName == "全て") } :
@@ -172,16 +171,9 @@ struct NewItemsView: View {
                 .onDisappear { print("カード詳細onDisappear") }
             }
         }
-//        .overlay(alignment: .bottomTrailing) {
-//
-//            FilteringFavoriteItemButton()
-//                .padding(.trailing, 40)
-//                .padding(.bottom, 20)
-//                .opacity(showDetailView ? 0 : 1)
-//
-//        }
         .overlay {
-            ItemSortManuView(userColor: userVM.user?.userColor ?? .blue)
+            ItemSortManuView(userColor: userVM.memberColor, itemVM: itemVM)
+                .opacity(showDetailView ? 0 : 1)
         }
         .background {
             ZStack {
@@ -390,22 +382,22 @@ struct NewItemsView: View {
         ZStack {
             Capsule()
                 .frame(width: 40, height: 12)
-                .foregroundColor(filterFavorite ? .green.opacity(0.7) : .gray.opacity(0.5))
+                .foregroundColor(itemVM.filterFavorite ? .green.opacity(0.7) : .gray.opacity(0.5))
             Image(systemName: "heart.fill")
                 .font(.title)
                 .foregroundColor(.black).opacity(0.6)
-                .offset(x: filterFavorite ? 9 : -7)
+                .offset(x: itemVM.filterFavorite ? 9 : -7)
             Image(systemName: "heart.fill")
                 .font(.title)
-                .foregroundColor(filterFavorite ? .red : .white)
+                .foregroundColor(itemVM.filterFavorite ? .red : .white)
                 .scaleEffect(0.95)
                 .padding()
-                .offset(x: filterFavorite ? 9 : -7)
+                .offset(x: itemVM.filterFavorite ? 9 : -7)
         }
         .opacity(itemVM.items.isEmpty ? 0 : 1)
         .onTapGesture {
             withAnimation(.spring(response: 0.4)) {
-                filterFavorite.toggle()
+                itemVM.filterFavorite.toggle()
             }
         }
     }

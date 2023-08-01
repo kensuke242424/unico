@@ -17,8 +17,10 @@ struct ItemSortManuView: View {
     let userColor: ThemeColor
 
     /// View properties
-    @State private var isOpen: Bool = true
+    @State private var isOpen: Bool = false
     @Namespace private var animation
+
+    @StateObject var itemVM: ItemViewModel
 
     var body: some View {
 
@@ -51,21 +53,39 @@ struct ItemSortManuView: View {
                     }
                 } label: {
                     ZStack {
-                        Circle()
+                        Circle() // ダミー
                             .frame(width: buttonSize)
                             .foregroundColor(.clear)
                         Image(systemName: "text.line.first.and.arrowtriangle.forward")
                             .foregroundColor(.white)
                     }
-
                 }
             }
             .padding(.trailing)
+            /// 選択されたソートタイプに合わせてアイテムを並び替え
+            .onChange(of: itemVM.selectedSortType) { type in
+                switch type {
+                case .name:
+                    withAnimation(.spring(response: 0.5)) { itemVM.nameSort() }
+                case .createTime:
+                    withAnimation(.spring(response: 0.5)) { itemVM.createTimeSort() }
+                case .updateTime:
+                    withAnimation(.spring(response: 0.5)) { itemVM.updateTimeSort() }
+                case .sales:
+                    withAnimation(.spring(response: 0.5)) { itemVM.updateTimeSort() }
+                }
+            }
+            /// 昇り・降り順の切り替え
+            .onChange(of: itemVM.selectedOder) { _ in
+                withAnimation(.spring(response: 0.5)) { itemVM.upDownOderSort() }
+            }
+            /// 初期値として名前の順に並び替え
+            .onAppear {
+                itemVM.nameSort()
+            }
     }
     @ViewBuilder
     func SortMenu() -> some View {
-        let sortTypes: [String] = ["名前", "追加日", "更新日", "売り上げ"]
-        let orderTypes: [String] = ["昇順", "降り順"]
         VStack(alignment: .leading, spacing: 30) {
 
             VStack(alignment: .leading) {
@@ -73,45 +93,71 @@ struct ItemSortManuView: View {
                 Divider().background(Color.white)
             }
 
-            VStack(alignment: .leading, spacing: 30) {
-                ForEach(sortTypes, id: \.self) { sortType in
+            /// アイテムのソートタイプメニュー
+            VStack(alignment: .leading, spacing: 25) {
+                ForEach(ItemsSortType.allCases, id: \.self) { sort in
                     HStack(spacing: 20) {
-                        Circle()
-                            .stroke(lineWidth: 1)
+                        Circle().stroke(lineWidth: 1)
                             .frame(width: 15, height: 15)
-                            .overlay { Circle().frame(width: 10) }
+                            .overlay {
+                                Circle()
+                                    .frame(width: 8)
+                                    .scaleEffect(itemVM.selectedSortType == sort ? 1 : 0)
+                            }
 
-                        Text("\(sortType)")
+                        Text(sort.text).tracking(3)
+                    }
+                    .onTapGesture {
+                        withAnimation {
+                            itemVM.selectedSortType = sort
+                        }
                     }
                 }
             }
-            .tracking(3)
             .offset(x: 20)
 
             Divider().background(Color.white)
 
+            /// 昇順・降り順のメニュー
             HStack(spacing: 30) {
-                ForEach(orderTypes, id: \.self) { orderType in
+                ForEach(UpDownOrder.allCases, id: \.self) { order in
                     HStack(spacing: 20) {
                         Circle()
                             .stroke(lineWidth: 1)
                             .frame(width: 15, height: 15)
-                            .overlay { Circle().frame(width: 10) }
+                            .overlay {
+                                Circle()
+                                    .frame(width: 8)
+                                    .scaleEffect(itemVM.selectedOder == order ? 1 : 0)
+                            }
 
-                        Text("\(orderType)").tracking(3)
+                        Text(order.text).tracking(3)
+                    }
+                    .onTapGesture {
+                        withAnimation {
+                            itemVM.selectedOder = order
+                        }
                     }
                 }
             }
 
             Divider().background(Color.white)
 
+            /// お気に入り絞り込みメニュー
             HStack(spacing: 20) {
-                Circle()
-                    .stroke(lineWidth: 1)
+                Circle().stroke(lineWidth: 1)
                     .frame(width: 15, height: 15)
-                    .overlay { Circle().frame(width: 10) }
+                    .overlay {
+                        Circle().frame(width: 8)
+                            .scaleEffect(itemVM.filterFavorite ? 1 : 0)
+                    }
 
                 Text("お気に入りのみ表示").tracking(2)
+            }
+            .onTapGesture {
+                withAnimation(.spring(response: 0.5)) {
+                    itemVM.filterFavorite.toggle()
+                }
             }
 
             Spacer()
@@ -121,18 +167,13 @@ struct ItemSortManuView: View {
         .padding(.top)
         .opacity(isOpen ? 1 : 0)
     }
-    @ViewBuilder
-    func CustomDivider(_ color: Color) -> some View {
-        Rectangle()
-            .frame(height: 1)
-            .foregroundColor(color)
-            .opacity(0.4)
-    }
 }
 
 struct SortItemView_Previews: PreviewProvider {
     static var previews: some View {
-        ItemSortManuView(userColor: .gray)
+        ItemSortManuView(userColor: .gray,
+                         itemVM: ItemViewModel()
+        )
     }
 }
 
