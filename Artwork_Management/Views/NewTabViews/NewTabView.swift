@@ -123,6 +123,7 @@ struct NewTabView: View {
                 .background {
                     ZStack {
                         GeometryReader { proxy in
+                            Color.black.ignoresSafeArea()
                             // チーム背景編集による選択画像URLが存在する場合、そちらを優先して背景表示する
                             SDWebImageBackgroundView(
                                 imageURL: backgroundVM.selectBackground?.imageURL ??

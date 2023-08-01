@@ -52,13 +52,14 @@ extension Item {
     }
 }
 
+/// アイテムの昇順・降順を管理する列挙体。
 enum UpDownOrder: CaseIterable {
     case up, down
 
     var text: String {
         switch self {
         case .up: return "昇順"
-        case .down: return "降り順"
+        case .down: return "降順"
         }
     }
 
@@ -70,6 +71,7 @@ enum UpDownOrder: CaseIterable {
     }
 }
 
+/// アイテムのソートタイプを管理する列挙体。
 enum ItemsSortType: CaseIterable {
     case name, updateTime, createTime, sales
 
@@ -116,20 +118,4 @@ var sampleItems: [Item] =
              inventory: 180,
              totalAmount: 20,
              totalInventory: 200),
-
-    Item(tag: "goods",
-             teamID: "",
-             name: "サンプル３",
-             author: "ユニコ太郎",
-             detail: "ここにアイテムの詳細メモが入ります。",
-         photoURL: URL(string: "https://firebasestorage.googleapis.com/v0/b/unico-cc222.appspot.com/o/sample%2Fcloth_sample2.jpg?alt=media&token=33f82ceb-f40d-4719-b453-f4d4f131b936&_gl=1*907n73*_ga*Njc5ODMwMzQzLjE2NzY5Nzg1MDE.*_ga_CW55HF8NVT*MTY4NjM4NTk5Ny42Mi4xLjE2ODYzODYwNTkuMC4wLjA."),
-             photoPath: nil,
-             favorite: false,
-             cost: 2000,
-             price: 3500,
-             amount: 0,
-             sales: 35000,
-             inventory: 90,
-             totalAmount: 10,
-             totalInventory: 100),
 ]
