@@ -172,14 +172,14 @@ struct NewItemsView: View {
                 .onDisappear { print("カード詳細onDisappear") }
             }
         }
-        .overlay(alignment: .bottomTrailing) {
-            
-            FilteringFavoriteItemButton()
-                .padding(.trailing, 40)
-                .padding(.bottom, 20)
-                .opacity(showDetailView ? 0 : 1)
-            
-        }
+//        .overlay(alignment: .bottomTrailing) {
+//
+//            FilteringFavoriteItemButton()
+//                .padding(.trailing, 40)
+//                .padding(.bottom, 20)
+//                .opacity(showDetailView ? 0 : 1)
+//
+//        }
         .overlay {
             ItemSortManuView(userColor: userVM.user?.userColor ?? .blue)
         }

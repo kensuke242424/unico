@@ -11,30 +11,30 @@ import SwiftUI
 /// 画面の右下に位置し、ボタンタップによりメニューが開く。
 struct ItemSortManuView: View {
 
-    let menuWidth: CGFloat = 220
-    let menuHeight: CGFloat = 350
+    let menuWidth: CGFloat = 300
+    let menuHeight: CGFloat = 490
     let buttonSize: CGFloat = 60
     let userColor: ThemeColor
 
     /// View properties
-    @State private var isOpen: Bool = false
+    @State private var isOpen: Bool = true
     @Namespace private var animation
 
     var body: some View {
 
         Color.clear
             .allowsHitTesting(true)
-            .onTapGesture {
-                print("タップを検知")
-            }
             .overlay(alignment: .bottomTrailing) {
                 if isOpen {
+
                     userColor.color2.opacity(0.8)
+                        .transition(.scale)
                         .background(BlurView(style: .systemUltraThinMaterial))
                         .clipShape(RoundedRectangle(cornerRadius: 20))
+                        .overlay { SortMenu() }
                         .matchedGeometryEffect(id: "MENU", in: animation)
-                        .transition(.scale)
                         .frame(width: menuWidth, height: menuHeight)
+
                 } else {
                     userColor.color2.opacity(0.8)
                         .background(BlurView(style: .systemUltraThinMaterial))
@@ -49,7 +49,6 @@ struct ItemSortManuView: View {
                     withAnimation(.spring(response: 0.35)) {
                         isOpen.toggle()
                     }
-
                 } label: {
                     ZStack {
                         Circle()
@@ -62,6 +61,72 @@ struct ItemSortManuView: View {
                 }
             }
             .padding(.trailing)
+    }
+    @ViewBuilder
+    func SortMenu() -> some View {
+        let sortTypes: [String] = ["名前", "追加日", "更新日", "売り上げ"]
+        let orderTypes: [String] = ["昇順", "降り順"]
+        VStack(alignment: .leading, spacing: 30) {
+
+            VStack(alignment: .leading) {
+                Text("並び替え").tracking(7).font(.title2)
+                Divider().background(Color.white)
+            }
+
+            VStack(alignment: .leading, spacing: 30) {
+                ForEach(sortTypes, id: \.self) { sortType in
+                    HStack(spacing: 20) {
+                        Circle()
+                            .stroke(lineWidth: 1)
+                            .frame(width: 15, height: 15)
+                            .overlay { Circle().frame(width: 10) }
+
+                        Text("\(sortType)")
+                    }
+                }
+            }
+            .tracking(3)
+            .offset(x: 20)
+
+            Divider().background(Color.white)
+
+            HStack(spacing: 30) {
+                ForEach(orderTypes, id: \.self) { orderType in
+                    HStack(spacing: 20) {
+                        Circle()
+                            .stroke(lineWidth: 1)
+                            .frame(width: 15, height: 15)
+                            .overlay { Circle().frame(width: 10) }
+
+                        Text("\(orderType)").tracking(3)
+                    }
+                }
+            }
+
+            Divider().background(Color.white)
+
+            HStack(spacing: 20) {
+                Circle()
+                    .stroke(lineWidth: 1)
+                    .frame(width: 15, height: 15)
+                    .overlay { Circle().frame(width: 10) }
+
+                Text("お気に入りのみ表示").tracking(2)
+            }
+
+            Spacer()
+        }
+        .foregroundColor(.white)
+        .padding(20)
+        .padding(.top)
+        .opacity(isOpen ? 1 : 0)
+    }
+    @ViewBuilder
+    func CustomDivider(_ color: Color) -> some View {
+        Rectangle()
+            .frame(height: 1)
+            .foregroundColor(color)
+            .opacity(0.4)
     }
 }
 
