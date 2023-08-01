@@ -18,13 +18,6 @@ class ItemViewModel: ObservableObject {
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
 
     @Published var items: [Item] = []
-    // アイテムの中にタグが未グループのものがあるかどうか
-    var unsetTag: Bool {
-        let result = self.items.contains(where: { $0.tag == "未グループ" })
-        print("タグ未グループアイテムの有無: \(result)")
-        return result
-    }
-    let emptyName: String = "No Name"
 
     func fetchItem(teamID: String) async {
 
