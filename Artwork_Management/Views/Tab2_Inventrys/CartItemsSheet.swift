@@ -98,11 +98,12 @@ struct CartItemRow: View {
                 Spacer()
 
                 VStack(alignment: .trailing, spacing: 30) {
-                    Text(itemRow.name == "" ? "No Name" : itemRow.name)
+                    CustomOneLineLimitText(text: itemRow.name == "" ?
+                                           "No Name" : itemRow.name,
+                                           limit: 12)
                         .foregroundColor(.black)
                         .opacity(0.8)
                         .font(.title3.bold())
-                        .lineLimit(1)
 
                     HStack(alignment: .bottom, spacing: 20) {
 

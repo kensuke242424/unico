@@ -62,13 +62,22 @@ struct ApplicationSettingView: View {
                     .opacity(0.7)
                     .padding([.top, .leading], 10)
 
+                    BackgroundCategoriesTagView()
+                        .scaleEffect(0.9)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.top)
+
+
                     SelectionColorList()
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .foregroundColor(.white)
 
+            Spacer().frame(height: 100)
+
         } // VStack
+        .padding(5)
         .customNavigationTitle(title: "アプリ設定")
         .customSystemBackground()
         .customBackButton()
@@ -78,9 +87,11 @@ struct ApplicationSettingView: View {
             selectedColor = userVM.memberColor
             darkModeToggle = applicationDarkMode
         }
+        .onChange(of: selectedColor) { newColor in
+            userVM.updateUserThemeColor(selected: newColor ?? .blue)
+        }
         .onDisappear {
             // 画面破棄時に選択内容を保存
-            userVM.updateUserThemeColor(selected: selectedColor ?? .blue)
             applicationDarkMode = darkModeToggle
         } // SCrollView
     }
@@ -105,11 +116,16 @@ struct ApplicationSettingView: View {
                             .fill(color.color3)
                             .frame(width: 100, height: 20)
                     }
+                    .padding(.vertical, 5)
                 }
                 .listRowBackground(Color.gray.opacity(0.2))
             }
             .scrollContentBackground(.hidden)
             .environment(\.editMode, .constant(.active))
+            .introspectTableView(customize: { list in
+                list.showsVerticalScrollIndicator = false
+                list.isDirectionalLockEnabled = true
+            })
             .frame(height: CGFloat(ThemeColor.allCases.count) * 50)
         }
     }
