@@ -26,6 +26,7 @@ struct ArtworkManagementApp: App {
         WindowGroup {
             RootView()
                 .environmentObject(NavigationViewModel())
+                .environmentObject(NotificationViewModel())
                 .environmentObject(LogInViewModel())
                 .environmentObject(TeamViewModel())
                 .environmentObject(UserViewModel())
