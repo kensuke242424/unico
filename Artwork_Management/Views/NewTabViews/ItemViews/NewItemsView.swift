@@ -366,6 +366,7 @@ struct NewItemsView: View {
     private func FavoriteButton(_ item: Item) -> some View {
         Button {
             itemVM.updateFavorite(item)
+            userVM.updateFavorite(item.id)
         } label: {
             if item.favorite {
                 Image(systemName: "heart.fill")

@@ -27,6 +27,7 @@ struct User: Identifiable, Codable, Equatable {
     var userColor: ThemeColor
     var joins: [JoinTeam]
     var myBackgrounds: [Background] = []
+    var favorites: [String] = []
     var lastLogIn: String?
 }
 

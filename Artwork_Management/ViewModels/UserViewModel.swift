@@ -155,6 +155,25 @@ class UserViewModel: ObservableObject {
         }
     }
 
+    func updateFavorite(_ itemID: String?) {
+        guard var userData = user else { return }
+        guard let itemID else { return }
+        guard let userRef = db?.collection("users").document(userData.id) else { return }
+
+        let index = userData.favorites.firstIndex(where: { $0 == itemID })
+        if let index {
+            userData.favorites.remove(at: index)
+            print("お気に入りを削除")
+        } else {
+            userData.favorites.append(itemID)
+            print("お気に入りを追加")
+        }
+
+        do {
+            _ = try? userRef.setData(from: userData)
+        }
+    }
+
     func addNewJoinTeam(newJoinTeam: JoinTeam) async throws {
 
         guard let uid = uid, var user = user else { throw CustomError.uidEmpty }
