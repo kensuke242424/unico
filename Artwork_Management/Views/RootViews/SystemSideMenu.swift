@@ -64,400 +64,410 @@ struct SystemSideMenu: View {
 
     var body: some View {
 
-        ZStack {
+        VStack(alignment: .leading) {
+
+            /// サイドメニューを閉じるボタンと所属チームアイコン群が並んだビュー領域
+            HStack {
+                Button {
+                    withAnimation(.spring(response: 0.3, blendDuration: 1)) {
+                        inputTab.showSideMenu = false
+                    }
+                } label: {
+                    Image(systemName: "multiply.circle.fill")
+                        .font(.title)
+                        .foregroundColor(.white.opacity(0.4))
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                JoinTeamsSideMenuIcon(teams: userVM.user!.joins)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                    .alert("", isPresented: $inputSideMenu.isShowChangeTeamAlert) {
+                        Button("キャンセル") {}
+                        Button("移動する") {
+                            // フェッチするチームデータを管理するUserModel内のlastLogInの値を更新後に、再fetchを実行
+                            Task {
+                                inputSideMenu.showChangeTeamSheet = false
+                                await userVM.updateLastLogInTeam(selected: inputSideMenu.selectedTeam)
+                                withAnimation(.spring(response: 0.5)) {
+                                    progressVM.showCubesProgress = true
+                                    inputTab.showSideMenu = false
+                                }
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                    withAnimation(.spring(response: 0.2)) {
+                                        logInVM.rootNavigation = .fetch
+                                    }
+                                }
+                            }
+                        }
+                    } message: {
+                        Text("\(inputSideMenu.selectedTeam?.name ?? "No Name")に移動しますか？")
+                    } // team change Alert
+            }
+            .frame(width: getRect().width * 0.7)
+            .padding(.top, getSafeArea().top + 10)
+            .padding(.bottom)
+
+            /// チームアイコンとチーム名
+            VStack(alignment: .leading, spacing: 15) {
+                let iconSize = getRect().width / 3 + 20
+                let teamName: String = teamVM.team?.name ?? "No Name"
+
+                SDWebImageCircleIcon(imageURL: teamVM.team?.iconURL,
+                                     width   : iconSize,
+                                     height  : iconSize)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .onTapGesture {
+                    withAnimation(.spring(response: 0.5)) { inputTab.showUpdateTeam.toggle() }
+                }
+
+                CustomOneLineLimitText(text: teamName, limit: 20)
+                    .font(.title3)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: teamName.count >= 8 ? .infinity : iconSize,
+                           alignment: teamName.count >= 8 ? .leading : .center)
+            }
+
+            ScrollView(showsIndicators: false) {
+                /// メニュー列全体
+                VStack(alignment: .leading, spacing: 60) {
+
+                    // Item Menu...
+                    VStack(alignment: .leading) {
+
+                        SideMenuButton(open: $inputSideMenu.item, title: "アイテム", image: "shippingbox")
+
+                        if inputSideMenu.item {
+
+                            VStack(alignment: .leading, spacing: 40) {
+                                Label("アイテム追加", systemImage: "shippingbox.fill")
+                                    .onTapGesture { navigationVM.path.append(EditItemPath.create) }
+                            }
+                            .foregroundColor(.white)
+                            .frame(width: 210, height: menuRowHeight, alignment: .topLeading)
+                            .offset(x: 20, y: 30)
+                        }
+                    }
+
+                    // Tag Menu...
+                    VStack(alignment: .leading) {
+
+                        HStack {
+
+                            SideMenuButton(open: $inputSideMenu.tag, title: "タグ", image: "tag")
+
+                            if inputSideMenu.tag {
+
+                                if tagVM.tags.count > 2 {
+                                    Button {
+                                        withAnimation {
+                                            inputSideMenu.editMode = inputSideMenu.editMode.isEditing ? .inactive : .active
+                                        }
+                                    } label: {
+                                        Image(systemName: inputSideMenu.editMode.isEditing ? "gearshape.fill" : "gearshape")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 16)
+                                            .foregroundColor(.gray)
+                                            .padding(4)
+                                            .background {
+                                                Circle()
+                                                    .fill(.white.gradient)
+                                                    .shadow(radius: 3, x: 1, y: 1)
+                                            }
+                                    }
+                                    .offset(x: 20)
+                                }
+
+                                Button {
+                                    withAnimation(.easeInOut(duration: 0.3)) {
+                                        inputTab.selectedTag = nil
+                                        tagVM.showEdit = true
+                                    }
+                                } label: {
+                                    Image(systemName: "plus")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 10)
+                                        .foregroundColor(.gray)
+                                        .padding(6)
+                                        .background {
+                                            Circle()
+                                                .fill(.white.gradient)
+                                                .shadow(radius: 3, x: 1, y: 1)
+                                        }
+                                }
+                                .offset(x: 27)
+                            }
+                        } // HStack
+                        .onChange(of: inputSideMenu.tag) { newValue in
+                            if !newValue {
+                                inputSideMenu.editMode = .inactive
+                            }
+                        }
+
+                        if inputSideMenu.tag {
+
+                            Spacer(minLength: 0)
+
+                            if tagVM.tags.count > 2 {
+                                List {
+
+                                    ForEach(Array(tagVM.tags.enumerated()), id: \.offset) { offset, tag in
+
+                                        if tag != tagVM.tags.first! && tag != tagVM.tags.last! {
+                                            HStack {
+                                                Image(systemName: "tag.fill")
+                                                    .font(.caption)
+                                                    .foregroundColor(
+                                                        userVM.user?.userColor.colorAccent ?? .gray
+                                                    )
+                                                    .opacity(0.6)
+
+                                                Text(tag.tagName)
+                                                    .lineLimit(1)
+                                                    .frame(alignment: .leading)
+                                                    .foregroundColor(.white)
+
+                                                Spacer()
+
+                                                if inputSideMenu.editMode == .inactive {
+                                                    Image(systemName: "highlighter")
+                                                        .foregroundColor(.orange)
+                                                        .opacity(inputSideMenu.editMode.isEditing ? 0.0 : 0.6)
+                                                        .onTapGesture {
+                                                            withAnimation(.easeInOut(duration: 0.3)) {
+                                                                inputTab.selectedTag = tag
+                                                                tagVM.showEdit = true
+                                                            }
+                                                        }
+                                                }
+                                            } // HStack
+                                            .overlay {
+                                                if colorScheme == .light {
+                                                    Image(systemName: "line.3.horizontal")
+                                                        .foregroundColor(.gray)
+                                                        .opacity(inputSideMenu.editMode.isEditing ? 0.6 : 0.0)
+                                                        .frame(width: UIScreen.main.bounds.width * 0.58, alignment: .leading)
+                                                        .offset(x: UIScreen.main.bounds.width * 0.44)
+                                                }
+                                            }
+                                            .listRowBackground(Color.clear)
+                                        }
+                                    }
+                                    .onDelete(perform: rowRemove)
+                                    .onMove(perform: rowReplace)
+                                } // List
+                                .environment(\.editMode, $inputSideMenu.editMode)
+                                .frame(width: UIScreen.main.bounds.width / 2 + 60,
+                                       height: menuRowHeight + (40 * CGFloat(tagVM.tags.count - 2)))
+                                .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
+                                .scrollContentBackground(.hidden)
+                                .offset(x: -10)
+                            } else {
+
+                                Text("登録タグはありません")
+                                    .font(.subheadline).foregroundColor(.white)
+                                    .opacity(0.7)
+                                    .frame(height: menuRowHeight)
+                                    .offset(y: 30)
+
+                            } // if tagVM.tags.count > 2
+                        } // if inputSideMenu.tag...
+                    }
+
+                    // Team menu...
+                    VStack(alignment: .leading) {
+
+                        SideMenuButton(open: $inputSideMenu.team, title: "チーム", image: "cube.transparent")
+
+                        if inputSideMenu.team {
+
+                            VStack(alignment: .leading, spacing: 40) {
+
+                                Label("チーム情報変更", systemImage: "cube.transparent.fill")
+                                    .onTapGesture {
+                                        withAnimation(.spring(response: 0.5)) { inputTab.showUpdateTeam.toggle() }
+                                    }
+
+                                Label("メンバー招待", systemImage: "person.wave.2.fill")
+                                    .onTapGesture {
+                                        withAnimation(.spring(response: 0.5, blendDuration: 1)) {
+                                            teamVM.isShowSearchedNewMemberJoinTeam.toggle()
+                                        }
+                                    }
+
+                                Label("チームを追加", systemImage: "person.2.crop.square.stack.fill")
+                                    .onTapGesture { inputSideMenu.isShowCreateTeamAlert.toggle() }
+                                    .alert("", isPresented: $inputSideMenu.isShowCreateTeamAlert) {
+                                        Button("戻る") {}
+                                        Button("はい") {
+                                            withAnimation(.spring(response: 0.5)) {
+                                                inputTab.showSideMenu = false
+                                            }
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                                withAnimation(.spring(response: 0.7)) {
+                                                    logInVM.rootNavigation = .join
+                                                }
+                                            }
+                                        }
+                                    } message: {
+                                        Text("新規チームの追加画面に移動します。")
+                                    } // alert
+
+                                Label("チームを変更", systemImage: "repeat")
+                                    .onTapGesture { inputSideMenu.showChangeTeamSheet.toggle() }
+
+                                Label("背景の変更", systemImage: "photo.artframe")
+                                    .onTapGesture {
+                                        withAnimation(.spring(response: 0.4, blendDuration: 1)) {
+                                            inputTab.showSideMenu = false
+                                        }
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                            withAnimation(.spring(response: 0.7, blendDuration: 1)) {
+                                                backgroundVM.showEdit.toggle()
+                                            }
+                                        }
+                                    }
+
+                            } // VStack
+                            .foregroundColor(.white)
+                            // メニュー一つ分のheight = コンテンツ数 * 60
+                            .frame(width: 210, height: menuRowHeight * 5, alignment: .topLeading)
+                            .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
+                            .offset(x: 20, y: 30)
+                        }
+                    }
+
+                    // Account Menu...
+                    VStack(alignment: .leading) {
+
+                        SideMenuButton(open: $inputSideMenu.account, title: "アカウント", image: "person")
+
+                        if inputSideMenu.account {
+
+                            VStack(alignment: .leading, spacing: 40) {
+
+                                Label("ユーザー情報変更", systemImage: "person.fill")
+                                    .onTapGesture {
+                                        withAnimation(.spring(response: 0.5)) { inputTab.showUpdateUser.toggle() }
+                                    }
+
+                                Label("アカウント登録", systemImage: "person.crop.square.filled.and.at.rectangle.fill")
+                                    .onTapGesture {
+                                        inputSideMenu.showUserEntrySheet.toggle()
+                                    }
+                                    .offset(x: -3)
+
+
+                                Label("ログアウト", systemImage: "door.right.hand.open")
+                                    .foregroundColor(.orange)
+                                    .onTapGesture { inputSideMenu.isShowLogOutAlert.toggle() }
+
+                            } // VStack
+                            .foregroundColor(.white)
+                            // メニュー一つ分のheight = コンテンツ数 * 60
+                            .frame(width: 210, height: menuRowHeight * 3, alignment: .topLeading)
+                            .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
+                            .offset(x: 20, y: 30)
+                            .alert("確認", isPresented: $inputSideMenu.isShowLogOutAlert) {
+                                Button("戻る") { inputSideMenu.isShowLogOutAlert.toggle() }
+                                Button("ログアウト") {
+                                    progressVM.showLoading.toggle()
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                                        progressVM.showLoading.toggle()
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                            withAnimation(.easeIn(duration: 0.5)) {
+                                                logInVM.rootNavigation = .logIn
+                                                logInVM.logOut()
+                                            }
+                                        }
+                                    }
+                                }
+                            } message: {
+                                if userVM.isAnonymous {
+                                    Text("お試し中にログアウトすると、元のデータに再度ログインすることはできません。ログアウトしますか？")
+                                } else {
+                                    Text("アカウントからログアウトして、ログイン画面に戻ります。よろしいですか？")
+                                }
+                            } // alert
+                        }
+                    }
+
+                    // Help Menu...
+                    VStack(alignment: .leading) {
+
+                        SideMenuButton(open: $inputSideMenu.help, title: "システム", image: "gearshape")
+
+                        if inputSideMenu.help {
+
+                            VStack(alignment: .leading, spacing: 40) {
+
+                                Label("アプリ設定", systemImage: "paintbrush.pointed.fill")
+                                    .onTapGesture { navigationVM.path.append(ApplicationSettingPath.root)
+                                    }
+
+                                Label("ホーム編集", systemImage: "house.fill")
+                                    .onTapGesture {
+                                        withAnimation(.spring(response: 0.4, blendDuration: 1)) {
+                                            inputTab.showSideMenu = false
+                                        }
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                            withAnimation(.spring(response: 0.7, blendDuration: 1)) {
+                                                homeVM.isActiveEdit.toggle()
+                                            }
+                                        }
+                                    }
+
+                                Label("システム設定", systemImage: "gearshape.fill")
+                                    .onTapGesture { navigationVM.path.append(SystemPath.root)
+                                    }
+
+                            } // VStack
+                            .foregroundColor(.white)
+                            // メニュー一つ分のheight = コンテンツ数 * 60
+                            .frame(width: 210, height: menuRowHeight * 3, alignment: .topLeading)
+                            .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
+                            .offset(x: 20, y: 30)
+
+                        }
+                    }
+                    /// スクロール下に余白を作るため
+                    Color.clear
+                        .frame(height: 150)
+                } // VStack(メニュー列全体)
+                .frame(maxWidth: .infinity)
+                .padding(.top)
+
+            } // ScrollView
+            .frame(maxWidth: .infinity)
+            .padding(.top)
+
+        } // VStack
+        .padding(.leading)
+        .background {
             // Blur View...
             BlurView(style: .systemUltraThinMaterialDark)
             userVM.memberColor.color2
                 .opacity(0.7)
                 .blur(radius: 15)
-                .overlay(alignment: .topLeading) {
-                    Button {
-                        withAnimation(.spring(response: 0.3, blendDuration: 1)) {
-                            inputTab.showSideMenu = false
-                        }
-                    } label: {
-                        Image(systemName: "multiply.circle.fill")
-                            .font(.title).foregroundColor(.white.opacity(0.4))
-                            .padding(.leading)
-                            .padding(.top, getSafeArea().top)
-                    }
-                }
-                .overlay(alignment: .topTrailing) {
-                    JoinTeamsSideMenuIcon(teams: userVM.user!.joins)
-                        .padding(.trailing, 90)
-                        .padding(.top, getSafeArea().top + 10)
-                }
-                .alert("", isPresented: $inputSideMenu.isShowChangeTeamAlert) {
-                    Button("キャンセル") {}
-                    Button("移動する") {
-                        // フェッチするチームデータを管理するUserModel内のlastLogInの値を更新後に、再fetchを実行
-                        Task {
-                            inputSideMenu.showChangeTeamSheet = false
-                            await userVM.updateLastLogInTeam(selected: inputSideMenu.selectedTeam)
-                            withAnimation(.spring(response: 0.5)) {
-                                progressVM.showCubesProgress = true
-                                inputTab.showSideMenu = false
-                            }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                withAnimation(.spring(response: 0.2)) {
-                                    logInVM.rootNavigation = .fetch
-                                }
-                            }
-                        }
-                    }
-                } message: {
-                    Text("\(inputSideMenu.selectedTeam?.name ?? "No Name")に移動しますか？")
-                } // team change Alert
+        }
+        .clipShape(SideMenuShape())
+        .contentShape(SideMenuShape())
+        .background(
 
-            VStack {
+            SideMenuShape()
+                .stroke(
+                    .linearGradient(.init(colors: [
+                        Color.customLightGray1,
+                        Color.customLightGray1.opacity(0.7),
+                        Color.customLightGray1.opacity(0.5),
+                        Color.clear
+                    ]), startPoint: .top, endPoint: .bottom),
+                    lineWidth: 7)
+                .padding(.leading, -50)
 
-                VStack(alignment: .leading, spacing: 20) {
-                    
-                    SDWebImageCircleIcon(imageURL: teamVM.team?.iconURL,
-                                         width   : getRect().width / 3 + 20,
-                                         height  : getRect().width / 3 + 20)
-                    .onTapGesture {
-                        withAnimation(.spring(response: 0.5)) { inputTab.showUpdateTeam.toggle() }
-                    }
-                    .overlay(alignment: .bottom) {
-                        if teamVM.team!.name.count < 12 {
-                            Text(teamVM.team!.name)
-                                .font(.title3.bold()).foregroundColor(.white)
-                                .frame(width: getRect().width * 0.7)
-                                .offset(y: 35)
-                        }
-                    }
-                    if teamVM.team!.name.count >= 12 {
-                        Text(teamVM.team!.name)
-                            .font(.title3.bold()).foregroundColor(.white)
-                            .frame(width: getRect().width * 0.7)
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding()
-                .padding(.vertical)
-                
-                Spacer(minLength: 40)
-                
-                HStack {
-                    ScrollView(showsIndicators: false) {
-                        VStack(alignment: .leading, spacing: 60) {
-                            
-                            // Item Menu...
-                            VStack(alignment: .leading) {
-                                
-                                SideMenuButton(open: $inputSideMenu.item, title: "アイテム", image: "shippingbox")
-                                
-                                if inputSideMenu.item {
-                                    
-                                    VStack(alignment: .leading, spacing: 40) {
-                                        Label("アイテム追加", systemImage: "shippingbox.fill")
-                                            .onTapGesture { navigationVM.path.append(EditItemPath.create) }
-                                    }
-                                    .foregroundColor(.white)
-                                    .frame(width: 210, height: menuRowHeight, alignment: .topLeading)
-                                    .offset(x: 20, y: 30)
-                                }
-                            }
-                            
-                            // Tag Menu...
-                            VStack(alignment: .leading) {
-                                
-                                HStack {
-                                    
-                                    SideMenuButton(open: $inputSideMenu.tag, title: "タグ", image: "tag")
-                                    
-                                    if inputSideMenu.tag {
-                                        
-                                        if tagVM.tags.count > 2 {
-                                            Button {
-                                                withAnimation {
-                                                    inputSideMenu.editMode = inputSideMenu.editMode.isEditing ? .inactive : .active
-                                                }
-                                            } label: {
-                                                Image(systemName: inputSideMenu.editMode.isEditing ? "gearshape.fill" : "gearshape")
-                                                    .resizable()
-                                                    .scaledToFit()
-                                                    .frame(width: 16)
-                                                    .foregroundColor(.gray)
-                                                    .padding(4)
-                                                    .background {
-                                                        Circle()
-                                                        .fill(.white.gradient)
-                                                        .shadow(radius: 3, x: 1, y: 1)
-                                                    }
-                                            }
-                                            .offset(x: 20)
-                                        }
-
-                                        Button {
-                                            withAnimation(.easeInOut(duration: 0.3)) {
-                                                inputTab.selectedTag = nil
-                                                tagVM.showEdit = true
-                                            }
-                                        } label: {
-                                            Image(systemName: "plus")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 10)
-                                                .foregroundColor(.gray)
-                                                .padding(6)
-                                                .background {
-                                                    Circle()
-                                                    .fill(.white.gradient)
-                                                    .shadow(radius: 3, x: 1, y: 1)
-                                                }
-                                        }
-                                        .offset(x: 27)
-                                    }
-                                } // HStack
-                                .onChange(of: inputSideMenu.tag) { newValue in
-                                    if !newValue {
-                                        inputSideMenu.editMode = .inactive
-                                    }
-                                }
-                                
-                                if inputSideMenu.tag {
-                                    
-                                    Spacer(minLength: 0)
-                                    
-                                    if tagVM.tags.count > 2 {
-                                        List {
-                                            
-                                            ForEach(Array(tagVM.tags.enumerated()), id: \.offset) { offset, tag in
-                                                
-                                                if tag != tagVM.tags.first! && tag != tagVM.tags.last! {
-                                                    HStack {
-                                                        Image(systemName: "tag.fill")
-                                                            .font(.caption)
-                                                            .foregroundColor(
-                                                                userVM.user?.userColor.colorAccent ?? .gray
-                                                            )
-                                                            .opacity(0.6)
-                                                        
-                                                        Text(tag.tagName)
-                                                            .lineLimit(1)
-                                                            .frame(alignment: .leading)
-                                                            .foregroundColor(.white)
-                                                        
-                                                        Spacer()
-                                                        
-                                                        if inputSideMenu.editMode == .inactive {
-                                                            Image(systemName: "highlighter")
-                                                                .foregroundColor(.orange)
-                                                                .opacity(inputSideMenu.editMode.isEditing ? 0.0 : 0.6)
-                                                                .onTapGesture {
-                                                                    withAnimation(.easeInOut(duration: 0.3)) {
-                                                                        inputTab.selectedTag = tag
-                                                                        tagVM.showEdit = true
-                                                                    }
-                                                                }
-                                                        }
-                                                    } // HStack
-                                                    .overlay {
-                                                        if colorScheme == .light {
-                                                            Image(systemName: "line.3.horizontal")
-                                                                .foregroundColor(.gray)
-                                                                .opacity(inputSideMenu.editMode.isEditing ? 0.6 : 0.0)
-                                                                .frame(width: UIScreen.main.bounds.width * 0.58, alignment: .leading)
-                                                                .offset(x: UIScreen.main.bounds.width * 0.44)
-                                                        }
-                                                    }
-                                                    .listRowBackground(Color.clear)
-                                                }
-                                            }
-                                            .onDelete(perform: rowRemove)
-                                            .onMove(perform: rowReplace)
-                                        } // List
-                                        .environment(\.editMode, $inputSideMenu.editMode)
-                                        .frame(width: UIScreen.main.bounds.width / 2 + 60,
-                                               height: menuRowHeight + (40 * CGFloat(tagVM.tags.count - 2)))
-                                        .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
-                                        .scrollContentBackground(.hidden)
-                                        .offset(x: -10)
-                                    } else {
-
-                                        Text("登録タグはありません")
-                                            .font(.subheadline).foregroundColor(.white)
-                                            .opacity(0.7)
-                                            .frame(height: menuRowHeight)
-                                            .offset(y: 30)
-
-                                    } // if tagVM.tags.count > 2
-                                } // if inputSideMenu.tag...
-                            }
-
-                            // Team menu...
-                            VStack(alignment: .leading) {
-
-                                SideMenuButton(open: $inputSideMenu.team, title: "チーム", image: "cube.transparent")
-
-                                if inputSideMenu.team {
-
-                                    VStack(alignment: .leading, spacing: 40) {
-
-                                        Label("チーム情報変更", systemImage: "cube.transparent.fill")
-                                            .onTapGesture {
-                                                withAnimation(.spring(response: 0.5)) { inputTab.showUpdateTeam.toggle() }
-                                            }
-
-                                        Label("メンバー招待", systemImage: "person.wave.2.fill")
-                                            .onTapGesture {
-                                                withAnimation(.spring(response: 0.5, blendDuration: 1)) {
-                                                    teamVM.isShowSearchedNewMemberJoinTeam.toggle()
-                                                }
-                                            }
-
-                                        Label("チームを追加", systemImage: "person.2.crop.square.stack.fill")
-                                            .onTapGesture { inputSideMenu.isShowCreateTeamAlert.toggle() }
-                                            .alert("", isPresented: $inputSideMenu.isShowCreateTeamAlert) {
-                                                Button("戻る") {}
-                                                Button("はい") {
-                                                    withAnimation(.spring(response: 0.5)) {
-                                                        inputTab.showSideMenu = false
-                                                    }
-                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                                        withAnimation(.spring(response: 0.7)) {
-                                                            logInVM.rootNavigation = .join
-                                                        }
-                                                    }
-                                                }
-                                            } message: {
-                                                Text("新規チームの追加画面に移動します。")
-                                            } // alert
-                                        
-                                        Label("チームを変更", systemImage: "repeat")
-                                            .onTapGesture { inputSideMenu.showChangeTeamSheet.toggle() }
-
-                                        Label("背景の変更", systemImage: "photo.artframe")
-                                            .onTapGesture {
-                                                withAnimation(.spring(response: 0.4, blendDuration: 1)) {
-                                                    inputTab.showSideMenu = false
-                                                }
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                                    withAnimation(.spring(response: 0.7, blendDuration: 1)) {
-                                                        backgroundVM.showEdit.toggle()
-                                                    }
-                                                }
-                                            }
-
-                                    } // VStack
-                                    .foregroundColor(.white)
-                                    // メニュー一つ分のheight = コンテンツ数 * 60
-                                    .frame(width: 210, height: menuRowHeight * 5, alignment: .topLeading)
-                                    .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
-                                    .offset(x: 20, y: 30)
-                                }
-                            }
-
-                            // Account Menu...
-                            VStack(alignment: .leading) {
-
-                                SideMenuButton(open: $inputSideMenu.account, title: "アカウント", image: "person")
-
-                                if inputSideMenu.account {
-
-                                    VStack(alignment: .leading, spacing: 40) {
-
-                                        Label("ユーザー情報変更", systemImage: "person.fill")
-                                            .onTapGesture {
-                                                withAnimation(.spring(response: 0.5)) { inputTab.showUpdateUser.toggle() }
-                                            }
-
-                                        Label("アカウント登録", systemImage: "person.crop.square.filled.and.at.rectangle.fill")
-                                            .onTapGesture {
-                                                inputSideMenu.showUserEntrySheet.toggle()
-                                            }
-                                            .offset(x: -3)
-
-
-                                        Label("ログアウト", systemImage: "door.right.hand.open")
-                                            .foregroundColor(.orange)
-                                            .onTapGesture { inputSideMenu.isShowLogOutAlert.toggle() }
-
-                                    } // VStack
-                                    .foregroundColor(.white)
-                                    // メニュー一つ分のheight = コンテンツ数 * 60
-                                    .frame(width: 210, height: menuRowHeight * 3, alignment: .topLeading)
-                                    .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
-                                    .offset(x: 20, y: 30)
-                                    .alert("確認", isPresented: $inputSideMenu.isShowLogOutAlert) {
-                                        Button("戻る") { inputSideMenu.isShowLogOutAlert.toggle() }
-                                        Button("ログアウト") {
-                                            progressVM.showLoading.toggle()
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                                                progressVM.showLoading.toggle()
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                                    withAnimation(.easeIn(duration: 0.5)) {
-                                                        logInVM.rootNavigation = .logIn
-                                                        logInVM.logOut()
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    } message: {
-                                        if userVM.isAnonymous {
-                                            Text("お試し中にログアウトすると、元のデータに再度ログインすることはできません。ログアウトしますか？")
-                                        } else {
-                                            Text("アカウントからログアウトして、ログイン画面に戻ります。よろしいですか？")
-                                        }
-                                    } // alert
-                                }
-                            }
-
-                            // Help Menu...
-                            VStack(alignment: .leading) {
-
-                                SideMenuButton(open: $inputSideMenu.help, title: "システム", image: "gearshape")
-
-                                if inputSideMenu.help {
-
-                                    VStack(alignment: .leading, spacing: 40) {
-                                        
-                                        Label("アプリ設定", systemImage: "paintbrush.pointed.fill")
-                                            .onTapGesture { navigationVM.path.append(ApplicationSettingPath.root)
-                                            }
-
-                                        Label("ホーム編集", systemImage: "house.fill")
-                                            .onTapGesture {
-                                                withAnimation(.spring(response: 0.4, blendDuration: 1)) {
-                                                    inputTab.showSideMenu = false
-                                                }
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                                    withAnimation(.spring(response: 0.7, blendDuration: 1)) {
-                                                        homeVM.isActiveEdit.toggle()
-                                                    }
-                                                }
-                                            }
-
-                                        Label("システム設定", systemImage: "gearshape.fill")
-                                            .onTapGesture { navigationVM.path.append(SystemPath.root)
-                                            }
-
-                                    } // VStack
-                                    .foregroundColor(.white)
-                                    // メニュー一つ分のheight = コンテンツ数 * 60
-                                    .frame(width: 210, height: menuRowHeight * 3, alignment: .topLeading)
-                                    .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
-                                    .offset(x: 20, y: 30)
-
-                                }
-                            }
-                            /// スクロール下に余白を作るため
-                            Color.clear
-                                .frame(height: 150)
-                        } // VStack(メニュー列全体)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding([.leading, .top])
-
-                    } // ScrollView
-                    .frame(width: UIScreen.main.bounds.width / 2 + 100)
-                    Spacer()
-                }
-            } // VStack
-            .offset(y: UIScreen.main.bounds.height / 12)
-
-        } // ZStack
+        )
         .sheet(isPresented: $inputSideMenu.showChangeTeamSheet) {
             ChangeTeamSheetView(teams: userVM.user?.joins ?? [])
                 .presentationDetents([.medium])
@@ -481,23 +491,7 @@ struct SystemSideMenu: View {
                 inputSideMenu.editMode = .inactive
             }
         }
-        .clipShape(SideMenuShape())
-        .contentShape(SideMenuShape())
-        .background(
 
-            SideMenuShape()
-                .stroke(
-                    .linearGradient(.init(colors: [
-                        Color.customLightGray1,
-                        Color.customLightGray1.opacity(0.7),
-                        Color.customLightGray1.opacity(0.5),
-                        Color.clear
-                    ]), startPoint: .top, endPoint: .bottom),
-                    lineWidth: 7)
-                .padding(.leading, -50)
-
-        )
-        // TODO: トランジションの確認
         .ignoresSafeArea()
         .offset(x: dragOffset)
         .gesture(
@@ -520,7 +514,6 @@ struct SystemSideMenu: View {
                                         initialVelocity: 0.1),
                                         value          : dragOffset
         )
-
     } // body
     
     @ViewBuilder

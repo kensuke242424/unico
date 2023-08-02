@@ -33,6 +33,7 @@ struct NewItemsView: View {
     /// View Properties
     @Environment(\.colorScheme) var colorScheme
     @State private var activeTag: Tag?
+    // TODO: アイテム表示のパターンを作成
     @State private var carouselMode: Bool = false
     /// For Matched Geometry Effect
     @Namespace private var animation
@@ -159,13 +160,13 @@ struct NewItemsView: View {
         } // Geometry
         .overlay {
             if let selectedItem, showDetailView {
-                DetailView(itemVM: itemVM,
+                DetailView(item: selectedItem,
+                           cardHeight: cardHeight,
+                           itemVM: itemVM,
                            cartVM: cartVM,
                            inputTab: $inputTab,
                            show: $showDetailView,
-                           animation: animation,
-                           item: itemVM.items[cartVM.actionItemIndex],
-                           cardHeight: cardHeight)
+                           animation: animation)
                 .transition(.asymmetric(insertion: .identity, removal: .offset(y: 0)))
                 .onAppear { print("カード詳細onAppear") }
                 .onDisappear { print("カード詳細onDisappear") }
@@ -218,11 +219,11 @@ struct NewItemsView: View {
             HStack(spacing: -25) {
                 /// Item Detail Card
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(item.name == "" ? "No Name" : item.name)
-                        .font(.title3)
+                    Spacer(minLength: 5)
+
+                    CustomOneLineLimitText(text: item.name == "" ? "No Name" : item.name, limit: 6)
                         .fontWeight(.semibold)
                         .foregroundColor(.black)
-                        .lineLimit(1)
                     
                     Text(item.tag == "" ? ": 未グループ" : ": \(item.tag)")
                         .font(.caption)
@@ -235,6 +236,8 @@ struct NewItemsView: View {
                     .font(.callout)
                     .foregroundColor(.orange)
                     .padding(.top, 20)
+
+                    Spacer(minLength: 0)
                     
                     HStack {
                         Text(item.price == 0 ? "-" : "\(item.price)")
@@ -245,8 +248,11 @@ struct NewItemsView: View {
                     .font(.caption)
                     .tracking(2)
                     .foregroundColor(.black)
+
+                    Spacer(minLength: 5)
                 }
                 .padding(20)
+                .padding(.vertical, 20)
                 .frame(width: size.width / 2, height: size.height * 0.85, alignment: .leading)
                 .background {
                     RoundedRectangle(cornerRadius: 10, style: .continuous)
@@ -497,7 +503,7 @@ struct NewItemsView: View {
                 } // HStack
                 .padding(.leading, 15)
             } // ScrollView
-            /// スクロール時の引っ掛かりを無くす
+            // スクロール時の引っ掛かりを無くす
             .introspectScrollView { scrollView in
                  scrollView.isDirectionalLockEnabled = true
                  scrollView.bounces = false

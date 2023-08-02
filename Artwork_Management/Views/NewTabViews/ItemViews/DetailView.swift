@@ -10,27 +10,24 @@ import FirebaseFirestore
 
 struct DetailView: View {
     
+    var item: Item
+    let cardHeight: CGFloat
     @Environment(\.colorScheme) var colorScheme
-    
+
     @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var userVM: UserViewModel
-    
+
     @StateObject var itemVM: ItemViewModel
     @StateObject var cartVM: CartViewModel
     @Binding var inputTab: InputTab
     @Binding var show: Bool
     var animation: Namespace.ID
-    var item: Item
-    let cardHeight: CGFloat
     /// View Properties
     @State private var animationContent: Bool = false
     @State private var offsetAnimation: Bool = false
     @State private var openDetail: Bool = false
     @State private var showDetailBackground: Bool = false
     @State private var showDeleteAlert: Bool = false
-    
-    // TODO: シェアリンク
-    @State private var rendeledImage: Image?
     
     var body: some View {
         
@@ -74,10 +71,11 @@ struct DetailView: View {
                         /// Matched Geometry ID
                         .transition(.asymmetric(insertion: .opacity, removal: .opacity))
                         .matchedGeometryEffect(id: item.id, in: animation)
-                    
+                    // アイテムの簡略情報
                     VStack(alignment: .leading, spacing: 8) {
-                        Text(item.name != "" ?
-                             item.name : "No Name")
+                        CustomOneLineLimitText(text: item.name == "" ?
+                                               "No Name" : item.name,
+                                               limit: 7)
                         .font(.title3)
                         .fontWeight(.semibold)
                         
@@ -298,9 +296,12 @@ struct DetailView: View {
                 .padding(.bottom)
             
             Group {
-                Text(item.name != "" ?
-                          "名前　　　:　　 \(item.name)" :
-                          "名前　　　:　　 No Name")
+                HStack(spacing: 0) {
+                    Text("名前　　　:　　 ")
+                    CustomOneLineLimitText(text: item.name == "" ?
+                                           "No Name" : item.name,
+                                           limit: 10)
+                }
                 
                 Text(item.author != "" ?
                           "制作者　　:　　 \(item.author)" :
@@ -331,13 +332,12 @@ struct DetailView: View {
                 Text("最終更新　:　　 \(asTimesString(item.updateTime))")
             }
             
-            
             Divider()
                 .frame(width: 300)
                 .padding(.top)
 
         } // VStack
-        .frame(maxWidth: .infinity)
+        .frame(width: 300)
         .font(.callout)
         .fontWeight(.light)
         .opacity(0.8)
@@ -387,12 +387,12 @@ struct DetailView: View {
 struct DetailView_Previews: PreviewProvider {
     @Namespace static var animation
     static var previews: some View {
-        DetailView(itemVM: ItemViewModel(),
+        DetailView(item: sampleItems.first!,
+                   cardHeight: 200,
+                   itemVM: ItemViewModel(),
                    cartVM: CartViewModel(),
                    inputTab: .constant(InputTab()),
                    show: .constant(true),
-                   animation: animation,
-                   item: sampleItems.first!,
-                   cardHeight: 200)
+                   animation: animation)
     }
 }
