@@ -351,7 +351,14 @@ struct NewEditItemView: View {
                                                         passItem.totalInventory - (passItem.inventory - editInventory) ))
 
                             itemVM.updateItem(updateData: updateItemData, defaultDataID: defaultDataID, teamID: teamVM.team!.id)
-                            withAnimation(.easeIn(duration: 0.1)) { input.showProgress = false }
+                            /// 編集アイテムの新規タグ設定とアイテムタブビュー内の選択タグを合わせる
+                            /// 編集画面から戻った時、アイテムカードが適切にアニメーションするために必要
+                            if tagVM.activeTag != tagVM.tags.first {
+                                tagVM.setActiveTag(from: input.selectionTagName)
+                            }
+                            withAnimation(.easeIn(duration: 0.1)) {
+                                input.showProgress = false
+                            }
                             dismiss()
                         } // Task(update Item)
                         
@@ -390,8 +397,13 @@ struct NewEditItemView: View {
                             itemVM.addItem(itemData: itemData,
                                            tag: input.selectionTag?.tagName ?? "未グループ",
                                            teamID: teamVM.team!.id)
+                            /// 編集アイテムの新規タグ設定とアイテムタブビュー内の選択タグを合わせる
+                            /// 編集画面から戻った時、アイテムカードが適切にアニメーションするために必要
+                            tagVM.setActiveTag(from: input.selectionTagName)
                             
-                            withAnimation(.easeIn(duration: 0.1)) { input.showProgress = false }
+                            withAnimation(.easeIn(duration: 0.1)) {
+                                input.showProgress = false
+                            }
                             dismiss()
                         } // Task(add Item)
                     } // if let passItem

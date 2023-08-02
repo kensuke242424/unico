@@ -76,10 +76,10 @@ struct NewItemsView: View {
                         ForEach(itemVM.items.filter(
                             itemVM.filterFavorite ?
                             {   userVM.user?.favorites.firstIndex(of: $0.id ?? "") != nil &&
-                                ($0.tag == activeTag?.tagName ||
-                                activeTag?.tagName == "全て") } :
-                            {   $0.tag == activeTag?.tagName ||
-                                activeTag?.tagName == "全て"
+                                ($0.tag == tagVM.activeTag?.tagName ||
+                                 tagVM.activeTag?.tagName == "全て") } :
+                                {   $0.tag == tagVM.activeTag?.tagName ||
+                                    tagVM.activeTag?.tagName == "全て"
                                 
                             })) { item in
                             ItemsCardView(item)
@@ -211,14 +211,6 @@ struct NewItemsView: View {
                 withAnimation(.easeInOut(duration: 0.35).delay(0.4)) {
                     animateCurrentItem = false
                 }
-            }
-        }
-        .onAppear {
-            print("アイテム画面が再生成されました")
-            if let index = selectedItemIndex {
-                print("選択アイテムのタグ: \(itemVM.items[index].tag)")
-            } else {
-                print("選択アイテムはnilです")
             }
         }
     }
@@ -473,7 +465,7 @@ struct NewItemsView: View {
                             .padding(.horizontal, 12)
                             .padding(.vertical, 5)
                             .background {
-                                if activeTag == tag {
+                                if tagVM.activeTag == tag {
                                     Capsule()
                                         .foregroundColor(userVM.memberColor.color3)
                                         .matchedGeometryEffect(id: "ACTIVETAG", in: animation)
@@ -482,10 +474,10 @@ struct NewItemsView: View {
                                         .fill(Color.gray.opacity(0.6))
                                 }
                             }
-                            .foregroundColor(activeTag == tag ? .white : .white.opacity(0.7))
+                            .foregroundColor(tagVM.activeTag == tag ? .white : .white.opacity(0.7))
                             .onTapGesture {
                                 withAnimation(.interactiveSpring(response: 0.5, dampingFraction: 0.7, blendDuration: 0.7)) {
-                                    activeTag = tag
+                                    tagVM.activeTag = tag
                                 }
                             }
                             .contextMenu {

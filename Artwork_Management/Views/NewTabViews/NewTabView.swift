@@ -361,7 +361,9 @@ struct NewTabView: View {
                 inputTab.showCommerce = .hidden
             }
         }
-
+        .onAppear {
+            tagVM.setFirstActiveTag()
+        }
     } // body
     @ViewBuilder
     /// タブビューのカスタムトップナビゲーションバー

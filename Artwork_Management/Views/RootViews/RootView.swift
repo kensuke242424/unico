@@ -104,7 +104,7 @@ struct RootView: View {
             }
         }
 
-        // fetch...
+        // ☑️全データのフェッチ処理☑️
         .onChange(of: logInVM.rootNavigation) { navigation in
             print("LogInVM.rootNavigation: \(logInVM.rootNavigation)")
             
