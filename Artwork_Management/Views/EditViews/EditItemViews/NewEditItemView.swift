@@ -240,7 +240,10 @@ struct NewEditItemView: View {
             } // VStack
         } // Geometry
         /// セーフエリアtopの幅だけ下にずらすがちょうど良さそう
-        .padding(.top, getSafeArea().top)
+        /// テキストフィールドの自動スクロールはoffsetを考慮していない？みたい
+        /// paddingで下げ、offsetで戻すことで、自動スクロール位置を調整している
+        .padding(.top, getSafeArea().top + 20)
+        .offset(y: -20)
         .navigationBarBackButtonHidden()
         .overlay {
             if input.showTagEdit {
