@@ -70,7 +70,6 @@ struct NewItemsView: View {
                 
                 TagsView(tags: tagVM.tags, items: itemVM.items)
                     .opacity(showDetailView ? 0 : 1)
-                    .onAppear { activeTag = tagVM.tags.first }
                 
                 ScrollView(.vertical, showsIndicators: false) {
                     LazyVStack(spacing: 35) {
@@ -212,6 +211,14 @@ struct NewItemsView: View {
                 withAnimation(.easeInOut(duration: 0.35).delay(0.4)) {
                     animateCurrentItem = false
                 }
+            }
+        }
+        .onAppear {
+            print("アイテム画面が再生成されました")
+            if let index = selectedItemIndex {
+                print("選択アイテムのタグ: \(itemVM.items[index].tag)")
+            } else {
+                print("選択アイテムはnilです")
             }
         }
     }

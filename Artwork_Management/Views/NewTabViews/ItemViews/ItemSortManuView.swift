@@ -89,15 +89,8 @@ struct ItemSortManuView: View {
             .padding([.bottom, .trailing])
             /// 選択されたソートタイプに合わせてアイテムを並び替え
             .onChange(of: itemVM.selectedSortType) { type in
-                switch type {
-                case .name:
-                    withAnimation(.spring(response: 0.5)) { itemVM.nameSort() }
-                case .createTime:
-                    withAnimation(.spring(response: 0.5)) { itemVM.createTimeSort() }
-                case .updateTime:
-                    withAnimation(.spring(response: 0.5)) { itemVM.updateTimeSort() }
-                case .sales:
-                    withAnimation(.spring(response: 0.5)) { itemVM.updateTimeSort() }
+                withAnimation(.spring(response: 0.5)) {
+                    itemVM.selectedTypesSort()
                 }
             }
             /// 昇り・降り順の切り替え

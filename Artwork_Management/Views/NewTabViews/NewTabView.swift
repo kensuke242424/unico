@@ -216,13 +216,6 @@ struct NewTabView: View {
                     }
                 }
                 .ignoresSafeArea()
-                /// アイテム新規登録用のナビゲーション管理
-                /// システムサイドメニュー側からのアクセス用
-                .navigationDestination(for: EditItemPath.self) { itemPath in
-                    if itemPath == .create {
-                        NewEditItemView(itemVM: itemVM, passItem: nil)
-                    }
-                }
                 .navigationDestination(for: SystemPath.self) { systemPath in
                     switch systemPath {
                     case .root:

@@ -46,6 +46,7 @@ class ItemViewModel: ObservableObject {
 
                     return try? snap.data(as: Item.self, with: .estimate)
                 }
+                self.selectedTypesSort()
             }
         }
         print("fetchItem完了")
@@ -239,6 +240,15 @@ class ItemViewModel: ObservableObject {
             }
         }
         print("updateCommerse完了")
+    }
+    /// 選択されているソートタイプに応じてitemsを並び替えするメソッド。
+    func selectedTypesSort() {
+        switch selectedSortType {
+        case .name      : nameSort()
+        case .createTime: createTimeSort()
+        case .updateTime: updateTimeSort()
+        case .sales     : updateTimeSort()
+        }
     }
 
     func upDownOderSort() {
