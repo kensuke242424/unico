@@ -239,8 +239,8 @@ struct NewEditItemView: View {
                 } // ScrollView
             } // VStack
         } // Geometry
-        /// 少し下めにするのがちょうど良さそう
-        .offset(y: getSafeArea().top)
+        /// セーフエリアtopの幅だけ下にずらすがちょうど良さそう
+        .padding(.top, getSafeArea().top)
         .navigationBarBackButtonHidden()
         .overlay {
             if input.showTagEdit {
