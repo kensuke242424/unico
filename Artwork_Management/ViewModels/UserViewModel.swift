@@ -58,13 +58,12 @@ class UserViewModel: ObservableObject {
     }
     
     func isAnonymousCheck() {
-        print("userVM_isAnonymousCheck実行")
         
         if let user = Auth.auth().currentUser, user.isAnonymous {
-            print("currentUser: anonymous user")
+            print("アカウント: Anonymous")
             self.isAnonymous = true
         } else {
-            print("currentUser: Not Anonymous user")
+            print("アカウント: Not Anonymous")
             self.isAnonymous = false
         }
     }
@@ -80,13 +79,11 @@ class UserViewModel: ObservableObject {
                     print("userRealtimeListener_Error: snapがnilです")
                     return
                 }
-                print("userRealtimeListener開始")
 
                 withAnimation {
                     do {
                         let userData = try snap.data(as: User.self)
                         self.user = userData
-                        print("userRealtimeListenerによりチームデータを更新")
                         DispatchQueue.main.async {
                             self.isAnonymousCheck()
                             self.updatedUser.toggle()
@@ -154,7 +151,8 @@ class UserViewModel: ObservableObject {
             print("ERROR: チーム背景のアップデートに失敗しました")
         }
     }
-
+    /// ユーザーのお気に入りアイテム追加or削除を管理するメソッド。
+    /// お気に入りアイテムのIDをFirestoreのuserドキュメントに保管する。
     func updateFavorite(_ itemID: String?) {
         guard var userData = user else { return }
         guard let itemID else { return }
@@ -163,14 +161,13 @@ class UserViewModel: ObservableObject {
         let index = userData.favorites.firstIndex(where: { $0 == itemID })
         if let index {
             userData.favorites.remove(at: index)
-            print("お気に入りを削除")
         } else {
             userData.favorites.append(itemID)
-            print("お気に入りを追加")
         }
 
         do {
             _ = try? userRef.setData(from: userData)
+            hapticActionNotification()
         }
     }
 

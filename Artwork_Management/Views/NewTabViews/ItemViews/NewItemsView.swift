@@ -68,7 +68,7 @@ struct NewItemsView: View {
                     LazyVStack(spacing: 35) {
                         ForEach(itemVM.items.filter(
                             itemVM.filterFavorite ?
-                            {   $0.favorite == true &&
+                            {   userVM.user?.favorites.firstIndex(of: $0.id ?? "") != nil &&
                                 ($0.tag == activeTag?.tagName ||
                                 activeTag?.tagName == "全て") } :
                             {   $0.tag == activeTag?.tagName ||
@@ -303,7 +303,7 @@ struct NewItemsView: View {
                 .opacity(showDetailView ? 0 : 1)
                 .onAppear { cardHeight = size.width / 2 }
                 
-                /// Book Cover Imager
+                /// アイテムのImageカード
                 ZStack {
                     if !(showDetailView && selectedItem?.id == item.id) {
                         SDWebImageView(imageURL: item.photoURL,
@@ -365,10 +365,9 @@ struct NewItemsView: View {
     @ViewBuilder
     private func FavoriteButton(_ item: Item) -> some View {
         Button {
-            itemVM.updateFavorite(item)
             userVM.updateFavorite(item.id)
         } label: {
-            if item.favorite {
+            if userVM.user?.favorites.firstIndex(of: item.id ?? "") != nil {
                 Image(systemName: "heart.fill")
             } else {
                 Image(systemName: "heart")
@@ -376,7 +375,7 @@ struct NewItemsView: View {
         }
         .particleEffect(systemImage: "heart.fill",
                         font: .title,
-                        status: item.favorite,
+                        status: userVM.user?.favorites.firstIndex(of: item.id ?? "") != nil,
                         activeTint: .red,
                         inActiveTint: .white
         )
