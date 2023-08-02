@@ -323,9 +323,9 @@
 		BE0E580929C4050600F5E42F /* EditItemViews */ = {
 			isa = PBXGroup;
 			children = (
+				BE8734F42A5EE9B7004AA246 /* NewEditItemView.swift */,
 				BE8734F22A5EE9B7004AA246 /* EditItemPhotoContent.swift */,
 				BE8734F32A5EE9B7004AA246 /* EditTagView.swift */,
-				BE8734F42A5EE9B7004AA246 /* NewEditItemView.swift */,
 			);
 			path = EditItemViews;
 			sourceTree = "<group>";

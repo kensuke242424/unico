@@ -39,7 +39,6 @@ extension InputFormsStatus.Model {
 }
 
 struct InputEditItem {
-
     /// アイテムの入力ステータス群
     var croppedImage    : UIImage? = nil
     var selectionTag    : Tag?
@@ -54,10 +53,10 @@ struct InputEditItem {
     var price           : String = ""
     var sales           : String = ""
     var totalAmount     : String = ""
-    var totalInventry   : String = ""
+    var totalInventory   : String = ""
     
-    /// view表示Presentを管理する
-    var showPicker: Bool = false
+    /// view表示のステートを管理する
+    var showPicker     : Bool = false
     var showTagEdit    : Bool = false
     var showProgress   : Bool = false
 }
@@ -143,7 +142,8 @@ struct NewEditItemView: View {
                             }
                         }
                     } // ZStack(選択画像エリア)
-                    
+
+                    /// ▫️タグメニュー
                     HStack {
                         Text("\(Image(systemName: "tag.fill")) タグ")
                             .fontWeight(.semibold)
@@ -161,7 +161,8 @@ struct NewEditItemView: View {
                         .font(.footnote)
                     }
                     .frame(width: size.width * 0.8, alignment: .leading)
-                    .padding(.vertical, 10)
+                    .padding(.vertical, 5)
+                    .padding(.top, 10)
                     
                     HStack {
                         Picker("タグを選択", selection: $input.selectionTagName) {
@@ -199,20 +200,20 @@ struct NewEditItemView: View {
                     } // ForEach
                     
                     // 複数行を書けるアイテム詳細テキストフィールド
-                    // ここの入力欄だけは少々仕様が異なるため、ForEach外で実装
+                    // アイテムメモ入力欄だけは他と仕様が異なるため、ForEach外で実装
                     HStack {
                         Text("■ アイテムの詳細")
-                            .fontWeight(.semibold)
                             .tracking(1)
+                            .fontWeight(.semibold)
                             .opacity(0.5)
                         /// 空白部分タップでフォーカスをnilにするためのほぼ透明の範囲View
-                        Color.gray
-                            .opacity(0.001)
+                        Color.gray.opacity(0.001)
                     }
                     .frame(width: size.width * 0.8, alignment: .leading)
                     .onTapGesture { focused = nil; detailFocused = nil }
                     .padding(.top, 30)
                     .padding(.bottom, 10)
+                    .padding(.top, 5)
                     
                     TextField("アイテムについてメモを残しましょう。",
                               text: $input.detail,
@@ -225,14 +226,14 @@ struct NewEditItemView: View {
                     .textInputAutocapitalization(.never)
                     .frame(width: size.width * 0.82)
                     .padding()
+                    .padding(.bottom, 50)
                     .background {
                         RoundedRectangle(cornerRadius: 10)
                             .fill(.gray)
                             .opacity(0.4)
                     }
                     
-                    Color.gray
-                        .opacity(0.001)
+                    Color.gray.opacity(0.001)
                         .frame(width: size.width, height: size.height / 2)
                         .onTapGesture { focused = nil; detailFocused = nil }
                 } // ScrollView
@@ -290,7 +291,7 @@ struct NewEditItemView: View {
                 input.sales            = passItem.sales != 0 ? String(passItem.sales) : ""
                 input.detail           = passItem.detail != "メモなし" ? passItem.detail : ""
                 input.totalAmount      = passItem.totalAmount != 0 ? String(passItem.totalAmount) : ""
-                input.totalInventry    = passItem.totalInventory != 0 ? String(passItem.totalInventory) : ""
+                input.totalInventory    = passItem.totalInventory != 0 ? String(passItem.totalInventory) : ""
             } else {
                 let filterTags = tagVM.tags.filter({ $0.tagName != "全て" })
                 input.selectionTag = filterTags.first
@@ -471,7 +472,7 @@ struct NewEditItemView: View {
                             .keyboardType(.numberPad)
                             .tracking(1)
                     case .totalInventory:
-                        TextField(value.model.example, text: $input.totalInventry)
+                        TextField(value.model.example, text: $input.totalInventory)
                             .focused($focused, equals: value)
                             .keyboardType(.numberPad)
                             .tracking(1)
@@ -482,6 +483,8 @@ struct NewEditItemView: View {
                 }
             } // VStack
             .frame(width: size.width * 0.8, height: 90)
+            .padding(.vertical, 5)
+            .padding(.top, 3)
             .onChange(of: focused) { newValue in
                 if newValue == .inventory {
                     if input.inventory == "0" {

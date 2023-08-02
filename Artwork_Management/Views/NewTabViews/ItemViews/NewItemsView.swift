@@ -49,6 +49,14 @@ struct NewItemsView: View {
     /// アイテムカードの高さ
     @State var cardHeight: CGFloat = 0
 
+    var selectedItemIndex: Int? {
+        if let selectedItem {
+            return getActionIndex(selectedItem)
+        } else {
+            return nil
+        }
+    }
+
     var selectedItemName: String {
         guard let selectedItem else { return "" }
         let getName = selectedItem.name != "" ? selectedItem.name : "No Name"
@@ -159,8 +167,8 @@ struct NewItemsView: View {
             .padding(.top, 15)
         } // Geometry
         .overlay {
-            if let selectedItem, showDetailView {
-                DetailView(item: selectedItem,
+            if let selectedItem, let selectedItemIndex, showDetailView {
+                DetailView(item: itemVM.items[selectedItemIndex],
                            cardHeight: cardHeight,
                            itemVM: itemVM,
                            cartVM: cartVM,
@@ -168,8 +176,6 @@ struct NewItemsView: View {
                            show: $showDetailView,
                            animation: animation)
                 .transition(.asymmetric(insertion: .identity, removal: .offset(y: 0)))
-                .onAppear { print("カード詳細onAppear") }
-                .onDisappear { print("カード詳細onDisappear") }
             }
         }
         .overlay {
@@ -185,6 +191,19 @@ struct NewItemsView: View {
                         .opacity(showDetailView ? 1 : 0)
                 }
                 .ignoresSafeArea()
+            }
+        }
+        /// NavigationStackによる遷移を管理します
+        .navigationDestination(for: EditItemPath.self) { itemPath in
+            switch itemPath {
+            case .create:
+                NewEditItemView(itemVM: itemVM, passItem: nil)
+
+            case .edit:
+                if let index = selectedItemIndex {
+                    NewEditItemView(itemVM: itemVM,
+                                    passItem: itemVM.items[index])
+                }
             }
         }
         .onChange(of: showDetailView) { newValue in
