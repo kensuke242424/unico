@@ -27,15 +27,14 @@ class CartViewModel: ObservableObject {
     func addCartItem(item: Item) {
         
         let index = cartItems.firstIndex(where: { $0.id == item.id })
-        print("cartItems_index: \(index)")
         
         if let index {
-            print("追加アイテムはカート内に存在する")
+            print("追加アイテムはカート内にすでに存在する。カウント+1")
             cartItems[index].amount += 1
             resultCartPrice += cartItems[index].price
             resultCartAmount += 1
         } else {
-            print("追加アイテムはカート内に存在しない")
+            print("追加アイテムはカート内に存在しない。カート内に新規追加")
             var item = item
             item.amount += 1
             resultCartPrice += item.price
@@ -44,7 +43,7 @@ class CartViewModel: ObservableObject {
         }
     }
     
-    func updateCommerseItems(teamID: String) {
+    func updateCommerceItems(teamID: String) {
 
         print("updateCommerse実行")
 

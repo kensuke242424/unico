@@ -196,7 +196,7 @@ struct CartItemRow: View {
 
 
 /// Viewの更新から切り離せるか試してみた
-struct CartItemPhoto: View {
+fileprivate struct CartItemPhoto: View {
     let photoURL: URL?
     var body: some View {
         

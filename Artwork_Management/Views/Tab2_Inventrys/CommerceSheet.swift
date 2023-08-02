@@ -44,7 +44,7 @@ struct CommerceSheet: View {
                         .padding(.horizontal)
                         .overlay(alignment: .topTrailing) {
                             if cartVM.resultCartAmount <= 50 {
-                                Image(systemName: "\(commerseResults().amount).circle.fill")
+                                Image(systemName: "\(commerceResults().amount).circle.fill")
                                     .foregroundColor(memberColor.color3)
                                     .offset(y: -8)
                             } else {
@@ -63,7 +63,7 @@ struct CommerceSheet: View {
                     Text("¥")
                         .foregroundColor(.black)
                         .font(.title2.bold())
-                    Text(commerseResults().price == 0 ? "-" : "\(commerseResults().price)")
+                    Text(commerceResults().price == 0 ? "-" : "\(commerceResults().price)")
                         .foregroundColor(.black)
                         .font(.title.bold())
                     Spacer()
@@ -73,7 +73,7 @@ struct CommerceSheet: View {
 
                 Button(
                     action: {
-                        cartVM.updateCommerseItems(teamID: teamID)
+                        cartVM.updateCommerceItems(teamID: teamID)
                         cartVM.resultCartPrice = 0
                         cartVM.resultCartAmount = 0
                         cartVM.doCommerce = true
@@ -115,7 +115,7 @@ struct CommerceSheet: View {
         }
 
     } // body
-    private func commerseResults() -> (price: Int, amount: Int) {
+    private func commerceResults() -> (price: Int, amount: Int) {
 
         var resultPrices: Int = 0
         var resultAmounts: Int = 0
