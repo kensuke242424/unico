@@ -132,23 +132,6 @@ struct SystemSideMenu: View {
                 /// メニュー列全体
                 VStack(alignment: .leading, spacing: 60) {
 
-                    // Item Menu...
-                    VStack(alignment: .leading) {
-
-                        SideMenuButton(open: $inputSideMenu.item, title: "アイテム", image: "shippingbox")
-
-                        if inputSideMenu.item {
-
-                            VStack(alignment: .leading, spacing: 40) {
-                                Label("アイテム追加", systemImage: "shippingbox.fill")
-                                    .onTapGesture { navigationVM.path.append(EditItemPath.create) }
-                            }
-                            .foregroundColor(.white)
-                            .frame(width: 210, height: menuRowHeight, alignment: .topLeading)
-                            .offset(x: 20, y: 30)
-                        }
-                    }
-
                     // Tag Menu...
                     VStack(alignment: .leading) {
 
@@ -437,7 +420,7 @@ struct SystemSideMenu: View {
                         .frame(height: 150)
                 } // VStack(メニュー列全体)
                 .frame(maxWidth: .infinity)
-                .padding(.top)
+                .padding(.top, 20)
 
             } // ScrollView
             .frame(maxWidth: .infinity)

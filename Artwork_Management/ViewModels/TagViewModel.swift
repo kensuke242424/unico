@@ -20,6 +20,8 @@ class TagViewModel: ObservableObject {
 
     @Published var tags: [Tag] = []
     @Published var showEdit: Bool = false
+    /// アイテムページの選択アイテムタグを管理するプロパティ。
+    @Published var activeTag: Tag?
 
     /// チーム作成時にデフォルトで挿入するサンプルタグ
     let sampleTag = Tag(oderIndex: 1, tagName: "goods", tagColor: .gray)
@@ -62,6 +64,15 @@ class TagViewModel: ObservableObject {
             self.tags.append(Tag(oderIndex: self.tags.count, tagName: "未グループ", tagColor: .gray))
         }
         print("fetchTag終了")
+    }
+    /// タグデータをFireStoreから取得した後、アイテムタブビュー内にある選択タグの初期値をセットするメソッド。
+    func setFirstActiveTag() {
+        self.activeTag = tags.first
+    }
+    /// アイテム編集画面で選択されたタグを、アイテムタブビュー内のアクティブタグと同期させるメソッド。
+    func setActiveTag(from setTagName: String) {
+        let setTag = self.tags.first(where: { $0.tagName == setTagName })
+        self.activeTag = setTag
     }
 
     func addTag(tagData: Tag, teamID: String) {

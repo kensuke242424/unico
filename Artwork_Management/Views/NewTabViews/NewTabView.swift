@@ -216,18 +216,6 @@ struct NewTabView: View {
                     }
                 }
                 .ignoresSafeArea()
-
-                /// NavigationStackによる遷移を管理します
-                .navigationDestination(for: EditItemPath.self) { itemPath in
-                    switch itemPath {
-                    case .create:
-                        NewEditItemView(itemVM: itemVM, passItem: nil)
-                        
-                    case .edit:
-                        NewEditItemView(itemVM: itemVM,
-                                        passItem: itemVM.items[cartVM.actionItemIndex])
-                    }
-                }
                 .navigationDestination(for: SystemPath.self) { systemPath in
                     switch systemPath {
                     case .root:
@@ -373,7 +361,9 @@ struct NewTabView: View {
                 inputTab.showCommerce = .hidden
             }
         }
-
+        .onAppear {
+            tagVM.setFirstActiveTag()
+        }
     } // body
     @ViewBuilder
     /// タブビューのカスタムトップナビゲーションバー

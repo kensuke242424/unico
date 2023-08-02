@@ -49,6 +49,14 @@ struct NewItemsView: View {
     /// アイテムカードの高さ
     @State var cardHeight: CGFloat = 0
 
+    var selectedItemIndex: Int? {
+        if let selectedItem {
+            return getActionIndex(selectedItem)
+        } else {
+            return nil
+        }
+    }
+
     var selectedItemName: String {
         guard let selectedItem else { return "" }
         let getName = selectedItem.name != "" ? selectedItem.name : "No Name"
@@ -62,17 +70,16 @@ struct NewItemsView: View {
                 
                 TagsView(tags: tagVM.tags, items: itemVM.items)
                     .opacity(showDetailView ? 0 : 1)
-                    .onAppear { activeTag = tagVM.tags.first }
                 
                 ScrollView(.vertical, showsIndicators: false) {
                     LazyVStack(spacing: 35) {
                         ForEach(itemVM.items.filter(
                             itemVM.filterFavorite ?
                             {   userVM.user?.favorites.firstIndex(of: $0.id ?? "") != nil &&
-                                ($0.tag == activeTag?.tagName ||
-                                activeTag?.tagName == "全て") } :
-                            {   $0.tag == activeTag?.tagName ||
-                                activeTag?.tagName == "全て"
+                                ($0.tag == tagVM.activeTag?.tagName ||
+                                 tagVM.activeTag?.tagName == "全て") } :
+                                {   $0.tag == tagVM.activeTag?.tagName ||
+                                    tagVM.activeTag?.tagName == "全て"
                                 
                             })) { item in
                             ItemsCardView(item)
@@ -159,8 +166,8 @@ struct NewItemsView: View {
             .padding(.top, 15)
         } // Geometry
         .overlay {
-            if let selectedItem, showDetailView {
-                DetailView(item: selectedItem,
+            if let selectedItem, let selectedItemIndex, showDetailView {
+                DetailView(item: itemVM.items[selectedItemIndex],
                            cardHeight: cardHeight,
                            itemVM: itemVM,
                            cartVM: cartVM,
@@ -168,8 +175,6 @@ struct NewItemsView: View {
                            show: $showDetailView,
                            animation: animation)
                 .transition(.asymmetric(insertion: .identity, removal: .offset(y: 0)))
-                .onAppear { print("カード詳細onAppear") }
-                .onDisappear { print("カード詳細onDisappear") }
             }
         }
         .overlay {
@@ -185,6 +190,19 @@ struct NewItemsView: View {
                         .opacity(showDetailView ? 1 : 0)
                 }
                 .ignoresSafeArea()
+            }
+        }
+        /// NavigationStackによる遷移を管理します
+        .navigationDestination(for: EditItemPath.self) { itemPath in
+            switch itemPath {
+            case .create:
+                NewEditItemView(itemVM: itemVM, passItem: nil)
+
+            case .edit:
+                if let index = selectedItemIndex {
+                    NewEditItemView(itemVM: itemVM,
+                                    passItem: itemVM.items[index])
+                }
             }
         }
         .onChange(of: showDetailView) { newValue in
@@ -447,7 +465,7 @@ struct NewItemsView: View {
                             .padding(.horizontal, 12)
                             .padding(.vertical, 5)
                             .background {
-                                if activeTag == tag {
+                                if tagVM.activeTag == tag {
                                     Capsule()
                                         .foregroundColor(userVM.memberColor.color3)
                                         .matchedGeometryEffect(id: "ACTIVETAG", in: animation)
@@ -456,10 +474,10 @@ struct NewItemsView: View {
                                         .fill(Color.gray.opacity(0.6))
                                 }
                             }
-                            .foregroundColor(activeTag == tag ? .white : .white.opacity(0.7))
+                            .foregroundColor(tagVM.activeTag == tag ? .white : .white.opacity(0.7))
                             .onTapGesture {
                                 withAnimation(.interactiveSpring(response: 0.5, dampingFraction: 0.7, blendDuration: 0.7)) {
-                                    activeTag = tag
+                                    tagVM.activeTag = tag
                                 }
                             }
                             .contextMenu {
