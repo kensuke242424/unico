@@ -162,11 +162,10 @@ fileprivate struct IconAndMessageView: View {
         .padding(10)
         .background(
             backColor.shadow(.drop(color: shadowColor.opacity(0.25),radius: 10)),
-                    in: RoundedRectangle(cornerRadius: 35))
+                    in: RoundedRectangle(cornerRadius: 40))
         .offset(y: CGFloat(index) * 10) // 複数の要素をずらす
         .offset(state ? .zero : CGSize(width: 0, height: -50))
         .offset(dragOffset)
-        .opacity(index == (vm.boardFrames.count - 1) ? 1 : 0.4)
         .opacity(state ? 1 : 0)
         .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: -50)))
         .gesture(
@@ -174,6 +173,8 @@ fileprivate struct IconAndMessageView: View {
                 .updating(self.$dragOffset, body: { (value, state, _) in
                     if value.translation.height < 0 {
                         state = CGSize(width: .zero, height: value.translation.height / 2)
+                    } else if value.translation.height > 0 {
+                        state = CGSize(width: .zero, height: value.translation.height / 8)
                     }
                 })
                 .onEnded { value in
@@ -299,7 +300,7 @@ struct NotificationBoard_Previews: PreviewProvider {
             NotificationBoard()
             Button("通知を確認") {
                 withAnimation(.easeOut(duration: 0.5)) {
-                    vm.setNotify(type: .outOfStock)
+                    vm.setNotify(type: .commerce(sampleItems))
                 }
             }
         }
