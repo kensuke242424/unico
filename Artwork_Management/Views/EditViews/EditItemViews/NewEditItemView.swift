@@ -365,11 +365,8 @@ struct NewEditItemView: View {
                                 input.showProgress = false
                             }
                             dismiss()
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                withAnimation(.easeOut(duration: 0.5)) {
-                                    notifyVM.setNotify(type: .updateItem(updateItemData))
-                                }
-                            }
+                            notifyVM.setNotify(type: .updateItem(updateItemData))
+
                         } // Task(update Item)
                         
                     } else {
@@ -388,20 +385,20 @@ struct NewEditItemView: View {
                             }
                             
                             let itemData = Item(tag           : input.selectionTagName,
-                                                    teamID        : teamVM.team!.id,
-                                                    name          : input.name,
-                                                    author        : input.author,
-                                                    detail        : input.detail != "" ? input.detail : "メモなし",
-                                                    photoURL      : input.photoURL,
-                                                    photoPath     : input.photoPath,
-                                                    favorite      : false,
-                                                    cost          : 0,
-                                                    price         : Int(input.price) ?? 0,
-                                                    amount        : 0,
-                                                    sales         : 0,
-                                                    inventory     : Int(input.inventory) ??  0,
-                                                    totalAmount   : 0,
-                                                    totalInventory: Int(input.inventory) ?? 0)
+                                                teamID        : teamVM.team!.id,
+                                                name          : input.name.isEmpty ? "No Name" : input.name,
+                                                author        : input.author,
+                                                detail        : input.detail != "" ? input.detail : "メモなし",
+                                                photoURL      : input.photoURL,
+                                                photoPath     : input.photoPath,
+                                                favorite      : false,
+                                                cost          : 0,
+                                                price         : Int(input.price) ?? 0,
+                                                amount        : 0,
+                                                sales         : 0,
+                                                inventory     : Int(input.inventory) ??  0,
+                                                totalAmount   : 0,
+                                                totalInventory: Int(input.inventory) ?? 0)
                             
                             // Firestoreにコーダブル保存
                             itemVM.addItem(itemData: itemData,
@@ -415,11 +412,8 @@ struct NewEditItemView: View {
                                 input.showProgress = false
                             }
                             dismiss()
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                withAnimation(.easeOut(duration: 0.5)) {
-                                    notifyVM.setNotify(type: .addItem(itemData))
-                                }
-                            }
+                            notifyVM.setNotify(type: .addItem(itemData))
+
                         } // Task(add Item)
                     } // if let passItem
                         

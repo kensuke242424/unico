@@ -9,12 +9,11 @@ import SwiftUI
 
 struct BoardFrame: Identifiable, Equatable, Hashable {
     var id: UUID = .init()
-    var image: UIImage?
-    var imageURL: URL?
     var type: NotificationType
     var message: String
+    var imageURL: URL?
     var color: Color
-    var waitTime: CGFloat
+    var exitTime: CGFloat
 }
 
 extension BoardFrame {

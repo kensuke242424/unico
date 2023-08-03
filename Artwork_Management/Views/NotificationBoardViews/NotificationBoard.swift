@@ -20,7 +20,7 @@ struct NotificationBoard: View {
                 ForEach(Array(vm.boardFrames.enumerated()), id: \.element) { index, element in
                     switch element.type {
                     case .addItem, .updateItem, .join, .commerce:
-                        IconAndMessage(element, index)
+                        IconAndMessageView(element: element, index: index)
                     case .outOfStock:
                         MessageOnly(element, index)
                     }
@@ -49,7 +49,7 @@ struct NotificationBoard: View {
             .offset(y: CGFloat(index) * 10)
             .opacity(index == (vm.boardFrames.count - 1) ? 1 : 0.4)
             .onAppear {
-                DispatchQueue.main.asyncAfter(deadline: .now() + element.waitTime) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + element.exitTime) {
                     withAnimation {
                         vm.boardFrames.removeAll(where: {$0.id == element.id})
                     }
@@ -66,8 +66,9 @@ struct NotificationBoard: View {
             if let url = element.imageURL {
                 WebImage(url: url)
                     .resizable()
-                    .frame(width: 60, height: 60)
+                    .scaledToFill()
                     .clipShape(Circle())
+                    .frame(width: 60, height: 60)
                     .padding(.trailing, 10)
             } else {
                 Circle()
@@ -98,7 +99,79 @@ struct NotificationBoard: View {
         .opacity(index == (vm.boardFrames.count - 1) ? 1 : 0.4)
         .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: -50)))
         .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + element.waitTime) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + element.exitTime) {
+                withAnimation {
+                    vm.boardFrames.removeAll(where: {$0.id == element.id})
+                }
+            }
+        }
+    }
+}
+
+/// アイコン+メッセージ型の通知ボード。
+/// 出現、退場のアニメーション管理はこのビュー内で管理されているため、外側での設定不要。
+/// WebImageの画像ロード完了を待つため、表示までに少しタイムラグを持たせている。
+fileprivate struct IconAndMessageView: View {
+    let element: BoardFrame
+    let index: Int
+    @EnvironmentObject var vm: NotificationViewModel
+    @Environment(\.colorScheme) var colorScheme
+
+    @State private var state: Bool = false
+    /// WebImageの画像ロード完了を待つ時間。出現時のアニメーション不具合を防ぐため。
+    let loadWaitTime: CGFloat = 0.5
+    let screen = UIScreen.main.bounds
+
+    var body: some View {
+        let backColor = colorScheme == .dark ? Color.black : Color.white
+        let shadowColor = colorScheme == .dark ? Color.white : Color.black
+
+        HStack {
+            if let url = element.imageURL {
+                ZStack {
+                    WebImage(url: url)
+                        .resizable().scaledToFill()
+                        .clipShape(Circle())
+                        .frame(width: 60, height: 60)
+                        .padding(.trailing, 10)
+                }
+
+            } else {
+                Circle()
+                    .fill(.gray.gradient)
+                    .frame(width: 60, height: 60)
+                    .shadow(radius: 1)
+                    .overlay {
+                        Image(systemName: element.type.symbol)
+                            .resizable().scaledToFit()
+                            .foregroundColor(.white)
+                            .frame(width: 30, height: 30)
+                    }
+                    .padding(.trailing, 10)
+            }
+
+            Text(element.message)
+                .tracking(1)
+                .fontWeight(.bold)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .opacity(0.5)
+                .padding(.trailing, 5)
+        }
+        .frame(width: screen.width * 0.9)
+        .padding(10)
+        .background(
+            backColor.shadow(.drop(color: shadowColor.opacity(0.25),radius: 10)),
+                    in: RoundedRectangle(cornerRadius: 35))
+        .offset(y: CGFloat(index) * 10)
+        .offset(state ? .zero : CGSize(width: 0, height: -50))
+        .opacity(index == (vm.boardFrames.count - 1) ? 1 : 0.4)
+        .opacity(state ? 1 : 0)
+        .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: -50)))
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + loadWaitTime) {
+                withAnimation(.easeOut(duration: 0.5)) { state = true }
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + element.exitTime + loadWaitTime) {
                 withAnimation {
                     vm.boardFrames.removeAll(where: {$0.id == element.id})
                 }
@@ -111,7 +184,7 @@ enum NotificationType {
     case addItem(Item)
     case updateItem(Item)
     case outOfStock
-    case commerce(Int)
+    case commerce([Item])
     case join(User)
 
     var type: NotificationType {
@@ -122,13 +195,23 @@ enum NotificationType {
     var message: String {
         switch self {
         case .addItem(let item):
-            return "\(item.name) のアイテム情報が追加されました。"
+            let name = item.name.isEmpty ? "No Name" : item.name
+            return "\(name) がチームアイテムに追加されました。"
         case .updateItem(let item):
-            return "\(item.name) のアイテム情報が更新されました。"
+            let name = item.name.isEmpty ? "No Name" : item.name
+            return "\(name) のアイテム情報が更新されました。"
         case .outOfStock:
             return "アイテムの在庫が不足しています。"
-        case .commerce(let count):
-            return "カート内 \(count) 個のアイテム情報が更新されました。"
+        case .commerce(let items):
+            let firstItemName = items.first?.name ?? ""
+            var message: String {
+                if items.count > 1 {
+                    return "\(firstItemName) 他、\(items.count - 1)個のアイテム情報が更新されました。"
+                } else {
+                    return "\(firstItemName) のアイテム情報が更新されました。"
+                }
+            }
+            return message
         case .join(let user):
             return "\(user.name) さんがチームに参加しました。"
         }
@@ -142,8 +225,8 @@ enum NotificationType {
             return item.photoURL
         case .outOfStock:
             return nil
-        case .commerce:
-            return nil
+        case .commerce(let items):
+            return items.first?.photoURL
         case .join(let user):
             return user.iconURL
         }

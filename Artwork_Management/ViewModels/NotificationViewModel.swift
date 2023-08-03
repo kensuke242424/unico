@@ -15,8 +15,9 @@ class NotificationViewModel: ObservableObject {
         boardFrames.append(
             BoardFrame(type: type.self,
                        message: type.message,
+                       imageURL: type.imageURL,
                        color: type.color,
-                       waitTime: type.waitTime)
+                       exitTime: type.waitTime)
         )
     }
 }

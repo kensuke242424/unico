@@ -74,15 +74,13 @@ struct CommerceSheet: View {
 
                 Button(
                     action: {
-                        let cartItemCount = cartVM.cartItems.count // 通知ように使う
+                        let cartItems = cartVM.cartItems // 通知用に使う
                         cartVM.updateCommerceItems(teamID: teamID)
                         cartVM.resultCartPrice = 0
                         cartVM.resultCartAmount = 0
                         cartVM.doCommerce = true
 
-                        withAnimation(.easeOut(duration: 0.5)) {
-                            notifyVM.setNotify(type: .commerce(cartItemCount))
-                        }
+                        notifyVM.setNotify(type: .commerce(cartItems)) // 通知
                         hapticSuccessNotification()
                     },
                     label: {
