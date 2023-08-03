@@ -75,7 +75,7 @@ struct NewItemsView: View {
                 ScrollView(.vertical, showsIndicators: false) {
                     LazyVStack(spacing: 35) {
                         ForEach(itemVM.items.filter(
-                            itemVM.filterFavorite ?
+                            itemVM.filteringFavorite ?
                             {   userVM.user?.favorites.firstIndex(of: $0.id ?? "") != nil &&
                                 ($0.tag == tagVM.activeTag?.tagName ||
                                  tagVM.activeTag?.tagName == "全て") } :
@@ -408,22 +408,22 @@ struct NewItemsView: View {
         ZStack {
             Capsule()
                 .frame(width: 40, height: 12)
-                .foregroundColor(itemVM.filterFavorite ? .green.opacity(0.7) : .gray.opacity(0.5))
+                .foregroundColor(itemVM.filteringFavorite ? .green.opacity(0.7) : .gray.opacity(0.5))
             Image(systemName: "heart.fill")
                 .font(.title)
                 .foregroundColor(.black).opacity(0.6)
-                .offset(x: itemVM.filterFavorite ? 9 : -7)
+                .offset(x: itemVM.filteringFavorite ? 9 : -7)
             Image(systemName: "heart.fill")
                 .font(.title)
-                .foregroundColor(itemVM.filterFavorite ? .red : .white)
+                .foregroundColor(itemVM.filteringFavorite ? .red : .white)
                 .scaleEffect(0.95)
                 .padding()
-                .offset(x: itemVM.filterFavorite ? 9 : -7)
+                .offset(x: itemVM.filteringFavorite ? 9 : -7)
         }
         .opacity(itemVM.items.isEmpty ? 0 : 1)
         .onTapGesture {
             withAnimation(.spring(response: 0.4)) {
-                itemVM.filterFavorite.toggle()
+                itemVM.filteringFavorite.toggle()
             }
         }
     }

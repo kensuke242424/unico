@@ -372,6 +372,7 @@ struct NewTabView: View {
         .onAppear {
             tagVM.setFirstActiveTag()
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                /// 各データのリスナーを起動
                 notifyVM.notificationListener(team: teamVM.team)
             }
         }

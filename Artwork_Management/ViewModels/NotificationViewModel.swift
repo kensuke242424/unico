@@ -68,15 +68,15 @@ class NotificationViewModel: ObservableObject {
                 snap.documentChanges.forEach { diff in
                     if (diff.type == .added) {
                         let data = diff.document.data()
-                        print("新規データを確認: \(data)")
+//                        print("新規データを確認: \(data)")
                     }
                     if (diff.type == .modified) {
                         let data = diff.document.data()
-                        print("データ更新を確認: \(data)")
+//                        print("データ更新を確認: \(data)")
                     }
                     if (diff.type == .removed) {
                         let data = diff.document.data()
-                        print("データ削除を確認: \(data)")
+//                        print("データ削除を確認: \(data)")
                     }
                 }
 //                do {

@@ -134,13 +134,10 @@ struct RootView: View {
                         
                         /// 最後にログインしたチーム情報をもとに、対象のチームの全データを取得
                         guard let lastLogInTeamID = user.lastLogIn else { return }
-                        
-                        try await teamVM.fetchTeam(teamID: lastLogInTeamID)
-                            await tagVM.fetchTag(  teamID: lastLogInTeamID)
-                            await itemVM.fetchItemListener(teamID: lastLogInTeamID)
 
-                        /// チームandユーザーデータのリスナーを起動
-                        _ = try await teamVM.teamRealtimeListener()
+                        await tagVM.fetchTag(teamID: lastLogInTeamID)
+                        _ = try await teamVM.teamListener(id: lastLogInTeamID)
+                        _ = try await itemVM.itemsListener(id: lastLogInTeamID)
                         _ = try await userVM.userRealtimeListener()
                         
                         /// ホーム画面へ遷移

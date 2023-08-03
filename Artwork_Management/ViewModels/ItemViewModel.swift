@@ -21,35 +21,69 @@ class ItemViewModel: ObservableObject {
     @Published var items: [Item] = []
     @Published var selectedSortType: ItemsSortType = .name
     @Published var selectedOder: UpDownOrder = .down
-    @Published var filterFavorite: Bool = false
+    @Published var filteringFavorite: Bool = false
 
-    func fetchItemListener(teamID: String) async {
+    var currentTeamID: String? {
+        guard let item = self.items.first else { return nil }
+        return item.teamID
+    }
+    /// 初回のデータフェッチが完了したかを判定するプロパティ。
+    /// アプリ起動によるFirestoreからの初期値フェッチ時、リスナーの「.added」に全アイテムの取得フラグが入ってくるため、
+    /// 初回のフラグのみをフラグ取得から除外するために使う。
 
-        print("fetchItem実行")
-
-        guard let itemsRef = db?.collection("teams").document(teamID).collection("items") else {
-            print("error: guard let tagsRef")
-            return
-        }
+    /// アイテムデータの追加・更新・削除のステートを管理するリスナーメソッド。
+    /// 初期実行時にリスニング対象ドキュメントのデータが全取得される。(フラグはadded)
+    func itemsListener(id currentTeamID: String) async {
+        print("itemsListener起動")
+        let itemsRef = db?.collection("teams").document(currentTeamID).collection("items")
+        guard let itemsRef else { return }
 
         listener = itemsRef.addSnapshotListener { (snap, _) in
-
-            guard let documents = snap?.documents else {
-                print("Error: guard let documents = snap?.documents")
+            guard let snap = snap else {
+                print("Error: itemsListener_snap nil")
                 return
             }
-
-            // 取得できたアイテムをデコーダブル ⇨ Itemモデルを参照 ⇨ 「items」に詰めていく
-            // with: ⇨ ServerTimestampを扱う際のオプションを指定
-            withAnimation {
-                self.items = documents.compactMap { (snap) -> Item? in
-
-                    return try? snap.data(as: Item.self, with: .estimate)
+            snap.documentChanges.forEach { diff in
+                if (diff.type == .added) {
+                    let item = try? diff.document.data(as: Item.self, with: .estimate)
+                    guard let item else { return }
+                    withAnimation {self.items.append(item)}
+                    withAnimation {self.selectedTypesSort()}
+                    print("新規アイテムの追加: \(item.name)")
                 }
-                self.selectedTypesSort()
+                if (diff.type == .modified) {
+                    let item = try? diff.document.data(as: Item.self, with: .estimate)
+                    guard let item else { return }
+                    guard let _ = item.updateTime else { return } // Timestamp更新前のフラグを除外
+                    guard let index = self.items.firstIndex(where: {$0.id == item.id}) else { return }
+                    withAnimation {self.items[index] = item}
+                    withAnimation {self.selectedTypesSort()}
+                    print("既存アイテムの更新: \(item)")
+                }
+                if (diff.type == .removed) {
+                    let item = try? diff.document.data(as: Item.self, with: .estimate)
+                    guard let item else { return }
+                    guard let _ = item.updateTime else { return } // Timestamp更新前のフラグを除外
+                    withAnimation {self.items.removeAll(where: {$0.id == item.id})}
+                    print("データ削除を確認: \(item)")
+                }
             }
         }
-        print("fetchItem完了")
+    }
+
+    /// Firestoreからチームの全アイテムをフェッチするメソッド。初回起動時に呼ばれる。
+    @MainActor func fetchAllItem(teamID: String) async throws {
+        guard let itemRefs = db?.collection("teams")
+            .document(teamID)
+            .collection("items") else {
+            print("ERROR: fetchAllItem_guard let itemRefs")
+            return
+        }
+        let snapshot = try await itemRefs.getDocuments()
+        self.items = snapshot.documents.compactMap { (document) -> Item? in
+            return try? document.data(as: Item.self, with: .estimate)
+        }
+        self.selectedTypesSort() // ソート
     }
 
     /// 指定idのアイテム一つをFirestoreから取得するメソッド。

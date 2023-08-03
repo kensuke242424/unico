@@ -27,6 +27,8 @@ class TeamViewModel: ObservableObject {
     @Published var showErrorAlert = false
     @Published var alertMessage = ""
 
+    var teamID: String? { team?.id }
+
     @MainActor
     func fetchTeam(teamID: String) async throws {
 
@@ -40,11 +42,11 @@ class TeamViewModel: ObservableObject {
             throw CustomError.fetch
         }
     }
-
-    func teamRealtimeListener() async throws {
-
-        guard let teamID = team?.id else { throw CustomError.teamEmpty }
-        guard let teamRef = db?.collection("teams").document(teamID) else { throw CustomError.getRef  }
+    /// チームデータの追加・更新・削除のステートを管理するリスナーメソッド。
+    /// 初期実行時にリスニング対象ドキュメントのデータが全取得される。(フラグはadded)
+    func teamListener(id currentTeamID: String) async throws {
+        let teamRef = db?.collection("teams").document(currentTeamID)
+        guard let teamRef else { throw CustomError.getRef }
 
         listener = teamRef.addSnapshotListener { snap, error in
             if let error {
@@ -55,15 +57,13 @@ class TeamViewModel: ObservableObject {
                     return
                 }
                 print("teamRealtimeListener開始")
-                
-                withAnimation {
-                    do {
-                        let teamData = try snap.data(as: Team.self)
-                        self.team = teamData
-                        print("teamRealtimeListenerによりチームデータを更新")
-                    } catch {
-                        print("teamRealtimeListener_Error: try snap?.data(as: Team.self)")
-                    }
+
+                do {
+                    let teamData = try snap.data(as: Team.self)
+                    withAnimation {self.team = teamData}
+                    print("teamRealtimeListenerによりチームデータを更新")
+                } catch {
+                    print("teamRealtimeListener_Error: try snap?.data(as: Team.self)")
                 }
             }
         }
