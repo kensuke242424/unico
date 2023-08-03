@@ -129,14 +129,17 @@ fileprivate struct IconAndMessageView: View {
 
         HStack {
             if let url = element.imageURL {
-                ZStack {
-                    WebImage(url: url)
-                        .resizable().scaledToFill()
-                        .clipShape(Circle())
-                        .frame(width: 60, height: 60)
-                        .padding(.trailing, 10)
-                }
-
+                WebImage(url: url)
+                    .resizable().scaledToFill()
+                    .clipShape(Circle())
+                    .frame(width: 60, height: 60)
+                    .background {
+                        RoundedRectangle(cornerRadius: 40)
+                            .stroke(lineWidth: 1)
+                            .fill(.orange)
+                            .opacity(0.5)
+                    }
+                    .padding(.trailing, 10)
             } else {
                 Circle()
                     .fill(.gray.gradient)
@@ -155,16 +158,22 @@ fileprivate struct IconAndMessageView: View {
                 .tracking(1)
                 .fontWeight(.bold)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .opacity(0.5)
+                .opacity(0.7)
                 .padding(.trailing, 5)
         }
         .frame(width: screen.width * 0.9)
         .padding(10)
         .background(
-            backColor.shadow(.drop(color: shadowColor.opacity(0.25),radius: 10)),
+            backColor.shadow(.drop(color: .black.opacity(0.25),radius: 10)),
                     in: RoundedRectangle(cornerRadius: 40))
+        .background {
+            RoundedRectangle(cornerRadius: 40)
+                .stroke(lineWidth: 1)
+                .fill(.white)
+                .opacity(0.4)
+        }
         .offset(y: CGFloat(index) * 10) // 複数の要素をずらす
-        .offset(state ? .zero : CGSize(width: 0, height: -50))
+        .offset(state ? .zero : CGSize(width: 0, height: -45))
         .offset(dragOffset)
         .opacity(state ? 1 : 0)
         .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: -50)))
@@ -203,6 +212,7 @@ fileprivate struct IconAndMessageView: View {
     }
 }
 
+/// 通知機能における通知タイプを管理する列挙体。
 enum NotificationType {
     case addItem(Item)
     case updateItem(Item)
