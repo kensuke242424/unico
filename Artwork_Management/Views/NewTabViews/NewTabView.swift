@@ -370,6 +370,9 @@ struct NewTabView: View {
         }
         .onAppear {
             tagVM.setFirstActiveTag()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                notifyVM.notificationListener(team: teamVM.team)
+            }
         }
     } // body
     @ViewBuilder
