@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+/// 通知ボード一要素分となる構造体。このデータがFireStoreに保存されることで、
+/// チームメンバーにも通知が届く。
 struct BoardFrame: Identifiable, Equatable, Hashable, Codable {
     var id: UUID = .init()
     var type: NotificationType

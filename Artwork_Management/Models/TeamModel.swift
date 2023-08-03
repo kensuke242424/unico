@@ -26,6 +26,7 @@ struct JoinMember: Hashable, Codable {
     var memberUID: String
     var name: String
     var iconURL: URL?
+    var notifications: [BoardFrame] = []
 }
 
 var testTeam: Team = Team(id: UUID().uuidString,
