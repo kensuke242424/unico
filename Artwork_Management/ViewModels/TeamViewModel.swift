@@ -114,7 +114,6 @@ class TeamViewModel: ObservableObject {
 
     /// チーム作成時にデフォルトのサンプルアイテムを追加するメソッド。
     func setSampleItem(itemsData: [Item] = sampleItems, teamID: String) async {
-        print("addSampleItem実行")
 
         guard let itemsRef = db?.collection("teams").document(teamID).collection("items") else {
             print("error: guard let tagsRef")
@@ -133,7 +132,6 @@ class TeamViewModel: ObservableObject {
                 print("Error: addDocument(from: \(itemData.name)")
             }
         }
-        print("addSampleItem完了")
     }
 
     // メンバー招待画面で取得した相手のユーザIDを使ってFirestoreのusersからデータをフェッチ

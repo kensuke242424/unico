@@ -6,6 +6,9 @@
 //
 
 import SwiftUI
+import Firebase
+import FirebaseFirestore
+import FirebaseFirestoreSwift
 
 enum InputFormsStatus: CaseIterable {
     case name, author ,inventory , price, sales ,totalAmount ,totalInventory
@@ -334,7 +337,7 @@ struct NewEditItemView: View {
                                 input.photoPath = newImageData.filePath
                             }
 
-                            // NOTE: アイテムを更新
+                            // NOTE: Timestamp値がnilだと、データの保存&サーバー側でタイムスタンプで2回の更新が走るようだ
                             let updateItemData = (Item(createTime : passItem.createTime,
                                                        updateTime : nil,
                                                        tag        : input.selectionTagName,
@@ -364,8 +367,9 @@ struct NewEditItemView: View {
                             withAnimation(.easeIn(duration: 0.1)) {
                                 input.showProgress = false
                             }
+//                            notifyVM.setNotificationToFirestore(team: teamVM.team,
+//                                                                type: .updateItem(passItem))
                             dismiss()
-                            notifyVM.setNotify(type: .updateItem(updateItemData))
 
                         } // Task(update Item)
                         
@@ -384,7 +388,7 @@ struct NewEditItemView: View {
                                 input.photoPath = newImageData.filePath
                             }
                             
-                            let itemData = Item(tag           : input.selectionTagName,
+                            var itemData = Item(tag           : input.selectionTagName,
                                                 teamID        : teamVM.team!.id,
                                                 name          : input.name.isEmpty ? "No Name" : input.name,
                                                 author        : input.author,
@@ -404,15 +408,11 @@ struct NewEditItemView: View {
                             itemVM.addItem(itemData: itemData,
                                            tag: input.selectionTag?.tagName ?? "未グループ",
                                            teamID: teamVM.team!.id)
-                            /// 編集アイテムの新規タグ設定とアイテムタブビュー内の選択タグを合わせる
-                            /// 編集画面から戻った時、アイテムカードが適切にアニメーションするために必要
                             tagVM.setActiveTag(from: input.selectionTagName)
-                            
-                            withAnimation(.easeIn(duration: 0.1)) {
-                                input.showProgress = false
-                            }
+
+//                            notifyVM.setNotificationToFirestore(team: teamVM.team, type: .addItem(itemData))
+                            withAnimation(.easeIn(duration: 0.1)) { input.showProgress = false }
                             dismiss()
-                            notifyVM.setNotify(type: .addItem(itemData))
 
                         } // Task(add Item)
                     } // if let passItem

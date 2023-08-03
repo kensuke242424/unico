@@ -12,6 +12,7 @@ import ResizableSheet
 struct CommerceSheet: View {
 
     @EnvironmentObject var userVM: UserViewModel
+    @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var notifyVM: NotificationViewModel
 
     @StateObject var cartVM: CartViewModel
@@ -80,7 +81,7 @@ struct CommerceSheet: View {
                         cartVM.resultCartAmount = 0
                         cartVM.doCommerce = true
 
-                        notifyVM.setNotify(type: .commerce(cartItems)) // 通知
+//                        notifyVM.setNotificationToFirestore(team: teamVM.team, type: .commerce(cartItems))
                         hapticSuccessNotification()
                     },
                     label: {

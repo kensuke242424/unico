@@ -23,7 +23,7 @@ class ItemViewModel: ObservableObject {
     @Published var selectedOder: UpDownOrder = .down
     @Published var filterFavorite: Bool = false
 
-    func fetchItem(teamID: String) async {
+    func fetchItemListener(teamID: String) async {
 
         print("fetchItem実行")
 
@@ -50,6 +50,25 @@ class ItemViewModel: ObservableObject {
             }
         }
         print("fetchItem完了")
+    }
+
+    /// 指定idのアイテム一つをFirestoreから取得するメソッド。
+    func fetchOneItem(teamID: String, itemID: String) async -> Item? {
+        guard let itemRef = db?.collection("teams")
+            .document(teamID)
+            .collection("items")
+            .document(itemID) else {
+            print("error: guard let itemRef")
+            return nil
+        }
+
+        do {
+            let itemDocument = try await itemRef.getDocument()
+            let itemData = try itemDocument.data(as: Item.self)
+            return itemData
+        } catch {
+            return nil
+        }
     }
 
     func addItem(itemData: Item, tag: String, teamID: String) {

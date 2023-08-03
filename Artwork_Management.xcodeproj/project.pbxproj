@@ -17,7 +17,7 @@
 		BE19FD6E2A79471300AE8165 /* CustomOneLineLimitText.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE19FD6D2A79471300AE8165 /* CustomOneLineLimitText.swift */; };
 		BE19FD802A7AAF6200AE8165 /* NotificationBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE19FD7F2A7AAF6200AE8165 /* NotificationBoard.swift */; };
 		BE19FD822A7AB0FF00AE8165 /* NotificationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE19FD812A7AB0FF00AE8165 /* NotificationViewModel.swift */; };
-		BE19FD842A7AB12600AE8165 /* BoardFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE19FD832A7AB12600AE8165 /* BoardFrame.swift */; };
+		BE19FD842A7AB12600AE8165 /* NotifyFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE19FD832A7AB12600AE8165 /* NotifyFrame.swift */; };
 		BE1F271E29C162B300AD55DF /* NewTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1F271D29C162B300AD55DF /* NewTabView.swift */; };
 		BE1F272329C166E700AD55DF /* NewHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1F272229C166E700AD55DF /* NewHomeView.swift */; };
 		BE1F272529C1673900AD55DF /* NewItemsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1F272429C1673900AD55DF /* NewItemsView.swift */; };
@@ -169,7 +169,7 @@
 		BE19FD6D2A79471300AE8165 /* CustomOneLineLimitText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomOneLineLimitText.swift; sourceTree = "<group>"; };
 		BE19FD7F2A7AAF6200AE8165 /* NotificationBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationBoard.swift; sourceTree = "<group>"; };
 		BE19FD812A7AB0FF00AE8165 /* NotificationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationViewModel.swift; sourceTree = "<group>"; };
-		BE19FD832A7AB12600AE8165 /* BoardFrame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardFrame.swift; sourceTree = "<group>"; };
+		BE19FD832A7AB12600AE8165 /* NotifyFrame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotifyFrame.swift; sourceTree = "<group>"; };
 		BE1F271D29C162B300AD55DF /* NewTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTabView.swift; sourceTree = "<group>"; };
 		BE1F272229C166E700AD55DF /* NewHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewHomeView.swift; sourceTree = "<group>"; };
 		BE1F272429C1673900AD55DF /* NewItemsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewItemsView.swift; sourceTree = "<group>"; };
@@ -423,13 +423,6 @@
 			path = Helpers;
 			sourceTree = "<group>";
 		};
-		BE41783E29B4AB3100434CFC /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		BE599F902A20F66C00821E01 /* ApplicationSettingViews */ = {
 			isa = PBXGroup;
 			children = (
@@ -515,7 +508,6 @@
 				E08F272328DDA08E00329C5E /* Artwork_Management */,
 				E08F272228DDA08E00329C5E /* Products */,
 				E02FB03F291671B900F72E1A /* Recovered References */,
-				BE41783E29B4AB3100434CFC /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -607,7 +599,7 @@
 				BE392FEF29C20E6900BB5700 /* Tab.swift */,
 				BE07F1272A220AD5007ED1C4 /* Particle.swift */,
 				BE74E91C2A77EE9B00C1A5F2 /* Crop.swift */,
-				BE19FD832A7AB12600AE8165 /* BoardFrame.swift */,
+				BE19FD832A7AB12600AE8165 /* NotifyFrame.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -893,7 +885,7 @@
 				E0BFE1C929746B06005481CA /* QRReaderView.swift in Sources */,
 				E04ACF4328E73C660054A6C4 /* IndicatorRow.swift in Sources */,
 				E09F09BC28EAF33500D07669 /* FocusedLineRow.swift in Sources */,
-				BE19FD842A7AB12600AE8165 /* BoardFrame.swift in Sources */,
+				BE19FD842A7AB12600AE8165 /* NotifyFrame.swift in Sources */,
 				E0455FEA292D1947004F677D /* GradientBackbround.swift in Sources */,
 				BE74E91D2A77EE9B00C1A5F2 /* Crop.swift in Sources */,
 				BE8734EF2A5EE99F004AA246 /* EditTeamBackgroundView.swift in Sources */,

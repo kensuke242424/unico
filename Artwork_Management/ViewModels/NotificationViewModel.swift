@@ -18,45 +18,122 @@ class NotificationViewModel: ObservableObject {
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
     var uid: String? { return Auth.auth().currentUser?.uid }
 
-    @Published var boardFrames: [BoardFrame] = []
+    @Published var boardFrames: [NotifyFrame] = []
 
     /// チームドキュメント内の自身のデータ(teamMember)のnotificationsテーブルを監視して、
     /// 新しい通知が来たら自動取得し、画面に表示させるためのリスナー。
+//    @MainActor
+//    func notificationListener(team: Team?) {
+//        print("notificationListener実行")
+//        guard var team else { return }
+//        guard let teamRef = db?.collection("teams").document(team.id) else { return }
+//
+//        listener = teamRef.addSnapshotListener { snap, error in
+//            if let error {
+//                print("notificationListener失敗: \(error.localizedDescription)")
+//            } else {
+//                guard let snap else {
+//                    print("notificationListener: snapがnilです")
+//                    return
+//                }
+//                do {
+//                    let team = try snap.data(as: Team.self)
+//                    guard let myData = team.members.first(where: {$0.memberUID == self.uid}) else { return }
+//                    for notify in myData.notifications {
+//                        self.boardFrames.append(notify)
+//                    }
+//
+//                    print("notificationListenerが新しい通知データを取得")
+//                } catch {
+//                    print("notificationListener: try snap?.data(as: Team.self)")
+//                }
+//            }
+//        }
+//    }
+
     @MainActor
     func notificationListener(team: Team?) {
         print("notificationListener実行")
         guard var team else { return }
-        guard let teamRef = db?.collection("teams").document(team.id) else { return }
+        guard let teamRef = db?.collection("teams").document(team.id).collection("items") else { return }
 
         listener = teamRef.addSnapshotListener { snap, error in
             if let error {
                 print("notificationListener失敗: \(error.localizedDescription)")
             } else {
                 guard let snap else {
-                    print("notificationListener: snapがnilです")
+                    print("snap_nil")
                     return
                 }
-                do {
-                    let team = try snap.data(as: Team.self)
-                    guard let myData = team.members.first(where: {$0.memberUID == self.uid}) else { return }
-                    for notify in myData.notifications {
-                        self.boardFrames.append(notify)
+                snap.documentChanges.forEach { diff in
+                    if (diff.type == .added) {
+                        let data = diff.document.data()
+                        print("新規データを確認: \(data)")
                     }
-
-                    print("notificationListenerが新しい通知データを取得")
-                } catch {
-                    print("notificationListener: try snap?.data(as: Team.self)")
+                    if (diff.type == .modified) {
+                        let data = diff.document.data()
+                        print("データ更新を確認: \(data)")
+                    }
+                    if (diff.type == .removed) {
+                        let data = diff.document.data()
+                        print("データ削除を確認: \(data)")
+                    }
                 }
+//                do {
+//                    let team = try snap.data(as: Team.self)
+//                    guard let myData = team.members.first(where: {$0.memberUID == self.uid}) else { return }
+//                    for notify in myData.notifications {
+//                        self.boardFrames.append(notify)
+//                    }
+//
+//                    print("notificationListenerが新しい通知データを取得")
+//                } catch {
+//                    print("notificationListener: try snap?.data(as: Team.self)")
+//                }
             }
         }
     }
+
     func setNotify(type: NotificationType) {
         boardFrames.append(
-            BoardFrame(type: type.self,
+            NotifyFrame(type: type.self,
                        message: type.message,
                        imageURL: type.imageURL,
                        exitTime: type.waitTime)
         )
+    }
+
+    /// アイテムや新規通知をチーム内の各メンバーに渡すメソッド。
+    func setNotificationToFirestore(team: Team?, type: NotificationType) {
+        guard var team else { return }
+        guard let teamRef = db?.collection("teams").document(team.id) else { return }
+        let notification = NotifyFrame(type: type,
+                                    message: type.message,
+                                    imageURL: type.imageURL,
+                                    exitTime: type.waitTime)
+        for index in team.members.indices {
+            team.members[index].notifications.append(notification)
+        }
+
+        do {
+            _ = try teamRef.setData(from: team)
+        } catch {
+            print("Error: setNotificationToFirestore")
+        }
+    }
+    /// 通知を自身のメンバーデータ内から削除するメソッド。
+    func removeNotificationToFirestore(team: Team?, data: NotifyFrame) {
+        guard var team else { return }
+        guard let teamRef = db?.collection("teams").document(team.id) else { return }
+
+        guard let index = team.members.firstIndex(where: { $0.memberUID == uid }) else { return }
+        team.members[index].notifications.removeAll(where: { $0.id == data.id })
+
+        do {
+            _ = try teamRef.setData(from: team)
+        } catch {
+            print("Error: setNotificationToFirestore")
+        }
     }
 
     deinit {

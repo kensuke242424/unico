@@ -341,6 +341,7 @@ struct NewTabView: View {
                               teamID: teamVM.team!.id,
                               memberColor: userVM.memberColor)
                 .environmentObject(notifyVM)
+                .environmentObject(teamVM)
                 
             } // builder.content
             .supportedState([.medium])

@@ -137,7 +137,7 @@ struct RootView: View {
                         
                         try await teamVM.fetchTeam(teamID: lastLogInTeamID)
                             await tagVM.fetchTag(  teamID: lastLogInTeamID)
-                            await itemVM.fetchItem(teamID: lastLogInTeamID)
+                            await itemVM.fetchItemListener(teamID: lastLogInTeamID)
 
                         /// チームandユーザーデータのリスナーを起動
                         _ = try await teamVM.teamRealtimeListener()

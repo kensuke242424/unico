@@ -10,14 +10,15 @@ import SDWebImageSwiftUI
 
 struct NotificationBoard: View {
 
-    @EnvironmentObject var vm: NotificationViewModel
+    @EnvironmentObject var notifyVM: NotificationViewModel
+    @EnvironmentObject var teamVM: TeamViewModel
     @Environment(\.colorScheme) var colorScheme
     let screen = UIScreen.main.bounds
 
     var body: some View {
         VStack {
             ZStack {
-                ForEach(Array(vm.boardFrames.enumerated()), id: \.element) { index, element in
+                ForEach(Array(notifyVM.boardFrames.enumerated()), id: \.element) { index, element in
                     switch element.type {
                     case .addItem, .updateItem, .join, .commerce:
                         IconAndMessageView(element: element, index: index)
@@ -30,9 +31,7 @@ struct NotificationBoard: View {
         } // VStack
     }
     @ViewBuilder
-    func MessageOnly(_ element: BoardFrame, _ index: Int) -> some View {
-        let backColor = colorScheme == .dark ? Color.black : Color.white
-        let shadowColor = colorScheme == .dark ? Color.white : Color.black
+    func MessageOnly(_ element: NotifyFrame, _ index: Int) -> some View {
 
         Text(element.message)
             .tracking(1)
@@ -46,65 +45,15 @@ struct NotificationBoard: View {
                         in: RoundedRectangle(cornerRadius: 35)
             )
             .opacity(0.9)
-            .offset(y: CGFloat(index) * 10)
-            .opacity(index == (vm.boardFrames.count - 1) ? 1 : 0.4)
+            .offset(y: CGFloat(index) * 10 + 50)
+            .opacity(index == (notifyVM.boardFrames.count - 1) ? 1 : 0.4)
             .onAppear {
                 DispatchQueue.main.asyncAfter(deadline: .now() + element.exitTime) {
                     withAnimation {
-                        vm.boardFrames.removeAll(where: {$0.id == element.id})
+                        notifyVM.boardFrames.removeAll(where: {$0.id == element.id})
                     }
                 }
             }
-    }
-    @ViewBuilder
-    func IconAndMessage(_ element: BoardFrame, _ index: Int) -> some View {
-
-        let backColor = colorScheme == .dark ? Color.black : Color.white
-        let shadowColor = colorScheme == .dark ? Color.white : Color.black
-        
-        HStack {
-            if let url = element.imageURL {
-                WebImage(url: url)
-                    .resizable()
-                    .scaledToFill()
-                    .clipShape(Circle())
-                    .frame(width: 60, height: 60)
-                    .padding(.trailing, 10)
-            } else {
-                Circle()
-                    .fill(.gray.gradient)
-                    .frame(width: 60, height: 60)
-                    .shadow(radius: 1)
-                    .overlay {
-                        Image(systemName: element.type.symbol)
-                            .resizable().scaledToFit()
-                            .foregroundColor(.white)
-                            .frame(width: 30, height: 30)
-                    }
-                    .padding(.trailing, 10)
-            }
-
-            Text(element.message)
-                .tracking(1)
-                .fontWeight(.bold)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .opacity(0.5)
-        }
-        .frame(width: screen.width * 0.9)
-        .padding(10)
-        .background(
-            backColor.shadow(.drop(color: shadowColor.opacity(0.25),radius: 10)),
-                    in: RoundedRectangle(cornerRadius: 35))
-        .offset(y: CGFloat(index) * 10)
-        .opacity(index == (vm.boardFrames.count - 1) ? 1 : 0.4)
-        .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: -50)))
-        .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + element.exitTime) {
-                withAnimation {
-                    vm.boardFrames.removeAll(where: {$0.id == element.id})
-                }
-            }
-        }
     }
 }
 
@@ -112,9 +61,10 @@ struct NotificationBoard: View {
 /// 出現、退場のアニメーション管理はこのビュー内で管理されているため、外側での設定不要。
 /// WebImageの画像ロード完了を待つため、表示までに少しタイムラグを持たせている。
 fileprivate struct IconAndMessageView: View {
-    let element: BoardFrame
+    let element: NotifyFrame
     let index: Int
-    @EnvironmentObject var vm: NotificationViewModel
+    @EnvironmentObject var notifyVM: NotificationViewModel
+    @EnvironmentObject var teamVM: TeamViewModel
     @Environment(\.colorScheme) var colorScheme
 
     @State private var state: Bool = false
@@ -190,6 +140,8 @@ fileprivate struct IconAndMessageView: View {
                     if value.translation.height < -50 {
                         withAnimation(.spring(response: 0.4, blendDuration: 1)) {
                             state = false
+                            notifyVM.boardFrames.removeAll(where: {$0.id == element.id})
+                            notifyVM.removeNotificationToFirestore(team: teamVM.team, data: element)
                         }
                     }
                 }
@@ -205,7 +157,8 @@ fileprivate struct IconAndMessageView: View {
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + element.exitTime + loadWaitTime) {
                 withAnimation {
-                    vm.boardFrames.removeAll(where: {$0.id == element.id})
+                    notifyVM.boardFrames.removeAll(where: {$0.id == element.id})
+                    notifyVM.removeNotificationToFirestore(team: teamVM.team, data: element)
                 }
             }
         }
