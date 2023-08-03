@@ -64,7 +64,7 @@ struct DetailView: View {
                 let size = $0.size
                 
                 HStack(spacing: 20) {
-                    SDWebImageView(imageURL: item.photoURL,
+                    SDWebImageToItem(imageURL: item.photoURL,
                                       width: size.width / 2 - 15,
                                       height: size.height)
                         .clipShape(CustomCorners(corners: [.topRight, .bottomRight], radius: 10))

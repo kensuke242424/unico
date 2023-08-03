@@ -68,7 +68,9 @@ struct NewEditItemView: View {
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var tagVM : TagViewModel
-    @StateObject var itemVM      : ItemViewModel
+    @EnvironmentObject var notifyVM: NotificationViewModel
+
+    @StateObject var itemVM: ItemViewModel
     
     @State private var input: InputEditItem = InputEditItem()
     
@@ -107,7 +109,7 @@ struct NewEditItemView: View {
                                 focused = nil; detailFocused = nil
                             }
                         } else if let passItemImageURL = input.photoURL {
-                            SDWebImageView(imageURL: passItemImageURL,
+                            SDWebImageToItem(imageURL: passItemImageURL,
                                               width: cardWidth,
                                               height: cardHeight)
                             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
@@ -257,7 +259,7 @@ struct NewEditItemView: View {
         .background {
             GeometryReader {
                 let size = $0.size
-                SDWebImageView(imageURL : userVM.currentTeamBackground?.imageURL,
+                SDWebImageToItem(imageURL : userVM.currentTeamBackground?.imageURL,
                                width : size.width,
                                height: size.height)
                     .opacity(0.1)
@@ -363,6 +365,11 @@ struct NewEditItemView: View {
                                 input.showProgress = false
                             }
                             dismiss()
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                withAnimation(.easeOut(duration: 0.5)) {
+                                    notifyVM.setNotify(type: .updateItem(updateItemData))
+                                }
+                            }
                         } // Task(update Item)
                         
                     } else {
@@ -408,6 +415,11 @@ struct NewEditItemView: View {
                                 input.showProgress = false
                             }
                             dismiss()
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                withAnimation(.easeOut(duration: 0.5)) {
+                                    notifyVM.setNotify(type: .addItem(itemData))
+                                }
+                            }
                         } // Task(add Item)
                     } // if let passItem
                         

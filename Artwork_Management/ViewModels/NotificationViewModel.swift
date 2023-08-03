@@ -13,7 +13,8 @@ class NotificationViewModel: ObservableObject {
 
     func setNotify(type: NotificationType) {
         boardFrames.append(
-            BoardFrame(message: type.message,
+            BoardFrame(type: type.self,
+                       message: type.message,
                        color: type.color,
                        waitTime: type.waitTime)
         )

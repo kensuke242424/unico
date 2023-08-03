@@ -12,6 +12,7 @@ import ResizableSheet
 struct CommerceSheet: View {
 
     @EnvironmentObject var userVM: UserViewModel
+    @EnvironmentObject var notifyVM: NotificationViewModel
 
     @StateObject var cartVM: CartViewModel
     @Binding var inputTab: InputTab
@@ -73,11 +74,15 @@ struct CommerceSheet: View {
 
                 Button(
                     action: {
+                        let cartItemCount = cartVM.cartItems.count // 通知ように使う
                         cartVM.updateCommerceItems(teamID: teamID)
                         cartVM.resultCartPrice = 0
                         cartVM.resultCartAmount = 0
                         cartVM.doCommerce = true
 
+                        withAnimation(.easeOut(duration: 0.5)) {
+                            notifyVM.setNotify(type: .commerce(cartItemCount))
+                        }
                         hapticSuccessNotification()
                     },
                     label: {

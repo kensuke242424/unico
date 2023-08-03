@@ -88,7 +88,7 @@ struct SelectionBackgroundCards: View {
     }
     @ViewBuilder
     func BackgroundCardView(_ background: Background) -> some View {
-        SDWebImageView(imageURL: background.imageURL,
+        SDWebImageToItem(imageURL: background.imageURL,
                        width: 110,
                        height: 220)
         .shadow(radius: 5, x: 2, y: 2)

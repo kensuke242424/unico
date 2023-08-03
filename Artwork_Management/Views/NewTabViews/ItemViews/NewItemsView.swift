@@ -21,6 +21,7 @@ struct NewItemsView: View {
     
     /// Tab親Viewから受け取るViewModelと状態変数
     @EnvironmentObject var navigationVM: NavigationViewModel
+    @EnvironmentObject var notifyVM: NotificationViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var tagVM : TagViewModel
@@ -282,24 +283,25 @@ struct NewItemsView: View {
                 .zIndex(1)
                 /// カートにアイテムを入れるボタン
                 .overlay(alignment: .bottomTrailing) {
+                    // 取引かごに追加するボタン
+                    // タップするたびに、値段合計、個数、カート内アイテム要素にプラスする
                     Button {
-                        // 取引かごに追加するボタン
-                        // タップするたびに、値段合計、個数、カート内アイテム要素にプラスする
                         guard let newActionIndex = getActionIndex(item) else {
                             print("アクションIndexの取得に失敗しました")
                             return
                         }
-                        
-                        // TODO: カートに追加する在庫が無いことを知らせるアラートメッセージ
+                        // カートに追加する在庫が無いことを知らせる通知
                         if checkHaveNotInventory(item) {
-                            print("これ以上カートに追加する在庫がありません")
+                            withAnimation(.spring(response: 0.2)) {
+                                notifyVM.setNotify(type: .outOfStock)
+                                hapticErrorNotification()
+                            }
                             return
                         }
-                        
-                        /// actionItemIndexは、itemVMのアイテムとcartItemのアイテムで同期を取るため必要
+                        /// actionItemIndexは、itemVM内のアイテムとcartItem内のアイテムで同期を取るため必要
                         cartVM.actionItemIndex = newActionIndex
                         cartVM.addCartItem(item: item)
-                        
+
                     } label: {
                         Image(systemName: "cart.fill")
                             .foregroundColor(.gray)
@@ -324,7 +326,7 @@ struct NewItemsView: View {
                 /// アイテムのImageカード
                 ZStack {
                     if !(showDetailView && selectedItem?.id == item.id) {
-                        SDWebImageView(imageURL: item.photoURL,
+                        SDWebImageToItem(imageURL: item.photoURL,
                                           width: size.width / 2,
                                           height: size.width / 2)
                             /// Matched Geometry ID

@@ -58,6 +58,7 @@ struct InputTab {
 struct NewTabView: View {
     
     @EnvironmentObject var navigationVM: NavigationViewModel
+    @EnvironmentObject var notifyVM: NotificationViewModel
     @EnvironmentObject var logInVM: LogInViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
@@ -191,22 +192,21 @@ struct NewTabView: View {
                         .transition(AnyTransition.opacity.combined(with: .offset(y: 50)))
                     }
                 }
-                /// チームへの招待View
+                /// チーム招待、チーム編集、ユーザー編集View
                 .overlay {
-                    if teamVM.isShowSearchedNewMemberJoinTeam {
-                        JoinUserDetectCheckView(teamVM: teamVM)
-                            .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
-                    }
-                }
-                /// チームorユーザー情報の編集View
-                .overlay {
-                    if inputTab.showUpdateTeam {
-                        UpdateTeamDataView(show: $inputTab.showUpdateTeam)
-                            .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
-                    }
-                    if inputTab.showUpdateUser {
-                        UpdateUserDataView(show: $inputTab.showUpdateUser)
-                            .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
+                    Group {
+                        if teamVM.isShowSearchedNewMemberJoinTeam {
+                            JoinUserDetectCheckView(teamVM: teamVM)
+                                .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
+                        }
+                        if inputTab.showUpdateTeam {
+                            UpdateTeamDataView(show: $inputTab.showUpdateTeam)
+                                .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
+                        }
+                        if inputTab.showUpdateUser {
+                            UpdateUserDataView(show: $inputTab.showUpdateUser)
+                                .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
+                        }
                     }
                 }
                 // お試しアカウントユーザーに本登録のインフォメーションを表示するView
@@ -216,6 +216,12 @@ struct NewTabView: View {
                     }
                 }
                 .ignoresSafeArea()
+                /// 通知ビュー
+                .overlay {
+                    Group {
+                        NotificationBoard()
+                    }
+                }
                 .navigationDestination(for: SystemPath.self) { systemPath in
                     switch systemPath {
                     case .root:
@@ -334,6 +340,7 @@ struct NewTabView: View {
                               inputTab: $inputTab,
                               teamID: teamVM.team!.id,
                               memberColor: userVM.memberColor)
+                .environmentObject(notifyVM)
                 
             } // builder.content
             .supportedState([.medium])

@@ -20,21 +20,22 @@ class CartViewModel: ObservableObject {
     @Published var cartItems: [Item] = []
     
     @Published var doCommerce: Bool = false
+    /// itemVM内のアイテムとcartItem内のアイテムで同期を取るために必要なアイテムインデックス。
     @Published var actionItemIndex: Int = 0
     @Published var resultCartAmount: Int = 0
     @Published var resultCartPrice: Int = 0
-    
+
+    /// カート内に選択アイテムを格納するメソッド。
+    /// 新規追加アイテムの場合は、カート内にリスト要素を追加する。
+    /// すでにカート内にアイテムが存在した場合、amountカウントを+1する。
     func addCartItem(item: Item) {
-        
         let index = cartItems.firstIndex(where: { $0.id == item.id })
         
         if let index {
-            print("追加アイテムはカート内にすでに存在する。カウント+1")
             cartItems[index].amount += 1
             resultCartPrice += cartItems[index].price
             resultCartAmount += 1
         } else {
-            print("追加アイテムはカート内に存在しない。カート内に新規追加")
             var item = item
             item.amount += 1
             resultCartPrice += item.price
