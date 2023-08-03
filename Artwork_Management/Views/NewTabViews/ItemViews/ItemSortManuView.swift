@@ -56,8 +56,7 @@ struct ItemSortManuView: View {
                                                         stiffness      : 100,
                                                         damping        : 80,
                                                         initialVelocity: 0.1),
-                                                        value          : dragOffset
-                        )
+                                                        value          : dragOffset)
 
                 } else {
                     userColor.color2.opacity(0.8)

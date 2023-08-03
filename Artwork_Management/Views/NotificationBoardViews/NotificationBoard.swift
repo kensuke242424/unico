@@ -118,6 +118,7 @@ fileprivate struct IconAndMessageView: View {
     @Environment(\.colorScheme) var colorScheme
 
     @State private var state: Bool = false
+    @GestureState var dragOffset: CGSize = .zero
     /// WebImageの画像ロード完了を待つ時間。出現時のアニメーション不具合を防ぐため。
     let loadWaitTime: CGFloat = 0.5
     let screen = UIScreen.main.bounds
@@ -162,11 +163,32 @@ fileprivate struct IconAndMessageView: View {
         .background(
             backColor.shadow(.drop(color: shadowColor.opacity(0.25),radius: 10)),
                     in: RoundedRectangle(cornerRadius: 35))
-        .offset(y: CGFloat(index) * 10)
+        .offset(y: CGFloat(index) * 10) // 複数の要素をずらす
         .offset(state ? .zero : CGSize(width: 0, height: -50))
+        .offset(dragOffset)
         .opacity(index == (vm.boardFrames.count - 1) ? 1 : 0.4)
         .opacity(state ? 1 : 0)
         .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: -50)))
+        .gesture(
+            DragGesture()
+                .updating(self.$dragOffset, body: { (value, state, _) in
+                    if value.translation.height < 0 {
+                        state = CGSize(width: .zero, height: value.translation.height / 2)
+                    }
+                })
+                .onEnded { value in
+                    if value.translation.height < -50 {
+                        withAnimation(.spring(response: 0.4, blendDuration: 1)) {
+                            state = false
+                        }
+                    }
+                }
+        )
+        .animation(.interpolatingSpring(mass           : 0.8,
+                                        stiffness      : 100,
+                                        damping        : 80,
+                                        initialVelocity: 0.1),
+                                        value          : dragOffset)
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + loadWaitTime) {
                 withAnimation(.easeOut(duration: 0.5)) { state = true }
