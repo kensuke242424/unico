@@ -37,7 +37,7 @@ struct NotificationBoard: View {
         Text(element.message)
             .tracking(1)
             .fontWeight(.black)
-            .foregroundColor(element.color)
+            .foregroundColor(.red)
             .opacity(0.5)
             .frame(maxWidth: screen.width * 0.8)
             .padding(10)
@@ -72,7 +72,7 @@ struct NotificationBoard: View {
                     .padding(.trailing, 10)
             } else {
                 Circle()
-                    .fill(element.color.gradient)
+                    .fill(.gray.gradient)
                     .frame(width: 60, height: 60)
                     .shadow(radius: 1)
                     .overlay {
@@ -213,7 +213,7 @@ fileprivate struct IconAndMessageView: View {
 }
 
 /// 通知機能における通知タイプを管理する列挙体。
-enum NotificationType {
+enum NotificationType: Codable, Equatable {
     case addItem(Item)
     case updateItem(Item)
     case outOfStock

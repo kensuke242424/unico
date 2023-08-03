@@ -7,12 +7,11 @@
 
 import SwiftUI
 
-struct BoardFrame: Identifiable, Equatable, Hashable {
+struct BoardFrame: Identifiable, Equatable, Hashable, Codable {
     var id: UUID = .init()
     var type: NotificationType
     var message: String
     var imageURL: URL?
-    var color: Color
     var exitTime: CGFloat
 }
 

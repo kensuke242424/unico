@@ -16,7 +16,6 @@ class NotificationViewModel: ObservableObject {
             BoardFrame(type: type.self,
                        message: type.message,
                        imageURL: type.imageURL,
-                       color: type.color,
                        exitTime: type.waitTime)
         )
     }
