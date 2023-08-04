@@ -72,10 +72,12 @@ fileprivate struct IconAndMessageView: View {
     @Environment(\.colorScheme) var colorScheme
 
     @State private var state: Bool = false
+    @State private var count: Int = 0
     @GestureState var dragOffset: CGSize = .zero
     /// WebImageの画像ロード完了を待つ時間。出現時のアニメーション不具合を防ぐため。
     let loadWaitTime: CGFloat = 0.5
     let screen = UIScreen.main.bounds
+    let timer = Timer.publish(every: 1, on: .current, in: .common).autoconnect()
 
     var body: some View {
         let backColor = colorScheme == .dark ? Color.black : Color.white
@@ -128,12 +130,12 @@ fileprivate struct IconAndMessageView: View {
         .offset(state ? .zero : CGSize(width: 0, height: -45))
         .opacity(state ? 1 : 0)
         .offset(dragOffset)
-        .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: -50)))
+        .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: -40)))
         .gesture(
             DragGesture()
                 .updating(self.$dragOffset, body: { (value, state, _) in
                     if value.translation.height < 0 {
-                        state = CGSize(width: .zero, height: value.translation.height / 2)
+                        state = CGSize(width: .zero, height: value.translation.height / 4)
                     } else if value.translation.height > 0 {
                         state = CGSize(width: .zero, height: value.translation.height / 8)
                     }
@@ -142,6 +144,7 @@ fileprivate struct IconAndMessageView: View {
                     if value.translation.height < -50 {
                         withAnimation(.spring(response: 0.4, blendDuration: 1)) {
                             print("スワイプ手動削除時のremoveNotificationController実行")
+                            vm.currentNotification = nil
                             self.removeNotificationController(type: element.type)
                         }
                     }
@@ -157,11 +160,17 @@ fileprivate struct IconAndMessageView: View {
                 withAnimation(.easeOut(duration: 0.5)) { state = true }
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + element.exitTime + loadWaitTime) {
+                if vm.currentNotification == nil { return }
                 withAnimation(.easeIn(duration: 0.3)) {
                     print("onAppear側のremoveNotificationController実行")
+                    vm.currentNotification = nil
                     self.removeNotificationController(type: element.type)
                 }
             }
+        }
+        /// 通知ボードの破棄タイミングに使うタイムカウント。
+        .onReceive(timer) { _ in
+            count += 1
         }
     }
     /// 表示通知の破棄と、表示済み通知の取り扱いをコントロールするメソッド。
@@ -169,12 +178,12 @@ fileprivate struct IconAndMessageView: View {
     fileprivate func removeNotificationController(type: TeamNotificationType) {
         switch type {
         case .addItem, .updateItem, .commerce:
-            vm.currentNotification = nil
+//            vm.currentNotification = nil
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 vm.removeAllMemberNotificationToFirestore(team: teamVM.team, data: element)
             }
         case .join:
-            vm.currentNotification = nil
+//            vm.currentNotification = nil
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 vm.removeMyNotificationToFirestore(team: teamVM.team, data: element)
             }
@@ -206,9 +215,9 @@ enum TeamNotificationType: Codable, Equatable {
             let firstItemName = items.first?.name ?? ""
             var message: String {
                 if items.count > 1 {
-                    return "\(firstItemName) 他、\(items.count - 1)個のアイテム情報が更新されました。"
+                    return "\(firstItemName) 他、\(items.count - 1)個のカート内アイテムが精算されました。"
                 } else {
-                    return "\(firstItemName) のアイテム情報が更新されました。"
+                    return "カート内の\(firstItemName) が精算されました。"
                 }
             }
             return message

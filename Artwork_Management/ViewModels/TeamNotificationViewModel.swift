@@ -83,7 +83,6 @@ class TeamNotificationViewModel: ObservableObject {
 
         guard let index = team.members.firstIndex(where: { $0.memberUID == uid }) else { return }
         team.members[index].notifications.removeAll(where: { $0.id == data.id })
-        print(team.members[index].notifications)
 
         do {
             _ = try teamRef.setData(from: team)
@@ -98,7 +97,6 @@ class TeamNotificationViewModel: ObservableObject {
 
         for index in team.members.indices {
             team.members[index].notifications.removeAll(where: { $0.id == data.id })
-            print(team.members[index].notifications)
         }
 
         do {
