@@ -54,7 +54,6 @@ fileprivate struct IconAndMessageView: View {
 
     var body: some View {
         let backColor = colorScheme == .dark ? Color.black : Color.white
-        let shadowColor = colorScheme == .dark ? Color.white : Color.black
 
         HStack {
             if let url = element.imageURL {
@@ -223,16 +222,12 @@ enum NotificationType: Codable, Equatable {
 }
 
 struct NotificationBoard_Previews: PreviewProvider {
-    static var vm = TeamViewModel()
+    static var frame = NotificationType.commerce(sampleItems)
     static var previews: some View {
         VStack {
-            TeamNotificationView()
-            Button("通知を確認") {
-                withAnimation(.easeOut(duration: 0.5)) {
-
-                }
-            }
+            IconAndMessageView(element: TeamNotifyFrame(type: frame.type,
+                                                        message: frame.message,
+                                                        exitTime: 10),index: 0)
         }
-        .environmentObject(vm)
     }
 }
