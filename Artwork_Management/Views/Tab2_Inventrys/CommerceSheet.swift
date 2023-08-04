@@ -13,7 +13,7 @@ struct CommerceSheet: View {
 
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var teamVM: TeamViewModel
-    @EnvironmentObject var notifyVM: NotificationViewModel
+    @EnvironmentObject var notifyVM: LocalNotificationViewModel
 
     @StateObject var cartVM: CartViewModel
     @Binding var inputTab: InputTab
@@ -81,7 +81,7 @@ struct CommerceSheet: View {
                         cartVM.resultCartAmount = 0
                         cartVM.doCommerce = true
 
-                        notifyVM.setNotificationToFirestore(team: teamVM.team, type: .commerce(cartItems))
+                        teamVM.setNotificationToFirestore(team: teamVM.team, type: .commerce(cartItems))
                         hapticSuccessNotification()
                     },
                     label: {

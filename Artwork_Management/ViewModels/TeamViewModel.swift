@@ -117,6 +117,39 @@ class TeamViewModel: ObservableObject {
         }
     }
 
+    /// アイテムや新規通知をチーム内の各メンバーに渡すメソッド。
+    func setNotificationToFirestore(team: Team?, type: NotificationType) {
+        guard var team else { return }
+        guard let teamRef = db?.collection("teams").document(team.id) else { return }
+        let notification = TeamNotifyFrame(type: type,
+                                    message: type.message,
+                                    imageURL: type.imageURL,
+                                    exitTime: type.waitTime)
+        for index in team.members.indices {
+            team.members[index].notifications.append(notification)
+        }
+
+        do {
+            _ = try teamRef.setData(from: team)
+        } catch {
+            print("Error: setNotificationToFirestore")
+        }
+    }
+    /// 通知を自身のメンバーデータ内から削除するメソッド。
+    func removeNotificationToFirestore(team: Team?, data: TeamNotifyFrame) {
+        guard var team else { return }
+        guard let teamRef = db?.collection("teams").document(team.id) else { return }
+
+        guard let index = team.members.firstIndex(where: { $0.memberUID == uid }) else { return }
+        team.members[index].notifications.removeAll(where: { $0.id == data.id })
+
+        do {
+            _ = try teamRef.setData(from: team)
+        } catch {
+            print("Error: setNotificationToFirestore")
+        }
+    }
+
     /// チーム作成時にデフォルトのサンプルアイテムを追加するメソッド。
     func setSampleItem(itemsData: [Item] = sampleItems, teamID: String) async {
 

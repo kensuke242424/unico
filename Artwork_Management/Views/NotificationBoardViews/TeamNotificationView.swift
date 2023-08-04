@@ -10,7 +10,7 @@ import SDWebImageSwiftUI
 
 struct TeamNotificationView: View {
 
-    @EnvironmentObject var notifyVM: NotificationViewModel
+    @EnvironmentObject var notifyVM: LocalNotificationViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @Environment(\.colorScheme) var colorScheme
     let screen = UIScreen.main.bounds
@@ -34,40 +34,15 @@ struct TeamNotificationView: View {
             Spacer()
         } // VStack
     }
-    @ViewBuilder
-    func MessageOnly(_ element: NotifyFrame, _ index: Int) -> some View {
-
-        Text(element.message)
-            .tracking(1)
-            .fontWeight(.black)
-            .foregroundColor(.red)
-            .opacity(0.5)
-            .frame(maxWidth: screen.width * 0.8)
-            .padding(10)
-            .background(
-                .white.shadow(.drop(color: .black.opacity(0.25),radius: 10)),
-                        in: RoundedRectangle(cornerRadius: 35)
-            )
-            .opacity(0.9)
-            .offset(y: CGFloat(index) * 10 + 50)
-            .opacity(index == (notifyVM.boardFrames.count - 1) ? 1 : 0.4)
-            .onAppear {
-                DispatchQueue.main.asyncAfter(deadline: .now() + element.exitTime) {
-                    withAnimation {
-                        notifyVM.boardFrames.removeAll(where: {$0.id == element.id})
-                    }
-                }
-            }
-    }
 }
 
 /// アイコン+メッセージ型の通知ボード。
 /// 出現、退場のアニメーション管理はこのビュー内で管理されているため、外側での設定不要。
 /// WebImageの画像ロード完了を待つため、表示までに少しタイムラグを持たせている。
 fileprivate struct IconAndMessageView: View {
-    let element: NotifyFrame
+    let element: TeamNotifyFrame
     let index: Int
-    @EnvironmentObject var notifyVM: NotificationViewModel
+    @EnvironmentObject var notifyVM: LocalNotificationViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @Environment(\.colorScheme) var colorScheme
 
@@ -144,8 +119,7 @@ fileprivate struct IconAndMessageView: View {
                     if value.translation.height < -50 {
                         withAnimation(.spring(response: 0.4, blendDuration: 1)) {
                             state = false
-                            notifyVM.boardFrames.removeAll(where: {$0.id == element.id})
-                            notifyVM.removeNotificationToFirestore(team: teamVM.team, data: element)
+                            teamVM.removeNotificationToFirestore(team: teamVM.team, data: element)
                         }
                     }
                 }
@@ -161,8 +135,7 @@ fileprivate struct IconAndMessageView: View {
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + element.exitTime + loadWaitTime) {
                 withAnimation {
-                    notifyVM.boardFrames.removeAll(where: {$0.id == element.id})
-                    notifyVM.removeNotificationToFirestore(team: teamVM.team, data: element)
+                    teamVM.removeNotificationToFirestore(team: teamVM.team, data: element)
                 }
             }
         }
@@ -250,13 +223,13 @@ enum NotificationType: Codable, Equatable {
 }
 
 struct NotificationBoard_Previews: PreviewProvider {
-    static var vm = NotificationViewModel()
+    static var vm = TeamViewModel()
     static var previews: some View {
         VStack {
             TeamNotificationView()
             Button("通知を確認") {
                 withAnimation(.easeOut(duration: 0.5)) {
-                    vm.setNotify(type: .commerce(sampleItems))
+
                 }
             }
         }

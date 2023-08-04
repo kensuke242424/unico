@@ -58,7 +58,7 @@ struct InputTab {
 struct NewTabView: View {
     
     @EnvironmentObject var navigationVM: NavigationViewModel
-    @EnvironmentObject var notifyVM: NotificationViewModel
+    @EnvironmentObject var localNotifyVM: LocalNotificationViewModel
     @EnvironmentObject var logInVM: LogInViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
@@ -216,10 +216,11 @@ struct NewTabView: View {
                     }
                 }
                 .ignoresSafeArea()
-                /// 通知ビュー
+                /// カスタム通知ビュー
                 .overlay {
                     Group {
                         TeamNotificationView()
+                        LocalNotificationView()
                     }
                 }
                 .navigationDestination(for: SystemPath.self) { systemPath in
@@ -340,7 +341,7 @@ struct NewTabView: View {
                               inputTab: $inputTab,
                               teamID: teamVM.team!.id,
                               memberColor: userVM.memberColor)
-                .environmentObject(notifyVM)
+                .environmentObject(localNotifyVM)
                 .environmentObject(teamVM)
                 
             } // builder.content
@@ -371,10 +372,6 @@ struct NewTabView: View {
         }
         .onAppear {
             tagVM.setFirstActiveTag()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                /// 各データのリスナーを起動
-                notifyVM.notificationListener(id: teamVM.team?.id)
-            }
         }
     } // body
     @ViewBuilder

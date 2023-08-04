@@ -21,7 +21,7 @@ struct NewItemsView: View {
     
     /// Tab親Viewから受け取るViewModelと状態変数
     @EnvironmentObject var navigationVM: NavigationViewModel
-    @EnvironmentObject var notifyVM: NotificationViewModel
+    @EnvironmentObject var localNotifyVM: LocalNotificationViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var tagVM : TagViewModel
@@ -293,7 +293,7 @@ struct NewItemsView: View {
                         // カートに追加する在庫が無いことを知らせる通知
                         if checkHaveNotInventory(item) {
                             withAnimation(.spring(response: 0.2)) {
-                                notifyVM.setNotify(type: .outOfStock)
+                                localNotifyVM.setLocalNotification(type: .outItemStock)
                                 hapticErrorNotification()
                             }
                             return

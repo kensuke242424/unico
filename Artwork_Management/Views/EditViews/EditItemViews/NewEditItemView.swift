@@ -71,7 +71,7 @@ struct NewEditItemView: View {
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var tagVM : TagViewModel
-    @EnvironmentObject var notifyVM: NotificationViewModel
+    @EnvironmentObject var notifyVM: LocalNotificationViewModel
 
     @StateObject var itemVM: ItemViewModel
     
@@ -367,7 +367,7 @@ struct NewEditItemView: View {
                             withAnimation(.easeIn(duration: 0.1)) {
                                 input.showProgress = false
                             }
-                            notifyVM.setNotificationToFirestore(team: teamVM.team,
+                            teamVM.setNotificationToFirestore(team: teamVM.team,
                                                                 type: .updateItem(updateItemData))
                             dismiss()
 
@@ -410,7 +410,7 @@ struct NewEditItemView: View {
                                            teamID: teamVM.team!.id)
                             tagVM.setActiveTag(from: input.selectionTagName)
 
-                            notifyVM.setNotificationToFirestore(team: teamVM.team, type: .addItem(itemData))
+                            teamVM.setNotificationToFirestore(team: teamVM.team, type: .addItem(itemData))
                             withAnimation(.easeIn(duration: 0.1)) { input.showProgress = false }
                             dismiss()
 

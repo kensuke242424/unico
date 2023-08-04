@@ -9,7 +9,7 @@ import SwiftUI
 
 /// 通知ボード一要素分となる構造体。このデータがFireStoreに保存されることで、
 /// チームメンバーにも通知が届く。
-struct NotifyFrame: Identifiable, Equatable, Hashable, Codable {
+struct TeamNotifyFrame: Identifiable, Equatable, Hashable, Codable {
     var id: UUID = .init()
     var type: NotificationType
     var message: String
@@ -17,12 +17,8 @@ struct NotifyFrame: Identifiable, Equatable, Hashable, Codable {
     var exitTime: CGFloat
 }
 
-struct NotifyItem {
-    
-}
-
-extension NotifyFrame {
-    static func == (lhs: NotifyFrame, rhs: NotifyFrame) -> Bool {
+extension TeamNotifyFrame {
+    static func == (lhs: TeamNotifyFrame, rhs: TeamNotifyFrame) -> Bool {
         return lhs.id == rhs.id
     }
     public func hash(into hasher: inout Hasher) {
