@@ -8,44 +8,68 @@
 import SwiftUI
 import SDWebImageSwiftUI
 
+/// チームのメンバー全員に届く通知を表示するビュー。
+/// 現在の通知対象 -> 「アイテムの追加・更新」「メンバーの加入」
 struct TeamNotificationView: View {
 
-    @EnvironmentObject var notifyVM: LocalNotificationViewModel
+    @EnvironmentObject var vm: TeamNotificationViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @Environment(\.colorScheme) var colorScheme
     let screen = UIScreen.main.bounds
-    var myMemberIndex: Int { teamVM.myMemberIndex ?? 0 }
+    var uid: String? { teamVM.uid }
+    var currentTeamMyMemberData: JoinMember? {
+        guard let team = teamVM.team else { return nil }
+        guard let index = teamVM.myMemberIndex else { return nil }
+        return team.members[index]
+    }
 
     @State private var currentNotification: TeamNotifyFrame?
 
     var body: some View {
         VStack {
-            ZStack {
-                ForEach(Array(teamVM.team!
-                    .members[myMemberIndex]
-                    .notifications.enumerated()), id: \.element) { index, element in
-                    switch element.type {
-                    case .addItem, .updateItem, .join, .commerce:
-                        IconAndMessageView(element: element, index: index)
-                    }
+            if let element = vm.currentNotification {
+                switch element.type {
+                case .addItem, .updateItem, .join, .commerce:
+                    IconAndMessageView(element: element)
                 }
-            } // ZStack
-
+            }
             Spacer()
         } // VStack
+        .onChange(of: vm.currentNotification) { value in
+            if value != nil { return }
+            guard let myData = currentTeamMyMemberData else { vm.show = false; return }
+            // 通知データがまだ残っていれば、引き続きvmに格納
+            if let notification = myData.notifications.first {
+                vm.currentNotification = notification
+            // 通知データが残っていなければ、ビューを閉じる
+            } else {
+                vm.show = false
+            }
+        }
         .onAppear {
-            //TODO: 自身のJoinMember内通知データをcurrentNotificationに入れる
+            guard let myData = currentTeamMyMemberData else { vm.show = false; return }
+            if let notification = myData.notifications.first {
+                // 通知データが存在すれば、vmに格納
+                vm.currentNotification = notification
+            } else {
+                // 通知データがもう残っていなければ、ビューを閉じる
+                vm.show = false
+            }
         }
     }
 }
 
 /// アイコン+メッセージ型の通知ボード。
-/// 出現、退場のアニメーション管理はこのビュー内で管理されているため、外側での設定不要。
 /// WebImageの画像ロード完了を待つため、表示までに少しタイムラグを持たせている。
 fileprivate struct IconAndMessageView: View {
-    let element: TeamNotifyFrame
-    let index: Int
 
+    fileprivate enum RemoveType {
+        case local, all
+    }
+    /// 表示される通知ボードの要素データ
+    let element: TeamNotifyFrame
+
+    @EnvironmentObject var vm: TeamNotificationViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @Environment(\.colorScheme) var colorScheme
 
@@ -103,7 +127,6 @@ fileprivate struct IconAndMessageView: View {
                 .fill(.white)
                 .opacity(0.4)
         }
-        .offset(y: CGFloat(index) * 10) // 複数の要素をずらす
         .offset(state ? .zero : CGSize(width: 0, height: -45))
         .offset(dragOffset)
         .opacity(state ? 1 : 0)
@@ -139,13 +162,27 @@ fileprivate struct IconAndMessageView: View {
                 withAnimation {
                     switch element.type {
                     case .addItem, .updateItem, .commerce:
-                        state = false
-                        teamVM.removeAllMemberNotificationToFirestore(team: teamVM.team, data: element)
+                        removeNotificationController(type: .all)
                     case .join:
-                        state = false
-                        teamVM.removeMyNotificationToFirestore(team: teamVM.team, data: element)
+                        removeNotificationController(type: .local)
                     }
                 }
+            }
+        }
+    }
+    func removeNotificationController(type: RemoveType) {
+        switch type {
+        case .local:
+            withAnimation {
+                state = false
+                vm.currentNotification = nil
+                teamVM.removeMyNotificationToFirestore(team: teamVM.team, data: element)
+            }
+        case .all:
+            withAnimation {
+                state = false
+                vm.currentNotification = nil
+                teamVM.removeAllMemberNotificationToFirestore(team: teamVM.team, data: element)
             }
         }
     }
@@ -235,9 +272,7 @@ struct NotificationBoard_Previews: PreviewProvider {
     static var frame = NotificationType.commerce(sampleItems)
     static var previews: some View {
         VStack {
-            IconAndMessageView(element: TeamNotifyFrame(type: frame.type,
-                                                        message: frame.message,
-                                                        exitTime: 10),index: 0)
+            IconAndMessageView(element: TeamNotifyFrame(type: frame.type, message: frame.message, exitTime: 10))
         }
     }
 }

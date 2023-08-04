@@ -27,6 +27,7 @@ struct ArtworkManagementApp: App {
             RootView()
                 .environmentObject(NavigationViewModel())
                 .environmentObject(LocalNotificationViewModel())
+                .environmentObject(TeamNotificationViewModel())
                 .environmentObject(LogInViewModel())
                 .environmentObject(TeamViewModel())
                 .environmentObject(UserViewModel())

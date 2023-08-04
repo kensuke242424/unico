@@ -14,8 +14,15 @@ class TeamNotificationViewModel: ObservableObject {
     init() { print("<<<<<<<<<  TeamNotificationViewModel_init  >>>>>>>>>") }
 
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
-
     var uid: String? { Auth.auth().currentUser?.uid }
+
+    /// 通知の表示開始を管理するプロパティ。
+    /// このプロパティがトグルされると、TeamNotificationViewが初期化され、
+    /// ビュー側で通知データの取得が始まる。
+    @Published var show: Bool = false
+    /// 現在表示されている通知を保持するプロパティ。
+    /// ユーザーが保持している通知の数が無くなるまで、ビュー側で更新が続く。
+    @Published var currentNotification: TeamNotifyFrame?
 
     /// アイテムや新規通知をチーム内の各メンバーに渡すメソッド。
     func setNotificationToFirestore(team: Team?, type: NotificationType) {
