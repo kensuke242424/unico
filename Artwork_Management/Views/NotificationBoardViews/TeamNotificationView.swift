@@ -14,9 +14,9 @@ struct TeamNotificationView: View {
     @EnvironmentObject var teamVM: TeamViewModel
     @Environment(\.colorScheme) var colorScheme
     let screen = UIScreen.main.bounds
-    var myMemberIndex: Int {
-        return teamVM.myMemberIndex ?? 0
-    }
+    var myMemberIndex: Int { teamVM.myMemberIndex ?? 0 }
+
+    @State private var currentNotification: TeamNotifyFrame?
 
     var body: some View {
         VStack {
@@ -33,6 +33,9 @@ struct TeamNotificationView: View {
 
             Spacer()
         } // VStack
+        .onAppear {
+            //TODO: 自身のJoinMember内通知データをcurrentNotificationに入れる
+        }
     }
 }
 
@@ -42,7 +45,7 @@ struct TeamNotificationView: View {
 fileprivate struct IconAndMessageView: View {
     let element: TeamNotifyFrame
     let index: Int
-    @EnvironmentObject var notifyVM: LocalNotificationViewModel
+
     @EnvironmentObject var teamVM: TeamViewModel
     @Environment(\.colorScheme) var colorScheme
 
