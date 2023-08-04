@@ -11,7 +11,7 @@ import SwiftUI
 /// チームメンバーにも通知が届く。
 struct TeamNotifyFrame: Identifiable, Equatable, Hashable, Codable {
     var id: UUID = .init()
-    var type: NotificationType
+    var type: TeamNotificationType
     var message: String
     var imageURL: URL?
     var exitTime: CGFloat

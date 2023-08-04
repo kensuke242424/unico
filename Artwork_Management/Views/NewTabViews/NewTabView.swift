@@ -220,9 +220,7 @@ struct NewTabView: View {
                 /// カスタム通知ビュー
                 .overlay {
                     Group {
-                        if teamNotificationVM.show {
-                            TeamNotificationView()
-                        }
+                        TeamNotificationView()
                         LocalNotificationView()
                     }
                 }

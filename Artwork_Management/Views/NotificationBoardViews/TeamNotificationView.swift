@@ -24,8 +24,6 @@ struct TeamNotificationView: View {
         return team.members[index]
     }
 
-    @State private var currentNotification: TeamNotifyFrame?
-
     var body: some View {
         VStack {
             if let element = vm.currentNotification {
@@ -36,25 +34,24 @@ struct TeamNotificationView: View {
             }
             Spacer()
         } // VStack
-        .onChange(of: vm.currentNotification) { value in
-            if value != nil { return }
-            guard let myData = currentTeamMyMemberData else { vm.show = false; return }
-            if let notification = myData.notifications.first {
-                // 通知データがまだ残っている場合
-                vm.currentNotification = notification
+        .onChange(of: vm.myNotifications) { remainingValue in
+            if remainingValue.isEmpty {
+                print("残ってる通知の数: 0個")
+                return
             } else {
-                // 通知データが残っていない場合
-                vm.show = false
+                print("残ってる通知の数: \(remainingValue.count)個")
+                guard let element = remainingValue.first else { return }
+                vm.currentNotification = element
             }
         }
         .onAppear {
-            guard let myData = currentTeamMyMemberData else { vm.show = false; return }
-            if let notification = myData.notifications.first {
-                // 自身のMemberデータに通知が存在する
-                vm.currentNotification = notification
+            if vm.myNotifications.isEmpty {
+                print("通知の数: 0個")
+                return
             } else {
-                // 通知データが存在しない
-                vm.show = false
+                print("通知の数: \(vm.myNotifications.count)個")
+                guard let element = vm.myNotifications.first else { return }
+                vm.currentNotification = element
             }
         }
     }
@@ -129,8 +126,8 @@ fileprivate struct IconAndMessageView: View {
                 .opacity(0.4)
         }
         .offset(state ? .zero : CGSize(width: 0, height: -45))
-        .offset(dragOffset)
         .opacity(state ? 1 : 0)
+        .offset(dragOffset)
         .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: -50)))
         .gesture(
             DragGesture()
@@ -144,8 +141,7 @@ fileprivate struct IconAndMessageView: View {
                 .onEnded { value in
                     if value.translation.height < -50 {
                         withAnimation(.spring(response: 0.4, blendDuration: 1)) {
-                            state = false
-                            teamVM.removeMyNotificationToFirestore(team: teamVM.team, data: element)
+                            self.removeNotificationController(type: element.type)
                         }
                     }
                 }
@@ -160,47 +156,38 @@ fileprivate struct IconAndMessageView: View {
                 withAnimation(.easeOut(duration: 0.5)) { state = true }
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + element.exitTime + loadWaitTime) {
-                withAnimation {
-                    switch element.type {
-                    case .addItem, .updateItem, .commerce:
-                        removeNotificationController(type: .all)
-                    case .join:
-                        removeNotificationController(type: .local)
-                    }
+                withAnimation(.easeIn(duration: 0.3)) {
+                    self.removeNotificationController(type: element.type)
                 }
             }
         }
     }
-    func removeNotificationController(type: RemoveType) {
+    /// 表示通知の破棄と、表示済み通知の取り扱いをコントロールするメソッド。
+    /// 通知タイプによって、ローカル削除か全体削除かを分岐する。
+    fileprivate func removeNotificationController(type: TeamNotificationType) {
         switch type {
-        case .local:
-            withAnimation {
-                state = false
-                teamVM.removeMyNotificationToFirestore(team: teamVM.team, data: element)
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    vm.currentNotification = nil
-                }
-            }
-        case .all:
-            withAnimation {
-                state = false
+        case .addItem, .updateItem, .commerce:
+            vm.currentNotification = nil
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 teamVM.removeAllMemberNotificationToFirestore(team: teamVM.team, data: element)
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    vm.currentNotification = nil
-                }
+            }
+        case .join:
+            vm.currentNotification = nil
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                teamVM.removeMyNotificationToFirestore(team: teamVM.team, data: element)
             }
         }
     }
 }
 
 /// 通知機能における通知タイプを管理する列挙体。
-enum NotificationType: Codable, Equatable {
+enum TeamNotificationType: Codable, Equatable {
     case addItem(Item)
     case updateItem(Item)
     case commerce([Item])
     case join(User)
 
-    var type: NotificationType {
+    var type: TeamNotificationType {
         return self
     }
 
@@ -274,10 +261,21 @@ enum NotificationType: Codable, Equatable {
 }
 
 struct NotificationBoard_Previews: PreviewProvider {
-    static var frame = NotificationType.commerce(sampleItems)
+    static var notifyVM = TeamNotificationViewModel()
+    static var teamVM = TeamViewModel()
+    static var frame = TeamNotifyFrame(id: UUID(),
+                                       type: .commerce(sampleItems),
+                                       message: "これは通知メッセージのチェックです。",
+                                       imageURL: sampleItems.first!.photoURL,
+                                       exitTime: 3.0)
     static var previews: some View {
-        VStack {
-            IconAndMessageView(element: TeamNotifyFrame(type: frame.type, message: frame.message, exitTime: 10))
+        ZStack {
+            TeamNotificationView()
+            Button("通知を確認") {
+                notifyVM.myNotifications.append(frame)
+            }
         }
+        .environmentObject(notifyVM)
+        .environmentObject(teamVM)
     }
 }

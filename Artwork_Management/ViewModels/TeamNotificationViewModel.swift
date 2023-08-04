@@ -56,7 +56,7 @@ class TeamNotificationViewModel: ObservableObject {
     }
 
     /// アイテムや新規通知をチーム内の各メンバーに渡すメソッド。
-    func setNotificationToFirestore(team: Team?, type: NotificationType) {
+    func setNotificationToFirestore(team: Team?, type: TeamNotificationType) {
         guard var team else { return }
         guard let teamRef = db?.collection("teams").document(team.id) else { return }
         let notification = TeamNotifyFrame(type: type,
@@ -70,7 +70,6 @@ class TeamNotificationViewModel: ObservableObject {
         do {
             _ = try teamRef.setData(from: team)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
-                self.show = true // 通知ビューの発火
             }
         } catch {
             print("Error: setNotificationToFirestore")
