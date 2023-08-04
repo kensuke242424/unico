@@ -136,8 +136,8 @@ class TeamViewModel: ObservableObject {
             print("Error: setNotificationToFirestore")
         }
     }
-    /// 通知を自身のメンバーデータ内から削除するメソッド。
-    func removeNotificationToFirestore(team: Team?, data: TeamNotifyFrame) {
+    /// 自身のみの通知データを消去するメソッド。他メンバーの通知データはそれぞれがログインした時に表示される。
+    func removeMyNotificationToFirestore(team: Team?, data: TeamNotifyFrame) {
         guard var team else { return }
         guard let teamRef = db?.collection("teams").document(team.id) else { return }
 
@@ -147,6 +147,23 @@ class TeamViewModel: ObservableObject {
 
         do {
             _ = try teamRef.setData(from: team)
+        } catch {
+            print("Error: setNotificationToFirestore")
+        }
+    }
+    /// 全メンバーの対象通知データを消去。他のメンバーがログインするまで残しておく必要がない通知データに使う。
+    func removeAllMemberNotificationToFirestore(team: Team?, data: TeamNotifyFrame) {
+        guard var team else { return }
+        guard let teamRef = db?.collection("teams").document(team.id) else { return }
+
+        for index in team.members.indices {
+            team.members[index].notifications.removeAll(where: { $0.id == data.id })
+            print(team.members[index].notifications)
+        }
+
+        do {
+            _ = try teamRef.setData(from: team)
+            print("全メンバーの対象通知データを消去")
         } catch {
             print("Error: setNotificationToFirestore")
         }

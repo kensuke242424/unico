@@ -299,14 +299,17 @@ struct JoinUserDetectCheckView: View {
                         Button("招待する") {
                             Task {
                                 do {
-                                    _ = try await teamVM.addNewTeamMember(data: detectedUser!)
-                                    _ = try await teamVM.addTeamIDToJoinedUser(to: detectedUser!.id)
+                                    guard let detectedUser else { return }
+                                    _ = try await teamVM.addNewTeamMember(data: detectedUser)
+                                    _ = try await teamVM.addTeamIDToJoinedUser(to: detectedUser.id)
                                     withAnimation(.spring(response: 0.8, blendDuration: 1)) { isAgreed.toggle() }
                                     hapticSuccessNotification()
 
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                                         withAnimation(.spring(response: 0.5, blendDuration: 1)) {
                                             teamVM.isShowSearchedNewMemberJoinTeam.toggle()
+                                            teamVM.setNotificationToFirestore(team: teamVM.team,
+                                                                              type: .join(detectedUser))
                                         }
                                     }
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {

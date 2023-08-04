@@ -118,7 +118,7 @@ fileprivate struct IconAndMessageView: View {
                     if value.translation.height < -50 {
                         withAnimation(.spring(response: 0.4, blendDuration: 1)) {
                             state = false
-                            teamVM.removeNotificationToFirestore(team: teamVM.team, data: element)
+                            teamVM.removeMyNotificationToFirestore(team: teamVM.team, data: element)
                         }
                     }
                 }
@@ -134,7 +134,14 @@ fileprivate struct IconAndMessageView: View {
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + element.exitTime + loadWaitTime) {
                 withAnimation {
-                    teamVM.removeNotificationToFirestore(team: teamVM.team, data: element)
+                    switch element.type {
+                    case .addItem, .updateItem, .commerce:
+                        state = false
+                        teamVM.removeAllMemberNotificationToFirestore(team: teamVM.team, data: element)
+                    case .join:
+                        state = false
+                        teamVM.removeMyNotificationToFirestore(team: teamVM.team, data: element)
+                    }
                 }
             }
         }
