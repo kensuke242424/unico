@@ -55,20 +55,21 @@ class TeamViewModel: ObservableObject {
 
         listener = teamRef.addSnapshotListener { snap, error in
             if let error {
-                print("teamRealtimeListener失敗: \(error.localizedDescription)")
+                print("teamListener失敗: \(error.localizedDescription)")
             } else {
                 guard let snap else {
-                    print("teamRealtimeListener_Error: snapがnilです")
+                    print("teamListener_Error: snapがnilです")
                     return
                 }
-                print("teamRealtimeListener開始")
+                print("teamListener開始")
 
                 do {
                     let teamData = try snap.data(as: Team.self)
+                    print(teamData)
                     withAnimation {self.team = teamData}
-                    print("teamRealtimeListenerによりチームデータを更新")
+                    print("teamListenerによりチームデータを更新")
                 } catch {
-                    print("teamRealtimeListener_Error: try snap?.data(as: Team.self)")
+                    print("teamListener_Error: try snap?.data(as: Team.self)")
                 }
             }
         }
@@ -142,6 +143,7 @@ class TeamViewModel: ObservableObject {
 
         guard let index = team.members.firstIndex(where: { $0.memberUID == uid }) else { return }
         team.members[index].notifications.removeAll(where: { $0.id == data.id })
+        print(team.members[index].notifications)
 
         do {
             _ = try teamRef.setData(from: team)

@@ -39,33 +39,48 @@ class ItemViewModel: ObservableObject {
         guard let itemsRef else { return }
 
         listener = itemsRef.addSnapshotListener { (snap, _) in
-            guard let snap = snap else {
-                print("Error: itemsListener_snap nil")
+            guard let documents = snap?.documents else {
+                print("Error: guard let documents = snap?.documents")
                 return
             }
+            // 取得できたアイテムをデコーダブル ⇨ Itemモデルを参照 ⇨ 「items」に詰めていく
+            // with: ⇨ ServerTimestampを扱う際のオプションを指定
+            withAnimation {
+                self.items = documents.compactMap { (snap) -> Item? in
+
+                    return try? snap.data(as: Item.self, with: .estimate)
+                }
+                self.selectedTypesSort()
+
+
+                
+//                guard let snap = snap else {
+//                    print("Error: itemsListener_snap nil")
+//                    return
+//                }
             // リスナーが受け取ったフラグ(追加・更新・削除)によって、処理を分岐する。
-            snap.documentChanges.forEach { diff in
-                if (diff.type == .added) { // 追加
-                    let item = try? diff.document.data(as: Item.self, with: .estimate)
-                    guard let item else { return }
-                    withAnimation {self.items.append(item)}
-                    withAnimation {self.selectedTypesSort()}
-                    print("新規アイテムの追加: \(item)")
-                }
-                if (diff.type == .modified) { // 更新
-                    let item = try? diff.document.data(as: Item.self, with: .estimate)
-                    guard let item else { return }
-                    guard let index = self.items.firstIndex(where: {$0.id == item.id}) else { return }
-                    withAnimation {self.items[index] = item}
-                    withAnimation {self.selectedTypesSort()}
-                    print("既存アイテムの更新: \(item)")
-                }
-                if (diff.type == .removed) { // 削除
-                    let item = try? diff.document.data(as: Item.self, with: .estimate)
-                    guard let item else { return }
-                    withAnimation {self.items.removeAll(where: {$0.id == item.id})}
-                    print("データ削除を確認: \(item)")
-                }
+//            snap.documentChanges.forEach { diff in
+//                if (diff.type == .added) { // 追加
+//                    let item = try? diff.document.data(as: Item.self, with: .estimate)
+//                    guard let item else { return }
+//                    withAnimation {self.items.append(item)}
+//                    withAnimation {self.selectedTypesSort()}
+//                    print("新規アイテムの追加: \(item)")
+//                }
+//                if (diff.type == .modified) { // 更新
+//                    let item = try? diff.document.data(as: Item.self, with: .estimate)
+//                    guard let item else { return }
+//                    guard let index = self.items.firstIndex(where: {$0.id == item.id}) else { return }
+//                    withAnimation {self.items[index] = item}
+//                    withAnimation {self.selectedTypesSort()}
+//                    print("既存アイテムの更新: \(item)")
+//                }
+//                if (diff.type == .removed) { // 削除
+//                    let item = try? diff.document.data(as: Item.self, with: .estimate)
+//                    guard let item else { return }
+//                    withAnimation {self.items.removeAll(where: {$0.id == item.id})}
+//                    print("データ削除を確認: \(item)")
+//                }
             }
         }
     }
