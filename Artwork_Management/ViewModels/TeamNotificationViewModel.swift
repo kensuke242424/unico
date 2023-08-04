@@ -9,6 +9,7 @@ import Foundation
 import Firebase
 import FirebaseFirestore
 
+/// チーム全体に届く通知ボードの保存・表示・削除を管理するクラス。
 class TeamNotificationViewModel: ObservableObject {
 
     init() { print("<<<<<<<<<  TeamNotificationViewModel_init  >>>>>>>>>") }

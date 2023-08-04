@@ -9,12 +9,13 @@ import SwiftUI
 import SDWebImageSwiftUI
 
 /// チームのメンバー全員に届く通知を表示するビュー。
+/// ビューの発火と同時に、自身が持つ通知の取得 -> 表示 -> 破棄 の処理が続く。
+/// 所持通知が無くなると、ビューが閉じる。
 /// 現在の通知対象 -> 「アイテムの追加・更新」「メンバーの加入」
 struct TeamNotificationView: View {
 
     @EnvironmentObject var vm: TeamNotificationViewModel
     @EnvironmentObject var teamVM: TeamViewModel
-    @Environment(\.colorScheme) var colorScheme
     let screen = UIScreen.main.bounds
     var uid: String? { teamVM.uid }
     var currentTeamMyMemberData: JoinMember? {
@@ -38,21 +39,21 @@ struct TeamNotificationView: View {
         .onChange(of: vm.currentNotification) { value in
             if value != nil { return }
             guard let myData = currentTeamMyMemberData else { vm.show = false; return }
-            // 通知データがまだ残っていれば、引き続きvmに格納
             if let notification = myData.notifications.first {
+                // 通知データがまだ残っている場合
                 vm.currentNotification = notification
-            // 通知データが残っていなければ、ビューを閉じる
             } else {
+                // 通知データが残っていない場合
                 vm.show = false
             }
         }
         .onAppear {
             guard let myData = currentTeamMyMemberData else { vm.show = false; return }
             if let notification = myData.notifications.first {
-                // 通知データが存在すれば、vmに格納
+                // 自身のMemberデータに通知が存在する
                 vm.currentNotification = notification
             } else {
-                // 通知データがもう残っていなければ、ビューを閉じる
+                // 通知データが存在しない
                 vm.show = false
             }
         }

@@ -58,7 +58,8 @@ struct InputTab {
 struct NewTabView: View {
     
     @EnvironmentObject var navigationVM: NavigationViewModel
-    @EnvironmentObject var localNotifyVM: LocalNotificationViewModel
+    @EnvironmentObject var localNotificationVM: LocalNotificationViewModel
+    @EnvironmentObject var teamNotificationVM: TeamNotificationViewModel
     @EnvironmentObject var logInVM: LogInViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
@@ -219,7 +220,9 @@ struct NewTabView: View {
                 /// カスタム通知ビュー
                 .overlay {
                     Group {
-                        TeamNotificationView()
+                        if teamNotificationVM.show {
+                            TeamNotificationView()
+                        }
                         LocalNotificationView()
                     }
                 }
@@ -341,7 +344,7 @@ struct NewTabView: View {
                               inputTab: $inputTab,
                               teamID: teamVM.team!.id,
                               memberColor: userVM.memberColor)
-                .environmentObject(localNotifyVM)
+                .environmentObject(localNotificationVM)
                 .environmentObject(teamVM)
                 
             } // builder.content
@@ -372,6 +375,7 @@ struct NewTabView: View {
         }
         .onAppear {
             tagVM.setFirstActiveTag()
+            teamNotificationVM.show.toggle()
         }
     } // body
     @ViewBuilder
