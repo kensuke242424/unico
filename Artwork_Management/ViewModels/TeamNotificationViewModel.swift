@@ -47,7 +47,8 @@ class TeamNotificationViewModel: ObservableObject {
                         .first(where: { $0.memberUID == uid }) else {
                         return
                     }
-                    self.myNotifications = myData.notifications.compactMap({ $0 })
+                    self.myNotifications = myData.notifications
+//                        .compactMap({ $0 })
                 } catch {
                     print("ERROR: try snap?.data(as: Team.self)")
                 }
