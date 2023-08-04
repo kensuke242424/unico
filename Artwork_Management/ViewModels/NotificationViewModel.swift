@@ -52,44 +52,35 @@ class NotificationViewModel: ObservableObject {
 //    }
 
     @MainActor
-    func notificationListener(team: Team?) {
+    func notificationListener(id teamID: String?) {
         print("notificationListener実行")
-        guard var team else { return }
-        guard let teamRef = db?.collection("teams").document(team.id).collection("items") else { return }
+        guard var teamID else { return }
+        guard let uid else { return }
+        let myMemberRef = db?.collection("teams").document(teamID)
+//            .whereField("memberUID", isEqualTo: uid)
+        guard let myMemberRef else {
+            print("ERROR: myMemberRef nil")
+            return
+        }
 
-        listener = teamRef.addSnapshotListener { snap, error in
+        listener = myMemberRef.addSnapshotListener { snapshot, error in
             if let error {
                 print("notificationListener失敗: \(error.localizedDescription)")
+
             } else {
-                guard let snap else {
-                    print("snap_nil")
-                    return
+                guard let snapshot else { print("snap_nil"); return}
+
+
+                do {
+                    let myMemberData = try snapshot.data(as: JoinMember.self)
+                    for notify in myMemberData.notifications {
+                        self.boardFrames.append(notify)
+                    }
+
+                    print("notificationListenerが新しい通知データを取得")
+                } catch {
+                    print("notificationListener: try snap?.data(as: Team.self)")
                 }
-                snap.documentChanges.forEach { diff in
-                    if (diff.type == .added) {
-                        let data = diff.document.data()
-//                        print("新規データを確認: \(data)")
-                    }
-                    if (diff.type == .modified) {
-                        let data = diff.document.data()
-//                        print("データ更新を確認: \(data)")
-                    }
-                    if (diff.type == .removed) {
-                        let data = diff.document.data()
-//                        print("データ削除を確認: \(data)")
-                    }
-                }
-//                do {
-//                    let team = try snap.data(as: Team.self)
-//                    guard let myData = team.members.first(where: {$0.memberUID == self.uid}) else { return }
-//                    for notify in myData.notifications {
-//                        self.boardFrames.append(notify)
-//                    }
-//
-//                    print("notificationListenerが新しい通知データを取得")
-//                } catch {
-//                    print("notificationListener: try snap?.data(as: Team.self)")
-//                }
             }
         }
     }

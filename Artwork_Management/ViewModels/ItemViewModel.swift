@@ -43,27 +43,26 @@ class ItemViewModel: ObservableObject {
                 print("Error: itemsListener_snap nil")
                 return
             }
+            // リスナーが受け取ったフラグ(追加・更新・削除)によって、処理を分岐する。
             snap.documentChanges.forEach { diff in
-                if (diff.type == .added) {
+                if (diff.type == .added) { // 追加
                     let item = try? diff.document.data(as: Item.self, with: .estimate)
                     guard let item else { return }
                     withAnimation {self.items.append(item)}
                     withAnimation {self.selectedTypesSort()}
-                    print("新規アイテムの追加: \(item.name)")
+                    print("新規アイテムの追加: \(item)")
                 }
-                if (diff.type == .modified) {
+                if (diff.type == .modified) { // 更新
                     let item = try? diff.document.data(as: Item.self, with: .estimate)
                     guard let item else { return }
-                    guard let _ = item.updateTime else { return } // Timestamp更新前のフラグを除外
                     guard let index = self.items.firstIndex(where: {$0.id == item.id}) else { return }
                     withAnimation {self.items[index] = item}
                     withAnimation {self.selectedTypesSort()}
                     print("既存アイテムの更新: \(item)")
                 }
-                if (diff.type == .removed) {
+                if (diff.type == .removed) { // 削除
                     let item = try? diff.document.data(as: Item.self, with: .estimate)
                     guard let item else { return }
-                    guard let _ = item.updateTime else { return } // Timestamp更新前のフラグを除外
                     withAnimation {self.items.removeAll(where: {$0.id == item.id})}
                     print("データ削除を確認: \(item)")
                 }
@@ -84,25 +83,6 @@ class ItemViewModel: ObservableObject {
             return try? document.data(as: Item.self, with: .estimate)
         }
         self.selectedTypesSort() // ソート
-    }
-
-    /// 指定idのアイテム一つをFirestoreから取得するメソッド。
-    func fetchOneItem(teamID: String, itemID: String) async -> Item? {
-        guard let itemRef = db?.collection("teams")
-            .document(teamID)
-            .collection("items")
-            .document(itemID) else {
-            print("error: guard let itemRef")
-            return nil
-        }
-
-        do {
-            let itemDocument = try await itemRef.getDocument()
-            let itemData = try itemDocument.data(as: Item.self)
-            return itemData
-        } catch {
-            return nil
-        }
     }
 
     func addItem(itemData: Item, tag: String, teamID: String) {
@@ -280,7 +260,7 @@ class ItemViewModel: ObservableObject {
 
             var item = item
 
-            item.updateTime = nil // nilを代入することで、保存時にTimestamp発火
+            item.updateTime = Date()
             item.sales += item.price * item.amount
             item.inventory -= item.amount
             item.totalAmount += item.amount
@@ -353,11 +333,11 @@ class ItemViewModel: ObservableObject {
         switch self.selectedOder {
         case .up:
             items.sort { before, after in
-                before.createTime!.dateValue() > after.createTime!.dateValue() ? true : false
+                before.createTime > after.createTime ? true : false
             }
         case .down:
             items.sort { before, after in
-                before.createTime!.dateValue() < after.createTime!.dateValue() ? true : false
+                before.createTime < after.createTime ? true : false
             }
         }
     }
@@ -366,11 +346,11 @@ class ItemViewModel: ObservableObject {
         switch self.selectedOder {
         case .up:
             items.sort { before, after in
-                before.updateTime!.dateValue() > after.updateTime!.dateValue() ? true : false
+                before.updateTime > after.updateTime ? true : false
             }
         case .down:
             items.sort { before, after in
-                before.updateTime!.dateValue() < after.updateTime!.dateValue() ? true : false
+                before.updateTime < after.updateTime ? true : false
             }
         }
     }

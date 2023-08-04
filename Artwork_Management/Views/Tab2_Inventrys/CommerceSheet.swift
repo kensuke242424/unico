@@ -81,7 +81,7 @@ struct CommerceSheet: View {
                         cartVM.resultCartAmount = 0
                         cartVM.doCommerce = true
 
-//                        notifyVM.setNotificationToFirestore(team: teamVM.team, type: .commerce(cartItems))
+                        notifyVM.setNotificationToFirestore(team: teamVM.team, type: .commerce(cartItems))
                         hapticSuccessNotification()
                     },
                     label: {

@@ -62,7 +62,7 @@ class CartViewModel: ObservableObject {
 
             var item = item
 
-            item.updateTime = nil // nilを代入することで、保存時にTimestamp発火
+            item.updateTime = Date()
             item.sales += item.price * item.amount
             item.inventory -= item.amount
             item.totalAmount += item.amount

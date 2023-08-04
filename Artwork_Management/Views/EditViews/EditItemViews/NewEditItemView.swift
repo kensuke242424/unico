@@ -339,7 +339,7 @@ struct NewEditItemView: View {
 
                             // NOTE: Timestamp値がnilだと、データの保存&サーバー側でタイムスタンプで2回の更新が走るようだ
                             let updateItemData = (Item(createTime : passItem.createTime,
-                                                       updateTime : nil,
+                                                       updateTime : Date(),
                                                        tag        : input.selectionTagName,
                                                        teamID     : teamVM.team!.id,
                                                        name       : input.name,
@@ -367,8 +367,8 @@ struct NewEditItemView: View {
                             withAnimation(.easeIn(duration: 0.1)) {
                                 input.showProgress = false
                             }
-//                            notifyVM.setNotificationToFirestore(team: teamVM.team,
-//                                                                type: .updateItem(passItem))
+                            notifyVM.setNotificationToFirestore(team: teamVM.team,
+                                                                type: .updateItem(updateItemData))
                             dismiss()
 
                         } // Task(update Item)
@@ -410,7 +410,7 @@ struct NewEditItemView: View {
                                            teamID: teamVM.team!.id)
                             tagVM.setActiveTag(from: input.selectionTagName)
 
-//                            notifyVM.setNotificationToFirestore(team: teamVM.team, type: .addItem(itemData))
+                            notifyVM.setNotificationToFirestore(team: teamVM.team, type: .addItem(itemData))
                             withAnimation(.easeIn(duration: 0.1)) { input.showProgress = false }
                             dismiss()
 

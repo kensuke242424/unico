@@ -8,25 +8,29 @@
 import SwiftUI
 import SDWebImageSwiftUI
 
-struct NotificationBoard: View {
+struct TeamNotificationView: View {
 
     @EnvironmentObject var notifyVM: NotificationViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @Environment(\.colorScheme) var colorScheme
     let screen = UIScreen.main.bounds
+    var myMemberIndex: Int {
+        return teamVM.myMemberIndex ?? 0
+    }
 
     var body: some View {
         VStack {
             ZStack {
-                ForEach(Array(notifyVM.boardFrames.enumerated()), id: \.element) { index, element in
+                ForEach(Array(teamVM.team!
+                    .members[myMemberIndex]
+                    .notifications.enumerated()), id: \.element) { index, element in
                     switch element.type {
                     case .addItem, .updateItem, .join, .commerce:
                         IconAndMessageView(element: element, index: index)
-                    case .outOfStock:
-                        MessageOnly(element, index)
                     }
                 }
             } // ZStack
+
             Spacer()
         } // VStack
     }
@@ -169,7 +173,6 @@ fileprivate struct IconAndMessageView: View {
 enum NotificationType: Codable, Equatable {
     case addItem(Item)
     case updateItem(Item)
-    case outOfStock
     case commerce([Item])
     case join(User)
 
@@ -186,8 +189,6 @@ enum NotificationType: Codable, Equatable {
         case .updateItem(let item):
             let name = item.name.isEmpty ? "No Name" : item.name
             return "\(name) のアイテム情報が更新されました。"
-        case .outOfStock:
-            return "アイテムの在庫が不足しています。"
         case .commerce(let items):
             let firstItemName = items.first?.name ?? ""
             var message: String {
@@ -209,8 +210,6 @@ enum NotificationType: Codable, Equatable {
             return item.photoURL
         case .updateItem(let item):
             return item.photoURL
-        case .outOfStock:
-            return nil
         case .commerce(let items):
             return items.first?.photoURL
         case .join(let user):
@@ -221,8 +220,6 @@ enum NotificationType: Codable, Equatable {
         switch self {
         case .addItem, .updateItem:
             return "shippingbox.fill"
-        case .outOfStock:
-            return ""
         case .commerce:
             return "cart.fill"
         case .join:
@@ -235,8 +232,6 @@ enum NotificationType: Codable, Equatable {
         switch self {
         case .addItem, .updateItem, .join:
             return Color.white
-        case .outOfStock:
-            return Color.red
         case .commerce:
             return Color.mint
         }
@@ -245,8 +240,6 @@ enum NotificationType: Codable, Equatable {
     var waitTime: CGFloat {
         switch self {
         case .addItem, .updateItem:
-            return 2.0
-        case .outOfStock:
             return 2.0
         case .commerce:
             return 3.0
@@ -260,7 +253,7 @@ struct NotificationBoard_Previews: PreviewProvider {
     static var vm = NotificationViewModel()
     static var previews: some View {
         VStack {
-            NotificationBoard()
+            TeamNotificationView()
             Button("通知を確認") {
                 withAnimation(.easeOut(duration: 0.5)) {
                     vm.setNotify(type: .commerce(sampleItems))

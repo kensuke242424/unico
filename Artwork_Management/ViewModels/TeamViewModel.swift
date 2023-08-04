@@ -28,6 +28,11 @@ class TeamViewModel: ObservableObject {
     @Published var alertMessage = ""
 
     var teamID: String? { team?.id }
+    var myMemberIndex: Int? {
+        guard let team else { return nil }
+        let index = team.members.firstIndex(where: {$0.memberUID == uid})
+        return index
+    }
 
     @MainActor
     func fetchTeam(teamID: String) async throws {

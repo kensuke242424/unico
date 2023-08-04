@@ -219,7 +219,7 @@ struct NewTabView: View {
                 /// 通知ビュー
                 .overlay {
                     Group {
-                        NotificationBoard()
+                        TeamNotificationView()
                     }
                 }
                 .navigationDestination(for: SystemPath.self) { systemPath in
@@ -373,7 +373,7 @@ struct NewTabView: View {
             tagVM.setFirstActiveTag()
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                 /// 各データのリスナーを起動
-                notifyVM.notificationListener(team: teamVM.team)
+                notifyVM.notificationListener(id: teamVM.team?.id)
             }
         }
     } // body

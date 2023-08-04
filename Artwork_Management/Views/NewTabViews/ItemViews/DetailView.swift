@@ -328,8 +328,10 @@ struct DetailView: View {
                      "総仕入れ　:　　   -")
                     .padding(.bottom, 12)
 
-                Text("登録日　　:　　 \(asTimesString(item.createTime))")
-                Text("最終更新　:　　 \(asTimesString(item.updateTime))")
+//                Text("登録日　　:　　 \(asTimesString(item.createTime))")
+//                Text("最終更新　:　　 \(asTimesString(item.updateTime))")
+                Text("登録日　　:　　 \(item.createTime.toStringWithCurrentLocale())")
+                Text("最終更新　:　　 \(item.updateTime.toStringWithCurrentLocale())")
             }
             
             Divider()
