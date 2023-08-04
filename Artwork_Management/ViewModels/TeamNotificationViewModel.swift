@@ -5,7 +5,7 @@
 //  Created by Kensuke Nakagawa on 2023/08/04.
 //
 
-import Foundation
+import SwiftUI
 import Firebase
 import FirebaseFirestore
 
@@ -15,6 +15,7 @@ class TeamNotificationViewModel: ObservableObject {
     init() { print("<<<<<<<<<  TeamNotificationViewModel_init  >>>>>>>>>") }
 
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
+    var listener: ListenerRegistration?
     var uid: String? { Auth.auth().currentUser?.uid }
 
     /// 通知の表示開始を管理するプロパティ。
@@ -24,6 +25,35 @@ class TeamNotificationViewModel: ObservableObject {
     /// 現在表示されている通知を保持するプロパティ。
     /// ユーザーが保持している通知の数が無くなるまで、ビュー側で更新が続く。
     @Published var currentNotification: TeamNotifyFrame?
+    @Published var myNotifications: [TeamNotifyFrame] = []
+
+    /// メンバーデータのステートを監視するリスナーメソッド。
+    /// 初期実行時にリスニング対象ドキュメントのデータが全取得される。(フラグはadded)
+    func listener(id currentTeamID: String?) {
+        print("notificationListener実行")
+        guard let uid, let currentTeamID else { return }
+        guard let teamRef = db?.collection("teams")
+            .document(currentTeamID) else { return }
+
+        listener = teamRef.addSnapshotListener { snap, error in
+            if let error {
+                print("ERROR: \(error.localizedDescription)")
+            } else {
+                guard let snap else { print("ERROR: snap nil"); return }
+
+                do {
+                    let teamData = try snap.data(as: Team.self)
+                    guard let myData = teamData.members
+                        .first(where: { $0.memberUID == uid }) else {
+                        return
+                    }
+                    self.myNotifications = myData.notifications.compactMap({ $0 })
+                } catch {
+                    print("ERROR: try snap?.data(as: Team.self)")
+                }
+            }
+        }
+    }
 
     /// アイテムや新規通知をチーム内の各メンバーに渡すメソッド。
     func setNotificationToFirestore(team: Team?, type: NotificationType) {
@@ -39,6 +69,9 @@ class TeamNotificationViewModel: ObservableObject {
 
         do {
             _ = try teamRef.setData(from: team)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
+                self.show = true // 通知ビューの発火
+            }
         } catch {
             print("Error: setNotificationToFirestore")
         }
@@ -74,5 +107,8 @@ class TeamNotificationViewModel: ObservableObject {
         } catch {
             print("Error: setNotificationToFirestore")
         }
+    }
+    deinit {
+        listener?.remove()
     }
 }

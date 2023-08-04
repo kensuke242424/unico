@@ -176,14 +176,18 @@ fileprivate struct IconAndMessageView: View {
         case .local:
             withAnimation {
                 state = false
-                vm.currentNotification = nil
                 teamVM.removeMyNotificationToFirestore(team: teamVM.team, data: element)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    vm.currentNotification = nil
+                }
             }
         case .all:
             withAnimation {
                 state = false
-                vm.currentNotification = nil
                 teamVM.removeAllMemberNotificationToFirestore(team: teamVM.team, data: element)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    vm.currentNotification = nil
+                }
             }
         }
     }

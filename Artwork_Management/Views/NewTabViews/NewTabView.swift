@@ -344,7 +344,7 @@ struct NewTabView: View {
                               inputTab: $inputTab,
                               teamID: teamVM.team!.id,
                               memberColor: userVM.memberColor)
-                .environmentObject(localNotificationVM)
+                .environmentObject(teamNotificationVM)
                 .environmentObject(teamVM)
                 
             } // builder.content
@@ -375,7 +375,7 @@ struct NewTabView: View {
         }
         .onAppear {
             tagVM.setFirstActiveTag()
-            teamNotificationVM.show.toggle()
+            teamNotificationVM.listener(id: teamVM.teamID)
         }
     } // body
     @ViewBuilder

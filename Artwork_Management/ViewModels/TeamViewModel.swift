@@ -65,7 +65,6 @@ class TeamViewModel: ObservableObject {
 
                 do {
                     let teamData = try snap.data(as: Team.self)
-                    print(teamData)
                     withAnimation {self.team = teamData}
                     print("teamListenerによりチームデータを更新")
                 } catch {
