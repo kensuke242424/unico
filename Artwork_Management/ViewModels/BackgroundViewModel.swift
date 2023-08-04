@@ -117,22 +117,6 @@ class BackgroundViewModel: ObservableObject {
             print("背景データの取得失敗")
         }
     }
-
-    // TODO: 6.15 まだ実装できてない
-//    func createTimeSortBackgrounds(order: UpDownOrder) {
-//
-//        switch order {
-//        case .up:
-//            categoryBackgrounds.sort { before, after in
-//                before.createTime!.dateValue() > after.createTime!.dateValue() ? true : false
-//            }
-//
-//        case .down:
-//            categoryBackgrounds.sort { before, after in
-//                before.createTime!.dateValue() < after.createTime!.dateValue() ? true : false
-//            }
-//        }
-//    }
     /// サインアップ時に、ユーザーが写真フォルダから選択した画像をFirestorageに保存するメソッド。
     func uploadUserBackgroundAtSignUp(_ image: UIImage?) async -> (url: URL?, filePath: String?) {
 

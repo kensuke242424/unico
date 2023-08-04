@@ -267,9 +267,11 @@ struct CreateAndJoinTeamView: View {
                         .offset(x: selectTeamFase == .fase2 || selectTeamFase == .check ? 0 :
                                     selectTeamFase == .start || selectTeamFase == .fase1 ? getRect().width : -getRect().width)
                     }
-
+                    /// 相手チームのチーム名とアイコンを表示するビューメソッド。
+                    /// 相手チームからの参加許可に検知時に、参加アナウンスとともに表示される。
                     if selectTeamFase == .success {
-                        joinedTeamIconAndName(image:croppedIconUIImage, name: joinedTeamData?.name)
+                        joinedTeamIconAndName(url:joinedTeamData?.iconURL,
+                                              name: joinedTeamData?.name)
                     }
                 } // ZStack
                 
@@ -461,7 +463,9 @@ struct CreateAndJoinTeamView: View {
             }
         }
     }
-
+    /// 他チーム参加フェーズの選択を管理するカード型のビュー。
+    /// ユーザーが匿名アカウントの場合は、カード上にアカウント登録ボタンを表示し、
+    /// カードを選択できない状態になる。
     @ViewBuilder
     func joinTeamCardView() -> some View {
         ZStack {
@@ -532,7 +536,8 @@ struct CreateAndJoinTeamView: View {
                 .opacity(selectedTeamCard == .start ? 0.7 : 0.0)
         }
     }
-
+    /// チーム新規作成フェーズの選択を管理するカード型のビュー。
+    @ViewBuilder
     func createTeamCardView() -> some View {
         ZStack {
             BlurView(style: .systemUltraThinMaterialDark)
@@ -565,7 +570,9 @@ struct CreateAndJoinTeamView: View {
                 .opacity(selectedTeamCard == .start ? 0.7 : 0.0)
         }
     }
-
+    /// 新規作成したチームのチーム名とアイコンを表示するビュー。
+    /// 作成完了のアナウンスとともに、チーム部屋ログインの直前に表示される。
+    @ViewBuilder
     func createTeamIconAndName() -> some View {
         Group {
             VStack(spacing: 40) {
@@ -601,13 +608,15 @@ struct CreateAndJoinTeamView: View {
             }
         }
     }
-
-    func joinedTeamIconAndName(image iconUIImage: UIImage?, name teamName: String?) -> some View {
+    /// 相手チームのチーム名とアイコンを表示するビューメソッド。
+    /// 相手チームからの参加許可に検知時に、参加アナウンスとともに表示される。
+    @ViewBuilder
+    func joinedTeamIconAndName(url iconImageURL: URL?, name teamName: String?) -> some View {
         Group {
             VStack(spacing: 40) {
                 Group {
-                    if let iconUIImage {
-                        UIImageCircleIcon(photoImage: iconUIImage, size: 150)
+                    if let iconImageURL {
+                        SDWebImageCircleIcon(imageURL: iconImageURL, width: 150, height: 150)
                     } else {
                         CubeCircleIcon(size: 150)
                     }

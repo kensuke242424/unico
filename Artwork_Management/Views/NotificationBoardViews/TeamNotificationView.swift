@@ -141,6 +141,7 @@ fileprivate struct IconAndMessageView: View {
                 .onEnded { value in
                     if value.translation.height < -50 {
                         withAnimation(.spring(response: 0.4, blendDuration: 1)) {
+                            print("スワイプ手動削除時のremoveNotificationController実行")
                             self.removeNotificationController(type: element.type)
                         }
                     }
@@ -157,6 +158,7 @@ fileprivate struct IconAndMessageView: View {
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + element.exitTime + loadWaitTime) {
                 withAnimation(.easeIn(duration: 0.3)) {
+                    print("onAppear側のremoveNotificationController実行")
                     self.removeNotificationController(type: element.type)
                 }
             }
@@ -169,12 +171,12 @@ fileprivate struct IconAndMessageView: View {
         case .addItem, .updateItem, .commerce:
             vm.currentNotification = nil
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                teamVM.removeAllMemberNotificationToFirestore(team: teamVM.team, data: element)
+                vm.removeAllMemberNotificationToFirestore(team: teamVM.team, data: element)
             }
         case .join:
             vm.currentNotification = nil
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                teamVM.removeMyNotificationToFirestore(team: teamVM.team, data: element)
+                vm.removeMyNotificationToFirestore(team: teamVM.team, data: element)
             }
         }
     }

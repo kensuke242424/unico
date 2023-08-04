@@ -117,57 +117,6 @@ class TeamViewModel: ObservableObject {
         }
     }
 
-    /// アイテムや新規通知をチーム内の各メンバーに渡すメソッド。
-    func setNotificationToFirestore(team: Team?, type: TeamNotificationType) {
-        guard var team else { return }
-        guard let teamRef = db?.collection("teams").document(team.id) else { return }
-        let notification = TeamNotifyFrame(type: type,
-                                    message: type.message,
-                                    imageURL: type.imageURL,
-                                    exitTime: type.waitTime)
-        for index in team.members.indices {
-            team.members[index].notifications.append(notification)
-        }
-
-        do {
-            _ = try teamRef.setData(from: team)
-        } catch {
-            print("Error: setNotificationToFirestore")
-        }
-    }
-    /// 自身のみの通知データを消去するメソッド。他メンバーの通知データはそれぞれがログインした時に表示される。
-    func removeMyNotificationToFirestore(team: Team?, data: TeamNotifyFrame) {
-        guard var team else { return }
-        guard let teamRef = db?.collection("teams").document(team.id) else { return }
-
-        guard let index = team.members.firstIndex(where: { $0.memberUID == uid }) else { return }
-        team.members[index].notifications.removeAll(where: { $0.id == data.id })
-        print(team.members[index].notifications)
-
-        do {
-            _ = try teamRef.setData(from: team)
-        } catch {
-            print("Error: setNotificationToFirestore")
-        }
-    }
-    /// 全メンバーの対象通知データを消去。他のメンバーがログインするまで残しておく必要がない通知データに使う。
-    func removeAllMemberNotificationToFirestore(team: Team?, data: TeamNotifyFrame) {
-        guard var team else { return }
-        guard let teamRef = db?.collection("teams").document(team.id) else { return }
-
-        for index in team.members.indices {
-            team.members[index].notifications.removeAll(where: { $0.id == data.id })
-            print(team.members[index].notifications)
-        }
-
-        do {
-            _ = try teamRef.setData(from: team)
-            print("全メンバーの対象通知データを消去")
-        } catch {
-            print("Error: setNotificationToFirestore")
-        }
-    }
-
     /// チーム作成時にデフォルトのサンプルアイテムを追加するメソッド。
     func setSampleItem(itemsData: [Item] = sampleItems, teamID: String) async {
 
@@ -207,14 +156,20 @@ class TeamViewModel: ObservableObject {
 
     func addTeamIDToJoinedUser(to toUID: String) async throws {
 
-        guard let toUserRef = db?.collection("users").document(toUID) else { throw CustomError.getDocument }
+        guard let toUserRef = db?.collection("users")
+            .document(toUID) else { throw CustomError.getDocument }
+        guard let team else { throw CustomError.teamEmpty }
         do {
             let toUserDocument = try await toUserRef.getDocument()
             var toUserData = try toUserDocument.data(as: User.self)
-            let teamData = JoinTeam(teamID: team!.id, name: team!.name, iconURL: team!.iconURL)
 
-            toUserData.joins.append(teamData)
-            toUserData.lastLogIn = team!.id
+            let joinTeamContainer = JoinTeam(teamID: team.id,
+                                    name: team.name,
+                                    iconURL: team.iconURL,
+                                    currentBackground: sampleBackground)
+
+            toUserData.joins.append(joinTeamContainer)
+            toUserData.lastLogIn = team.id
 
             _ = try toUserRef.setData(from: toUserData)
 

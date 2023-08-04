@@ -140,8 +140,10 @@ struct NewTabView: View {
                             // タブのスワイプ遷移時と背景へのblurが重なると、動作が重くなる
                             // オーバーレイでブラー処理済み背景を重ねる
                             .overlay {
-                                BlurMaskingImageView(imageURL: userVM.currentTeamBackground?.imageURL)
-                                    .opacity(inputTab.animationTab == .item ? 1 : 0)
+                                BlurMaskingImageView(
+                                    imageURL: backgroundVM.selectBackground?.imageURL ??
+                                    userVM.currentTeamBackground?.imageURL)
+                                .opacity(inputTab.animationTab == .item ? 1 : 0)
                             }
                             .overlay {
                                 if homeVM.isActiveEdit {

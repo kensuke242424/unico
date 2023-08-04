@@ -29,12 +29,14 @@ class UserViewModel: ObservableObject {
         return user?.userColor ?? ThemeColor.blue
     }
     var currentTeamIndex: Int? {
-        let index = getCurrentTeamIndex()
+        let index = user?.joins.firstIndex(where: { $0.teamID == user?.lastLogIn })
         return index
     }
     /// ユーザーが現在操作しているチームの背景データ
     var currentTeamBackground: Background? {
-        return user?.joins[currentTeamIndex ?? 0].currentBackground
+        let container = user?.joins[currentTeamIndex ?? 0].currentBackground
+        guard let  index = currentTeamIndex else { return nil }
+        return container
     }
 
     @Published var user: User?
@@ -185,13 +187,14 @@ class UserViewModel: ObservableObject {
             throw CustomError.updateData
         }
     }
-
+    /// ユーザーアイコンをFirestorageに保存するメソッド。
+    /// filePathは「users/\(Date()).jpeg」
     func uploadUserImage(_ image: UIImage?) async -> (url: URL?, filePath: String?) {
 
         guard let imageData = image?.jpegData(compressionQuality: 0.8) else {
+            print("ユーザーアイコンのアップロードに失敗しました")
             return (url: nil, filePath: nil)
         }
-        guard let user else { return (url: nil, filePath: nil) }
 
         do {
             let storage = Storage.storage()

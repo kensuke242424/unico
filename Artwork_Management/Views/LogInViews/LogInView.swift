@@ -534,8 +534,9 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             }
         }
         
-        // currentUserを監視するリスナーによってサインインが検知されたら、ユーザが選択したサインインフローに分岐して処理
-        // (ログイン or サインアップ)
+        /// currentUserを監視するリスナーによってサインインが検知されたら、
+        /// ユーザが選択したサインインフローに分岐して処理
+        /// (ログイン or サインアップ)
         .onChange(of: logInVM.signedInOrNotResult) { resultValue in
             
             print("logInVM.signedInOrNotResultの更新を検知")
