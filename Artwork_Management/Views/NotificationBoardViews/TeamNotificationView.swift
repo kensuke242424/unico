@@ -65,7 +65,7 @@ fileprivate struct IconAndMessageBoard: View {
     fileprivate enum RemoveType {
         case local, all
     }
-    /// 表示される通知ボードの要素データ
+    /// 通知の種類データと、種類ごとの要素データをもつ
     let element: TeamNotifyFrame
 
     @EnvironmentObject var vm: TeamNotificationViewModel
@@ -88,8 +88,7 @@ fileprivate struct IconAndMessageBoard: View {
 
         VStack {
             HStack {
-                IconView(url: element.imageURL,
-                         size: CGSize(width: 60, height: 60))
+                CircleIconView(url: element.imageURL, size: 60)
 
                 Text(element.message)
                     .tracking(1)
@@ -100,41 +99,22 @@ fileprivate struct IconAndMessageBoard: View {
             }
             /// detailプロパティがtrueだったら表示される詳細
             if detail {
+                Text("--- 詳細 ---")
+                    .tracking(4)
+                    .font(.footnote)
+                    .fontWeight(.black)
+                    .foregroundColor(.gray)
+                    .opacity(0.5)
                 switch element.type {
                 case .addItem(let item):
-                    EmptyView()
+                    CreateItemDetail(item: item)
 
                 case .updateItem(let item):
-                    EmptyView()
+                    UpdateItemDetail(item: item)
 
-                case .commerce(let cartItems):
-                    VStack {
-                        /// カートアイテムが複数あった場合に、各アイテム情報を切り替える番号テーブルを出す
-                        if cartItems.count > 1 {
-                            HStack {
-                                ForEach(cartItems.indices, id: \.self) { itemIndex in
-                                    Text("\(itemIndex + 1)")
-                                        .frame(maxWidth: .infinity, maxHeight: 30)
-                                        .background {
-                                            if itemIndex == selectedIndex {
-                                                RoundedRectangle(cornerRadius: 10)
-                                                    .fill(.gray)
-                                                    .opacity(0.2)
-                                            }
-                                        }
-                                        .background(
-                                            backColor
-                                                .shadow(.drop(color: .black.opacity(0.2),radius: 3)),
-                                                    in: RoundedRectangle(cornerRadius: 10)
-                                        )
-                                        .onTapGesture { selectedIndex = itemIndex }
-                                }
-                            }
-                        }
-
-                        CommerceItemDetail(cartItems[selectedIndex].before,
-                                           cartItems[selectedIndex].after)
-                    }
+                case .commerce(let commerceItems):
+                    CommerceItemDetail(item: commerceItems[selectedIndex],
+                                       count: commerceItems.count)
 
                 case .join(let user):
                     EmptyView()
@@ -204,65 +184,198 @@ fileprivate struct IconAndMessageBoard: View {
         }
     }
     @ViewBuilder
-    func IconView(url: URL?, size: CGSize) -> some View {
+    func CircleIconView(url: URL?, size: CGFloat) -> some View {
         if let url = url {
             WebImage(url: url)
                 .resizable().scaledToFill()
+                .frame(width: size, height: size)
                 .clipShape(Circle())
-                .frame(width: size.width, height: size.height)
-                .background {
-                    RoundedRectangle(cornerRadius: 40)
-                        .stroke(lineWidth: 1)
-                        .fill(.orange)
-                        .opacity(0.5)
-                }
-                .padding(.trailing, 10)
+                .shadow(radius: 1)
         } else {
             Circle()
                 .fill(.gray.gradient)
-                .frame(width: size.width, height: size.height)
+                .frame(width: size, height: size)
                 .shadow(radius: 1)
-                .overlay {
-                    Image(systemName: element.type.symbol)
-                        .resizable().scaledToFit()
-                        .foregroundColor(.white)
-                        .frame(width: 30, height: 30)
-                }
-                .padding(.trailing, 10)
         }
     }
     @ViewBuilder
-    func CommerceItemDetail(_ before: Item, _ after: Item) -> some View {
-        Grid(alignment: .leading, verticalSpacing: 20) {
-
-            HStack {
-                IconView(url: after.photoURL,
-                         size: CGSize(width: 40, height: 40))
-                CustomOneLineLimitText(text: after.name, limit: 30)
-            }
-            Divider()
-
-            GridRow {
-                Text("在庫")
-                Text(":")
-                Text("\(before.inventory)")
-                Text("▶︎")
-                Text("\(after.inventory)")
-            }
-            Divider()
-
-            if before.sales != after.sales {
-                GridRow {
-                    Text("売り上げ")
-                    Text(":")
-                    Text("\(before.sales)")
-                    Text("▶︎")
-                    Text("\(after.sales)")
-                }
+    func RectIconView(url: URL?, size: CGFloat) -> some View {
+        if let url = url {
+            WebImage(url: url)
+                .resizable().scaledToFill()
+                .frame(width: size, height: size)
+                .clipShape(RoundedRectangle(cornerRadius: 5))
+                .shadow(radius: 1)
+        } else {
+            RoundedRectangle(cornerRadius: 5)
+                .fill(.gray.gradient)
+                .frame(width: size, height: size)
+                .shadow(radius: 1)
+        }
+    }
+    @ViewBuilder
+    /// 通知の詳細部分に表示するアイテムの名前とアイコン
+    func ItemDetailIconAndName(item: Item, size iconSize: CGFloat) -> some View {
+        HStack(spacing: 20) {
+            RectIconView(url: item.photoURL, size: iconSize)
+            VStack(alignment: .leading, spacing: 10) {
+                Text("\(item.tag):").font(.footnote).opacity(0.5)
+                CustomOneLineLimitText(text: item.name, limit: 15)
+                    .fontWeight(.bold)
             }
         }
+    }
+    /// 主にデータ追加時の通知詳細セクションに用いるグリッドひとつ分のグリッドビュー要素。
+    /// 「<データ名> : <データバリュー>」の形でGridRowを返す。
+    /// グリッドの整列制御は親のGrid側で操作する。
+    @ViewBuilder
+    func AddElementGridRow(_ title: String, _ value: String) -> some View {
+        GridRow {
+            Text(title)
+            Text(":")
+            Text(value)
+        }
         .opacity(0.7)
+    }
+    /// 更新が発生したデータの更新内容を、比較で表示するためのグリッドビュー要素。
+    /// 「<データ名> : <更新前バリュー> ▶︎ <更新後バリュー>」の形でGridRowを返す。
+    /// グリッドの整列制御は親のGrid側で操作する。
+    @ViewBuilder
+    func UpdateElementGridRow(_ title: String, _ before: String, _ after: String) -> some View {
+        GridRow {
+            Text(title)
+            Text(":")
+            Text(before)
+            Text("▶︎")
+            Text(after)
+        }
+        .opacity(0.7)
+    }
+    @ViewBuilder
+    func CreateItemDetail(item: Item) -> some View {
+        Grid(alignment: .leading, verticalSpacing: 20) {
+
+            ItemDetailIconAndName(item: item, size: 50)
+            Divider()
+            AddElementGridRow("製作者", item.author.isEmpty ? "???" : item.author)
+            Divider()
+            AddElementGridRow("在庫", String(item.inventory))
+            Divider()
+        } // Grid
         .padding()
+        .padding(.horizontal, 30) // 一要素の詳細しか表示しないため、横幅を狭くする
+
+    }
+    @ViewBuilder
+    func UpdateItemDetail(item: CompareItem) -> some View {
+        Grid(alignment: .leading, verticalSpacing: 20) {
+
+            ItemDetailIconAndName(item: item.after, size: 50)
+            Divider()
+
+            if item.before.tag != item.after.tag {
+                UpdateElementGridRow("タグ",
+                               item.before.tag,
+                               item.after.tag)
+                Divider()
+            }
+            if item.before.name != item.after.name {
+                UpdateElementGridRow("名前",
+                               item.before.name,
+                               item.after.name)
+                Divider()
+            }
+
+            if item.before.author != item.after.author {
+                UpdateElementGridRow("製作者",
+                               item.before.author,
+                               item.after.author)
+                Divider()
+            }
+
+            if item.before.inventory != item.after.inventory {
+                UpdateElementGridRow("在庫",
+                               String(item.before.inventory),
+                               String(item.after.inventory))
+                Divider()
+            }
+            if item.before.cost != item.after.cost {
+                UpdateElementGridRow("原価",
+                               String(item.before.cost),
+                               String(item.after.cost))
+                Divider()
+            }
+            if item.before.sales != item.after.sales {
+                UpdateElementGridRow("売り上げ",
+                               String(item.before.sales),
+                               String(item.after.sales))
+                Divider()
+            }
+
+            if item.before.totalAmount != item.after.totalAmount {
+                UpdateElementGridRow("総売個数",
+                               String(item.before.totalAmount),
+                               String(item.after.totalAmount))
+                Divider()
+            }
+
+            if item.before.totalInventory != item.after.totalInventory {
+                UpdateElementGridRow("総仕入れ",
+                               String(item.before.totalInventory),
+                               String(item.after.totalInventory))
+                Divider()
+            }
+        } // Grid
+        .padding()
+
+    }
+    @ViewBuilder
+    func CommerceItemDetail(item: CompareItem, count commerceItemsCount: Int) -> some View {
+        VStack {
+            if commerceItemsCount > 1 {
+                CommerceItemsTableNumber(count: commerceItemsCount)
+            }
+
+            Grid(alignment: .leading, verticalSpacing: 20) {
+                ItemDetailIconAndName(item: item.after, size: 50)
+                Divider()
+                UpdateElementGridRow("在庫",
+                               String(item.before.inventory),
+                               String(item.after.inventory))
+                Divider()
+
+                if item.before.sales != item.after.sales {
+                    UpdateElementGridRow("売り上げ",
+                                   String(item.before.sales),
+                                   String(item.after.sales))
+                }
+            } // Grid
+            .padding()
+        } // VStack
+    }
+    /// カートアイテムが複数あった場合に、各アイテム情報を切り替えるための番号テーブル。
+    @ViewBuilder
+    func CommerceItemsTableNumber(count itemsCount: Int) -> some View {
+        let backColor = colorScheme == .dark ? Color.black : Color.white
+        HStack {
+            ForEach(0..<itemsCount, id: \.self) { itemIndex in
+                Text("\(itemIndex + 1)")
+                    .frame(maxWidth: .infinity, maxHeight: 30)
+                    .background {
+                        if itemIndex == selectedIndex {
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(.gray)
+                                .opacity(0.2)
+                        }
+                    }
+                    .background(
+                        backColor
+                            .shadow(.drop(color: .black.opacity(0.2),radius: 3)),
+                                in: RoundedRectangle(cornerRadius: 10)
+                    )
+                    .onTapGesture { selectedIndex = itemIndex }
+            }
+        }
     }
     /// 表示通知の破棄と、表示済み通知の取り扱いをコントロールするメソッド。
     /// 通知タイプによって、ローカル削除か全体削除かを分岐する。
@@ -286,7 +399,7 @@ fileprivate struct IconAndMessageBoard: View {
 /// 通知機能における通知タイプを管理する列挙体。
 enum TeamNotificationType: Codable, Equatable {
     case addItem(Item)
-    case updateItem(Item)
+    case updateItem(CompareItem)
     case commerce([CompareItem])
     case join(User)
 
@@ -301,18 +414,10 @@ enum TeamNotificationType: Codable, Equatable {
             let name = item.name.isEmpty ? "No Name" : item.name
             return "\(name) がチームアイテムに追加されました。"
         case .updateItem(let item):
-            let name = item.name.isEmpty ? "No Name" : item.name
+            let name = item.before.name.isEmpty ? "No Name" : item.before.name
             return "\(name) のアイテム情報が更新されました。"
         case .commerce(let items):
-            let firstItemName = items.first?.after.name ?? ""
-            var message: String {
-                if items.count > 1 {
-                    return "\(firstItemName) 他、\(items.count - 1)個のカート内アイテムが精算されました。"
-                } else {
-                    return "カート内の\(firstItemName) が精算されました。"
-                }
-            }
-            return message
+            return "カート内 \(items.count) 個のアイテムが精算されました。"
         case .join(let user):
             return "\(user.name) さんがチームに参加しました。"
         }
@@ -323,7 +428,7 @@ enum TeamNotificationType: Codable, Equatable {
         case .addItem(let item):
             return item.photoURL
         case .updateItem(let item):
-            return item.photoURL
+            return item.after.photoURL
         case .commerce(let items):
             return items.first?.after.photoURL
         case .join(let user):
@@ -367,7 +472,7 @@ struct NotificationBoard_Previews: PreviewProvider {
     static var notifyVM = TeamNotificationViewModel()
     static var teamVM = TeamViewModel()
     static var frame = TeamNotifyFrame(id: UUID(),
-                                       type: .updateItem(sampleItems.first!),
+                                       type: .addItem(sampleItems.first!),
                                        message: "これは通知メッセージのチェックです。",
                                        imageURL: sampleItems.first!.photoURL,
                                        exitTime: 3.0)

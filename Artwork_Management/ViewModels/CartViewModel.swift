@@ -88,7 +88,7 @@ class CartViewModel: ObservableObject {
 
         return compareItems
     }
-    
+    /// カート内の総価格・総個数・選択アイテムを全てリセットするメソッド。
     func resetCart() {
         self.resultCartPrice = 0
         self.resultCartAmount = 0

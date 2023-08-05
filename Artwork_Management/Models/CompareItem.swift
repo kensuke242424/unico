@@ -7,8 +7,8 @@
 
 import Foundation
 
-/// カート処理時の通知作成において用いられるモデル。
-/// 処理前と処理後のアイテムデータ比較を目的とする。
+/// アイテムデータの更新前と更新後の比較値を使いたい時に用いるモデル。
+/// Firestoreへのコーダブル保存を可能にするため、Codableに準拠。
 struct CompareItem: Codable, Equatable {
     let before: Item
     let after: Item

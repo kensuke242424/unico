@@ -119,5 +119,5 @@ var sampleItems: [Item] =
          sales: 40000,
          inventory: 180,
          totalAmount: 20,
-             totalInventory: 200),
+         totalInventory: 200),
 ]

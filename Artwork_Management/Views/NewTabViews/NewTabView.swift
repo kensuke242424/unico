@@ -81,7 +81,7 @@ struct NewTabView: View {
             let size = $0.size
             
             NavigationStack(path: $navigationVM.path) {
-                
+
                 VStack {
                     TabTopBarView()
                         .blur(radius: backgroundVM.checkMode ||
@@ -289,6 +289,8 @@ struct NewTabView: View {
                         Spacer()
                         Button(
                             action: {
+                                inputTab.showCart = .hidden
+                                inputTab.showCommerce = .hidden
                                 cartVM.resetCart()
                             },
                             label: {
@@ -339,14 +341,13 @@ struct NewTabView: View {
         // 🧺決済リザルトのシート画面
         .resizableSheet($inputTab.showCommerce, id: "B") {builder in
             builder.content { _ in
-                
+
                 CommerceSheet(cartVM: cartVM,
                               inputTab: $inputTab,
-                              teamID: teamVM.team!.id,
+                              teamID: teamVM.team?.id ?? "",
                               memberColor: userVM.memberColor)
                 .environmentObject(teamNotificationVM)
                 .environmentObject(teamVM)
-                
             } // builder.content
             .supportedState([.medium])
             .sheetBackground { _ in
@@ -357,6 +358,7 @@ struct NewTabView: View {
                 EmptyView()
             }
         }
+        /// カートの状態を監視し、アイテムが入ったらカートビューを表示する。
         .onChange(of: cartVM.resultCartAmount) {
             [beforeCart = cartVM.resultCartAmount] afterCart in
             
@@ -367,10 +369,16 @@ struct NewTabView: View {
                     inputTab.showCart = .medium
                 }
             }
-            if afterCart == 0 {
-                print("カートアイテムが空になったのを検知。シートを閉じる")
+        }
+        /// カートの精算実行を監視する
+        .onChange(of: cartVM.doCommerce) { doCommerce in
+            if doCommerce {
+                print("カートアイテムが空になったのを検知。カート内容をリセットし、シートを閉じる")
                 inputTab.showCart = .hidden
                 inputTab.showCommerce = .hidden
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    cartVM.resetCart()
+                }
             }
         }
         .onAppear {

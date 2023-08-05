@@ -338,7 +338,7 @@ struct NewEditItemView: View {
                             }
 
                             // NOTE: Timestamp値がnilだと、データの保存&サーバー側でタイムスタンプで2回の更新が走るようだ
-                            let updateItemData = (Item(createTime : passItem.createTime,
+                            let updatedItem = (Item(createTime : passItem.createTime,
                                                        updateTime : Date(),
                                                        tag        : input.selectionTagName,
                                                        teamID     : teamVM.team!.id,
@@ -358,7 +358,9 @@ struct NewEditItemView: View {
                                                        passItem.totalInventory + (editInventory - passItem.inventory) :
                                                         passItem.totalInventory - (passItem.inventory - editInventory) ))
 
-                            itemVM.updateItem(updateData: updateItemData, defaultDataID: defaultDataID, teamID: teamVM.team!.id)
+                            itemVM.updateItem(updateData: updatedItem,
+                                              defaultDataID: defaultDataID,
+                                              teamID: teamVM.team!.id)
                             /// 編集アイテムの新規タグ設定とアイテムタブビュー内の選択タグを合わせる
                             /// 編集画面から戻った時、アイテムカードが適切にアニメーションするために必要
                             if tagVM.activeTag != tagVM.tags.first {
@@ -367,8 +369,11 @@ struct NewEditItemView: View {
                             withAnimation(.easeIn(duration: 0.1)) {
                                 input.showProgress = false
                             }
+
+                            /// 通知データの作成
+                            let compareItemData = CompareItem(before: passItem, after: updatedItem)
                             teamNotificationVM.setNotificationToFirestore(team: teamVM.team,
-                                                                          type: .updateItem(updateItemData))
+                                                                          type: .updateItem(compareItemData))
                             dismiss()
 
                         } // Task(update Item)
@@ -388,7 +393,7 @@ struct NewEditItemView: View {
                                 input.photoPath = newImageData.filePath
                             }
                             
-                            var itemData = Item(tag           : input.selectionTagName,
+                            var newItem = Item(tag           : input.selectionTagName,
                                                 teamID        : teamVM.team!.id,
                                                 name          : input.name.isEmpty ? "No Name" : input.name,
                                                 author        : input.author,
@@ -405,13 +410,13 @@ struct NewEditItemView: View {
                                                 totalInventory: Int(input.inventory) ?? 0)
                             
                             // Firestoreにコーダブル保存
-                            itemVM.addItem(itemData: itemData,
+                            itemVM.addItem(itemData: newItem,
                                            tag: input.selectionTag?.tagName ?? "未グループ",
                                            teamID: teamVM.team!.id)
                             tagVM.setActiveTag(from: input.selectionTagName)
 
                             teamNotificationVM.setNotificationToFirestore(team: teamVM.team,
-                                                                          type: .addItem(itemData))
+                                                                          type: .addItem(newItem))
                             withAnimation(.easeIn(duration: 0.1)) { input.showProgress = false }
                             dismiss()
 
