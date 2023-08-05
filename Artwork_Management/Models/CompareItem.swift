@@ -9,7 +9,7 @@ import Foundation
 
 /// カート処理時の通知作成において用いられるモデル。
 /// 処理前と処理後のアイテムデータ比較を目的とする。
-struct CompareItem: Codable {
+struct CompareItem: Codable, Equatable {
     let before: Item
     let after: Item
 }

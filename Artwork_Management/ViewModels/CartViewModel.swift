@@ -43,14 +43,18 @@ class CartViewModel: ObservableObject {
             cartItems.append(item)
         }
     }
-    
-    func updateCommerceItems(teamID: String) {
+    /// カート内の各アイテムを精算し、アイテム情報を更新するメソッド。
+    /// 同時に、アイテムの更新前・更新後二つのデータを入れたCompareItemモデルを配列で返す。
+    /// CompareItemは通知の比較表示などで用いる。
+    func updateCommerceItemsAndGetCompare(teamID: String) -> [CompareItem] {
 
         print("updateCommerse実行")
 
+        var compareItems: [CompareItem] = []
+
         guard let itemsRef = db?.collection("teams").document(teamID).collection("items") else {
             print("error: guard let tagsRef")
-            return
+            return compareItems
         }
 
         for item in cartItems where item.amount != 0 {
@@ -59,17 +63,21 @@ class CartViewModel: ObservableObject {
                 print("Error: 「\(item.name)」 guard let = item.id")
                 continue
             }
+            // 更新前・更新後を分けるためのアイテムコンテナを用意
+            let defaultItem = item
+            var updateItem = item
 
-            var item = item
-
-            item.updateTime = Date()
-            item.sales += item.price * item.amount
-            item.inventory -= item.amount
-            item.totalAmount += item.amount
-            item.amount = 0
+            updateItem.updateTime = Date()
+            updateItem.sales += item.price * item.amount
+            updateItem.inventory -= item.amount
+            updateItem.totalAmount += item.amount
+            updateItem.amount = 0
 
             do {
-                try itemsRef.document(itemID).setData(from: item)
+                try itemsRef.document(itemID).setData(from: updateItem)
+                // Firestoreへの保存が成功すれば、更新比較アイテム情報CompareItemを返す
+                let compareItem = CompareItem(before: defaultItem, after: updateItem)
+                compareItems.append(compareItem)
             } catch {
                 print("Error: 「\(item.name)」try reference.document(itemID).setData(from: item)")
             }
@@ -77,6 +85,8 @@ class CartViewModel: ObservableObject {
         print("updateCommerse完了")
         resetCart()
         self.doCommerce = true
+
+        return compareItems
     }
     
     func resetCart() {

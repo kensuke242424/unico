@@ -342,7 +342,7 @@ struct NewEditItemView: View {
                                                        updateTime : Date(),
                                                        tag        : input.selectionTagName,
                                                        teamID     : teamVM.team!.id,
-                                                       name       : input.name,
+                                                       name       : input.name.isEmpty ? "No Name" : input.name,
                                                        author     : input.author,
                                                        detail     : input.detail != "" ? input.detail : "メモなし",
                                                        photoURL   : input.photoURL,

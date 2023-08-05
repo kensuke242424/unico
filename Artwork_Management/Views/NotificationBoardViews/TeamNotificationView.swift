@@ -132,8 +132,8 @@ fileprivate struct IconAndMessageBoard: View {
                             }
                         }
 
-                        CommerceItemDetail(cartItems[selectedIndex],
-                                           cartItems[selectedIndex])
+                        CommerceItemDetail(cartItems[selectedIndex].before,
+                                           cartItems[selectedIndex].after)
                     }
 
                 case .join(let user):
@@ -220,7 +220,7 @@ fileprivate struct IconAndMessageBoard: View {
         } else {
             Circle()
                 .fill(.gray.gradient)
-                .frame(width: 60, height: 60)
+                .frame(width: size.width, height: size.height)
                 .shadow(radius: 1)
                 .overlay {
                     Image(systemName: element.type.symbol)
@@ -287,7 +287,7 @@ fileprivate struct IconAndMessageBoard: View {
 enum TeamNotificationType: Codable, Equatable {
     case addItem(Item)
     case updateItem(Item)
-    case commerce([Item])
+    case commerce([CompareItem])
     case join(User)
 
     var type: TeamNotificationType {
@@ -304,7 +304,7 @@ enum TeamNotificationType: Codable, Equatable {
             let name = item.name.isEmpty ? "No Name" : item.name
             return "\(name) のアイテム情報が更新されました。"
         case .commerce(let items):
-            let firstItemName = items.first?.name ?? ""
+            let firstItemName = items.first?.after.name ?? ""
             var message: String {
                 if items.count > 1 {
                     return "\(firstItemName) 他、\(items.count - 1)個のカート内アイテムが精算されました。"
@@ -325,7 +325,7 @@ enum TeamNotificationType: Codable, Equatable {
         case .updateItem(let item):
             return item.photoURL
         case .commerce(let items):
-            return items.first?.photoURL
+            return items.first?.after.photoURL
         case .join(let user):
             return user.iconURL
         }
@@ -367,7 +367,7 @@ struct NotificationBoard_Previews: PreviewProvider {
     static var notifyVM = TeamNotificationViewModel()
     static var teamVM = TeamViewModel()
     static var frame = TeamNotifyFrame(id: UUID(),
-                                       type: .commerce(sampleItems),
+                                       type: .updateItem(sampleItems.first!),
                                        message: "これは通知メッセージのチェックです。",
                                        imageURL: sampleItems.first!.photoURL,
                                        exitTime: 3.0)

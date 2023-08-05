@@ -76,14 +76,15 @@ struct CommerceSheet: View {
 
                 Button(
                     action: {
-                        let cartItems = cartVM.cartItems // 通知用に使う
-                        cartVM.updateCommerceItems(teamID: teamID)
+                        /// カート内各アイテムの更新前・更新後データがメソッドの返り値として渡ってくる
+                        /// これらのデータを通知用の比較表示データとして渡す
+                        let compareItems = cartVM.updateCommerceItemsAndGetCompare(teamID: teamID)
                         cartVM.resultCartPrice = 0
                         cartVM.resultCartAmount = 0
                         cartVM.doCommerce = true
-
+                        // 通知
                         teamNotificationVM.setNotificationToFirestore(team: teamVM.team,
-                                                                      type: .commerce(cartItems))
+                                                                      type: .commerce(compareItems))
                         hapticSuccessNotification()
                     },
                     label: {
