@@ -82,11 +82,13 @@ fileprivate struct NotificationContainer: View {
     /// 通知アイコンWebImageの画像ロード完了を待つ時間。出現時のアニメーション不具合を防ぐため。
     let loadWaitTime: CGFloat = 0.5
     let screen = UIScreen.main.bounds
-    let timer = Timer.publish(every: 1, on: .current, in: .common).autoconnect()
+    let stateTimer = Timer.publish(every: 1, on: .current, in: .common).autoconnect()
     /// データ更新内容の取り消しを管理するプロパティ群
     @State private var cancelState: Bool = false
     @State private var longPressButtonFrame: CGFloat = .zero
     let cancelButtonFrame: CGFloat = 80
+    let longPressMinTime: CGFloat = 1.0
+    let cancelTimer = Timer.publish(every: 0.01, on: .current, in: .common) .autoconnect()
 
     var body: some View {
         let backColor = colorScheme == .dark ? Color.black : Color.white
@@ -140,17 +142,36 @@ fileprivate struct NotificationContainer: View {
                             Capsule()
                                 .fill(.red)
                                 .frame(width: cancelState ?
-                                       longPressButtonFrame : cancelButtonFrame)
+                                       longPressButtonFrame : 80)
                             Spacer().frame(minWidth: 0)
                         }
                     )
                     .background(Capsule().fill(.gray.opacity(0.6)))
-
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .frame(maxWidth: .infinity)
                     .padding(.leading)
-                    .onTapGesture(perform: {
-                        cancelState.toggle()
+                    .scaleEffect(cancelState ? 1 + (longPressButtonFrame / 250) : 1)
+                    .onLongPressGesture(
+                        minimumDuration: longPressMinTime, // プレス完了の時間設定
+                        pressing: { pressing in
+                            if pressing {
+                                // プレス開始
+                                cancelState = true
+                            } else {
+                                // プレス中断
+                                cancelState = false
+                                longPressButtonFrame = 0
+                            }
+                        },
+                        // プレス完了
+                        perform: {
+                            cancelState = false
+                            longPressButtonFrame = 0
                     })
+                    .onReceive(cancelTimer) { value in
+                        if !cancelState { return }
+                        // Timerの更新が0.01ごとのため、100で割る
+                        longPressButtonFrame += (cancelButtonFrame / 100)
+                    }
             }
         }
         .frame(width: screen.width * 0.9)
@@ -208,7 +229,7 @@ fileprivate struct NotificationContainer: View {
             }
         }
         /// 通知ボードの破棄タイミングに使うタイムカウント。
-        .onReceive(timer) { _ in
+        .onReceive(stateTimer) { _ in
             if dragOffset != .zero || detail {
                 count = 0
             } else {

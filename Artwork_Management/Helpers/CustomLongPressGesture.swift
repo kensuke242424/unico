@@ -28,7 +28,6 @@ struct CustomLongPressGesture: ViewModifier {
                         }
                         withAnimation(.spring(response: 1.2, blendDuration: 1)) {
                             self.pressing = true
-
                         }
                     } else {
                         withAnimation {
