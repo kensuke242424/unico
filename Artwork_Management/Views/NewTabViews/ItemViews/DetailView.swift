@@ -28,6 +28,10 @@ struct DetailView: View {
     @State private var openDetail: Bool = false
     @State private var showDetailBackground: Bool = false
     @State private var showDeleteAlert: Bool = false
+
+    var favoriteStatus: Bool {
+        return userVM.user?.favorites.contains(where: {$0 == item.id}) ?? false
+    }
     
     var body: some View {
         
@@ -149,11 +153,11 @@ struct DetailView: View {
                 HStack(spacing: 0) {
                     
                     Button {
-                        itemVM.updateFavorite(item)
+                        userVM.updateFavorite(item.id)
                     } label: {
-                        Label("お気に入り", systemImage: item.favorite ? "heart.fill" : "suit.heart")
-                            .font(.callout)
-                            .foregroundColor(item.favorite ? .red : .gray)
+                        Label("お気に入り", systemImage: favoriteStatus ? "heart.fill" : "suit.heart")
+                        .font(.callout)
+                        .foregroundColor(favoriteStatus ? .red : .gray)
                     }
                     .frame(maxWidth: .infinity)
                     .disabled(openDetail ? true : false)

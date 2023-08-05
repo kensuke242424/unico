@@ -384,10 +384,14 @@ struct NewItemsView: View {
     
     @ViewBuilder
     private func FavoriteButton(_ item: Item) -> some View {
+        /// ユーザーが対象アイテムをお気に入りに入れているかをBool値で返すプロパティ
+        var favoriteStatus: Bool {
+            return userVM.user?.favorites.contains(where: {$0 == item.id}) ?? false
+        }
         Button {
             userVM.updateFavorite(item.id)
         } label: {
-            if userVM.user?.favorites.firstIndex(of: item.id ?? "") != nil {
+            if favoriteStatus {
                 Image(systemName: "heart.fill")
             } else {
                 Image(systemName: "heart")
@@ -395,7 +399,7 @@ struct NewItemsView: View {
         }
         .particleEffect(systemImage: "heart.fill",
                         font: .title,
-                        status: userVM.user?.favorites.firstIndex(of: item.id ?? "") != nil,
+                        status: favoriteStatus,
                         activeTint: .red,
                         inActiveTint: .white
         )
