@@ -12,4 +12,5 @@ import Foundation
 struct CompareItem: Codable, Equatable {
     let before: Item
     let after: Item
+    var cancel: Bool? // 取り消しが実行されるとtrue
 }

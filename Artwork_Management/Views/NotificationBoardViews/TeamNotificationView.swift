@@ -79,16 +79,21 @@ fileprivate struct NotificationContainer: View {
     @State private var count: Int = 0
     @GestureState var dragOffset: CGSize = .zero
     @Namespace var animation
-    /// WebImageの画像ロード完了を待つ時間。出現時のアニメーション不具合を防ぐため。
+    /// 通知アイコンWebImageの画像ロード完了を待つ時間。出現時のアニメーション不具合を防ぐため。
     let loadWaitTime: CGFloat = 0.5
     let screen = UIScreen.main.bounds
     let timer = Timer.publish(every: 1, on: .current, in: .common).autoconnect()
+    /// データ更新内容の取り消しを管理するプロパティ群
+    @State private var cancelState: Bool = false
+    @State private var longPressButtonFrame: CGFloat = .zero
+    let cancelButtonFrame: CGFloat = 80
 
     var body: some View {
         let backColor = colorScheme == .dark ? Color.black : Color.white
         let shadowColor = colorScheme == .dark ? Color.white : Color.black
 
         VStack {
+            /// 通知ボードのヘッドビュー
             HStack {
                 CircleIconView(url: element.imageURL, size: 60)
 
@@ -99,13 +104,14 @@ fileprivate struct NotificationContainer: View {
                     .opacity(0.7)
                     .padding(.horizontal, 10)
             }
-            /// detailプロパティがtrueだったら表示される詳細
+            /// 通知ボードの詳細ビュー
             if detail {
                 Text("--- 詳細 ---")
                     .tracking(4)
                     .font(.footnote)
                     .fontWeight(.black)
                     .foregroundColor(.gray.opacity(0.6))
+
                 switch element.type {
                 case .addItem(let item):
                     CreateItemDetail(item: item)
@@ -120,6 +126,31 @@ fileprivate struct NotificationContainer: View {
                 case .join(let user):
                     EmptyView()
                 }
+
+                Label("取消", systemImage: "clock.arrow.circlepath")
+                    .font(.subheadline)
+                    .fontWeight(.bold)
+                    .foregroundColor(cancelState ? .gray : .white)
+                    .padding(8)
+                    .frame(width: cancelButtonFrame)
+                    /// ボタン長押しで変動する背景フレーム
+                    /// 規定時間まで長押しが続くと、対象データの変更内容が取り消される
+                    .background(
+                        HStack {
+                            Capsule()
+                                .fill(.red)
+                                .frame(width: cancelState ?
+                                       longPressButtonFrame : cancelButtonFrame)
+                            Spacer().frame(minWidth: 0)
+                        }
+                    )
+                    .background(Capsule().fill(.gray.opacity(0.6)))
+
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.leading)
+                    .onTapGesture(perform: {
+                        cancelState.toggle()
+                    })
             }
         }
         .frame(width: screen.width * 0.9)
@@ -354,6 +385,7 @@ fileprivate struct NotificationContainer: View {
                     UpdateElementGridRow("売り上げ",
                                    String(item.before.sales),
                                    String(item.after.sales))
+                    Divider()
                 }
             } // Grid
             .padding()
