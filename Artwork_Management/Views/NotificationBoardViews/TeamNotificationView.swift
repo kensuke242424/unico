@@ -29,7 +29,7 @@ struct TeamNotificationView: View {
             if let element = vm.currentNotification {
                 switch element.type {
                 case .addItem, .updateItem, .join, .commerce:
-                    IconAndMessageView(element: element)
+                    IconAndMessageBoard(element: element)
                 }
             }
             Spacer()
@@ -60,7 +60,7 @@ struct TeamNotificationView: View {
 
 /// アイコン+メッセージ型の通知ボード。
 /// WebImageの画像ロード完了を待つため、表示までに少しタイムラグを持たせている。
-fileprivate struct IconAndMessageView: View {
+fileprivate struct IconAndMessageBoard: View {
 
     fileprivate enum RemoveType {
         case local, all
@@ -73,6 +73,8 @@ fileprivate struct IconAndMessageView: View {
     @Environment(\.colorScheme) var colorScheme
 
     @State private var state: Bool = false
+    @State private var detail: Bool = false
+    @State private var selectedIndex: Int = 0
     @State private var count: Int = 0
     @GestureState var dragOffset: CGSize = .zero
     /// WebImageの画像ロード完了を待つ時間。出現時のアニメーション不具合を防ぐため。
@@ -83,39 +85,80 @@ fileprivate struct IconAndMessageView: View {
     var body: some View {
         let backColor = colorScheme == .dark ? Color.black : Color.white
 
-        HStack {
-            if let url = element.imageURL {
-                WebImage(url: url)
-                    .resizable().scaledToFill()
-                    .clipShape(Circle())
-                    .frame(width: 60, height: 60)
-                    .background {
-                        RoundedRectangle(cornerRadius: 40)
-                            .stroke(lineWidth: 1)
-                            .fill(.orange)
-                            .opacity(0.5)
-                    }
-                    .padding(.trailing, 10)
-            } else {
-                Circle()
-                    .fill(.gray.gradient)
-                    .frame(width: 60, height: 60)
-                    .shadow(radius: 1)
-                    .overlay {
-                        Image(systemName: element.type.symbol)
-                            .resizable().scaledToFit()
-                            .foregroundColor(.white)
-                            .frame(width: 30, height: 30)
-                    }
-                    .padding(.trailing, 10)
-            }
+        VStack {
+            HStack {
+                if let url = element.imageURL {
+                    WebImage(url: url)
+                        .resizable().scaledToFill()
+                        .clipShape(Circle())
+                        .frame(width: 60, height: 60)
+                        .background {
+                            RoundedRectangle(cornerRadius: 40)
+                                .stroke(lineWidth: 1)
+                                .fill(.orange)
+                                .opacity(0.5)
+                        }
+                        .padding(.trailing, 10)
+                } else {
+                    Circle()
+                        .fill(.gray.gradient)
+                        .frame(width: 60, height: 60)
+                        .shadow(radius: 1)
+                        .overlay {
+                            Image(systemName: element.type.symbol)
+                                .resizable().scaledToFit()
+                                .foregroundColor(.white)
+                                .frame(width: 30, height: 30)
+                        }
+                        .padding(.trailing, 10)
+                }
 
-            Text(element.message)
-                .tracking(1)
-                .fontWeight(.bold)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .opacity(0.7)
-                .padding(.trailing, 5)
+                Text(element.message)
+                    .tracking(1)
+                    .fontWeight(.bold)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .opacity(0.7)
+                    .padding(.trailing, 5)
+            }
+            /// detailプロパティがtrueだったら表示される詳細
+            if detail {
+                switch element.type {
+                case .addItem(let item):
+                    UpdateItemDetail(item, item)
+
+                case .updateItem(let item):
+                    UpdateItemDetail(item, item)
+
+                case .commerce(let cartItems):
+                    VStack {
+                        HStack {
+                            ForEach(cartItems.indices) { itemIndex in
+                                Text("\(itemIndex + 1)")
+                                    .frame(maxWidth: .infinity, maxHeight: 30)
+                                    .background {
+                                        if itemIndex == selectedIndex {
+                                            RoundedRectangle(cornerRadius: 10)
+                                                .fill(.gray.opacity(0.1))
+                                        }
+                                    }
+                                    .background(
+                                        backColor
+                                            .shadow(.drop(color: .black.opacity(0.5),radius: 1)),
+                                                in: RoundedRectangle(cornerRadius: 10)
+                                    )
+                                    .onTapGesture(perform: {
+                                        selectedIndex = itemIndex
+                                    })
+                            }
+                        }
+                        UpdateItemDetail(cartItems[selectedIndex],
+                                         cartItems[selectedIndex])
+                    }
+
+                case .join(let user):
+                    EmptyView()
+                }
+            }
         }
         .frame(width: screen.width * 0.9)
         .padding(10)
@@ -128,10 +171,13 @@ fileprivate struct IconAndMessageView: View {
                 .fill(.white)
                 .opacity(0.4)
         }
-        .offset(state ? .zero : CGSize(width: 0, height: -45))
         .opacity(state ? 1 : 0)
+        .offset(state ? .zero : CGSize(width: 0, height: -45))
         .offset(dragOffset)
         .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: -40)))
+        .onTapGesture {
+            withAnimation(.spring(response: 0.5, blendDuration: 1)) { detail.toggle() }
+        }
         .gesture(
             DragGesture()
                 .updating(self.$dragOffset, body: { (value, state, _) in
@@ -169,16 +215,37 @@ fileprivate struct IconAndMessageView: View {
         }
         /// 通知ボードの破棄タイミングに使うタイムカウント。
         .onReceive(timer) { _ in
-            if dragOffset != .zero {
+            if dragOffset != .zero || detail {
                 count = 0
             } else {
                 count += 1
             }
         }
     }
+    @ViewBuilder
+    func UpdateItemDetail(_ before: Item, _ after: Item) -> some View {
+        Grid(alignment: .leading, verticalSpacing: 20) {
+            Divider()
+            GridRow {
+                Text("名前:")
+                Text("サンプル１")
+                Text("▶︎")
+                Text("サンプル２")
+            }
+            Divider()
+            GridRow {
+                Text("売り上げ:")
+                Text("10000")
+                Text("▶︎")
+                Text("12000")
+            }
+        }
+        .opacity(0.7)
+        .padding()
+    }
     /// 表示通知の破棄と、表示済み通知の取り扱いをコントロールするメソッド。
     /// 通知タイプによって、ローカル削除か全体削除かを分岐する。
-    /// 削除要素のアニメーションは実行元で決定すること。
+    /// 削除要素のアニメーションは実行元で調整する。
     fileprivate func removeNotificationController(type: TeamNotificationType) {
         switch type {
         case .addItem, .updateItem, .commerce:
