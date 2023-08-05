@@ -129,46 +129,7 @@ fileprivate struct NotificationContainer: View {
                     EmptyView()
                 }
 
-                Label("取消", systemImage: "clock.arrow.circlepath")
-                    .font(.footnote)
-                    .fontWeight(.bold)
-                    .foregroundColor(cancelState ? .gray : .white)
-                    .padding(5)
-                    .frame(width: cancelButtonFrame)
-                /// ボタン長押しで変動する背景フレーム
-                /// 規定時間まで長押しが続くと、対象データの変更内容が取り消される
-                    .background(
-                        HStack {
-                            Capsule().fill(.red)
-                                .frame(width: cancelState ? longPressButtonFrame : cancelButtonFrame)
-                            Spacer().frame(minWidth: 0)
-                        }
-                    )
-                    .background(Capsule().fill(.gray.opacity(0.6)))
-                    .scaleEffect(cancelState ? 1 + (longPressButtonFrame / 250) : 1)
-                    .onLongPressGesture(
-                        minimumDuration: longPressMinTime, // プレス完了の時間設定
-                        pressing: { pressing in
-                            if pressing {
-                                // 更新データの取り消し判定開始
-                                cancelState = true
-                            } else {
-                                // 取り消し中断
-                                cancelState = false
-                            }
-                        },
-                        perform: {
-                            // 取り消し処理実行
-                            cancelState = false
-                        })
-                    .onReceive(cancelTimer) { value in
-                        if !cancelState {
-                            longPressButtonFrame = 0
-                        } else {
-                            // Timerの更新頻度が0.01のため、100で割る
-                            longPressButtonFrame += (cancelButtonFrame / 100)
-                        }
-                    }
+                CancelUpdateButton()
             } // if detail
         }
         .frame(width: screen.width * 0.9)
@@ -263,6 +224,49 @@ fileprivate struct NotificationContainer: View {
                 .background(RoundedRectangle(cornerRadius: 5).fill(.gray.gradient))
                 .shadow(radius: 1)
         }
+    }
+    @ViewBuilder
+    func CancelUpdateButton() -> some View {
+        Label("取消", systemImage: "clock.arrow.circlepath")
+            .font(.footnote)
+            .fontWeight(.bold)
+            .foregroundColor(cancelState ? .gray : .white)
+            .padding(5)
+            .frame(width: cancelButtonFrame)
+        /// ボタン長押しで変動する背景フレーム
+        /// 規定時間まで長押しが続くと、対象データの変更内容が取り消される
+            .background(
+                HStack {
+                    Capsule().fill(.red)
+                        .frame(width: cancelState ? longPressButtonFrame : cancelButtonFrame)
+                    Spacer().frame(minWidth: 0)
+                }
+            )
+            .background(Capsule().fill(.gray.opacity(0.6)))
+            .scaleEffect(cancelState ? 1 + (longPressButtonFrame / 250) : 1)
+            .onLongPressGesture(
+                minimumDuration: longPressMinTime, // プレス完了の時間設定
+                pressing: { pressing in
+                    if pressing {
+                        // 更新データの取り消し判定開始
+                        cancelState = true
+                    } else {
+                        // 取り消し中断
+                        cancelState = false
+                    }
+                },
+                perform: {
+                    // 取り消し処理実行
+                    cancelState = false
+                })
+            .onReceive(cancelTimer) { value in
+                if !cancelState {
+                    longPressButtonFrame = 0
+                } else {
+                    // Timerの更新頻度が0.01のため、100で割る
+                    longPressButtonFrame += (cancelButtonFrame / 100)
+                }
+            }
     }
     @ViewBuilder
     /// 通知の詳細部分に表示するアイテムの名前とアイコン
