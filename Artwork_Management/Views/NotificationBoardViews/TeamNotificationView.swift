@@ -36,10 +36,10 @@ struct TeamNotificationView: View {
         } // VStack
         .onChange(of: vm.myNotifications) { remainingValue in
             if remainingValue.isEmpty {
-                print("残ってる通知の数: 0個")
+                print("残りの通知の数: 0個")
                 return
             } else {
-                print("残ってる通知の数: \(remainingValue.count)個")
+                print("残りの通知の数: \(remainingValue.count)個")
                 guard let element = remainingValue.first else { return }
                 vm.currentNotification = element
             }
@@ -49,6 +49,7 @@ struct TeamNotificationView: View {
                 print("通知の数: 0個")
                 return
             } else {
+                print("通知の追加を検知")
                 print("通知の数: \(vm.myNotifications.count)個")
                 guard let element = vm.myNotifications.first else { return }
                 vm.currentNotification = element
@@ -142,9 +143,7 @@ fileprivate struct IconAndMessageView: View {
                 })
                 .onEnded { value in
                     if value.translation.height < -50 {
-                        withAnimation(.spring(response: 0.4, blendDuration: 1)) {
-                            print("スワイプ手動削除時のremoveNotificationController実行")
-                            vm.currentNotification = nil
+                        withAnimation(.spring(response: 0.4)) {
                             self.removeNotificationController(type: element.type)
                         }
                     }
@@ -159,31 +158,36 @@ fileprivate struct IconAndMessageView: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + loadWaitTime) {
                 withAnimation(.easeOut(duration: 0.5)) { state = true }
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + element.exitTime + loadWaitTime) {
-                if vm.currentNotification == nil { return }
+        }
+        .onChange(of: count) { _ in
+            if count > Int(element.exitTime) {
+                print("通知ボードの破棄時間です")
                 withAnimation(.easeIn(duration: 0.3)) {
-                    print("onAppear側のremoveNotificationController実行")
-                    vm.currentNotification = nil
                     self.removeNotificationController(type: element.type)
                 }
             }
         }
         /// 通知ボードの破棄タイミングに使うタイムカウント。
         .onReceive(timer) { _ in
-            count += 1
+            if dragOffset != .zero {
+                count = 0
+            } else {
+                count += 1
+            }
         }
     }
     /// 表示通知の破棄と、表示済み通知の取り扱いをコントロールするメソッド。
     /// 通知タイプによって、ローカル削除か全体削除かを分岐する。
+    /// 削除要素のアニメーションは実行元で決定すること。
     fileprivate func removeNotificationController(type: TeamNotificationType) {
         switch type {
         case .addItem, .updateItem, .commerce:
-//            vm.currentNotification = nil
+            vm.currentNotification = nil
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 vm.removeAllMemberNotificationToFirestore(team: teamVM.team, data: element)
             }
         case .join:
-//            vm.currentNotification = nil
+            vm.currentNotification = nil
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 vm.removeMyNotificationToFirestore(team: teamVM.team, data: element)
             }
