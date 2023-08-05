@@ -156,7 +156,7 @@ struct NewItemsView: View {
                     .padding(.bottom, bottomPadding(size))
                     .background {
                         ScrollViewDetector(carouselMode: $carouselMode,
-                                           totalContent: sampleBooks.count)
+                                           totalContent: itemVM.items.count)
                     }
                 }
                 /// グローバルビューからではなく、ここからのオフセットが必要なため

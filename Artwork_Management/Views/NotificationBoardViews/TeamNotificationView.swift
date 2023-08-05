@@ -249,17 +249,17 @@ fileprivate struct IconAndMessageBoard: View {
                 Text("▶︎")
                 Text("\(after.inventory)")
             }
-            .tracking(1)
             Divider()
 
-            GridRow {
-                Text("売り上げ")
-                Text(":")
-                Text("\(before.sales)")
-                Text("▶︎")
-                Text("\(after.sales)")
+            if before.sales != after.sales {
+                GridRow {
+                    Text("売り上げ")
+                    Text(":")
+                    Text("\(before.sales)")
+                    Text("▶︎")
+                    Text("\(after.sales)")
+                }
             }
-            .tracking(1)
         }
         .opacity(0.7)
         .padding()
