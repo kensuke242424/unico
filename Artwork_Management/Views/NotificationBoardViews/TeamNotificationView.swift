@@ -130,19 +130,17 @@ fileprivate struct NotificationContainer: View {
                 }
 
                 Label("取消", systemImage: "clock.arrow.circlepath")
-                    .font(.subheadline)
+                    .font(.footnote)
                     .fontWeight(.bold)
                     .foregroundColor(cancelState ? .gray : .white)
-                    .padding(8)
+                    .padding(5)
                     .frame(width: cancelButtonFrame)
                     /// ボタン長押しで変動する背景フレーム
                     /// 規定時間まで長押しが続くと、対象データの変更内容が取り消される
                     .background(
                         HStack {
-                            Capsule()
-                                .fill(.red)
-                                .frame(width: cancelState ?
-                                       longPressButtonFrame : 80)
+                            Capsule().fill(.red)
+                                .frame(width: cancelState ? longPressButtonFrame : cancelButtonFrame)
                             Spacer().frame(minWidth: 0)
                         }
                     )
@@ -159,18 +157,20 @@ fileprivate struct NotificationContainer: View {
                             } else {
                                 // プレス中断
                                 cancelState = false
-                                longPressButtonFrame = 0
                             }
                         },
                         // プレス完了
                         perform: {
+                            // キャンセル処理実行
                             cancelState = false
-                            longPressButtonFrame = 0
                     })
                     .onReceive(cancelTimer) { value in
-                        if !cancelState { return }
-                        // Timerの更新が0.01ごとのため、100で割る
-                        longPressButtonFrame += (cancelButtonFrame / 100)
+                        if !cancelState {
+                            longPressButtonFrame = 0
+                        } else {
+                            // Timerの更新頻度が0.01のため、100で割る
+                            longPressButtonFrame += (cancelButtonFrame / 100)
+                        }
                     }
             }
         }
