@@ -77,6 +77,7 @@ fileprivate struct IconAndMessageBoard: View {
     @State private var selectedIndex: Int = 0
     @State private var count: Int = 0
     @GestureState var dragOffset: CGSize = .zero
+    @Namespace var animation
     /// WebImageの画像ロード完了を待つ時間。出現時のアニメーション不具合を防ぐため。
     let loadWaitTime: CGFloat = 0.5
     let screen = UIScreen.main.bounds
@@ -87,31 +88,8 @@ fileprivate struct IconAndMessageBoard: View {
 
         VStack {
             HStack {
-                if let url = element.imageURL {
-                    WebImage(url: url)
-                        .resizable().scaledToFill()
-                        .clipShape(Circle())
-                        .frame(width: 60, height: 60)
-                        .background {
-                            RoundedRectangle(cornerRadius: 40)
-                                .stroke(lineWidth: 1)
-                                .fill(.orange)
-                                .opacity(0.5)
-                        }
-                        .padding(.trailing, 10)
-                } else {
-                    Circle()
-                        .fill(.gray.gradient)
-                        .frame(width: 60, height: 60)
-                        .shadow(radius: 1)
-                        .overlay {
-                            Image(systemName: element.type.symbol)
-                                .resizable().scaledToFit()
-                                .foregroundColor(.white)
-                                .frame(width: 30, height: 30)
-                        }
-                        .padding(.trailing, 10)
-                }
+                IconView(url: element.imageURL,
+                         size: CGSize(width: 60, height: 60))
 
                 Text(element.message)
                     .tracking(1)
@@ -124,35 +102,38 @@ fileprivate struct IconAndMessageBoard: View {
             if detail {
                 switch element.type {
                 case .addItem(let item):
-                    UpdateItemDetail(item, item)
+                    EmptyView()
 
                 case .updateItem(let item):
-                    UpdateItemDetail(item, item)
+                    EmptyView()
 
                 case .commerce(let cartItems):
                     VStack {
-                        HStack {
-                            ForEach(cartItems.indices) { itemIndex in
-                                Text("\(itemIndex + 1)")
-                                    .frame(maxWidth: .infinity, maxHeight: 30)
-                                    .background {
-                                        if itemIndex == selectedIndex {
-                                            RoundedRectangle(cornerRadius: 10)
-                                                .fill(.gray.opacity(0.1))
+                        /// カートアイテムが複数あった場合に、各アイテム情報を切り替える番号テーブルを出す
+                        if cartItems.count > 1 {
+                            HStack {
+                                ForEach(cartItems.indices, id: \.self) { itemIndex in
+                                    Text("\(itemIndex + 1)")
+                                        .frame(maxWidth: .infinity, maxHeight: 30)
+                                        .background {
+                                            if itemIndex == selectedIndex {
+                                                RoundedRectangle(cornerRadius: 10)
+                                                    .fill(.gray)
+                                                    .opacity(0.2)
+                                            }
                                         }
-                                    }
-                                    .background(
-                                        backColor
-                                            .shadow(.drop(color: .black.opacity(0.5),radius: 1)),
-                                                in: RoundedRectangle(cornerRadius: 10)
-                                    )
-                                    .onTapGesture(perform: {
-                                        selectedIndex = itemIndex
-                                    })
+                                        .background(
+                                            backColor
+                                                .shadow(.drop(color: .black.opacity(0.2),radius: 3)),
+                                                    in: RoundedRectangle(cornerRadius: 10)
+                                        )
+                                        .onTapGesture { selectedIndex = itemIndex }
+                                }
                             }
                         }
-                        UpdateItemDetail(cartItems[selectedIndex],
-                                         cartItems[selectedIndex])
+
+                        CommerceItemDetail(cartItems[selectedIndex],
+                                           cartItems[selectedIndex])
                     }
 
                 case .join(let user):
@@ -223,22 +204,62 @@ fileprivate struct IconAndMessageBoard: View {
         }
     }
     @ViewBuilder
-    func UpdateItemDetail(_ before: Item, _ after: Item) -> some View {
+    func IconView(url: URL?, size: CGSize) -> some View {
+        if let url = url {
+            WebImage(url: url)
+                .resizable().scaledToFill()
+                .clipShape(Circle())
+                .frame(width: size.width, height: size.height)
+                .background {
+                    RoundedRectangle(cornerRadius: 40)
+                        .stroke(lineWidth: 1)
+                        .fill(.orange)
+                        .opacity(0.5)
+                }
+                .padding(.trailing, 10)
+        } else {
+            Circle()
+                .fill(.gray.gradient)
+                .frame(width: 60, height: 60)
+                .shadow(radius: 1)
+                .overlay {
+                    Image(systemName: element.type.symbol)
+                        .resizable().scaledToFit()
+                        .foregroundColor(.white)
+                        .frame(width: 30, height: 30)
+                }
+                .padding(.trailing, 10)
+        }
+    }
+    @ViewBuilder
+    func CommerceItemDetail(_ before: Item, _ after: Item) -> some View {
         Grid(alignment: .leading, verticalSpacing: 20) {
-            Divider()
-            GridRow {
-                Text("名前:")
-                Text("サンプル１")
-                Text("▶︎")
-                Text("サンプル２")
+
+            HStack {
+                IconView(url: after.photoURL,
+                         size: CGSize(width: 40, height: 40))
+                CustomOneLineLimitText(text: after.name, limit: 30)
             }
             Divider()
+
             GridRow {
-                Text("売り上げ:")
-                Text("10000")
+                Text("在庫")
+                Text(":")
+                Text("\(before.inventory)")
                 Text("▶︎")
-                Text("12000")
+                Text("\(after.inventory)")
             }
+            .tracking(1)
+            Divider()
+
+            GridRow {
+                Text("売り上げ")
+                Text(":")
+                Text("\(before.sales)")
+                Text("▶︎")
+                Text("\(after.sales)")
+            }
+            .tracking(1)
         }
         .opacity(0.7)
         .padding()

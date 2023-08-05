@@ -408,7 +408,8 @@ struct NewItemsView: View {
         ZStack {
             Capsule()
                 .frame(width: 40, height: 12)
-                .foregroundColor(itemVM.filteringFavorite ? .green.opacity(0.7) : .gray.opacity(0.5))
+                .foregroundColor(itemVM.filteringFavorite ? .green : .gray)
+                .opacity(itemVM.filteringFavorite ? 0.7 : 0.5)
             Image(systemName: "heart.fill")
                 .font(.title)
                 .foregroundColor(.black).opacity(0.6)
