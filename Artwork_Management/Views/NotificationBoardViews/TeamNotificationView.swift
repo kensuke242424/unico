@@ -135,8 +135,8 @@ fileprivate struct NotificationContainer: View {
                     .foregroundColor(cancelState ? .gray : .white)
                     .padding(5)
                     .frame(width: cancelButtonFrame)
-                    /// ボタン長押しで変動する背景フレーム
-                    /// 規定時間まで長押しが続くと、対象データの変更内容が取り消される
+                /// ボタン長押しで変動する背景フレーム
+                /// 規定時間まで長押しが続くと、対象データの変更内容が取り消される
                     .background(
                         HStack {
                             Capsule().fill(.red)
@@ -145,25 +145,22 @@ fileprivate struct NotificationContainer: View {
                         }
                     )
                     .background(Capsule().fill(.gray.opacity(0.6)))
-                    .frame(maxWidth: .infinity)
-                    .padding(.leading)
                     .scaleEffect(cancelState ? 1 + (longPressButtonFrame / 250) : 1)
                     .onLongPressGesture(
                         minimumDuration: longPressMinTime, // プレス完了の時間設定
                         pressing: { pressing in
                             if pressing {
-                                // プレス開始
+                                // 更新データの取り消し判定開始
                                 cancelState = true
                             } else {
-                                // プレス中断
+                                // 取り消し中断
                                 cancelState = false
                             }
                         },
-                        // プレス完了
                         perform: {
-                            // キャンセル処理実行
+                            // 取り消し処理実行
                             cancelState = false
-                    })
+                        })
                     .onReceive(cancelTimer) { value in
                         if !cancelState {
                             longPressButtonFrame = 0
@@ -172,7 +169,7 @@ fileprivate struct NotificationContainer: View {
                             longPressButtonFrame += (cancelButtonFrame / 100)
                         }
                     }
-            }
+            } // if detail
         }
         .frame(width: screen.width * 0.9)
         .padding(10)
@@ -190,7 +187,7 @@ fileprivate struct NotificationContainer: View {
         .offset(dragOffset)
         .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: -40)))
         .onTapGesture {
-            withAnimation(.spring(response: 0.5, blendDuration: 1)) { detail.toggle() }
+            withAnimation(.spring(response: 0.4, blendDuration: 1)) { detail.toggle() }
         }
         .gesture(
             DragGesture()
@@ -220,20 +217,18 @@ fileprivate struct NotificationContainer: View {
                 withAnimation(.easeOut(duration: 0.5)) { state = true }
             }
         }
-        .onChange(of: count) { _ in
-            if count > Int(element.exitTime) {
-                print("通知ボードの破棄時間です")
-                withAnimation(.easeIn(duration: 0.3)) {
-                    self.removeNotificationController(type: element.type)
-                }
-            }
-        }
-        /// 通知ボードの破棄タイミングに使うタイムカウント。
+        /// 通知ボードの自動破棄に用いるタイムカウントレシーバー。
         .onReceive(stateTimer) { _ in
             if dragOffset != .zero || detail {
                 count = 0
             } else {
                 count += 1
+                if count > Int(element.exitTime) {
+                    print("通知ボードの破棄時間です")
+                    withAnimation(.easeIn(duration: 0.3)) {
+                        self.removeNotificationController(type: element.type)
+                    }
+                }
             }
         }
     }
