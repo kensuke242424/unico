@@ -85,6 +85,7 @@ fileprivate struct IconAndMessageBoard: View {
 
     var body: some View {
         let backColor = colorScheme == .dark ? Color.black : Color.white
+        let shadowColor = colorScheme == .dark ? Color.white : Color.black
 
         VStack {
             HStack {
@@ -124,7 +125,7 @@ fileprivate struct IconAndMessageBoard: View {
         .frame(width: screen.width * 0.9)
         .padding(10)
         .background(
-            backColor.shadow(.drop(color: .black.opacity(0.25),radius: 10)),
+            backColor.shadow(.drop(color: shadowColor.opacity(0.25),radius: 10)),
                     in: RoundedRectangle(cornerRadius: 40))
         .background {
             RoundedRectangle(cornerRadius: 40)
@@ -185,16 +186,17 @@ fileprivate struct IconAndMessageBoard: View {
     }
     @ViewBuilder
     func CircleIconView(url: URL?, size: CGFloat) -> some View {
-        if let url = url {
+        if let url {
             WebImage(url: url)
                 .resizable().scaledToFill()
                 .frame(width: size, height: size)
                 .clipShape(Circle())
                 .shadow(radius: 1)
         } else {
-            Circle()
-                .fill(.gray.gradient)
+            Image(systemName: element.type.symbol)
+                .foregroundColor(.white)
                 .frame(width: size, height: size)
+                .background(Circle().fill(.gray.gradient))
                 .shadow(radius: 1)
         }
     }
@@ -207,9 +209,10 @@ fileprivate struct IconAndMessageBoard: View {
                 .clipShape(RoundedRectangle(cornerRadius: 5))
                 .shadow(radius: 1)
         } else {
-            RoundedRectangle(cornerRadius: 5)
-                .fill(.gray.gradient)
+            Image(systemName: "cube.transparent.fill")
+                .foregroundColor(.white)
                 .frame(width: size, height: size)
+                .background(RoundedRectangle(cornerRadius: 5).fill(.gray.gradient))
                 .shadow(radius: 1)
         }
     }
@@ -235,7 +238,7 @@ fileprivate struct IconAndMessageBoard: View {
             Text(":")
             Text(value)
         }
-        .opacity(0.7)
+        .opacity(0.6)
     }
     /// 更新が発生したデータの更新内容を、比較で表示するためのグリッドビュー要素。
     /// 「<データ名> : <更新前バリュー> ▶︎ <更新後バリュー>」の形でGridRowを返す。
@@ -249,7 +252,7 @@ fileprivate struct IconAndMessageBoard: View {
             Text("▶︎")
             Text(after)
         }
-        .opacity(0.7)
+        .opacity(0.6)
     }
     @ViewBuilder
     func CreateItemDetail(item: Item) -> some View {
@@ -357,12 +360,15 @@ fileprivate struct IconAndMessageBoard: View {
     @ViewBuilder
     func CommerceItemsTableNumber(count itemsCount: Int) -> some View {
         let backColor = colorScheme == .dark ? Color.black : Color.white
+        let shadowColor = colorScheme == .dark ? Color.white : Color.black
         HStack {
             ForEach(0..<itemsCount, id: \.self) { itemIndex in
                 Text("\(itemIndex + 1)")
+                    .fontWeight(.bold)
                     .frame(maxWidth: .infinity, maxHeight: 30)
-                    .background {
-                        if itemIndex == selectedIndex {
+                    .opacity(itemIndex == selectedIndex ? 1 : 0.3)
+                    .overlay {
+                        if itemIndex != selectedIndex {
                             RoundedRectangle(cornerRadius: 10)
                                 .fill(.gray)
                                 .opacity(0.2)
@@ -370,7 +376,7 @@ fileprivate struct IconAndMessageBoard: View {
                     }
                     .background(
                         backColor
-                            .shadow(.drop(color: .black.opacity(0.2),radius: 3)),
+                            .shadow(.drop(color: shadowColor.opacity(0.2),radius: 3)),
                                 in: RoundedRectangle(cornerRadius: 10)
                     )
                     .onTapGesture { selectedIndex = itemIndex }
@@ -410,16 +416,14 @@ enum TeamNotificationType: Codable, Equatable {
     /// 通知に渡すメッセージテキスト。
     var message: String {
         switch self {
-        case .addItem(let item):
-            let name = item.name.isEmpty ? "No Name" : item.name
-            return "\(name) がチームアイテムに追加されました。"
-        case .updateItem(let item):
-            let name = item.before.name.isEmpty ? "No Name" : item.before.name
-            return "\(name) のアイテム情報が更新されました。"
+        case .addItem:
+            return "新しいアイテムが追加されました。"
+        case .updateItem:
+            return "アイテム情報が更新されました。"
         case .commerce(let items):
             return "カート内 \(items.count) 個のアイテムが精算されました。"
         case .join(let user):
-            return "\(user.name) さんがチームに参加しました。"
+            return "\(user.name) さんがチームに参加しました！"
         }
     }
     /// 通知アイコンに用いられる画像URL。WebImageによって表示される。

@@ -328,7 +328,7 @@ struct DetailView: View {
                      "総売個数　:　　   -")
                 
                 Text(item.totalInventory != 0 ?
-                     "総在庫数　:　　 \(item.totalInventory) 個":
+                     "総仕入れ　:　　 \(item.totalInventory) 個":
                      "総仕入れ　:　　   -")
                     .padding(.bottom, 12)
 
