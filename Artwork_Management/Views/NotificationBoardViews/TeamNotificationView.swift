@@ -29,7 +29,7 @@ struct TeamNotificationView: View {
             if let element = vm.currentNotification {
                 switch element.type {
                 case .addItem, .updateItem, .join, .commerce:
-                    IconAndMessageBoard(element: element)
+                    NotificationContainer(element: element)
                 }
             }
             Spacer()
@@ -59,9 +59,10 @@ struct TeamNotificationView: View {
 }
 
 /// アイコン+メッセージ型の通知ボード。
-/// WebImageの画像ロード完了を待つため、表示までに少しタイムラグを持たせている。
-fileprivate struct IconAndMessageBoard: View {
+/// 受け取った通知フレームから通知のタイプを参照して、タイプに合わせた出力を行う。
+fileprivate struct NotificationContainer: View {
 
+    ///
     fileprivate enum RemoveType {
         case local, all
     }
@@ -96,7 +97,7 @@ fileprivate struct IconAndMessageBoard: View {
                     .fontWeight(.bold)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .opacity(0.7)
-                    .padding(.trailing, 5)
+                    .padding(.horizontal, 10)
             }
             /// detailプロパティがtrueだったら表示される詳細
             if detail {
@@ -104,8 +105,7 @@ fileprivate struct IconAndMessageBoard: View {
                     .tracking(4)
                     .font(.footnote)
                     .fontWeight(.black)
-                    .foregroundColor(.gray)
-                    .opacity(0.5)
+                    .foregroundColor(.gray.opacity(0.6))
                 switch element.type {
                 case .addItem(let item):
                     CreateItemDetail(item: item)
@@ -134,7 +134,7 @@ fileprivate struct IconAndMessageBoard: View {
                 .opacity(0.4)
         }
         .opacity(state ? 1 : 0)
-        .offset(state ? .zero : CGSize(width: 0, height: -45))
+        .offset(state ? .zero : CGSize(width: 0, height: -85))
         .offset(dragOffset)
         .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: -40)))
         .onTapGesture {
@@ -163,6 +163,7 @@ fileprivate struct IconAndMessageBoard: View {
                                         initialVelocity: 0.1),
                                         value          : dragOffset)
         .onAppear {
+            // WebImageの画像ロード完了を待つため、表示までに少しタイムラグを持たせている。
             DispatchQueue.main.asyncAfter(deadline: .now() + loadWaitTime) {
                 withAnimation(.easeOut(duration: 0.5)) { state = true }
             }
@@ -238,6 +239,7 @@ fileprivate struct IconAndMessageBoard: View {
             Text(":")
             Text(value)
         }
+        .font(.callout)
         .opacity(0.6)
     }
     /// 更新が発生したデータの更新内容を、比較で表示するためのグリッドビュー要素。
@@ -252,6 +254,7 @@ fileprivate struct IconAndMessageBoard: View {
             Text("▶︎")
             Text(after)
         }
+        .font(.callout)
         .opacity(0.6)
     }
     @ViewBuilder
