@@ -199,13 +199,12 @@ class TeamViewModel: ObservableObject {
         }
     }
 
-    /// 現在操作しているチームの、作成から現在までの使用日数を算出するメソッド。
+    /// 現在操作しているチームのcreateTime(Date)から、現在までの使用日数を算出するメソッド。
     func getUsageDayCount() -> Int {
         guard let team else { return 0 }
-        guard let createDate = team.createTime?.dateValue() else { return 0 }
         let nowDate = Date()
         /// チーム作成日時と現在日時の差分から利用日数を取得
-        let timeInterval = createDate.distance(to: nowDate)
+        let timeInterval = team.createTime.distance(to: nowDate)
         let usageDay = Int(ceil(timeInterval / 60 / 60 / 24)) // ceil -> 小数点切り上げ
 
         return usageDay

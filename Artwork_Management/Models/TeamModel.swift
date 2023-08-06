@@ -10,7 +10,7 @@ import FirebaseFirestoreSwift
 
 // チーム情報
 struct Team: Identifiable, Codable {
-    @ServerTimestamp var createTime: Timestamp?
+    var createTime = Date()
     var id: String
     var name: String
     var iconURL: URL?
