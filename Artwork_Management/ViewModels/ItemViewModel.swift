@@ -53,7 +53,7 @@ class ItemViewModel: ObservableObject {
                 self.selectedTypesSort()
 
 
-                
+
 //                guard let snap = snap else {
 //                    print("Error: itemsListener_snap nil")
 //                    return
@@ -122,7 +122,10 @@ class ItemViewModel: ObservableObject {
         print("updateItem実行")
         print(defaultDataID)
 
-        guard let updateItemRef = db?.collection("teams").document(teamID).collection("items").document(defaultDataID) else {
+        guard let updateItemRef = db?.collection("teams")
+            .document(teamID)
+            .collection("items")
+            .document(defaultDataID) else {
             print("error: guard let updateItemRef")
             return
         }

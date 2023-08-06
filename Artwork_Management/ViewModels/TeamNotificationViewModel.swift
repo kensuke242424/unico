@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Firebase
+import FirebaseStorage
 import FirebaseFirestore
 
 /// チーム全体に届く通知ボードの保存・表示・削除を管理するクラス。
@@ -76,8 +77,44 @@ class TeamNotificationViewModel: ObservableObject {
             print("Error: setNotificationToFirestore")
         }
     }
+    /// 通知から受け取ったアイテムデータの更新内容を取り消すメソッド。
+    /// 更新以前の値を受け取り、Firestoreに上書き保存する。
+    func cancelUpdateItemToFirestore(data beforeItem: Item, team: Team?) async throws {
+        guard let team else { return }
+        guard let itemID = beforeItem.id else { return }
+        guard let itemRef = db?.collection("teams")
+            .document(team.id)
+            .collection("items")
+            .document(itemID) else { return }
+
+        do {
+            try itemRef.setData(from: beforeItem, merge: true) // 保存
+        } catch {
+            print("Item: \(beforeItem.name)の更新取り消し失敗")
+            throw CustomError.setData
+        }
+    }
+    /// 通知から受け取ったユーザーの更新内容を取り消すメソッド。
+    /// 更新以前の値を受け取り、Firestoreに上書き保存する。
+    func cancelUpdateUserToFirestore(data beforeUser: User?) async throws {
+        guard let beforeUser else { return }
+        guard let userRef = db?.collection("users")
+            .document(beforeUser.id) else { throw CustomError.getRef }
+
+        do {
+            try userRef.setData(from: beforeUser, merge: true) // 保存
+        } catch {
+            throw CustomError.setData
+        }
+    }
+    /// 通知から受け取ったチームの更新内容を取り消すメソッド。
+    /// 更新以前の値を受け取り、Firestoreに上書き保存する。
+    func cancelUpdateTeam(to beforeTeam: Team?) {
+        guard let beforeTeam else { return }
+
+    }
     /// 自身のみの通知データを消去するメソッド。他メンバーの通知データはそれぞれがログインした時に表示される。
-    func removeMyNotificationToFirestore(team: Team?, data: TeamNotifyFrame) {
+    func removeLocalNotificationToFirestore(team: Team?, data: TeamNotifyFrame) {
         guard var team else { return }
         guard let teamRef = db?.collection("teams").document(team.id) else { return }
 
@@ -91,7 +128,7 @@ class TeamNotificationViewModel: ObservableObject {
         }
     }
     /// 全メンバーの対象通知データを消去。他のメンバーがログインするまで残しておく必要がない通知データに使う。
-    func removeAllMemberNotificationToFirestore(team: Team?, data: TeamNotifyFrame) {
+    func removeTeamNotificationToFirestore(team: Team?, data: TeamNotifyFrame) {
         guard var team else { return }
         guard let teamRef = db?.collection("teams").document(team.id) else { return }
 
@@ -106,6 +143,12 @@ class TeamNotificationViewModel: ObservableObject {
             print("Error: setNotificationToFirestore")
         }
     }
+    /// 現在の操作チームのメンバーidを取得するメソッド。。
+    func getCurrentTeamMembers(team: Team) -> [String] {
+        let membersID: [String] = team.members.map({ $0.memberUID })
+        return membersID
+    }
+
     deinit {
         listener?.remove()
     }

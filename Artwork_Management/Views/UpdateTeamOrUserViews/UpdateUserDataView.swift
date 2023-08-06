@@ -161,13 +161,13 @@ struct UpdateUserDataView: View {
                 let defaultNameContainer = team.name
                 var updateJoinMemberContainer = myJoinMemberData
 
-                // アイコンに変更があれば、アップロード&JoinMemberを更新&コンテナに格納
+                // アイコンに変更があれば、Storageにアップロード -> JoinMemberを更新 ->コンテナに格納
                 if let updateIconImage = inputUpdate.captureImage {
                     let uploadIconData = await userVM.uploadUserImage(updateIconImage)
                     newIconDataContainer = uploadIconData
                     updateJoinMemberContainer.iconURL = uploadIconData.url
                 }
-                // 名前に変更があれば、JoinMemberを更新&コンテナに格納
+                // 名前に変更があれば、JoinMemberを更新 -> コンテナに格納
                 if team.name != inputUpdate.nameText {
                     newNameContainer = inputUpdate.nameText
                     updateJoinMemberContainer.name = inputUpdate.nameText

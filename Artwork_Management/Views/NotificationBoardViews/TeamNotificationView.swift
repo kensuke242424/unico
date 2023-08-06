@@ -117,19 +117,20 @@ fileprivate struct NotificationContainer: View {
                 switch element.type {
                 case .addItem(let item):
                     CreateItemDetail(item: item)
+                    CancelUpdateButton(item)
 
                 case .updateItem(let item):
                     UpdateItemDetail(item: item)
+                    CancelUpdateButton(item.before)
 
                 case .commerce(let commerceItems):
                     CommerceItemDetail(item: commerceItems[selectedIndex],
                                        count: commerceItems.count)
+                    CancelUpdateButton(commerceItems[selectedIndex].before)
 
                 case .join(let user):
                     EmptyView()
                 }
-
-                CancelUpdateButton()
             } // if detail
         }
         .frame(width: screen.width * 0.9)
@@ -225,8 +226,10 @@ fileprivate struct NotificationContainer: View {
                 .shadow(radius: 1)
         }
     }
+    /// 通知から受け取ったデータ更新の内容を取り消すボタン。
+    /// ロングタップによって取り消しが実行される。
     @ViewBuilder
-    func CancelUpdateButton() -> some View {
+    func CancelUpdateButton(_ beforeItem: Item) -> some View {
         Label("取消", systemImage: "clock.arrow.circlepath")
             .font(.footnote)
             .fontWeight(.bold)
@@ -306,6 +309,7 @@ fileprivate struct NotificationContainer: View {
             Text(after)
         }
         .font(.callout)
+        .fontWeight(.bold)
         .opacity(0.6)
     }
     @ViewBuilder
@@ -446,12 +450,12 @@ fileprivate struct NotificationContainer: View {
         case .addItem, .updateItem, .commerce:
             vm.currentNotification = nil
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                vm.removeAllMemberNotificationToFirestore(team: teamVM.team, data: element)
+                vm.removeTeamNotificationToFirestore(team: teamVM.team, data: element)
             }
         case .join:
             vm.currentNotification = nil
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                vm.removeMyNotificationToFirestore(team: teamVM.team, data: element)
+                vm.removeLocalNotificationToFirestore(team: teamVM.team, data: element)
             }
         }
     }

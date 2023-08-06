@@ -12,7 +12,7 @@ import FirebaseFirestore
 import FirebaseFirestoreSwift
 
 enum CustomError: Error {
-    case uidEmpty, getRef, fetch, setData, updateData, getDocument,getUserDocument, photoUrlEmpty, userEmpty, teamEmpty, getDetectUser, inputTextEmpty, memberDuplication, addTeamIDToJoinedUser, createAnonymous, existUserDocument, existAccountEmail, deleteAccount
+    case uidEmpty, getItemID, getRef, fetch, setData, updateData, getDocument,getUserDocument, photoUrlEmpty, userEmpty, teamEmpty, getDetectUser, inputTextEmpty, memberDuplication, addTeamIDToJoinedUser, createAnonymous, existUserDocument, existAccountEmail, deleteAccount
 }
 
 class UserViewModel: ObservableObject {
@@ -214,7 +214,8 @@ class UserViewModel: ObservableObject {
 
         // 取得アイコンデータurlがnilであれば更新しない
         guard var userDataSource = user else { throw CustomError.userEmpty }
-        guard let userRef = db?.collection("users").document(userDataSource.id) else { throw CustomError.getDocument }
+        guard let userRef = db?.collection("users")
+            .document(userDataSource.id) else { throw CustomError.getDocument }
 
         do {
             // 更新前の元々のアイコンパスを保持しておく。更新成功後のデフォルトデータ削除に使う
