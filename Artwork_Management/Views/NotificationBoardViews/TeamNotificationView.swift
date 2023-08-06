@@ -78,7 +78,7 @@ fileprivate struct NotificationContainer: View {
     @State private var showState: Bool = false
     /// 通知ボードの詳細表示を管理するプロパティ。
     @State private var detail: Bool = false
-    /// 現在通知ボード上に表示されているデータのインデックス。
+    /// カート精算された複数のアイテムの中で、現在通知ボード上に選択表示されているアイテムのインデックス。
     @State private var showIndex: Int = 0
     /// タイマーパブリッシャーによって更新されるカウントプロパティ。
     @State private var showLimitCount: Int = 0
@@ -125,20 +125,17 @@ fileprivate struct NotificationContainer: View {
                 switch element.type {
                 case .addItem(let item):
                     CreateItemDetail(item: item)
-                    CancelUpdateButton(item)
 
                 case .updateItem(let item):
                     UpdateItemDetail(item: item)
-                    CancelUpdateButton(item.before)
 
                 case .commerce(let items):
-                    CommerceItemDetail(item: items[showIndex],
-                                       count: items.count)
-                    CancelUpdateLongPressButton(ids: $canceledIDs,
-                                                for: items[showIndex].before)
+                    CommerceItemDetail(items: items,
+                                       index: showIndex)
 
                 case .join(let user):
-                    EmptyView()
+                    CancelUpdateLongPressButton(ids: $canceledIDs,
+                                                for: user)
                 }
             } // if detail
         }
@@ -323,105 +320,109 @@ fileprivate struct NotificationContainer: View {
     }
     @ViewBuilder
     func CreateItemDetail(item: Item) -> some View {
-        Grid(alignment: .leading, verticalSpacing: 20) {
+        VStack {
+            Grid(alignment: .leading, verticalSpacing: 20) {
 
-            ItemDetailIconAndName(item: item, size: 50)
-            Divider()
-            AddElementGridRow("製作者", item.author.isEmpty ? "???" : item.author)
-            Divider()
-            AddElementGridRow("在庫", String(item.inventory))
-            Divider()
-        } // Grid
-        .padding()
-        .padding(.horizontal, 30) // 一要素の詳細しか表示しないため、横幅を狭くする
-
+                ItemDetailIconAndName(item: item, size: 50)
+                Divider()
+                AddElementGridRow("製作者", item.author.isEmpty ? "???" : item.author)
+                Divider()
+                AddElementGridRow("在庫", String(item.inventory))
+                Divider()
+            } // Grid
+            .padding()
+            .padding(.horizontal, 30) // 一要素の詳細しか表示しないため、横幅を狭くする
+        }
+        CancelUpdateLongPressButton(ids: $canceledIDs, for: item)
     }
     @ViewBuilder
     func UpdateItemDetail(item: CompareItem) -> some View {
-        Grid(alignment: .leading, verticalSpacing: 20) {
-
-            ItemDetailIconAndName(item: item.after, size: 50)
-            Divider()
-
-            if item.before.tag != item.after.tag {
-                UpdateElementGridRow("タグ",
-                               item.before.tag,
-                               item.after.tag)
-                Divider()
-            }
-            if item.before.name != item.after.name {
-                UpdateElementGridRow("名前",
-                               item.before.name,
-                               item.after.name)
-                Divider()
-            }
-
-            if item.before.author != item.after.author {
-                UpdateElementGridRow("製作者",
-                               item.before.author,
-                               item.after.author)
-                Divider()
-            }
-
-            if item.before.inventory != item.after.inventory {
-                UpdateElementGridRow("在庫",
-                               String(item.before.inventory),
-                               String(item.after.inventory))
-                Divider()
-            }
-            if item.before.cost != item.after.cost {
-                UpdateElementGridRow("原価",
-                               String(item.before.cost),
-                               String(item.after.cost))
-                Divider()
-            }
-            if item.before.sales != item.after.sales {
-                UpdateElementGridRow("売り上げ",
-                               String(item.before.sales),
-                               String(item.after.sales))
-                Divider()
-            }
-
-            if item.before.totalAmount != item.after.totalAmount {
-                UpdateElementGridRow("総売個数",
-                               String(item.before.totalAmount),
-                               String(item.after.totalAmount))
-                Divider()
-            }
-
-            if item.before.totalInventory != item.after.totalInventory {
-                UpdateElementGridRow("総仕入れ",
-                               String(item.before.totalInventory),
-                               String(item.after.totalInventory))
-                Divider()
-            }
-        } // Grid
-        .padding()
-
-    }
-    @ViewBuilder
-    func CommerceItemDetail(item: CompareItem, count commerceItemsCount: Int) -> some View {
         VStack {
-            if commerceItemsCount > 1 {
-                CommerceItemsTableNumber(count: commerceItemsCount)
-            }
-
             Grid(alignment: .leading, verticalSpacing: 20) {
                 ItemDetailIconAndName(item: item.after, size: 50)
                 Divider()
-                UpdateElementGridRow("在庫",
-                               String(item.before.inventory),
-                               String(item.after.inventory))
-                Divider()
 
+                if item.before.tag != item.after.tag {
+                    UpdateElementGridRow("タグ",
+                                   item.before.tag,
+                                   item.after.tag)
+                    Divider()
+                }
+                if item.before.name != item.after.name {
+                    UpdateElementGridRow("名前",
+                                   item.before.name,
+                                   item.after.name)
+                    Divider()
+                }
+
+                if item.before.author != item.after.author {
+                    UpdateElementGridRow("製作者",
+                                   item.before.author,
+                                   item.after.author)
+                    Divider()
+                }
+
+                if item.before.inventory != item.after.inventory {
+                    UpdateElementGridRow("在庫",
+                                   String(item.before.inventory),
+                                   String(item.after.inventory))
+                    Divider()
+                }
+                if item.before.cost != item.after.cost {
+                    UpdateElementGridRow("原価",
+                                   String(item.before.cost),
+                                   String(item.after.cost))
+                    Divider()
+                }
                 if item.before.sales != item.after.sales {
                     UpdateElementGridRow("売り上げ",
                                    String(item.before.sales),
                                    String(item.after.sales))
                     Divider()
                 }
+
+                if item.before.totalAmount != item.after.totalAmount {
+                    UpdateElementGridRow("総売個数",
+                                   String(item.before.totalAmount),
+                                   String(item.after.totalAmount))
+                    Divider()
+                }
+
+                if item.before.totalInventory != item.after.totalInventory {
+                    UpdateElementGridRow("総仕入れ",
+                                   String(item.before.totalInventory),
+                                   String(item.after.totalInventory))
+                    Divider()
+                }
             } // Grid
             .padding()
+            CancelUpdateLongPressButton(ids: $canceledIDs, for: item.before)
+        } // VStack
+    }
+    @ViewBuilder
+    func CommerceItemDetail(items: [CompareItem], index showIndex: Int) -> some View {
+        VStack {
+            if items.count > 1 {
+                CommerceItemsTableNumber(count: items.count)
+            }
+
+            Grid(alignment: .leading, verticalSpacing: 20) {
+                ItemDetailIconAndName(item: items[showIndex].after, size: 50)
+                Divider()
+                UpdateElementGridRow("在庫",
+                               String(items[showIndex].before.inventory),
+                               String(items[showIndex].after.inventory))
+                Divider()
+
+                if items[showIndex].before.sales != items[showIndex].after.sales {
+                    UpdateElementGridRow("売り上げ",
+                                   String(items[showIndex].before.sales),
+                                   String(items[showIndex].after.sales))
+                    Divider()
+                }
+            } // Grid
+            .padding()
+            CancelUpdateLongPressButton(ids: $canceledIDs, for: items[showIndex].before)
         } // VStack
     }
     /// カートアイテムが複数あった場合に、各アイテム情報を切り替えるための番号テーブル。
