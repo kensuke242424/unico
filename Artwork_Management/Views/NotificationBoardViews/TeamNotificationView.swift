@@ -220,7 +220,6 @@ fileprivate struct NotificationContainer: View {
     /// 主にデータ追加時の通知詳細セクションに用いるグリッドひとつ分のグリッドビュー要素。
     /// 「<データ名> : <データバリュー>」の形でGridRowを返す。
     /// グリッドの整列制御は親のGrid側で操作する。
-    ///
     @ViewBuilder
     func SingleElementGridRow(_ title: String, _ value: String) -> some View {
         GridRow {
@@ -332,27 +331,57 @@ fileprivate struct NotificationContainer: View {
     }
     @ViewBuilder
     func CommerceItemDetail(items: [CompareItem]) -> some View {
-        VStack {
+        /// 表示アイテムが更新キャンセルされているかを判定する
+        var canceled: Bool {
+            return withAnimation {
+                canceledElementsDate.contains(items[showIndex].after.createTime)
+            }
+        }
+        VStack(spacing: 10) {
             if items.count > 1 {
                 CommerceItemsTableNumber(count: items.count)
             }
+            ItemDetailIconAndName(item: items[showIndex].after, size: 50)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 20)
+                .padding(.top)
 
-            Grid(alignment: .leading, verticalSpacing: 20) {
-                ItemDetailIconAndName(item: items[showIndex].after, size: 50)
-                Divider()
-                CompareElementGridRow("在庫",
-                               String(items[showIndex].before.inventory),
-                               String(items[showIndex].after.inventory))
-                Divider()
+            VStack {
+                Grid(alignment: .leading, verticalSpacing: 20) {
 
-                if items[showIndex].before.sales != items[showIndex].after.sales {
-                    CompareElementGridRow("売り上げ",
-                                   String(items[showIndex].before.sales),
-                                   String(items[showIndex].after.sales))
                     Divider()
+                    CompareElementGridRow("在庫",
+                                          String(items[showIndex].before.inventory),
+                                          String(items[showIndex].after.inventory))
+                    Divider()
+
+                    if items[showIndex].before.sales != items[showIndex].after.sales {
+                        CompareElementGridRow("売り上げ",
+                                              String(items[showIndex].before.sales),
+                                              String(items[showIndex].after.sales))
+                        Divider()
+                    }
+                } // Grid
+                .opacity(canceled ? 0.4 : 1)
+                .padding()
+            }
+            .overlay {
+                if canceled {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(lineWidth: 3)
+                            .frame(width: 180, height: 40)
+                            .foregroundColor(.red)
+                        Text("Canceled")
+                            .tracking(5)
+                            .fontWeight(.black)
+                            .foregroundColor(.red)
+                    }
+                    .opacity(0.7)
+                    .rotationEffect(Angle(degrees: -10))
                 }
-            } // Grid
-            .padding()
+            }
+
             CancelUpdateLongPressButton(ids: $canceledElementsDate, for: items[showIndex].before)
         } // VStack
     }
@@ -404,7 +433,7 @@ fileprivate struct NotificationContainer: View {
 
 /// 通知から受け取ったデータ更新内容を取り消す長押し実行型のカスタムボタン。
 /// 取り消し対象データの更新前の値と、取り消し完了済みのステートを管理するためのid配列参照を受け取る
-/// 取り消しが完了したら、対象データのidを配列に入れる
+/// 取り消しが完了したら、対象データのcreateTimeをキャンセル判定配列に入れる
 fileprivate
 struct CancelUpdateLongPressButton: View {
     let passItem: Item?
