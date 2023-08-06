@@ -9,52 +9,29 @@ import SwiftUI
 import FirebaseAuth
 import SDWebImageSwiftUI
 
-/// チームのメンバー全員に届く通知を表示するビュー。
-/// ビューの発火と同時に、自身が持つ通知の取得 -> 表示 -> 破棄 の処理が続く。
-/// 所持通知が無くなると、ビューが閉じる。
-/// 現在の通知対象 -> 「アイテムの追加・更新」「メンバーの加入」
+/// チームのメンバー全員に届く通知TeamNotificationを画面に表示するビュー。
+/// ビューモデルの通知保持プロパティ「myNotifications」に値が検知されることで、
+/// 表示 -> 破棄 -> 取得 のループが通知が無くなるまで続く。
 struct TeamNotificationView: View {
 
     @EnvironmentObject var vm: TeamNotificationViewModel
     @EnvironmentObject var teamVM: TeamViewModel
-    let screen = UIScreen.main.bounds
-    var uid: String? { Auth.auth().currentUser?.uid }
-    var currentTeamMyMemberData: JoinMember? {
-        guard let team = teamVM.team else { return nil }
-        guard let index = teamVM.myMemberIndex else { return nil }
-        return team.members[index]
-    }
 
     var body: some View {
         VStack {
             if let element = vm.currentNotification {
-                switch element.type {
-                case .addItem, .updateItem, .join, .commerce:
-                    NotificationContainer(element: element)
-                }
+
+                NotificationContainer(element: element)
             }
             Spacer()
         } // VStack
         .onChange(of: vm.myNotifications) { remainingValue in
-            if remainingValue.isEmpty {
-                print("残りの通知の数: 0個")
-                return
-            } else {
-                print("残りの通知の数: \(remainingValue.count)個")
-                guard let element = remainingValue.first else { return }
-                vm.currentNotification = element
-            }
+            guard let element = remainingValue.first else { return }
+            vm.currentNotification = element
         }
         .onAppear {
-            if vm.myNotifications.isEmpty {
-                print("通知の数: 0個")
-                return
-            } else {
-                print("通知の追加を検知")
-                print("通知の数: \(vm.myNotifications.count)個")
-                guard let element = vm.myNotifications.first else { return }
-                vm.currentNotification = element
-            }
+            guard let element = vm.myNotifications.first else { return }
+            vm.currentNotification = element
         }
     }
 }
@@ -232,53 +209,9 @@ fileprivate struct NotificationContainer: View {
                 .shadow(radius: 1)
         }
     }
-    /// 通知から受け取ったデータ更新の内容を取り消すボタン。
-    /// ロングタップによって取り消しが実行される。
-    @ViewBuilder
-    func CancelUpdateButton(_ beforeItem: Item) -> some View {
-        Label("取消", systemImage: "clock.arrow.circlepath")
-            .font(.footnote)
-            .fontWeight(.bold)
-            .foregroundColor(cancelState ? .gray : .white)
-            .padding(5)
-            .frame(width: cancelButtonFrame)
-        /// ボタン長押しで変動する背景フレーム
-        /// 規定時間まで長押しが続くと、対象データの変更内容が取り消される
-            .background(
-                HStack {
-                    Capsule().fill(.red)
-                        .frame(width: cancelState ? longPressButtonFrame : cancelButtonFrame)
-                    Spacer().frame(minWidth: 0)
-                }
-            )
-            .background(Capsule().fill(.gray.opacity(0.6)))
-            .scaleEffect(cancelState ? 1 + (longPressButtonFrame / 250) : 1)
-            .onLongPressGesture(
-                minimumDuration: longPressMinTime, // プレス完了の時間設定
-                pressing: { pressing in
-                    if pressing {
-                        // 更新データの取り消し判定開始
-                        cancelState = true
-                    } else {
-                        // 取り消し中断
-                        cancelState = false
-                    }
-                },
-                perform: {
-                    // 取り消し処理実行
-                    cancelState = false
-                })
-            .onReceive(cancelTimer) { value in
-                if !cancelState {
-                    longPressButtonFrame = 0
-                } else {
-                    // Timerの更新頻度が0.01のため、100で割る
-                    longPressButtonFrame += (cancelButtonFrame / 100)
-                }
-            }
-    }
-    @ViewBuilder
+
     /// 通知の詳細部分に表示するアイテムの名前とアイコン
+    @ViewBuilder
     func ItemDetailIconAndName(item: Item, size iconSize: CGFloat) -> some View {
         HStack(spacing: 20) {
             RectIconView(url: item.photoURL, size: iconSize)
@@ -292,6 +225,7 @@ fileprivate struct NotificationContainer: View {
     /// 主にデータ追加時の通知詳細セクションに用いるグリッドひとつ分のグリッドビュー要素。
     /// 「<データ名> : <データバリュー>」の形でGridRowを返す。
     /// グリッドの整列制御は親のGrid側で操作する。
+    ///
     @ViewBuilder
     func AddElementGridRow(_ title: String, _ value: String) -> some View {
         GridRow {
@@ -318,6 +252,7 @@ fileprivate struct NotificationContainer: View {
         .fontWeight(.bold)
         .opacity(0.6)
     }
+
     @ViewBuilder
     func AddItemDetail(item: Item) -> some View {
         VStack {
@@ -474,6 +409,7 @@ fileprivate struct NotificationContainer: View {
 /// 通知から受け取ったデータ更新内容を取り消す長押し実行型のカスタムボタン。
 /// 取り消し対象データの更新前の値と、取り消し完了済みのステートを管理するためのid配列参照を受け取る
 /// 取り消しが完了したら、対象データのidを配列に入れる
+fileprivate
 struct CancelUpdateLongPressButton: View {
     let passItem: Item?
     let passUser: User?
