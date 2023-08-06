@@ -461,6 +461,96 @@ fileprivate struct NotificationContainer: View {
     }
 }
 
+/// 通知から受け取ったデータ更新内容を取り消す長押し実行型のカスタムボタン。
+/// 取り消し対象データの更新前の値と、取り消し完了済みのステートを管理するためのid配列参照を受け取る
+/// 取り消しが完了したら、対象データのidを配列に入れる
+struct CancelUpdateLongPressButton: View {
+    let passUser: User?
+    let passItem: Item?
+    let passTeam: Team?
+    @Binding var canceledState: [String]
+    /// カスタムイニシャライザ
+    init(canceledState: Binding<[String]>, for beforeUser: User?) {
+        self.passUser = beforeUser
+        self.passItem = nil
+        self.passTeam = nil
+        self._canceledState = canceledState
+    }
+    init(canceledState: Binding<[String]>, for beforeTeam: Team?) {
+        self.passUser = nil
+        self.passItem = nil
+        self.passTeam = beforeTeam
+        self._canceledState = canceledState
+    }
+    init(canceledState: Binding<[String]>, for beforeItem: Item?) {
+        self.passUser = nil
+        self.passItem = beforeItem
+        self.passTeam = nil
+        self._canceledState = canceledState
+    }
+
+    let cancelButtonFrame: CGFloat = 80 // ボタン長押しによる赤ゲージ満タン時のサイズ
+    let pressingMinTime: CGFloat = 1.0 // 取り消し実行に必要な長押しタイム設定
+    let pressingTimer = Timer.publish(every: 0.01, on: .current, in: .common) .autoconnect()
+
+    @State private var pressingState: Bool = false
+    @State private var pressingButtonFrame: CGFloat = .zero
+    var body: some View {
+        Label("取消", systemImage: "clock.arrow.circlepath")
+            .font(.footnote)
+            .fontWeight(.bold)
+            .foregroundColor(pressingState ? .gray : .white)
+            .padding(5)
+            .frame(width: cancelButtonFrame)
+        /// ボタン長押しで変動する背景フレーム
+        /// 規定時間まで長押しが続くと、対象データの変更内容が取り消される
+            .background(
+                HStack {
+                    Capsule().fill(.red)
+                        .frame(width: pressingState ? pressingButtonFrame : cancelButtonFrame)
+                    Spacer().frame(minWidth: 0)
+                }
+            )
+            .background(Capsule().fill(.gray.opacity(0.6)))
+            .scaleEffect(pressingState ? 1 + (pressingButtonFrame / 250) : 1)
+            .onLongPressGesture(
+                minimumDuration: pressingMinTime, // プレス完了の時間設定
+                pressing: { pressing in
+                    if pressing {
+                        // 更新データの取り消し判定開始
+                        pressingState = true
+                    } else {
+                        // 取り消し中断
+                        pressingState = false
+                    }
+                },
+                perform: {
+                    // 取り消し処理実行
+                    pressingState = false
+                    if let passItem {
+                        // アイテム更新の取り消し
+                        print("\(passItem.name)の更新取り消し実行")
+                    }
+                    if let passTeam {
+                        // チーム更新の取り消し
+                        print("\(passTeam.name)の更新取り消し実行")
+                    }
+                    if let passUser {
+                        // ユーザー更新の取り消し
+                        print("\(passUser.name)の更新取り消し実行")
+                    }
+                })
+            .onReceive(pressingTimer) { value in
+                if !pressingState {
+                    pressingButtonFrame = 0
+                } else {
+                    // Timerの更新頻度が0.01のため、100で割る
+                    pressingButtonFrame += (cancelButtonFrame / 100)
+                }
+            }
+    }
+}
+
 /// 通知機能における通知タイプを管理する列挙体。
 enum TeamNotificationType: Codable, Equatable {
     case addItem(Item)
