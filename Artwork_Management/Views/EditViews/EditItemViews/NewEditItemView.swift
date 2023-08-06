@@ -332,9 +332,9 @@ struct NewEditItemView: View {
                                 itemVM.deleteImage(path: input.photoPath)
                                 let resizedImage = itemVM.resizeUIImage(image: croppedImage,
                                                                         width: width * 2)
-                                let newImageData =  await itemVM.uploadItemImage(resizedImage, teamID)
-                                input.photoURL = newImageData.url
-                                input.photoPath = newImageData.filePath
+                                let uploadImageData =  await itemVM.uploadItemImage(resizedImage, teamID)
+                                input.photoURL = uploadImageData.url
+                                input.photoPath = uploadImageData.filePath
                             }
 
                             // NOTE: Timestamp値がnilだと、データの保存&サーバー側でタイムスタンプで2回の更新が走るようだ
@@ -416,9 +416,14 @@ struct NewEditItemView: View {
                             await itemVM.addItemToFirestore(newItem)
                             tagVM.setActiveTag(from: input.selectionTagName)
 
-                            /// 通知の作成
-                            teamNotifyVM.setNotification(team: teamVM.team,
-                                                         type: .addItem(newItem))
+                            let callBackNewItem: Item? = await itemVM.getOneItemToFirestore(from: newItem)
+                            if let callBackNewItem {
+                                print(callBackNewItem.id)
+                                teamNotifyVM.setNotification(team: teamVM.team,
+                                                             type: .addItem(callBackNewItem))
+                            } else {
+                                print("callBackNewItem_nil")
+                            }
                             withAnimation(.easeIn(duration: 0.1)) { input.showProgress = false }
                             dismiss()
 

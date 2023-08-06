@@ -100,6 +100,30 @@ class ItemViewModel: ObservableObject {
         }
         self.selectedTypesSort() // ソート
     }
+    /// Firestoreから一つのアイテムを取得するメソッド。
+    /// 主に、新規追加したアイテムをすぐに使用したい場合に用いる。
+    /// ドキュメントIDはサーバーへ保存されたときに生成されるため、アイテムのcreateTimeをクエリに使う。
+    func getOneItemToFirestore(from item: Item) async -> Item? {
+        print("getOneItemToFirestore実行")
+        guard let teamId = currentTeamID else { return nil }
+        guard let itemsRef = db?.collection("teams")
+            .document(teamId)
+            .collection("items") else { return nil }
+
+        var resultItem: [Item]?
+        let oneItemQuery = itemsRef
+            .whereField("createTime", isEqualTo: item.createTime)
+
+        do {
+            let snapshot = try await oneItemQuery.getDocuments()
+            resultItem = snapshot.documents.compactMap { (document) -> Item? in
+                return try? document.data(as: Item.self)
+            }
+            return resultItem?.first
+        } catch {
+            return nil
+        }
+    }
 
     func addItemToFirestore(_ itemData: Item) async {
         print("addItem実行")

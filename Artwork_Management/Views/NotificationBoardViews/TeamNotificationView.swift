@@ -266,9 +266,9 @@ fileprivate struct NotificationContainer: View {
                 Divider()
             } // Grid
             .padding()
-            .padding(.horizontal, 30) // 一要素の詳細しか表示しないため、横幅を狭くする
+            .padding(.horizontal, 30) // 表示要素１つのため、横幅を狭くする
+            CancelUpdateLongPressButton(ids: $canceledIDs, for: item, id: item.id)
         }
-//        CancelUpdateLongPressButton(ids: $canceledIDs, for: item)
     }
     @ViewBuilder
     func UpdateItemDetail(item: CompareItem) -> some View {
@@ -415,14 +415,16 @@ struct CancelUpdateLongPressButton: View {
     let passUser: User?
     let passTeam: Team?
     let passCompareItem: CompareItem?
+    let elementId: String?
     @Binding var canceledIDs: [String]
 
     /// アイテム追加の取り消しに用いるイニシャライザ。
-    init(ids canceledIDs: Binding<[String]>, for item: Item?) {
+    init(ids canceledIDs: Binding<[String]>, for item: Item?, id elementId: String?) {
         self.passItem = item
         self.passUser = nil
         self.passTeam = nil
         self.passCompareItem = nil
+        self.elementId = elementId
         self._canceledIDs = canceledIDs
     }
     /// ユーザー情報変更の取り消しに用いるイニシャライザ。
@@ -431,6 +433,7 @@ struct CancelUpdateLongPressButton: View {
         self.passUser = beforeUser
         self.passTeam = nil
         self.passCompareItem = nil
+        self.elementId = nil
         self._canceledIDs = canceledIDs
     }
     /// チーム情報変更の取り消しに用いるイニシャライザ。
@@ -439,6 +442,7 @@ struct CancelUpdateLongPressButton: View {
         self.passUser = nil
         self.passTeam = beforeTeam
         self.passCompareItem = nil
+        self.elementId = nil
         self._canceledIDs = canceledIDs
     }
     /// アイテム情報変更の取り消しに用いるイニシャライザ。
@@ -447,6 +451,7 @@ struct CancelUpdateLongPressButton: View {
         self.passUser = nil
         self.passTeam = nil
         self.passCompareItem = compareItem
+        self.elementId = nil
         self._canceledIDs = canceledIDs
     }
     let pressingMinTime: CGFloat = 1.0 // 取り消し実行に必要な長押しタイム設定
@@ -515,8 +520,9 @@ struct CancelUpdateLongPressButton: View {
                     // アイテム追加の取り消し、削除
                     if let passItem {
                         print("\(passItem.name)の更新取り消し実行")
-                        guard let id = passTeam?.id else { return }
-                        canceledIDs.append(id)
+                        guard let id = passItem.id else { return }
+                        print(elementId)
+//                        canceledIDs.append(id)
                     }
                     // ユーザー更新の取り消し
                     if let passUser {
