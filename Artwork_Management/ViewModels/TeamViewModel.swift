@@ -19,7 +19,7 @@ class TeamViewModel: ObservableObject {
 
     var listener: ListenerRegistration?
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
-    var uid: String? { return Auth.auth().currentUser?.uid }
+    var uid: String? { Auth.auth().currentUser?.uid }
 
     @Published var team: Team?
     @Published var isShowCreateAndJoinTeam: Bool = false

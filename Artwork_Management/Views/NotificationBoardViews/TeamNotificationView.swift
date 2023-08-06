@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 import SDWebImageSwiftUI
 
 /// チームのメンバー全員に届く通知を表示するビュー。
@@ -17,7 +18,7 @@ struct TeamNotificationView: View {
     @EnvironmentObject var vm: TeamNotificationViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     let screen = UIScreen.main.bounds
-    var uid: String? { teamVM.uid }
+    var uid: String? { Auth.auth().currentUser?.uid }
     var currentTeamMyMemberData: JoinMember? {
         guard let team = teamVM.team else { return nil }
         guard let index = teamVM.myMemberIndex else { return nil }
@@ -124,14 +125,13 @@ fileprivate struct NotificationContainer: View {
 
                 switch element.type {
                 case .addItem(let item):
-                    CreateItemDetail(item: item)
+                    AddItemDetail(item: item)
 
                 case .updateItem(let item):
                     UpdateItemDetail(item: item)
 
                 case .commerce(let items):
-                    CommerceItemDetail(items: items,
-                                       index: showIndex)
+                    CommerceItemDetail(items: items)
 
                 case .join(let user):
                     CancelUpdateLongPressButton(ids: $canceledIDs,
@@ -319,7 +319,7 @@ fileprivate struct NotificationContainer: View {
         .opacity(0.6)
     }
     @ViewBuilder
-    func CreateItemDetail(item: Item) -> some View {
+    func AddItemDetail(item: Item) -> some View {
         VStack {
             Grid(alignment: .leading, verticalSpacing: 20) {
 
@@ -333,7 +333,7 @@ fileprivate struct NotificationContainer: View {
             .padding()
             .padding(.horizontal, 30) // 一要素の詳細しか表示しないため、横幅を狭くする
         }
-        CancelUpdateLongPressButton(ids: $canceledIDs, for: item)
+//        CancelUpdateLongPressButton(ids: $canceledIDs, for: item)
     }
     @ViewBuilder
     func UpdateItemDetail(item: CompareItem) -> some View {
@@ -396,11 +396,11 @@ fileprivate struct NotificationContainer: View {
                 }
             } // Grid
             .padding()
-            CancelUpdateLongPressButton(ids: $canceledIDs, for: item.before)
+            CancelUpdateLongPressButton(ids: $canceledIDs, for: item)
         } // VStack
     }
     @ViewBuilder
-    func CommerceItemDetail(items: [CompareItem], index showIndex: Int) -> some View {
+    func CommerceItemDetail(items: [CompareItem]) -> some View {
         VStack {
             if items.count > 1 {
                 CommerceItemsTableNumber(count: items.count)
@@ -422,7 +422,7 @@ fileprivate struct NotificationContainer: View {
                 }
             } // Grid
             .padding()
-            CancelUpdateLongPressButton(ids: $canceledIDs, for: items[showIndex].before)
+            CancelUpdateLongPressButton(ids: $canceledIDs, for: items[showIndex])
         } // VStack
     }
     /// カートアイテムが複数あった場合に、各アイテム情報を切り替えるための番号テーブル。
@@ -475,38 +475,73 @@ fileprivate struct NotificationContainer: View {
 /// 取り消し対象データの更新前の値と、取り消し完了済みのステートを管理するためのid配列参照を受け取る
 /// 取り消しが完了したら、対象データのidを配列に入れる
 struct CancelUpdateLongPressButton: View {
-    let passUser: User?
     let passItem: Item?
+    let passUser: User?
     let passTeam: Team?
+    let passCompareItem: CompareItem?
     @Binding var canceledIDs: [String]
-    /// カスタムイニシャライザ
-    init(ids canceledIDs: Binding<[String]>, for beforeUser: User?) {
-        self.passUser = beforeUser
-        self.passItem = nil
-        self.passTeam = nil
-        self._canceledIDs = canceledIDs
-    }
-    init(ids canceledIDs: Binding<[String]>, for beforeTeam: Team?) {
-        self.passUser = nil
-        self.passItem = nil
-        self.passTeam = beforeTeam
-        self._canceledIDs = canceledIDs
-    }
-    init(ids canceledIDs: Binding<[String]>, for beforeItem: Item?) {
-        self.passUser = nil
-        self.passItem = beforeItem
-        self.passTeam = nil
-        self._canceledIDs = canceledIDs
-    }
 
-    let cancelButtonFrame: CGFloat = 80 // ボタン長押しによる赤ゲージ満タン時のサイズ
+    /// アイテム追加の取り消しに用いるイニシャライザ。
+    init(ids canceledIDs: Binding<[String]>, for item: Item?) {
+        self.passItem = item
+        self.passUser = nil
+        self.passTeam = nil
+        self.passCompareItem = nil
+        self._canceledIDs = canceledIDs
+    }
+    /// ユーザー情報変更の取り消しに用いるイニシャライザ。
+    init(ids canceledIDs: Binding<[String]>, for beforeUser: User?) {
+        self.passItem = nil
+        self.passUser = beforeUser
+        self.passTeam = nil
+        self.passCompareItem = nil
+        self._canceledIDs = canceledIDs
+    }
+    /// チーム情報変更の取り消しに用いるイニシャライザ。
+    init(ids canceledIDs: Binding<[String]>, for beforeTeam: Team?) {
+        self.passItem = nil
+        self.passUser = nil
+        self.passTeam = beforeTeam
+        self.passCompareItem = nil
+        self._canceledIDs = canceledIDs
+    }
+    /// アイテム情報変更の取り消しに用いるイニシャライザ。
+    init(ids canceledIDs: Binding<[String]>, for compareItem: CompareItem?) {
+        self.passItem = nil
+        self.passUser = nil
+        self.passTeam = nil
+        self.passCompareItem = compareItem
+        self._canceledIDs = canceledIDs
+    }
     let pressingMinTime: CGFloat = 1.0 // 取り消し実行に必要な長押しタイム設定
     let pressingTimer = Timer.publish(every: 0.01, on: .current, in: .common) .autoconnect()
 
+    /// canceledIDsを検索し、渡されたデータの更新が取り消し済みかどうかをBool値で返す
+    var canceled: Bool {
+        var resultState: Bool = false
+
+        if let itemId = passItem?.id {
+            resultState = canceledIDs.contains(itemId)
+        }
+        if let passUser {
+            resultState = canceledIDs.contains(passUser.id)
+        }
+        if let passTeam {
+            resultState = canceledIDs.contains(passTeam.id)
+        }
+        if let itemId = passCompareItem?.id {
+            resultState = canceledIDs.contains(itemId)
+        }
+        return resultState
+    }
+
     @State private var pressingState: Bool = false
-    @State private var pressingButtonFrame: CGFloat = .zero
+    @State private var pressingFrame: CGFloat = .zero
     var body: some View {
-        Label("取消", systemImage: "clock.arrow.circlepath")
+        // ボタンのサイズ
+        let cancelButtonFrame: CGFloat = self.canceled ? 100 : 80
+
+        Label(canceled ? "取消済み" : "取消", systemImage: "clock.arrow.circlepath")
             .font(.footnote)
             .fontWeight(.bold)
             .foregroundColor(pressingState ? .gray : .white)
@@ -516,17 +551,20 @@ struct CancelUpdateLongPressButton: View {
         /// 規定時間まで長押しが続くと、対象データの変更内容が取り消される
             .background(
                 HStack {
-                    Capsule().fill(.red)
-                        .frame(width: pressingState ? pressingButtonFrame : cancelButtonFrame)
+                    Capsule()
+                        .fill(canceled ? .gray : .red)
+                        .frame(width: pressingState ? pressingFrame : cancelButtonFrame)
                     Spacer().frame(minWidth: 0)
                 }
             )
             .background(Capsule().fill(.gray.opacity(0.6)))
-            .scaleEffect(pressingState ? 1 + (pressingButtonFrame / 250) : 1)
+            .scaleEffect(pressingState ? 1 + (pressingFrame / 250) : 1)
+            .opacity(canceled ? 0.4 : 1)
             .onLongPressGesture(
-                minimumDuration: pressingMinTime, // プレス完了の時間設定
+                minimumDuration: pressingMinTime,
                 pressing: { pressing in
                     if pressing {
+                        if canceled { return } // 取消済み
                         // 更新データの取り消し判定開始
                         pressingState = true
                     } else {
@@ -537,25 +575,35 @@ struct CancelUpdateLongPressButton: View {
                 perform: {
                     // 取り消し処理実行
                     pressingState = false
+
+                    // アイテム追加の取り消し、削除
                     if let passItem {
-                        // アイテム更新の取り消し
                         print("\(passItem.name)の更新取り消し実行")
+                        guard let id = passTeam?.id else { return }
+                        canceledIDs.append(id)
                     }
-                    if let passTeam {
-                        // チーム更新の取り消し
-                        print("\(passTeam.name)の更新取り消し実行")
-                    }
+                    // ユーザー更新の取り消し
                     if let passUser {
-                        // ユーザー更新の取り消し
                         print("\(passUser.name)の更新取り消し実行")
+                        canceledIDs.append(passUser.id)
+                    }
+                    // チーム更新の取り消し
+                    if let passTeam {
+                        print("\(passTeam.name)の更新取り消し実行")
+                        canceledIDs.append(passTeam.id)
+                    }
+                    // アイテム更新の取り消し
+                    if let passCompareItem {
+                        print("\(passCompareItem.before.name)の更新取り消し実行")
+                        canceledIDs.append(passCompareItem.id)
                     }
                 })
             .onReceive(pressingTimer) { value in
                 if !pressingState {
-                    pressingButtonFrame = 0
+                    pressingFrame = 0
                 } else {
                     // Timerの更新頻度が0.01のため、100で割る
-                    pressingButtonFrame += (cancelButtonFrame / 100)
+                    pressingFrame += (cancelButtonFrame / 100)
                 }
             }
     }

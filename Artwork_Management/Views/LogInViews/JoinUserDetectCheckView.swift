@@ -309,7 +309,7 @@ struct JoinUserDetectCheckView: View {
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                                         withAnimation(.spring(response: 0.5, blendDuration: 1)) {
                                             teamVM.isShowSearchedNewMemberJoinTeam.toggle()
-                                            teamNotificationVM.setNotificationToFirestore(team: teamVM.team,
+                                            teamNotificationVM.setNotification(team: teamVM.team,
                                                                                           type: .join(detectedUser))
                                         }
                                     }

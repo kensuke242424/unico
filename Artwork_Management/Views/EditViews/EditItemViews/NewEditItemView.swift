@@ -71,7 +71,7 @@ struct NewEditItemView: View {
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var tagVM : TagViewModel
-    @EnvironmentObject var teamNotificationVM: TeamNotificationViewModel
+    @EnvironmentObject var teamNotifyVM: TeamNotificationViewModel
 
     @StateObject var itemVM: ItemViewModel
     
@@ -299,7 +299,7 @@ struct NewEditItemView: View {
                 input.sales            = passItem.sales != 0 ? String(passItem.sales) : ""
                 input.detail           = passItem.detail != "メモなし" ? passItem.detail : ""
                 input.totalAmount      = passItem.totalAmount != 0 ? String(passItem.totalAmount) : ""
-                input.totalInventory    = passItem.totalInventory != 0 ? String(passItem.totalInventory) : ""
+                input.totalInventory   = passItem.totalInventory != 0 ? String(passItem.totalInventory) : ""
             } else {
                 let filterTags = tagVM.tags.filter({ $0.tagName != "全て" })
                 input.selectionTag = filterTags.first
@@ -317,12 +317,12 @@ struct NewEditItemView: View {
             /// ✅ 追加 or 更新ボタン
             .overlay(alignment: .trailing) {
                 Button {
-                    /// passItemにデータがある -> update Item
-                    /// passItemにデータがない -> add item
-                    if let passItem {
 
+                    if let passItem {
+                        /// 🍎------------アイテム更新--------------🍎
                         Task {
-                            guard let defaultDataID = passItem.id else { return }
+
+                            guard let passItemId = passItem.id else { return }
                             guard let teamID = teamVM.team?.id else { return }
                             let editInventory = Int(input.inventory) ?? 0
 
@@ -338,29 +338,28 @@ struct NewEditItemView: View {
                             }
 
                             // NOTE: Timestamp値がnilだと、データの保存&サーバー側でタイムスタンプで2回の更新が走るようだ
-                            let updatedItem = (Item(createTime : passItem.createTime,
-                                                       updateTime : Date(),
-                                                       tag        : input.selectionTagName,
-                                                       teamID     : teamVM.team!.id,
-                                                       name       : input.name.isEmpty ? "No Name" : input.name,
-                                                       author     : input.author,
-                                                       detail     : input.detail != "" ? input.detail : "メモなし",
-                                                       photoURL   : input.photoURL,
-                                                       photoPath  : input.photoPath,
-                                                       favorite   : false,
-                                                       cost       : Int( input.cost) ?? 0,
-                                                       price      : Int(input.price) ?? 0,
-                                                       amount     : 0,
-                                                       sales      : Int(input.sales) ?? 0,
-                                                       inventory  : editInventory,
-                                                       totalAmount: passItem.totalAmount,
-                                                       totalInventory: passItem.inventory < editInventory ?
-                                                       passItem.totalInventory + (editInventory - passItem.inventory) :
+                            let updatedItem = (Item(id: passItemId,
+                                                    createTime : passItem.createTime,
+                                                    updateTime : Date(),
+                                                    tag        : input.selectionTagName,
+                                                    teamID     : teamVM.team!.id,
+                                                    name       : input.name.isEmpty ? "No Name" : input.name,
+                                                    author     : input.author,
+                                                    detail     : input.detail != "" ? input.detail : "メモなし",
+                                                    photoURL   : input.photoURL,
+                                                    photoPath  : input.photoPath,
+                                                    favorite   : false,
+                                                    cost       : Int( input.cost) ?? 0,
+                                                    price      : Int(input.price) ?? 0,
+                                                    amount     : 0,
+                                                    sales      : Int(input.sales) ?? 0,
+                                                    inventory  : editInventory,
+                                                    totalAmount: passItem.totalAmount,
+                                                    totalInventory: passItem.inventory < editInventory ?
+                                                    passItem.totalInventory + (editInventory - passItem.inventory) :
                                                         passItem.totalInventory - (passItem.inventory - editInventory) ))
 
-                            itemVM.updateItem(updateData: updatedItem,
-                                              defaultDataID: defaultDataID,
-                                              teamID: teamVM.team!.id)
+                            itemVM.updateItemToFirestore(updatedItem)
                             /// 編集アイテムの新規タグ設定とアイテムタブビュー内の選択タグを合わせる
                             /// 編集画面から戻った時、アイテムカードが適切にアニメーションするために必要
                             if tagVM.activeTag != tagVM.tags.first {
@@ -371,15 +370,19 @@ struct NewEditItemView: View {
                             }
 
                             /// 通知データの作成
-                            let compareItemData = CompareItem(before: passItem, after: updatedItem)
-                            teamNotificationVM.setNotificationToFirestore(team: teamVM.team,
-                                                                          type: .updateItem(compareItemData))
+                            print("アイテムエディット内のpassItemID: \(passItemId)")
+                            let compareItemData = CompareItem(id: passItemId,
+                                                              before: passItem,
+                                                              after: updatedItem)
+                            print("アイテムエディット内のcompareItemId: \(compareItemData.id)")
+                            teamNotifyVM.setNotification(team: teamVM.team,
+                                                         type: .updateItem(compareItemData))
                             dismiss()
 
                         } // Task(update Item)
                         
                     } else {
-                        
+                        /// 🍎------------アイテム追加--------------🍎
                         Task {
                             guard let teamID = teamVM.team?.id else { return }
                             
@@ -393,30 +396,29 @@ struct NewEditItemView: View {
                                 input.photoPath = newImageData.filePath
                             }
                             
-                            var newItem = Item(tag           : input.selectionTagName,
-                                                teamID        : teamVM.team!.id,
-                                                name          : input.name.isEmpty ? "No Name" : input.name,
-                                                author        : input.author,
-                                                detail        : input.detail != "" ? input.detail : "メモなし",
-                                                photoURL      : input.photoURL,
-                                                photoPath     : input.photoPath,
-                                                favorite      : false,
-                                                cost          : 0,
-                                                price         : Int(input.price) ?? 0,
-                                                amount        : 0,
-                                                sales         : 0,
-                                                inventory     : Int(input.inventory) ??  0,
-                                                totalAmount   : 0,
-                                                totalInventory: Int(input.inventory) ?? 0)
+                            let newItem = Item(tag           : input.selectionTagName,
+                                               teamID        : teamID,
+                                               name          : input.name.isEmpty ? "No Name" : input.name,
+                                               author        : input.author,
+                                               detail        : input.detail != "" ? input.detail : "メモなし",
+                                               photoURL      : input.photoURL,
+                                               photoPath     : input.photoPath,
+                                               favorite      : false,
+                                               cost          : 0,
+                                               price         : Int(input.price) ?? 0,
+                                               amount        : 0,
+                                               sales         : 0,
+                                               inventory     : Int(input.inventory) ??  0,
+                                               totalAmount   : 0,
+                                               totalInventory: Int(input.inventory) ?? 0)
                             
                             // Firestoreにコーダブル保存
-                            itemVM.addItem(itemData: newItem,
-                                           tag: input.selectionTag?.tagName ?? "未グループ",
-                                           teamID: teamVM.team!.id)
+                            await itemVM.addItemToFirestore(newItem)
                             tagVM.setActiveTag(from: input.selectionTagName)
 
-                            teamNotificationVM.setNotificationToFirestore(team: teamVM.team,
-                                                                          type: .addItem(newItem))
+                            /// 通知の作成
+                            teamNotifyVM.setNotification(team: teamVM.team,
+                                                         type: .addItem(newItem))
                             withAnimation(.easeIn(duration: 0.1)) { input.showProgress = false }
                             dismiss()
 

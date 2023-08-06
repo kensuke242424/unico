@@ -33,7 +33,7 @@ class ItemViewModel: ObservableObject {
 
     /// アイテムデータの追加・更新・削除のステートを管理するリスナーメソッド。
     /// 初期実行時にリスニング対象ドキュメントのデータが全取得される。(フラグはadded)
-    func itemsListener(id currentTeamID: String) async {
+    func listener(id currentTeamID: String) async {
         print("itemsListener起動")
         let itemsRef = db?.collection("teams").document(currentTeamID).collection("items")
         guard let itemsRef else { return }
@@ -86,7 +86,8 @@ class ItemViewModel: ObservableObject {
     }
 
     /// Firestoreからチームの全アイテムをフェッチするメソッド。初回起動時に呼ばれる。
-    @MainActor func fetchAllItem(teamID: String) async throws {
+    @MainActor
+    func fetchAllItem(teamID: String) async throws {
         guard let itemRefs = db?.collection("teams")
             .document(teamID)
             .collection("items") else {
@@ -95,45 +96,44 @@ class ItemViewModel: ObservableObject {
         }
         let snapshot = try await itemRefs.getDocuments()
         self.items = snapshot.documents.compactMap { (document) -> Item? in
-            return try? document.data(as: Item.self, with: .estimate)
+            return try? document.data(as: Item.self)
         }
         self.selectedTypesSort() // ソート
     }
 
-    func addItem(itemData: Item, tag: String, teamID: String) {
-
+    func addItemToFirestore(_ itemData: Item) async {
         print("addItem実行")
-
-        guard let itemsRef = db?.collection("teams").document(teamID).collection("items") else {
+        guard let teamId = currentTeamID else { return }
+        guard let itemRef = db?.collection("teams")
+            .document(teamId)
+            .collection("items") else {
             print("error: guard let tagsRef")
             return
         }
 
         do {
-            _ = try itemsRef.addDocument(from: itemData)
+            _ = try itemRef.addDocument(from: itemData)
         } catch {
-            print("Error: try db!.collection(collectionID).addDocument(from: itemData)")
+            print("Error: addDocument")
         }
         print("addItem完了")
     }
 
-    func updateItem(updateData: Item, defaultDataID: String, teamID: String) {
-
+    func updateItemToFirestore(_ updateItem: Item) {
         print("updateItem実行")
-        print(defaultDataID)
 
-        guard let updateItemRef = db?.collection("teams")
-            .document(teamID)
+        guard let teamId = currentTeamID else { return }
+        guard let itemId = updateItem.id else { return }
+        guard let itemRef = db?.collection("teams")
+            .document(teamId)
             .collection("items")
-            .document(defaultDataID) else {
-            print("error: guard let updateItemRef")
+            .document(itemId) else {
+            print("ERROR: getItemRef")
             return
         }
 
         do {
-
-            try updateItemRef.setData(from: updateData)
-
+            try itemRef.setData(from: updateItem)
         } catch {
             print("updateItem失敗")
         }
@@ -143,34 +143,14 @@ class ItemViewModel: ObservableObject {
     func deleteItem(deleteItem: Item, teamID: String) {
 
         guard let itemID = deleteItem.id else { return }
-        guard let itemRef = db?.collection("teams").document(teamID).collection("items").document(itemID) else {
+        guard let itemRef = db?.collection("teams")
+            .document(teamID)
+            .collection("items")
+            .document(itemID) else {
             print("error: deleteItem_guard let ItemRef")
             return
         }
-
         itemRef.delete()
-    }
-    
-    func updateFavorite(_ item: Item) {
-        print("updateFavoriteメソッド実行")
-
-        guard let itemsRef = db?.collection("teams").document(item.teamID).collection("items") else {
-            print("error: guard let itemsRef")
-            return
-        }
-        guard let itemID = item.id else { return }
-        
-        var item = item
-        item.favorite.toggle()
-
-        do {
-            try itemsRef.document(itemID).setData(from: item)
-        } catch {
-            hapticErrorNotification()
-            print("updateFavoriteメソッド失敗")
-        }
-        hapticSuccessNotification()
-        print("updateFavoriteメソッド完了")
     }
     
     func resizeUIImage(image: UIImage?, width: CGFloat) -> UIImage? {
@@ -292,6 +272,7 @@ class ItemViewModel: ObservableObject {
         }
         print("updateCommerse完了")
     }
+
     /// 選択されているソートタイプに応じてitemsを並び替えするメソッド。
     func selectedTypesSort() {
         switch selectedSortType {
@@ -301,11 +282,9 @@ class ItemViewModel: ObservableObject {
         case .sales     : updateTimeSort()
         }
     }
-
     func upDownOderSort() {
         items.reverse()
     }
-
     func valueSort(order: UpDownOrder, status: IndicatorValueStatus) {
 
         switch order {
@@ -333,7 +312,6 @@ class ItemViewModel: ObservableObject {
             }
         }
     }
-
     func nameSort() {
 
         switch self.selectedOder {
@@ -345,7 +323,6 @@ class ItemViewModel: ObservableObject {
             items.sort(by: { $0.name < $1.name })
         }
     }
-
     func createTimeSort() {
 
         switch self.selectedOder {
@@ -359,7 +336,6 @@ class ItemViewModel: ObservableObject {
             }
         }
     }
-
     func updateTimeSort() {
         switch self.selectedOder {
         case .up:

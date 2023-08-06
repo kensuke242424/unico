@@ -58,7 +58,7 @@ class TeamNotificationViewModel: ObservableObject {
     }
 
     /// アイテムや新規通知をチーム内の各メンバーに渡すメソッド。
-    func setNotificationToFirestore(team: Team?, type: TeamNotificationType) {
+    func setNotification(team: Team?, type: TeamNotificationType) {
         guard var team else { return }
         guard let teamRef = db?.collection("teams").document(team.id) else { return }
         let notification = TeamNotifyFrame(type: type,
@@ -74,7 +74,7 @@ class TeamNotificationViewModel: ObservableObject {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
             }
         } catch {
-            print("Error: setNotificationToFirestore")
+            print("Error: setNotification")
         }
     }
     /// 通知から受け取ったアイテムデータの更新内容を取り消すメソッド。
@@ -124,7 +124,7 @@ class TeamNotificationViewModel: ObservableObject {
         do {
             _ = try teamRef.setData(from: team)
         } catch {
-            print("Error: setNotificationToFirestore")
+            print("Error: setNotification")
         }
     }
     /// 全メンバーの対象通知データを消去。他のメンバーがログインするまで残しておく必要がない通知データに使う。
@@ -140,7 +140,7 @@ class TeamNotificationViewModel: ObservableObject {
             _ = try teamRef.setData(from: team)
             print("全メンバーの対象通知データを消去")
         } catch {
-            print("Error: setNotificationToFirestore")
+            print("Error: setNotification")
         }
     }
     /// 現在の操作チームのメンバーidを取得するメソッド。。

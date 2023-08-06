@@ -66,6 +66,7 @@ class CartViewModel: ObservableObject {
             // 更新前・更新後を分けるためのアイテムコンテナを用意
             let defaultItem = item
             var updateItem = item
+            print(updateItem.id)
 
             updateItem.updateTime = Date()
             updateItem.sales += item.price * item.amount
@@ -76,7 +77,9 @@ class CartViewModel: ObservableObject {
             do {
                 try itemsRef.document(itemID).setData(from: updateItem)
                 // Firestoreへの保存が成功すれば、更新比較アイテム情報CompareItemを返す
-                let compareItem = CompareItem(before: defaultItem, after: updateItem)
+                let compareItem = CompareItem(id: defaultItem.id ?? "",
+                                              before: defaultItem,
+                                              after: updateItem)
                 compareItems.append(compareItem)
             } catch {
                 print("Error: 「\(item.name)」try reference.document(itemID).setData(from: item)")

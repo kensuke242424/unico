@@ -10,6 +10,7 @@ import Foundation
 /// アイテムデータの更新前と更新後の比較値を使いたい時に用いるモデル。
 /// Firestoreへのコーダブル保存を可能にするため、Codableに準拠。
 struct CompareItem: Codable, Equatable {
+    let id: String
     let before: Item
     let after: Item
     var cancel: Bool? // 取り消しが実行されるとtrue
