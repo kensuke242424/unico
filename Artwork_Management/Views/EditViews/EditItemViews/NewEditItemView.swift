@@ -415,15 +415,8 @@ struct NewEditItemView: View {
                             // Firestoreにコーダブル保存
                             await itemVM.addItemToFirestore(newItem)
                             tagVM.setActiveTag(from: input.selectionTagName)
+                            teamNotifyVM.setNotification(team: teamVM.team, type: .addItem(newItem))
 
-                            let callBackNewItem: Item? = await itemVM.getOneItemToFirestore(from: newItem)
-                            if let callBackNewItem {
-                                print(callBackNewItem.id)
-                                teamNotifyVM.setNotification(team: teamVM.team,
-                                                             type: .addItem(callBackNewItem))
-                            } else {
-                                print("callBackNewItem_nil")
-                            }
                             withAnimation(.easeIn(duration: 0.1)) { input.showProgress = false }
                             dismiss()
 

@@ -19,6 +19,7 @@ extension User {
 struct User: Identifiable, Codable, Equatable {
 
     var id: String
+    var createTime = Date()
     var name: String
     var address: String?
     var password: String?

@@ -18,4 +18,10 @@ extension Date {
 
         return formatter.string(from: self)
     }
+    /// Dateの時間を１時間ずらす。主に初期サンプルアイテム挿入時に使う。
+    /// (更新キャンセル時にcreateTimeの差分を用いるため)
+    func plusOneHour() -> Date {
+        let modifiedDate = Calendar.current.date(byAdding: .hour, value: 1, to: self)
+        return modifiedDate ?? Date()
+    }
 }

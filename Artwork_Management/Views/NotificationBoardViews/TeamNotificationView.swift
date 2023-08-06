@@ -70,6 +70,8 @@ fileprivate struct NotificationContainer: View {
     let showLimitTimer = Timer.publish(every: 1, on: .current, in: .common).autoconnect()
     /// 更新がキャンセルされたデータのidが格納されるプロパティ。
     @State private var canceledIDs: [String] = []
+    /// 更新がキャンセルされたデータのcreateTimeが格納されるプロパティ。
+    @State private var canceledElements: [Date] = []
     @State private var cancelState: Bool = false
     @State private var longPressButtonFrame: CGFloat = .zero
     let cancelButtonFrame: CGFloat = 80
@@ -111,8 +113,7 @@ fileprivate struct NotificationContainer: View {
                     CommerceItemDetail(items: items)
 
                 case .join(let user):
-                    CancelUpdateLongPressButton(ids: $canceledIDs,
-                                                for: user)
+                    EmptyView()
                 }
             } // if detail
         }
@@ -267,7 +268,7 @@ fileprivate struct NotificationContainer: View {
             } // Grid
             .padding()
             .padding(.horizontal, 30) // 表示要素１つのため、横幅を狭くする
-            CancelUpdateLongPressButton(ids: $canceledIDs, for: item, id: item.id)
+            CancelUpdateLongPressButton(ids: $canceledElements, for: item)
         }
     }
     @ViewBuilder
@@ -331,7 +332,7 @@ fileprivate struct NotificationContainer: View {
                 }
             } // Grid
             .padding()
-            CancelUpdateLongPressButton(ids: $canceledIDs, for: item)
+            CancelUpdateLongPressButton(ids: $canceledElements, for: item.before)
         } // VStack
     }
     @ViewBuilder
@@ -357,7 +358,7 @@ fileprivate struct NotificationContainer: View {
                 }
             } // Grid
             .padding()
-            CancelUpdateLongPressButton(ids: $canceledIDs, for: items[showIndex])
+            CancelUpdateLongPressButton(ids: $canceledElements, for: items[showIndex].before)
         } // VStack
     }
     /// カートアイテムが複数あった場合に、各アイテム情報を切り替えるための番号テーブル。
@@ -414,46 +415,30 @@ struct CancelUpdateLongPressButton: View {
     let passItem: Item?
     let passUser: User?
     let passTeam: Team?
-    let passCompareItem: CompareItem?
-    let elementId: String?
-    @Binding var canceledIDs: [String]
+    @Binding var canceledElements: [Date]
 
-    /// アイテム追加の取り消しに用いるイニシャライザ。
-    init(ids canceledIDs: Binding<[String]>, for item: Item?, id elementId: String?) {
+    /// アイテム更新の取り消しに用いるイニシャライザ。
+    init(ids canceledElements: Binding<[Date]>, for item: Item?) {
         self.passItem = item
         self.passUser = nil
         self.passTeam = nil
-        self.passCompareItem = nil
-        self.elementId = elementId
-        self._canceledIDs = canceledIDs
+        self._canceledElements = canceledElements
     }
-    /// ユーザー情報変更の取り消しに用いるイニシャライザ。
-    init(ids canceledIDs: Binding<[String]>, for beforeUser: User?) {
-        self.passItem = nil
-        self.passUser = beforeUser
-        self.passTeam = nil
-        self.passCompareItem = nil
-        self.elementId = nil
-        self._canceledIDs = canceledIDs
-    }
-    /// チーム情報変更の取り消しに用いるイニシャライザ。
-    init(ids canceledIDs: Binding<[String]>, for beforeTeam: Team?) {
-        self.passItem = nil
-        self.passUser = nil
-        self.passTeam = beforeTeam
-        self.passCompareItem = nil
-        self.elementId = nil
-        self._canceledIDs = canceledIDs
-    }
-    /// アイテム情報変更の取り消しに用いるイニシャライザ。
-    init(ids canceledIDs: Binding<[String]>, for compareItem: CompareItem?) {
-        self.passItem = nil
-        self.passUser = nil
-        self.passTeam = nil
-        self.passCompareItem = compareItem
-        self.elementId = nil
-        self._canceledIDs = canceledIDs
-    }
+//    /// ユーザー情報変更の取り消しに用いるイニシャライザ。
+//    init(ids canceledElements: Binding<[Date]>, for beforeUser: User?) {
+//        self.passItem = nil
+//        self.passUser = beforeUser
+//        self.passTeam = nil
+//        self.canceledElements = canceledElements
+//    }
+//    /// チーム情報変更の取り消しに用いるイニシャライザ。
+//    init(ids canceledElements: Binding<[Date]>, for beforeTeam: Team?) {
+//        self.passItem = nil
+//        self.passUser = nil
+//        self.passTeam = beforeTeam
+//        self.canceledElements = canceledElements
+//    }
+
     let pressingMinTime: CGFloat = 1.0 // 取り消し実行に必要な長押しタイム設定
     let pressingTimer = Timer.publish(every: 0.01, on: .current, in: .common) .autoconnect()
 
@@ -461,18 +446,16 @@ struct CancelUpdateLongPressButton: View {
     var canceled: Bool {
         var resultState: Bool = false
 
-        if let itemId = passItem?.id {
-            resultState = canceledIDs.contains(itemId)
+        if let passItem {
+            resultState = canceledElements.contains(passItem.createTime)
         }
         if let passUser {
-            resultState = canceledIDs.contains(passUser.id)
+            resultState = canceledElements.contains(passUser.createTime)
         }
         if let passTeam {
-            resultState = canceledIDs.contains(passTeam.id)
+//            resultState = canceledElements.contains(passTeam.createTime)
         }
-        if let itemId = passCompareItem?.id {
-            resultState = canceledIDs.contains(itemId)
-        }
+
         return resultState
     }
 
@@ -520,25 +503,18 @@ struct CancelUpdateLongPressButton: View {
                     // アイテム追加の取り消し、削除
                     if let passItem {
                         print("\(passItem.name)の更新取り消し実行")
-                        guard let id = passItem.id else { return }
-                        print(elementId)
-//                        canceledIDs.append(id)
+                        canceledElements.append(passItem.createTime)
                     }
-                    // ユーザー更新の取り消し
+//                    // ユーザー更新の取り消し
                     if let passUser {
                         print("\(passUser.name)の更新取り消し実行")
-                        canceledIDs.append(passUser.id)
+                        canceledElements.append(passUser.createTime)
                     }
-                    // チーム更新の取り消し
-                    if let passTeam {
-                        print("\(passTeam.name)の更新取り消し実行")
-                        canceledIDs.append(passTeam.id)
-                    }
-                    // アイテム更新の取り消し
-                    if let passCompareItem {
-                        print("\(passCompareItem.before.name)の更新取り消し実行")
-                        canceledIDs.append(passCompareItem.id)
-                    }
+//                    // チーム更新の取り消し
+//                    if let passTeam {
+//                        print("\(passTeam.name)の更新取り消し実行")
+//                        canceledElements.append(passTeam.createTime)
+//                    }
                 })
             .onReceive(pressingTimer) { value in
                 if !pressingState {

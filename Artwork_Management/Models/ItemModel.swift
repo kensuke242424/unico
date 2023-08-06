@@ -103,8 +103,7 @@ var sampleItems: [Item] =
          totalAmount: 0,
          totalInventory: 0),
 
-    Item(createTime: Date(),
-         updateTime: Date(),
+    Item(createTime: Date().plusOneHour(),
          tag: "goods",
          teamID: "",
          name: "サンプル２",
