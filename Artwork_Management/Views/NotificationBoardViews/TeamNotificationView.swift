@@ -125,7 +125,7 @@ fileprivate struct NotificationContainer: View {
         .opacity(showState ? 1 : 0)
         .offset(showState ? .zero : CGSize(width: 0, height: -85))
         .offset(dragOffset)
-        .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: -40)))
+        .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: -80)))
         .onTapGesture {
             withAnimation(.spring(response: 0.4, blendDuration: 1)) { detail.toggle() }
         }
@@ -249,93 +249,149 @@ fileprivate struct NotificationContainer: View {
     }
 
     @ViewBuilder
-    func AddItemDetail(item: Item) -> some View {
-        VStack {
-            Grid(alignment: .leading, verticalSpacing: 20) {
-
-                ItemDetailIconAndName(item: item, size: 50)
-                Divider()
-                SingleElementGridRow("製作者", item.author.isEmpty ? "???" : item.author)
-                Divider()
-                SingleElementGridRow("在庫", String(item.inventory))
-                Divider()
-            } // Grid
-            .padding()
-            .padding(.horizontal, 30) // 表示要素１つのため、横幅を狭くする
-            CancelUpdateLongPressButton(ids: $canceledElementsDate, for: item)
+    func CanceledStumpView() -> some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(lineWidth: 3)
+                .frame(width: 180, height: 40)
+                .foregroundColor(.red)
+            Text("Canceled")
+                .tracking(5)
+                .fontWeight(.black)
+                .foregroundColor(.red)
         }
+        .opacity(0.7)
+        .rotationEffect(Angle(degrees: -10))
+    }
+
+    @ViewBuilder
+    func AddItemDetail(item: Item) -> some View {
+        /// 表示アイテムが更新キャンセルされているかを判定する
+        var canceled: Bool {
+            return canceledElementsDate.contains(item.createTime)
+        }
+
+        VStack(spacing: 10) {
+            ItemDetailIconAndName(item: item, size: 50)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 20)
+                .padding(.top)
+
+            VStack {
+                Grid(alignment: .leading, verticalSpacing: 20) {
+                    Divider()
+                    SingleElementGridRow("製作者", item.author.isEmpty ? "???" : item.author)
+                    Divider()
+                    SingleElementGridRow("在庫", String(item.inventory))
+                    Divider()
+                } // Grid
+                .padding()
+                .padding(.horizontal, 30) // 表示要素１つのため、横幅を狭くする
+            }
+
+            CancelUpdateLongPressButton(cancelDates: $canceledElementsDate,
+                                        element: element,
+                                        arrayIndex: nil)
+        }
+        .opacity(canceled ? 0.4 : 1)
+        .overlay {
+            if canceled {
+                CanceledStumpView()
+            }
+        }
+
     }
     @ViewBuilder
     func UpdateItemDetail(item: CompareItem) -> some View {
-        VStack {
-            Grid(alignment: .leading, verticalSpacing: 20) {
-                ItemDetailIconAndName(item: item.after, size: 50)
-                Divider()
+        /// 表示アイテムが更新キャンセルされているかを判定する
+        var canceled: Bool {
+            return canceledElementsDate.contains(item.before.createTime)
+        }
 
-                if item.before.tag != item.after.tag {
-                    CompareElementGridRow("タグ",
-                                   item.before.tag,
-                                   item.after.tag)
-                    Divider()
-                }
-                if item.before.name != item.after.name {
-                    CompareElementGridRow("名前",
-                                   item.before.name,
-                                   item.after.name)
-                    Divider()
-                }
+        VStack(spacing: 10) {
 
-                if item.before.author != item.after.author {
-                    CompareElementGridRow("製作者",
-                                   item.before.author,
-                                   item.after.author)
-                    Divider()
-                }
+            ItemDetailIconAndName(item: item.after, size: 50)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 20)
+                .padding(.top)
 
-                if item.before.inventory != item.after.inventory {
-                    CompareElementGridRow("在庫",
-                                   String(item.before.inventory),
-                                   String(item.after.inventory))
-                    Divider()
-                }
-                if item.before.cost != item.after.cost {
-                    CompareElementGridRow("原価",
-                                   String(item.before.cost),
-                                   String(item.after.cost))
-                    Divider()
-                }
-                if item.before.sales != item.after.sales {
-                    CompareElementGridRow("売り上げ",
-                                   String(item.before.sales),
-                                   String(item.after.sales))
-                    Divider()
-                }
+            VStack {
+                Grid(alignment: .leading, verticalSpacing: 20) {
 
-                if item.before.totalAmount != item.after.totalAmount {
-                    CompareElementGridRow("総売個数",
-                                   String(item.before.totalAmount),
-                                   String(item.after.totalAmount))
                     Divider()
-                }
 
-                if item.before.totalInventory != item.after.totalInventory {
-                    CompareElementGridRow("総仕入れ",
-                                   String(item.before.totalInventory),
-                                   String(item.after.totalInventory))
-                    Divider()
+                    if item.before.tag != item.after.tag {
+                        CompareElementGridRow("タグ",
+                                              item.before.tag,
+                                              item.after.tag)
+                        Divider()
+                    }
+                    if item.before.name != item.after.name {
+                        CompareElementGridRow("名前",
+                                              item.before.name,
+                                              item.after.name)
+                        Divider()
+                    }
+
+                    if item.before.author != item.after.author {
+                        CompareElementGridRow("製作者",
+                                              item.before.author,
+                                              item.after.author)
+                        Divider()
+                    }
+
+                    if item.before.inventory != item.after.inventory {
+                        CompareElementGridRow("在庫",
+                                              String(item.before.inventory),
+                                              String(item.after.inventory))
+                        Divider()
+                    }
+                    if item.before.cost != item.after.cost {
+                        CompareElementGridRow("原価",
+                                              String(item.before.cost),
+                                              String(item.after.cost))
+                        Divider()
+                    }
+                    if item.before.sales != item.after.sales {
+                        CompareElementGridRow("売り上げ",
+                                              String(item.before.sales),
+                                              String(item.after.sales))
+                        Divider()
+                    }
+
+                    if item.before.totalAmount != item.after.totalAmount {
+                        CompareElementGridRow("総売個数",
+                                              String(item.before.totalAmount),
+                                              String(item.after.totalAmount))
+                        Divider()
+                    }
+
+                    if item.before.totalInventory != item.after.totalInventory {
+                        CompareElementGridRow("総仕入れ",
+                                              String(item.before.totalInventory),
+                                              String(item.after.totalInventory))
+                        Divider()
+                    }
+                } // Grid
+                .opacity(canceled ? 0.4 : 1)
+                .padding()
+            }
+            .overlay {
+                if canceled {
+                    CanceledStumpView()
                 }
-            } // Grid
-            .padding()
-            CancelUpdateLongPressButton(ids: $canceledElementsDate, for: item.before)
+            }
+
+            CancelUpdateLongPressButton(cancelDates: $canceledElementsDate,
+                                        element: element,
+                                        arrayIndex: nil)
         } // VStack
     }
     @ViewBuilder
     func CommerceItemDetail(items: [CompareItem]) -> some View {
         /// 表示アイテムが更新キャンセルされているかを判定する
         var canceled: Bool {
-            return withAnimation {
-                canceledElementsDate.contains(items[showIndex].after.createTime)
-            }
+            return canceledElementsDate.contains(items[showIndex].after.createTime)
         }
         VStack(spacing: 10) {
             if items.count > 1 {
@@ -367,22 +423,13 @@ fileprivate struct NotificationContainer: View {
             }
             .overlay {
                 if canceled {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(lineWidth: 3)
-                            .frame(width: 180, height: 40)
-                            .foregroundColor(.red)
-                        Text("Canceled")
-                            .tracking(5)
-                            .fontWeight(.black)
-                            .foregroundColor(.red)
-                    }
-                    .opacity(0.7)
-                    .rotationEffect(Angle(degrees: -10))
+                    CanceledStumpView()
                 }
             }
 
-            CancelUpdateLongPressButton(ids: $canceledElementsDate, for: items[showIndex].before)
+            CancelUpdateLongPressButton(cancelDates: $canceledElementsDate,
+                                        element: element,
+                                        arrayIndex: showIndex)
         } // VStack
     }
     /// カートアイテムが複数あった場合に、各アイテム情報を切り替えるための番号テーブル。
@@ -436,51 +483,31 @@ fileprivate struct NotificationContainer: View {
 /// 取り消しが完了したら、対象データのcreateTimeをキャンセル判定配列に入れる
 fileprivate
 struct CancelUpdateLongPressButton: View {
-    let passItem: Item?
-    let passUser: User?
-    let passTeam: Team?
-    @Binding var canceledElementsDate: [Date]
 
-    /// アイテム更新の取り消しに用いるイニシャライザ。
-    init(ids canceledElementsDate: Binding<[Date]>, for beforeItem: Item?) {
-        self.passItem = beforeItem
-        self.passUser = nil
-        self.passTeam = nil
-        self._canceledElementsDate = canceledElementsDate
-    }
-    /// ユーザー情報変更の取り消しに用いるイニシャライザ。
-    init(ids canceledElementsDate: Binding<[Date]>, for beforeUser: User?) {
-        self.passItem = nil
-        self.passUser = beforeUser
-        self.passTeam = nil
-        self._canceledElementsDate = canceledElementsDate
-    }
-    /// チーム情報変更の取り消しに用いるイニシャライザ。
-    init(ids canceledElementsDate: Binding<[Date]>, for beforeTeam: Team?) {
-        self.passItem = nil
-        self.passUser = nil
-        self.passTeam = beforeTeam
-        self._canceledElementsDate = canceledElementsDate
-    }
+    @Binding var cancelDates: [Date]
+    let element: TeamNotifyFrame
+    let arrayIndex: Int? // 複数アイテムの場合(.commerce)
 
     let pressingMinTime: CGFloat = 1.0 // 取り消し実行に必要な長押しタイム設定
     let pressingTimer = Timer.publish(every: 0.01, on: .current, in: .common) .autoconnect()
 
+    var index: Int { arrayIndex ?? 0 }
     /// Date配列のcanceledElementsDateを検索し、渡されたデータの更新がキャンセル済みかどうかをBool値で返す
     var canceled: Bool {
-        var resultState: Bool = false
 
-        if let passItem {
-            resultState = canceledElementsDate.contains(passItem.createTime)
-        }
-        if let passUser {
-            resultState = canceledElementsDate.contains(passUser.createTime)
-        }
-        if let passTeam {
-            resultState = canceledElementsDate.contains(passTeam.createTime)
-        }
+        switch element.type {
+        case .addItem(let item):
+            return cancelDates.contains(item.createTime)
 
-        return resultState
+        case .updateItem(let item):
+            return cancelDates.contains(item.before.createTime)
+
+        case .commerce(let items):
+            return cancelDates.contains(items[index].before.createTime)
+
+        case .join(let user):
+            return cancelDates.contains(user.createTime)
+        }
     }
 
     @State private var pressingState: Bool = false
@@ -524,20 +551,23 @@ struct CancelUpdateLongPressButton: View {
                     // 取り消し処理実行
                     pressingState = false
 
-                    // アイテム更新の取り消し、削除
-                    if let passItem {
-                        print("\(passItem.name)の更新取り消し実行")
-                        canceledElementsDate.append(passItem.createTime)
-                    }
-                    // ユーザー更新の取り消し
-                    if let passUser {
-                        print("\(passUser.name)の更新取り消し実行")
-                        canceledElementsDate.append(passUser.createTime)
-                    }
-                    // チーム更新の取り消し
-                    if let passTeam {
-                        print("\(passTeam.name)の更新取り消し実行")
-                        canceledElementsDate.append(passTeam.createTime)
+                    switch element.type {
+                    case .addItem(let item):
+                        print("\(item.name)の追加取り消し")
+                        // 処理...
+                        cancelDates.append(item.createTime)
+                    case .updateItem(let item):
+                        print("\(item.after.name)更新取り消し")
+                        // 処理...
+                        cancelDates.append(item.before.createTime)
+                    case .commerce(let items):
+                        print("\(items[index].after.name)カート処理取り消し")
+                        // 処理...
+                        cancelDates.append(items[index].before.createTime)
+                    case .join(let user):
+                        print("\(user.name)更新取り消し")
+                        // 処理...
+                        cancelDates.append(user.createTime)
                     }
                 })
             .onReceive(pressingTimer) { value in
@@ -575,6 +605,7 @@ enum TeamNotificationType: Codable, Equatable {
             return "\(user.name) さんがチームに参加しました！"
         }
     }
+
     /// 通知アイコンに用いられる画像URL。WebImageによって表示される。
     var imageURL: URL? {
         switch self {
