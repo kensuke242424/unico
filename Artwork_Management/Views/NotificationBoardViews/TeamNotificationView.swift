@@ -66,24 +66,32 @@ fileprivate struct NotificationContainer: View {
     fileprivate enum RemoveType {
         case local, all
     }
-    /// 通知の種類データと、種類ごとの要素データをもつ
+    /// 通知のタイプと、タイプごとのデータ要素をもつ通知一個分のエレメント。
     let element: TeamNotifyFrame
 
     @EnvironmentObject var vm: TeamNotificationViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @Environment(\.colorScheme) var colorScheme
 
-    @State private var state: Bool = false
+    /// 通知ボードの表示有無を管理するプロパティ。
+    /// WebImageのロードを待つため、onAppear内で少しタイムラグを持たせてからtrueにしている。
+    @State private var showState: Bool = false
+    /// 通知ボードの詳細表示を管理するプロパティ。
     @State private var detail: Bool = false
-    @State private var selectedIndex: Int = 0
-    @State private var count: Int = 0
+    /// 現在通知ボード上に表示されているデータのインデックス。
+    @State private var showIndex: Int = 0
+    /// タイマーパブリッシャーによって更新されるカウントプロパティ。
+    @State private var showLimitCount: Int = 0
+
     @GestureState var dragOffset: CGSize = .zero
     @Namespace var animation
     /// 通知アイコンWebImageの画像ロード完了を待つ時間。出現時のアニメーション不具合を防ぐため。
     let loadWaitTime: CGFloat = 0.5
     let screen = UIScreen.main.bounds
-    let stateTimer = Timer.publish(every: 1, on: .current, in: .common).autoconnect()
-    /// データ更新内容の取り消しを管理するプロパティ群
+    /// １秒ごとにカウントをプラスしていくタイマーパブリッシャー。自動破棄を管理するために用いる。
+    let showLimitTimer = Timer.publish(every: 1, on: .current, in: .common).autoconnect()
+    /// 更新がキャンセルされたデータのidが格納されるプロパティ。
+    @State private var canceledIDs: [String] = []
     @State private var cancelState: Bool = false
     @State private var longPressButtonFrame: CGFloat = .zero
     let cancelButtonFrame: CGFloat = 80
@@ -123,10 +131,11 @@ fileprivate struct NotificationContainer: View {
                     UpdateItemDetail(item: item)
                     CancelUpdateButton(item.before)
 
-                case .commerce(let commerceItems):
-                    CommerceItemDetail(item: commerceItems[selectedIndex],
-                                       count: commerceItems.count)
-                    CancelUpdateButton(commerceItems[selectedIndex].before)
+                case .commerce(let items):
+                    CommerceItemDetail(item: items[showIndex],
+                                       count: items.count)
+                    CancelUpdateLongPressButton(ids: $canceledIDs,
+                                                for: items[showIndex].before)
 
                 case .join(let user):
                     EmptyView()
@@ -144,8 +153,8 @@ fileprivate struct NotificationContainer: View {
                 .fill(.white)
                 .opacity(0.4)
         }
-        .opacity(state ? 1 : 0)
-        .offset(state ? .zero : CGSize(width: 0, height: -85))
+        .opacity(showState ? 1 : 0)
+        .offset(showState ? .zero : CGSize(width: 0, height: -85))
         .offset(dragOffset)
         .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: -40)))
         .onTapGesture {
@@ -176,16 +185,16 @@ fileprivate struct NotificationContainer: View {
         .onAppear {
             // WebImageの画像ロード完了を待つため、表示までに少しタイムラグを持たせている。
             DispatchQueue.main.asyncAfter(deadline: .now() + loadWaitTime) {
-                withAnimation(.easeOut(duration: 0.5)) { state = true }
+                withAnimation(.easeOut(duration: 0.5)) { showState = true }
             }
         }
         /// 通知ボードの自動破棄に用いるタイムカウントレシーバー。
-        .onReceive(stateTimer) { _ in
+        .onReceive(showLimitTimer) { _ in
             if dragOffset != .zero || detail {
-                count = 0
+                showLimitCount = 0
             } else {
-                count += 1
-                if count > Int(element.exitTime) {
+                showLimitCount += 1
+                if showLimitCount > Int(element.exitTime) {
                     print("通知ボードの破棄時間です")
                     withAnimation(.easeIn(duration: 0.3)) {
                         self.removeNotificationController(type: element.type)
@@ -425,9 +434,9 @@ fileprivate struct NotificationContainer: View {
                 Text("\(itemIndex + 1)")
                     .fontWeight(.bold)
                     .frame(maxWidth: .infinity, maxHeight: 30)
-                    .opacity(itemIndex == selectedIndex ? 1 : 0.3)
+                    .opacity(itemIndex == showIndex ? 1 : 0.3)
                     .overlay {
-                        if itemIndex != selectedIndex {
+                        if itemIndex != showIndex {
                             RoundedRectangle(cornerRadius: 10)
                                 .fill(.gray)
                                 .opacity(0.2)
@@ -438,7 +447,7 @@ fileprivate struct NotificationContainer: View {
                             .shadow(.drop(color: shadowColor.opacity(0.2),radius: 3)),
                                 in: RoundedRectangle(cornerRadius: 10)
                     )
-                    .onTapGesture { selectedIndex = itemIndex }
+                    .onTapGesture { showIndex = itemIndex }
             }
         }
     }
@@ -468,25 +477,25 @@ struct CancelUpdateLongPressButton: View {
     let passUser: User?
     let passItem: Item?
     let passTeam: Team?
-    @Binding var canceledState: [String]
+    @Binding var canceledIDs: [String]
     /// カスタムイニシャライザ
-    init(canceledState: Binding<[String]>, for beforeUser: User?) {
+    init(ids canceledIDs: Binding<[String]>, for beforeUser: User?) {
         self.passUser = beforeUser
         self.passItem = nil
         self.passTeam = nil
-        self._canceledState = canceledState
+        self._canceledIDs = canceledIDs
     }
-    init(canceledState: Binding<[String]>, for beforeTeam: Team?) {
+    init(ids canceledIDs: Binding<[String]>, for beforeTeam: Team?) {
         self.passUser = nil
         self.passItem = nil
         self.passTeam = beforeTeam
-        self._canceledState = canceledState
+        self._canceledIDs = canceledIDs
     }
-    init(canceledState: Binding<[String]>, for beforeItem: Item?) {
+    init(ids canceledIDs: Binding<[String]>, for beforeItem: Item?) {
         self.passUser = nil
         self.passItem = beforeItem
         self.passTeam = nil
-        self._canceledState = canceledState
+        self._canceledIDs = canceledIDs
     }
 
     let cancelButtonFrame: CGFloat = 80 // ボタン長押しによる赤ゲージ満タン時のサイズ
