@@ -40,8 +40,7 @@ struct TeamNotificationView: View {
 /// 受け取った通知フレームから通知のタイプを参照して、タイプに合わせた出力を行う。
 fileprivate struct NotificationContainer: View {
 
-    ///
-    fileprivate enum RemoveType {
+    enum RemoveType {
         case local, all
     }
     /// 通知のタイプと、タイプごとのデータ要素をもつ通知一個分のエレメント。
@@ -103,10 +102,19 @@ fileprivate struct NotificationContainer: View {
                 case .updateItem(let item):
                     UpdateItemDetail(item: item)
 
+                case .deleteItem(let item):
+                    EmptyView()
+
                 case .commerce(let items):
                     CommerceItemDetail(items: items)
 
                 case .join(let user):
+                    EmptyView()
+
+                case .updateUser(let user):
+                    EmptyView()
+
+                case .updateTeam(let team):
                     EmptyView()
                 }
             } // if detail
@@ -205,9 +213,9 @@ fileprivate struct NotificationContainer: View {
         }
     }
 
-    /// 通知の詳細部分に表示するアイテムの名前とアイコン
+    /// アイテムに関する通知の詳細表示で用いる詳細ビューのトップ部分。
     @ViewBuilder
-    func ItemDetailIconAndName(item: Item, size iconSize: CGFloat) -> some View {
+    func DetailTopToItem(item: Item, size iconSize: CGFloat) -> some View {
         HStack(spacing: 20) {
             RectIconView(url: item.photoURL, size: iconSize)
             VStack(alignment: .leading, spacing: 10) {
@@ -215,6 +223,24 @@ fileprivate struct NotificationContainer: View {
                 CustomOneLineLimitText(text: item.name, limit: 15)
                     .fontWeight(.bold)
             }
+        }
+    }
+    /// チームに関する通知の詳細表示で用いる詳細ビューのトップ部分。
+    @ViewBuilder
+    func DetailTopToUser(user: User, size iconSize: CGFloat) -> some View {
+        HStack(spacing: 20) {
+            RectIconView(url: user.iconURL, size: iconSize)
+            CustomOneLineLimitText(text: user.name, limit: 15)
+                .fontWeight(.bold)
+        }
+    }
+    /// チームに関する通知の詳細表示で用いる詳細ビューのトップ部分。
+    @ViewBuilder
+    func DetailTopToTeam(team: Team, size iconSize: CGFloat) -> some View {
+        HStack(spacing: 20) {
+            RectIconView(url: team.iconURL, size: iconSize)
+            CustomOneLineLimitText(text: team.name, limit: 15)
+                .fontWeight(.bold)
         }
     }
     /// 主にデータ追加時の通知詳細セクションに用いるグリッドひとつ分のグリッドビュー要素。
@@ -247,20 +273,32 @@ fileprivate struct NotificationContainer: View {
         .fontWeight(.bold)
         .opacity(0.6)
     }
+    @ViewBuilder
+    func CompareIconImageGridRow(_ title: String, _ before: URL?, _ after: URL?, size: CGFloat) -> some View {
+        GridRow {
+            Text(title)
+            Text(":")
+            CircleIconView(url: before, size: size)
+            Text("▶︎")
+            CircleIconView(url: before, size: size)
+        }
+        .font(.callout)
+        .fontWeight(.bold)
+        .opacity(0.6)
+    }
 
     @ViewBuilder
-    func CanceledStumpView() -> some View {
+    func CanceledStumpView(color: Color) -> some View {
         ZStack {
             RoundedRectangle(cornerRadius: 10)
                 .stroke(lineWidth: 3)
                 .frame(width: 180, height: 40)
-                .foregroundColor(.red)
             Text("Canceled")
                 .tracking(5)
                 .fontWeight(.black)
-                .foregroundColor(.red)
         }
         .opacity(0.7)
+        .foregroundColor(color)
         .rotationEffect(Angle(degrees: -10))
     }
 
@@ -272,7 +310,8 @@ fileprivate struct NotificationContainer: View {
         }
 
         VStack(spacing: 10) {
-            ItemDetailIconAndName(item: item, size: 50)
+
+            DetailTopToItem(item: item, size: 30)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 20)
                 .padding(.top)
@@ -292,14 +331,13 @@ fileprivate struct NotificationContainer: View {
             CancelUpdateLongPressButton(cancelDates: $canceledElementsDate,
                                         element: element,
                                         arrayIndex: nil)
-        }
+        } // VStack(Detail全体)
         .opacity(canceled ? 0.4 : 1)
         .overlay {
             if canceled {
-                CanceledStumpView()
+                CanceledStumpView(color: .red)
             }
         }
-
     }
     @ViewBuilder
     func UpdateItemDetail(item: CompareItem) -> some View {
@@ -310,7 +348,7 @@ fileprivate struct NotificationContainer: View {
 
         VStack(spacing: 10) {
 
-            ItemDetailIconAndName(item: item.after, size: 50)
+            DetailTopToItem(item: item.after, size: 50)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 20)
                 .padding(.top)
@@ -378,7 +416,7 @@ fileprivate struct NotificationContainer: View {
             }
             .overlay {
                 if canceled {
-                    CanceledStumpView()
+                    CanceledStumpView(color: .red)
                 }
             }
 
@@ -386,6 +424,42 @@ fileprivate struct NotificationContainer: View {
                                         element: element,
                                         arrayIndex: nil)
         } // VStack
+    }
+    @ViewBuilder
+    func DeleteItemDetail(item: Item) -> some View {
+        /// 表示アイテムが更新キャンセルされているかを判定する
+        var canceled: Bool {
+            return canceledElementsDate.contains(item.createTime)
+        }
+
+        VStack(spacing: 10) {
+            DetailTopToItem(item: item, size: 50)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 20)
+                .padding(.top)
+
+            VStack {
+                Grid(alignment: .leading, verticalSpacing: 20) {
+                    Divider()
+                    SingleElementGridRow("製作者", item.author.isEmpty ? "???" : item.author)
+                    Divider()
+                    SingleElementGridRow("在庫", String(item.inventory))
+                    Divider()
+                } // Grid
+                .padding()
+                .padding(.horizontal, 30) // 表示要素１つのため、横幅を狭くする
+            }
+
+            CancelUpdateLongPressButton(cancelDates: $canceledElementsDate,
+                                        element: element,
+                                        arrayIndex: nil)
+        }
+        .opacity(canceled ? 0.4 : 1)
+        .overlay {
+            if canceled {
+                CanceledStumpView(color: .white)
+            }
+        }
     }
     @ViewBuilder
     func CommerceItemDetail(items: [CompareItem]) -> some View {
@@ -397,7 +471,7 @@ fileprivate struct NotificationContainer: View {
             if items.count > 1 {
                 CommerceItemsTableNumber(count: items.count)
             }
-            ItemDetailIconAndName(item: items[showIndex].after, size: 50)
+            DetailTopToItem(item: items[showIndex].after, size: 50)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 20)
                 .padding(.top)
@@ -423,7 +497,7 @@ fileprivate struct NotificationContainer: View {
             }
             .overlay {
                 if canceled {
-                    CanceledStumpView()
+                    CanceledStumpView(color: .red)
                 }
             }
 
@@ -459,17 +533,112 @@ fileprivate struct NotificationContainer: View {
             }
         }
     }
+    @ViewBuilder
+    func UpdateUserDetail(user: CompareUser) -> some View {
+        /// 表示アイテムが更新キャンセルされているかを判定する
+        var canceled: Bool {
+            return canceledElementsDate.contains(user.after.createTime)
+        }
+
+        VStack(spacing: 10) {
+            DetailTopToUser(user: user.after, size: 30)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 20)
+                .padding(.top)
+
+            VStack {
+                Grid(alignment: .leading, verticalSpacing: 20) {
+                    Divider()
+                    if user.before.iconURL != user.after.iconURL {
+                        CompareIconImageGridRow("アイコン",
+                                                user.before.iconURL,
+                                                user.after.iconURL,
+                                                size: 30)
+                        Divider()
+                    }
+                    if user.before.name != user.after.name {
+                        CompareElementGridRow("名前",
+                                              user.before.name,
+                                              user.after.name)
+                        Divider()
+                    }
+                } // Grid
+                .padding()
+                .padding(.horizontal, 30) // 表示要素１つのため、横幅を狭くする
+            }
+            .opacity(canceled ? 0.4 : 1)
+            .overlay {
+                if canceled {
+                    CanceledStumpView(color: .red)
+                }
+            }
+
+            CancelUpdateLongPressButton(cancelDates: $canceledElementsDate,
+                                        element: element,
+                                        arrayIndex: nil)
+        }
+    }
+    @ViewBuilder
+    func UpdateTeamDetail(team: CompareTeam) -> some View {
+        /// 表示アイテムが更新キャンセルされているかを判定する
+        var canceled: Bool {
+            return canceledElementsDate.contains(team.after.createTime)
+        }
+
+        VStack(spacing: 10) {
+            DetailTopToTeam(team: team.after, size: 30)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 20)
+                .padding(.top)
+
+            VStack {
+                Grid(alignment: .leading, verticalSpacing: 20) {
+                    Divider()
+                    if team.before.iconURL != team.after.iconURL {
+                        CompareIconImageGridRow("アイコン",
+                                                team.before.iconURL,
+                                                team.after.iconURL,
+                                                size: 30)
+                        Divider()
+                    }
+                    if team.before.name != team.after.name {
+                        CompareElementGridRow("名前",
+                                              team.before.name,
+                                              team.after.name)
+                        Divider()
+                    }
+                } // Grid
+                .padding()
+                .padding(.horizontal, 30) // 表示要素１つのため、横幅を狭くする
+            }
+            .opacity(canceled ? 0.4 : 1)
+            .overlay {
+                if canceled {
+                    CanceledStumpView(color: .red)
+                }
+            }
+
+            CancelUpdateLongPressButton(cancelDates: $canceledElementsDate,
+                                        element: element,
+                                        arrayIndex: nil)
+        }
+    }
     /// 表示通知の破棄と、表示済み通知の取り扱いをコントロールするメソッド。
     /// 通知タイプによって、ローカル削除か全体削除かを分岐する。
     /// 削除要素のアニメーションは実行元で調整する。
-    fileprivate func removeNotificationController(type: TeamNotificationType) {
+    fileprivate
+    func removeNotificationController(type: TeamNotificationType) {
         switch type {
-        case .addItem, .updateItem, .commerce:
+        case .addItem, .updateItem, .commerce, .deleteItem, .updateUser:
+            // チームメンバー全体への通知削除
+            // ユーザーがアプリにログインしていなくても通知が削除される
             vm.currentNotification = nil
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 vm.removeTeamNotificationToFirestore(team: teamVM.team, data: element)
             }
-        case .join:
+        case .join, .updateTeam:
+            /// ローカル範囲だけの通知削除
+            /// ユーザーがアプリにログインするまで通知が残る
             vm.currentNotification = nil
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 vm.removeLocalNotificationToFirestore(team: teamVM.team, data: element)
@@ -502,11 +671,20 @@ struct CancelUpdateLongPressButton: View {
         case .updateItem(let item):
             return cancelDates.contains(item.before.createTime)
 
+        case .deleteItem(let item):
+            return cancelDates.contains(item.createTime)
+
         case .commerce(let items):
             return cancelDates.contains(items[index].before.createTime)
 
         case .join(let user):
             return cancelDates.contains(user.createTime)
+
+        case .updateUser(let user):
+            return cancelDates.contains(user.before.createTime)
+
+        case .updateTeam(let team):
+            return cancelDates.contains(team.before.createTime)
         }
     }
 
@@ -553,21 +731,32 @@ struct CancelUpdateLongPressButton: View {
 
                     switch element.type {
                     case .addItem(let item):
-                        print("\(item.name)の追加取り消し")
+                        print("\(item.name)の追加キャンセル")
                         // 処理...
                         cancelDates.append(item.createTime)
+
                     case .updateItem(let item):
-                        print("\(item.after.name)更新取り消し")
+                        print("\(item.after.name)更新キャンセル")
                         // 処理...
                         cancelDates.append(item.before.createTime)
+
+                    case .deleteItem(let item):
+                        print("\(item.name)の削除キャンセル")
+
                     case .commerce(let items):
-                        print("\(items[index].after.name)カート処理取り消し")
+                        print("\(items[index].after.name)カート処理キャンセル")
                         // 処理...
                         cancelDates.append(items[index].before.createTime)
                     case .join(let user):
-                        print("\(user.name)更新取り消し")
+                        print("\(user.name)更新キャンセル")
                         // 処理...
                         cancelDates.append(user.createTime)
+
+                    case .updateUser(let user):
+                        print("\(user.after.name)の更新キャンセル")
+
+                    case .updateTeam(let team):
+                        print("\(team.after.name)の更新キャンセル")
                     }
                 })
             .onReceive(pressingTimer) { value in
@@ -585,8 +774,11 @@ struct CancelUpdateLongPressButton: View {
 enum TeamNotificationType: Codable, Equatable {
     case addItem(Item)
     case updateItem(CompareItem)
+    case deleteItem(Item)
     case commerce([CompareItem])
     case join(User)
+    case updateUser(CompareUser)
+    case updateTeam(CompareTeam)
 
     var type: TeamNotificationType {
         return self
@@ -599,10 +791,16 @@ enum TeamNotificationType: Codable, Equatable {
             return "新しいアイテムが追加されました。"
         case .updateItem:
             return "アイテム情報が更新されました。"
+        case .deleteItem:
+            return "アイテムが削除されました。"
         case .commerce(let items):
             return "カート内 \(items.count) 個のアイテムが精算されました。"
         case .join(let user):
             return "\(user.name) さんがチームに参加しました！"
+        case .updateUser:
+            return "　ユーザー情報が更新されました。"
+        case .updateTeam:
+            return "チーム情報が更新されました。"
         }
     }
 
@@ -613,40 +811,50 @@ enum TeamNotificationType: Codable, Equatable {
             return item.photoURL
         case .updateItem(let item):
             return item.after.photoURL
+        case .deleteItem(let item):
+            return item.photoURL
         case .commerce(let items):
             return items.first?.after.photoURL
         case .join(let user):
             return user.iconURL
+        case .updateUser(let user):
+            return user.after.iconURL
+        case .updateTeam(let team):
+            return team.after.iconURL
         }
     }
     var symbol: String {
         switch self {
-        case .addItem, .updateItem:
+        case .addItem, .updateItem, .deleteItem:
             return "shippingbox.fill"
         case .commerce:
             return "cart.fill"
         case .join:
             return "person.fill"
+        case .updateUser:
+            return "person.fill"
+        case .updateTeam:
+            return "shippingbox.fill"
         }
     }
 
     /// 通知に用いられるカラー。主にアイコンの背景色。
     var color: Color {
         switch self {
-        case .addItem, .updateItem, .join:
+        case .addItem, .updateItem, .join, .updateUser, .updateTeam:
             return Color.white
         case .commerce:
             return Color.mint
+        case .deleteItem(_):
+            return Color.red
         }
     }
     /// 通知が画面上に残る時間
     var waitTime: CGFloat {
         switch self {
-        case .addItem, .updateItem:
-            return 2.0
-        case .commerce:
+        case .addItem, .updateItem, .updateUser, .updateTeam, .commerce:
             return 3.0
-        case .join:
+        case .join, .deleteItem:
             return 5.0
         }
     }
