@@ -28,14 +28,14 @@ class UserViewModel: ObservableObject {
     var memberColor: ThemeColor {
         return user?.userColor ?? ThemeColor.blue
     }
-    var currentTeamIndex: Int? {
+    var currentJoinsTeamIndex: Int? {
         let index = user?.joins.firstIndex(where: { $0.teamID == user?.lastLogIn })
         return index
     }
     /// ユーザーが現在操作しているチームの背景データ
     var currentTeamBackground: Background? {
-        let container = user?.joins[currentTeamIndex ?? 0].currentBackground
-        guard let  index = currentTeamIndex else { return nil }
+        let container = user?.joins[currentJoinsTeamIndex ?? 0].currentBackground
+        guard let  index = currentJoinsTeamIndex else { return nil }
         return container
     }
 
@@ -122,7 +122,7 @@ class UserViewModel: ObservableObject {
 
     func getCurrentTeamMyBackgrounds() -> [Background] {
         guard let user else { return [] }
-        let myBackgrounds = user.joins[currentTeamIndex ?? 0].myBackgrounds
+        let myBackgrounds = user.joins[currentJoinsTeamIndex ?? 0].myBackgrounds
         return myBackgrounds
     }
 
@@ -147,7 +147,7 @@ class UserViewModel: ObservableObject {
         guard let userRef = db?.collection("users").document(user.id) else { throw CustomError.getDocument }
 
         do {
-            user.joins[currentTeamIndex ?? 0].currentBackground = backgroundData
+            user.joins[currentJoinsTeamIndex ?? 0].currentBackground = backgroundData
             try userRef.setData(from: user)
         } catch {
             print("ERROR: チーム背景のアップデートに失敗しました")
@@ -263,13 +263,10 @@ class UserViewModel: ObservableObject {
         }
     }
     
-    func updateJoinTeamNameNameAndIcon(data updatedJoinTeamData: JoinTeam, members joinMembers: [JoinMember]) async throws {
+    func updateJoinTeamToMembers(data updatedJoinTeam: JoinTeam, members joinMembers: [JoinMember]) async throws {
 
-        var joinMembersID: [String] = []
         // チームに所属している各メンバーのid文字列データを配列に格納(whereFieldクエリで使う)
-        for member in joinMembers {
-            joinMembersID.append(member.memberUID)
-        }
+        var joinMembersID: [String] = joinMembers.map { $0.memberUID }
 
         // 所属メンバーのid配列を使ってクエリを叩く
         guard let joinMemberRefs = db?.collection("users")
@@ -277,23 +274,18 @@ class UserViewModel: ObservableObject {
 
         do {
             let snapshot = try await joinMemberRefs.getDocuments()
-
             for memberDocument in snapshot.documents {
+                var memberData = try memberDocument.data(as: User.self)
 
-                do {
-
-                    var memberData = try memberDocument.data(as: User.self)
-
-                    // ユーザのjoins配列からアップデート対象のチームを検出する
-                    for (index, joinTeam) in memberData.joins.enumerated() where joinTeam.teamID == updatedJoinTeamData.teamID {
-                        // 対象JoinTeamデータの名前とアイコンを更新
-                        memberData.joins[index].name = updatedJoinTeamData.name
-                        memberData.joins[index].iconURL = updatedJoinTeamData.iconURL
-                        // 更新後のユーザデータを再保存するためのリファレンスを取得
-                        guard let teamRef = db?.collection("users").document(memberData.id) else { throw CustomError.getRef }
-                        // リファレンスをもとにsetDataを実行
-                        try teamRef.setData(from: memberData)
-                    }
+                // ユーザのjoins配列からアップデート対象のチームを検出する
+                for (index, joinTeam) in memberData.joins.enumerated() where joinTeam.teamID == updatedJoinTeam.teamID {
+                    // 対象JoinTeamデータの名前とアイコンを更新
+                    memberData.joins[index].name = updatedJoinTeam.name
+                    memberData.joins[index].iconURL = updatedJoinTeam.iconURL
+                    // 更新後のユーザデータを再保存するためのリファレンスを取得
+                    guard let teamRef = db?.collection("users").document(memberData.id) else { throw CustomError.getRef }
+                    // リファレンスをもとにsetDataを実行
+                    try teamRef.setData(from: memberData)
                 }
             }
         }

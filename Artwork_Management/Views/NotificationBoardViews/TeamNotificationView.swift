@@ -87,7 +87,7 @@ fileprivate struct NotificationContainer: View {
                     .opacity(0.7)
                     .padding(.horizontal, 10)
             }
-            /// 通知ボードの詳細ビュー
+
             if detail {
                 Text("--- 詳細 ---")
                     .tracking(4)
@@ -95,7 +95,9 @@ fileprivate struct NotificationContainer: View {
                     .fontWeight(.black)
                     .foregroundColor(.gray.opacity(0.6))
 
+                /// 通知ボードの詳細ビュー
                 switch element.type {
+
                 case .addItem(let item):
                     AddItemDetail(item: item)
 
@@ -103,7 +105,7 @@ fileprivate struct NotificationContainer: View {
                     UpdateItemDetail(item: item)
 
                 case .deleteItem(let item):
-                    EmptyView()
+                    DeleteItemDetail(item: item)
 
                 case .commerce(let items):
                     CommerceItemDetail(items: items)
@@ -112,10 +114,10 @@ fileprivate struct NotificationContainer: View {
                     EmptyView()
 
                 case .updateUser(let user):
-                    EmptyView()
+                    UpdateUserDetail(user: user)
 
                 case .updateTeam(let team):
-                    EmptyView()
+                    UpdateTeamDetail(team: team)
                 }
             } // if detail
         }
@@ -180,40 +182,7 @@ fileprivate struct NotificationContainer: View {
             }
         }
     }
-    @ViewBuilder
-    func CircleIconView(url: URL?, size: CGFloat) -> some View {
-        if let url {
-            WebImage(url: url)
-                .resizable().scaledToFill()
-                .frame(width: size, height: size)
-                .clipShape(Circle())
-                .shadow(radius: 1)
-        } else {
-            Image(systemName: element.type.symbol)
-                .foregroundColor(.white)
-                .frame(width: size, height: size)
-                .background(Circle().fill(.gray.gradient))
-                .shadow(radius: 1)
-        }
-    }
-    @ViewBuilder
-    func RectIconView(url: URL?, size: CGFloat) -> some View {
-        if let url = url {
-            WebImage(url: url)
-                .resizable().scaledToFill()
-                .frame(width: size, height: size)
-                .clipShape(RoundedRectangle(cornerRadius: 5))
-                .shadow(radius: 1)
-        } else {
-            Image(systemName: "cube.transparent.fill")
-                .foregroundColor(.white)
-                .frame(width: size, height: size)
-                .background(RoundedRectangle(cornerRadius: 5).fill(.gray.gradient))
-                .shadow(radius: 1)
-        }
-    }
-
-    /// アイテムに関する通知の詳細表示で用いる詳細ビューのトップ部分。
+    // 🍎------  アイテム通知の詳細ビュー   -------🍎
     @ViewBuilder
     func DetailTopToItem(item: Item, size iconSize: CGFloat) -> some View {
         HStack(spacing: 20) {
@@ -225,83 +194,6 @@ fileprivate struct NotificationContainer: View {
             }
         }
     }
-    /// チームに関する通知の詳細表示で用いる詳細ビューのトップ部分。
-    @ViewBuilder
-    func DetailTopToUser(user: User, size iconSize: CGFloat) -> some View {
-        HStack(spacing: 20) {
-            RectIconView(url: user.iconURL, size: iconSize)
-            CustomOneLineLimitText(text: user.name, limit: 15)
-                .fontWeight(.bold)
-        }
-    }
-    /// チームに関する通知の詳細表示で用いる詳細ビューのトップ部分。
-    @ViewBuilder
-    func DetailTopToTeam(team: Team, size iconSize: CGFloat) -> some View {
-        HStack(spacing: 20) {
-            RectIconView(url: team.iconURL, size: iconSize)
-            CustomOneLineLimitText(text: team.name, limit: 15)
-                .fontWeight(.bold)
-        }
-    }
-    /// 主にデータ追加時の通知詳細セクションに用いるグリッドひとつ分のグリッドビュー要素。
-    /// 「<データ名> : <データバリュー>」の形でGridRowを返す。
-    /// グリッドの整列制御は親のGrid側で操作する。
-    @ViewBuilder
-    func SingleElementGridRow(_ title: String, _ value: String) -> some View {
-        GridRow {
-            Text(title)
-            Text(":")
-            Text(value)
-        }
-        .font(.callout)
-        .fontWeight(.bold)
-        .opacity(0.6)
-    }
-    /// 更新が発生したデータの更新内容を、比較で表示するためのグリッドビュー要素。
-    /// 「<データ名> : <更新前バリュー> ▶︎ <更新後バリュー>」の形でGridRowを返す。
-    /// グリッドの整列制御は親のGrid側で操作する。
-    @ViewBuilder
-    func CompareElementGridRow(_ title: String, _ before: String, _ after: String) -> some View {
-        GridRow {
-            Text(title)
-            Text(":")
-            Text(before)
-            Text("▶︎")
-            Text(after)
-        }
-        .font(.callout)
-        .fontWeight(.bold)
-        .opacity(0.6)
-    }
-    @ViewBuilder
-    func CompareIconImageGridRow(_ title: String, _ before: URL?, _ after: URL?, size: CGFloat) -> some View {
-        GridRow {
-            Text(title)
-            Text(":")
-            CircleIconView(url: before, size: size)
-            Text("▶︎")
-            CircleIconView(url: before, size: size)
-        }
-        .font(.callout)
-        .fontWeight(.bold)
-        .opacity(0.6)
-    }
-
-    @ViewBuilder
-    func CanceledStumpView(color: Color) -> some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(lineWidth: 3)
-                .frame(width: 180, height: 40)
-            Text("Canceled")
-                .tracking(5)
-                .fontWeight(.black)
-        }
-        .opacity(0.7)
-        .foregroundColor(color)
-        .rotationEffect(Angle(degrees: -10))
-    }
-
     @ViewBuilder
     func AddItemDetail(item: Item) -> some View {
         /// 表示アイテムが更新キャンセルされているかを判定する
@@ -311,7 +203,7 @@ fileprivate struct NotificationContainer: View {
 
         VStack(spacing: 10) {
 
-            DetailTopToItem(item: item, size: 30)
+            DetailTopToItem(item: item, size: 50)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 20)
                 .padding(.top)
@@ -319,9 +211,11 @@ fileprivate struct NotificationContainer: View {
             VStack {
                 Grid(alignment: .leading, verticalSpacing: 20) {
                     Divider()
-                    SingleElementGridRow("製作者", item.author.isEmpty ? "???" : item.author)
+                    SingleNumberGridRow("製作者", item.author.isEmpty ? "???" : item.author)
                     Divider()
-                    SingleElementGridRow("在庫", String(item.inventory))
+                    SingleNumberGridRow("在庫", String(item.inventory))
+                    Divider()
+                    SingleNumberGridRow("価格", item.price != 0 ? String(item.price) : "-")
                     Divider()
                 } // Grid
                 .padding()
@@ -359,53 +253,53 @@ fileprivate struct NotificationContainer: View {
                     Divider()
 
                     if item.before.tag != item.after.tag {
-                        CompareElementGridRow("タグ",
-                                              item.before.tag,
-                                              item.after.tag)
+                        CompareTextGridRow("タグ",
+                                           item.before.tag,
+                                           item.after.tag)
                         Divider()
                     }
                     if item.before.name != item.after.name {
-                        CompareElementGridRow("名前",
-                                              item.before.name,
-                                              item.after.name)
+                        CompareTextGridRow("名前",
+                                           item.before.name,
+                                           item.after.name)
                         Divider()
                     }
 
                     if item.before.author != item.after.author {
-                        CompareElementGridRow("製作者",
-                                              item.before.author,
-                                              item.after.author)
+                        CompareTextGridRow("製作者",
+                                           item.before.author,
+                                           item.after.author)
                         Divider()
                     }
 
                     if item.before.inventory != item.after.inventory {
-                        CompareElementGridRow("在庫",
+                        CompareNumberGridRow("在庫",
                                               String(item.before.inventory),
                                               String(item.after.inventory))
                         Divider()
                     }
                     if item.before.cost != item.after.cost {
-                        CompareElementGridRow("原価",
+                        CompareNumberGridRow("原価",
                                               String(item.before.cost),
                                               String(item.after.cost))
                         Divider()
                     }
                     if item.before.sales != item.after.sales {
-                        CompareElementGridRow("売り上げ",
+                        CompareNumberGridRow("売り上げ",
                                               String(item.before.sales),
                                               String(item.after.sales))
                         Divider()
                     }
 
                     if item.before.totalAmount != item.after.totalAmount {
-                        CompareElementGridRow("総売個数",
+                        CompareNumberGridRow("総売個数",
                                               String(item.before.totalAmount),
                                               String(item.after.totalAmount))
                         Divider()
                     }
 
                     if item.before.totalInventory != item.after.totalInventory {
-                        CompareElementGridRow("総仕入れ",
+                        CompareNumberGridRow("総仕入れ",
                                               String(item.before.totalInventory),
                                               String(item.after.totalInventory))
                         Divider()
@@ -441,9 +335,11 @@ fileprivate struct NotificationContainer: View {
             VStack {
                 Grid(alignment: .leading, verticalSpacing: 20) {
                     Divider()
-                    SingleElementGridRow("製作者", item.author.isEmpty ? "???" : item.author)
+                    SingleTextGridRow("製作者", item.author.isEmpty ? "???" : item.author)
                     Divider()
-                    SingleElementGridRow("在庫", String(item.inventory))
+                    SingleNumberGridRow("在庫", String(item.inventory))
+                    Divider()
+                    SingleNumberGridRow("価格", item.price != 0 ? String(item.price) : "-")
                     Divider()
                 } // Grid
                 .padding()
@@ -480,15 +376,15 @@ fileprivate struct NotificationContainer: View {
                 Grid(alignment: .leading, verticalSpacing: 20) {
 
                     Divider()
-                    CompareElementGridRow("在庫",
-                                          String(items[showIndex].before.inventory),
-                                          String(items[showIndex].after.inventory))
+                    CompareNumberGridRow("在庫",
+                                         String(items[showIndex].before.inventory),
+                                         String(items[showIndex].after.inventory))
                     Divider()
 
                     if items[showIndex].before.sales != items[showIndex].after.sales {
-                        CompareElementGridRow("売り上げ",
-                                              String(items[showIndex].before.sales),
-                                              String(items[showIndex].after.sales))
+                        CompareNumberGridRow("売り上げ",
+                                             String(items[showIndex].before.sales),
+                                             String(items[showIndex].after.sales))
                         Divider()
                     }
                 } // Grid
@@ -533,6 +429,17 @@ fileprivate struct NotificationContainer: View {
             }
         }
     }
+
+    // 🍎------  ユーザー通知の詳細ビュー   -------🍎
+    /// チームに関する通知の詳細表示で用いる詳細ビューのトップ部分。
+    @ViewBuilder
+    func DetailTopToUser(user: User, size iconSize: CGFloat) -> some View {
+        HStack(spacing: 20) {
+            RectIconView(url: user.iconURL, size: iconSize)
+            CustomOneLineLimitText(text: user.name, limit: 15)
+                .fontWeight(.bold)
+        }
+    }
     @ViewBuilder
     func UpdateUserDetail(user: CompareUser) -> some View {
         /// 表示アイテムが更新キャンセルされているかを判定する
@@ -541,7 +448,7 @@ fileprivate struct NotificationContainer: View {
         }
 
         VStack(spacing: 10) {
-            DetailTopToUser(user: user.after, size: 30)
+            DetailTopToUser(user: user.after, size: 40)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 20)
                 .padding(.top)
@@ -553,18 +460,17 @@ fileprivate struct NotificationContainer: View {
                         CompareIconImageGridRow("アイコン",
                                                 user.before.iconURL,
                                                 user.after.iconURL,
-                                                size: 30)
+                                                size: 40)
                         Divider()
                     }
                     if user.before.name != user.after.name {
-                        CompareElementGridRow("名前",
-                                              user.before.name,
-                                              user.after.name)
+                        CompareTextGridRow("名前",
+                                           user.before.name,
+                                           user.after.name)
                         Divider()
                     }
                 } // Grid
                 .padding()
-                .padding(.horizontal, 30) // 表示要素１つのため、横幅を狭くする
             }
             .opacity(canceled ? 0.4 : 1)
             .overlay {
@@ -578,6 +484,16 @@ fileprivate struct NotificationContainer: View {
                                         arrayIndex: nil)
         }
     }
+
+    // 🍎------  チーム通知の詳細ビュー   -------🍎
+    @ViewBuilder
+    func DetailTopToTeam(team: Team, size iconSize: CGFloat) -> some View {
+        HStack(spacing: 20) {
+            CircleIconView(url: team.iconURL, size: iconSize)
+            CustomOneLineLimitText(text: team.name, limit: 15)
+                .fontWeight(.bold)
+        }
+    }
     @ViewBuilder
     func UpdateTeamDetail(team: CompareTeam) -> some View {
         /// 表示アイテムが更新キャンセルされているかを判定する
@@ -586,7 +502,7 @@ fileprivate struct NotificationContainer: View {
         }
 
         VStack(spacing: 10) {
-            DetailTopToTeam(team: team.after, size: 30)
+            DetailTopToTeam(team: team.after, size: 40)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 20)
                 .padding(.top)
@@ -598,18 +514,17 @@ fileprivate struct NotificationContainer: View {
                         CompareIconImageGridRow("アイコン",
                                                 team.before.iconURL,
                                                 team.after.iconURL,
-                                                size: 30)
+                                                size: 40)
                         Divider()
                     }
                     if team.before.name != team.after.name {
-                        CompareElementGridRow("名前",
-                                              team.before.name,
-                                              team.after.name)
+                        CompareTextGridRow("名前",
+                                           team.before.name,
+                                           team.after.name)
                         Divider()
                     }
                 } // Grid
                 .padding()
-                .padding(.horizontal, 30) // 表示要素１つのため、横幅を狭くする
             }
             .opacity(canceled ? 0.4 : 1)
             .overlay {
@@ -623,6 +538,129 @@ fileprivate struct NotificationContainer: View {
                                         arrayIndex: nil)
         }
     }
+
+    // 🍎------  パーツ類   -------🍎
+
+    /// 主にデータ追加時の通知詳細セクションに用いるグリッドひとつ分のグリッドビュー要素。
+    /// 「<データ名> : <データバリュー>」の形でGridRowを返す。
+    /// グリッドの整列制御は親のGrid側で操作する。
+    @ViewBuilder
+    func SingleNumberGridRow(_ title: String, _ value: String) -> some View {
+        GridRow {
+            Text(title)
+            Text(":")
+            CustomOneLineLimitText(text: value, limit: 15)
+        }
+        .font(.callout)
+        .fontWeight(.bold)
+        .opacity(0.7)
+    }
+    @ViewBuilder
+    func SingleTextGridRow(_ title: String, _ value: String) -> some View {
+        GridRow {
+            Text(title)
+            Text(":")
+            CustomOneLineLimitText(text: value, limit: 15)
+                .font(.caption)
+        }
+        .font(.callout)
+        .fontWeight(.bold)
+        .opacity(0.7)
+    }
+    /// 更新が発生したデータの更新内容を、比較で表示するためのグリッドビュー要素。
+    /// 「<データ名> : <更新前バリュー> ▶︎ <更新後バリュー>」の形でGridRowを返す。
+    /// グリッドの整列制御は親のGrid側で操作する。
+    @ViewBuilder
+    func CompareNumberGridRow(_ title: String, _ before: String, _ after: String) -> some View {
+        GridRow {
+            Text(title)
+            Text(":")
+            CustomOneLineLimitText(text: before, limit: 8)
+            Text("▶︎")
+            CustomOneLineLimitText(text: after, limit: 8)
+        }
+        .font(.callout)
+        .fontWeight(.bold)
+        .opacity(0.7)
+    }
+    @ViewBuilder
+    func CompareTextGridRow(_ title: String, _ before: String, _ after: String) -> some View {
+        GridRow {
+            Text(title)
+            Text(":")
+            CustomOneLineLimitText(text: before, limit: 8)
+                .font(.caption)
+            Text("▶︎")
+            CustomOneLineLimitText(text: after, limit: 8)
+                .font(.caption)
+        }
+        .font(.callout)
+        .fontWeight(.bold)
+        .opacity(0.7)
+    }
+    @ViewBuilder
+    func CompareIconImageGridRow(_ title: String, _ before: URL?, _ after: URL?, size: CGFloat) -> some View {
+        GridRow {
+            Text(title).opacity(0.7)
+            Text(":").opacity(0.7)
+            CircleIconView(url: before, size: size)
+            Text("▶︎").opacity(0.7)
+            CircleIconView(url: after, size: size)
+        }
+        .font(.callout)
+        .fontWeight(.bold)
+    }
+    @ViewBuilder
+    func CircleIconView(url: URL?, size: CGFloat) -> some View {
+        if let url {
+            WebImage(url: url)
+                .resizable().scaledToFill()
+                .frame(width: size, height: size)
+                .clipShape(Circle())
+                .shadow(radius: 1)
+        } else {
+            Image(systemName: element.type.symbol)
+                .foregroundColor(.white)
+                .frame(width: size, height: size)
+                .background(Circle())
+                .foregroundColor(.userGray1)
+                .shadow(radius: 1)
+        }
+    }
+    @ViewBuilder
+    func RectIconView(url: URL?, size: CGFloat) -> some View {
+        if let url = url {
+            WebImage(url: url)
+                .resizable().scaledToFill()
+                .frame(width: size, height: size)
+                .clipShape(RoundedRectangle(cornerRadius: 5))
+                .shadow(radius: 1)
+        } else {
+            Image(systemName: "cube.transparent.fill")
+                .foregroundColor(.white)
+                .frame(width: size, height: size)
+                .background(
+                    RoundedRectangle(cornerRadius: 5)
+                    .foregroundColor(.userGray1)
+                )
+                .shadow(radius: 1)
+        }
+    }
+    @ViewBuilder
+    func CanceledStumpView(color: Color) -> some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(lineWidth: 3)
+                .frame(width: 180, height: 40)
+            Text("Canceled")
+                .tracking(5)
+                .fontWeight(.black)
+        }
+        .opacity(0.7)
+        .foregroundColor(color)
+        .rotationEffect(Angle(degrees: -10))
+    }
+
     /// 表示通知の破棄と、表示済み通知の取り扱いをコントロールするメソッド。
     /// 通知タイプによって、ローカル削除か全体削除かを分岐する。
     /// 削除要素のアニメーションは実行元で調整する。
@@ -669,22 +707,22 @@ struct CancelUpdateLongPressButton: View {
             return cancelDates.contains(item.createTime)
 
         case .updateItem(let item):
-            return cancelDates.contains(item.before.createTime)
+            return cancelDates.contains(item.after.createTime)
 
         case .deleteItem(let item):
             return cancelDates.contains(item.createTime)
 
         case .commerce(let items):
-            return cancelDates.contains(items[index].before.createTime)
+            return cancelDates.contains(items[index].after.createTime)
 
         case .join(let user):
             return cancelDates.contains(user.createTime)
 
         case .updateUser(let user):
-            return cancelDates.contains(user.before.createTime)
+            return cancelDates.contains(user.after.createTime)
 
         case .updateTeam(let team):
-            return cancelDates.contains(team.before.createTime)
+            return cancelDates.contains(team.after.createTime)
         }
     }
 
@@ -750,13 +788,16 @@ struct CancelUpdateLongPressButton: View {
                     case .join(let user):
                         print("\(user.name)更新キャンセル")
                         // 処理...
-                        cancelDates.append(user.createTime)
 
                     case .updateUser(let user):
                         print("\(user.after.name)の更新キャンセル")
+                        // 処理...
+                        cancelDates.append(user.createTime)
 
                     case .updateTeam(let team):
                         print("\(team.after.name)の更新キャンセル")
+                        // 処理...
+                        cancelDates.append(team.after.createTime)
                     }
                 })
             .onReceive(pressingTimer) { value in
@@ -834,19 +875,21 @@ enum TeamNotificationType: Codable, Equatable {
         case .updateUser:
             return "person.fill"
         case .updateTeam:
-            return "shippingbox.fill"
+            return "cube.transparent"
         }
     }
 
-    /// 通知に用いられるカラー。主にアイコンの背景色。
+    /// 通知に用いられるカラー。主に通知アイコンの背景色に使う。
     var color: Color {
         switch self {
-        case .addItem, .updateItem, .join, .updateUser, .updateTeam:
-            return Color.white
+        case .addItem, .updateItem, .join, .updateUser:
+            return Color.gray
         case .commerce:
             return Color.mint
         case .deleteItem(_):
             return Color.red
+        case .updateTeam:
+            return Color.userGray1
         }
     }
     /// 通知が画面上に残る時間

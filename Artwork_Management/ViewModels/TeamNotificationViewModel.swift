@@ -70,7 +70,7 @@ class TeamNotificationViewModel: ObservableObject {
         }
 
         do {
-            _ = try teamRef.setData(from: team)
+            _ = try teamRef.setData(from: team, merge: true)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
             }
         } catch {
