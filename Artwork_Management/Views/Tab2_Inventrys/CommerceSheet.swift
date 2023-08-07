@@ -81,7 +81,7 @@ struct CommerceSheet: View {
                         let compareItems = cartVM.updateCommerceItemsAndGetCompare(teamID: teamID)
                         // 通知の作成
                         teamNotificationVM.setNotification(team: teamVM.team,
-                                                                      type: .commerce(compareItems))
+                                                                      notifyType: .commerce(compareItems))
                         cartVM.doCommerce = true
                         hapticSuccessNotification()
                     },

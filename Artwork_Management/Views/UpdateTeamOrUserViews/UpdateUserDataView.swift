@@ -189,7 +189,7 @@ struct UpdateUserDataView: View {
                     team.members[myMemberIndex] = afterMyJoinMember
 
                     let compareUser = CompareUser(id: user.id, before: beforeUser, after: afterUser)
-                    teamNotifyVM.setNotification(team: team, type: .updateUser(compareUser))
+                    teamNotifyVM.setNotification(team: team, notifyType: .updateUser(compareUser))
 
                     hapticSuccessNotification()
                 }

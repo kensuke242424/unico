@@ -41,7 +41,7 @@ struct TeamNotificationView: View {
 fileprivate struct NotificationContainer: View {
 
     /// 通知のタイプと、タイプごとのデータ要素をもつ通知一個分のエレメント。
-    let element: TeamNotifyFrame
+    let element: NotifyElement
 
     @EnvironmentObject var vm: TeamNotificationViewModel
     @EnvironmentObject var teamVM: TeamViewModel
@@ -92,8 +92,8 @@ fileprivate struct NotificationContainer: View {
                     .fontWeight(.black)
                     .foregroundColor(.gray.opacity(0.6))
 
-                /// 通知ボードの詳細ビュー
-                switch element.type {
+                /// 通知ボードのタイプ別詳細ビュー
+                switch element.notifyType {
 
                 case .addItem(let item):
                     AddItemDetail(item: item)
@@ -148,7 +148,10 @@ fileprivate struct NotificationContainer: View {
                 .onEnded { value in
                     if value.translation.height < -50 {
                         withAnimation(.spring(response: 0.4)) {
-                            self.removeNotificationController(type: element.type)
+                            vm.currentNotification = nil
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            vm.removeNotification(team: teamVM.team, element: element)
                         }
                     }
                 }
@@ -173,7 +176,10 @@ fileprivate struct NotificationContainer: View {
                 if showLimitCount > Int(element.exitTime) {
                     print("通知ボードの破棄時間です")
                     withAnimation(.easeIn(duration: 0.3)) {
-                        self.removeNotificationController(type: element.type)
+                        vm.currentNotification = nil
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        vm.removeNotification(team: teamVM.team, element: element)
                     }
                 }
             }
@@ -565,7 +571,6 @@ fileprivate struct NotificationContainer: View {
     }
     /// 更新が発生したデータの更新内容を、比較で表示するためのグリッドビュー要素。
     /// 「<データ名> : <更新前バリュー> ▶︎ <更新後バリュー>」の形でGridRowを返す。
-    /// グリッドの整列制御は親のGrid側で操作する。
     @ViewBuilder
     func CompareNumberGridRow(_ title: String, _ before: String, _ after: String) -> some View {
         GridRow {
@@ -615,11 +620,10 @@ fileprivate struct NotificationContainer: View {
                 .clipShape(Circle())
                 .shadow(radius: 1)
         } else {
-            Image(systemName: element.type.symbol)
+            Image(systemName: element.notifyType.symbol)
                 .foregroundColor(.white)
-                .frame(width: size, height: size)
-                .background(Circle())
-                .foregroundColor(.userGray1)
+                .frame(width: size * 0.9, height: size * 0.9)
+                .background(Circle().fill(.gray.gradient))
                 .shadow(radius: 1)
         }
     }
@@ -633,11 +637,12 @@ fileprivate struct NotificationContainer: View {
                 .shadow(radius: 1)
         } else {
             Image(systemName: "cube.transparent.fill")
+                .resizable().scaledToFit()
                 .foregroundColor(.white)
-                .frame(width: size, height: size)
+                .frame(width: size * 0.9, height: size * 0.9)
                 .background(
                     RoundedRectangle(cornerRadius: 5)
-                    .foregroundColor(.userGray1)
+                        .fill(.gray.gradient)
                 )
                 .shadow(radius: 1)
         }
@@ -656,29 +661,6 @@ fileprivate struct NotificationContainer: View {
         .foregroundColor(color)
         .rotationEffect(Angle(degrees: -10))
     }
-
-    /// 表示通知の破棄と、表示済み通知の取り扱いをコントロールするメソッド。
-    /// 通知タイプによって、ローカル削除か全体削除かを分岐する。
-    /// 削除要素のアニメーションは実行元で調整する。
-    fileprivate
-    func removeNotificationController(type: TeamNotificationType) {
-        switch type {
-        case .addItem, .updateItem, .commerce, .deleteItem, .updateUser:
-            // チームメンバー全体への通知削除
-            // ユーザーがアプリにログインしていなくても通知が削除される
-            vm.currentNotification = nil
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                vm.removeTeamNotification(team: teamVM.team, data: element)
-            }
-        case .join, .updateTeam:
-            /// ローカル範囲だけの通知削除
-            /// ユーザーがアプリにログインするまで通知が残る
-            vm.currentNotification = nil
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                vm.removeLocalNotification(team: teamVM.team, data: element)
-            }
-        }
-    }
 }
 
 /// 通知から受け取ったデータ更新内容を取り消す長押し実行型のカスタムボタン。
@@ -688,7 +670,7 @@ fileprivate
 struct CancelUpdateLongPressButton: View {
 
     @Binding var cancelDates: [Date]
-    let element: TeamNotifyFrame
+    let element: NotifyElement
     let arrayIndex: Int? // 複数アイテムの場合(.commerce)
 
     let pressingMinTime: CGFloat = 1.0 // 取り消し実行に必要な長押しタイム設定
@@ -698,7 +680,7 @@ struct CancelUpdateLongPressButton: View {
     /// Date配列のcanceledElementsDateを検索し、渡されたデータの更新がキャンセル済みかどうかをBool値で返す
     var canceled: Bool {
 
-        switch element.type {
+        switch element.notifyType {
         case .addItem(let item):
             return cancelDates.contains(item.createTime)
 
@@ -762,7 +744,7 @@ struct CancelUpdateLongPressButton: View {
                 perform: {
                     pressingState = false
 
-                    switch element.type {
+                    switch element.notifyType {
 
                     case .addItem(let item):
                         print("\(item.name)の追加キャンセル")
@@ -819,10 +801,27 @@ enum TeamNotificationType: Codable, Equatable {
     case updateUser(CompareUser)
     case updateTeam(CompareTeam)
 
-    var type: TeamNotificationType {
+    var notifyType: TeamNotificationType {
         return self
     }
 
+    var setType: SetType {
+        switch self {
+        case .addItem, .updateItem, .deleteItem, .commerce, .join, .updateTeam:
+            return .global
+        case .updateUser:
+            return .local
+        }
+    }
+    /// 通知の削除時に、メンバー全員の通知データをまとめて削除(global)するか、ローカルだけ削除(local)するかを管理する。
+    var removeType: RemoveType {
+        switch self {
+        case .addItem, .updateItem, .deleteItem, .commerce, .join, .updateTeam:
+            return .global
+        case .updateUser:
+            return .local
+        }
+    }
     /// 通知に渡すメッセージテキスト。
     var message: String {
         switch self {

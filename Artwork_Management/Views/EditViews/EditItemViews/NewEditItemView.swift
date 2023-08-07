@@ -376,7 +376,7 @@ struct NewEditItemView: View {
                                                               after: updatedItem)
                             print("アイテムエディット内のcompareItemId: \(compareItemData.id)")
                             teamNotifyVM.setNotification(team: teamVM.team,
-                                                         type: .updateItem(compareItemData))
+                                                         notifyType: .updateItem(compareItemData))
                             dismiss()
 
                         } // Task(update Item)
@@ -415,7 +415,7 @@ struct NewEditItemView: View {
                             // Firestoreにコーダブル保存
                             await itemVM.addItemToFirestore(newItem)
                             tagVM.setActiveTag(from: input.selectionTagName)
-                            teamNotifyVM.setNotification(team: teamVM.team, type: .addItem(newItem))
+                            teamNotifyVM.setNotification(team: teamVM.team, notifyType: .addItem(newItem))
 
                             withAnimation(.easeIn(duration: 0.1)) { input.showProgress = false }
                             dismiss()

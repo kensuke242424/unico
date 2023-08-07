@@ -190,7 +190,7 @@ struct UpdateTeamDataView: View {
                     let compareTeam = CompareTeam(id: team.id,
                                                   before: beforeTeam,
                                                   after: afterTeam)
-                    teamNotifyVM.setNotification(team: afterTeam, type: .updateTeam(compareTeam))
+                    teamNotifyVM.setNotification(team: afterTeam, notifyType: .updateTeam(compareTeam))
                     hapticSuccessNotification()
                 }
                 // 編集画面を閉じる

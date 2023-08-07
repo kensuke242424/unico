@@ -310,7 +310,7 @@ struct JoinUserDetectCheckView: View {
                                         withAnimation(.spring(response: 0.5, blendDuration: 1)) {
                                             teamVM.isShowSearchedNewMemberJoinTeam.toggle()
                                             teamNotificationVM.setNotification(team: teamVM.team,
-                                                                                          type: .join(detectedUser))
+                                                                                          notifyType: .join(detectedUser))
                                         }
                                     }
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {
