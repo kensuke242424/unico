@@ -210,29 +210,24 @@ class UserViewModel: ObservableObject {
         }
     }
 
-    func updateUserNameAndIcon(name updateName: String, data updateIconData: (url: URL?, filePath: String?)) async throws {
-
-        // 取得アイコンデータurlがnilであれば更新しない
-        guard var userDataSource = user else { throw CustomError.userEmpty }
+    func updateUserToFirestore(data updatedUserData: User) async throws {
+        guard let user else { throw CustomError.userEmpty }
         guard let userRef = db?.collection("users")
-            .document(userDataSource.id) else { throw CustomError.getDocument }
+            .document(user.id) else { throw CustomError.getDocument }
+        // 更新前の元々のアイコンパスを保持しておく。更新成功後のデフォルトデータ削除に使う
+        let defaultIconPath = user.iconPath
 
         do {
-            // 更新前の元々のアイコンパスを保持しておく。更新成功後のデフォルトデータ削除に使う
-            let defaultIconPath = userDataSource.iconPath
-            userDataSource.name     = updateName
-            userDataSource.iconURL  = updateIconData.url
-            userDataSource.iconPath = updateIconData.filePath
-
-            _ = try userRef.setData(from: userDataSource)
+            _ = try userRef.setData(from: updatedUserData)
             // アイコンデータは変えていない場合、削除処理をスキップする
-            if defaultIconPath != updateIconData.filePath {
+            if defaultIconPath != updatedUserData.iconPath {
                 await deleteUserImageData(path: defaultIconPath)
             }
         } catch {
-            // アイコンデータ更新失敗のため、保存予定だったアイコンデータをfirestorageから削除
-            await deleteUserImageData(path: updateIconData.filePath)
-            print("error: updateTeamNameAndIcon_do_try_catch")
+            // アイコンデータ更新失敗時の処理
+            // 保存予定だったアイコンデータをfirestorageから削除
+            await deleteUserImageData(path: updatedUserData.iconPath)
+            print("ERROR: updateUser")
         }
     }
     

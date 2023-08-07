@@ -169,8 +169,6 @@ struct UpdateTeamDataView: View {
                 var afterTeam = team
                 var joinTeamContainer = user.joins[joinIndex]
 
-                var teamContainer = team // 通知の作成に使う
-
                 // 新規アイコンデータが存在すれば、アップロード&アイコンコンテナに格納
                 if let updateIconImage = input.captureImage {
                     let uploadIconData = await teamVM.uploadTeamImage(updateIconImage)
@@ -183,7 +181,6 @@ struct UpdateTeamDataView: View {
                     afterTeam.name = input.nameText
                     joinTeamContainer.name = input.nameText
                 }
-
                 // データの変更があれば、Firebaseへの保存処理実行
                 if beforeTeam != afterTeam {
                     try await teamVM.updateTeam(data: afterTeam)

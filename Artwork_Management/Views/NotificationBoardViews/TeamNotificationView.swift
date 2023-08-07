@@ -40,9 +40,6 @@ struct TeamNotificationView: View {
 /// 受け取った通知フレームから通知のタイプを参照して、タイプに合わせた出力を行う。
 fileprivate struct NotificationContainer: View {
 
-    enum RemoveType {
-        case local, all
-    }
     /// 通知のタイプと、タイプごとのデータ要素をもつ通知一個分のエレメント。
     let element: TeamNotifyFrame
 
@@ -435,7 +432,7 @@ fileprivate struct NotificationContainer: View {
     @ViewBuilder
     func DetailTopToUser(user: User, size iconSize: CGFloat) -> some View {
         HStack(spacing: 20) {
-            RectIconView(url: user.iconURL, size: iconSize)
+            CircleIconView(url: user.iconURL, size: iconSize)
             CustomOneLineLimitText(text: user.name, limit: 15)
                 .fontWeight(.bold)
         }
@@ -540,7 +537,6 @@ fileprivate struct NotificationContainer: View {
     }
 
     // 🍎------  パーツ類   -------🍎
-
     /// 主にデータ追加時の通知詳細セクションに用いるグリッドひとつ分のグリッドビュー要素。
     /// 「<データ名> : <データバリュー>」の形でGridRowを返す。
     /// グリッドの整列制御は親のGrid側で操作する。
@@ -672,14 +668,14 @@ fileprivate struct NotificationContainer: View {
             // ユーザーがアプリにログインしていなくても通知が削除される
             vm.currentNotification = nil
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                vm.removeTeamNotificationToFirestore(team: teamVM.team, data: element)
+                vm.removeTeamNotification(team: teamVM.team, data: element)
             }
         case .join, .updateTeam:
             /// ローカル範囲だけの通知削除
             /// ユーザーがアプリにログインするまで通知が残る
             vm.currentNotification = nil
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                vm.removeLocalNotificationToFirestore(team: teamVM.team, data: element)
+                vm.removeLocalNotification(team: teamVM.team, data: element)
             }
         }
     }
@@ -764,10 +760,10 @@ struct CancelUpdateLongPressButton: View {
                     }
                 },
                 perform: {
-                    // 取り消し処理実行
                     pressingState = false
 
                     switch element.type {
+
                     case .addItem(let item):
                         print("\(item.name)の追加キャンセル")
                         // 処理...
@@ -780,14 +776,16 @@ struct CancelUpdateLongPressButton: View {
 
                     case .deleteItem(let item):
                         print("\(item.name)の削除キャンセル")
+                        // 処理...
+                        cancelDates.append(item.createTime)
 
                     case .commerce(let items):
                         print("\(items[index].after.name)カート処理キャンセル")
                         // 処理...
                         cancelDates.append(items[index].before.createTime)
+
                     case .join(let user):
-                        print("\(user.name)更新キャンセル")
-                        // 処理...
+                        print("ユーザー参加通知にはキャンセルボタン無し")
 
                     case .updateUser(let user):
                         print("\(user.after.name)の更新キャンセル")
@@ -839,7 +837,7 @@ enum TeamNotificationType: Codable, Equatable {
         case .join(let user):
             return "\(user.name) さんがチームに参加しました！"
         case .updateUser:
-            return "　ユーザー情報が更新されました。"
+            return "ユーザー情報が更新されました。"
         case .updateTeam:
             return "チーム情報が更新されました。"
         }

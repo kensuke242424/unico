@@ -28,6 +28,7 @@ class TeamViewModel: ObservableObject {
     @Published var alertMessage = ""
 
     var teamID: String? { team?.id }
+    /// 現在の操作チーム「members」内のフィールドから自身のmemberデータインデックスを取得するプロパティ。
     var myMemberIndex: Int? {
         guard let team else { return nil }
         let index = team.members.firstIndex(where: {$0.memberUID == uid})
@@ -312,12 +313,7 @@ class TeamViewModel: ObservableObject {
             // 更新前の元々のアイコンパスを保持しておく
             // 更新成功が確認できてから以前のアイコンデータを削除する
             let defaultIconPath = teamContainer.iconPath
-
-            teamContainer.name = updatedTeamData.name
-            teamContainer.iconURL = updatedTeamData.iconURL
-            teamContainer.iconPath = updatedTeamData.iconPath
-
-            _ = try teamRef.setData(from: teamContainer)
+            _ = try teamRef.setData(from: updatedTeamData)
             // アイコンデータは変えていない場合、削除処理をスキップする
             if defaultIconPath != updatedTeamData.iconPath {
                 await deleteTeamImageData(path: defaultIconPath)
@@ -329,13 +325,9 @@ class TeamViewModel: ObservableObject {
         }
     }
 
-    func updateTeamJoinMemberData(data updateMemberData: JoinMember, joins joinsTeam: [JoinTeam]) async throws {
-
-        var joinsTeamID: [String] = []
+    func updateTeamToMyJoinMemberData(data updatedMemberData: JoinMember, joins joinsTeam: [JoinTeam]) async throws {
         // ユーザが参加している各チームのid文字列データを配列に格納(whereFieldクエリで使う)
-        for joinTeam in joinsTeam {
-            joinsTeamID.append(joinTeam.teamID)
-        }
+        var joinsTeamID: [String] = joinsTeam.map { $0.teamID }
 
         // ユーザが所属している各チームのid配列を使ってクエリを叩く
         guard let joinTeamRefs = db?.collection("teams")
@@ -352,11 +344,12 @@ class TeamViewModel: ObservableObject {
                     // チームのmembers配列からcurrentのユーザメンバーデータを検出する
                     for (index, teamMember) in teamData.members.enumerated() where teamMember.memberUID == uid {
                         // チーム内の対象メンバーデータを更新
-                        teamData.members[index] = updateMemberData
+                        teamData.members[index] = updatedMemberData
                         // 更新対象チームの更新用リファレンスを生成
-                        guard let teamRef = db?.collection("teams").document(teamData.id) else { throw CustomError.getRef }
+                        guard let teamRef = db?.collection("teams")
+                            .document(teamData.id) else { throw CustomError.getRef }
                         // リファレンスをもとにsetDataを実行
-                        try teamRef.setData(from: teamData)
+                        try teamRef.setData(from: teamData, merge: true)
                     }
                 }
             }

@@ -17,6 +17,10 @@ struct TeamNotifyFrame: Identifiable, Equatable, Hashable, Codable {
     var exitTime: CGFloat
 }
 
+enum RemoveType: Codable {
+    case local, all
+}
+
 extension TeamNotifyFrame {
     static func == (lhs: TeamNotifyFrame, rhs: TeamNotifyFrame) -> Bool {
         return lhs.id == rhs.id

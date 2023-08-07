@@ -49,7 +49,7 @@ class TeamNotificationViewModel: ObservableObject {
                         return
                     }
                     self.myNotifications = myData.notifications
-//                        .compactMap({ $0 })
+                    //                        .compactMap({ $0 })
                 } catch {
                     print("ERROR: try snap?.data(as: Team.self)")
                 }
@@ -62,11 +62,20 @@ class TeamNotificationViewModel: ObservableObject {
         guard var team else { return }
         guard let teamRef = db?.collection("teams").document(team.id) else { return }
         let notification = TeamNotifyFrame(type: type,
-                                    message: type.message,
-                                    imageURL: type.imageURL,
-                                    exitTime: type.waitTime)
-        for index in team.members.indices {
-            team.members[index].notifications.append(notification)
+                                           message: type.message,
+                                           imageURL: type.imageURL,
+                                           exitTime: type.waitTime)
+        switch type.type {
+
+        case .addItem, .updateItem, .deleteItem, .commerce, .join, .updateTeam:
+            for index in team.members.indices {
+                team.members[index].notifications.append(notification)
+            }
+
+        case .updateUser(let user):
+            for index in team.members.indices where team.members[index].memberUID == uid {
+                team.members[index].notifications.append(notification)
+            }
         }
 
         do {
@@ -114,7 +123,7 @@ class TeamNotificationViewModel: ObservableObject {
 
     }
     /// 自身のみの通知データを消去するメソッド。他メンバーの通知データはそれぞれがログインした時に表示される。
-    func removeLocalNotificationToFirestore(team: Team?, data: TeamNotifyFrame) {
+    func removeLocalNotification(team: Team?, data: TeamNotifyFrame) {
         guard var team else { return }
         guard let teamRef = db?.collection("teams").document(team.id) else { return }
 
@@ -128,7 +137,7 @@ class TeamNotificationViewModel: ObservableObject {
         }
     }
     /// 全メンバーの対象通知データを消去。他のメンバーがログインするまで残しておく必要がない通知データに使う。
-    func removeTeamNotificationToFirestore(team: Team?, data: TeamNotifyFrame) {
+    func removeTeamNotification(team: Team?, data: TeamNotifyFrame) {
         guard var team else { return }
         guard let teamRef = db?.collection("teams").document(team.id) else { return }
 
