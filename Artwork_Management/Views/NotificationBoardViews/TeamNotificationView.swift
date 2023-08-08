@@ -14,8 +14,8 @@ import SDWebImageSwiftUI
 /// 表示 -> 破棄 -> 取得 のループが通知が無くなるまで続く。
 struct TeamNotificationView: View {
 
-    @EnvironmentObject var vm: TeamNotificationViewModel
-    @EnvironmentObject var teamVM: TeamViewModel
+    @EnvironmentObject var vm: NotificationViewModel
+//    @EnvironmentObject var teamVM: TeamViewModel
 
     var body: some View {
         VStack {
@@ -41,9 +41,9 @@ struct TeamNotificationView: View {
 fileprivate struct NotificationContainer: View {
 
     /// 通知のタイプと、タイプごとのデータ要素をもつ通知一個分のエレメント。
-    let element: NotifyElement
+    let element: Log
 
-    @EnvironmentObject var vm: TeamNotificationViewModel
+    @EnvironmentObject var vm: NotificationViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @Environment(\.colorScheme) var colorScheme
 
@@ -66,7 +66,7 @@ fileprivate struct NotificationContainer: View {
     let showLimitTimer = Timer.publish(every: 1, on: .current, in: .common).autoconnect()
     /// キャンセルボタンによって更新キャンセルされたデータの「createTime」が格納されるプロパティ。
     /// このcreateTime値を照らし合わせて、表示データがキャンセル実行済みかどうかを判定する。
-    @State private var canceledElementsDate: [Date] = []
+    @State private var resetedLogs: [Date] = []
 
     var body: some View {
         let backColor = colorScheme == .dark ? Color.black : Color.white
@@ -93,7 +93,7 @@ fileprivate struct NotificationContainer: View {
                     .foregroundColor(.gray.opacity(0.6))
 
                 /// 通知ボードのタイプ別詳細ビュー
-                switch element.notifyType {
+                switch element.type {
 
                 case .addItem(let item):
                     AddItemDetail(item: item)
@@ -200,8 +200,8 @@ fileprivate struct NotificationContainer: View {
     @ViewBuilder
     func AddItemDetail(item: Item) -> some View {
         /// 表示アイテムが更新キャンセルされているかを判定する
-        var canceled: Bool {
-            return canceledElementsDate.contains(item.createTime)
+        var reseted: Bool {
+            return resetedLogs.contains(item.createTime)
         }
 
         VStack(spacing: 10) {
@@ -225,22 +225,22 @@ fileprivate struct NotificationContainer: View {
                 .padding(.horizontal, 30) // 表示要素１つのため、横幅を狭くする
             }
 
-            CancelUpdateLongPressButton(cancelDates: $canceledElementsDate,
+            ResetLogButton(cancelDates: $resetedLogs,
                                         element: element,
                                         arrayIndex: nil)
         } // VStack(Detail全体)
-        .opacity(canceled ? 0.4 : 1)
+        .opacity(reseted ? 0.4 : 1)
         .overlay {
-            if canceled {
-                CanceledStumpView(color: .red)
+            if reseted {
+                ResetedStumpView(color: .red)
             }
         }
     }
     @ViewBuilder
     func UpdateItemDetail(item: CompareItem) -> some View {
         /// 表示アイテムが更新キャンセルされているかを判定する
-        var canceled: Bool {
-            return canceledElementsDate.contains(item.before.createTime)
+        var reseted: Bool {
+            return resetedLogs.contains(item.before.createTime)
         }
 
         VStack(spacing: 10) {
@@ -316,16 +316,16 @@ fileprivate struct NotificationContainer: View {
                         Divider()
                     }
                 } // Grid
-                .opacity(canceled ? 0.4 : 1)
+                .opacity(reseted ? 0.4 : 1)
                 .padding()
             }
             .overlay {
-                if canceled {
-                    CanceledStumpView(color: .red)
+                if reseted {
+                    ResetedStumpView(color: .red)
                 }
             }
 
-            CancelUpdateLongPressButton(cancelDates: $canceledElementsDate,
+            ResetLogButton(cancelDates: $resetedLogs,
                                         element: element,
                                         arrayIndex: nil)
         } // VStack
@@ -333,8 +333,8 @@ fileprivate struct NotificationContainer: View {
     @ViewBuilder
     func DeleteItemDetail(item: Item) -> some View {
         /// 表示アイテムが更新キャンセルされているかを判定する
-        var canceled: Bool {
-            return canceledElementsDate.contains(item.createTime)
+        var reseted: Bool {
+            return resetedLogs.contains(item.createTime)
         }
 
         VStack(spacing: 10) {
@@ -357,22 +357,22 @@ fileprivate struct NotificationContainer: View {
                 .padding(.horizontal, 30) // 表示要素１つのため、横幅を狭くする
             }
 
-            CancelUpdateLongPressButton(cancelDates: $canceledElementsDate,
+            ResetLogButton(cancelDates: $resetedLogs,
                                         element: element,
                                         arrayIndex: nil)
         }
-        .opacity(canceled ? 0.4 : 1)
+        .opacity(reseted ? 0.4 : 1)
         .overlay {
-            if canceled {
-                CanceledStumpView(color: .white)
+            if reseted {
+                ResetedStumpView(color: .white)
             }
         }
     }
     @ViewBuilder
     func CommerceItemDetail(items: [CompareItem]) -> some View {
         /// 表示アイテムが更新キャンセルされているかを判定する
-        var canceled: Bool {
-            return canceledElementsDate.contains(items[showIndex].after.createTime)
+        var reseted: Bool {
+            return resetedLogs.contains(items[showIndex].after.createTime)
         }
         VStack(spacing: 10) {
             if items.count > 1 {
@@ -399,16 +399,16 @@ fileprivate struct NotificationContainer: View {
                         Divider()
                     }
                 } // Grid
-                .opacity(canceled ? 0.4 : 1)
+                .opacity(reseted ? 0.4 : 1)
                 .padding()
             }
             .overlay {
-                if canceled {
-                    CanceledStumpView(color: .red)
+                if reseted {
+                    ResetedStumpView(color: .red)
                 }
             }
 
-            CancelUpdateLongPressButton(cancelDates: $canceledElementsDate,
+            ResetLogButton(cancelDates: $resetedLogs,
                                         element: element,
                                         arrayIndex: showIndex)
         } // VStack
@@ -454,8 +454,8 @@ fileprivate struct NotificationContainer: View {
     @ViewBuilder
     func UpdateUserDetail(user: CompareUser) -> some View {
         /// 表示アイテムが更新キャンセルされているかを判定する
-        var canceled: Bool {
-            return canceledElementsDate.contains(user.after.createTime)
+        var reseted: Bool {
+            return resetedLogs.contains(user.after.createTime)
         }
 
         VStack(spacing: 10) {
@@ -483,14 +483,14 @@ fileprivate struct NotificationContainer: View {
                 } // Grid
                 .padding()
             }
-            .opacity(canceled ? 0.4 : 1)
+            .opacity(reseted ? 0.4 : 1)
             .overlay {
-                if canceled {
-                    CanceledStumpView(color: .red)
+                if reseted {
+                    ResetedStumpView(color: .red)
                 }
             }
 
-            CancelUpdateLongPressButton(cancelDates: $canceledElementsDate,
+            ResetLogButton(cancelDates: $resetedLogs,
                                         element: element,
                                         arrayIndex: nil)
         }
@@ -508,8 +508,8 @@ fileprivate struct NotificationContainer: View {
     @ViewBuilder
     func UpdateTeamDetail(team: CompareTeam) -> some View {
         /// 表示アイテムが更新キャンセルされているかを判定する
-        var canceled: Bool {
-            return canceledElementsDate.contains(team.after.createTime)
+        var reseted: Bool {
+            return resetedLogs.contains(team.after.createTime)
         }
 
         VStack(spacing: 10) {
@@ -537,14 +537,14 @@ fileprivate struct NotificationContainer: View {
                 } // Grid
                 .padding()
             }
-            .opacity(canceled ? 0.4 : 1)
+            .opacity(reseted ? 0.4 : 1)
             .overlay {
-                if canceled {
-                    CanceledStumpView(color: .red)
+                if reseted {
+                    ResetedStumpView(color: .red)
                 }
             }
 
-            CancelUpdateLongPressButton(cancelDates: $canceledElementsDate,
+            ResetLogButton(cancelDates: $resetedLogs,
                                         element: element,
                                         arrayIndex: nil)
         }
@@ -641,7 +641,7 @@ fileprivate struct NotificationContainer: View {
                 .clipShape(Circle())
                 .shadow(radius: 1)
         } else {
-            Image(systemName: element.notifyType.symbol)
+            Image(systemName: element.type.symbol)
                 .foregroundColor(.white)
                 .frame(width: size * 0.9, height: size * 0.9)
                 .background(Circle().fill(.gray.gradient))
@@ -669,7 +669,7 @@ fileprivate struct NotificationContainer: View {
         }
     }
     @ViewBuilder
-    func CanceledStumpView(color: Color) -> some View {
+    func ResetedStumpView(color: Color) -> some View {
         ZStack {
             RoundedRectangle(cornerRadius: 10)
                 .stroke(lineWidth: 3)
@@ -688,10 +688,10 @@ fileprivate struct NotificationContainer: View {
 /// 取り消し対象データの更新前の値と、取り消し完了済みのステートを管理するためのid配列参照を受け取る
 /// 取り消しが完了したら、対象データのcreateTimeをキャンセル判定配列に入れる
 fileprivate
-struct CancelUpdateLongPressButton: View {
+struct ResetLogButton: View {
 
     @Binding var cancelDates: [Date]
-    let element: NotifyElement
+    let element: Log
     let arrayIndex: Int? // 複数アイテムの場合(.commerce)
 
     let pressingMinTime: CGFloat = 1.0 // 取り消し実行に必要な長押しタイム設定
@@ -699,9 +699,9 @@ struct CancelUpdateLongPressButton: View {
 
     var index: Int { arrayIndex ?? 0 }
     /// Date配列のcanceledElementsDateを検索し、渡されたデータの更新がキャンセル済みかどうかをBool値で返す
-    var canceled: Bool {
+    var reseted: Bool {
 
-        switch element.notifyType {
+        switch element.type {
         case .addItem(let item):
             return cancelDates.contains(item.createTime)
 
@@ -729,9 +729,9 @@ struct CancelUpdateLongPressButton: View {
     @State private var pressingFrame: CGFloat = .zero
     var body: some View {
         // ボタンのサイズ
-        let cancelButtonFrame: CGFloat = self.canceled ? 100 : 80
+        let cancelButtonFrame: CGFloat = self.reseted ? 100 : 80
 
-        Label(canceled ? "取消済み" : "取消", systemImage: "clock.arrow.circlepath")
+        Label(reseted ? "取消済み" : "取消", systemImage: "clock.arrow.circlepath")
             .font(.footnote)
             .fontWeight(.bold)
             .foregroundColor(pressingState ? .gray : .white)
@@ -742,19 +742,19 @@ struct CancelUpdateLongPressButton: View {
             .background(
                 HStack {
                     Capsule()
-                        .fill(canceled ? .gray : .red)
+                        .fill(reseted ? .gray : .red)
                         .frame(width: pressingState ? pressingFrame : cancelButtonFrame)
                     Spacer().frame(minWidth: 0)
                 }
             )
             .background(Capsule().fill(.gray.opacity(0.6)))
             .scaleEffect(pressingState ? 1 + (pressingFrame / 250) : 1)
-            .opacity(canceled ? 0.4 : 1)
+            .opacity(reseted ? 0.4 : 1)
             .onLongPressGesture(
                 minimumDuration: pressingMinTime,
                 pressing: { pressing in
                     if pressing {
-                        if canceled { return } // 取消済み
+                        if reseted { return } // 取消済み
                         // 更新データの取り消し判定開始
                         pressingState = true
                     } else {
@@ -765,7 +765,7 @@ struct CancelUpdateLongPressButton: View {
                 perform: {
                     pressingState = false
 
-                    switch element.notifyType {
+                    switch element.type {
 
                     case .addItem(let item):
                         print("\(item.name)の追加キャンセル")
@@ -813,7 +813,7 @@ struct CancelUpdateLongPressButton: View {
 }
 
 /// 通知機能における通知タイプを管理する列挙体。
-enum TeamNotificationType: Codable, Equatable {
+enum LogType: Codable, Equatable {
     case addItem(Item)
     case updateItem(CompareItem)
     case deleteItem(Item)
@@ -822,11 +822,11 @@ enum TeamNotificationType: Codable, Equatable {
     case updateUser(CompareUser)
     case updateTeam(CompareTeam)
 
-    var notifyType: TeamNotificationType {
+    var type: LogType {
         return self
     }
 
-    var setType: SetType {
+    var setRule: SetType {
         switch self {
         case .addItem, .updateItem, .deleteItem, .commerce, .join, .updateTeam:
             return .global
@@ -835,7 +835,7 @@ enum TeamNotificationType: Codable, Equatable {
         }
     }
     /// 通知の削除時に、メンバー全員の通知データをまとめて削除(global)するか、ローカルだけ削除(local)するかを管理する。
-    var removeType: RemoveType {
+    var removeRule: RemoveType {
         switch self {
         case .addItem, .updateItem, .deleteItem, .commerce, .join, .updateTeam:
             return .global

@@ -7,15 +7,15 @@
 
 import SwiftUI
 
-class LocalNotificationViewModel: ObservableObject {
+class MomentLogViewModel: ObservableObject {
 
     init() { print("<<<<<<<<<  NotificationViewModel_init  >>>>>>>>>") }
 
-    @Published var localNotifications: [LocalNotifyFrame] = []
+    @Published var localNotifications: [MomentLog] = []
 
     func setLocalNotification(type: LocalNotificationType) {
         localNotifications.append(
-            LocalNotifyFrame(type: type.self,
+            MomentLog(type: type.self,
                        message: type.message,
                        exitTime: type.exitTime)
         )

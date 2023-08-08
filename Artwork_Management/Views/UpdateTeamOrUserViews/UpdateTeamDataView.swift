@@ -33,7 +33,7 @@ struct UpdateTeamDataView: View {
 
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var teamVM: TeamViewModel
-    @EnvironmentObject var teamNotifyVM: TeamNotificationViewModel
+    @EnvironmentObject var teamNotifyVM: NotificationViewModel
     
     @FocusState var showKeyboard: ShowKeyboard?
     /// キーボード出現時のViewOffsetを管理するプロパティ
@@ -200,7 +200,7 @@ struct UpdateTeamDataView: View {
                         let compareTeam = CompareTeam(id: team.id,
                                                       before: beforeTeam,
                                                       after: afterTeam)
-                        teamNotifyVM.setNotification(team: afterTeam, notifyType: .updateTeam(compareTeam))
+                        teamNotifyVM.setNotification(team: afterTeam, type: .updateTeam(compareTeam))
                     }
                 }
             } // Task ここまで

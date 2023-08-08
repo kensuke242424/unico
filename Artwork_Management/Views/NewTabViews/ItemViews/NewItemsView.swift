@@ -21,7 +21,7 @@ struct NewItemsView: View {
     
     /// Tab親Viewから受け取るViewModelと状態変数
     @EnvironmentObject var navigationVM: NavigationViewModel
-    @EnvironmentObject var localNotifyVM: LocalNotificationViewModel
+    @EnvironmentObject var localNotifyVM: MomentLogViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var tagVM : TagViewModel

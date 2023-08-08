@@ -58,8 +58,8 @@ struct InputTab {
 struct NewTabView: View {
     
     @EnvironmentObject var navigationVM: NavigationViewModel
-    @EnvironmentObject var localNotificationVM: LocalNotificationViewModel
-    @EnvironmentObject var teamNotificationVM: TeamNotificationViewModel
+    @EnvironmentObject var localNotificationVM: MomentLogViewModel
+    @EnvironmentObject var teamNotificationVM: NotificationViewModel
     @EnvironmentObject var logInVM: LogInViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel

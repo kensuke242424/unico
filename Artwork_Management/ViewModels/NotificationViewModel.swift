@@ -11,7 +11,8 @@ import FirebaseStorage
 import FirebaseFirestore
 
 /// チーム全体に届く通知ボードの保存・表示・削除を管理するクラス。
-class TeamNotificationViewModel: ObservableObject {
+/// チームメンバーによるデータの編集履歴「Log」構造体を元に、通知を生成する。
+class NotificationViewModel: ObservableObject {
 
     init() { print("<<<<<<<<<  TeamNotificationViewModel_init  >>>>>>>>>") }
 
@@ -25,8 +26,8 @@ class TeamNotificationViewModel: ObservableObject {
     @Published var show: Bool = false
     /// 現在表示されている通知を保持するプロパティ。
     /// ユーザーが保持している通知の数が無くなるまで、ビュー側で更新が続く。
-    @Published var currentNotification: NotifyElement?
-    @Published var myNotifications: [NotifyElement] = []
+    @Published var currentNotification: Log?
+    @Published var myNotifications: [Log] = []
 
     /// メンバーデータのステートを監視するリスナーメソッド。
     /// 初期実行時にリスニング対象ドキュメントのデータが全取得される。(フラグはadded)
@@ -48,6 +49,7 @@ class TeamNotificationViewModel: ObservableObject {
                         .first(where: { $0.memberUID == uid }) else {
                         return
                     }
+                    
                     self.myNotifications = myData.notifications
                     //                        .compactMap({ $0 })
                 } catch {
@@ -58,18 +60,18 @@ class TeamNotificationViewModel: ObservableObject {
     }
 
     /// アイテムや新規通知をチーム内の各メンバーに渡すメソッド。
-    func setNotification(team: Team?, notifyType: TeamNotificationType) {
+    func setNotification(team: Team?, type logType: LogType) {
         guard var team else { return }
         guard let myMemberData = getCurrentTeamMyMemberData(team: team) else { return }
         guard let teamRef = db?.collection("teams").document(team.id) else { return }
 
-        let element = NotifyElement(createTime: Date(),
+        let element = Log(createTime: Date(),
                                     editBy: myMemberData,
-                                    notifyType: notifyType,
-                                    message: notifyType.message,
-                                    imageURL: notifyType.imageURL,
-                                    exitTime: notifyType.waitTime)
-        switch notifyType.setType {
+                                    type: logType,
+                                    message: logType.message,
+                                    imageURL: logType.imageURL,
+                                    exitTime: logType.waitTime)
+        switch logType.setRule {
 
         case .local:
             for index in team.members.indices where team.members[index].memberUID == uid {
@@ -91,24 +93,24 @@ class TeamNotificationViewModel: ObservableObject {
     }
     /// Firestore内の通知データを削除するメソッド。
     /// 通知のエレメントが持つ削除タイプを参照して、ローカル削除とグローバル削除を分岐する。
-    func removeNotification(team: Team?, element: NotifyElement) {
+    func removeNotification(team: Team?, element: Log) {
         guard var team else { return }
         guard let teamRef = db?.collection("teams").document(team.id) else { return }
 
-        switch element.notifyType.removeType {
+//        switch element.type.removeRule {
 
-        case .local:
+//        case .local:
             guard let index = team.members.firstIndex(where: { $0.memberUID == uid }) else { return }
             team.members[index].notifications.removeAll(where: { $0.id == element.id })
 
-        case .global:
-            for index in team.members.indices {
-                team.members[index].notifications.removeAll(where: { $0.id == element.id })
-            }
-        }
+//        case .global:
+//            for index in team.members.indices {
+//                team.members[index].notifications.removeAll(where: { $0.id == element.id })
+//            }
+//        }
 
         do {
-            _ = try teamRef.setData(from: team)
+            _ = try teamRef.setData(from: team, merge: true)
         } catch {
             print("Error: removeNotification")
         }
@@ -117,7 +119,7 @@ class TeamNotificationViewModel: ObservableObject {
     /// 更新されたデータの内容をリセットするメソッド。
 //    func resetToItem(element: NotifyElement) {
 //
-//        switch element.notifyType.setType {
+//        switch element.type.setRule {
 //
 //        case .local:
 //            <#code#>

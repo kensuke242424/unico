@@ -71,7 +71,7 @@ struct NewEditItemView: View {
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var tagVM : TagViewModel
-    @EnvironmentObject var teamNotifyVM: TeamNotificationViewModel
+    @EnvironmentObject var teamNotifyVM: NotificationViewModel
 
     @StateObject var itemVM: ItemViewModel
     
@@ -376,7 +376,7 @@ struct NewEditItemView: View {
                                                               after: updatedItem)
                             print("アイテムエディット内のcompareItemId: \(compareItemData.id)")
                             teamNotifyVM.setNotification(team: teamVM.team,
-                                                         notifyType: .updateItem(compareItemData))
+                                                         type: .updateItem(compareItemData))
                             dismiss()
 
                         } // Task(update Item)
@@ -415,7 +415,7 @@ struct NewEditItemView: View {
                             // Firestoreにコーダブル保存
                             await itemVM.addItemToFirestore(newItem)
                             tagVM.setActiveTag(from: input.selectionTagName)
-                            teamNotifyVM.setNotification(team: teamVM.team, notifyType: .addItem(newItem))
+                            teamNotifyVM.setNotification(team: teamVM.team, type: .addItem(newItem))
 
                             withAnimation(.easeIn(duration: 0.1)) { input.showProgress = false }
                             dismiss()

@@ -9,7 +9,7 @@ import Foundation
 
 /// ユーザーのローカルに通知される通知ボードのフレーム。
 /// このデータはFirestoreとの通信を介さない。
-struct LocalNotifyFrame: Identifiable, Hashable {
+struct MomentLog: Identifiable, Hashable {
     var id: UUID = .init()
     var type: LocalNotificationType
     var message: String

@@ -267,7 +267,7 @@ struct RootView_Previews: PreviewProvider {
     static var previews: some View {
         RootView()
             .environmentObject(NavigationViewModel())
-            .environmentObject(LocalNotificationViewModel())
+            .environmentObject(MomentLogViewModel())
             .environmentObject(LogInViewModel())
             .environmentObject(TeamViewModel())
             .environmentObject(UserViewModel())

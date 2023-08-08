@@ -13,8 +13,8 @@ struct CommerceSheet: View {
 
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var teamVM: TeamViewModel
-    @EnvironmentObject var notifyVM: LocalNotificationViewModel
-    @EnvironmentObject var teamNotificationVM: TeamNotificationViewModel
+    @EnvironmentObject var notifyVM: MomentLogViewModel
+    @EnvironmentObject var teamNotificationVM: NotificationViewModel
 
     @StateObject var cartVM: CartViewModel
     @Binding var inputTab: InputTab
@@ -81,7 +81,7 @@ struct CommerceSheet: View {
                         let compareItems = cartVM.updateCommerceItemsAndGetCompare(teamID: teamID)
                         // 通知の作成
                         teamNotificationVM.setNotification(team: teamVM.team,
-                                                                      notifyType: .commerce(compareItems))
+                                                                      type: .commerce(compareItems))
                         cartVM.doCommerce = true
                         hapticSuccessNotification()
                     },

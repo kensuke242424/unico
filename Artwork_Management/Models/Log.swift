@@ -7,12 +7,12 @@
 
 import SwiftUI
 
-/// 通知ボード一要素分となる構造体。
-struct NotifyElement: Identifiable, Equatable, Hashable, Codable {
+/// チームおよびユーザーが行った編集履歴のエレメントを管理する。
+struct Log: Identifiable, Equatable, Hashable, Codable {
     var id: UUID = .init()
     var createTime: Date
     var editBy: JoinMember
-    var notifyType: TeamNotificationType
+    var type: LogType
     var message: String
     var imageURL: URL?
     var exitTime: CGFloat
@@ -34,8 +34,8 @@ enum RemoveType: Codable {
     case local, global
 }
 
-extension NotifyElement {
-    static func == (lhs: NotifyElement, rhs: NotifyElement) -> Bool {
+extension Log {
+    static func == (lhs: Log, rhs: Log) -> Bool {
         return lhs.id == rhs.id
     }
     public func hash(into hasher: inout Hasher) {

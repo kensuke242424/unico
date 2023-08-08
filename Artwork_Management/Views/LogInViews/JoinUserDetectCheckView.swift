@@ -18,7 +18,7 @@ struct JoinUserDetectCheckView: View {
     }
 
     @EnvironmentObject var userVM: UserViewModel
-    @EnvironmentObject var teamNotificationVM: TeamNotificationViewModel
+    @EnvironmentObject var teamNotificationVM: NotificationViewModel
 
     @StateObject var qrReader: QRReader = QRReader()
     @StateObject var teamVM: TeamViewModel
@@ -310,7 +310,7 @@ struct JoinUserDetectCheckView: View {
                                         withAnimation(.spring(response: 0.5, blendDuration: 1)) {
                                             teamVM.isShowSearchedNewMemberJoinTeam.toggle()
                                             teamNotificationVM.setNotification(team: teamVM.team,
-                                                                                          notifyType: .join(detectedUser))
+                                                                                          type: .join(detectedUser))
                                         }
                                     }
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {

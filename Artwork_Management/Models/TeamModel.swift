@@ -18,7 +18,7 @@ struct Team: Identifiable, Codable, Equatable {
     var backgroundURL: URL?
     var backgroundPath: String?
     var members: [JoinMember]
-    var logs: [NotifyElement] = []
+    var logs: [Log] = []
 }
 
 // Team構造体が保持するメンバー一人分の情報
@@ -27,7 +27,7 @@ struct JoinMember: Hashable, Codable {
     var memberUID: String
     var name: String
     var iconURL: URL?
-    var notifications: [NotifyElement] = []
+    var notifications: [Log] = []
 }
 
 var testTeam: Team = Team(id: UUID().uuidString,

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct LocalNotificationView: View {
-    @EnvironmentObject var vm: LocalNotificationViewModel
+    @EnvironmentObject var vm: MomentLogViewModel
     @Environment(\.colorScheme) var colorScheme
     let screen = UIScreen.main.bounds
 
@@ -27,7 +27,7 @@ struct LocalNotificationView: View {
         } // VStack
     }
     @ViewBuilder
-    func MessageBoard(_ element: LocalNotifyFrame, _ index: Int) -> some View {
+    func MessageBoard(_ element: MomentLog, _ index: Int) -> some View {
 
         Text(element.message)
             .tracking(1)
