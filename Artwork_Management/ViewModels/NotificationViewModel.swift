@@ -32,17 +32,20 @@ class NotificationViewModel: ObservableObject {
             .document(currentTeamID)
             .collection("logs") else { return }
 
-        /// 既読管理「already」フィールドに自身のuidが存在しないものを取得するためのクエリ
+        /// 未読を表す「unread」フィールドに自身のuidが存在するものを取得するためのクエリ
+
         let notAlreadyQuery = logsRef
-            .whereField("already", notIn: [uid])
+            .whereField("unread", arrayContains: uid)
 
         listener = notAlreadyQuery.addSnapshotListener { (snapshot, _) in
             print("Notification_listener起動")
             guard let documents = snapshot?.documents else { return }
 
             do {
-                self.notifications = documents.compactMap { (snap) -> Log? in
-                    return try? snap.data(as: Log.self, with: .estimate)
+                withAnimation(.spring(response: 0.4)) {
+                    self.notifications = documents.compactMap { (snap) -> Log? in
+                        return try? snap.data(as: Log.self, with: .estimate)
+                    }
                 }
                 print("notificationsデータ更新")
             }
@@ -52,36 +55,6 @@ class NotificationViewModel: ObservableObject {
         }
     }
 
-    /// メンバーデータのステートを監視するリスナーメソッド。
-    /// 初期実行時にリスニング対象ドキュメントのデータが全取得される。(フラグはadded)
-//    func listener(id currentTeamID: String?) {
-//        print("notificationListener実行")
-//        guard let uid, let currentTeamID else { return }
-//        guard let teamRef = db?.collection("teams")
-//            .document(currentTeamID) else { return }
-//
-//        listener = teamRef.addSnapshotListener { snap, error in
-//            if let error {
-//                print("ERROR: \(error.localizedDescription)")
-//            } else {
-//                guard let snap else { print("ERROR: snap nil"); return }
-//
-//                do {
-//                    let teamData = try snap.data(as: Team.self)
-//                    guard let myData = teamData.members
-//                        .first(where: { $0.memberUID == uid }) else {
-//                        return
-//                    }
-//
-//                    self.remainNotifications = myData.notifications
-//                    //                        .compactMap({ $0 })
-//                } catch {
-//                    print("ERROR: try snap?.data(as: Team.self)")
-//                }
-//            }
-//        }
-//    }
-
     /// アイテムや新規通知をチーム内の各メンバーに渡すメソッド。
     func setNotification(team: Team?, type logType: LogType) {
         guard var team else { return }
@@ -90,7 +63,8 @@ class NotificationViewModel: ObservableObject {
 
         let element = Log(createTime: Date(),
                           editByIcon: myMemberData.iconURL,
-                          type: logType)
+                          type: logType,
+                          unread: getMembersId(team: team))
         switch logType.setRule {
 
         case .local:
@@ -109,6 +83,25 @@ class NotificationViewModel: ObservableObject {
             }
         } catch {
             print("Error: setNotification")
+        }
+    }
+
+    /// ユーザーが既に表示した通知に既読を付けるメソッド。
+    func setRead(team: Team?, element: Log) {
+        guard let team, let uid else { return }
+        guard let logRef = db?.collection("teams")
+            .document(team.id)
+            .collection("logs")
+            .document(element.id) else { return }
+
+        do {
+            var updateElement = element
+            updateElement.unread.removeAll(where: {$0 == uid})
+
+            try logRef.setData(from: updateElement)
+
+        } catch {
+            print("既読に失敗")
         }
     }
     /// Firestore内の通知データを削除するメソッド。
@@ -186,7 +179,7 @@ class NotificationViewModel: ObservableObject {
     }
 
     /// 現在の操作チームのメンバーidを取得するメソッド。。
-    func getCurrentTeamMembersUid(team: Team) -> [String] {
+    func getMembersId(team: Team) -> [String] {
         let membersID: [String] = team.members.map({ $0.memberUID })
         return membersID
     }

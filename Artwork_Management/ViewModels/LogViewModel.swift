@@ -20,8 +20,6 @@ class LogViewModel: ObservableObject {
     /// Firestoreから取得したチームのログデータを管理するプロパティ。
     @Published var logs: [Log] = []
 
-    @Published var currentNotification: Log?
-
     func listener(id currentTeamID: String?) {
         print("LogsViewModel_listener実行")
         guard let uid, let currentTeamID else { return }
@@ -52,7 +50,8 @@ class LogViewModel: ObservableObject {
 
         let newLog = Log(createTime: Date(),
                          editByIcon: myMemberData.iconURL,
-                         type: logType)
+                         type: logType,
+                         unread: getMembersId(team: team))
         guard let logsRef = db?
             .collection("teams")
             .document(team.id)
@@ -69,6 +68,10 @@ class LogViewModel: ObservableObject {
     func getCurrentTeamMyMemberData(team: Team) -> JoinMember? {
         let getGyMemberData = team.members.first(where: { $0.memberUID == uid })
         return getGyMemberData
+    }
+    /// 現在の操作チームのメンバーidを取得するメソッド。。
+    func getMembersId(team: Team) -> [String] {
+        return team.members.map {$0.memberUID}
     }
 
     deinit {

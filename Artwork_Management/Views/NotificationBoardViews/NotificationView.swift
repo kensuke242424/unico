@@ -19,14 +19,14 @@ struct NotificationView: View {
 
     var body: some View {
         VStack {
-            if let element = vm.notifications.first {
+            if let element = vm.currentNotification {
                 NotificationContainer(element: element)
             }
             Spacer()
         } // VStack
         .onChange(of: vm.notifications) { remainingValue in
-            guard let element = remainingValue.first else { return }
-            vm.currentNotification = element
+            guard let nextElement = remainingValue.first else { return }
+            vm.currentNotification = nextElement
         }
         .onAppear {
             guard let element = vm.notifications.first else { return }
@@ -149,8 +149,8 @@ fileprivate struct NotificationContainer: View {
                         withAnimation(.spring(response: 0.4)) {
                             vm.currentNotification = nil
                         }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                            vm.removeNotification(team: teamVM.team, element: element)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                            vm.setRead(team: teamVM.team, element: element)
                         }
                     }
                 }
@@ -174,11 +174,11 @@ fileprivate struct NotificationContainer: View {
                 showLimitCount += 1
                 if showLimitCount > Int(element.type.stayTime) {
                     print("通知ボードの破棄時間です")
-                    withAnimation(.easeIn(duration: 0.3)) {
+                    withAnimation(.easeIn(duration: 0.5)) {
                         vm.currentNotification = nil
                     }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        vm.removeNotification(team: teamVM.team, element: element)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                        vm.setRead(team: teamVM.team, element: element)
                     }
                 }
             }
