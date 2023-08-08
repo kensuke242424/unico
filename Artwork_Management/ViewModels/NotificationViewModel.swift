@@ -26,35 +26,58 @@ class NotificationViewModel: ObservableObject {
     /// currentNotificationへの格納 -> 破棄 -> 格納 が続く。
     @Published var remainNotifications: [Log] = []
 
-    /// メンバーデータのステートを監視するリスナーメソッド。
-    /// 初期実行時にリスニング対象ドキュメントのデータが全取得される。(フラグはadded)
     func listener(id currentTeamID: String?) {
-        print("notificationListener実行")
+        print("LogsViewModel_listener実行")
         guard let uid, let currentTeamID else { return }
-        guard let teamRef = db?.collection("teams")
-            .document(currentTeamID) else { return }
+        guard let logsRef = db?.collection("teams")
+            .document(currentTeamID)
+            .collection("logs") else { return }
 
-        listener = teamRef.addSnapshotListener { snap, error in
-            if let error {
-                print("ERROR: \(error.localizedDescription)")
-            } else {
-                guard let snap else { print("ERROR: snap nil"); return }
+        listener = logsRef.addSnapshotListener { (snapshot, _) in
+            print("LogListener起動")
+            guard let documents = snapshot?.documents else { return }
 
-                do {
-                    let teamData = try snap.data(as: Team.self)
-                    guard let myData = teamData.members
-                        .first(where: { $0.memberUID == uid }) else {
-                        return
-                    }
-                    
-                    self.remainNotifications = myData.notifications
-                    //                        .compactMap({ $0 })
-                } catch {
-                    print("ERROR: try snap?.data(as: Team.self)")
+            do {
+                self.remainNotifications = documents.compactMap { (snap) -> Log? in
+                    return try? snap.data(as: Log.self, with: .estimate)
                 }
+                print("Logデータ更新")
+            }
+            catch {
+                print("ERROR: try snap?.data(as: Team.self)")
             }
         }
     }
+
+    /// メンバーデータのステートを監視するリスナーメソッド。
+    /// 初期実行時にリスニング対象ドキュメントのデータが全取得される。(フラグはadded)
+//    func listener(id currentTeamID: String?) {
+//        print("notificationListener実行")
+//        guard let uid, let currentTeamID else { return }
+//        guard let teamRef = db?.collection("teams")
+//            .document(currentTeamID) else { return }
+//
+//        listener = teamRef.addSnapshotListener { snap, error in
+//            if let error {
+//                print("ERROR: \(error.localizedDescription)")
+//            } else {
+//                guard let snap else { print("ERROR: snap nil"); return }
+//
+//                do {
+//                    let teamData = try snap.data(as: Team.self)
+//                    guard let myData = teamData.members
+//                        .first(where: { $0.memberUID == uid }) else {
+//                        return
+//                    }
+//
+//                    self.remainNotifications = myData.notifications
+//                    //                        .compactMap({ $0 })
+//                } catch {
+//                    print("ERROR: try snap?.data(as: Team.self)")
+//                }
+//            }
+//        }
+//    }
 
     /// アイテムや新規通知をチーム内の各メンバーに渡すメソッド。
     func setNotification(team: Team?, type logType: LogType) {
