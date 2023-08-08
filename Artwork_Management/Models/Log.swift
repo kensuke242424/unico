@@ -13,9 +13,6 @@ struct Log: Identifiable, Equatable, Hashable, Codable {
     var createTime: Date
     var editBy: JoinMember
     var type: LogType
-    var message: String
-    var imageURL: URL?
-    var exitTime: CGFloat
     var already: [String] = []
     var canceledDatas: [Date] = []
 }

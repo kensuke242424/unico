@@ -15,7 +15,6 @@ import SDWebImageSwiftUI
 struct TeamNotificationView: View {
 
     @EnvironmentObject var vm: NotificationViewModel
-//    @EnvironmentObject var teamVM: TeamViewModel
 
     var body: some View {
         VStack {
@@ -75,9 +74,9 @@ fileprivate struct NotificationContainer: View {
         VStack {
             /// 通知ボードのヘッドビュー
             HStack {
-                CircleIconView(url: element.imageURL, size: 60)
+                CircleIconView(url: element.type.imageURL, size: 60)
 
-                Text(element.message)
+                Text(element.type.message)
                     .tracking(1)
                     .fontWeight(.bold)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -173,7 +172,7 @@ fileprivate struct NotificationContainer: View {
                 showLimitCount = 0
             } else {
                 showLimitCount += 1
-                if showLimitCount > Int(element.exitTime) {
+                if showLimitCount > Int(element.type.stayTime) {
                     print("通知ボードの破棄時間です")
                     withAnimation(.easeIn(duration: 0.3)) {
                         vm.currentNotification = nil
@@ -911,7 +910,7 @@ enum LogType: Codable, Equatable {
         }
     }
     /// 通知が画面上に残る時間
-    var waitTime: CGFloat {
+    var stayTime: CGFloat {
         switch self {
         case .addItem, .updateItem, .updateUser, .updateTeam, .commerce:
             return 3.0
