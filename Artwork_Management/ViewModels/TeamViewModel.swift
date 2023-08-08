@@ -50,7 +50,7 @@ class TeamViewModel: ObservableObject {
     }
     /// チームデータの追加・更新・削除のステートを管理するリスナーメソッド。
     /// 初期実行時にリスニング対象ドキュメントのデータが全取得される。(フラグはadded)
-    func teamListener(id currentTeamID: String) async throws {
+    func listener(id currentTeamID: String) async throws {
         let teamRef = db?.collection("teams").document(currentTeamID)
         guard let teamRef else { throw CustomError.getRef }
 

@@ -14,7 +14,7 @@ import FirebaseFirestore
 class LogViewModel: ObservableObject {
     init() { print("<<<<<<<<<  LogsViewModel_init  >>>>>>>>>") }
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
-    var logListener: ListenerRegistration?
+    var listener: ListenerRegistration?
     var uid: String? { Auth.auth().currentUser?.uid }
 
     /// Firestoreから取得したチームのログデータを管理するプロパティ。
@@ -27,17 +27,15 @@ class LogViewModel: ObservableObject {
             .document(currentTeamID)
             .collection("logs") else { return }
 
-        logListener = logsRef.addSnapshotListener { (snapshot, _) in
-
-            guard let documents = snapshot?.documents else {
-                print("ERROR: snap?.documentsがnilでした")
-                return
-            }
+        listener = logsRef.addSnapshotListener { (snapshot, _) in
+            print("LogListener起動")
+            guard let documents = snapshot?.documents else { return }
 
             do {
                 self.logs = documents.compactMap { (snap) -> Log? in
                     return try? snap.data(as: Log.self, with: .estimate)
                 }
+                print("Logデータ更新")
             }
             catch {
                 print("ERROR: try snap?.data(as: Team.self)")
@@ -50,7 +48,9 @@ class LogViewModel: ObservableObject {
         guard var team else { return }
         guard let myMemberData = getCurrentTeamMyMemberData(team: team) else { return }
 
-        let newLog = Log(createTime: Date(), editBy: myMemberData, type: logType)
+        let newLog = Log(createTime: Date(),
+                         editByIcon: myMemberData.iconURL,
+                         type: logType)
         guard let logsRef = db?
             .collection("teams")
             .document(team.id)
@@ -69,6 +69,6 @@ class LogViewModel: ObservableObject {
     }
 
     deinit {
-        logListener?.remove()
+        listener?.remove()
     }
 }

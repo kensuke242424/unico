@@ -136,9 +136,9 @@ struct RootView: View {
                         guard let lastLogInTeamID = user.lastLogIn else { return }
 
                         await tagVM.fetchTag(teamID: lastLogInTeamID)
-                        _ = try await teamVM.teamListener(id: lastLogInTeamID)
-                        _ = try await itemVM.listener(id: lastLogInTeamID)
-                        _ = try await userVM.userRealtimeListener()
+                        _ = try await teamVM.listener(id: lastLogInTeamID)
+                        _ = try await userVM.listener()
+                        _ =     await itemVM.listener(id: lastLogInTeamID)
                         
                         /// ホーム画面へ遷移
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {

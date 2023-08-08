@@ -28,6 +28,7 @@ struct UpdateUserDataView: View {
 
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var teamVM: TeamViewModel
+    @EnvironmentObject var logVM: LogViewModel
     @EnvironmentObject var teamNotifyVM: NotificationViewModel
 
     @FocusState var showKeyboard: ShowKeyboard?
@@ -199,7 +200,8 @@ struct UpdateUserDataView: View {
                     withAnimation(.spring(response: 0.3)) { show = false }
                     if beforeUser != afterUser {
                         let compareUser = CompareUser(id: user.id, before: beforeUser, after: afterUser)
-                        teamNotifyVM.setNotification(team: team, type: .updateUser(compareUser))
+//                        teamNotifyVM.setNotification(team: team, type: .updateUser(compareUser))
+                        logVM.addLog(team: team, type: .updateUser(compareUser))
                     }
                 }
             } // Task ここまで

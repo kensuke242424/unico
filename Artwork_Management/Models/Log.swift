@@ -11,7 +11,7 @@ import SwiftUI
 struct Log: Identifiable, Equatable, Hashable, Codable {
     var id: String = UUID().uuidString
     var createTime: Date
-    var editBy: JoinMember
+    var editByIcon: URL?
     var type: LogType
     var already: [String] = []
     var canceledDatas: [Date] = []

@@ -62,7 +62,9 @@ class NotificationViewModel: ObservableObject {
         guard let myMemberData = getCurrentTeamMyMemberData(team: team) else { return }
         guard let teamRef = db?.collection("teams").document(team.id) else { return }
 
-        let element = Log(createTime: Date(), editBy: myMemberData, type: logType)
+        let element = Log(createTime: Date(),
+                          editByIcon: myMemberData.iconURL,
+                          type: logType)
         switch logType.setRule {
 
         case .local:

@@ -58,8 +58,9 @@ struct InputTab {
 struct NewTabView: View {
     
     @EnvironmentObject var navigationVM: NavigationViewModel
-    @EnvironmentObject var localNotificationVM: MomentLogViewModel
-    @EnvironmentObject var teamNotificationVM: NotificationViewModel
+    @EnvironmentObject var logVM: LogViewModel
+    @EnvironmentObject var momentLogVM: MomentLogViewModel
+    @EnvironmentObject var notificationVM: NotificationViewModel
     @EnvironmentObject var logInVM: LogInViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
@@ -346,7 +347,7 @@ struct NewTabView: View {
                               inputTab: $inputTab,
                               teamID: teamVM.team?.id ?? "",
                               memberColor: userVM.memberColor)
-                .environmentObject(teamNotificationVM)
+                .environmentObject(notificationVM)
                 .environmentObject(teamVM)
             } // builder.content
             .supportedState([.medium])
@@ -383,7 +384,8 @@ struct NewTabView: View {
         }
         .onAppear {
             tagVM.setFirstActiveTag()
-            teamNotificationVM.listener(id: teamVM.teamID)
+            logVM.listener(id : teamVM.teamID)
+            notificationVM.listener(id: teamVM.teamID)
         }
     } // body
     @ViewBuilder

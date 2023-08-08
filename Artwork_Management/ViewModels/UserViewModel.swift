@@ -70,7 +70,7 @@ class UserViewModel: ObservableObject {
         }
     }
 
-    func userRealtimeListener() async throws {
+    func listener() async throws {
         guard let uid = uid else { throw CustomError.uidEmpty }
         guard let userRef = db?.collection("users").document(uid) else { throw CustomError.getRef }
         listener = userRef.addSnapshotListener { snap, error in
