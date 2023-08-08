@@ -23,7 +23,8 @@ class LogViewModel: ObservableObject {
     func listener(id currentTeamID: String?) {
         print("LogsViewModel_listener実行")
         guard let uid, let currentTeamID else { return }
-        guard let logsRef = db?.collection("teams")
+        guard let logsRef = db?
+            .collection("teams")
             .document(currentTeamID)
             .collection("logs") else { return }
 

@@ -17,11 +17,14 @@ class TeamViewModel: ObservableObject {
         print("<<<<<<<<<  TeamViewModel_init  >>>>>>>>>")
     }
 
-    var listener: ListenerRegistration?
+    var teamListener: ListenerRegistration?
+    var membersListener: ListenerRegistration?
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
     var uid: String? { Auth.auth().currentUser?.uid }
 
     @Published var team: Team?
+    @Published var members: [JoinMember] = []
+
     @Published var isShowCreateAndJoinTeam: Bool = false
     @Published var isShowSearchedNewMemberJoinTeam: Bool = false
     @Published var showErrorAlert = false
@@ -50,26 +53,52 @@ class TeamViewModel: ObservableObject {
     }
     /// チームデータの追加・更新・削除のステートを管理するリスナーメソッド。
     /// 初期実行時にリスニング対象ドキュメントのデータが全取得される。(フラグはadded)
-    func listener(id currentTeamID: String) async throws {
-        let teamRef = db?.collection("teams").document(currentTeamID)
+    func teamListener(id currentTeamID: String) async throws {
+        let teamRef = db?
+            .collection("teams")
+            .document(currentTeamID)
+
         guard let teamRef else { throw CustomError.getRef }
 
-        listener = teamRef.addSnapshotListener { snap, error in
+        teamListener = teamRef.addSnapshotListener { snap, error in
             if let error {
                 print("teamListener失敗: \(error.localizedDescription)")
             } else {
-                guard let snap else {
-                    print("teamListener_Error: snapがnilです")
-                    return
+                print("teamListener起動")
+
+                do {
+                    let teamData = try snap?.data(as: Team.self)
+                    withAnimation {self.team = teamData}
+                    print("チームデータを更新")
+                } catch {
+                    print("チームデータ更新失敗")
                 }
+            }
+        }
+    }
+
+    /// チームのサブコレクション「members」における追加・更新・削除のステートを管理するリスナーメソッド。
+    /// 初期実行時にリスニング対象ドキュメントのデータが全取得される。(フラグはadded)
+    func membersListener(id currentTeamID: String) async {
+        let teamRef = db?
+            .collection("teams")
+            .document(currentTeamID)
+            .collection("members")
+
+        membersListener = teamRef?.addSnapshotListener { snapshot, error in
+            if let error {
+                print("membersListener起動失敗: \(error.localizedDescription)")
+            } else {
+                guard let documents = snapshot?.documents else { return }
                 print("teamListener開始")
 
                 do {
-                    let teamData = try snap.data(as: Team.self)
-                    withAnimation {self.team = teamData}
-                    print("teamListenerによりチームデータを更新")
+                    self.members = documents.compactMap { (snap) -> JoinMember? in
+                        return try? snap.data(as: JoinMember.self, with: .estimate)
+                    }
+                    print("メンバーデータを更新")
                 } catch {
-                    print("teamListener_Error: try snap?.data(as: Team.self)")
+                    print("メンバーデータ更新失敗")
                 }
             }
         }
@@ -78,13 +107,12 @@ class TeamViewModel: ObservableObject {
     func addTeam(teamData: Team) async throws {
         print("addTeamAndGetID実行")
 
-        guard let teamsRef = db?.collection("teams") else {
-            print("error: guard let teamsRef = db?.collection(teams)")
-            throw CustomError.getRef
-        }
+        let teamsRef = db?
+            .collection("teams")
+            .document(teamData.id)
 
         do {
-            _ = try teamsRef.document(teamData.id).setData(from: teamData)
+            _ = try teamsRef?.setData(from: teamData)
         } catch {
             print("Error: try db!.collection(collectionID).addDocument(from: itemData)")
             throw CustomError.setData
@@ -102,19 +130,44 @@ class TeamViewModel: ObservableObject {
         return resultData
     }
 
-    func addNewTeamMember(data userData: User) async throws {
+    /// 新規チーム作成時に使用するメソッド。作成者の目mんバーデータを新規チームのサブコレクションに保存する。
+    func addFirstMemberData(id teamId: String, data userData: User) async throws {
+        print("addFirstMemberData実行")
+        let membersRef = db?
+            .collection("teams")
+            .document(teamId)
+            .collection("members")
+
+        let newMemberData = JoinMember(memberUID: userData.id,
+                                       name: userData.name,
+                                       iconURL: userData.iconURL)
+
+        do {
+            _ = try membersRef?
+                .document(userData.id)
+                .setData(from: newMemberData)
+        }
+    }
+
+    func addDetectedNewMember(data userData: User) async throws {
         print("addDetectedUser実行")
-        guard var team else { throw CustomError.teamEmpty }
-        guard let teamsRef = db?.collection("teams").document(team.id) else { throw CustomError.getRef }
+        guard let team else { throw CustomError.teamEmpty }
+        let memberRef = db?
+            .collection("teams")
+            .document(team.id)
+            .collection("members")
+            .document(userData.id)
 
         do {
             for member in team.members where userData.id == member.memberUID {
                 throw CustomError.memberDuplication
             }
 
-            let detectMemberData = JoinMember(memberUID: userData.id, name: userData.name, iconURL: userData.iconURL)
-            team.members.append(detectMemberData)
-            _ = try teamsRef.setData(from: team)
+            let newMemberData = JoinMember(memberUID: userData.id,
+                                           name: userData.name,
+                                           iconURL: userData.iconURL)
+
+            _ = try memberRef?.setData(from: newMemberData)
         }
     }
 
@@ -140,7 +193,7 @@ class TeamViewModel: ObservableObject {
         }
     }
 
-    // メンバー招待画面で取得した相手のユーザIDを使ってFirestoreのusersからデータをフェッチ
+    // メンバー招待画面で取得した相手のユーザIDを使って、Firestoreのusersからデータをフェッチ
     func detectUserFetchData(id userID: String) async throws -> User? {
 
         guard let userRef = db?.collection("users").document(userID) else { throw CustomError.getDocument }
@@ -306,14 +359,16 @@ class TeamViewModel: ObservableObject {
     func updateTeam(data updatedTeamData: Team) async throws {
 
         // 取得アイコンデータurlがnilだったら処理終了
-        guard var teamContainer = team else { throw CustomError.teamEmpty }
-        guard let teamRef = db?.collection("teams").document(teamContainer.id) else { throw CustomError.getDocument }
+        guard let team else { throw CustomError.teamEmpty }
+        let teamRef = db?
+            .collection("teams")
+            .document(team.id)
 
         do {
             // 更新前の元々のアイコンパスを保持しておく
             // 更新成功が確認できてから以前のアイコンデータを削除する
-            let defaultIconPath = teamContainer.iconPath
-            _ = try teamRef.setData(from: updatedTeamData)
+            let defaultIconPath = team.iconPath
+            _ = try teamRef?.setData(from: updatedTeamData)
             // アイコンデータは変えていない場合、削除処理をスキップする
             if defaultIconPath != updatedTeamData.iconPath {
                 await deleteTeamImageData(path: defaultIconPath)
@@ -330,13 +385,15 @@ class TeamViewModel: ObservableObject {
         var joinsTeamID: [String] = joinsTeam.map { $0.teamID }
 
         // ユーザが所属している各チームのid配列を使ってクエリを叩く
-        guard let joinTeamRefs = db?.collection("teams")
-            .whereField("id", in: joinsTeamID) else { throw CustomError.getRef }
+        let joinTeamRefs = db?
+            .collection("teams")
+            .whereField("id", in: joinsTeamID)
 
         do {
-            let snapshot = try await joinTeamRefs.getDocuments()
+            let snapshot = try await joinTeamRefs?.getDocuments()
+            guard let documents = snapshot?.documents else { return }
 
-            for teamDocument in snapshot.documents {
+            for teamDocument in documents {
 
                 do {
                     var teamData = try teamDocument.data(as: Team.self)
@@ -346,10 +403,11 @@ class TeamViewModel: ObservableObject {
                         // チーム内の対象メンバーデータを更新
                         teamData.members[index] = updatedMemberData
                         // 更新対象チームの更新用リファレンスを生成
-                        guard let teamRef = db?.collection("teams")
-                            .document(teamData.id) else { throw CustomError.getRef }
+                        let teamRef = db?
+                            .collection("teams")
+                            .document(teamData.id)
                         // リファレンスをもとにsetDataを実行
-                        try teamRef.setData(from: teamData, merge: true)
+                        try teamRef?.setData(from: teamData, merge: true)
                     }
                 }
             }
@@ -500,6 +558,7 @@ class TeamViewModel: ObservableObject {
     }
 
     deinit {
-        listener?.remove()
+        teamListener?.remove()
+        membersListener?.remove()
     }
 }

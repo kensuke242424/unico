@@ -615,6 +615,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         /// 準備したチームデータをFirestoreに保存していく
                         /// userDocument側にも新規作成したチームのidを保存しておく(addNewJoinTeam)
                         try await teamVM.addTeam(teamData: teamData)
+                        try await teamVM.addFirstMemberData(id: teamData.id, data: user)
                         try await userVM.addNewJoinTeam(newJoinTeam: joinTeamData)
                         await teamVM.setSampleItem(teamID: teamData.id)
                         tagVM.addTag(tagData: tagVM.sampleTag, teamID: teamData.id)
