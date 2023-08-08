@@ -20,14 +20,11 @@ class NotificationViewModel: ObservableObject {
     var listener: ListenerRegistration?
     var uid: String? { Auth.auth().currentUser?.uid }
 
-    /// 通知の表示開始を管理するプロパティ。
-    /// このプロパティがトグルされると、TeamNotificationViewが初期化され、
-    /// ビュー側で通知データの取得が始まる。
-    @Published var show: Bool = false
     /// 現在表示されている通知を保持するプロパティ。
-    /// ユーザーが保持している通知の数が無くなるまで、ビュー側で更新が続く。
     @Published var currentNotification: Log?
-    @Published var myNotifications: [Log] = []
+    /// ローカルに残っている通知。このプロパティ内の通知データが無くなるまで
+    /// currentNotificationへの格納 -> 破棄 -> 格納 が続く。
+    @Published var remainNotifications: [Log] = []
 
     /// メンバーデータのステートを監視するリスナーメソッド。
     /// 初期実行時にリスニング対象ドキュメントのデータが全取得される。(フラグはadded)
@@ -50,7 +47,7 @@ class NotificationViewModel: ObservableObject {
                         return
                     }
                     
-                    self.myNotifications = myData.notifications
+                    self.remainNotifications = myData.notifications
                     //                        .compactMap({ $0 })
                 } catch {
                     print("ERROR: try snap?.data(as: Team.self)")

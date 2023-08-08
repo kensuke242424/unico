@@ -62,6 +62,7 @@
 		BE4663D82A13B54A0072C025 /* UserEntryNavigationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE4663D72A13B54A0072C025 /* UserEntryNavigationViewModel.swift */; };
 		BE4663F42A150A440072C025 /* AnonymousEntryRecomendationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE4663F32A150A440072C025 /* AnonymousEntryRecomendationView.swift */; };
 		BE4664142A18BAD20072C025 /* TermsAndPrivacyText.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE4664132A18BAD20072C025 /* TermsAndPrivacyText.swift */; };
+		BE5872BE2A81E0190004E722 /* LogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE5872BD2A81E0190004E722 /* LogViewModel.swift */; };
 		BE599F6B2A1B1F9D00821E01 /* DeletingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE599F6A2A1B1F9D00821E01 /* DeletingView.swift */; };
 		BE599F6D2A1B25DF00821E01 /* customNavigationTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE599F6C2A1B25DF00821E01 /* customNavigationTitle.swift */; };
 		BE599F922A20F68100821E01 /* ApplicationSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE599F912A20F68100821E01 /* ApplicationSettingView.swift */; };
@@ -215,6 +216,7 @@
 		BE4663D72A13B54A0072C025 /* UserEntryNavigationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserEntryNavigationViewModel.swift; sourceTree = "<group>"; };
 		BE4663F32A150A440072C025 /* AnonymousEntryRecomendationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnonymousEntryRecomendationView.swift; sourceTree = "<group>"; };
 		BE4664132A18BAD20072C025 /* TermsAndPrivacyText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermsAndPrivacyText.swift; sourceTree = "<group>"; };
+		BE5872BD2A81E0190004E722 /* LogViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogViewModel.swift; sourceTree = "<group>"; };
 		BE599F6A2A1B1F9D00821E01 /* DeletingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeletingView.swift; sourceTree = "<group>"; };
 		BE599F6C2A1B25DF00821E01 /* customNavigationTitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = customNavigationTitle.swift; sourceTree = "<group>"; };
 		BE599F912A20F68100821E01 /* ApplicationSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationSettingView.swift; sourceTree = "<group>"; };
@@ -593,6 +595,7 @@
 				BE30B5D32A33D2430034755B /* BackgroundViewModel.swift */,
 				BE19FD812A7AB0FF00AE8165 /* MomentLogViewModel.swift */,
 				BE19FD8B2A7CD04100AE8165 /* NotificationViewModel.swift */,
+				BE5872BD2A81E0190004E722 /* LogViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -997,6 +1000,7 @@
 				BEAAD8FA29CDEF6200C53138 /* DefaultEmailCheckView.swift in Sources */,
 				E01AA3A729177A76000FCD37 /* UserViewModel.swift in Sources */,
 				E09F09CE28F146DB00D07669 /* EditItemView.swift in Sources */,
+				BE5872BE2A81E0190004E722 /* LogViewModel.swift in Sources */,
 				E0CF7EEC28DEEED700735142 /* LibraryListView.swift in Sources */,
 				E0A7DE50290DAB40008C3F3F /* BlurView.swift in Sources */,
 				BE392FF329C2135300BB5700 /* ScrollOffsetModifier.swift in Sources */,

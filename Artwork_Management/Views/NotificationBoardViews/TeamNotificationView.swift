@@ -24,12 +24,12 @@ struct TeamNotificationView: View {
             }
             Spacer()
         } // VStack
-        .onChange(of: vm.myNotifications) { remainingValue in
+        .onChange(of: vm.remainNotifications) { remainingValue in
             guard let element = remainingValue.first else { return }
             vm.currentNotification = element
         }
         .onAppear {
-            guard let element = vm.myNotifications.first else { return }
+            guard let element = vm.remainNotifications.first else { return }
             vm.currentNotification = element
         }
     }

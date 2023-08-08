@@ -9,7 +9,7 @@ import SwiftUI
 
 /// チームおよびユーザーが行った編集履歴のエレメントを管理する。
 struct Log: Identifiable, Equatable, Hashable, Codable {
-    var id: UUID = .init()
+    var id: String = UUID().uuidString
     var createTime: Date
     var editBy: JoinMember
     var type: LogType
