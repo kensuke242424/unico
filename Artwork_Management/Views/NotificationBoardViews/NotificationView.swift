@@ -19,18 +19,17 @@ struct NotificationView: View {
 
     var body: some View {
         VStack {
-            if let element = vm.currentNotification {
-
+            if let element = vm.notifications.first {
                 NotificationContainer(element: element)
             }
             Spacer()
         } // VStack
-        .onChange(of: vm.remainNotifications) { remainingValue in
+        .onChange(of: vm.notifications) { remainingValue in
             guard let element = remainingValue.first else { return }
             vm.currentNotification = element
         }
         .onAppear {
-            guard let element = vm.remainNotifications.first else { return }
+            guard let element = vm.notifications.first else { return }
             vm.currentNotification = element
         }
     }

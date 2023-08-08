@@ -14,7 +14,7 @@ import FirebaseFirestore
 /// チームメンバーによるデータの編集履歴「Log」構造体を元に、通知を生成する。
 class NotificationViewModel: ObservableObject {
 
-    init() { print("<<<<<<<<<  TeamNotificationViewModel_init  >>>>>>>>>") }
+    init() { print("<<<<<<<<<  NotificationViewModel_init  >>>>>>>>>") }
 
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
     var listener: ListenerRegistration?
@@ -24,24 +24,27 @@ class NotificationViewModel: ObservableObject {
     @Published var currentNotification: Log?
     /// ローカルに残っている通知。このプロパティ内の通知データが無くなるまで
     /// currentNotificationへの格納 -> 破棄 -> 格納 が続く。
-    @Published var remainNotifications: [Log] = []
+    @Published var notifications: [Log] = []
 
     func listener(id currentTeamID: String?) {
-        print("LogsViewModel_listener実行")
         guard let uid, let currentTeamID else { return }
         guard let logsRef = db?.collection("teams")
             .document(currentTeamID)
             .collection("logs") else { return }
 
-        listener = logsRef.addSnapshotListener { (snapshot, _) in
-            print("LogListener起動")
+        /// 既読管理「already」フィールドに自身のuidが存在しないものを取得するためのクエリ
+        let notAlreadyQuery = logsRef
+            .whereField("already", notIn: [uid])
+
+        listener = notAlreadyQuery.addSnapshotListener { (snapshot, _) in
+            print("Notification_listener起動")
             guard let documents = snapshot?.documents else { return }
 
             do {
-                self.remainNotifications = documents.compactMap { (snap) -> Log? in
+                self.notifications = documents.compactMap { (snap) -> Log? in
                     return try? snap.data(as: Log.self, with: .estimate)
                 }
-                print("Logデータ更新")
+                print("notificationsデータ更新")
             }
             catch {
                 print("ERROR: try snap?.data(as: Team.self)")
