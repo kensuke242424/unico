@@ -366,7 +366,6 @@ struct NewTabView: View {
             [beforeCart = cartVM.resultCartAmount] afterCart in
             
             if beforeCart == 0 {
-                print("カートにアイテム追加を検知。シートを表示")
                 inputTab.showCommerce = .medium
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                     inputTab.showCart = .medium
@@ -376,7 +375,6 @@ struct NewTabView: View {
         /// カートの精算実行を監視する
         .onChange(of: cartVM.doCommerce) { doCommerce in
             if doCommerce {
-                print("カートアイテムが空になったのを検知。カート内容をリセットし、シートを閉じる")
                 inputTab.showCart = .hidden
                 inputTab.showCommerce = .hidden
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -386,7 +384,7 @@ struct NewTabView: View {
         }
         .onAppear {
             tagVM.setFirstActiveTag()
-            logVM.listener(id : teamVM.teamID)
+//            logVM.listener(id : teamVM.teamID)
             notificationVM.listener(id: teamVM.teamID)
         }
     } // body

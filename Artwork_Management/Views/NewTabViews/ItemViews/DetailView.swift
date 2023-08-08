@@ -15,7 +15,9 @@ struct DetailView: View {
     @Environment(\.colorScheme) var colorScheme
 
     @EnvironmentObject var navigationVM: NavigationViewModel
+    @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
+    @EnvironmentObject var logVM: LogViewModel
 
     @StateObject var itemVM: ItemViewModel
     @StateObject var cartVM: CartViewModel
@@ -243,6 +245,8 @@ struct DetailView: View {
                         Task {
                             itemVM.deleteImage(path: item.photoPath)
                             itemVM.deleteItem(deleteItem: item, teamID: item.teamID)
+
+                            logVM.addLog(team: teamVM.team, type: .deleteItem(item))
                         }
                     }
                 }
@@ -332,8 +336,6 @@ struct DetailView: View {
                      "総仕入れ　:　　   -")
                     .padding(.bottom, 12)
 
-//                Text("登録日　　:　　 \(asTimesString(item.createTime))")
-//                Text("最終更新　:　　 \(asTimesString(item.updateTime))")
                 Text("登録日　　:　　 \(item.createTime.toStringWithCurrentLocale())")
                 Text("最終更新　:　　 \(item.updateTime.toStringWithCurrentLocale())")
             }
@@ -350,18 +352,6 @@ struct DetailView: View {
         .tracking(1)
         .lineLimit(1)
         .padding(.vertical, 10)
-    }
-
-    // 取得アイテムのタイムスタンプを◯年◯月◯日になおす
-    func asTimesString(_ time: Timestamp?) -> String {
-        
-        if let time {
-            let formatter = DateFormatter()
-            formatter.setTemplate(.date, .jaJP)
-            return formatter.string(from: time.dateValue())
-        } else {
-            return "???"
-        }
     }
     
     func checkHaveNotInventory(_ item: Item) -> Bool {

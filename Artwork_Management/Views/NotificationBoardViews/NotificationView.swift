@@ -15,7 +15,6 @@ import SDWebImageSwiftUI
 struct NotificationView: View {
 
     @EnvironmentObject var vm: NotificationViewModel
-    @EnvironmentObject var logVM: NotificationViewModel
 
     var body: some View {
         VStack {
@@ -24,14 +23,6 @@ struct NotificationView: View {
             }
             Spacer()
         } // VStack
-        .onChange(of: vm.notifications) { remainingValue in
-            guard let nextElement = remainingValue.first else { return }
-            vm.currentNotification = nextElement
-        }
-        .onAppear {
-            guard let element = vm.notifications.first else { return }
-            vm.currentNotification = element
-        }
     }
 }
 

@@ -13,7 +13,7 @@ class MomentLogViewModel: ObservableObject {
 
     @Published var localNotifications: [MomentLog] = []
 
-    func setLocalNotification(type: LocalNotificationType) {
+    func setLog(type: LocalNotificationType) {
         localNotifications.append(
             MomentLog(type: type.self,
                        message: type.message,

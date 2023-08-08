@@ -113,7 +113,6 @@ struct CommerceSheet: View {
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                     cartVM.doCommerce = false
-                    print("DispatchQueue2秒後doCommerceをfalse")
                 }
             }
         }

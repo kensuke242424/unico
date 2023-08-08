@@ -21,7 +21,8 @@ struct NewItemsView: View {
     
     /// Tab親Viewから受け取るViewModelと状態変数
     @EnvironmentObject var navigationVM: NavigationViewModel
-    @EnvironmentObject var localNotifyVM: MomentLogViewModel
+    @EnvironmentObject var momentLogVM: MomentLogViewModel
+    @EnvironmentObject var logVM: LogViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var tagVM : TagViewModel
@@ -133,6 +134,9 @@ struct NewItemsView: View {
                                                     itemVM.deleteImage(path: selectedItem.photoPath)
                                                     itemVM.deleteItem(deleteItem: selectedItem,
                                                                       teamID: selectedItem.teamID)
+
+                                                    logVM.addLog(team: teamVM.team,
+                                                                 type: .deleteItem(selectedItem))
                                                 }
                                             }
                                         }
@@ -293,7 +297,7 @@ struct NewItemsView: View {
                         // カートに追加する在庫が無いことを知らせる通知
                         if checkHaveNotInventory(item) {
                             withAnimation(.spring(response: 0.2)) {
-                                localNotifyVM.setLocalNotification(type: .outItemStock)
+                                momentLogVM.setLog(type: .outItemStock)
                                 hapticErrorNotification()
                             }
                             return

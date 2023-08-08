@@ -18,7 +18,7 @@ struct JoinUserDetectCheckView: View {
     }
 
     @EnvironmentObject var userVM: UserViewModel
-    @EnvironmentObject var teamNotificationVM: NotificationViewModel
+    @EnvironmentObject var logVM: LogViewModel
 
     @StateObject var qrReader: QRReader = QRReader()
     @StateObject var teamVM: TeamViewModel
@@ -167,7 +167,6 @@ struct JoinUserDetectCheckView: View {
                         let detectUserID = qrReader.captureQRData
                         inputUserIDText = detectUserID
                         detectedUser = try await teamVM.detectUserFetchData(id: detectUserID)
-                        print("detectedUser: \(detectedUser)")
                         qrReader.isdetectQR.toggle()
                         withAnimation(.spring(response: 0.8, blendDuration: 1)) { joinUserCheckFase = .agree }
                     } catch {
@@ -309,8 +308,7 @@ struct JoinUserDetectCheckView: View {
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                                         withAnimation(.spring(response: 0.5, blendDuration: 1)) {
                                             teamVM.isShowSearchedNewMemberJoinTeam.toggle()
-                                            teamNotificationVM.setNotification(team: teamVM.team,
-                                                                                          type: .join(detectedUser))
+                                            logVM.addLog(team: teamVM.team, type: .join(detectedUser))
                                         }
                                     }
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {

@@ -10,8 +10,8 @@ import Firebase
 import FirebaseStorage
 import FirebaseFirestore
 
-/// チーム全体に届く通知ボードの保存・表示・削除を管理するクラス。
-/// チームメンバーによるデータの編集履歴「Log」構造体を元に、通知を生成する。
+/// チーム全体に届くデータの追加・更新・削除通知を管理するクラス。
+/// チームドキュメントのサブコレクション「logs」から、自身が未読のログをクエリ取得して通知表示する。
 class NotificationViewModel: ObservableObject {
 
     init() { print("<<<<<<<<<  NotificationViewModel_init  >>>>>>>>>") }
@@ -22,32 +22,46 @@ class NotificationViewModel: ObservableObject {
 
     /// 現在表示されている通知を保持するプロパティ。
     @Published var currentNotification: Log?
-    /// ローカルに残っている通知。このプロパティ内の通知データが無くなるまで
+    /// ローカルに残っている通知。このプロパティ内の通知が空になるまで
     /// currentNotificationへの格納 -> 破棄 -> 格納 が続く。
     @Published var notifications: [Log] = []
 
     func listener(id currentTeamID: String?) {
         guard let uid, let currentTeamID else { return }
-        guard let logsRef = db?.collection("teams")
+        let logsRef = db?
+            .collection("teams")
             .document(currentTeamID)
-            .collection("logs") else { return }
+            .collection("logs")
 
-        /// 未読を表す「unread」フィールドに自身のuidが存在するものを取得するためのクエリ
-
-        let notAlreadyQuery = logsRef
+        let unreadLogQuery = logsRef?
             .whereField("unread", arrayContains: uid)
 
-        listener = notAlreadyQuery.addSnapshotListener { (snapshot, _) in
-            print("Notification_listener起動")
-            guard let documents = snapshot?.documents else { return }
-
+        /// 未読を表す「unread」フィールドに自身のuidが存在するドキュメントを取得する
+        listener = unreadLogQuery?.addSnapshotListener { (snapshot, _) in
+            print("NotificationListener起動")
             do {
-                withAnimation(.spring(response: 0.4)) {
-                    self.notifications = documents.compactMap { (snap) -> Log? in
-                        return try? snap.data(as: Log.self, with: .estimate)
-                    }
+                guard let documents = snapshot?.documents else { return }
+
+                self.notifications = documents.compactMap { (snap) -> Log? in
+                    return try? snap.data(as: Log.self, with: .estimate)
                 }
-                print("notificationsデータ更新")
+                print("取得した通知の数: \(self.notifications.count)")
+                // 現在表示されている通知が無く、かつ未読の通知が残っていれば新たに通知を格納する
+                if self.currentNotification == nil {
+                    guard let nextElement = self.notifications.first else { return }
+                    self.currentNotification = nextElement
+                    print("新しい通知を格納")
+                }
+//                else {
+//                    // 自身が通知表示中に更新が走った場合、他のメンバーが何らかの通知操作を行った可能性がある
+//                    // この場合、現在自身が表示している通知と同一の配列内通知を抜き出し、curerntデータに上書きする
+//                    if let getCurrentElement = self.notifications.first(where: {
+//                        $0.id == self.currentNotification?.id
+//                    }) {
+//                        self.currentNotification = getCurrentElement
+//                        print("現在表示している通知を更新")
+//                    }
+//                }
             }
             catch {
                 print("ERROR: try snap?.data(as: Team.self)")
@@ -55,53 +69,26 @@ class NotificationViewModel: ObservableObject {
         }
     }
 
-    /// アイテムや新規通知をチーム内の各メンバーに渡すメソッド。
-    func setNotification(team: Team?, type logType: LogType) {
-        guard var team else { return }
-        guard let myMemberData = getCurrentTeamMyMemberData(team: team) else { return }
-        guard let teamRef = db?.collection("teams").document(team.id) else { return }
-
-        let element = Log(createTime: Date(),
-                          editByIcon: myMemberData.iconURL,
-                          type: logType,
-                          unread: getMembersId(team: team))
-        switch logType.setRule {
-
-        case .local:
-            for index in team.members.indices where team.members[index].memberUID == uid {
-                team.members[index].notifications.append(element)
-            }
-        case .global:
-            for index in team.members.indices {
-                team.members[index].notifications.append(element)
-            }
-        }
-
-        do {
-            _ = try teamRef.setData(from: team, merge: true)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
-            }
-        } catch {
-            print("Error: setNotification")
-        }
-    }
-
     /// ユーザーが既に表示した通知に既読を付けるメソッド。
     func setRead(team: Team?, element: Log) {
         guard let team, let uid else { return }
-        guard let logRef = db?.collection("teams")
-            .document(team.id)
-            .collection("logs")
-            .document(element.id) else { return }
 
         do {
+            self.notifications.removeAll(where: {$0.id == element.id})
             var updateElement = element
             updateElement.unread.removeAll(where: {$0 == uid})
+            print("既読処理実行")
+            print("自身のuid: \(uid)")
+            print("updateElementのunread: \(updateElement.unread)")
 
-            try logRef.setData(from: updateElement)
+            try db?.collection("teams")
+                .document(team.id)
+                .collection("logs")
+                .document(element.id)
+                .setData(from: updateElement, merge: true)
 
         } catch {
-            print("既読に失敗")
+            print("ERROR: 既読処理に失敗")
         }
     }
     /// Firestore内の通知データを削除するメソッド。
