@@ -18,6 +18,7 @@ struct Team: Identifiable, Codable, Equatable {
     var backgroundURL: URL?
     var backgroundPath: String?
     var members: [JoinMember]
+    var logs: [NotifyElement] = []
 }
 
 // Team構造体が保持するメンバー一人分の情報

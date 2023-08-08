@@ -60,8 +60,12 @@ class TeamNotificationViewModel: ObservableObject {
     /// アイテムや新規通知をチーム内の各メンバーに渡すメソッド。
     func setNotification(team: Team?, notifyType: TeamNotificationType) {
         guard var team else { return }
+        guard let myMemberData = getCurrentTeamMyMemberData(team: team) else { return }
         guard let teamRef = db?.collection("teams").document(team.id) else { return }
-        let element = NotifyElement(notifyType: notifyType,
+
+        let element = NotifyElement(createTime: Date(),
+                                    editBy: myMemberData,
+                                    notifyType: notifyType,
                                     message: notifyType.message,
                                     imageURL: notifyType.imageURL,
                                     exitTime: notifyType.waitTime)
@@ -110,6 +114,18 @@ class TeamNotificationViewModel: ObservableObject {
         }
     }
 
+    /// 更新されたデータの内容をリセットするメソッド。
+//    func resetToItem(element: NotifyElement) {
+//
+//        switch element.notifyType.setType {
+//
+//        case .local:
+//            <#code#>
+//        case .global:
+//            <#code#>
+//        }
+//    }
+
     /// 通知から受け取ったアイテムデータの更新内容を取り消すメソッド。
     /// 更新以前の値を受け取り、Firestoreに上書き保存する。
     func cancelUpdateItemToFirestore(data beforeItem: Item, team: Team?) async throws {
@@ -147,41 +163,15 @@ class TeamNotificationViewModel: ObservableObject {
 
     }
 
-    /// 自身のドキュメント内だけの通知データを消去するメソッド。
-    /// 各チームメンバーがアプリログインまでの間、通知を残しておく場合に用いる。
-    func removeNotificationForLocal(team: Team?, data: NotifyElement) {
-        guard var team else { return }
-        guard let teamRef = db?.collection("teams").document(team.id) else { return }
-
-        guard let index = team.members.firstIndex(where: { $0.memberUID == uid }) else { return }
-        team.members[index].notifications.removeAll(where: { $0.id == data.id })
-
-        do {
-            _ = try teamRef.setData(from: team)
-        } catch {
-            print("Error: setNotification")
-        }
-    }
-    /// 全メンバーの対象通知データを消去。他のメンバーがログインするまで残しておく必要がない通知データに使う。
-    func removeNotificationForGlobal(team: Team?, data: NotifyElement) {
-        guard var team else { return }
-        guard let teamRef = db?.collection("teams").document(team.id) else { return }
-
-        for index in team.members.indices {
-            team.members[index].notifications.removeAll(where: { $0.id == data.id })
-        }
-
-        do {
-            _ = try teamRef.setData(from: team)
-            print("全メンバーの対象通知データを消去")
-        } catch {
-            print("Error: setNotification")
-        }
-    }
     /// 現在の操作チームのメンバーidを取得するメソッド。。
-    func getCurrentTeamMembers(team: Team) -> [String] {
+    func getCurrentTeamMembersUid(team: Team) -> [String] {
         let membersID: [String] = team.members.map({ $0.memberUID })
         return membersID
+    }
+    /// 現在の操作チームのメンバーidを取得するメソッド。。
+    func getCurrentTeamMyMemberData(team: Team) -> JoinMember? {
+        let getGyMemberData = team.members.first(where: { $0.memberUID == uid })
+        return getGyMemberData
     }
 
     deinit {

@@ -10,10 +10,14 @@ import SwiftUI
 /// 通知ボード一要素分となる構造体。
 struct NotifyElement: Identifiable, Equatable, Hashable, Codable {
     var id: UUID = .init()
+    var createTime: Date
+    var editBy: JoinMember
     var notifyType: TeamNotificationType
     var message: String
     var imageURL: URL?
     var exitTime: CGFloat
+    /// キャンセルされた更新データのcreateTime値が入るプロパティ。
+    var canceledDatas: [Date] = []
 }
 
 /// 通知のセットタイプを管理する列挙体。

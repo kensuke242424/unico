@@ -186,11 +186,6 @@ struct UpdateTeamDataView: View {
                     try await teamVM.updateTeam(data: afterTeam)
                     try await userVM.updateJoinTeamToMembers(data: joinTeamContainer, members: team.members)
 
-                    // 変更前・変更後のデータを使って通知の作成
-                    let compareTeam = CompareTeam(id: team.id,
-                                                  before: beforeTeam,
-                                                  after: afterTeam)
-                    teamNotifyVM.setNotification(team: afterTeam, notifyType: .updateTeam(compareTeam))
                     hapticSuccessNotification()
                 }
                 // 編集画面を閉じる
@@ -200,6 +195,13 @@ struct UpdateTeamDataView: View {
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     withAnimation(.spring(response: 0.3)) { show = false }
+                    if beforeTeam != afterTeam {
+                        // 変更前・変更後のデータを使って通知の作成
+                        let compareTeam = CompareTeam(id: team.id,
+                                                      before: beforeTeam,
+                                                      after: afterTeam)
+                        teamNotifyVM.setNotification(team: afterTeam, notifyType: .updateTeam(compareTeam))
+                    }
                 }
             } // Task ここまで
         }

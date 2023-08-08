@@ -188,9 +188,6 @@ struct UpdateUserDataView: View {
                     guard let myMemberIndex = teamVM.myMemberIndex else { return }
                     team.members[myMemberIndex] = afterMyJoinMember
 
-                    let compareUser = CompareUser(id: user.id, before: beforeUser, after: afterUser)
-                    teamNotifyVM.setNotification(team: team, notifyType: .updateUser(compareUser))
-
                     hapticSuccessNotification()
                 }
 
@@ -200,6 +197,10 @@ struct UpdateUserDataView: View {
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     withAnimation(.spring(response: 0.3)) { show = false }
+                    if beforeUser != afterUser {
+                        let compareUser = CompareUser(id: user.id, before: beforeUser, after: afterUser)
+                        teamNotifyVM.setNotification(team: team, notifyType: .updateUser(compareUser))
+                    }
                 }
             } // Task ここまで
         }

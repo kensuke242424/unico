@@ -34,8 +34,8 @@ class UserViewModel: ObservableObject {
     }
     /// ユーザーが現在操作しているチームの背景データ
     var currentTeamBackground: Background? {
-        let container = user?.joins[currentJoinsTeamIndex ?? 0].currentBackground
-        guard let  index = currentJoinsTeamIndex else { return nil }
+        guard let index = currentJoinsTeamIndex else { return nil }
+        let container = user?.joins[index].currentBackground
         return container
     }
 

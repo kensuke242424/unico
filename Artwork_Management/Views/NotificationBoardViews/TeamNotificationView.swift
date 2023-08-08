@@ -255,6 +255,14 @@ fileprivate struct NotificationContainer: View {
 
                     Divider()
 
+                    if item.before.photoURL != item.after.photoURL {
+                        CompareRectImageGridRow("アイコン",
+                                                item.before.photoURL,
+                                                item.after.photoURL,
+                                                size: 40)
+                        Divider()
+                    }
+
                     if item.before.tag != item.after.tag {
                         CompareTextGridRow("タグ",
                                            item.before.tag,
@@ -460,7 +468,7 @@ fileprivate struct NotificationContainer: View {
                 Grid(alignment: .leading, verticalSpacing: 20) {
                     Divider()
                     if user.before.iconURL != user.after.iconURL {
-                        CompareIconImageGridRow("アイコン",
+                        CompareCircleImageGridRow("アイコン",
                                                 user.before.iconURL,
                                                 user.after.iconURL,
                                                 size: 40)
@@ -514,7 +522,7 @@ fileprivate struct NotificationContainer: View {
                 Grid(alignment: .leading, verticalSpacing: 20) {
                     Divider()
                     if team.before.iconURL != team.after.iconURL {
-                        CompareIconImageGridRow("アイコン",
+                        CompareCircleImageGridRow("アイコン",
                                                 team.before.iconURL,
                                                 team.after.iconURL,
                                                 size: 40)
@@ -542,7 +550,7 @@ fileprivate struct NotificationContainer: View {
         }
     }
 
-    // 🍎------  パーツ類   -------🍎
+    // 🍎------  ビューパーツ類   -------🍎
     /// 主にデータ追加時の通知詳細セクションに用いるグリッドひとつ分のグリッドビュー要素。
     /// 「<データ名> : <データバリュー>」の形でGridRowを返す。
     /// グリッドの整列制御は親のGrid側で操作する。
@@ -551,8 +559,9 @@ fileprivate struct NotificationContainer: View {
         GridRow {
             Text(title)
             Text(":")
-            CustomOneLineLimitText(text: value, limit: 15)
+            Text(value)
         }
+        .lineLimit(1)
         .font(.callout)
         .fontWeight(.bold)
         .opacity(0.7)
@@ -562,9 +571,9 @@ fileprivate struct NotificationContainer: View {
         GridRow {
             Text(title)
             Text(":")
-            CustomOneLineLimitText(text: value, limit: 15)
-                .font(.caption)
+            Text(value).font(.caption)
         }
+        .lineLimit(1)
         .font(.callout)
         .fontWeight(.bold)
         .opacity(0.7)
@@ -576,10 +585,11 @@ fileprivate struct NotificationContainer: View {
         GridRow {
             Text(title)
             Text(":")
-            CustomOneLineLimitText(text: before, limit: 8)
+            Text(before)
             Text("▶︎")
-            CustomOneLineLimitText(text: after, limit: 8)
+            Text(after)
         }
+        .lineLimit(1)
         .font(.callout)
         .fontWeight(.bold)
         .opacity(0.7)
@@ -589,24 +599,35 @@ fileprivate struct NotificationContainer: View {
         GridRow {
             Text(title)
             Text(":")
-            CustomOneLineLimitText(text: before, limit: 8)
-                .font(.caption)
+            Text(before).font(.caption)
             Text("▶︎")
-            CustomOneLineLimitText(text: after, limit: 8)
-                .font(.caption)
+            Text(after).font(.caption)
         }
+        .lineLimit(1)
         .font(.callout)
         .fontWeight(.bold)
         .opacity(0.7)
     }
     @ViewBuilder
-    func CompareIconImageGridRow(_ title: String, _ before: URL?, _ after: URL?, size: CGFloat) -> some View {
+    func CompareCircleImageGridRow(_ title: String, _ before: URL?, _ after: URL?, size: CGFloat) -> some View {
         GridRow {
             Text(title).opacity(0.7)
             Text(":").opacity(0.7)
             CircleIconView(url: before, size: size)
             Text("▶︎").opacity(0.7)
             CircleIconView(url: after, size: size)
+        }
+        .font(.callout)
+        .fontWeight(.bold)
+    }
+    @ViewBuilder
+    func CompareRectImageGridRow(_ title: String, _ before: URL?, _ after: URL?, size: CGFloat) -> some View {
+        GridRow {
+            Text(title).opacity(0.7)
+            Text(":").opacity(0.7)
+            RectIconView(url: before, size: size)
+            Text("▶︎").opacity(0.7)
+            RectIconView(url: after, size: size)
         }
         .font(.callout)
         .fontWeight(.bold)
@@ -697,10 +718,10 @@ struct CancelUpdateLongPressButton: View {
             return cancelDates.contains(user.createTime)
 
         case .updateUser(let user):
-            return cancelDates.contains(user.after.createTime)
+            return cancelDates.contains(user.before.createTime)
 
         case .updateTeam(let team):
-            return cancelDates.contains(team.after.createTime)
+            return cancelDates.contains(team.before.createTime)
         }
     }
 
@@ -766,13 +787,13 @@ struct CancelUpdateLongPressButton: View {
                         // 処理...
                         cancelDates.append(items[index].before.createTime)
 
-                    case .join(let user):
+                    case .join:
                         print("ユーザー参加通知にはキャンセルボタン無し")
 
                     case .updateUser(let user):
                         print("\(user.after.name)の更新キャンセル")
                         // 処理...
-                        cancelDates.append(user.createTime)
+                        cancelDates.append(user.after.createTime)
 
                     case .updateTeam(let team):
                         print("\(team.after.name)の更新キャンセル")
@@ -781,11 +802,11 @@ struct CancelUpdateLongPressButton: View {
                     }
                 })
             .onReceive(pressingTimer) { value in
-                if !pressingState {
-                    pressingFrame = 0
-                } else {
+                if pressingState {
                     // Timerの更新頻度が0.01のため、100で割る
                     pressingFrame += (cancelButtonFrame / 100)
+                } else {
+                    pressingFrame = 0
                 }
             }
     }
