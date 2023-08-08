@@ -16,7 +16,7 @@ struct Log: Identifiable, Equatable, Hashable, Codable {
     var message: String
     var imageURL: URL?
     var exitTime: CGFloat
-    /// キャンセルされた更新データのcreateTime値が入るプロパティ。
+    var already: [String] = []
     var canceledDatas: [Date] = []
 }
 
