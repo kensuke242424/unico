@@ -14,7 +14,7 @@ struct CommerceSheet: View {
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var notifyVM: MomentLogViewModel
-    @EnvironmentObject var teamNotificationVM: NotificationViewModel
+    @EnvironmentObject var logVM: LogViewModel
 
     @StateObject var cartVM: CartViewModel
     @Binding var inputTab: InputTab
@@ -80,8 +80,7 @@ struct CommerceSheet: View {
                         /// これらのデータを通知用の比較表示データとして渡す
                         let compareItems = cartVM.updateCommerceItemsAndGetCompare(teamID: teamID)
                         // 通知の作成
-                        teamNotificationVM.setNotification(team: teamVM.team,
-                                                                      type: .commerce(compareItems))
+                        logVM.addLog(team: teamVM.team, type: .commerce(compareItems))
                         cartVM.doCommerce = true
                         hapticSuccessNotification()
                     },

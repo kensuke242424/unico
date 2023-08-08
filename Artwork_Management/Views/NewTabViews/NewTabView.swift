@@ -347,7 +347,9 @@ struct NewTabView: View {
                               inputTab: $inputTab,
                               teamID: teamVM.team?.id ?? "",
                               memberColor: userVM.memberColor)
-                .environmentObject(notificationVM)
+                // MEMO: resizableSheet内でEnvironmentObjectを使うには
+                // 再度参照を渡す必要がある↓
+                .environmentObject(logVM)
                 .environmentObject(teamVM)
             } // builder.content
             .supportedState([.medium])

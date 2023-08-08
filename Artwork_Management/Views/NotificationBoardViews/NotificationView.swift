@@ -174,7 +174,7 @@ fileprivate struct NotificationContainer: View {
                 showLimitCount += 1
                 if showLimitCount > Int(element.type.stayTime) {
                     print("通知ボードの破棄時間です")
-                    withAnimation(.easeIn(duration: 0.5)) {
+                    withAnimation(.easeIn(duration: 0.3)) {
                         vm.currentNotification = nil
                     }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
@@ -640,10 +640,13 @@ fileprivate struct NotificationContainer: View {
                 .clipShape(Circle())
                 .shadow(radius: 1)
         } else {
-            Image(systemName: element.type.symbol)
-                .foregroundColor(.white)
-                .frame(width: size * 0.9, height: size * 0.9)
-                .background(Circle().fill(.gray.gradient))
+            Circle().fill(.gray.gradient)
+                .frame(width: size, height: size)
+                .overlay {
+                    Image(systemName: element.type.symbol)
+                        .foregroundColor(.white)
+                        .frame(width: size * 0.6, height: size * 0.6)
+                }
                 .shadow(radius: 1)
         }
     }
@@ -656,14 +659,15 @@ fileprivate struct NotificationContainer: View {
                 .clipShape(RoundedRectangle(cornerRadius: 5))
                 .shadow(radius: 1)
         } else {
-            Image(systemName: "cube.transparent.fill")
-                .resizable().scaledToFit()
-                .foregroundColor(.white)
-                .frame(width: size * 0.9, height: size * 0.9)
-                .background(
-                    RoundedRectangle(cornerRadius: 5)
-                        .fill(.gray.gradient)
-                )
+            RoundedRectangle(cornerRadius: 5)
+                .fill(.gray.gradient)
+                .frame(width: size, height: size)
+                .overlay {
+                    Image(systemName: "cube.transparent.fill")
+                        .resizable().scaledToFit()
+                        .foregroundColor(.white)
+                        .frame(width: size * 0.6, height: size * 0.6)
+                }
                 .shadow(radius: 1)
         }
     }
