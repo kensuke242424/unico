@@ -12,9 +12,10 @@ import SDWebImageSwiftUI
 /// チームのメンバー全員に届く通知TeamNotificationを画面に表示するビュー。
 /// ビューモデルの通知保持プロパティ「myNotifications」に値が検知されることで、
 /// 表示 -> 破棄 -> 取得 のループが通知が無くなるまで続く。
-struct TeamNotificationView: View {
+struct NotificationView: View {
 
     @EnvironmentObject var vm: NotificationViewModel
+    @EnvironmentObject var logVM: NotificationViewModel
 
     var body: some View {
         VStack {

@@ -223,8 +223,8 @@ struct NewTabView: View {
                 /// カスタム通知ビュー
                 .overlay {
                     Group {
-                        TeamNotificationView()
-                        LocalNotificationView()
+                        NotificationView()
+                        MomentLogView()
                     }
                 }
                 .navigationDestination(for: SystemPath.self) { systemPath in

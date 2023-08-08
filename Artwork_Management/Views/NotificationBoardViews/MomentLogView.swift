@@ -7,7 +7,9 @@
 
 import SwiftUI
 
-struct LocalNotificationView: View {
+/// 一瞬だけ出る通知メッセージボードを管理するビュー。
+/// ここでのログデータはローカル内でのみ追加 -> 削除が扱われ、Firestoreには保存されない。
+struct MomentLogView: View {
     @EnvironmentObject var vm: MomentLogViewModel
     @Environment(\.colorScheme) var colorScheme
     let screen = UIScreen.main.bounds
@@ -79,6 +81,6 @@ enum LocalNotificationType: Equatable, Hashable {
 
 struct LocalNotificationView_Previews: PreviewProvider {
     static var previews: some View {
-        LocalNotificationView()
+        MomentLogView()
     }
 }
