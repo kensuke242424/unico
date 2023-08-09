@@ -131,7 +131,6 @@ struct NewItemsView: View {
                                             guard let selectedItem else { return }
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                                 Task {
-                                                    itemVM.deleteImage(path: selectedItem.photoPath)
                                                     itemVM.deleteItem(deleteItem: selectedItem,
                                                                       teamID: selectedItem.teamID)
 

@@ -10,60 +10,6 @@ import Firebase
 import FirebaseFirestore
 import FirebaseFirestoreSwift
 
-enum InputFormsStatus: CaseIterable {
-    case name, author ,inventory , price, sales ,totalAmount ,totalInventory
-    
-    struct Model {
-        let title: String
-        let example: String
-    }
-    
-    var model: Model {
-        switch self {
-        case .name          : return .name
-        case .author        : return .author
-        case .inventory     : return .inventory
-        case .price         : return .price
-        case .sales         : return .sales
-        case .totalAmount   : return .totalAmount
-        case .totalInventory: return .totalInventory
-        }
-    }
-}
-
-extension InputFormsStatus.Model {
-    static let name = InputFormsStatus.Model(          title: "アイテム名", example: "unico")
-    static let author = InputFormsStatus.Model(        title: "製作者"   , example: "ユニコ 太郎")
-    static let inventory = InputFormsStatus.Model(     title: "在庫"     , example: "100")
-    static let price = InputFormsStatus.Model(         title: "価格"     , example: "1500")
-    static let sales = InputFormsStatus.Model(         title: "総売上"    , example: "100000")
-    static let totalAmount = InputFormsStatus.Model(   title: "総売個数"  , example: "150")
-    static let totalInventory = InputFormsStatus.Model(title: "総仕入れ"  , example: "300")
-}
-
-struct InputEditItem {
-    /// アイテムの入力ステータス群
-    var croppedImage    : UIImage? = nil
-    var selectionTag    : Tag?
-    var selectionTagName: String = ""
-    var name            : String = ""
-    var author          : String = ""
-    var photoURL        : URL? = nil
-    var photoPath       : String? = nil
-    var detail          : String = ""
-    var inventory       : String = ""
-    var cost            : String = ""
-    var price           : String = ""
-    var sales           : String = ""
-    var totalAmount     : String = ""
-    var totalInventory   : String = ""
-    
-    /// view表示のステートを管理する
-    var showPicker     : Bool = false
-    var showTagEdit    : Bool = false
-    var showProgress   : Bool = false
-}
-
 struct NewEditItemView: View {
     
     @Environment(\.dismiss) var dismiss
@@ -329,7 +275,6 @@ struct NewEditItemView: View {
                             // croppedImageに新しい画像があれば、元の画像データを更新
                             if let croppedImage = input.croppedImage {
                                 withAnimation(.easeIn(duration: 0.1)) { input.showProgress = true }
-                                itemVM.deleteImage(path: input.photoPath)
                                 let resizedImage = itemVM.resizeUIImage(image: croppedImage,
                                                                         width: width * 2)
                                 let uploadImageData =  await itemVM.uploadItemImage(resizedImage, teamID)
@@ -388,7 +333,6 @@ struct NewEditItemView: View {
                             // croppedImageに新しい画像があれば、元の画像データを更新
                             if let croppedImage = input.croppedImage {
                                 withAnimation(.easeIn(duration: 0.1)) { input.showProgress = true }
-                                itemVM.deleteImage(path: input.photoPath)
                                 let resizedImage = itemVM.resizeUIImage(image: croppedImage, width: width)
                                 let newImageData =  await itemVM.uploadItemImage(resizedImage, teamID)
                                 input.photoURL = newImageData.url
@@ -442,7 +386,9 @@ struct NewEditItemView: View {
                 .padding(.leading)
             }
     }
-    
+
+    /// アイテムの各データを入力するためのフィールド群。
+    /// 作成か編集かによって、表示フィールド数が変化する。
     @ViewBuilder
     func InputForm(_ size: CGSize,_ value: InputFormsStatus) -> some View {
         
@@ -460,7 +406,7 @@ struct NewEditItemView: View {
                         .fontWeight(.semibold)
                         .tracking(1)
                         .opacity(0.5)
-                    /// 空白部分タップでフォーカスをnilにするためのほぼ透明の範囲View
+                    // 空白部分タップでフォーカスをnilにするためのほぼ透明の範囲View
                     Color.gray
                         .opacity(0.001)
                 }
@@ -523,6 +469,60 @@ struct NewEditItemView: View {
             }
         }
     }
+}
+
+enum InputFormsStatus: CaseIterable {
+    case name, author ,inventory , price, sales ,totalAmount ,totalInventory
+
+    struct Model {
+        let title: String
+        let example: String
+    }
+
+    var model: Model {
+        switch self {
+        case .name          : return .name
+        case .author        : return .author
+        case .inventory     : return .inventory
+        case .price         : return .price
+        case .sales         : return .sales
+        case .totalAmount   : return .totalAmount
+        case .totalInventory: return .totalInventory
+        }
+    }
+}
+
+extension InputFormsStatus.Model {
+    static let name = InputFormsStatus.Model(          title: "アイテム名", example: "unico")
+    static let author = InputFormsStatus.Model(        title: "製作者"   , example: "ユニコ 太郎")
+    static let inventory = InputFormsStatus.Model(     title: "在庫"     , example: "100")
+    static let price = InputFormsStatus.Model(         title: "価格"     , example: "1500")
+    static let sales = InputFormsStatus.Model(         title: "総売上"    , example: "100000")
+    static let totalAmount = InputFormsStatus.Model(   title: "総売個数"  , example: "150")
+    static let totalInventory = InputFormsStatus.Model(title: "総仕入れ"  , example: "300")
+}
+
+struct InputEditItem {
+    /// アイテムの入力ステータス群
+    var croppedImage    : UIImage? = nil
+    var selectionTag    : Tag?
+    var selectionTagName: String = ""
+    var name            : String = ""
+    var author          : String = ""
+    var photoURL        : URL? = nil
+    var photoPath       : String? = nil
+    var detail          : String = ""
+    var inventory       : String = ""
+    var cost            : String = ""
+    var price           : String = ""
+    var sales           : String = ""
+    var totalAmount     : String = ""
+    var totalInventory   : String = ""
+
+    /// view表示のステートを管理する
+    var showPicker     : Bool = false
+    var showTagEdit    : Bool = false
+    var showProgress   : Bool = false
 }
 
 struct NewEditItemView_Previews: PreviewProvider {

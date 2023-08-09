@@ -260,12 +260,14 @@ class UserViewModel: ObservableObject {
         var joinMembersID: [String] = joinMembers.map { $0.memberUID }
 
         // 所属メンバーのid配列を使ってクエリを叩く
-        guard let joinMemberRefs = db?.collection("users")
-            .whereField("id", in: joinMembersID) else { throw CustomError.getRef }
+        let joinMemberRefs = db?
+            .collection("users")
+            .whereField("id", in: joinMembersID)
 
         do {
-            let snapshot = try await joinMemberRefs.getDocuments()
-            for memberDocument in snapshot.documents {
+            let snapshot = try await joinMemberRefs?.getDocuments()
+            guard let documents = snapshot?.documents else { throw CustomError.getDocument }
+            for memberDocument in documents {
                 var memberData = try memberDocument.data(as: User.self)
 
                 // ユーザのjoins配列からアップデート対象のチームを検出する

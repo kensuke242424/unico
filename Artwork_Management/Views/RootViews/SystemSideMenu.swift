@@ -45,10 +45,10 @@ struct SystemSideMenu: View {
     @Environment(\.colorScheme) var colorScheme: ColorScheme
 
     @StateObject var itemVM: ItemViewModel
+    @StateObject var homeVM: HomeViewModel
     
     @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var progressVM: ProgressViewModel
-    @EnvironmentObject var homeVM: HomeViewModel
     @EnvironmentObject var backgroundVM: BackgroundViewModel
 
     @EnvironmentObject var logInVM : LogInViewModel

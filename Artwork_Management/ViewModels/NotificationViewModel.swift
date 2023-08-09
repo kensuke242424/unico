@@ -52,6 +52,11 @@ class NotificationViewModel: ObservableObject {
                     guard let nextElement = self.notifications.first else { return }
                     self.currentNotification = nextElement
                 }
+                if let updatedLog = self.notifications.first(where: {
+                    $0.id == self.currentNotification?.id
+                }) {
+                    self.currentNotification = updatedLog
+                }
             }
             catch {
                 print("ERROR: 通知の取得に失敗")
@@ -93,8 +98,7 @@ class NotificationViewModel: ObservableObject {
         switch element.type {
 
         case .addItem(let item):
-            try await
-            self.resetAddedItem(item, to: team, element: element)
+            try await self.resetAddedItem(item, to: team, element: element)
 
         case .updateItem(let item):
             try await
@@ -134,32 +138,49 @@ class NotificationViewModel: ObservableObject {
             .document(item.id)
 
         do {
-
+            /// 削除済みであることを各メンバーのログデータに書き込む
+//            try await setCanceled(to: team, date: addedItem.createTime, element: element)
         } catch {
             throw NotificationError.resetUpdatedItem
         }
     }
     /// アイテムデータの追加をキャンセルし削除するメソッド。
+    /// アイテムのidはFirestoreに保存される時に生成されるため、
+    /// 一度アイテムをフェッチし、ドキュメントIDを取得する工程が必要である。
     func resetAddedItem(_ addedItem: Item, to team: Team?, element: Log) async throws {
         guard let team, let itemId = addedItem.id else {
             throw NotificationError.missingData
         }
-
-        let itemRef = db?
+        let itemsRef = db?
             .collection("teams")
             .document(team.id)
             .collection("items")
-            .document(addedItem.id ?? "")
+
+        /// 削除対象アイテムのcreateTimeでクエリを作成
+        let addedItemQuery = itemsRef?
+            .whereField("name", in: [addedItem.name])
 
         do {
-            try await itemRef?.delete()
+            let snapshot = try await addedItemQuery?.getDocuments()
+            guard let documents = snapshot?.documents else {
+                throw NotificationError.noSnapShotExist
+            }
+            guard let document = documents.first else {
+                throw NotificationError.noDocumentExist
+            }
+            /// DocIDが取得できたら、アイテム削除を実行
+            let itemId = document.documentID
+            let addedItemRef = itemsRef?.document(itemId)
+            try await addedItemRef?.delete()
+            /// リセット済みであることを各メンバーのログデータに書き込む
+            try await setCanceled(to: team, date: addedItem.createTime, element: element)
         }
         catch {
             throw NotificationError.resetAddedItem
         }
     }
 
-    /// アイテムデータの追加をキャンセルし削除するメソッド。
+    /// アイテムデータの削除をキャンセルし、元に戻すメソッド。
     func resetDeletedItem(_ deletedItem: Item, to team: Team?, element: Log) async throws {
         guard let team, let itemId = deletedItem.id else {
             throw NotificationError.missingData
@@ -173,13 +194,14 @@ class NotificationViewModel: ObservableObject {
 
         do {
             try await itemRef?.setData(from: deletedItem)
+            try await setCanceled(to: team, date: deletedItem.createTime, element: element)
         }
         catch {
             throw NotificationError.resetDeletedItem
         }
     }
 
-    /// アイテムデータの追加をキャンセルし削除するメソッド。
+    /// ユーザーデータの更新をキャンセルし元に戻すメソッド。
     func resetUpdateUser(_ beforeUser: User?, to team: Team?, element: Log) async throws {
         guard let beforeUser, let team else {
             throw NotificationError.missingData
@@ -191,6 +213,7 @@ class NotificationViewModel: ObservableObject {
 
         do {
             try await userRef?.setData(from: beforeUser)
+            try await setCanceled(to: team, date: beforeUser.createTime, element: element)
         }
         catch {
             throw NotificationError.resetAddedItem
@@ -200,10 +223,10 @@ class NotificationViewModel: ObservableObject {
 
         /// ユーザーが所属している全てのチームのmembersサブコレクションから、
         /// 自身のドキュメントリファレンスを取り出す。
-        let joinsTeamMembersRef = beforeUser.joins.compactMap { join in
+        let joinTeamsMembersRef = beforeUser.joins.compactMap { joinTeam in
             let teamMembersRef = db?
                 .collection("teams")
-                .document(join.teamID)
+                .document(joinTeam.teamID)
                 .collection("members")
                 .document(beforeUser.id)
             return teamMembersRef
@@ -213,7 +236,7 @@ class NotificationViewModel: ObservableObject {
                                          name: beforeUser.name,
                                          iconURL: beforeUser.iconURL)
 
-        for MyMemberRef in joinsTeamMembersRef {
+        for MyMemberRef in joinTeamsMembersRef {
             do {
                 try await MyMemberRef.setData(from: resetMemberData)
             }
@@ -222,19 +245,63 @@ class NotificationViewModel: ObservableObject {
             }
         }
     }
+    /// チームデータの更新をキャンセルし元に戻すメソッド。
+    func resetUpdateTeam(_ beforeUser: User?, to team: Team?, element: Log) async throws {
+        return
+    }
+
+    /// チームの各メンバーのログデータに、変更内容のキャンセル実行を反映させるメソッド。
+    /// キャンセル処理の重複を避けるために必要である。
+    /// ログデータの「canceledDatas」にデータのcreateTimeを格納する。
+    func setCanceled(to team: Team?, date canceledDataDate: Date, element: Log) async throws {
+        guard let team else { throw NotificationError.missingData }
+
+        /// ログデータに削除済みデータのcreateTimeを格納
+        var updatedElement = element
+        updatedElement.canceledDatas.append(canceledDataDate)
+        /// チームのサブコレクションmembersリファレンス
+        let membersRef = db?
+            .collection("teams")
+            .document(team.id)
+            .collection("members")
+
+        let snap = try await membersRef?.getDocuments()
+        guard let documents = snap?.documents else {
+            throw NotificationError.noDocumentExist
+        }
+
+        for document in documents {
+
+            let memberId = document.documentID
+            let logRef = membersRef?
+                .document(memberId)
+                .collection("logs")
+                .document(element.id)
+            /// メンバーのログデータにキャンセル済であることを反映
+            try await logRef?.setData(from: updatedElement)
+        }
+    }
+
     /// 通知の破棄によって発火されるbeforeデータ画像削除メソッドコントローラ。
     /// メソッド内部でログ通知のタイプを判定し、処理を分岐する。
+    /// アイテム追加時を除き、対象アイテムがすでに取り消し実行済みだった場合、処理を行わない。
     func deleteBeforeUIImageController(element: Log) {
         switch element.type {
+        case .addItem(let item):
+            deleteBeforeUIImage(path: item.photoPath)
         case .deleteItem(let item):
+            if element.canceledDatas.contains(where:{ $0 == item.createTime}) { return }
             deleteBeforeUIImage(path: item.photoPath)
         case .updateItem(let item):
+            if element.canceledDatas.contains(where:{ $0 == item.before.createTime}) { return }
             deleteBeforeUIImage(path: item.before.photoPath)
         case .updateUser(let user):
+            if element.canceledDatas.contains(where:{ $0 == user.before.createTime}) { return }
             deleteBeforeUIImage(path: user.before.iconPath)
         case .updateTeam(let team):
+            if element.canceledDatas.contains(where:{ $0 == team.before.createTime}) { return }
             deleteBeforeUIImage(path: team.before.iconPath)
-        case .addItem, .commerce, .join:
+        case .commerce, .join:
             break
         }
     }
@@ -268,5 +335,6 @@ enum NotificationError: Error {
     case resetAddedItem
     case resetDeletedItem
     case resetUpdatedUser
-    case noSnapShotExsist
+    case noSnapShotExist
+    case noDocumentExist
 }

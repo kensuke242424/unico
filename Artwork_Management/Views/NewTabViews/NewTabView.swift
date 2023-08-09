@@ -184,7 +184,7 @@ struct NewTabView: View {
                                 }
                             })
                     }
-                    SystemSideMenu(itemVM: itemVM, inputTab: $inputTab)
+                    SystemSideMenu(itemVM: itemVM, homeVM: homeVM, inputTab: $inputTab)
                         .offset(x: inputTab.showSideMenu ? 0 : -size.width)
                 }
                 /// 🏷タグの追加や編集を行うView

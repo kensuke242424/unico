@@ -58,6 +58,10 @@ fileprivate struct NotificationContainer: View {
     /// このcreateTime値を照らし合わせて、表示データがキャンセル実行済みかどうかを判定する。
     @State private var resetedLogs: [Date] = []
 
+    var reseted: Bool {
+        return checkReseted(element: element)
+    }
+
     var body: some View {
         let backColor = colorScheme == .dark ? Color.black : Color.white
         let shadowColor = colorScheme == .dark ? Color.white : Color.black
@@ -106,6 +110,9 @@ fileprivate struct NotificationContainer: View {
                 case .updateTeam(let team):
                     UpdateTeamDetail(team: team)
                 }
+                // データの変更をリセットする長押しボタン
+                ResetLogButton(element: element,
+                               reseted: reseted)
             } // if detail
         }
         .frame(width: screen.width * 0.9)
@@ -142,7 +149,6 @@ fileprivate struct NotificationContainer: View {
                         }
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                             vm.setRead(team: teamVM.team, element: element)
-                            vm.deleteBeforeUIImageController(element: element)
                         }
                     }
                 }
@@ -192,9 +198,6 @@ fileprivate struct NotificationContainer: View {
     @ViewBuilder
     func AddItemDetail(item: Item) -> some View {
         /// 表示アイテムが更新キャンセルされているかを判定する
-        var reseted: Bool {
-            return resetedLogs.contains(item.createTime)
-        }
 
         VStack(spacing: 10) {
 
@@ -216,10 +219,6 @@ fileprivate struct NotificationContainer: View {
                 .padding()
                 .padding(.horizontal, 30) // 表示要素１つのため、横幅を狭くする
             }
-
-            ResetLogButton(cancelDates: $resetedLogs,
-                                        element: element,
-                                        arrayIndex: nil)
         } // VStack(Detail全体)
         .opacity(reseted ? 0.4 : 1)
         .overlay {
@@ -230,10 +229,6 @@ fileprivate struct NotificationContainer: View {
     }
     @ViewBuilder
     func UpdateItemDetail(item: CompareItem) -> some View {
-        /// 表示アイテムが更新キャンセルされているかを判定する
-        var reseted: Bool {
-            return resetedLogs.contains(item.before.createTime)
-        }
 
         VStack(spacing: 10) {
 
@@ -317,17 +312,12 @@ fileprivate struct NotificationContainer: View {
                 }
             }
 
-            ResetLogButton(cancelDates: $resetedLogs,
-                                        element: element,
-                                        arrayIndex: nil)
+            ResetLogButton(element: element,
+                           reseted: reseted)
         } // VStack
     }
     @ViewBuilder
     func DeletedItemDetail(item: Item) -> some View {
-        /// 表示アイテムが更新キャンセルされているかを判定する
-        var reseted: Bool {
-            return resetedLogs.contains(item.createTime)
-        }
 
         VStack(spacing: 10) {
             DetailTopToItem(item: item, size: 50)
@@ -348,10 +338,6 @@ fileprivate struct NotificationContainer: View {
                 .padding()
                 .padding(.horizontal, 30) // 表示要素１つのため、横幅を狭くする
             }
-
-            ResetLogButton(cancelDates: $resetedLogs,
-                                        element: element,
-                                        arrayIndex: nil)
         }
         .opacity(reseted ? 0.4 : 1)
         .overlay {
@@ -362,10 +348,7 @@ fileprivate struct NotificationContainer: View {
     }
     @ViewBuilder
     func CommerceItemDetail(items: [CompareItem]) -> some View {
-        /// 表示アイテムが更新キャンセルされているかを判定する
-        var reseted: Bool {
-            return resetedLogs.contains(items[showIndex].after.createTime)
-        }
+
         VStack(spacing: 10) {
             if items.count > 1 {
                 CommerceItemsTableNumber(count: items.count)
@@ -399,10 +382,6 @@ fileprivate struct NotificationContainer: View {
                     ResetedStumpView(color: .red)
                 }
             }
-
-            ResetLogButton(cancelDates: $resetedLogs,
-                                        element: element,
-                                        arrayIndex: showIndex)
         } // VStack
     }
     /// カートアイテムが複数あった場合に、各アイテム情報を切り替えるための番号テーブル。
@@ -481,10 +460,6 @@ fileprivate struct NotificationContainer: View {
                     ResetedStumpView(color: .red)
                 }
             }
-
-            ResetLogButton(cancelDates: $resetedLogs,
-                                        element: element,
-                                        arrayIndex: nil)
         }
     }
 
@@ -535,10 +510,6 @@ fileprivate struct NotificationContainer: View {
                     ResetedStumpView(color: .red)
                 }
             }
-
-            ResetLogButton(cancelDates: $resetedLogs,
-                                        element: element,
-                                        arrayIndex: nil)
         }
     }
 
@@ -678,40 +649,20 @@ fileprivate struct NotificationContainer: View {
         .foregroundColor(color)
         .rotationEffect(Angle(degrees: -10))
     }
-}
-
-/// 通知から受け取ったデータ更新内容を取り消す長押し実行型のカスタムボタン。
-/// 取り消し対象データの更新前の値と、取り消し完了済みのステートを管理するためのid配列参照を受け取る
-/// 取り消しが完了したら、対象データのcreateTimeをキャンセル判定配列に入れる
-fileprivate
-struct ResetLogButton: View {
-
-    @EnvironmentObject var vm: NotificationViewModel
-    @EnvironmentObject var teamVM: TeamViewModel
-
-    @Binding var cancelDates: [Date]
-    let element: Log
-    let arrayIndex: Int? // 複数アイテムの場合(.commerce)
-
-    let pressingMinTime: CGFloat = 1.0 // 取り消し実行に必要な長押しタイム設定
-    let pressingTimer = Timer.publish(every: 0.01, on: .current, in: .common) .autoconnect()
-
-    var index: Int { arrayIndex ?? 0 }
-    /// Date配列のcanceledElementsDateを検索し、渡されたデータの更新がキャンセル済みかどうかをBool値で返す
-    var reseted: Bool {
-
+    /// ログデータのcanceledDatasDateを検索し、更新内容がキャンセル済みかどうかをBool値で返す
+    func checkReseted(element: Log) -> Bool {
         switch element.type {
         case .addItem(let item):
             return element.canceledDatas.contains(item.createTime)
 
         case .updateItem(let item):
-            return element.canceledDatas.contains(item.after.createTime)
+            return element.canceledDatas.contains(item.before.createTime)
 
         case .deleteItem(let item):
             return element.canceledDatas.contains(item.createTime)
 
         case .commerce(let items):
-            return element.canceledDatas.contains(items[index].after.createTime)
+            return element.canceledDatas.contains(items[showIndex].before.createTime)
 
         case .join(let user):
             return element.canceledDatas.contains(user.createTime)
@@ -723,6 +674,22 @@ struct ResetLogButton: View {
             return element.canceledDatas.contains(team.before.createTime)
         }
     }
+}
+
+/// 通知から受け取ったデータ更新内容を取り消す長押し実行型のカスタムボタン。
+/// 取り消し対象データの更新前の値と、取り消し完了済みのステートを管理するためのid配列参照を受け取る
+/// 取り消しが完了したら、対象データのcreateTimeをキャンセル判定配列に入れる
+fileprivate
+struct ResetLogButton: View {
+
+    @EnvironmentObject var vm: NotificationViewModel
+    @EnvironmentObject var teamVM: TeamViewModel
+
+    let element: Log
+    let reseted: Bool
+
+    let pressingMinTime: CGFloat = 1.0 // 取り消し実行に必要な長押しタイム設定
+    let pressingTimer = Timer.publish(every: 0.01, on: .current, in: .common) .autoconnect()
 
     @State private var pressingState: Bool = false
     @State private var pressingFrame: CGFloat = .zero
