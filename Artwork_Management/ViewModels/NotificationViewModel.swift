@@ -83,33 +83,33 @@ class NotificationViewModel: ObservableObject {
     }
     /// ユーザーが通知ビュー内の更新キャンセルボタンをタップした場合に発火するデータ変更リセットメソッド。
     ///
-    func resetController(to team: Team?, element: Log) {
+    func resetController(to team: Team?, element: Log) async throws {
 
-        Task {
-            switch element.type {
+        switch element.type {
 
-            case .addItem(let item):
-                print("")
+        case .addItem(let item):
+            try await
+            self.resetAddedItem(item, to: team, element: element)
 
-            case .updateItem(let item):
-                try await self.resetUpdateItem(item, to: team, element: element)
+        case .updateItem(let item):
+            try await
+            self.resetUpdatedItem(item, to: team, element: element)
 
-            case .deleteItem(let item):
-                print("")
+        case .deleteItem(let item):
+            try await
+            self.resetDeletedItem(item, to: team, element: element)
 
-            case .commerce(let items):
-                print("")
+        case .commerce(let items):
+            break
 
-            case .join:
-                print("ユーザー参加通知にはキャンセルボタン無し")
+        case .join:
+            break
 
-            case .updateUser(let user):
-                print("")
+        case .updateUser(let user):
+            break
 
-            case .updateTeam(let team):
-                print("")
-
-            }
+        case .updateTeam(let team):
+            break
         }
     }
 
@@ -117,7 +117,7 @@ class NotificationViewModel: ObservableObject {
     // 以降の更新も一緒に上書きしてしまう。よって、beforeとafterの差分を先に求め、その値をデータに反映させる。
     /// 更新されたアイテムデータの内容をリセットするメソッド。
     /// 現在のアイテムデータをフェッチし、更新の差分値を反映させて保存し直す。
-    func resetUpdateItem(_ item: CompareItem, to team: Team?, element: Log) async throws {
+    func resetUpdatedItem(_ item: CompareItem, to team: Team?, element: Log) async throws {
 
         print("更新を取り消すアイテムのid: \(item.id)")
 
@@ -132,12 +132,39 @@ class NotificationViewModel: ObservableObject {
         do {
 
         } catch {
-            throw CustomNotificationError.resetUpdateItem
+            throw NotificationError.resetUpdateItem
+        }
+    }
+    /// アイテムデータの追加をキャンセルし削除するメソッド。
+    func resetAddedItem(_ addedItem: Item, to team: Team?, element: Log) async throws {
+        let itemRef = db?
+            .collection("teams")
+            .document(team?.id ?? "")
+            .collection("items")
+            .document(addedItem.id ?? "")
+
+        do {
+            try await itemRef?.delete()
+        }
+        catch {
+            throw NotificationError.resetAddItem
         }
     }
 
-    func resetAddItem(_ item: Item, to team: Team?, element: Log) async throws {
+    /// アイテムデータの追加をキャンセルし削除するメソッド。
+    func resetDeletedItem(_ deletedItem: Item, to team: Team?, element: Log) async throws {
+        let itemRef = db?
+            .collection("teams")
+            .document(team?.id ?? "")
+            .collection("items")
+            .document(deletedItem.id ?? "")
 
+        do {
+            try await itemRef?.setData(from: deletedItem)
+        }
+        catch {
+            throw NotificationError.resetAddItem
+        }
     }
 
     /// 通知から受け取ったアイテムデータの更新内容を取り消すメソッド。
@@ -177,22 +204,13 @@ class NotificationViewModel: ObservableObject {
 
     }
 
-    /// 現在の操作チームのメンバーidを取得するメソッド。。
-    func getMembersId(team: Team) -> [String] {
-        let membersID: [String] = team.members.map({ $0.memberUID })
-        return membersID
-    }
-    /// 現在の操作チームのメンバーidを取得するメソッド。。
-    func getCurrentTeamMyMemberData(team: Team) -> JoinMember? {
-        let getGyMemberData = team.members.first(where: { $0.memberUID == uid })
-        return getGyMemberData
-    }
-
     deinit {
         listener?.remove()
     }
 }
 
-enum CustomNotificationError: Error {
+/// 通知関連のエラーを管理するクラス。
+enum NotificationError: Error {
     case resetUpdateItem
+    case resetAddItem
 }

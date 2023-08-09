@@ -700,30 +700,31 @@ struct ResetLogButton: View {
 
         switch element.type {
         case .addItem(let item):
-            return cancelDates.contains(item.createTime)
+            return element.canceledDatas.contains(item.createTime)
 
         case .updateItem(let item):
-            return cancelDates.contains(item.after.createTime)
+            return element.canceledDatas.contains(item.after.createTime)
 
         case .deleteItem(let item):
-            return cancelDates.contains(item.createTime)
+            return element.canceledDatas.contains(item.createTime)
 
         case .commerce(let items):
-            return cancelDates.contains(items[index].after.createTime)
+            return element.canceledDatas.contains(items[index].after.createTime)
 
         case .join(let user):
-            return cancelDates.contains(user.createTime)
+            return element.canceledDatas.contains(user.createTime)
 
         case .updateUser(let user):
-            return cancelDates.contains(user.before.createTime)
+            return element.canceledDatas.contains(user.before.createTime)
 
         case .updateTeam(let team):
-            return cancelDates.contains(team.before.createTime)
+            return element.canceledDatas.contains(team.before.createTime)
         }
     }
 
     @State private var pressingState: Bool = false
     @State private var pressingFrame: CGFloat = .zero
+    @State private var resetExecution: Bool?
     var body: some View {
         // ボタンのサイズ
         let cancelButtonFrame: CGFloat = self.reseted ? 100 : 80
@@ -761,16 +762,27 @@ struct ResetLogButton: View {
                 },
                 perform: {
                     pressingState = false
-                    /// リセット処理
-                    /// 内部でログデータのタイプを判定し、対象データの変更リセットを実行
-                    vm.resetController(to: teamVM.team, element: element)
+                    resetExecution = true
                 })
-            .onReceive(pressingTimer) { value in
+            // 長押しによるボタンゲージの増加処理
+            .onReceive(pressingTimer) { _ in
                 if pressingState {
                     // Timerの更新頻度が0.01のため、100で割る
                     pressingFrame += (cancelButtonFrame / 100)
                 } else {
                     pressingFrame = 0
+                }
+            }
+            // idが更新されるたびに、タスクがキャンセル -> 再実行される
+            .task(id: resetExecution) {
+                guard let resetExecution else { return }
+
+                do {
+                    try await vm.resetController(to: teamVM.team, element: element)
+                    self.resetExecution = nil
+                } catch {
+                    print(error.localizedDescription)
+                    self.resetExecution = nil
                 }
             }
     }
