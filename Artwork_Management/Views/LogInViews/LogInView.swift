@@ -593,18 +593,13 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         // Firestoreに保存したデータをローカルに引っ張ってくる
                         try await userVM.fetchUser()
                         guard let user = userVM.user else { return }
-                        
-                        /// 新規チームデータに格納するjoinMemberデータの準備⬇︎
-                        let joinMember = JoinMember(memberUID: user.id,
-                                                    name     : user.name,
-                                                    iconURL  : user.iconURL)
 
                         // 新規チームのIDとして使用
                         let createTeamID = UUID().uuidString
                         
                         let teamData = Team(id     : createTeamID,
                                             name   : "\(user.name)のチーム",
-                                            members: [joinMember])
+                                            membersId: [user.id])
 
                         let joinTeamData = JoinTeam(teamID           : teamData.id,
                                                     name             : teamData.name,

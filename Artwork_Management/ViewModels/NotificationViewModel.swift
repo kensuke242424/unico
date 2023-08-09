@@ -232,7 +232,7 @@ class NotificationViewModel: ObservableObject {
             return teamMembersRef
         }
 
-        let resetMemberData = JoinMember(memberUID: beforeUser.id,
+        let resetMemberData = JoinMember(id: beforeUser.id,
                                          name: beforeUser.name,
                                          iconURL: beforeUser.iconURL)
 

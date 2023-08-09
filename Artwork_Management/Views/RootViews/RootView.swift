@@ -106,7 +106,6 @@ struct RootView: View {
 
         // ☑️全データのフェッチ処理☑️
         .onChange(of: logInVM.rootNavigation) { navigation in
-            print("LogInVM.rootNavigation: \(logInVM.rootNavigation)")
             
             if navigation == .fetch {
                 Task {

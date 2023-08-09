@@ -301,7 +301,8 @@ struct JoinUserDetectCheckView: View {
                                 do {
                                     guard let detectedUser else { return }
 
-                                    _ = try await teamVM.addDetectedNewMember(data: detectedUser)
+                                    _ = try await teamVM.addDetectedNewMember(for: detectedUser)
+                                    _ = try await teamVM.setNewMemberId(detectedUser.id)
                                     _ = try await teamVM.addTeamIDToJoinedUser(to: detectedUser.id)
                                     withAnimation(.spring(response: 0.8, blendDuration: 1)) { isAgreed.toggle() }
                                     hapticSuccessNotification()

@@ -91,28 +91,31 @@ fileprivate struct NotificationContainer: View {
 
                 case .addItem(let item):
                     AddItemDetail(item: item)
+                    ResetLogButton(element: element, reseted: reseted)
 
                 case .updateItem(let item):
                     UpdateItemDetail(item: item)
+                    ResetLogButton(element: element, reseted: reseted)
 
                 case .deleteItem(let item):
                     DeletedItemDetail(item: item)
+                    ResetLogButton(element: element, reseted: reseted)
 
                 case .commerce(let items):
                     CommerceItemDetail(items: items)
+                    ResetLogButton(element: element, reseted: reseted)
 
                 case .join(let user):
                     EmptyView()
 
                 case .updateUser(let user):
                     UpdateUserDetail(user: user)
+                    ResetLogButton(element: element, reseted: reseted)
 
                 case .updateTeam(let team):
                     UpdateTeamDetail(team: team)
+                    ResetLogButton(element: element, reseted: reseted)
                 }
-                // データの変更をリセットする長押しボタン
-                ResetLogButton(element: element,
-                               reseted: reseted)
             } // if detail
         }
         .frame(width: screen.width * 0.9)
@@ -311,9 +314,6 @@ fileprivate struct NotificationContainer: View {
                     ResetedStumpView(color: .red)
                 }
             }
-
-            ResetLogButton(element: element,
-                           reseted: reseted)
         } // VStack
     }
     @ViewBuilder

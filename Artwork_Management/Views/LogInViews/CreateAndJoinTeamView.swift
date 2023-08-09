@@ -311,7 +311,7 @@ struct CreateAndJoinTeamView: View {
             .offset(y: 30)
             .opacity(selectTeamFase == .start ? 0.0 : 1.0)
 
-            
+
 
             // Go back login flow Button...
             Button {
@@ -391,13 +391,8 @@ struct CreateAndJoinTeamView: View {
                                                                     width: 60)
                         }
                         /// 準備したチームアイコン&背景画像をFirestorageに保存
-                        let uplaodIconImageData       = await teamVM.firstUploadTeamImage(iconImageContainer,
-                                                                                          id: createTeamID)
-                        
-                        // チームデータに格納するログインユーザのユーザデータ
-                        let joinMember = JoinMember(memberUID: user.id,
-                                                    name     : user.name,
-                                                    iconURL  : user.iconURL)
+                        let uplaodIconImageData = await teamVM.firstUploadTeamImage(iconImageContainer,
+                                                                                    id: createTeamID)
                         
                         let teamData = Team(id: createTeamID,
                                             name          : inputTeamName,
@@ -405,7 +400,7 @@ struct CreateAndJoinTeamView: View {
                                             iconPath      : uplaodIconImageData.filePath,
                                             backgroundURL : backgroundContainer.imageURL,
                                             backgroundPath: backgroundContainer.imagePath,
-                                            members       : [joinMember])
+                                            membersId       : [user.id])
                         
                         let joinTeamData = JoinTeam(teamID : createTeamID,
                                                     name   : inputTeamName,

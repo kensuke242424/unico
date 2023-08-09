@@ -34,7 +34,7 @@ class TeamViewModel: ObservableObject {
     /// 現在の操作チーム「members」内のフィールドから自身のmemberデータインデックスを取得するプロパティ。
     var myMemberIndex: Int? {
         guard let team else { return nil }
-        let index = team.members.firstIndex(where: {$0.memberUID == uid})
+        let index = team.membersId.firstIndex(where: {$0 == uid})
         return index
     }
 
@@ -80,12 +80,13 @@ class TeamViewModel: ObservableObject {
     /// チームのサブコレクション「members」における追加・更新・削除のステートを管理するリスナーメソッド。
     /// 初期実行時にリスニング対象ドキュメントのデータが全取得される。(フラグはadded)
     func membersListener(id currentTeamID: String) async {
-        let teamRef = db?
+        let membersRef = db?
             .collection("teams")
             .document(currentTeamID)
             .collection("members")
+        guard let membersRef else { return }
 
-        membersListener = teamRef?.addSnapshotListener { snapshot, error in
+        membersListener = membersRef.addSnapshotListener { snapshot, error in
             if let error {
                 print("membersListener起動失敗: \(error.localizedDescription)")
             } else {
@@ -119,16 +120,6 @@ class TeamViewModel: ObservableObject {
         }
         print("addTeamAndGetID完了")
     }
-    /// 現在の操作チームデータのMembersの中から、自身のJoinMemberデータを取り出すメソッド。
-    func getMyJoinMemberData(uid: String) -> JoinMember? {
-        guard let team else { return nil }
-        var resultData: JoinMember?
-
-        for member in team.members where member.memberUID == uid {
-            resultData = member
-        }
-        return resultData
-    }
 
     /// 新規チーム作成時に使用するメソッド。作成者の目mんバーデータを新規チームのサブコレクションに保存する。
     func addFirstMemberData(id teamId: String, data userData: User) async throws {
@@ -138,36 +129,49 @@ class TeamViewModel: ObservableObject {
             .document(teamId)
             .collection("members")
 
-        let newMemberData = JoinMember(memberUID: userData.id,
+        let newMemberData = JoinMember(id: userData.id,
                                        name: userData.name,
                                        iconURL: userData.iconURL)
-
         do {
             _ = try membersRef?
                 .document(userData.id)
                 .setData(from: newMemberData)
         }
     }
-
-    func addDetectedNewMember(data userData: User) async throws {
-        print("addDetectedUser実行")
+    /// チームのサブコレクション「members」に、新規加入したユーザーのデータを保存するメソッド。
+    ///
+    func addDetectedNewMember(for detectedUser: User) async throws {
         guard let team else { throw CustomError.teamEmpty }
         let memberRef = db?
             .collection("teams")
             .document(team.id)
             .collection("members")
-            .document(userData.id)
+            .document(detectedUser.id)
 
         do {
-            for member in team.members where userData.id == member.memberUID {
+            for memberId in team.membersId where detectedUser.id == memberId {
                 throw CustomError.memberDuplication
             }
 
-            let newMemberData = JoinMember(memberUID: userData.id,
-                                           name: userData.name,
-                                           iconURL: userData.iconURL)
+            let newMemberData = JoinMember(id: detectedUser.id,
+                                           name: detectedUser.name,
+                                           iconURL: detectedUser.iconURL)
 
             _ = try memberRef?.setData(from: newMemberData)
+        }
+    }
+
+    func setNewMemberId(_ newMemberId: String) async throws {
+        guard let team else { throw CustomError.teamEmpty }
+        let teamRef = db?
+            .collection("teams")
+            .document(team.id)
+
+        var updateTeam = team
+        updateTeam.membersId.append(newMemberId)
+
+        do {
+            try await teamRef?.setData(from: updateTeam)
         }
     }
 
@@ -391,7 +395,7 @@ class TeamViewModel: ObservableObject {
             .collection("teams")
             .whereField("id", in: joinsTeamId)
 
-        let updateMemberData = JoinMember(memberUID: userData.id,
+        let updateMemberData = JoinMember(id: userData.id,
                                        name: userData.name,
                                        iconURL: userData.iconURL)
 
@@ -545,16 +549,16 @@ class TeamViewModel: ObservableObject {
                         continue
                     }
 
-                    if teamData.members.count == 1 &&
-                        teamData.members.first?.memberUID == userID {
+                    if teamData.membersId.count == 1 &&
+                        teamData.membersId.first == userID {
                         // 削除対象ユーザーの他にチームメンバーが居なかった場合、全データをFirestoreから削除
                         _ = await deleteAllTeamTags()
                         _ = await deleteAllTeamItems()
                         _ = try await teamRowDocument.reference.delete()
 
                     } else {
-                        // 削除対象ユーザーの他にもチーム所属者がいた場合、削除ユーザーのみmembersから処理し、保存
-                        teamData.members.removeAll(where: { $0.memberUID == userID })
+                        // 削除対象ユーザーの他にもチーム所属者がいた場合、自身のみmembersから処理し、保存
+                        teamData.membersId.removeAll(where: { $0 == userID })
                         try teamRowRef.setData(from: teamData)
                     }
                 }

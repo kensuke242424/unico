@@ -346,13 +346,13 @@
 			path = EditItemViews;
 			sourceTree = "<group>";
 		};
-		BE19FD712A7AAC4D00AE8165 /* NotificationBoardViews */ = {
+		BE19FD712A7AAC4D00AE8165 /* NotificationViews */ = {
 			isa = PBXGroup;
 			children = (
 				BE19FD7F2A7AAF6200AE8165 /* NotificationView.swift */,
 				BE19FD872A7C928E00AE8165 /* MomentLogView.swift */,
 			);
-			path = NotificationBoardViews;
+			path = NotificationViews;
 			sourceTree = "<group>";
 		};
 		BE1F271F29C1669400AD55DF /* NewTabViews */ = {
@@ -566,7 +566,7 @@
 				E0796AD828F48D530094E50C /* RootViews */,
 				BE30B5CF2A33CA890034755B /* EditViews */,
 				E094B788298EB7C700A2E33C /* UpdateTeamOrUserViews */,
-				BE19FD712A7AAC4D00AE8165 /* NotificationBoardViews */,
+				BE19FD712A7AAC4D00AE8165 /* NotificationViews */,
 				BEAB502C29A7C5E300ECCB4F /* PageTabNavigateViews */,
 				E09F09BA28EAF2DD00D07669 /* EditItemViews */,
 				E08F273F28DEAD1100329C5E /* Tab1_Librarys */,

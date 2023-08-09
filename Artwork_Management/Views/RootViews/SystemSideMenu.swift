@@ -549,8 +549,8 @@ struct SystemSideMenu: View {
                             Task {
                                 guard let selectedTeam = inputSideMenu.selectedTeam else { return }
                                 inputSideMenu.showdeletedAllTeamProgress = true
-                                try await userVM.deleteMembersJoinTeam(selected: selectedTeam,
-                                                                       members : teamVM.team!.members)
+                                try await userVM.deleteMembersJoinTeam(for: selectedTeam,
+                                                                       ids: teamVM.team!.membersId)
 
                                 await teamVM.deleteAllTeamImages()
                                 await itemVM.deleteAllItemImages()

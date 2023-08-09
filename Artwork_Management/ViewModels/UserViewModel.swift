@@ -254,15 +254,11 @@ class UserViewModel: ObservableObject {
         }
     }
     
-    func updateJoinTeamToMembers(data updatedJoinTeam: JoinTeam, members joinMembers: [JoinMember]) async throws {
-
-        // チームに所属している各メンバーのid文字列データを配列に格納(whereFieldクエリで使う)
-        var joinMembersID: [String] = joinMembers.map { $0.memberUID }
-
+    func updateJoinTeamToMembers(data updatedJoinTeam: JoinTeam, ids membersId: [String]) async throws {
         // 所属メンバーのid配列を使ってクエリを叩く
         let joinMemberRefs = db?
             .collection("users")
-            .whereField("id", in: joinMembersID)
+            .whereField("id", in: membersId)
 
         do {
             let snapshot = try await joinMemberRefs?.getDocuments()
@@ -379,30 +375,27 @@ class UserViewModel: ObservableObject {
         }
     }
     
-    func deleteMembersJoinTeam(selected selectedTeam: JoinTeam, members joinMembers: [JoinMember]) async throws {
-        var joinMembersID: [String] = []
-        // チームに所属している各メンバーのid文字列データを配列に格納(whereFieldクエリで使う)
-        for member in joinMembers {
-            joinMembersID.append(member.memberUID)
-        }
+    func deleteMembersJoinTeam(for selectedTeam: JoinTeam, ids membersId: [String]) async throws {
 
-        // 所属メンバーのid配列を使ってクエリを叩く
-        guard let joinMemberRefs = db?.collection("users")
-            .whereField("id", in: joinMembersID) else { throw CustomError.getRef }
+        let joinMemberRefs = db?
+            .collection("users")
+            .whereField("id", in: membersId)
 
         do {
-            let snapshot = try await joinMemberRefs.getDocuments()
+            let snapshot = try await joinMemberRefs?.getDocuments()
+            guard let documents = snapshot?.documents else { throw CustomError.getDocument }
             
-            for memberDocument in snapshot.documents {
+            for memberDocument in documents {
                 
-                var rowMemberData = try memberDocument.data(as: User.self)
-                let resultJoins = rowMemberData.joins.drop(while: { $0.teamID == selectedTeam.teamID })
-                rowMemberData.joins = Array(resultJoins)
+                var memberData = try memberDocument.data(as: User.self)
+                let resultJoins = memberData.joins.drop(while: { $0.teamID == selectedTeam.teamID })
+                memberData.joins = Array(resultJoins)
                 
-                guard let userRef = db?.collection("users").document(rowMemberData.id) else {
-                    throw CustomError.getRef
-                }
-                _ = try userRef.setData(from: rowMemberData)
+                let userRef = db?
+                    .collection("users")
+                    .document(memberData.id)
+
+                _ = try userRef?.setData(from: memberData)
                 
             } // for
         } // do
