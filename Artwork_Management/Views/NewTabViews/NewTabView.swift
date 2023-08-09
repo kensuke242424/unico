@@ -58,19 +58,21 @@ struct InputTab {
 struct NewTabView: View {
     
     @EnvironmentObject var navigationVM: NavigationViewModel
-    @EnvironmentObject var logVM: LogViewModel
-    @EnvironmentObject var momentLogVM: MomentLogViewModel
     @EnvironmentObject var notificationVM: NotificationViewModel
     @EnvironmentObject var logInVM: LogInViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var tagVM : TagViewModel
-    @EnvironmentObject var homeVM: HomeViewModel
     @EnvironmentObject var backgroundVM: BackgroundViewModel
+
+    @EnvironmentObject var logVM: LogViewModel
+    @EnvironmentObject var momentLogVM: MomentLogViewModel
 
     @StateObject var itemVM: ItemViewModel
     @StateObject var cartVM: CartViewModel
-    
+
+    @StateObject var homeVM = HomeViewModel()
+
     /// View Properties
     @State private var inputTab = InputTab()
 
@@ -91,7 +93,7 @@ struct NewTabView: View {
                     Spacer(minLength: 0)
                     
                     TabView(selection: $inputTab.selectionTab) {
-                        NewHomeView(itemVM: itemVM, inputTab: $inputTab)
+                        NewHomeView(itemVM: itemVM, homeVM: homeVM, inputTab: $inputTab)
                             .tag(Tab.home)
 
                         NewItemsView(itemVM: itemVM,  cartVM: cartVM, inputTab: $inputTab)
@@ -491,27 +493,3 @@ struct NewTabView: View {
     }
 
 } // View
-
-struct NewTabView_Previews: PreviewProvider {
-
-    static var previews: some View {
-
-        var windowScene: UIWindowScene? {
-                    let scenes = UIApplication.shared.connectedScenes
-                    let windowScene = scenes.first as? UIWindowScene
-                    return windowScene
-                }
-        var resizableSheetCenter: ResizableSheetCenter? {
-                   windowScene.flatMap(ResizableSheetCenter.resolve(for:))
-               }
-
-        return NewTabView(itemVM: ItemViewModel(), cartVM: CartViewModel())
-            .environment(\.resizableSheetCenter, resizableSheetCenter)
-            .environmentObject(NavigationViewModel())
-            .environmentObject(LogInViewModel())
-            .environmentObject(TeamViewModel())
-            .environmentObject(UserViewModel())
-            .environmentObject(TagViewModel())
-            .environmentObject(BackgroundViewModel())
-    }
-}

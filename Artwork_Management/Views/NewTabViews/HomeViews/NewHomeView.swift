@@ -33,9 +33,10 @@ struct NewHomeView: View {
 
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
-    @EnvironmentObject var homeVM: HomeViewModel
     @EnvironmentObject var backgroundVM: BackgroundViewModel
+
     @StateObject var itemVM: ItemViewModel
+    @StateObject var homeVM: HomeViewModel
 
     /// Tab親Viewから受け取った状態変数群
     @Binding var inputTab: InputTab
@@ -421,19 +422,5 @@ fileprivate struct CustomizeHomePartsButtons: View {
             }
             .transition(AnyTransition.opacity.combined(with: .offset(y: 20)))
         } // if
-    }
-}
-
-struct HomeView_Previews: PreviewProvider {
-    static var previews: some View {
-        NewHomeView(itemVM: ItemViewModel(),
-                    inputTab: .constant(InputTab()))
-        .environmentObject(BackgroundViewModel())
-        .background {
-            Image("background_4")
-                .resizable()
-                .scaledToFill()
-                .ignoresSafeArea()
-        }
     }
 }
