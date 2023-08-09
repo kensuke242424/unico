@@ -194,7 +194,7 @@ class TeamViewModel: ObservableObject {
     }
 
     // メンバー招待画面で取得した相手のユーザIDを使って、Firestoreのusersからデータをフェッチ
-    func detectUserFetchData(id userID: String) async throws -> User? {
+    func fetchDetectUserData(id userID: String) async throws -> User? {
 
         guard let userRef = db?.collection("users").document(userID) else { throw CustomError.getDocument }
 
@@ -380,35 +380,40 @@ class TeamViewModel: ObservableObject {
         }
     }
 
-    func updateTeamToMyJoinMemberData(data updatedMemberData: JoinMember, joins joinsTeam: [JoinTeam]) async throws {
-        // ユーザが参加している各チームのid文字列データを配列に格納(whereFieldクエリで使う)
-        var joinsTeamID: [String] = joinsTeam.map { $0.teamID }
+    /// ユーザーが所属しているチーム内の自身のメンバーデータを更新する。
+    /// ユーザーデータの変更を行った時に、各チームのユーザーステートを揃えるために使う。
+    func updateJoinTeamsToMyData(data userData: User) async throws {
+        // 自身が参加している各チームのid文字列データを配列に格納
+        var joinsTeamId: [String] = userData.joins.map { $0.teamID }
 
         // ユーザが所属している各チームのid配列を使ってクエリを叩く
         let joinTeamRefs = db?
             .collection("teams")
-            .whereField("id", in: joinsTeamID)
+            .whereField("id", in: joinsTeamId)
+
+        let updateMemberData = JoinMember(memberUID: userData.id,
+                                       name: userData.name,
+                                       iconURL: userData.iconURL)
 
         do {
             let snapshot = try await joinTeamRefs?.getDocuments()
             guard let documents = snapshot?.documents else { return }
 
+            /// 所属チームごとに自身のメンバーデータを更新していく
             for teamDocument in documents {
 
                 do {
-                    var teamData = try teamDocument.data(as: Team.self)
+                    var teamDocumentId = teamDocument.documentID
+                    let myMemberRef = db?
+                        .collection("teams")
+                        .document(teamDocumentId)
+                        .collection("members")
+                        .document(uid ?? "")
 
-                    // チームのmembers配列からcurrentのユーザメンバーデータを検出する
-                    for (index, teamMember) in teamData.members.enumerated() where teamMember.memberUID == uid {
-                        // チーム内の対象メンバーデータを更新
-                        teamData.members[index] = updatedMemberData
-                        // 更新対象チームの更新用リファレンスを生成
-                        let teamRef = db?
-                            .collection("teams")
-                            .document(teamData.id)
-                        // リファレンスをもとにsetDataを実行
-                        try teamRef?.setData(from: teamData, merge: true)
-                    }
+                    try myMemberRef?.setData(from: updateMemberData, merge: true)
+                }
+                catch {
+                    print("所属チームのメンバーデータ更新失敗")
                 }
             }
         }

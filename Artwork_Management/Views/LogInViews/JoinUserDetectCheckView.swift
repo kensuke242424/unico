@@ -166,7 +166,7 @@ struct JoinUserDetectCheckView: View {
                     do {
                         let detectUserID = qrReader.captureQRData
                         inputUserIDText = detectUserID
-                        detectedUser = try await teamVM.detectUserFetchData(id: detectUserID)
+                        detectedUser = try await teamVM.fetchDetectUserData(id: detectUserID)
                         qrReader.isdetectQR.toggle()
                         withAnimation(.spring(response: 0.8, blendDuration: 1)) { joinUserCheckFase = .agree }
                     } catch {
@@ -253,7 +253,7 @@ struct JoinUserDetectCheckView: View {
                                 return
                             }
                             withAnimation{joinUserCheckFase = .check}
-                            detectedUser = try await teamVM.detectUserFetchData(id: inputUserIDText)
+                            detectedUser = try await teamVM.fetchDetectUserData(id: inputUserIDText)
                             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                                 if detectedUser != nil {
                                     withAnimation{ joinUserCheckFase = .agree }

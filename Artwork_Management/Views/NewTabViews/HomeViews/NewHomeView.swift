@@ -318,7 +318,7 @@ struct NewHomeView: View {
                             .opacity(0.8)
 
                         // Team members Icon...
-                        teamMembersIcon(members: teamVM.team?.members)
+                        teamMembersIcon(members: teamVM.members)
                     }
                     .offset(x: 20, y: 35)
                     .tracking(5)

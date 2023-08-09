@@ -149,58 +149,48 @@ struct UpdateUserDataView: View {
     func SavingButton() -> some View {
         Button("保存する") {
 
-            guard var team = teamVM.team,
-                  let user = userVM.user,
-                  let myJoinMemberData = teamVM.getMyJoinMemberData(uid: user.id) else {
-                print("ERROR: チームデータの更新に失敗しました。")
-                withAnimation { showContent.toggle() }
+            guard let team = teamVM.team,
+                  let user = userVM.user else {
+                print("ユーザーまたはチームがnil")
                 return
             }
 
             Task {
                 withAnimation(.spring(response: 0.3)) { input.savingWait = true }
 
-                // ーー保存に用いるデータコンテナ群ーー
+                // ーー保存時の比較に用いるデータコンテナーー
                 var beforeUser = user
                 var afterUser = user
-                var afterMyJoinMember = myJoinMemberData
 
-                // アイコンに変更があれば、Storageにアップロード -> JoinMemberを更新 ->コンテナに格納
+                // ーーーー　アイコン画像の更新をチェック　ーーーーー
                 if let captureImage = input.captureImage {
                     let uploadIconData = await userVM.uploadUserImage(captureImage)
                     afterUser.iconURL = uploadIconData.url
                     afterUser.iconPath = uploadIconData.filePath
-                    afterMyJoinMember.iconURL = uploadIconData.url
                 }
-                // 名前に変更があれば、JoinMemberを更新 -> コンテナに格納
+                // ーーーー　名前の更新をチェック　ーーーーー
                 if user.name != input.nameText {
                     afterUser.name = input.nameText
-                    afterMyJoinMember.name = input.nameText
                 }
+
                 // データの変更があれば、Firebaseへの保存処理&通知の生成
                 if beforeUser != afterUser {
                     /// 自身のユーザーデータ更新と、所属するチームが保持する自身のデータを更新
                     try await userVM.updateUserToFirestore(data: afterUser)
-                    try await teamVM.updateTeamToMyJoinMemberData(data: afterMyJoinMember,
-                                                                  joins: afterUser.joins)
-                    // MEMO:
-                    // ユーザー編集時はチーム内のmembersデータが変更されるので、
-                    // 通知生成前に、「Team」データに対してjoinMemberデータをを反映させておく必要がある
-                    guard let myMemberIndex = teamVM.myMemberIndex else { return }
-                    team.members[myMemberIndex] = afterMyJoinMember
-
+                    try await teamVM.updateJoinTeamsToMyData(data: afterUser)
                     hapticSuccessNotification()
                 }
 
                 withAnimation {
-                    showContent.toggle()
+                    showContent = false
                     input.savingWait = false
                 }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                     withAnimation(.spring(response: 0.3)) { show = false }
                     if beforeUser != afterUser {
-                        let compareUser = CompareUser(id: user.id, before: beforeUser, after: afterUser)
-//                        teamNotifyVM.setNotification(team: team, type: .updateUser(compareUser))
+                        let compareUser = CompareUser(id    : user.id,
+                                                      before: beforeUser,
+                                                      after : afterUser)
                         logVM.addLog(team: team, type: .updateUser(compareUser))
                     }
                 }

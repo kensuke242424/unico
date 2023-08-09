@@ -416,6 +416,7 @@ struct CreateAndJoinTeamView: View {
                         self.joinedTeamData = joinTeamData
                         
                         try await teamVM.addTeam(teamData: teamData)
+                        try await teamVM.addFirstMemberData(id: teamData.id, data: user)
                         try await userVM.addNewJoinTeam(newJoinTeam: joinTeamData)
                             await teamVM.setSampleItem(teamID: teamData.id)
                             tagVM.addTag(tagData: tagVM.sampleTag, teamID: teamData.id)
