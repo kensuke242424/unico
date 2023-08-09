@@ -27,44 +27,33 @@ class NotificationViewModel: ObservableObject {
     @Published var notifications: [Log] = []
 
     func listener(id currentTeamID: String?) {
-        guard let uid, let currentTeamID else { return }
-        let logsRef = db?
+
+        let myLogsRef = db?
             .collection("teams")
-            .document(currentTeamID)
+            .document(currentTeamID ?? "")
+            .collection("members")
+            .document(uid ?? "")
             .collection("logs")
 
-        let unreadLogQuery = logsRef?
-            .whereField("unread", arrayContains: uid)
+        let unreadLogQuery = myLogsRef?
+            .whereField("read", in: [false])
 
         /// 未読を表す「unread」フィールドに自身のuidが存在するドキュメントを取得する
         listener = unreadLogQuery?.addSnapshotListener { (snapshot, _) in
-            print("NotificationListener起動")
             do {
                 guard let documents = snapshot?.documents else { return }
 
                 self.notifications = documents.compactMap { (snap) -> Log? in
                     return try? snap.data(as: Log.self, with: .estimate)
                 }
-                print("取得した通知の数: \(self.notifications.count)")
                 // 現在表示されている通知が無く、かつ未読の通知が残っていれば新たに通知を格納する
                 if self.currentNotification == nil {
                     guard let nextElement = self.notifications.first else { return }
                     self.currentNotification = nextElement
-                    print("新しい通知を格納")
                 }
-//                else {
-//                    // 自身が通知表示中に更新が走った場合、他のメンバーが何らかの通知操作を行った可能性がある
-//                    // この場合、現在自身が表示している通知と同一の配列内通知を抜き出し、curerntデータに上書きする
-//                    if let getCurrentElement = self.notifications.first(where: {
-//                        $0.id == self.currentNotification?.id
-//                    }) {
-//                        self.currentNotification = getCurrentElement
-//                        print("現在表示している通知を更新")
-//                    }
-//                }
             }
             catch {
-                print("ERROR: try snap?.data(as: Team.self)")
+                print("ERROR: 通知の取得に失敗")
             }
         }
     }
@@ -74,19 +63,19 @@ class NotificationViewModel: ObservableObject {
         guard let team, let uid else { return }
 
         do {
-            self.notifications.removeAll(where: {$0.id == element.id})
-            var updateElement = element
-            updateElement.unread.removeAll(where: {$0 == uid})
+            var updatedElement = element
+            updatedElement.read = true
             print("既読処理実行")
-            print("自身のuid: \(uid)")
-            print("updateElementのunread: \(updateElement.unread)")
 
             try db?.collection("teams")
                 .document(team.id)
+                .collection("members")
+                .document(uid)
                 .collection("logs")
                 .document(element.id)
-                .setData(from: updateElement, merge: true)
+                .setData(from: updatedElement, merge: true)
 
+            print("通知を既読にしました")
         } catch {
             print("ERROR: 既読処理に失敗")
         }

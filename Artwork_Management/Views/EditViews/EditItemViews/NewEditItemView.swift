@@ -373,7 +373,9 @@ struct NewEditItemView: View {
                             let compareItemData = CompareItem(id: passItemId,
                                                               before: passItem,
                                                               after: updatedItem)
-                            logVM.addLog(team: teamVM.team, type: .updateItem(compareItemData))
+                            logVM.addLog(to: teamVM.team,
+                                         by: userVM.user,
+                                         type: .updateItem(compareItemData))
                             dismiss()
 
                         } // Task(update Item)
@@ -412,7 +414,10 @@ struct NewEditItemView: View {
                             // Firestoreにコーダブル保存
                             await itemVM.addItemToFirestore(newItem)
                             tagVM.setActiveTag(from: input.selectionTagName)
-                            logVM.addLog(team: teamVM.team, type: .addItem(newItem))
+
+                            logVM.addLog(to: teamVM.team,
+                                         by: userVM.user,
+                                         type: .addItem(newItem))
 
                             withAnimation(.easeIn(duration: 0.1)) { input.showProgress = false }
                             dismiss()

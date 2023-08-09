@@ -13,7 +13,7 @@ struct Log: Identifiable, Equatable, Hashable, Codable {
     var createTime: Date
     var editByIcon: URL?
     var type: LogType
-    var unread: [String]
+    var read: Bool = false
     var canceledDatas: [Date] = []
 }
 

@@ -135,7 +135,8 @@ struct NewItemsView: View {
                                                     itemVM.deleteItem(deleteItem: selectedItem,
                                                                       teamID: selectedItem.teamID)
 
-                                                    logVM.addLog(team: teamVM.team,
+                                                    logVM.addLog(to: teamVM.team,
+                                                                 by: userVM.user,
                                                                  type: .deleteItem(selectedItem))
                                                 }
                                             }

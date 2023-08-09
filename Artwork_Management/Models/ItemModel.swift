@@ -101,7 +101,7 @@ var sampleItems: [Item] =
          sales: 28000,
          inventory: 50,
          totalAmount: 0,
-         totalInventory: 0),
+         totalInventory: 50),
 
     Item(createTime: Date().plusOneHour(),
          tag: "goods",
@@ -118,5 +118,5 @@ var sampleItems: [Item] =
          sales: 40000,
          inventory: 180,
          totalAmount: 20,
-         totalInventory: 200),
+         totalInventory: 180),
 ]

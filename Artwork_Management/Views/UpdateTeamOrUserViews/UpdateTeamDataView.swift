@@ -200,7 +200,9 @@ struct UpdateTeamDataView: View {
                         let compareTeam = CompareTeam(id: team.id,
                                                       before: beforeTeam,
                                                       after: afterTeam)
-                        logVM.addLog(team: afterTeam, type: .updateTeam(compareTeam))
+                        logVM.addLog(to: teamVM.team,
+                                     by: userVM.user,
+                                     type: .updateTeam(compareTeam))
                     }
                 }
             } // Task ここまで

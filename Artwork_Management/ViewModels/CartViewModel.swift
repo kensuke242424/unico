@@ -48,8 +48,6 @@ class CartViewModel: ObservableObject {
     /// CompareItemは通知の比較表示などで用いる。
     func updateCommerceItemsAndGetCompare(teamID: String) -> [CompareItem] {
 
-        print("updateCommerse実行")
-
         var compareItems: [CompareItem] = []
 
         guard let itemsRef = db?.collection("teams").document(teamID).collection("items") else {
@@ -66,7 +64,6 @@ class CartViewModel: ObservableObject {
             // 更新前・更新後を分けるためのアイテムコンテナを用意
             let defaultItem = item
             var updateItem = item
-            print(updateItem.id)
 
             updateItem.updateTime = Date()
             updateItem.sales += item.price * item.amount
@@ -85,7 +82,7 @@ class CartViewModel: ObservableObject {
                 print("Error: 「\(item.name)」try reference.document(itemID).setData(from: item)")
             }
         }
-        print("updateCommerse完了")
+
         resetCart()
         self.doCommerce = true
 

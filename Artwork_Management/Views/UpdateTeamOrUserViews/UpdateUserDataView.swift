@@ -185,13 +185,15 @@ struct UpdateUserDataView: View {
                     showContent = false
                     input.savingWait = false
                 }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     withAnimation(.spring(response: 0.3)) { show = false }
                     if beforeUser != afterUser {
                         let compareUser = CompareUser(id    : user.id,
                                                       before: beforeUser,
                                                       after : afterUser)
-                        logVM.addLog(team: team, type: .updateUser(compareUser))
+                        logVM.addLog(to: team,
+                                     by: user,
+                                     type: .updateUser(compareUser))
                     }
                 }
             } // Task ここまで

@@ -80,7 +80,9 @@ struct CommerceSheet: View {
                         /// これらのデータを通知用の比較表示データとして渡す
                         let compareItems = cartVM.updateCommerceItemsAndGetCompare(teamID: teamID)
                         // 通知の作成
-                        logVM.addLog(team: teamVM.team, type: .commerce(compareItems))
+                        logVM.addLog(to: teamVM.team,
+                                     by: userVM.user,
+                                     type: .commerce(compareItems))
                         cartVM.doCommerce = true
                         hapticSuccessNotification()
                     },

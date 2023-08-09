@@ -44,29 +44,39 @@ class LogViewModel: ObservableObject {
         }
     }
 
-    /// アイテムや新規通知をチーム内の各メンバーに渡すメソッド。
-    func addLog(team: Team?, type logType: LogType) {
-        guard var team else { return }
-        guard let myMemberData = getCurrentTeamMyMemberData(team: team) else { return }
+    /// アイテムや新規通知をチームのサブコレクション「members」の各メンバーデータに渡すメソッド。
+    func addLog(to team: Team?, by user: User?,  type logType: LogType) {
+        guard let team, let user else { return }
 
         let newLog = Log(createTime: Date(),
-                         editByIcon: myMemberData.iconURL,
-                         type: logType,
-                         unread: getMembersId(team: team))
-        guard let logsRef = db?
+                         editByIcon: user.iconURL,
+                         type      : logType)
+
+        let membersRef = db?
             .collection("teams")
             .document(team.id)
-            .collection("logs").document(newLog.id) else { return }
+            .collection("members")
 
         do {
-            _ = try logsRef.setData(from: newLog)
-        } catch {
-            print("Error: setNotification")
+            membersRef?.getDocuments { (snapshot, _) in
+                guard let snapshot else { return }
+
+                snapshot.documents.compactMap { (member) -> () in
+
+                    let memberId = member.documentID
+
+                    try? membersRef?
+                        .document(memberId)
+                        .collection("logs")
+                        .document(newLog.id)
+                        .setData(from: newLog) // 保存
+                }
+            }
         }
     }
 
     /// 現在の操作チームのメンバーidを取得するメソッド。。
-    func getCurrentTeamMyMemberData(team: Team) -> JoinMember? {
+    func getMyMemberData(team: Team) -> JoinMember? {
         let getGyMemberData = team.members.first(where: { $0.memberUID == uid })
         return getGyMemberData
     }

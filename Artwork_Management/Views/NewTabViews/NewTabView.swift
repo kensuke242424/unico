@@ -351,6 +351,7 @@ struct NewTabView: View {
                 // 再度参照を渡す必要がある↓
                 .environmentObject(logVM)
                 .environmentObject(teamVM)
+                .environmentObject(userVM)
             } // builder.content
             .supportedState([.medium])
             .sheetBackground { _ in
@@ -384,7 +385,6 @@ struct NewTabView: View {
         }
         .onAppear {
             tagVM.setFirstActiveTag()
-//            logVM.listener(id : teamVM.teamID)
             notificationVM.listener(id: teamVM.teamID)
         }
     } // body

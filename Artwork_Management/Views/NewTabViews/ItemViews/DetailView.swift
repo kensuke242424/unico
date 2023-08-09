@@ -246,7 +246,9 @@ struct DetailView: View {
                             itemVM.deleteImage(path: item.photoPath)
                             itemVM.deleteItem(deleteItem: item, teamID: item.teamID)
 
-                            logVM.addLog(team: teamVM.team, type: .deleteItem(item))
+                            logVM.addLog(to: teamVM.team,
+                                         by: userVM.user,
+                                         type: .deleteItem(item))
                         }
                     }
                 }
