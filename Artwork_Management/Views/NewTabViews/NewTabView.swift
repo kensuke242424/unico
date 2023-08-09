@@ -491,5 +491,4 @@ struct NewTabView: View {
                 }
         )
     }
-
 } // View

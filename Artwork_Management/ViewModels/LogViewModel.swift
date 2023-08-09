@@ -10,13 +10,14 @@ import Firebase
 import FirebaseStorage
 import FirebaseFirestore
 
-/// チームに保存されているチームログを管理するクラス。
+/// チームのデータ編集履歴を管理するクラス。
 class LogViewModel: ObservableObject {
     init() { print("<<<<<<<<<  LogsViewModel_init  >>>>>>>>>") }
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
     var listener: ListenerRegistration?
     var uid: String? { Auth.auth().currentUser?.uid }
 
+    //TODO: 変更履歴が閲覧できるリストページの作成
     /// Firestoreから取得したチームのログデータを管理するプロパティ。
     @Published var logs: [Log] = []
 
@@ -48,7 +49,8 @@ class LogViewModel: ObservableObject {
     func addLog(to team: Team?, by user: User?,  type logType: LogType) {
         guard let team, let user else { return }
 
-        let newLog = Log(createTime: Date(),
+        let newLog = Log(teamId    : team.id,
+                         createTime: Date(),
                          editByIcon: user.iconURL,
                          type      : logType)
 
@@ -69,20 +71,10 @@ class LogViewModel: ObservableObject {
                         .document(memberId)
                         .collection("logs")
                         .document(newLog.id)
-                        .setData(from: newLog) // 保存
+                        .setData(from: newLog, merge: true) // 保存
                 }
             }
         }
-    }
-
-    /// 現在の操作チームのメンバーidを取得するメソッド。。
-    func getMyMemberData(team: Team) -> JoinMember? {
-        let getGyMemberData = team.members.first(where: { $0.memberUID == uid })
-        return getGyMemberData
-    }
-    /// 現在の操作チームのメンバーidを取得するメソッド。。
-    func getMembersId(team: Team) -> [String] {
-        return team.members.map {$0.memberUID}
     }
 
     deinit {

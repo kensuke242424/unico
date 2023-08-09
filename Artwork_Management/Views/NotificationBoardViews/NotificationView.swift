@@ -22,7 +22,7 @@ struct NotificationView: View {
                 NotificationContainer(element: element)
             }
             Spacer()
-        } // VStack
+        }
     }
 }
 
@@ -92,7 +92,7 @@ fileprivate struct NotificationContainer: View {
                     UpdateItemDetail(item: item)
 
                 case .deleteItem(let item):
-                    DeleteItemDetail(item: item)
+                    DeletedItemDetail(item: item)
 
                 case .commerce(let items):
                     CommerceItemDetail(items: items)
@@ -321,7 +321,7 @@ fileprivate struct NotificationContainer: View {
         } // VStack
     }
     @ViewBuilder
-    func DeleteItemDetail(item: Item) -> some View {
+    func DeletedItemDetail(item: Item) -> some View {
         /// 表示アイテムが更新キャンセルされているかを判定する
         var reseted: Bool {
             return resetedLogs.contains(item.createTime)
@@ -684,6 +684,9 @@ fileprivate struct NotificationContainer: View {
 fileprivate
 struct ResetLogButton: View {
 
+    @EnvironmentObject var vm: NotificationViewModel
+    @EnvironmentObject var teamVM: TeamViewModel
+
     @Binding var cancelDates: [Date]
     let element: Log
     let arrayIndex: Int? // 複数アイテムの場合(.commerce)
@@ -758,42 +761,9 @@ struct ResetLogButton: View {
                 },
                 perform: {
                     pressingState = false
-
-                    switch element.type {
-
-                    case .addItem(let item):
-                        print("\(item.name)の追加キャンセル")
-                        // 処理...
-                        cancelDates.append(item.createTime)
-
-                    case .updateItem(let item):
-                        print("\(item.after.name)更新キャンセル")
-                        // 処理...
-                        cancelDates.append(item.before.createTime)
-
-                    case .deleteItem(let item):
-                        print("\(item.name)の削除キャンセル")
-                        // 処理...
-                        cancelDates.append(item.createTime)
-
-                    case .commerce(let items):
-                        print("\(items[index].after.name)カート処理キャンセル")
-                        // 処理...
-                        cancelDates.append(items[index].before.createTime)
-
-                    case .join:
-                        print("ユーザー参加通知にはキャンセルボタン無し")
-
-                    case .updateUser(let user):
-                        print("\(user.after.name)の更新キャンセル")
-                        // 処理...
-                        cancelDates.append(user.after.createTime)
-
-                    case .updateTeam(let team):
-                        print("\(team.after.name)の更新キャンセル")
-                        // 処理...
-                        cancelDates.append(team.after.createTime)
-                    }
+                    /// リセット処理
+                    /// 内部でログデータのタイプを判定し、対象データの変更リセットを実行
+                    vm.resetController(to: teamVM.team, element: element)
                 })
             .onReceive(pressingTimer) { value in
                 if pressingState {

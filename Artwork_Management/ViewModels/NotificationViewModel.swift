@@ -37,6 +37,7 @@ class NotificationViewModel: ObservableObject {
 
         let unreadLogQuery = myLogsRef?
             .whereField("read", in: [false])
+            .limit(to: 10)
 
         /// 未読を表す「unread」フィールドに自身のuidが存在するドキュメントを取得する
         listener = unreadLogQuery?.addSnapshotListener { (snapshot, _) in
@@ -80,42 +81,64 @@ class NotificationViewModel: ObservableObject {
             print("ERROR: 既読処理に失敗")
         }
     }
-    /// Firestore内の通知データを削除するメソッド。
-    /// 通知のエレメントが持つ削除タイプを参照して、ローカル削除とグローバル削除を分岐する。
-    func removeNotification(team: Team?, element: Log) {
-        guard var team else { return }
-        guard let teamRef = db?.collection("teams").document(team.id) else { return }
+    /// ユーザーが通知ビュー内の更新キャンセルボタンをタップした場合に発火するデータ変更リセットメソッド。
+    ///
+    func resetController(to team: Team?, element: Log) {
 
-//        switch element.type.removeRule {
+        Task {
+            switch element.type {
 
-//        case .local:
-            guard let index = team.members.firstIndex(where: { $0.memberUID == uid }) else { return }
-            team.members[index].notifications.removeAll(where: { $0.id == element.id })
+            case .addItem(let item):
+                print("")
 
-//        case .global:
-//            for index in team.members.indices {
-//                team.members[index].notifications.removeAll(where: { $0.id == element.id })
-//            }
-//        }
+            case .updateItem(let item):
+                try await self.resetUpdateItem(item, to: team, element: element)
 
-        do {
-            _ = try teamRef.setData(from: team, merge: true)
-        } catch {
-            print("Error: removeNotification")
+            case .deleteItem(let item):
+                print("")
+
+            case .commerce(let items):
+                print("")
+
+            case .join:
+                print("ユーザー参加通知にはキャンセルボタン無し")
+
+            case .updateUser(let user):
+                print("")
+
+            case .updateTeam(let team):
+                print("")
+
+            }
         }
     }
 
-    /// 更新されたデータの内容をリセットするメソッド。
-//    func resetToItem(element: NotifyElement) {
-//
-//        switch element.type.setRule {
-//
-//        case .local:
-//            <#code#>
-//        case .global:
-//            <#code#>
-//        }
-//    }
+    //MEMO:  単純にbeforeデータを上書きするだけだと、通知が発行された以降にもしデータの更新があった場合に、
+    // 以降の更新も一緒に上書きしてしまう。よって、beforeとafterの差分を先に求め、その値をデータに反映させる。
+    /// 更新されたアイテムデータの内容をリセットするメソッド。
+    /// 現在のアイテムデータをフェッチし、更新の差分値を反映させて保存し直す。
+    func resetUpdateItem(_ item: CompareItem, to team: Team?, element: Log) async throws {
+
+        print("更新を取り消すアイテムのid: \(item.id)")
+
+        // CompareItemを使って差分を先に出す
+
+        let itemRef = db?
+            .collection("teams")
+            .document(team?.id ?? "")
+            .collection("items")
+            .document(item.id)
+
+        do {
+
+        } catch {
+            throw CustomNotificationError.resetUpdateItem
+        }
+    }
+
+    func resetAddItem(_ item: Item, to team: Team?, element: Log) async throws {
+
+    }
 
     /// 通知から受け取ったアイテムデータの更新内容を取り消すメソッド。
     /// 更新以前の値を受け取り、Firestoreに上書き保存する。
@@ -168,4 +191,8 @@ class NotificationViewModel: ObservableObject {
     deinit {
         listener?.remove()
     }
+}
+
+enum CustomNotificationError: Error {
+    case resetUpdateItem
 }
