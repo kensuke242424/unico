@@ -81,9 +81,14 @@ class NotificationViewModel: ObservableObject {
             print("ERROR: 既読処理に失敗")
         }
     }
-    /// ユーザーが通知ビュー内の更新キャンセルボタンをタップした場合に発火するデータ変更リセットメソッド。
-    ///
-    func resetController(to team: Team?, element: Log) async throws {
+    /// ユーザーが通知ビューに記載している更新内容をキャンセルした場合に発火する、更新内容のリセットメソッドコントローラ。
+    /// ログのタイプをメソッド内で参照し、タイプごとで実行メソッドを分岐ハンドリングする。
+    /// - Parameters:
+    ///   - team: リセット処理を行う対象のチーム。現在操作しているCurrentTeamが格納される。
+    ///   - element: 現在操作を行っているログ通知の要素データ。ログの要素とタイプが格納されている。
+    ///   - selectedIndex: 通知ログのタイプが複数のデータを扱うタイプの場合(カート処理など)に、
+    ///   リセット対象のアイテムをハンドリングするための配列インデックス。
+    func resetController(to team: Team?, element: Log, index selectedIndex: Int? = nil) async throws {
 
         switch element.type {
 
@@ -106,7 +111,8 @@ class NotificationViewModel: ObservableObject {
             break
 
         case .updateUser(let user):
-            break
+            try await
+            self.resetUpdateUser(user.before, to: team, element: element)
 
         case .updateTeam(let team):
             break
@@ -121,8 +127,6 @@ class NotificationViewModel: ObservableObject {
 
         print("更新を取り消すアイテムのid: \(item.id)")
 
-        // CompareItemを使って差分を先に出す
-
         let itemRef = db?
             .collection("teams")
             .document(team?.id ?? "")
@@ -132,14 +136,18 @@ class NotificationViewModel: ObservableObject {
         do {
 
         } catch {
-            throw NotificationError.resetUpdateItem
+            throw NotificationError.resetUpdatedItem
         }
     }
     /// アイテムデータの追加をキャンセルし削除するメソッド。
     func resetAddedItem(_ addedItem: Item, to team: Team?, element: Log) async throws {
+        guard let team, let itemId = addedItem.id else {
+            throw NotificationError.missingData
+        }
+
         let itemRef = db?
             .collection("teams")
-            .document(team?.id ?? "")
+            .document(team.id)
             .collection("items")
             .document(addedItem.id ?? "")
 
@@ -147,61 +155,105 @@ class NotificationViewModel: ObservableObject {
             try await itemRef?.delete()
         }
         catch {
-            throw NotificationError.resetAddItem
+            throw NotificationError.resetAddedItem
         }
     }
 
     /// アイテムデータの追加をキャンセルし削除するメソッド。
     func resetDeletedItem(_ deletedItem: Item, to team: Team?, element: Log) async throws {
+        guard let team, let itemId = deletedItem.id else {
+            throw NotificationError.missingData
+        }
+
         let itemRef = db?
             .collection("teams")
-            .document(team?.id ?? "")
+            .document(team.id)
             .collection("items")
-            .document(deletedItem.id ?? "")
+            .document(itemId)
 
         do {
             try await itemRef?.setData(from: deletedItem)
         }
         catch {
-            throw NotificationError.resetAddItem
+            throw NotificationError.resetDeletedItem
         }
     }
 
-    /// 通知から受け取ったアイテムデータの更新内容を取り消すメソッド。
-    /// 更新以前の値を受け取り、Firestoreに上書き保存する。
-    func cancelUpdateItemToFirestore(data beforeItem: Item, team: Team?) async throws {
-        guard let team else { return }
-        guard let itemID = beforeItem.id else { return }
-        guard let itemRef = db?.collection("teams")
-            .document(team.id)
-            .collection("items")
-            .document(itemID) else { return }
+    /// アイテムデータの追加をキャンセルし削除するメソッド。
+    func resetUpdateUser(_ beforeUser: User?, to team: Team?, element: Log) async throws {
+        guard let beforeUser, let team else {
+            throw NotificationError.missingData
+        }
+        // 👦 ------- 自身のユーザードキュメント処理 ---------👦
+        let userRef = db?
+            .collection("users")
+            .document(beforeUser.id)
 
         do {
-            try itemRef.setData(from: beforeItem, merge: true) // 保存
-        } catch {
-            print("Item: \(beforeItem.name)の更新取り消し失敗")
-            throw CustomError.setData
+            try await userRef?.setData(from: beforeUser)
+        }
+        catch {
+            throw NotificationError.resetAddedItem
+        }
+
+        // 👦👩 ------- 自身の所属するチームのメンバーデータ処理 ---------👩👦
+
+        /// ユーザーが所属している全てのチームのmembersサブコレクションから、
+        /// 自身のドキュメントリファレンスを取り出す。
+        let joinsTeamMembersRef = beforeUser.joins.compactMap { join in
+            let teamMembersRef = db?
+                .collection("teams")
+                .document(join.teamID)
+                .collection("members")
+                .document(beforeUser.id)
+            return teamMembersRef
+        }
+
+        let resetMemberData = JoinMember(memberUID: beforeUser.id,
+                                         name: beforeUser.name,
+                                         iconURL: beforeUser.iconURL)
+
+        for MyMemberRef in joinsTeamMembersRef {
+            do {
+                try await MyMemberRef.setData(from: resetMemberData)
+            }
+            catch {
+                throw NotificationError.resetAddedItem
+            }
         }
     }
-    /// 通知から受け取ったユーザーの更新内容を取り消すメソッド。
-    /// 更新以前の値を受け取り、Firestoreに上書き保存する。
-    func cancelUpdateUserToFirestore(data beforeUser: User?) async throws {
-        guard let beforeUser else { return }
-        guard let userRef = db?.collection("users")
-            .document(beforeUser.id) else { throw CustomError.getRef }
-
-        do {
-            try userRef.setData(from: beforeUser, merge: true) // 保存
-        } catch {
-            throw CustomError.setData
+    /// 通知の破棄によって発火されるbeforeデータ画像削除メソッドコントローラ。
+    /// メソッド内部でログ通知のタイプを判定し、処理を分岐する。
+    func deleteBeforeUIImageController(element: Log) {
+        switch element.type {
+        case .deleteItem(let item):
+            deleteBeforeUIImage(path: item.photoPath)
+        case .updateItem(let item):
+            deleteBeforeUIImage(path: item.before.photoPath)
+        case .updateUser(let user):
+            deleteBeforeUIImage(path: user.before.iconPath)
+        case .updateTeam(let team):
+            deleteBeforeUIImage(path: team.before.iconPath)
+        case .addItem, .commerce, .join:
+            break
         }
     }
-    /// 通知から受け取ったチームの更新内容を取り消すメソッド。
-    /// 更新以前の値を受け取り、Firestoreに上書き保存する。
-    func cancelUpdateTeam(to beforeTeam: Team?) {
-        guard let beforeTeam else { return }
+    /// データ内の画像が変更されている or データが削除された状態で、変更をキャンセルせずに通知を破棄した時、
+    /// beforeデータの画像を削除するメソッド。
+    func deleteBeforeUIImage(path imagePath: String?) {
+        guard let imagePath else { return }
 
+        let storage = Storage.storage()
+        let reference = storage.reference()
+        let imageRef = reference.child(imagePath)
+
+        imageRef.delete { error in
+            if let error = error {
+                print(error)
+            } else {
+                print("beforeデータの画像削除成功!")
+            }
+        }
     }
 
     deinit {
@@ -211,6 +263,10 @@ class NotificationViewModel: ObservableObject {
 
 /// 通知関連のエラーを管理するクラス。
 enum NotificationError: Error {
-    case resetUpdateItem
-    case resetAddItem
+    case missingData
+    case resetUpdatedItem
+    case resetAddedItem
+    case resetDeletedItem
+    case resetUpdatedUser
+    case noSnapShotExsist
 }

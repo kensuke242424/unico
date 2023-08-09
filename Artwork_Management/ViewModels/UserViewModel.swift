@@ -219,10 +219,6 @@ class UserViewModel: ObservableObject {
 
         do {
             _ = try userRef.setData(from: updatedUserData)
-            // アイコンデータは変えていない場合、削除処理をスキップする
-            if defaultIconPath != updatedUserData.iconPath {
-                await deleteUserImageData(path: defaultIconPath)
-            }
         } catch {
             // アイコンデータ更新失敗時の処理
             // 保存予定だったアイコンデータをfirestorageから削除
