@@ -184,7 +184,7 @@ struct UpdateTeamDataView: View {
                 if beforeTeam != afterTeam {
                     try await teamVM.updateTeam(data: afterTeam)
                     try await userVM.updateJoinTeamToMembers(data: joinTeamContainer,
-                                                             ids: team.membersId)
+                                                             ids: teamVM.membersId)
 
                     hapticSuccessNotification()
                 }

@@ -417,8 +417,7 @@ struct CreateAndJoinTeamView: View {
                                             iconURL       : uplaodIconImageData.url,
                                             iconPath      : uplaodIconImageData.filePath,
                                             backgroundURL : backgroundContainer.imageURL,
-                                            backgroundPath: backgroundContainer.imagePath,
-                                            membersId       : [user.id])
+                                            backgroundPath: backgroundContainer.imagePath)
                         
                         let joinTeamData = JoinTeam(id : createTeamID,
                                                     name   : inputTeamName,

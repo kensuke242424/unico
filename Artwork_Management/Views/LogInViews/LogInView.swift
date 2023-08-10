@@ -599,8 +599,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
 
                         /// teamsコレクションに保存する新規チームデータ
                         let teamData = Team(id     : createTeamID,
-                                            name   : "\(user.name)のチーム",
-                                            membersId: [user.id])
+                                            name   : "\(user.name)のチーム")
 
                         /// ユーザードキュメントのサブコレクションに保存する所属チームの情報
                         let joinTeamData = JoinTeam(id           : teamData.id,

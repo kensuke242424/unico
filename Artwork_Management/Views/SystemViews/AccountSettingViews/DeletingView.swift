@@ -44,10 +44,11 @@ struct DeletingView: View {
                 guard let userID = userVM.user?.id else { return }
 
                 do {
-                    _ = try await logInVM.deleteAccountWithEmailLink()
-                    _ = try await teamVM.deleteAccountRelatedTeamData(uid: userID,
-                                                                      joinsTeam: userVM.joins)
-                    _ = try await userVM.deleteAccountRelatedUserData()
+                    //TODO: この辺りの処理見直す必要あり
+//                    _ = try await logInVM.deleteAccountWithEmailLink()
+//                    _ = try await teamVM.deleteAccountRelatedTeamData(uid: userID,
+//                                                                      joinsTeam: userVM.joins)
+//                    _ = try await userVM.deleteAccountRelatedUserData()
 
                     navigationVM.path.append(SystemAccountPath.deletedAccount)
 

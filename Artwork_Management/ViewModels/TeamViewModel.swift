@@ -34,7 +34,7 @@ class TeamViewModel: ObservableObject {
     /// 現在の操作チーム「members」内のフィールドから自身のmemberデータインデックスを取得するプロパティ。
     var myMemberIndex: Int? {
         guard let team else { return nil }
-        let index = team.membersId.firstIndex(where: {$0 == uid})
+        let index = self.members.firstIndex(where: {$0.id == uid})
         return index
     }
     /// 現在の操作しているチームのメンバー全員のIdを格納するプロパティ。
@@ -153,7 +153,7 @@ class TeamViewModel: ObservableObject {
             .document(detectedUser.id)
 
         do {
-            for memberId in team.membersId where detectedUser.id == memberId {
+            for memberId in self.membersId where detectedUser.id == memberId {
                 throw CustomError.memberDuplication
             }
 
@@ -165,27 +165,13 @@ class TeamViewModel: ObservableObject {
         }
     }
 
-    func setNewMemberId(_ newMemberId: String) async throws {
-        guard let team else { throw CustomError.teamEmpty }
-        let teamRef = db?
-            .collection("teams")
-            .document(team.id)
-
-        var updateTeam = team
-        updateTeam.membersId.append(newMemberId)
-
-        do {
-            try await teamRef?.setData(from: updateTeam)
-        }
-    }
-
     /// チーム作成時にデフォルトのサンプルアイテムを追加するメソッド。
     func setSampleItem(itemsData: [Item] = sampleItems, teamID: String) async {
 
-        guard let itemsRef = db?.collection("teams").document(teamID).collection("items") else {
-            print("error: guard let tagsRef")
-            return
-        }
+        let itemsRef = db?
+            .collection("teams")
+            .document(teamID)
+            .collection("items")
 
         for itemData in itemsData {
             do {
@@ -193,7 +179,11 @@ class TeamViewModel: ObservableObject {
                 var itemData = itemData
                 itemData.teamID = teamID
 
-                _ = try itemsRef.addDocument(from: itemData)
+                try db?
+                    .collection("teams")
+                    .document(teamID)
+                    .collection("items")
+                    .addDocument(from: itemData)
 
             } catch {
                 print("Error: addDocument(from: \(itemData.name)")
@@ -530,8 +520,8 @@ class TeamViewModel: ObservableObject {
                         continue
                     }
 
-                    if teamData.membersId.count == 1 &&
-                        teamData.membersId.first == userID {
+                    if self.membersId.count == 1 &&
+                        self.membersId.first == userID {
                         // 削除対象ユーザーの他にチームメンバーが居なかった場合、全データをFirestoreから削除
                         _ = await deleteAllTeamTags()
                         _ = await deleteAllTeamItems()
@@ -539,7 +529,7 @@ class TeamViewModel: ObservableObject {
 
                     } else {
                         // 削除対象ユーザーの他にもチーム所属者がいた場合、自身のみmembersから処理し、保存
-                        teamData.membersId.removeAll(where: { $0 == userID })
+//                        teamData.membersId.removeAll(where: { $0 == userID })
                         try teamRowRef.setData(from: teamData)
                     }
                 }

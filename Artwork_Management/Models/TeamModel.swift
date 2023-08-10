@@ -17,7 +17,6 @@ struct Team: Identifiable, Codable, Equatable {
     var iconPath: String?
     var backgroundURL: URL?
     var backgroundPath: String?
-    var membersId: [String]
     var logs: [Log] = []
 }
 
