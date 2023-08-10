@@ -177,9 +177,9 @@ struct UpdateUserDataView: View {
                 if beforeUser != afterUser {
                     /// 自身のユーザーデータ更新
                     try await userVM.updateUser(from: afterUser)
-                    // 所属するチームが保持する自身のデータを更新
-                    try await userVM.updateJoinTeamsMyData(from: afterUser)
-
+                    // 自身が所属するチーム群が保持している自身のメンバーデータを更新
+                    try await teamVM.updateJoinTeamsMyData(from: afterUser,
+                                                           joins: userVM.joins)
                     hapticSuccessNotification()
                 }
 

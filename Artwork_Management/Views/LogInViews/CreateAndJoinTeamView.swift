@@ -348,23 +348,18 @@ struct CreateAndJoinTeamView: View {
                 Text("チーム追加をやめて戻りますか？")
             } // alert
         } // ZStack
-        /// 所属チームの数を監視して、新規チームの加入を検知する
-        .onChange(of: userVM.joinsCount) { [before = userVM.joinsCount] after in
-            if after == 1 { return }
-            if before < after {
-                userVM.isApproved = true
-            }
-        }
-        .task(id: userVM.isApproved) {
-            guard let _ = userVM.isApproved else { return }
-            print("=========チーム加入承諾を検知=========")
-//            if selectedTeamCard != .join { return }
+        .task(id: userVM.newJoinedTeam) {
+            guard let newJoinTeam = userVM.newJoinedTeam else { return }
+            print("=========他チームからのチーム加入承諾を検知=========")
 
-            guard let user = userVM.user else { return }
-            // lastLogInのidを元に、joins配列内から新規加入チームデータを取り出す
-            for team in userVM.joins where team.id == user.lastLogIn {
-                self.joinedTeamData = team
+            do {
+                try await userVM.setApprovedJoinTeam(to: newJoinTeam)
+                self.joinedTeamData = newJoinTeam
+            } catch {
+                print("新チーム加入の既読approvedの更新失敗")
+                return
             }
+
             // 加入完了ビューを表示
             withAnimation(.spring(response: 1.5, blendDuration: 1)) {
                 selectTeamFase = .success
@@ -374,21 +369,6 @@ struct CreateAndJoinTeamView: View {
                 withAnimation(.spring(response: 0.5)) { logInVM.rootNavigation = .fetch }
             }
         }
-
-        // 「チームに参加」により、相手から承認を受け、チーム情報を受け取ることでリスナーが変更を検知し、作動する
-        // 受け取ったチームの情報をもとに、ログインを行う
-//        .onChange(of: userVM.isApproved) { _ in
-//            print("=========user情報の更新を検知=========")
-//            if selectedTeamCard != .join { return }
-//            guard let user = userVM.user else { return }
-//            for joinTeam in userVM.joins where joinTeam.id == user.lastLogIn {
-//                self.joinedTeamData = joinTeam
-//            }
-//            withAnimation(.spring(response: 1.5, blendDuration: 1)) { selectTeamFase = .success }
-//            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-//                withAnimation(.spring(response: 0.5)) { logInVM.rootNavigation = .fetch }
-//            }
-//        }
 
         // ✅チーム生成と保存処理
         .onChange(of: selectTeamFase) { _ in

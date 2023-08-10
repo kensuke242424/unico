@@ -35,6 +35,10 @@ class TeamViewModel: ObservableObject {
     var myMemberIndex: Int? {
         return self.members.firstIndex(where: {$0.id == uid})
     }
+    var myJoinMemberData: JoinMember? {
+        guard let index = myMemberIndex else { return nil }
+        return self.members[index]
+    }
     /// 現在の操作しているチームのメンバー全員のIdを格納するプロパティ。
     var membersId: [String] {
         return self.members.compactMap {$0.id}
@@ -121,6 +125,31 @@ class TeamViewModel: ObservableObject {
             throw CustomError.setData
         }
         print("addTeamAndGetID完了")
+    }
+
+    /// ユーザーが所属しているチーム全てに保存されている自身のメンバーデータを更新する。
+    /// ユーザーデータの変更を行った時に、各チームのユーザーステートを揃えるために使う。
+    func updateJoinTeamsMyData(from updatedData: User, joins: [JoinTeam]) async throws {
+        guard var myJoinMember = self.myJoinMemberData else {
+            throw TeamRelatedError.missingData
+        }
+
+        /// データの更新
+        myJoinMember.name = updatedData.name
+        myJoinMember.iconURL = updatedData.iconURL
+
+        joins.compactMap { team in
+            do {
+                try db?
+                    .collection("teams")
+                    .document(team.id) // 所属チームの一つ
+                    .collection("members")
+                    .document(myJoinMember.id)
+                    .setData(from: myJoinMember)
+            } catch {
+                UserRelatedError.failedUpdateJoinsMyMemberData
+            }
+        }
     }
 
     /// 新規チーム作成時に使用するメソッド。作成者のメンバーデータを新規チームのサブコレクションに保存する。
@@ -210,9 +239,10 @@ class TeamViewModel: ObservableObject {
 
         /// 現在のチームのjoinTeamデータを生成
         let joinTeamContainer = JoinTeam(id: team.id,
-                                name: team.name,
-                                iconURL: team.iconURL,
-                                currentBackground: sampleBackground)
+                                         name: team.name,
+                                         iconURL: team.iconURL,
+                                         currentBackground: sampleBackground,
+                                         approved: false)
         do {
             try db?
                 .collection("users")

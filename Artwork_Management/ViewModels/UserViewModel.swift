@@ -29,7 +29,12 @@ class UserViewModel: ObservableObject {
 
     @Published var user: User?
     @Published var joins: [JoinTeam] = []
-    @Published var joinsCount: Int = 0
+
+    /// 新規加入チームのjoinTeamデータを保持するプロパティ。
+    /// リスナーが受け取ったjoinTeamのapprovedがfalseだと、
+    /// このプロパティにデータが格納される。
+    /// 加入通知をユーザーが確認した時点で、approvedはtrueとなる。
+    @Published var newJoinedTeam: JoinTeam?
 
     var memberColor: ThemeColor {
         return user?.userColor ?? ThemeColor.blue
@@ -163,11 +168,13 @@ class UserViewModel: ObservableObject {
             do {
                 DispatchQueue.main.async {
                     self.joins = documents.compactMap { (document) -> JoinTeam? in
-                        return try? document.data(as: JoinTeam.self)
+                        let getJoinTeam = try? document.data(as: JoinTeam.self)
+                        // approved == falseなら、相手から承認を受けた新規加入チーム
+                        if let approved = getJoinTeam?.approved, !approved {
+                            self.newJoinedTeam = getJoinTeam
+                        }
+                        return getJoinTeam
                     }
-                    // 所属チームの数を保存
-                    self.joinsCount = self.joins.count
-                    print("所属チームの数: \(self.joinsCount)")
                 }
             }
         }
@@ -208,18 +215,18 @@ class UserViewModel: ObservableObject {
 
         let currentIndex = getCurrentJoinsIndex()
         guard let currentIndex else { return }
-        var updateJoinTeam = self.joins[currentIndex]
+        var myJoinTeam = self.joins[currentIndex]
 
-        updateJoinTeam.homeEdits = EditedData
-
-        let joinTeamRef = db?
-            .collection("users")
-            .document(uid)
-            .collection("joins")
-            .document(updateJoinTeam.id)
+        // Homeエディットデータを更新
+        myJoinTeam.homeEdits = EditedData
 
         do {
-            try joinTeamRef?.setData(from: updateJoinTeam)
+            try db?
+                .collection("users")
+                .document(uid)
+                .collection("joins")
+                .document(myJoinTeam.id)
+                .setData(from: myJoinTeam)
         } catch {
             throw UserRelatedError.failedHomeEdits
         }
@@ -229,18 +236,16 @@ class UserViewModel: ObservableObject {
         guard let uid, var currentJoinTeam else {
             throw UserRelatedError.missingData
         }
-
-        let joinTeamRef = db?
-            .collection("users")
-            .document(uid)
-            .collection("joins")
-            .document(currentJoinTeam.id)
-
         // 背景のアップデート
         currentJoinTeam.currentBackground = newBackground
 
         do {
-            try joinTeamRef?.setData(from: currentJoinTeam)
+            try db?
+                .collection("users")
+                .document(uid)
+                .collection("joins")
+                .document(currentJoinTeam.id)
+                .setData(from: currentJoinTeam)
         } catch {
             throw UserRelatedError.failedUpdateBackground
             print("ERROR: チーム背景のアップデートに失敗しました")
@@ -251,7 +256,6 @@ class UserViewModel: ObservableObject {
     func updateFavorite(_ itemID: String?) {
         guard var userData = user else { return }
         guard let itemID else { return }
-        guard let userRef = db?.collection("users").document(userData.id) else { return }
 
         let index = userData.favorites.firstIndex(where: { $0 == itemID })
         if let index {
@@ -261,7 +265,10 @@ class UserViewModel: ObservableObject {
         }
 
         do {
-            _ = try? userRef.setData(from: userData)
+            try? db?
+                .collection("users")
+                .document(userData.id)
+                .setData(from: userData)
             hapticActionNotification()
         }
     }
@@ -283,51 +290,6 @@ class UserViewModel: ObservableObject {
         }
     }
 
-    /// ユーザーが所属しているチーム全てに保存されている自身のメンバーデータを更新する。
-    /// ユーザーデータの変更を行った時に、各チームのユーザーステートを揃えるために使う。
-    func updateJoinTeamsMyData(from updatedData: User) async throws {
-        // 自身が参加している各チームのid文字列データを配列に格納
-
-        let updatedMyMemberData = JoinMember(id: updatedData.id,
-                                       name: updatedData.name,
-                                       iconURL: updatedData.iconURL)
-
-        self.joins.compactMap { team in
-            do {
-                try db?
-                    .collection("teams")
-                    .document(team.id) // 所属チームの一つ
-                    .collection("members")
-                    .document(updatedMyMemberData.id)
-                    .setData(from: updatedMyMemberData)
-            } catch {
-                UserRelatedError.failedUpdateJoinsMyMemberData
-            }
-        }
-    }
-
-    /// ユーザーアイコンをFirestorageに保存するメソッド。
-    /// filePathは「users/\(Date()).jpeg」
-    func uploadUserImage(_ image: UIImage?) async -> (url: URL?, filePath: String?) {
-        guard let user,
-              let imageData = image?.jpegData(compressionQuality: 0.8) else {
-            print("ユーザーアイコンのアップロード失敗")
-            return (url: nil, filePath: nil)
-        }
-
-        do {
-            let storage = Storage.storage()
-            let reference = storage.reference()
-            let filePath = "users/\(user.id)\(Date()).jpeg"
-            let imageRef = reference.child(filePath)
-            _ = try await imageRef.putDataAsync(imageData)
-            let url = try await imageRef.downloadURL()
-
-            return (url: url, filePath: filePath) // 成功
-        } catch {
-            return (url: nil, filePath: nil)
-        }
-    }
     /// ユーザーデータの更新をFirestoreに保存するメソッド。
     func updateUser(from updatedUserData: User) async throws {
         guard let user else { throw CustomError.userEmpty }
@@ -391,6 +353,27 @@ class UserViewModel: ObservableObject {
             }
         }
     }
+    /// joinTeamデータのプロパティ「approved」をtrueにするメソッド。
+    /// 他チームからの承諾によって新規チームが追加された時、ユーザーに追加を知らせるのに
+    /// approvedの値を用いる。
+    func setApprovedJoinTeam(to newJoinTeam: JoinTeam) async throws {
+        guard let uid else { throw UserRelatedError.uidEmpty }
+        // 加入の既読を付ける
+        var newJoinTeam = newJoinTeam
+        newJoinTeam.approved = true
+
+        do {
+            try db?
+                .collection("users")
+                .document(uid)
+                .collection("joins")
+                .document(newJoinTeam.id)
+                .setData(from: newJoinTeam)
+        } catch {
+            print("ERROR: 新規加入チームの既読失敗")
+            throw UserRelatedError.failedUpdateJoinTeamApproved
+        }
+    }
 
     /// ユーザーが現在のチーム内で選択した背景画像をFireStorageに保存する。
     func uploadMyNewBackground(_ image: UIImage?) async -> (url: URL?, filePath: String?) {
@@ -452,6 +435,29 @@ class UserViewModel: ObservableObject {
 
         } catch {
             print("ERROR: チーム背景の保存に失敗しました。")
+        }
+    }
+
+    /// ユーザーアイコンをFirestorageに保存するメソッド。
+    /// filePathは「users/\(Date()).jpeg」
+    func uploadUserImage(_ image: UIImage?) async -> (url: URL?, filePath: String?) {
+        guard let user,
+              let imageData = image?.jpegData(compressionQuality: 0.8) else {
+            print("ユーザーアイコンのアップロード失敗")
+            return (url: nil, filePath: nil)
+        }
+
+        do {
+            let storage = Storage.storage()
+            let reference = storage.reference()
+            let filePath = "users/\(user.id)\(Date()).jpeg"
+            let imageRef = reference.child(filePath)
+            _ = try await imageRef.putDataAsync(imageData)
+            let url = try await imageRef.downloadURL()
+
+            return (url: url, filePath: filePath) // 成功
+        } catch {
+            return (url: nil, filePath: nil)
         }
     }
 
@@ -566,6 +572,7 @@ enum UserRelatedError:Error {
     case failedHomeEdits
     case failedUserListen
     case failedUpdateBackground
+    case failedUpdateJoinTeamApproved
     case failedUpdateLastLogIn
     case failedUpdateJoinsMyMemberData
     case failedEscapeTeam

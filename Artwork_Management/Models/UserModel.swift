@@ -34,6 +34,7 @@ struct JoinTeam: Codable, Hashable {
     var myBackgrounds: [Background] = []
     var homeEdits = HomeEditData(nowTime: NowTimeParts(),
                                      teamNews: TeamNewsParts())
+    var approved: Bool?
 }
 
 /// Homeの各パーツ設定をまとめたデータモデル
