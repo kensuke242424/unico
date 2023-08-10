@@ -355,18 +355,17 @@ struct CreateAndJoinTeamView: View {
             do {
                 try await userVM.setApprovedJoinTeam(to: newJoinTeam)
                 self.joinedTeamData = newJoinTeam
+                // 加入完了ビューを表示
+                withAnimation(.spring(response: 1.5, blendDuration: 1)) {
+                    selectTeamFase = .success
+                }
+                // ログイン開始
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                    withAnimation(.spring(response: 0.5)) { logInVM.rootNavigation = .fetch }
+                }
             } catch {
                 print("新チーム加入の既読approvedの更新失敗")
                 return
-            }
-
-            // 加入完了ビューを表示
-            withAnimation(.spring(response: 1.5, blendDuration: 1)) {
-                selectTeamFase = .success
-            }
-            // ログイン開始
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                withAnimation(.spring(response: 0.5)) { logInVM.rootNavigation = .fetch }
             }
         }
 

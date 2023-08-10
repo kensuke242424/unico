@@ -70,6 +70,9 @@
 		BE74E91B2A77E5D800C1A5F2 /* CustomImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE74E91A2A77E5D800C1A5F2 /* CustomImagePicker.swift */; };
 		BE74E91D2A77EE9B00C1A5F2 /* Crop.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE74E91C2A77EE9B00C1A5F2 /* Crop.swift */; };
 		BE74E9212A78B2CE00C1A5F2 /* ItemSortManuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE74E9202A78B2CE00C1A5F2 /* ItemSortManuView.swift */; };
+		BE86547E2A857EF8006AE163 /* JoinedTeamInformationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE86547D2A857EF8006AE163 /* JoinedTeamInformationView.swift */; };
+		BE8654802A8586C0006AE163 /* WebImageTypesIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE86547F2A8586C0006AE163 /* WebImageTypesIcon.swift */; };
+		BE8654822A8597C7006AE163 /* AnyShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8654812A8597C7006AE163 /* AnyShape.swift */; };
 		BE8734DB2A5D53F1004AA246 /* SDWebImageBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8734DA2A5D53F1004AA246 /* SDWebImageBackgroundView.swift */; };
 		BE8734EE2A5EE99F004AA246 /* SelectionBackgroundCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8734EA2A5EE99F004AA246 /* SelectionBackgroundCards.swift */; };
 		BE8734EF2A5EE99F004AA246 /* EditTeamBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8734EB2A5EE99F004AA246 /* EditTeamBackgroundView.swift */; };
@@ -224,6 +227,9 @@
 		BE74E91A2A77E5D800C1A5F2 /* CustomImagePicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CustomImagePicker.swift; path = ../../../../../Try_Tutorial/PhotoCroppingSampleApp/PhotoCroppingSampleApp/View/CustomImagePicker.swift; sourceTree = "<group>"; };
 		BE74E91C2A77EE9B00C1A5F2 /* Crop.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Crop.swift; path = ../../../Try_Tutorial/PhotoCroppingSampleApp/PhotoCroppingSampleApp/Model/Crop.swift; sourceTree = "<group>"; };
 		BE74E9202A78B2CE00C1A5F2 /* ItemSortManuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemSortManuView.swift; sourceTree = "<group>"; };
+		BE86547D2A857EF8006AE163 /* JoinedTeamInformationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinedTeamInformationView.swift; sourceTree = "<group>"; };
+		BE86547F2A8586C0006AE163 /* WebImageTypesIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebImageTypesIcon.swift; sourceTree = "<group>"; };
+		BE8654812A8597C7006AE163 /* AnyShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyShape.swift; sourceTree = "<group>"; };
 		BE8734DA2A5D53F1004AA246 /* SDWebImageBackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDWebImageBackgroundView.swift; sourceTree = "<group>"; };
 		BE8734EA2A5EE99F004AA246 /* SelectionBackgroundCards.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectionBackgroundCards.swift; sourceTree = "<group>"; };
 		BE8734EB2A5EE99F004AA246 /* EditTeamBackgroundView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditTeamBackgroundView.swift; sourceTree = "<group>"; };
@@ -430,6 +436,7 @@
 				BE07F1712A2732D4007ED1C4 /* CustomMagnificationGesture.swift */,
 				BE07F1732A2732EE007ED1C4 /* CustomDragGesture.swift */,
 				BEB669CA2A2CD105008FC9DE /* CustomLongPressGesture.swift */,
+				BE8654812A8597C7006AE163 /* AnyShape.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -680,6 +687,7 @@
 				BE17B97429CC2D8F00F08915 /* LogInAddressSheetView.swift */,
 				E0DE98D528E2D85E00471AB4 /* LogInCheckView.swift */,
 				E0A3B995292EFCE500209ADC /* CreateAndJoinTeamView.swift */,
+				BE86547D2A857EF8006AE163 /* JoinedTeamInformationView.swift */,
 				E0F0180D2975A9E10063C96B /* JoinUserDetectCheckView.swift */,
 				BE254F9229BF1104004FE9AE /* UserEntryRecommendationView.swift */,
 				BE4663F32A150A440072C025 /* AnonymousEntryRecomendationView.swift */,
@@ -712,6 +720,7 @@
 				BE245BD329C5DA9E00539A04 /* SDWebImageToItem.swift */,
 				BE8734DA2A5D53F1004AA246 /* SDWebImageBackgroundView.swift */,
 				BE17B97029C9977100F08915 /* SDWebImageCircleIcon.swift */,
+				BE86547F2A8586C0006AE163 /* WebImageTypesIcon.swift */,
 				BE245BC829C5718A00539A04 /* NewItemUIImage.swift */,
 				BE245BCE29C5A41200539A04 /* NewItemUrlToUIImage.swift */,
 				E0A7DE4D290C289A008C3F3F /* AsyncImageCircleIcon.swift */,
@@ -887,6 +896,7 @@
 				BE254FBD29C092F5004FE9AE /* AsyncImageBackground.swift in Sources */,
 				BE74E9212A78B2CE00C1A5F2 /* ItemSortManuView.swift in Sources */,
 				E0FCADA429708B9800BA6A75 /* LogoMark.swift in Sources */,
+				BE8654802A8586C0006AE163 /* WebImageTypesIcon.swift in Sources */,
 				E01AA3A9291780DD000FCD37 /* UIImageExtension.swift in Sources */,
 				E08F273828DDB51600329C5E /* ManageView.swift in Sources */,
 				BE1F271E29C162B300AD55DF /* NewTabView.swift in Sources */,
@@ -951,6 +961,7 @@
 				E05130E228F341620092FE46 /* RootView.swift in Sources */,
 				BE24374B29BE3A3F000C2D01 /* UIImageRectIcon.swift in Sources */,
 				BE599F922A20F68100821E01 /* ApplicationSettingView.swift in Sources */,
+				BE86547E2A857EF8006AE163 /* JoinedTeamInformationView.swift in Sources */,
 				E08F272528DDA08E00329C5E /* Artwork_ManagementApp.swift in Sources */,
 				BE8734F12A5EE99F004AA246 /* EditBackgroundControlButtons.swift in Sources */,
 				BE20B04829BAEFDB0078169B /* UpdateAddressView.swift in Sources */,
@@ -996,6 +1007,7 @@
 				E08F273A28DDB53700329C5E /* SystemView.swift in Sources */,
 				E0CC79B628E761EA00CE0B19 /* UserModel.swift in Sources */,
 				E0A36452290A37A600B30A14 /* CustomArcShape.swift in Sources */,
+				BE8654822A8597C7006AE163 /* AnyShape.swift in Sources */,
 				E0455FE4292C8EF0004F677D /* BounceAnimationView.swift in Sources */,
 				BEAAD8FA29CDEF6200C53138 /* DefaultEmailCheckView.swift in Sources */,
 				E01AA3A729177A76000FCD37 /* UserViewModel.swift in Sources */,
