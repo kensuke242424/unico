@@ -33,9 +33,7 @@ class TeamViewModel: ObservableObject {
     var teamID: String? { team?.id }
     /// 現在の操作チーム「members」内のフィールドから自身のmemberデータインデックスを取得するプロパティ。
     var myMemberIndex: Int? {
-        guard let team else { return nil }
-        let index = self.members.firstIndex(where: {$0.id == uid})
-        return index
+        return self.members.firstIndex(where: {$0.id == uid})
     }
     /// 現在の操作しているチームのメンバー全員のIdを格納するプロパティ。
     var membersId: [String] {
@@ -489,7 +487,7 @@ class TeamViewModel: ObservableObject {
         }
     }
 
-    /// アカウント削除時に実行されるメソッド。削除実行アカウントが所属するチームの関連データを削除する
+    /// アカウント削除時に実行されるメソッド。削除実行アカウントが所属する全てのチームのデータを削除する
     /// ✅所属チームのメンバーが削除アカウントのユーザーのみだった場合 ⇨ チームデータを全て消去
     /// ✅所属チームのメンバーが削除アカウントのユーザー以外にも在籍している場合 ⇨ 関連ユーザーデータのみ削除
     func deleteAccountRelatedTeamData(uid userID: String, joinsTeam: [JoinTeam]) async throws {

@@ -29,6 +29,7 @@ class UserViewModel: ObservableObject {
 
     @Published var user: User?
     @Published var joins: [JoinTeam] = []
+    @Published var joinsCount: Int = 0
 
     var memberColor: ThemeColor {
         return user?.userColor ?? ThemeColor.blue
@@ -55,9 +56,11 @@ class UserViewModel: ObservableObject {
     @Published var isAnonymous: Bool = false
     @Published var showAlert = false
     @Published var userErrorMessage = ""
+
     /// 相手チームからチーム加入の承認を受けた場合にtrueとなるプロパティ。
     @Published var isApproved: Bool?
 
+    /// 自身のユーザードキュメントを取得するメソッド。
     @MainActor
     func fetchUser() async throws {
         guard let uid else { throw CustomError.uidEmpty }
@@ -74,25 +77,29 @@ class UserViewModel: ObservableObject {
         }
     }
 
+    /// 自身の所属するチームデータ「joins」を取得するメソッド。
+    @MainActor
     func fetchJoinTeams() async throws {
         guard let uid else { throw CustomError.uidEmpty }
-        let joinsRef = db?
-            .collection("users")
-            .document(uid)
-            .collection("joins")
 
         do {
-            let snapshot = try await joinsRef?.getDocuments(source: .default)
-            guard let documents = snapshot?.documents else { return }
+            let snapshot = try await db?
+                .collection("users")
+                .document(uid)
+                .collection("joins")
+                .getDocuments(source: .default)
+
+            guard let documents = snapshot?.documents else {
+                throw UserRelatedError.missingSnapshot
+            }
 
             for document in documents {
                 let joinTeam = try document.data(as: JoinTeam.self)
-                DispatchQueue.main.async {
-                    self.joins.append(joinTeam)
-                }
+
+                self.joins.append(joinTeam)
             }
         } catch {
-            print("ERROR_FetchJoinTeam: データ取得失敗")
+            print("ERROR: JoinTeam取得失敗")
             return
         }
     }
@@ -158,6 +165,9 @@ class UserViewModel: ObservableObject {
                     self.joins = documents.compactMap { (document) -> JoinTeam? in
                         return try? document.data(as: JoinTeam.self)
                     }
+                    // 所属チームの数を保存
+                    self.joinsCount = self.joins.count
+                    print("所属チームの数: \(self.joinsCount)")
                 }
             }
         }

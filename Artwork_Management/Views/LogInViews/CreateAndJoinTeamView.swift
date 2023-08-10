@@ -348,6 +348,13 @@ struct CreateAndJoinTeamView: View {
                 Text("チーム追加をやめて戻りますか？")
             } // alert
         } // ZStack
+        /// 所属チームの数を監視して、新規チームの加入を検知する
+        .onChange(of: userVM.joinsCount) { [before = userVM.joinsCount] after in
+            if after == 1 { return }
+            if before < after {
+                userVM.isApproved = true
+            }
+        }
         .task(id: userVM.isApproved) {
             guard let _ = userVM.isApproved else { return }
             print("=========チーム加入承諾を検知=========")
