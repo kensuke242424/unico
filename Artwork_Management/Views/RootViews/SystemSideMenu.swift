@@ -79,7 +79,7 @@ struct SystemSideMenu: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-                JoinTeamsSideMenuIcon(teams: userVM.user!.joins)
+                JoinTeamsSideMenuIcon(joins: userVM.joins)
                     .frame(maxWidth: .infinity, alignment: .trailing)
                     .alert("", isPresented: $inputSideMenu.isShowChangeTeamAlert) {
                         Button("キャンセル") {}
@@ -87,7 +87,7 @@ struct SystemSideMenu: View {
                             // フェッチするチームデータを管理するUserModel内のlastLogInの値を更新後に、再fetchを実行
                             Task {
                                 inputSideMenu.showChangeTeamSheet = false
-                                await userVM.updateLastLogInTeam(selected: inputSideMenu.selectedTeam)
+                                try await userVM.updateLastLogInTeam(teamId: inputSideMenu.selectedTeam?.id)
                                 withAnimation(.spring(response: 0.5)) {
                                     progressVM.showCubesProgress = true
                                     inputTab.showSideMenu = false
@@ -452,7 +452,7 @@ struct SystemSideMenu: View {
 
         )
         .sheet(isPresented: $inputSideMenu.showChangeTeamSheet) {
-            ChangeTeamSheetView(teams: userVM.user?.joins ?? [])
+            ChangeTeamSheetView(teams: userVM.joins)
                 .presentationDetents([.medium])
         }
         .sheet(isPresented: $inputSideMenu.showUserEntrySheet) {
@@ -518,7 +518,7 @@ struct SystemSideMenu: View {
                     
                 } else {
                     List {
-                        ForEach(teams.filter({ $0.teamID != teamVM.team!.id}), id: \.self) { teamRow in
+                        ForEach(teams.filter({ $0.id != teamVM.team!.id}), id: \.self) { teamRow in
                             HStack(spacing: 20) {
                                 if inputSideMenu.teamsListSheetEdit {
                                     Image(systemName: "trash.fill")
@@ -578,7 +578,7 @@ struct SystemSideMenu: View {
                             // フェッチするチームデータを管理するUserModel内のlastLogInの値を更新後に、再fetchを実行
                             Task {
                                 inputSideMenu.showChangeTeamSheet = false
-                                await userVM.updateLastLogInTeam(selected: inputSideMenu.selectedTeam)
+                                try await userVM.updateLastLogInTeam(teamId: inputSideMenu.selectedTeam?.id)
                                 withAnimation(.spring(response: 0.5)) {
                                     progressVM.showCubesProgress = true
                                     inputTab.showSideMenu = false
@@ -628,13 +628,13 @@ struct SystemSideMenu: View {
     }
     
     @ViewBuilder
-    func JoinTeamsSideMenuIcon(teams: [JoinTeam]) -> some View {
+    func JoinTeamsSideMenuIcon(joins: [JoinTeam]) -> some View {
         
         HStack(spacing: 12) {
-            ForEach(Array(teams.enumerated()), id: \.offset) { offset, team  in
-                if !teams.isEmpty &&
+            ForEach(Array(joins.enumerated()), id: \.offset) { offset, team  in
+                if !joins.isEmpty &&
                     offset <= 2   &&
-                    team.teamID != userVM.user!.lastLogIn {
+                    team.id != userVM.user!.lastLogIn {
                     SDWebImageCircleIcon(imageURL: team.iconURL,
                                          width: 28, height: 28)
                     .onTapGesture {

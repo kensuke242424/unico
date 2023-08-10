@@ -154,7 +154,6 @@ struct UpdateTeamDataView: View {
         Button("保存する") {
 
             guard let team = teamVM.team,
-                  let user = userVM.user,
                   let joinIndex = userVM.currentJoinsTeamIndex else {
                 print("ERROR: チームデータの更新に失敗しました。")
                 withAnimation { showContent.toggle() }
@@ -167,7 +166,7 @@ struct UpdateTeamDataView: View {
                 // ーー保存に用いるデータコンテナ群ーー
                 var beforeTeam = team
                 var afterTeam = team
-                var joinTeamContainer = user.joins[joinIndex]
+                var joinTeamContainer = userVM.joins[joinIndex]
 
                 // 新規アイコンデータが存在すれば、アップロード&アイコンコンテナに格納
                 if let updateIconImage = input.captureImage {
@@ -184,7 +183,8 @@ struct UpdateTeamDataView: View {
                 // データの変更があれば、Firebaseへの保存処理実行
                 if beforeTeam != afterTeam {
                     try await teamVM.updateTeam(data: afterTeam)
-                    try await userVM.updateJoinTeamToMembers(data: joinTeamContainer, ids: team.membersId)
+                    try await userVM.updateJoinTeamToMembers(data: joinTeamContainer,
+                                                             ids: team.membersId)
 
                     hapticSuccessNotification()
                 }

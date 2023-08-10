@@ -62,7 +62,7 @@ struct EditTeamBackgroundView: View {
                         Task {
                             do {
                                 if let selectedBackground = backgroundVM.selectBackground {
-                                    _ = try await userVM.updateCurrentTeamBackground(data: selectedBackground)
+                                    _ = try await userVM.updateJoinTeamBackground(data: selectedBackground)
                                 }
                                 withAnimation(.spring(response: 0.3, blendDuration: 1)) {
                                     showContents = false

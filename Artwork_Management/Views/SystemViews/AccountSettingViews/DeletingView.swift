@@ -42,11 +42,11 @@ struct DeletingView: View {
             // この画面に遷移した時点で、データ削除を開始する
             Task {
                 guard let userID = userVM.user?.id else { return }
-                guard let joinsTeam = userVM.user?.joins else { return }
 
                 do {
                     _ = try await logInVM.deleteAccountWithEmailLink()
-                    _ = try await teamVM.deleteAccountRelatedTeamData(uid: userID, joinsTeam: joinsTeam)
+                    _ = try await teamVM.deleteAccountRelatedTeamData(uid: userID,
+                                                                      joinsTeam: userVM.joins)
                     _ = try await userVM.deleteAccountRelatedUserData()
 
                     navigationVM.path.append(SystemAccountPath.deletedAccount)
@@ -63,12 +63,11 @@ struct DeletingView: View {
     private func excutionDeleteAll() {
         Task {
             guard let userID = userVM.user?.id else { return }
-            guard let joinsTeam = userVM.user?.joins else { return }
 
             do {
                 _ = try await logInVM.deleteAccountWithEmailLink()
                 _ = try await teamVM.deleteAccountRelatedTeamData(uid: userID,
-                                                                  joinsTeam: joinsTeam)
+                                                                  joinsTeam: userVM.joins)
 
             } catch {
                 // アカウントデータの削除に失敗したら、一つ前のページに戻る

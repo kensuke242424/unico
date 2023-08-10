@@ -22,7 +22,7 @@ class LogViewModel: ObservableObject {
     @Published var logs: [Log] = []
 
     func listener(id currentTeamID: String?) {
-        print("LogsViewModel_listener実行")
+        print("LogsViewModel_listener起動")
         guard let uid, let currentTeamID else { return }
         guard let logsRef = db?
             .collection("teams")
@@ -30,7 +30,6 @@ class LogViewModel: ObservableObject {
             .collection("logs") else { return }
 
         listener = logsRef.addSnapshotListener { (snapshot, _) in
-            print("LogListener起動")
             guard let documents = snapshot?.documents else { return }
 
             do {

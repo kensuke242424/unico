@@ -22,24 +22,32 @@ class UserViewModel: ObservableObject {
         isAnonymousCheck()
     }
 
-    var listener: ListenerRegistration?
+    var userListener: ListenerRegistration?
+    var joinsListener: ListenerRegistration?
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
     var uid: String? { return Auth.auth().currentUser?.uid }
+
+    @Published var user: User?
+    @Published var joins: [JoinTeam] = []
+
     var memberColor: ThemeColor {
         return user?.userColor ?? ThemeColor.blue
     }
     var currentJoinsTeamIndex: Int? {
-        let index = user?.joins.firstIndex(where: { $0.teamID == user?.lastLogIn })
+        let index = self.joins.firstIndex(where: { $0.id == user?.lastLogIn })
         return index
     }
     /// ユーザーが現在操作しているチームの背景データ
     var currentTeamBackground: Background? {
         guard let index = currentJoinsTeamIndex else { return nil }
-        let container = user?.joins[index].currentBackground
+        let container = self.joins[index].currentBackground
         return container
     }
+    var currentJoinTeam: JoinTeam? {
+        guard let index = currentJoinsTeamIndex else { return nil }
+        return self.joins[index]
+    }
 
-    @Published var user: User?
     @Published var isAnonymous: Bool = false
     @Published var showAlert = false
     @Published var userErrorMessage = ""
@@ -47,109 +55,182 @@ class UserViewModel: ObservableObject {
 
     @MainActor
     func fetchUser() async throws {
-        guard let uid = uid else { throw CustomError.uidEmpty }
-        guard let userRef = db?.collection("users").document(uid) else { throw CustomError.getRef }
+        guard let uid else { throw CustomError.uidEmpty }
+        let userRef = db?
+            .collection("users")
+            .document(uid)
 
         do {
-            let document = try await userRef.getDocument(source: .default)
-            let user = try document.data(as: User.self)
+            let document = try await userRef?.getDocument(source: .default)
+            let user = try await document?.data(as: User.self)
             self.user = user
         } catch {
-            throw CustomError.getUserDocument
+            throw UserRelatedError.failedFetchAddedNewUser
         }
     }
+
+    func fetchJoinTeams() async throws {
+        guard let uid else { throw CustomError.uidEmpty }
+        let joinsRef = db?
+            .collection("users")
+            .document(uid)
+            .collection("joins")
+
+        do {
+            let snapshot = try await joinsRef?.getDocuments(source: .default)
+            guard let documents = snapshot?.documents else { return }
+
+            for document in documents {
+                let joinTeam = try document.data(as: JoinTeam.self)
+                DispatchQueue.main.async {
+                    self.joins.append(joinTeam)
+                }
+            }
+        } catch {
+            print("ERROR_FetchJoinTeam: データ取得失敗")
+            return
+        }
+    }
+
     
     func isAnonymousCheck() {
         
         if let user = Auth.auth().currentUser, user.isAnonymous {
-            print("アカウント: Anonymous")
+            print("アカウント: 匿名")
             self.isAnonymous = true
         } else {
-            print("アカウント: Not Anonymous")
+            print("アカウント: 登録済み")
             self.isAnonymous = false
         }
     }
+    /// ユーザーデータの更新をリスニングするスナップショットリスナー。
+    func userDataListener() async throws {
+        guard let uid else { throw UserRelatedError.uidEmpty }
 
-    func listener() async throws {
-        guard let uid = uid else { throw CustomError.uidEmpty }
-        guard let userRef = db?.collection("users").document(uid) else { throw CustomError.getRef }
-        listener = userRef.addSnapshotListener { snap, error in
-            if let error {
-                print("userRealtimeListener失敗: \(error.localizedDescription)")
-            } else {
-                guard let snap else {
-                    print("userRealtimeListener_Error: snapがnilです")
+        userListener = db?
+            .collection("users")
+            .document(uid)
+            .addSnapshotListener { snap, error in
+                if let error {
+                    print("ERROR: \(error.localizedDescription)")
                     return
                 }
 
-                withAnimation {
-                    do {
-                        let userData = try snap.data(as: User.self)
-                        self.user = userData
+                do {
+                    let userData = try snap?.data(as: User.self)
+                    withAnimation {
+                            self.user = userData
                         DispatchQueue.main.async {
                             self.isAnonymousCheck()
                             self.updatedUser.toggle()
                         }
-                    } catch {
-                        print("userRealtimeListener_Error: try snap?.data(as: User.self)")
+                    }
+                } catch {
+                    print("ERROR: リスナーによるユーザーデータの更新失敗")
+                    return
+                }
+            }
+    }
+
+    /// 参加チームデータ群「joins」の更新をリスニングするスナップショットリスナー。
+    func joinsDataListener(teamId: String) async throws {
+        guard let uid else { throw UserRelatedError.uidEmpty }
+
+        let joinsRef = db?
+            .collection("users")
+            .document(uid)
+            .collection("joins")
+
+        joinsListener = joinsRef?.addSnapshotListener { snap, error in
+            if let error = error?.localizedDescription {
+                print("ERROR: \(error)")
+                return
+            }
+            guard let documents = snap?.documents else {
+                print("ERROR: snap_nil")
+                return
+            }
+
+            do {
+                DispatchQueue.main.async {
+                    self.joins = documents.compactMap { (document) -> JoinTeam? in
+                        return try? document.data(as: JoinTeam.self)
                     }
                 }
             }
         }
     }
     
-    func updateLastLogInTeam(selected selectedTeam: JoinTeam?) async {
-        guard var user else { return }
-        guard let selectedTeam else { return }
-        guard let userRef = db?.collection("users").document(user.id) else { return }
+    func updateLastLogInTeam(teamId: String?) async throws {
+        guard var user, let teamId else { throw UserRelatedError.missingData }
+        let userRef = db?
+            .collection("users")
+            .document(user.id)
         do {
-            user.lastLogIn = selectedTeam.teamID
-            _ = try userRef.setData(from: user)
+            user.lastLogIn = teamId
+            _ = try userRef?.setData(from: user)
         } catch {
-            print("最新ログインチームのFirestoreへの保存に失敗しました")
-            return
+            print("最新ログインチーム状態のFirestoreへの保存に失敗しました")
+            throw UserRelatedError.failedUpdateLastLogIn
         }
     }
 
     /// 参加チーム群の配列から現在操作しているチームのインデックスを取得するメソッド
-    func getCurrentTeamIndex() -> Int? {
+    func getCurrentJoinsIndex() -> Int? {
         guard let user else { return nil }
         var getIndex: Int?
 
-        getIndex = user.joins.firstIndex(where: { $0.teamID == user.lastLogIn })
+        getIndex = self.joins.firstIndex(where: { $0.id == user.lastLogIn })
         return getIndex
     }
 
     func getCurrentTeamMyBackgrounds() -> [Background] {
-        guard let user else { return [] }
-        let myBackgrounds = user.joins[currentJoinsTeamIndex ?? 0].myBackgrounds
+        let myBackgrounds = self.joins[currentJoinsTeamIndex ?? 0].myBackgrounds
         return myBackgrounds
     }
 
     /// Homeのパーツ編集設定をFirestoreのドキュメントに保存するメソッド
     /// 現在操作しているチームのJoinTeamデータモデルに保存される
-    func updateCurrentTeamHomeEdits(data EditsData: HomePartsEditData) {
-        guard var user = user else { return }
-        guard let userRef = db?.collection("users").document(user.id) else { return }
+    func updateHomeEdits(data EditedData: HomeEditData) async throws {
+        guard let uid else { return }
+
+        let currentIndex = getCurrentJoinsIndex()
+        guard let currentIndex else { return }
+        var updateJoinTeam = self.joins[currentIndex]
+
+        updateJoinTeam.homeEdits = EditedData
+
+        let joinTeamRef = db?
+            .collection("users")
+            .document(uid)
+            .collection("joins")
+            .document(updateJoinTeam.id)
 
         do {
-            let currentTeamIndex = getCurrentTeamIndex()
-            guard let currentTeamIndex else { return }
-            user.joins[currentTeamIndex].homeEdits = EditsData
-            try userRef.setData(from: user)
+            try joinTeamRef?.setData(from: updateJoinTeam)
         } catch {
-            print("ERROR: Homeパーツ設定の保存に失敗しました。")
+            throw UserRelatedError.failedHomeEdits
         }
     }
 
-    func updateCurrentTeamBackground(data backgroundData: Background) async throws {
-        guard var user else { throw CustomError.userEmpty }
-        guard let userRef = db?.collection("users").document(user.id) else { throw CustomError.getDocument }
+    func updateJoinTeamBackground(data newBackground: Background) async throws {
+        guard let uid, var currentJoinTeam else {
+            throw UserRelatedError.missingData
+        }
+
+        let joinTeamRef = db?
+            .collection("users")
+            .document(uid)
+            .collection("joins")
+            .document(currentJoinTeam.id)
+
+        // 背景のアップデート
+        currentJoinTeam.currentBackground = newBackground
 
         do {
-            user.joins[currentJoinsTeamIndex ?? 0].currentBackground = backgroundData
-            try userRef.setData(from: user)
+            try joinTeamRef?.setData(from: currentJoinTeam)
         } catch {
+            throw UserRelatedError.failedUpdateBackground
             print("ERROR: チーム背景のアップデートに失敗しました")
         }
     }
@@ -173,13 +254,30 @@ class UserViewModel: ObservableObject {
         }
     }
 
+    /// 新規チーム作成時に使用するメソッド。作成者のメンバーデータを新規チームのサブコレクションに保存する。
+    func addNewJoinTeamToFirestore(data newJoinTeam: JoinTeam) async throws {
+        guard let uid else { throw CustomError.uidEmpty }
+        let joinTeamRef = db?
+            .collection("users")
+            .document(uid)
+            .collection("joins")
+            .document(newJoinTeam.id)
+
+        do {
+            _ = try joinTeamRef?.setData(from: newJoinTeam)
+        }
+        catch {
+            throw UserRelatedError.failedCreateJoinTeam
+        }
+    }
+
     func addNewJoinTeam(newJoinTeam: JoinTeam) async throws {
 
-        guard let uid = uid, var user = user else { throw CustomError.uidEmpty }
+        guard let uid, var user else { throw CustomError.uidEmpty }
         guard let userRef = db?.collection("users").document(uid) else { throw CustomError.getRef }
 
         user.joins.append(newJoinTeam)
-        user.lastLogIn = newJoinTeam.teamID
+        user.lastLogIn = newJoinTeam.id
 
         do {
             try userRef.setData(from: user)
@@ -255,27 +353,17 @@ class UserViewModel: ObservableObject {
     }
     
     func updateJoinTeamToMembers(data updatedJoinTeam: JoinTeam, ids membersId: [String]) async throws {
-        // 所属メンバーのid配列を使ってクエリを叩く
-        let joinMemberRefs = db?
-            .collection("users")
-            .whereField("id", in: membersId)
-
-        do {
-            let snapshot = try await joinMemberRefs?.getDocuments()
-            guard let documents = snapshot?.documents else { throw CustomError.getDocument }
-            for memberDocument in documents {
-                var memberData = try memberDocument.data(as: User.self)
-
-                // ユーザのjoins配列からアップデート対象のチームを検出する
-                for (index, joinTeam) in memberData.joins.enumerated() where joinTeam.teamID == updatedJoinTeam.teamID {
-                    // 対象JoinTeamデータの名前とアイコンを更新
-                    memberData.joins[index].name = updatedJoinTeam.name
-                    memberData.joins[index].iconURL = updatedJoinTeam.iconURL
-                    // 更新後のユーザデータを再保存するためのリファレンスを取得
-                    guard let teamRef = db?.collection("users").document(memberData.id) else { throw CustomError.getRef }
-                    // リファレンスをもとにsetDataを実行
-                    try teamRef.setData(from: memberData)
-                }
+        // メンバー全員のアップデート対象JoinTeamサブコレクションリファレンスを取得
+        membersId.map { memberId in
+            do {
+                try db?
+                    .collection("users")
+                    .document(memberId)
+                    .collection("joins")
+                    .document(updatedJoinTeam.id)
+                    .setData(from: updatedJoinTeam)
+            } catch {
+                print("ERROR: \(memberId)のjoinTeam更新失敗")
             }
         }
     }
@@ -291,7 +379,7 @@ class UserViewModel: ObservableObject {
         do {
             let storage = Storage.storage()
             let reference = storage.reference()
-            let filePath = "users/\(Date()).jpeg"
+            let filePath = "users/myBackgrounds/\(Date()).jpeg"
             let imageRef = reference.child(filePath)
             _ = try await imageRef.putDataAsync(imageData)
             let url = try await imageRef.downloadURL()
@@ -388,7 +476,7 @@ class UserViewModel: ObservableObject {
             for memberDocument in documents {
                 
                 var memberData = try memberDocument.data(as: User.self)
-                let resultJoins = memberData.joins.drop(while: { $0.teamID == selectedTeam.teamID })
+                let resultJoins = memberData.joins.drop(while: { $0.id == selectedTeam.id })
                 memberData.joins = Array(resultJoins)
                 
                 let userRef = db?
@@ -441,8 +529,24 @@ class UserViewModel: ObservableObject {
         
 
     deinit {
-        listener?.remove()
+        userListener?.remove()
+        joinsListener?.remove()
     }
+}
+
+enum UserRelatedError:Error {
+    case uidEmpty
+    case joinsEmpty
+    case referenceEmpty
+    case missingData
+    case missingSnapshot
+    case failedCreateJoinTeam
+    case failedFetchUser
+    case failedFetchAddedNewUser
+    case failedHomeEdits
+    case failedUserListen
+    case failedUpdateBackground
+    case failedUpdateLastLogIn
 }
 
 struct TestUser {

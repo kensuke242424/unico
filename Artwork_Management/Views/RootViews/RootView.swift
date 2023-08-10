@@ -110,17 +110,20 @@ struct RootView: View {
             if navigation == .fetch {
                 Task {
                     do {
-                        /// ユーザーデータの取得
-                        _ = try await userVM.fetchUser()
-                        
+                        /// MEMO: スナップショットはasync/awaitに対応してないため、
+                        /// 先に取得しておく必要がある「user」と「joins」をasync/awaitメソッドで取得。
+                        /// 取得に成功すれば、以降のデータ取得が進む。
+                        try await userVM.fetchUser()
                         /// ユーザーデータの所得ができなければ、ログイン画面に遷移
                         guard let user = userVM.user else {
                             logInVM.rootNavigation = .logIn
                             return
                         }
-                        
+
+                        try await userVM.fetchJoinTeams()
+
                         /// チームデータを持っていなければ、チーム追加画面へ遷移
-                        if user.joins.isEmpty {
+                        if userVM.joins.isEmpty {
                             print("参加チーム無し。チーム作成画面へ遷移")
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                 withAnimation(.spring(response: 1)) {
@@ -131,14 +134,16 @@ struct RootView: View {
                             return
                         }
                         
-                        /// 最後にログインしたチーム情報をもとに、対象のチームの全データを取得
+                        /// 最後にログインしたチームIdをもとに、対象のチームの全データを取得
                         guard let lastLogInTeamID = user.lastLogIn else { return }
 
-                        await tagVM.fetchTag(teamID: lastLogInTeamID)
-                        _ = try await teamVM.teamListener(id: lastLogInTeamID)
-                        _ =     await teamVM.membersListener(id: lastLogInTeamID)
-                        _ = try await userVM.listener()
-                        _ =     await itemVM.listener(id: lastLogInTeamID)
+                        await tagVM.tagDataLister(teamID: lastLogInTeamID)
+
+                        try await userVM.userDataListener()
+                        try await teamVM.teamListener(id: lastLogInTeamID)
+                            await teamVM.membersListener(id: lastLogInTeamID)
+                        try await userVM.joinsDataListener(teamId: lastLogInTeamID)
+                            await itemVM.listener(id: lastLogInTeamID)
                         
                         /// ホーム画面へ遷移
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {

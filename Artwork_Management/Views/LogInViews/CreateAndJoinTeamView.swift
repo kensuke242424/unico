@@ -353,15 +353,14 @@ struct CreateAndJoinTeamView: View {
         // 受け取ったチームの情報をもとに、ログインを行う
         .onChange(of: userVM.updatedUser) { _ in
             print("=========user情報の更新を検知=========")
-            if selectedTeamCard == .join {
-                guard let user = userVM.user else { return }
-                for joinTeam in user.joins where joinTeam.teamID == user.lastLogIn {
-                    self.joinedTeamData = joinTeam
-                }
-                withAnimation(.spring(response: 1.5, blendDuration: 1)) { selectTeamFase = .success }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                    withAnimation(.spring(response: 0.5)) { logInVM.rootNavigation = .fetch }
-                }
+            if selectedTeamCard != .join { return }
+            guard let user = userVM.user else { return }
+            for joinTeam in userVM.joins where joinTeam.id == user.lastLogIn {
+                self.joinedTeamData = joinTeam
+            }
+            withAnimation(.spring(response: 1.5, blendDuration: 1)) { selectTeamFase = .success }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                withAnimation(.spring(response: 0.5)) { logInVM.rootNavigation = .fetch }
             }
         }
 
@@ -382,7 +381,7 @@ struct CreateAndJoinTeamView: View {
                         
                         // 背景、アイコン画像をリサイズして保存していく
                         let createTeamID = UUID().uuidString
-                        var iconImageContainer      : UIImage?
+                        var iconImageContainer: UIImage?
                         var backgroundContainer: Background = backgroundVM.sampleBackground
 
                         // アイコン画像が入力されていれば、リサイズ処理をしてコンテナに格納
@@ -394,7 +393,7 @@ struct CreateAndJoinTeamView: View {
                         let uplaodIconImageData = await teamVM.firstUploadTeamImage(iconImageContainer,
                                                                                     id: createTeamID)
                         
-                        let teamData = Team(id: createTeamID,
+                        let teamData = Team(id            : createTeamID,
                                             name          : inputTeamName,
                                             iconURL       : uplaodIconImageData.url,
                                             iconPath      : uplaodIconImageData.filePath,
@@ -402,7 +401,7 @@ struct CreateAndJoinTeamView: View {
                                             backgroundPath: backgroundContainer.imagePath,
                                             membersId       : [user.id])
                         
-                        let joinTeamData = JoinTeam(teamID : createTeamID,
+                        let joinTeamData = JoinTeam(id : createTeamID,
                                                     name   : inputTeamName,
                                                     iconURL: uplaodIconImageData.url,
                                                     currentBackground: backgroundContainer)
@@ -410,11 +409,12 @@ struct CreateAndJoinTeamView: View {
                         // 作成or参加したチームをView表示する用のプロパティ
                         self.joinedTeamData = joinTeamData
                         
-                        try await teamVM.addTeam(teamData: teamData)
-                        try await teamVM.addFirstMemberData(id: teamData.id, data: user)
-                        try await userVM.addNewJoinTeam(newJoinTeam: joinTeamData)
+                        try await teamVM.addTeamToFirestore(teamData: teamData)
+                        try await teamVM.addFirstMemberToFirestore(teamId: teamData.id, data: user)
+                        try await userVM.addNewJoinTeamToFirestore(data: joinTeamData)
+                        try await userVM.updateLastLogInTeam(teamId: teamData.id)
                             await teamVM.setSampleItem(teamID: teamData.id)
-                            tagVM.addTag(tagData: tagVM.sampleTag, teamID: teamData.id)
+                            await tagVM.setSampleTag(teamID: teamData.id)
 
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                             withAnimation(.spring(response: 1)) {

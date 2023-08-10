@@ -105,7 +105,7 @@ class TeamViewModel: ObservableObject {
         }
     }
 
-    func addTeam(teamData: Team) async throws {
+    func addTeamToFirestore(teamData: Team) async throws {
         print("addTeamAndGetID実行")
 
         let teamsRef = db?
@@ -121,8 +121,8 @@ class TeamViewModel: ObservableObject {
         print("addTeamAndGetID完了")
     }
 
-    /// 新規チーム作成時に使用するメソッド。作成者の目mんバーデータを新規チームのサブコレクションに保存する。
-    func addFirstMemberData(id teamId: String, data userData: User) async throws {
+    /// 新規チーム作成時に使用するメソッド。作成者のメンバーデータを新規チームのサブコレクションに保存する。
+    func addFirstMemberToFirestore(teamId: String, data userData: User) async throws {
         print("addFirstMemberData実行")
         let membersRef = db?
             .collection("teams")
@@ -221,7 +221,7 @@ class TeamViewModel: ObservableObject {
             let toUserDocument = try await toUserRef.getDocument()
             var toUserData = try toUserDocument.data(as: User.self)
 
-            let joinTeamContainer = JoinTeam(teamID: team.id,
+            let joinTeamContainer = JoinTeam(id: team.id,
                                     name: team.name,
                                     iconURL: team.iconURL,
                                     currentBackground: sampleBackground)
@@ -388,7 +388,7 @@ class TeamViewModel: ObservableObject {
     /// ユーザーデータの変更を行った時に、各チームのユーザーステートを揃えるために使う。
     func updateJoinTeamsToMyData(data userData: User) async throws {
         // 自身が参加している各チームのid文字列データを配列に格納
-        var joinsTeamId: [String] = userData.joins.map { $0.teamID }
+        var joinsTeamId: [String] = userData.joins.compactMap { $0.id }
 
         // ユーザが所属している各チームのid配列を使ってクエリを叩く
         let joinTeamRefs = db?
@@ -480,7 +480,7 @@ class TeamViewModel: ObservableObject {
     }
     /// ユーザーが選択したチームのデータを削除する
     func deleteSelectedTeamDocuments(selected selectedTeam: JoinTeam) async {
-        guard let teamRef = db?.collection("teams").document(selectedTeam.teamID) else {
+        guard let teamRef = db?.collection("teams").document(selectedTeam.id) else {
             print("error: deleteAllTeamDocumentsでリファレンスを取得できませんでした")
             return
         }
@@ -526,7 +526,7 @@ class TeamViewModel: ObservableObject {
         var joinsTeamID: [String] = []
         // ユーザが参加している各チームのid文字列データを配列に格納(whereFieldクエリで使う)
         for joinTeam in joinsTeam {
-            joinsTeamID.append(joinTeam.teamID)
+            joinsTeamID.append(joinTeam.id)
         }
 
         // ユーザが所属している各チームのid配列を使ってクエリを叩く

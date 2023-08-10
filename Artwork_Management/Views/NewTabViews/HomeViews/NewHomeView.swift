@@ -115,12 +115,11 @@ struct NewHomeView: View {
             } // VStack
             /// 保存しているユーザーのHomeパーツ設定をViewプロパティに代入
             .onAppear {
-                let currentTeamIndex = userVM.getCurrentTeamIndex()
-                guard let user = userVM.user else { return }
-                guard let getIndex = currentTeamIndex else { return }
+                let currentJoinsIndex = userVM.getCurrentJoinsIndex()
+                guard let getIndex = currentJoinsIndex else { return }
 
-                nowTime = user.joins[getIndex].homeEdits.nowTime
-                teamNews = user.joins[getIndex].homeEdits.teamNews
+                nowTime = userVM.joins[getIndex].homeEdits.nowTime
+                teamNews = userVM.joins[getIndex].homeEdits.teamNews
             }
             /// Homeパーツのロングプレスを検知し、親ビューにステートを知らせる
             .frame(width: size.width, height: size.height)
@@ -169,10 +168,13 @@ struct NewHomeView: View {
                             }
 
                             Button {
-                                userVM.updateCurrentTeamHomeEdits(data: HomePartsEditData(nowTime: nowTime,
-                                                                                   teamNews: teamNews))
-                                withAnimation(.spring(response: 0.7, blendDuration: 1)) {
-                                    homeVM.isActiveEdit = false
+                                Task {
+                                    let editedData = HomeEditData(nowTime: nowTime, teamNews: teamNews)
+                                    try await userVM.updateHomeEdits(data: editedData)
+
+                                    withAnimation(.spring(response: 0.7, blendDuration: 1)) {
+                                        homeVM.isActiveEdit = false
+                                    }
                                 }
                             } label: {
                                 Circle()
@@ -188,13 +190,12 @@ struct NewHomeView: View {
                         }
 
                         Button {
-                            let currentTeamIndex = userVM.getCurrentTeamIndex()
-                            guard let user = userVM.user else { return }
-                            guard let getIndex = currentTeamIndex else { return }
+                            let currentJoinsIndex = userVM.getCurrentJoinsIndex()
+                            guard let getIndex = currentJoinsIndex else { return }
 
                             withAnimation(.spring(response: 0.7, blendDuration: 1)) {
-                                nowTime = user.joins[getIndex].homeEdits.nowTime
-                                teamNews = user.joins[getIndex].homeEdits.teamNews
+                                nowTime = userVM.joins[getIndex].homeEdits.nowTime
+                                teamNews = userVM.joins[getIndex].homeEdits.teamNews
                                 homeVM.isActiveEdit = false
                             }
                         } label: {

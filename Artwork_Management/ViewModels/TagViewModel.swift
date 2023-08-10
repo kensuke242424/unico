@@ -26,23 +26,20 @@ class TagViewModel: ObservableObject {
     /// チーム作成時にデフォルトで挿入するサンプルタグ
     let sampleTag = Tag(oderIndex: 1, tagName: "goods", tagColor: .gray)
 
-    func fetchTag(teamID: String) async {
+    func tagDataLister(teamID: String) async {
+        let tagsRef = db?
+            .collection("teams")
+            .document(teamID)
+            .collection("tags")
 
-        print("fetchTag実行")
+        tagListener = tagsRef?.addSnapshotListener { (snaps, error) in
 
-        guard let tagsRef = db?.collection("teams").document(teamID).collection("tags") else {
-            return
-        }
-
-        tagListener = tagsRef.addSnapshotListener { (snaps, error) in
-
-            if let error = error {
-                print(error)
+            if let error = error?.localizedDescription {
+                print("ERROR: \(error)")
                 return
             }
-
             guard let documents = snaps?.documents else {
-                print("Error: guard let documents = snap?.documents")
+                print("ERROR: snap_nil")
                 return
             }
 
@@ -75,10 +72,11 @@ class TagViewModel: ObservableObject {
         self.activeTag = setTag
     }
 
-    func addTag(tagData: Tag, teamID: String) {
-        guard let tagsRef = db?.collection("teams/\(teamID)/tags") else { return }
+    func addTagToFirestore(tagData: Tag, teamID: String) {
+        let tagsRef = db?
+            .collection("teams/\(teamID)/tags")
         do {
-            _ = try tagsRef.addDocument(from: tagData)
+            _ = try tagsRef?.addDocument(from: tagData)
         } catch {
             print("Error: try db!.collection(collectionID).addDocument(from: itemData)")
         }
@@ -145,6 +143,21 @@ class TagViewModel: ObservableObject {
                 }
                 tagRef.delete()
             }
+        }
+    }
+
+    /// チーム作成時にデフォルトのサンプルタグを追加するメソッド。
+    func setSampleTag(teamID: String) async {
+
+        do {
+            try db?
+                .collection("teams")
+                .document(teamID)
+                .collection("tags")
+                .addDocument(from: self.sampleTag)
+
+        } catch {
+            print("ERROR: サンプルタグの保存失敗")
         }
     }
 

@@ -174,7 +174,7 @@ fileprivate struct NotificationContainer: View {
             } else {
                 showLimitCount += 1
                 if showLimitCount > Int(element.type.stayTime) {
-                    print("通知ボードの破棄時間です")
+                    print("通知ボードの破棄時間")
                     withAnimation(.easeIn(duration: 0.3)) {
                         vm.currentNotification = nil
                     }

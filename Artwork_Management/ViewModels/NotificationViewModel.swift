@@ -223,10 +223,11 @@ class NotificationViewModel: ObservableObject {
 
         /// ユーザーが所属している全てのチームのmembersサブコレクションから、
         /// 自身のドキュメントリファレンスを取り出す。
+        //TODO: ユーザーのjoins[JoinMember] -> joinsId[String]に変更する必要あり
         let joinTeamsMembersRef = beforeUser.joins.compactMap { joinTeam in
             let teamMembersRef = db?
                 .collection("teams")
-                .document(joinTeam.teamID)
+                .document(joinTeam.id)
                 .collection("members")
                 .document(beforeUser.id)
             return teamMembersRef

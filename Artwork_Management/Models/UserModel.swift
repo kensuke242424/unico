@@ -27,17 +27,17 @@ struct User: Identifiable, Codable, Equatable {
 
 
 struct JoinTeam: Codable, Hashable {
-    var teamID: String
+    var id: String
     var name: String
     var iconURL: URL?
     var currentBackground: Background?
     var myBackgrounds: [Background] = []
-    var homeEdits = HomePartsEditData(nowTime: NowTimeParts(),
+    var homeEdits = HomeEditData(nowTime: NowTimeParts(),
                                      teamNews: TeamNewsParts())
 }
 
 /// Homeの各パーツ設定をまとめたデータモデル
-struct HomePartsEditData: Codable, Hashable {
+struct HomeEditData: Codable, Hashable {
     var nowTime: NowTimeParts
     var teamNews: TeamNewsParts
 }
