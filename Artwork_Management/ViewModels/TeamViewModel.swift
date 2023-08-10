@@ -37,6 +37,10 @@ class TeamViewModel: ObservableObject {
         let index = team.membersId.firstIndex(where: {$0 == uid})
         return index
     }
+    /// 現在の操作しているチームのメンバー全員のIdを格納するプロパティ。
+    var membersId: [String] {
+        return self.members.compactMap {$0.id}
+    }
 
     @MainActor
     func fetchTeam(teamID: String) async throws {
@@ -211,25 +215,23 @@ class TeamViewModel: ObservableObject {
             throw CustomError.getDetectUser
         }
     }
-
-    func addTeamIDToJoinedUser(to toUID: String) async throws {
-
-        guard let toUserRef = db?.collection("users")
-            .document(toUID) else { throw CustomError.getDocument }
+    /// チーム参加を許可したユーザーに対して、チーム情報（joinTeam）を渡すメソッド。
+    /// Firestoreのusersコレクションの中から、相手ユーザードキュメントのサブコレクション（joins）にデータをセットする。
+    func addJoinTeamToDetectedMember(for detectedUser: User) async throws {
         guard let team else { throw CustomError.teamEmpty }
+
+        /// 現在のチームのjoinTeamデータを生成
+        let joinTeamContainer = JoinTeam(id: team.id,
+                                name: team.name,
+                                iconURL: team.iconURL,
+                                currentBackground: sampleBackground)
         do {
-            let toUserDocument = try await toUserRef.getDocument()
-            var toUserData = try toUserDocument.data(as: User.self)
-
-            let joinTeamContainer = JoinTeam(id: team.id,
-                                    name: team.name,
-                                    iconURL: team.iconURL,
-                                    currentBackground: sampleBackground)
-
-            toUserData.joins.append(joinTeamContainer)
-            toUserData.lastLogIn = team.id
-
-            _ = try toUserRef.setData(from: toUserData)
+            try db?
+                .collection("users")
+                .document(detectedUser.id)
+                .collection("joins")
+                .document(team.id)
+                .setData(from: joinTeamContainer)
 
         } catch {
             throw CustomError.addTeamIDToJoinedUser
@@ -384,45 +386,6 @@ class TeamViewModel: ObservableObject {
         }
     }
 
-    /// ユーザーが所属しているチーム内の自身のメンバーデータを更新する。
-    /// ユーザーデータの変更を行った時に、各チームのユーザーステートを揃えるために使う。
-    func updateJoinTeamsToMyData(data userData: User) async throws {
-        // 自身が参加している各チームのid文字列データを配列に格納
-        var joinsTeamId: [String] = userData.joins.compactMap { $0.id }
-
-        // ユーザが所属している各チームのid配列を使ってクエリを叩く
-        let joinTeamRefs = db?
-            .collection("teams")
-            .whereField("id", in: joinsTeamId)
-
-        let updateMemberData = JoinMember(id: userData.id,
-                                       name: userData.name,
-                                       iconURL: userData.iconURL)
-
-        do {
-            let snapshot = try await joinTeamRefs?.getDocuments()
-            guard let documents = snapshot?.documents else { return }
-
-            /// 所属チームごとに自身のメンバーデータを更新していく
-            for teamDocument in documents {
-
-                do {
-                    var teamDocumentId = teamDocument.documentID
-                    let myMemberRef = db?
-                        .collection("teams")
-                        .document(teamDocumentId)
-                        .collection("members")
-                        .document(uid ?? "")
-
-                    try myMemberRef?.setData(from: updateMemberData, merge: true)
-                }
-                catch {
-                    print("所属チームのメンバーデータ更新失敗")
-                }
-            }
-        }
-    }
-
     @MainActor
     func fetchNewTeamBackgroundImage(teamID: String) async throws {
 
@@ -453,6 +416,24 @@ class TeamViewModel: ObservableObject {
         }
         print("imageの返却")
         return iamge
+    }
+
+    /// 選択されたチーム内の自身のメンバーデータを削除するメソッド。
+    /// チーム脱退操作が実行された時に使う。
+    func deleteMyMemberDataFromTeam(for selectedTeam: JoinTeam) async throws {
+        guard let uid else { throw TeamRelatedError.uidEmpty }
+
+        do {
+            try await db?
+                .collection("teams")
+                .document(selectedTeam.id)
+                .collection("members")
+                .document(uid)
+                .delete() // 削除
+
+        } catch {
+            throw UserRelatedError.failedEscapeTeam
+        }
     }
     
     func deleteAllTeamImages() async {
@@ -570,4 +551,17 @@ class TeamViewModel: ObservableObject {
         teamListener?.remove()
         membersListener?.remove()
     }
+}
+
+enum TeamRelatedError:Error {
+    case uidEmpty
+    case joinsEmpty
+    case referenceEmpty
+    case missingData
+    case missingSnapshot
+    case failedCreateJoinTeam
+    case failedFetchUser
+    case failedFetchAddedNewUser
+    case failedTeamListen
+    case failedUpdateLastLogIn
 }

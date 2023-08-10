@@ -240,22 +240,18 @@ class LogInViewModel: ObservableObject {
         }
     }
 
-    func setNewUserDocument(name     : String,
+    func setNewUserToFirestore(name     : String,
                                password : String?,
                                imageData: (url: URL?, filePath: String?),
                                color: ThemeColor) async throws {
 
-        print("setSignUpUserDocument実行")
-
-        guard let usersRef = db?.collection("users") else {
-            print("ERROR: guard let itemsRef = db?.collection(users), let uid = Auth.auth().currentUser?.uid")
-            throw CustomError.getRef
-        }
+        let usersRef = db?.collection("users")
 
         guard let currentUser = Auth.auth().currentUser else {
             print("ERROR: guard let currentUser")
             throw CustomError.uidEmpty
         }
+        // currentUserのuidとドキュメントIDを同じにして生成
         let newUserData = User(id: currentUser.uid,
                                name: name,
                                address: currentUser.email,
@@ -263,13 +259,15 @@ class LogInViewModel: ObservableObject {
                                iconURL: imageData.url,
                                iconPath: imageData.filePath,
                                userColor: color,
-                               joins: [])
+                               joinsId: [])
         do {
-            // currentUserのuidとドキュメントIDを同じにして保存
-            _ = try usersRef.document(newUserData.id).setData(from: newUserData)
+            try db?
+                .collection("users")
+                .document(newUserData.id)
+                .setData(from: newUserData)
 
         } catch {
-            print("ERROR: try usersRef.document(newUserData.id).setData(from: newUserData)")
+            print("ERROR: 新規ユーザーデータ保存失敗")
             throw CustomError.setData
         }
     }
@@ -754,4 +752,17 @@ class LogInViewModel: ObservableObject {
             Auth.auth().removeStateDidChangeListener(listenerHandle)
         }
     }
+}
+
+enum AuthRelatedError:Error {
+    case uidEmpty
+    case joinsEmpty
+    case referenceEmpty
+    case missingData
+    case missingSnapshot
+    case failedCreateJoinTeam
+    case failedFetchUser
+    case failedFetchAddedNewUser
+    case failedTeamListen
+    case failedUpdateLastLogIn
 }

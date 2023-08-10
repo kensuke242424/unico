@@ -154,7 +154,7 @@ struct UpdateTeamDataView: View {
         Button("保存する") {
 
             guard let team = teamVM.team,
-                  let joinIndex = userVM.currentJoinsTeamIndex else {
+                  let joinIndex = userVM.currentJoinsIndex else {
                 print("ERROR: チームデータの更新に失敗しました。")
                 withAnimation { showContent.toggle() }
                 return

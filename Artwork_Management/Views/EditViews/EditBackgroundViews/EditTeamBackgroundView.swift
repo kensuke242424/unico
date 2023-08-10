@@ -122,8 +122,8 @@ struct EditTeamBackgroundView: View {
             Task{
                 withAnimation { backgroundVM.savingWait = true }
                 let resizedImage = backgroundVM.resizeUIImage(image: newImage)
-                let uploadImage = await userVM.uploadMyBackgroundToFirestorage(resizedImage)
-                await userVM.addMyBackgroundToFirestore(url: uploadImage.url, path: uploadImage.filePath)
+                let uploadImage = await userVM.uploadMyNewBackground(resizedImage)
+                await userVM.setMyNewBackground(url: uploadImage.url, path: uploadImage.filePath)
                 withAnimation { backgroundVM.savingWait = false }
             }
         }

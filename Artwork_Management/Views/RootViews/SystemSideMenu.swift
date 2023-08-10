@@ -27,7 +27,7 @@ struct InputSideMenu {
     
     // チームデータ消去時の状態を管理するプロパティ
     var showdeletedAllTeamAlert   : Bool = false
-    var showdeletedAllTeamProgress: Bool = false
+    var showEscapeTeamProgress: Bool = false
     
     // 操作チームを変更するハーフモーダルを管理
     var showChangeTeamSheet: Bool = false
@@ -548,21 +548,26 @@ struct SystemSideMenu: View {
 
                             Task {
                                 guard let selectedTeam = inputSideMenu.selectedTeam else { return }
-                                inputSideMenu.showdeletedAllTeamProgress = true
-                                try await userVM.deleteMembersJoinTeam(for: selectedTeam,
-                                                                       ids: teamVM.team!.membersId)
+                                inputSideMenu.showEscapeTeamProgress = true
+                                // 対象チーム内のメンバーデータ（members）から自身のメンバーデータを消去
+                                try await teamVM.deleteMyMemberDataFromTeam(for: selectedTeam)
+                                try await userVM.deleteJoinTeamFromMyData(for: selectedTeam)
+                                /// 自身の所属チームデータ（joins）から対象チームデータを消去
+                                /// ⚠️この時、チーム内に他メンバーがいない場合は、チームデータごと削除する
 
+                                // 全部削除の場合の処理
                                 await teamVM.deleteAllTeamImages()
                                 await itemVM.deleteAllItemImages()
                                 await teamVM.deleteSelectedTeamDocuments(selected: selectedTeam)
-                                inputSideMenu.showdeletedAllTeamProgress = false
+
+                                inputSideMenu.showEscapeTeamProgress = false
                                 //TODO: 削除完了アラートが表示されないぞ？？？
                                 inputSideMenu.showdeletedAllTeamAlert = true
 
                             }
                         }
                     } message: {
-                        Text("チーム内のアイテム、タグ、メンバー情報を含めた全てのデータを消去します。チーム削除を実行しますか？")
+                        Text("\(inputSideMenu.selectedTeam?.name ?? "No Name")から脱退しますか？（他に所属メンバーがいない場合、チームデータはすべて削除されます）")
                     } // alert
                     .alert("", isPresented: $inputSideMenu.showdeletedAllTeamAlert) {
                         Button("OK") {

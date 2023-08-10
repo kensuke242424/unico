@@ -19,7 +19,7 @@ struct SelectionBackgroundCards: View {
             LazyHStack(spacing: 30) {
                 Spacer().frame(width: 10)
 
-                let currentIndex = userVM.currentJoinsTeamIndex ?? 0
+                let currentIndex = userVM.currentJoinsIndex ?? 0
 
                 if backgroundVM.selectCategory == .original {
 
@@ -40,7 +40,7 @@ struct SelectionBackgroundCards: View {
                                     guard let deleteTargetImage = backgroundVM.deleteTarget else { return }
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                         backgroundVM.deleteBackground(path: background.imagePath)
-                                        userVM.deleteMyBackgroundToFirestore(deleteTargetImage)
+                                        userVM.deleteMyBackground(deleteTargetImage)
                                         if backgroundVM.selectBackground == background {
                                             backgroundVM.selectBackground = nil
                                         }

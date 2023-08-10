@@ -348,21 +348,40 @@ struct CreateAndJoinTeamView: View {
                 Text("チーム追加をやめて戻りますか？")
             } // alert
         } // ZStack
+        .task(id: userVM.isApproved) {
+            guard let _ = userVM.isApproved else { return }
+            print("=========チーム加入承諾を検知=========")
+//            if selectedTeamCard != .join { return }
 
-        // 「チームに参加」により、相手から承認を受け、チーム情報を受け取ることでリスナーが変更を検知し、作動する
-        // 受け取ったチームの情報をもとに、ログインを行う
-        .onChange(of: userVM.updatedUser) { _ in
-            print("=========user情報の更新を検知=========")
-            if selectedTeamCard != .join { return }
             guard let user = userVM.user else { return }
-            for joinTeam in userVM.joins where joinTeam.id == user.lastLogIn {
-                self.joinedTeamData = joinTeam
+            // lastLogInのidを元に、joins配列内から新規加入チームデータを取り出す
+            for team in userVM.joins where team.id == user.lastLogIn {
+                self.joinedTeamData = team
             }
-            withAnimation(.spring(response: 1.5, blendDuration: 1)) { selectTeamFase = .success }
+            // 加入完了ビューを表示
+            withAnimation(.spring(response: 1.5, blendDuration: 1)) {
+                selectTeamFase = .success
+            }
+            // ログイン開始
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                 withAnimation(.spring(response: 0.5)) { logInVM.rootNavigation = .fetch }
             }
         }
+
+        // 「チームに参加」により、相手から承認を受け、チーム情報を受け取ることでリスナーが変更を検知し、作動する
+        // 受け取ったチームの情報をもとに、ログインを行う
+//        .onChange(of: userVM.isApproved) { _ in
+//            print("=========user情報の更新を検知=========")
+//            if selectedTeamCard != .join { return }
+//            guard let user = userVM.user else { return }
+//            for joinTeam in userVM.joins where joinTeam.id == user.lastLogIn {
+//                self.joinedTeamData = joinTeam
+//            }
+//            withAnimation(.spring(response: 1.5, blendDuration: 1)) { selectTeamFase = .success }
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+//                withAnimation(.spring(response: 0.5)) { logInVM.rootNavigation = .fetch }
+//            }
+//        }
 
         // ✅チーム生成と保存処理
         .onChange(of: selectTeamFase) { _ in
@@ -411,7 +430,7 @@ struct CreateAndJoinTeamView: View {
                         
                         try await teamVM.addTeamToFirestore(teamData: teamData)
                         try await teamVM.addFirstMemberToFirestore(teamId: teamData.id, data: user)
-                        try await userVM.addNewJoinTeamToFirestore(data: joinTeamData)
+                        try await userVM.addNewJoinTeam(data: joinTeamData)
                         try await userVM.updateLastLogInTeam(teamId: teamData.id)
                             await teamVM.setSampleItem(teamID: teamData.id)
                             await tagVM.setSampleTag(teamID: teamData.id)

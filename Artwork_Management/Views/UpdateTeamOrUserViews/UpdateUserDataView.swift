@@ -12,15 +12,6 @@ struct UpdateUserDataView: View {
         case check
     }
 
-    struct InputUpdateUser {
-        var nameText: String = ""
-        var defaultIconData: (url: URL?, filePath: String?)
-        var showPicker: Bool = false
-        var captureImage: UIImage?
-        var captureError: Bool = false
-        var savingWait: Bool = false
-    }
-
     /// ビューの表示を管理するプロパティ
     @Binding var show: Bool
     /// ビュー内のコンテンツ表示を管理するプロパティ
@@ -36,6 +27,15 @@ struct UpdateUserDataView: View {
     @State private var showKeyboardOffset: Bool = false
     /// View内でユーザーが入力するデータを管理するプロパティ群
     @State private var input = InputUpdateUser()
+
+    private struct InputUpdateUser {
+        var nameText: String = ""
+        var defaultIconData: (url: URL?, filePath: String?)
+        var showPicker: Bool = false
+        var captureImage: UIImage?
+        var captureError: Bool = false
+        var savingWait: Bool = false
+    }
 
     var body: some View {
 
@@ -125,7 +125,7 @@ struct UpdateUserDataView: View {
 
         .onAppear {
             input.defaultIconData = (url     : userVM.user?.iconURL,
-                                           filePath: userVM.user?.iconPath)
+                                     filePath: userVM.user?.iconPath)
             input.nameText = userVM.user?.name ?? ""
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -173,11 +173,13 @@ struct UpdateUserDataView: View {
                     afterUser.name = input.nameText
                 }
 
-                // データの変更があれば、Firebaseへの保存処理&通知の生成
+                // ーーーー　データの更新が確認できたら実行　ーーーーー
                 if beforeUser != afterUser {
-                    /// 自身のユーザーデータ更新と、所属するチームが保持する自身のデータを更新
-                    try await userVM.updateUserToFirestore(data: afterUser)
-                    try await teamVM.updateJoinTeamsToMyData(data: afterUser)
+                    /// 自身のユーザーデータ更新
+                    try await userVM.updateUser(from: afterUser)
+                    // 所属するチームが保持する自身のデータを更新
+                    try await userVM.updateJoinTeamsMyData(from: afterUser)
+
                     hapticSuccessNotification()
                 }
 

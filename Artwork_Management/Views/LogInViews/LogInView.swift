@@ -577,7 +577,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         /// オリジナルアイコン画像が入力されている場合は、リサイズ処理しコンテナに格納
                         if let captureIconUIImage = inputLogIn.croppedUserIconImage {
                             iconImageContainer = logInVM.resizeUIImage(image: captureIconUIImage,
-                                                                    width: 60)
+                                                                       width: 60)
                         }
                         /// ーーーーアイコンデータのアップロード処理ーーーー
                         let uplaodIconImageData = await userVM.uploadUserImage(iconImageContainer)
@@ -585,7 +585,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         if inputLogIn.createUserNameText == "" { inputLogIn.createUserNameText = "名無し" }
 
                         /// ユーザーの入力値をもとにユーザーデータを作成し、Firestoreに保存⬇︎
-                        try await logInVM.setNewUserDocument(name     : inputLogIn.createUserNameText,
+                        try await logInVM.setNewUserToFirestore(name     : inputLogIn.createUserNameText,
                                                              password : inputLogIn.password,
                                                              imageData: uplaodIconImageData,
                                                              color    : inputLogIn.selectUserColor)
@@ -613,11 +613,12 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         /// userDocument側にも新規作成したチームのidを保存しておく(addNewJoinTeam)
                         try await teamVM.addTeamToFirestore(teamData: teamData)
                         try await teamVM.addFirstMemberToFirestore(teamId: teamData.id, data: user)
-                        try await userVM.updateLastLogInTeam(teamId: teamData.id)
-                        try await userVM.addNewJoinTeamToFirestore(data: joinTeamData)
-//                        try await userVM.addNewJoinTeam(newJoinTeam: joinTeamData) // 以前のもの
+                        try await userVM.addNewJoinTeam(data: joinTeamData)
+                        // サンプルアイテム&タグをセット
                         await teamVM.setSampleItem(teamID: teamData.id)
-                        tagVM.addTagToFirestore(tagData: tagVM.sampleTag, teamID: teamData.id)
+                        await tagVM.setSampleTag(teamID: teamData.id)
+                        // ユーザーのログイン先を新規チームに設定
+                        try await userVM.updateLastLogInTeam(teamId: teamData.id)
                         
                         /// データ生成の成功を知らせるアニメーションの後、データのフェッチとログイン開始
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
