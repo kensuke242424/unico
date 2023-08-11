@@ -348,24 +348,22 @@ struct CreateAndJoinTeamView: View {
                 Text("チーム追加をやめて戻りますか？")
             } // alert
         } // ZStack
+        .overlay {
+            if userVM.showJoinedTeamInformation {
+                JoinedTeamInformationView(presented: $userVM.showJoinedTeamInformation)
+            }
+        }
+        // 新規チームへの加入が検知されたら、新規加入報告ビューを表示
         .task(id: userVM.newJoinedTeam) {
-            guard let newJoinTeam = userVM.newJoinedTeam else { return }
-            print("=========他チームからのチーム加入承諾を検知=========")
+            if logInVM.rootNavigation != .join { return }
+            guard let _ = userVM.newJoinedTeam else { return }
 
-            do {
-                try await userVM.setApprovedJoinTeam(to: newJoinTeam)
-                self.joinedTeamData = newJoinTeam
-                // 加入完了ビューを表示
-                withAnimation(.spring(response: 1.5, blendDuration: 1)) {
-                    selectTeamFase = .success
+            print("=========他チームからのチーム加入承諾を検知=========")
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                withAnimation {
+                    userVM.showJoinedTeamInformation = true
+                    hapticSuccessNotification()
                 }
-                // ログイン開始
-                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                    withAnimation(.spring(response: 0.5)) { logInVM.rootNavigation = .fetch }
-                }
-            } catch {
-                print("新チーム加入の既読approvedの更新失敗")
-                return
             }
         }
 

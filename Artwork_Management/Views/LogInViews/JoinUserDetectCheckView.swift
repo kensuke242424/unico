@@ -319,6 +319,7 @@ struct JoinUserDetectCheckView: View {
                                         isAgreed.toggle()
                                         joinUserCheckFase = .start
                                     }
+
                                 } catch CustomError.memberDuplication {
                                     hapticErrorNotification()
                                     teamVM.alertMessage = "こちらのユーザーは既にチームに所属しています。"

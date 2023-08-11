@@ -35,6 +35,7 @@ class UserViewModel: ObservableObject {
     /// このプロパティにデータが格納される。
     /// 加入通知をユーザーが確認した時点で、approvedはtrueとなる。
     @Published var newJoinedTeam: JoinTeam?
+    @Published var showJoinedTeamInformation: Bool = false
 
     var memberColor: ThemeColor {
         return user?.userColor ?? ThemeColor.blue
@@ -61,9 +62,6 @@ class UserViewModel: ObservableObject {
     @Published var isAnonymous: Bool = false
     @Published var showAlert = false
     @Published var userErrorMessage = ""
-
-    /// 相手チームからチーム加入の承認を受けた場合にtrueとなるプロパティ。
-    @Published var isApproved: Bool?
 
     /// 自身のユーザードキュメントを取得するメソッド。
     @MainActor
@@ -109,7 +107,7 @@ class UserViewModel: ObservableObject {
         }
     }
 
-    
+    /// ユーザーのアカウントステートを返すメソッド。
     func isAnonymousCheck() {
         
         if let user = Auth.auth().currentUser, user.isAnonymous {
@@ -118,8 +116,9 @@ class UserViewModel: ObservableObject {
             self.isAnonymous = false
         }
     }
+
     /// ユーザーデータの更新をリスニングするスナップショットリスナー。
-    func userDataListener() async throws {
+    func userListener() async throws {
         guard let uid else { throw UserRelatedError.uidEmpty }
 
         userListener = db?
@@ -133,6 +132,7 @@ class UserViewModel: ObservableObject {
 
                 do {
                     let userData = try snap?.data(as: User.self)
+
                     withAnimation {
                             self.user = userData
                         DispatchQueue.main.async {
@@ -147,17 +147,16 @@ class UserViewModel: ObservableObject {
     }
 
     /// 参加チームデータ群「joins」の更新をリスニングするスナップショットリスナー。
-    func joinsDataListener(teamId: String) async throws {
+    func joinsListener(teamId: String) async throws {
         guard let uid else { throw UserRelatedError.uidEmpty }
 
-        let joinsRef = db?
+        joinsListener = db?
             .collection("users")
             .document(uid)
             .collection("joins")
-
-        joinsListener = joinsRef?.addSnapshotListener { snap, error in
-            if let error = error?.localizedDescription {
-                print("ERROR: \(error)")
+            .addSnapshotListener { snap, error in
+            if let error {
+                print("ERROR: \(error.localizedDescription)")
                 return
             }
             guard let documents = snap?.documents else {
@@ -167,12 +166,15 @@ class UserViewModel: ObservableObject {
 
             do {
                 DispatchQueue.main.async {
-                    self.joins = documents.compactMap { (document) -> JoinTeam? in
-                        let getJoinTeam = try? document.data(as: JoinTeam.self)
-                        // approved == falseなら、相手から承認を受けた新規加入チーム
+                    self.joins = documents.compactMap {
+
+                        let getJoinTeam = try? $0.data(as: JoinTeam.self)
+
+                        // 取得したデータのapprovedがfalseなら、相手から承認を受けた新規加入チーム
                         if let approved = getJoinTeam?.approved, !approved {
                             self.newJoinedTeam = getJoinTeam
                         }
+
                         return getJoinTeam
                     }
                 }
@@ -182,14 +184,15 @@ class UserViewModel: ObservableObject {
     
     func updateLastLogInTeam(teamId: String?) async throws {
         guard var user, let teamId else { throw UserRelatedError.missingData }
-        let userRef = db?
-            .collection("users")
-            .document(user.id)
+
+        user.lastLogIn = teamId
+
         do {
-            user.lastLogIn = teamId
-            _ = try userRef?.setData(from: user)
+            try db?
+                .collection("users")
+                .document(user.id)
+                .setData(from: user)
         } catch {
-            print("最新ログインチーム状態のFirestoreへの保存に失敗しました")
             throw UserRelatedError.failedUpdateLastLogIn
         }
     }
@@ -356,10 +359,9 @@ class UserViewModel: ObservableObject {
     /// joinTeamデータのプロパティ「approved」をtrueにするメソッド。
     /// 他チームからの承諾によって新規チームが追加された時、ユーザーに追加を知らせるのに
     /// approvedの値を用いる。
-    func setApprovedJoinTeam(to newJoinTeam: JoinTeam) async throws {
-        guard let uid else { throw UserRelatedError.uidEmpty }
+    func setApprovedJoinTeam(to newJoinTeam: JoinTeam?) async throws {
+        guard let uid, var newJoinTeam else { throw UserRelatedError.uidEmpty }
         // 加入の既読を付ける
-        var newJoinTeam = newJoinTeam
         newJoinTeam.approved = true
 
         do {

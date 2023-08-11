@@ -110,6 +110,19 @@ struct NewTabView: View {
                     PHPickerView(captureImage: $backgroundVM.croppedUIImage,
                                  isShowSheet : $backgroundVM.showPicker)
                 }
+                /// 新規チームへの加入が検知されたら、新規加入報告ビューを表示
+                .task(id: userVM.newJoinedTeam) {
+                    if logInVM.rootNavigation == .join { return }
+                    guard let _ = userVM.newJoinedTeam else { return }
+
+                    print("=========他チームからのチーム加入承諾を検知=========")
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                        withAnimation {
+                            userVM.showJoinedTeamInformation = true
+                            hapticSuccessNotification()
+                        }
+                    }
+                }
                 /// TabViewに紐づけているプロパティをアニメーションのトリガーとして使えないため
                 ///  タブのステートとタブ切り替えによるアニメーションのステートを切り分けている
                 .onChange(of: inputTab.selectionTab) { _ in
@@ -198,7 +211,7 @@ struct NewTabView: View {
                         .transition(AnyTransition.opacity.combined(with: .offset(y: 50)))
                     }
                 }
-                /// チーム招待、チーム編集、ユーザー編集View
+                /// チーム招待、チーム編集、ユーザー編集関連のView
                 .overlay {
                     Group {
                         if teamVM.isShowSearchedNewMemberJoinTeam {
@@ -211,6 +224,10 @@ struct NewTabView: View {
                         }
                         if inputTab.showUpdateUser {
                             UpdateUserDataView(show: $inputTab.showUpdateUser)
+                                .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
+                        }
+                        if userVM.showJoinedTeamInformation {
+                            JoinedTeamInformationView(presented: $userVM.showJoinedTeamInformation)
                                 .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
                         }
                     }

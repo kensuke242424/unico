@@ -27,12 +27,16 @@ class NotificationViewModel: ObservableObject {
     @Published var notifications: [Log] = []
 
     func listener(id currentTeamID: String?) {
+        guard let uid, let currentTeamID else {
+            print("ERROR: 通知のリスニング失敗")
+            return
+        }
 
         let myLogsRef = db?
             .collection("teams")
-            .document(currentTeamID ?? "")
+            .document(currentTeamID)
             .collection("members")
-            .document(uid ?? "")
+            .document(uid)
             .collection("logs")
 
         let unreadLogQuery = myLogsRef?
@@ -59,7 +63,7 @@ class NotificationViewModel: ObservableObject {
                 }
             }
             catch {
-                print("ERROR: 通知の取得に失敗")
+                print("ERROR: 通知のリスニング失敗")
             }
         }
     }
@@ -128,12 +132,11 @@ class NotificationViewModel: ObservableObject {
     /// 更新されたアイテムデータの内容をリセットするメソッド。
     /// 現在のアイテムデータをフェッチし、更新の差分値を反映させて保存し直す。
     func resetUpdatedItem(_ item: CompareItem, to team: Team?, element: Log) async throws {
-
-        print("更新を取り消すアイテムのid: \(item.id)")
+        guard let team else { throw NotificationError.missingData }
 
         let itemRef = db?
             .collection("teams")
-            .document(team?.id ?? "")
+            .document(team.id)
             .collection("items")
             .document(item.id)
 

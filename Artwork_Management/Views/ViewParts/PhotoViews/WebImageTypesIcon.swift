@@ -64,6 +64,7 @@ struct WebImageTypesIcon: View {
                         .foregroundColor(.white.opacity(0.8))
                 }
             }
+            .clipShape(shape)
         }
     }
 }
@@ -74,6 +75,5 @@ struct WebImageTypesIcon_Previews: PreviewProvider {
                           size: 180,
                           type: .item,
                           shape: AnyShape(Circle()))
-        .clipShape(Circle()) // ビューの外でシェイプを指定
     }
 }

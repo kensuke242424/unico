@@ -453,40 +453,46 @@ class TeamViewModel: ObservableObject {
             throw UserRelatedError.failedEscapeTeam
         }
     }
-    
-    func deleteAllTeamImages() async {
-        guard let team else { return }
-        
+
+    /// 選択されたチームの画像関連データをFirestorageから削除するメソッド。
+    /// 主にチーム脱退処理が行われた際に使う。
+    func deleteEscapingTeamImages(for escapingTeam: Team?) async {
+        guard let escapingTeam else { return }
+
+        /// 削除する画像データのファイルパスを配列に格納
         var teamImagesPath: [String?]
-        teamImagesPath = [team.iconPath,
-                          team.backgroundPath]
+        teamImagesPath = [escapingTeam.iconPath,
+                          escapingTeam.backgroundPath]
         
         let storage = Storage.storage()
         let reference = storage.reference()
         
         for path in teamImagesPath {
-            guard let path else { return }
+            guard let path else { continue }
             let imageRef = reference.child(path)
             imageRef.delete { error in
-                if let error = error {
-                    print("画像の削除に失敗しました: \(path)")
-                    print(error)
-                } else {
-                    print("画像の削除に成功しました")
+                if let error {
+                    print("チーム画像の削除失敗")
+                    print(error.localizedDescription)
                 }
             }
         } // for in
     }
     /// ユーザーが選択したチームのデータを削除する
-    func deleteSelectedTeamDocuments(selected selectedTeam: JoinTeam) async {
-        guard let teamRef = db?.collection("teams").document(selectedTeam.id) else {
-            print("error: deleteAllTeamDocumentsでリファレンスを取得できませんでした")
-            return
-        }
+    func deleteSelectedTeamDocuments(selected selectedTeam: JoinTeam) async throws {
+        let teamRef = db?
+            .collection("teams")
+            .document(selectedTeam.id)
+
         do {
-            _ = try await teamRef.delete()
+            let document = try await teamRef?.getDocument()
+            let escapingTeam = try await document?.data(as: Team.self)
+            await deleteEscapingTeamImages(for: escapingTeam)
+            try await teamRef?.delete()
+
         } catch {
-            print("チームドキュメントの削除に失敗しました")
+            print("脱退チームのドキュメント削除失敗")
+            throw TeamRelatedError.failedDeleteTeamDocuments
         }
     }
     /// チームの保持しているアイテムドキュメントを全て削除するメソッド。
@@ -582,4 +588,5 @@ enum TeamRelatedError:Error {
     case failedFetchAddedNewUser
     case failedTeamListen
     case failedUpdateLastLogIn
+    case failedDeleteTeamDocuments
 }

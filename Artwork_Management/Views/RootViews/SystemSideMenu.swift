@@ -57,7 +57,9 @@ struct SystemSideMenu: View {
     @EnvironmentObject var tagVM   : TagViewModel
 
     @Binding var inputTab: InputTab
-    @State private var inputSideMenu: InputSideMenu = InputSideMenu()
+    @State private var input: InputSideMenu = InputSideMenu()
+
+    @State private var teamEscaping: Bool?
 
     @GestureState var dragOffset: CGFloat = 0.0
     let menuRowHeight: CGFloat = 60
@@ -81,13 +83,13 @@ struct SystemSideMenu: View {
 
                 JoinTeamsSideMenuIcon(joins: userVM.joins)
                     .frame(maxWidth: .infinity, alignment: .trailing)
-                    .alert("", isPresented: $inputSideMenu.isShowChangeTeamAlert) {
+                    .alert("", isPresented: $input.isShowChangeTeamAlert) {
                         Button("キャンセル") {}
                         Button("移動する") {
                             // フェッチするチームデータを管理するUserModel内のlastLogInの値を更新後に、再fetchを実行
                             Task {
-                                inputSideMenu.showChangeTeamSheet = false
-                                try await userVM.updateLastLogInTeam(teamId: inputSideMenu.selectedTeam?.id)
+                                input.showChangeTeamSheet = false
+                                try await userVM.updateLastLogInTeam(teamId: input.selectedTeam?.id)
                                 withAnimation(.spring(response: 0.5)) {
                                     progressVM.showCubesProgress = true
                                     inputTab.showSideMenu = false
@@ -100,7 +102,7 @@ struct SystemSideMenu: View {
                             }
                         }
                     } message: {
-                        Text("\(inputSideMenu.selectedTeam?.name ?? "No Name")に移動しますか？")
+                        Text("\(input.selectedTeam?.name ?? "No Name")に移動しますか？")
                     } // team change Alert
             }
             .frame(width: getRect().width * 0.7)
@@ -137,17 +139,17 @@ struct SystemSideMenu: View {
 
                         HStack {
 
-                            SideMenuButton(open: $inputSideMenu.tag, title: "タグ", image: "tag")
+                            SideMenuButton(open: $input.tag, title: "タグ", image: "tag")
 
-                            if inputSideMenu.tag {
+                            if input.tag {
 
                                 if tagVM.tags.count > 2 {
                                     Button {
                                         withAnimation {
-                                            inputSideMenu.editMode = inputSideMenu.editMode.isEditing ? .inactive : .active
+                                            input.editMode = input.editMode.isEditing ? .inactive : .active
                                         }
                                     } label: {
-                                        Image(systemName: inputSideMenu.editMode.isEditing ? "gearshape.fill" : "gearshape")
+                                        Image(systemName: input.editMode.isEditing ? "gearshape.fill" : "gearshape")
                                             .resizable()
                                             .scaledToFit()
                                             .frame(width: 16)
@@ -183,13 +185,13 @@ struct SystemSideMenu: View {
                                 .offset(x: 27)
                             }
                         } // HStack
-                        .onChange(of: inputSideMenu.tag) { newValue in
+                        .onChange(of: input.tag) { newValue in
                             if !newValue {
-                                inputSideMenu.editMode = .inactive
+                                input.editMode = .inactive
                             }
                         }
 
-                        if inputSideMenu.tag {
+                        if input.tag {
 
                             Spacer(minLength: 0)
 
@@ -214,10 +216,10 @@ struct SystemSideMenu: View {
 
                                                 Spacer()
 
-                                                if inputSideMenu.editMode == .inactive {
+                                                if input.editMode == .inactive {
                                                     Image(systemName: "highlighter")
                                                         .foregroundColor(.orange)
-                                                        .opacity(inputSideMenu.editMode.isEditing ? 0.0 : 0.6)
+                                                        .opacity(input.editMode.isEditing ? 0.0 : 0.6)
                                                         .onTapGesture {
                                                             withAnimation(.easeInOut(duration: 0.3)) {
                                                                 inputTab.selectedTag = tag
@@ -230,7 +232,7 @@ struct SystemSideMenu: View {
                                                 if colorScheme == .light {
                                                     Image(systemName: "line.3.horizontal")
                                                         .foregroundColor(.gray)
-                                                        .opacity(inputSideMenu.editMode.isEditing ? 0.6 : 0.0)
+                                                        .opacity(input.editMode.isEditing ? 0.6 : 0.0)
                                                         .frame(width: UIScreen.main.bounds.width * 0.58, alignment: .leading)
                                                         .offset(x: UIScreen.main.bounds.width * 0.44)
                                                 }
@@ -241,7 +243,7 @@ struct SystemSideMenu: View {
                                     .onDelete(perform: rowRemove)
                                     .onMove(perform: rowReplace)
                                 } // List
-                                .environment(\.editMode, $inputSideMenu.editMode)
+                                .environment(\.editMode, $input.editMode)
                                 .frame(width: UIScreen.main.bounds.width / 2 + 60,
                                        height: menuRowHeight + (40 * CGFloat(tagVM.tags.count - 2)))
                                 .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
@@ -262,9 +264,9 @@ struct SystemSideMenu: View {
                     // Team menu...
                     VStack(alignment: .leading) {
 
-                        SideMenuButton(open: $inputSideMenu.team, title: "チーム", image: "cube.transparent")
+                        SideMenuButton(open: $input.team, title: "チーム", image: "cube.transparent")
 
-                        if inputSideMenu.team {
+                        if input.team {
 
                             VStack(alignment: .leading, spacing: 40) {
 
@@ -281,8 +283,8 @@ struct SystemSideMenu: View {
                                     }
 
                                 Label("チームを追加", systemImage: "person.2.crop.square.stack.fill")
-                                    .onTapGesture { inputSideMenu.isShowCreateTeamAlert.toggle() }
-                                    .alert("", isPresented: $inputSideMenu.isShowCreateTeamAlert) {
+                                    .onTapGesture { input.isShowCreateTeamAlert.toggle() }
+                                    .alert("", isPresented: $input.isShowCreateTeamAlert) {
                                         Button("戻る") {}
                                         Button("はい") {
                                             withAnimation(.spring(response: 0.5)) {
@@ -299,7 +301,7 @@ struct SystemSideMenu: View {
                                     } // alert
 
                                 Label("チームを変更", systemImage: "repeat")
-                                    .onTapGesture { inputSideMenu.showChangeTeamSheet.toggle() }
+                                    .onTapGesture { input.showChangeTeamSheet.toggle() }
 
                                 Label("背景の変更", systemImage: "photo.artframe")
                                     .onTapGesture {
@@ -325,9 +327,9 @@ struct SystemSideMenu: View {
                     // Account Menu...
                     VStack(alignment: .leading) {
 
-                        SideMenuButton(open: $inputSideMenu.account, title: "アカウント", image: "person")
+                        SideMenuButton(open: $input.account, title: "アカウント", image: "person")
 
-                        if inputSideMenu.account {
+                        if input.account {
 
                             VStack(alignment: .leading, spacing: 40) {
 
@@ -338,14 +340,14 @@ struct SystemSideMenu: View {
 
                                 Label("アカウント登録", systemImage: "person.crop.square.filled.and.at.rectangle.fill")
                                     .onTapGesture {
-                                        inputSideMenu.showUserEntrySheet.toggle()
+                                        input.showUserEntrySheet.toggle()
                                     }
                                     .offset(x: -3)
 
 
                                 Label("ログアウト", systemImage: "door.right.hand.open")
                                     .foregroundColor(.orange)
-                                    .onTapGesture { inputSideMenu.isShowLogOutAlert.toggle() }
+                                    .onTapGesture { input.isShowLogOutAlert.toggle() }
 
                             } // VStack
                             .foregroundColor(.white)
@@ -353,8 +355,8 @@ struct SystemSideMenu: View {
                             .frame(width: 210, height: menuRowHeight * 3, alignment: .topLeading)
                             .transition(AnyTransition.opacity.combined(with: .offset(x: 0, y: 0)))
                             .offset(x: 20, y: 30)
-                            .alert("確認", isPresented: $inputSideMenu.isShowLogOutAlert) {
-                                Button("戻る") { inputSideMenu.isShowLogOutAlert.toggle() }
+                            .alert("確認", isPresented: $input.isShowLogOutAlert) {
+                                Button("戻る") { input.isShowLogOutAlert.toggle() }
                                 Button("ログアウト") {
                                     progressVM.showLoading.toggle()
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
@@ -380,9 +382,9 @@ struct SystemSideMenu: View {
                     // Help Menu...
                     VStack(alignment: .leading) {
 
-                        SideMenuButton(open: $inputSideMenu.help, title: "システム", image: "gearshape")
+                        SideMenuButton(open: $input.help, title: "システム", image: "gearshape")
 
-                        if inputSideMenu.help {
+                        if input.help {
 
                             VStack(alignment: .leading, spacing: 40) {
 
@@ -451,27 +453,55 @@ struct SystemSideMenu: View {
                 .padding(.leading, -50)
 
         )
-        .sheet(isPresented: $inputSideMenu.showChangeTeamSheet) {
-            ChangeTeamSheetView(teams: userVM.joins)
+        .sheet(isPresented: $input.showChangeTeamSheet) {
+            ChangeTeamSheetView(current: teamVM.team, joins: userVM.joins)
                 .presentationDetents([.medium])
         }
-        .sheet(isPresented: $inputSideMenu.showUserEntrySheet) {
-            UserEntryRecommendationView(isShow: $inputSideMenu.showUserEntrySheet)
+        .sheet(isPresented: $input.showUserEntrySheet) {
+            UserEntryRecommendationView(isShow: $input.showUserEntrySheet)
         }
         // NOTE: ローカルのタグ順番操作をfirestoreに保存
-        .onChange(of: inputSideMenu.editMode) { newEdit in
+        .onChange(of: input.editMode) { newEdit in
             if newEdit == .inactive {
                 tagVM.updateOderTagIndex(teamID: teamVM.team!.id)
             }
         }
         .onChange(of: inputTab.showSideMenu) { newValue in
             if !newValue {
-                inputSideMenu.item     = false
-                inputSideMenu.tag      = false
-                inputSideMenu.team     = false
-                inputSideMenu.account  = false
-                inputSideMenu.help     = false
-                inputSideMenu.editMode = .inactive
+                input.item     = false
+                input.tag      = false
+                input.team     = false
+                input.account  = false
+                input.help     = false
+                input.editMode = .inactive
+            }
+        }
+        .task(id: teamEscaping) {
+            guard let _ = teamEscaping,
+                  let selectedTeam = input.selectedTeam else {
+                      print("チーム脱退処理失敗")
+                      teamEscaping = nil
+                      return
+                  }
+
+            // ⚠️ ------  チーム脱退処理実行  -----  ⚠️
+
+            Task {
+                input.showEscapeTeamProgress = true
+                // 対象チーム内のメンバーデータ（members）から自身のメンバーデータを消去
+                try await teamVM.deleteMyMemberDataFromTeam(for: selectedTeam)
+                try await userVM.deleteJoinTeamFromMyData(for: selectedTeam)
+                /// 自身の所属チームデータ（joins）から対象チームデータを消去
+                /// この時、チーム内に他メンバーがいない場合は、チームデータごと削除する
+
+                // 全部削除の場合の処理
+                await itemVM.deleteAllItemImages()
+                try await teamVM.deleteSelectedTeamDocuments(selected: selectedTeam)
+
+                input.showEscapeTeamProgress = false
+                //TODO: 削除完了アラートが表示されないぞ？？？
+                input.showdeletedAllTeamAlert = true
+
             }
         }
 
@@ -500,10 +530,10 @@ struct SystemSideMenu: View {
     } // body
     
     @ViewBuilder
-    func ChangeTeamSheetView(teams: [JoinTeam]) -> some View {
+    func ChangeTeamSheetView(current: Team?, joins: [JoinTeam]) -> some View {
         NavigationStack {
             Group {
-                if teams.count == 1 {
+                if joins.count == 1 {
                     VStack(spacing: 20) {
                         Image(systemName: "cube.transparent")
                             .resizable()
@@ -518,58 +548,42 @@ struct SystemSideMenu: View {
                     
                 } else {
                     List {
-                        ForEach(teams.filter({ $0.id != teamVM.team!.id}), id: \.self) { teamRow in
-                            HStack(spacing: 20) {
-                                if inputSideMenu.teamsListSheetEdit {
-                                    Image(systemName: "trash.fill")
-                                        .foregroundColor(.red)
-                                        .transition(.opacity.combined(with: .offset(x: -30)))
-                                        .onTapGesture {
-                                            inputSideMenu.selectedTeam = teamRow
-                                            inputSideMenu.showdeleteTeamAlert.toggle()
-                                        }
+                        if let current {
+                            ForEach(joins.filter({ $0.id != current.id}), id: \.self) { teamRow in
+                                HStack(spacing: 20) {
+                                    if input.teamsListSheetEdit {
+                                        Image(systemName: "trash.fill")
+                                            .foregroundColor(.red)
+                                            .transition(.opacity.combined(with: .offset(x: -30)))
+                                            .onTapGesture {
+                                                input.selectedTeam = teamRow
+                                                input.showdeleteTeamAlert.toggle()
+                                            }
+                                    }
+                                    SDWebImageCircleIcon(imageURL: teamRow.iconURL,
+                                                         width: 50, height: 50)
+                                    Text(teamRow.name)
+                                        .lineLimit(1)
                                 }
-                                SDWebImageCircleIcon(imageURL: teamRow.iconURL,
-                                                     width: 50, height: 50)
-                                Text(teamRow.name)
-                                    .lineLimit(1)
-                            }
-                            .frame(height: 60)
-                            .listRowBackground(Color.clear)
-                            .onTapGesture {
-                                inputSideMenu.selectedTeam = teamRow
-                                inputSideMenu.isShowChangeTeamAlert.toggle()
-                            }
-                        } // ForEath
+                                .frame(height: 60)
+                                .listRowBackground(Color.clear)
+                                .onTapGesture {
+                                    input.selectedTeam = teamRow
+                                    input.isShowChangeTeamAlert.toggle()
+                                }
+                            } // ForEath
+                        }
                     } // List
                     .offset(y: -30)
-                    .alert("確認", isPresented: $inputSideMenu.showdeleteTeamAlert) {
-                        Button("削除する", role: .destructive) {
-
-                            Task {
-                                guard let selectedTeam = inputSideMenu.selectedTeam else { return }
-                                inputSideMenu.showEscapeTeamProgress = true
-                                // 対象チーム内のメンバーデータ（members）から自身のメンバーデータを消去
-                                try await teamVM.deleteMyMemberDataFromTeam(for: selectedTeam)
-                                try await userVM.deleteJoinTeamFromMyData(for: selectedTeam)
-                                /// 自身の所属チームデータ（joins）から対象チームデータを消去
-                                /// ⚠️この時、チーム内に他メンバーがいない場合は、チームデータごと削除する
-
-                                // 全部削除の場合の処理
-                                await teamVM.deleteAllTeamImages()
-                                await itemVM.deleteAllItemImages()
-                                await teamVM.deleteSelectedTeamDocuments(selected: selectedTeam)
-
-                                inputSideMenu.showEscapeTeamProgress = false
-                                //TODO: 削除完了アラートが表示されないぞ？？？
-                                inputSideMenu.showdeletedAllTeamAlert = true
-
-                            }
+                    .alert("確認", isPresented: $input.showdeleteTeamAlert) {
+                        Button("脱退する", role: .destructive) {
+                            // ⚠️ ----  チーム脱退処理の実行 ------- ⚠️
+                            teamEscaping = true
                         }
                     } message: {
-                        Text("\(inputSideMenu.selectedTeam?.name ?? "No Name")から脱退しますか？（他に所属メンバーがいない場合、チームデータはすべて削除されます）")
+                        Text("\(input.selectedTeam?.name ?? "No Name")から脱退しますか？（他に所属メンバーがいない場合、チームデータはすべて削除されます）")
                     } // alert
-                    .alert("", isPresented: $inputSideMenu.showdeletedAllTeamAlert) {
+                    .alert("", isPresented: $input.showdeletedAllTeamAlert) {
                         Button("OK") {
                             // TODO: 他のチームデータをfetch
                             // 他のチームが存在しなければ、チーム作成画面へ遷移
@@ -577,13 +591,13 @@ struct SystemSideMenu: View {
                     } message: {
                         Text("チームデータの消去が完了しました")
                     } // team delete Alert
-                    .alert("", isPresented: $inputSideMenu.isShowChangeTeamAlert) {
+                    .alert("", isPresented: $input.isShowChangeTeamAlert) {
                         Button("キャンセル") {}
                         Button("移動する") {
                             // フェッチするチームデータを管理するUserModel内のlastLogInの値を更新後に、再fetchを実行
                             Task {
-                                inputSideMenu.showChangeTeamSheet = false
-                                try await userVM.updateLastLogInTeam(teamId: inputSideMenu.selectedTeam?.id)
+                                input.showChangeTeamSheet = false
+                                try await userVM.updateLastLogInTeam(teamId: input.selectedTeam?.id)
                                 withAnimation(.spring(response: 0.5)) {
                                     progressVM.showCubesProgress = true
                                     inputTab.showSideMenu = false
@@ -596,28 +610,28 @@ struct SystemSideMenu: View {
                             }
                         }
                     } message: {
-                        Text("\(inputSideMenu.selectedTeam?.name ?? "No Name")に移動しますか？")
+                        Text("\(input.selectedTeam?.name ?? "No Name")に移動しますか？")
                     } // team change Alert
                 }
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button(inputSideMenu.teamsListSheetEdit ? "終了" : "編集") {
+                    Button(input.teamsListSheetEdit ? "終了" : "編集") {
                         withAnimation(.easeInOut(duration: 0.4)) {
-                            inputSideMenu.teamsListSheetEdit.toggle()
+                            input.teamsListSheetEdit.toggle()
                         }
                     }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
-                        inputSideMenu.isShowCreateTeamAlert.toggle()
+                        input.isShowCreateTeamAlert.toggle()
                     } label: {
                         Image(systemName: "plus")
                     }
-                    .alert("", isPresented: $inputSideMenu.isShowCreateTeamAlert) {
+                    .alert("", isPresented: $input.isShowCreateTeamAlert) {
                         Button("戻る") {}
                         Button("はい") {
-                            inputSideMenu.showChangeTeamSheet.toggle()
+                            input.showChangeTeamSheet.toggle()
                             withAnimation(.spring(response: 0.5)) {
                                 logInVM.rootNavigation = .join
                             }
@@ -643,15 +657,15 @@ struct SystemSideMenu: View {
                     SDWebImageCircleIcon(imageURL: team.iconURL,
                                          width: 28, height: 28)
                     .onTapGesture {
-                        inputSideMenu.selectedTeam = team
-                        inputSideMenu.isShowChangeTeamAlert.toggle()
+                        input.selectedTeam = team
+                        input.isShowChangeTeamAlert.toggle()
                     }
                 }
             }
             
             Button {
              //TODO: チーム選択ハーフモーダル
-                inputSideMenu.showChangeTeamSheet.toggle()
+                input.showChangeTeamSheet.toggle()
             } label: {
                 Image(systemName: "ellipsis.circle")
                     .foregroundColor(.white)

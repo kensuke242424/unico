@@ -92,9 +92,8 @@ struct RootView: View {
                     CreateAndJoinTeamView()
                     PHPickerView(captureImage: $preloads.captureImage, isShowSheet: $preloads.showSheet)
                     NewItemsView(itemVM: itemVM,  cartVM: cartVM, inputTab: $preloadVM.inputTab)
-//                    SelectBackgroundView()
                 }
-                .opacity(0)
+                .opacity(0.01)
             }
         }
         .onAppear {
@@ -139,10 +138,10 @@ struct RootView: View {
 
                         await tagVM.tagDataLister(teamID: lastLogInTeamID)
 
-                        try await userVM.userDataListener()
+                        try await userVM.userListener()
                         try await teamVM.teamListener(id: lastLogInTeamID)
                             await teamVM.membersListener(id: lastLogInTeamID)
-                        try await userVM.joinsDataListener(teamId: lastLogInTeamID)
+                        try await userVM.joinsListener(teamId: lastLogInTeamID)
                             await itemVM.listener(id: lastLogInTeamID)
                         
                         /// ホーム画面へ遷移
