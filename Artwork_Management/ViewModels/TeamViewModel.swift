@@ -47,16 +47,20 @@ class TeamViewModel: ObservableObject {
     @MainActor
     func fetchTeam(teamID: String) async throws {
 
-        guard let teamRef = db?.collection("teams").document(teamID) else { throw CustomError.getRef  }
-
         do {
-            let teamDocument = try await teamRef.getDocument()
-            let teamData = try teamDocument.data(as: Team.self)
+            let teamDocument = try await db?
+                .collection("teams")
+                .document(teamID)
+                .getDocument()
+
+            let teamData = try teamDocument?.data(as: Team.self)
             self.team =  teamData
         } catch {
+            print("ERROR: チームデータ取得失敗")
             throw CustomError.fetch
         }
     }
+
     /// チームデータの追加・更新・削除のステートを管理するリスナーメソッド。
     /// 初期実行時にリスニング対象ドキュメントのデータが全取得される。(フラグはadded)
     func teamListener(id currentTeamID: String) async throws {
@@ -104,6 +108,7 @@ class TeamViewModel: ObservableObject {
                 }
             }
     }
+
     /// Firestoreの「teams」コレクションに、新規チームを保存するメソッド。
     func addNewTeam(team newAddTeam: Team) async throws {
 
@@ -138,6 +143,7 @@ class TeamViewModel: ObservableObject {
                     .document(myJoinMember.id)
                     .setData(from: myJoinMember)
             } catch {
+                print("ERROR: JoinTeam更新失敗")
                 UserRelatedError.failedUpdateJoinsMyMemberData
             }
         }
@@ -219,6 +225,7 @@ class TeamViewModel: ObservableObject {
             throw CustomError.getDetectUser
         }
     }
+
     /// チーム参加を許可したユーザーに対して、チーム情報（joinTeam）を渡すメソッド。
     /// Firestoreのusersコレクションの中から、相手ユーザードキュメントのサブコレクション（joins）にデータをセットする。
     func passJoinTeamToDetectedMember(for detectedUser: User, from currentJoinTeam: JoinTeam?) async throws {
@@ -240,6 +247,7 @@ class TeamViewModel: ObservableObject {
                 .setData(from: passJoinTeam)
 
         } catch {
+            print("ERROR: 新規参加ユーザーへのJoinTeam譲渡失敗")
             throw CustomError.addTeamIDToJoinedUser
         }
     }
@@ -319,7 +327,7 @@ class TeamViewModel: ObservableObject {
         }
     }
 
-    func deleteTeamImage(path: String?) async {
+    func deleteImage(path: String?) async {
 
         guard let path = path else { return }
 
@@ -337,26 +345,24 @@ class TeamViewModel: ObservableObject {
     }
 
     func updateTeam(data updatedTeamData: Team) async throws {
-
-        // 取得アイコンデータurlがnilだったら処理終了
         guard let team else { throw CustomError.teamEmpty }
-        let teamRef = db?
-            .collection("teams")
-            .document(team.id)
+
+        // 更新前の元々のアイコンパスを保持しておく
+        // 更新成功が確認できてから以前のアイコンデータを削除する
+        let defaultIconPath = team.iconPath
 
         do {
-            // 更新前の元々のアイコンパスを保持しておく
-            // 更新成功が確認できてから以前のアイコンデータを削除する
-            let defaultIconPath = team.iconPath
-            _ = try teamRef?.setData(from: updatedTeamData)
-            // アイコンデータは変えていない場合、削除処理をスキップする
-            if defaultIconPath != updatedTeamData.iconPath {
-                await deleteTeamImage(path: defaultIconPath)
-            }
+            try db?
+                .collection("teams")
+                .document(team.id)
+                .setData(from: updatedTeamData)
         } catch {
-            // アイコンデータ更新失敗のため、保存予定だったアイコンデータをfirestorageから削除
-            await deleteTeamImage(path: updatedTeamData.iconPath)
-            print("ERROR: updateTeam")
+            // アイコンデータが変更されていた場合は、firestorageから画像を削除
+            if defaultIconPath != updatedTeamData.iconPath {
+                await deleteImage(path: updatedTeamData.iconPath)
+            }
+            print("ERROR: チーム更新失敗")
+            throw TeamRelatedError.failedUpdateTeam
         }
     }
 
@@ -374,19 +380,20 @@ class TeamViewModel: ObservableObject {
                 .delete() // 削除
 
         } catch {
+            print("ERROR: 脱退チームのドキュメント削除失敗")
             throw UserRelatedError.failedEscapeTeam
         }
     }
 
     /// 選択されたチームの画像関連データをFirestorageから削除するメソッド。
     /// 主にチーム脱退処理が行われた際に使う。
-    func deleteEscapingTeamImages(for escapingTeam: Team?) async {
-        guard let escapingTeam else { return }
+    func deleteTeamImages(for team: Team?) async {
+        guard let team else { return }
 
         /// 削除する画像データのファイルパスを配列に格納
         var teamImagesPath: [String?]
-        teamImagesPath = [escapingTeam.iconPath,
-                          escapingTeam.backgroundPath]
+        teamImagesPath = [team.iconPath,
+                          team.backgroundPath]
         
         let storage = Storage.storage()
         let reference = storage.reference()
@@ -410,9 +417,11 @@ class TeamViewModel: ObservableObject {
 
         do {
             let document = try await teamRef?.getDocument()
-            let escapingTeam = try await document?.data(as: Team.self)
+            let escapingTeam = try document?.data(as: Team.self)
             // Firestorageから画像データ削除
-            await deleteEscapingTeamImages(for: escapingTeam)
+            await deleteImage(path: escapingTeam?.iconPath)
+            await deleteImage(path: escapingTeam?.backgroundPath)
+            // チームドキュメントを削除
             try await teamRef?.delete()
 
         } catch {
@@ -421,76 +430,121 @@ class TeamViewModel: ObservableObject {
         }
     }
     /// チームの保持しているアイテムドキュメントを全て削除するメソッド。
-    func deleteAllTeamItems() async {
+    /// 主にチームの脱退処理を実行した際に使われる。
+    func deleteTeamItemsDocuments(teamId: String) async throws {
         guard let team else { return }
-        guard let itemsRef = db?.collection("teams").document(team.id).collection("items") else { return }
+
         do {
-            let snapshot = try await itemsRef.getDocuments()
+            let snapshot = try await db?
+                .collection("teams")
+                .document(teamId)
+                .collection("items")
+                .getDocuments()
+
+            guard let snapshot else { return }
+
             for document in snapshot.documents {
-                _ = try await document.reference.delete()
+                let item = try document.data(as: Item.self)
+                try await document.reference.delete() // ドキュメント削除
+                await deleteImage(path: item.photoPath) // 画像データ削除
             }
         } catch {
-            print("チームアイテムの削除に失敗しました")
+            print("ERROR: 脱退チームのアイテム削除失敗")
+            throw TeamRelatedError.failedDeleteEscapeTeamItems
         }
     }
 
     /// チームの保持しているタグドキュメントを全て削除するメソッド。
-    func deleteAllTeamTags() async {
+    func deleteTeamTagsDocuments(teamId: String) async throws {
         guard let team else { return }
-        guard let itemsRef = db?.collection("teams").document(team.id).collection("tags") else { return }
+
         do {
-            let snapshot = try await itemsRef.getDocuments()
+            let snapshot = try await db?
+                .collection("teams")
+                .document(teamId)
+                .collection("tags")
+                .getDocuments()
+
+            guard let snapshot else { throw TeamRelatedError.missingSnapshot }
+
             for document in snapshot.documents {
-                _ = try await document.reference.delete()
+                try await document.reference.delete() // タグ削除
             }
         } catch {
-            print("チームアイテムの削除に失敗しました")
+            print("チームタグの削除失敗")
+            throw TeamRelatedError.failedDeleteEscapeTeamTags
+        }
+    }
+    /// チーム内の所属メンバー一人分のデータ群を削除するメソッド。
+    /// メンバーがサブコレクションとして持つログデータ「logs」を削除した後、ドキュメント本体を削除する。
+    ///MEMO: ドキュメントだけを削除してもサブコレクションのデータは残るので注意
+    func deleteTeamMemberDocuments(teamId: String, memberId: String) async throws {
+
+        do {
+            // ログデータ全てのスナップショットを取得
+            let logsSnapshot = try await db?
+                .collection("teams")
+                .document(teamId)
+                .collection("members")
+                .document(memberId)
+                .collection("logs")
+                .getDocuments()
+
+            // ログデータ全てのドキュメントを削除
+            let _ = logsSnapshot?.documents.compactMap { document in
+                document.reference.delete()
+            }
+            // メンバードキュメントを削除
+            try await db?
+                .collection("teams")
+                .document(teamId)
+                .collection("members")
+                .document(memberId)
+                .delete()
+
+        } catch {
+            print("ERROR: メンバーデータの削除失敗")
+            throw TeamRelatedError.failedDeleteMemberDocuments
         }
     }
 
     /// アカウント削除時に実行されるメソッド。削除実行アカウントが所属する全てのチームのデータを削除する
     /// ✅所属チームのメンバーが削除アカウントのユーザーのみだった場合 ⇨ チームデータを全て消去
     /// ✅所属チームのメンバーが削除アカウントのユーザー以外にも在籍している場合 ⇨ 関連ユーザーデータのみ削除
-    func deleteAccountRelatedTeamData(uid userID: String, joinsTeam: [JoinTeam]) async throws {
+    func deleteAllDocumentsController(joinsTeam: [JoinTeam]) async throws {
+        guard let uid else { throw TeamRelatedError.uidEmpty }
 
-        var joinsTeamID: [String] = []
-        // ユーザが参加している各チームのid文字列データを配列に格納(whereFieldクエリで使う)
-        for joinTeam in joinsTeam {
-            joinsTeamID.append(joinTeam.id)
-        }
-
-        // ユーザが所属している各チームのid配列を使ってクエリを叩く
-        guard let joinTeamRefs = db?.collection("teams")
-            .whereField("id", in: joinsTeamID) else {
-            print("deleteAccountRelatedTeamDataでのクエリに失敗しました")
-            throw CustomError.getRef
+        // ユーザーが所属している各チームのリファレンス群を取得
+        var teamRefs = joinsTeam.compactMap {
+            return db?
+                .collection("teams")
+                .document($0.id)
         }
 
         do {
-            let snapshot = try await joinTeamRefs.getDocuments()
+            // 各所属チームのリファレンスごとに削除処理を実行していく
+            for teamRef in teamRefs {
+                /// チームのドキュメントId
+                let teamId = teamRef.documentID
+                /// 所属チームのメンバードキュメントを取得
+                let membersSnapshot = try await teamRef
+                    .collection("members")
+                    .getDocuments()
 
-            for teamRowDocument in snapshot.documents {
+                // チームに所属しているメンバー全員のidを取得
+                let membersId: [String] = membersSnapshot.documents.compactMap {$0.documentID}
 
-                do {
-                    // 所属チーム一つ分のドキュメント取得
-                    var teamData = try teamRowDocument.data(as: Team.self)
-                    guard let teamRowRef = db?.collection("teams").document(teamData.id) else {
-                        print("\(teamData.name)チームのリファレンス取得に失敗しました")
-                        continue
-                    }
+                if membersId.count == 1 &&
+                    membersId.first == uid {
+                    // ⚠️チーム内に自分以外のメンバーが居なかった場合、全データをFirestoreから削除
+                    try await deleteTeamMemberDocuments(teamId: teamId, memberId: uid)
+                    try await deleteTeamTagsDocuments(teamId: teamId)
+                    try await deleteTeamItemsDocuments(teamId: teamId)
+                    try await teamRef.delete() // 最後にチームドキュメントを削除
 
-                    if self.membersId.count == 1 &&
-                        self.membersId.first == userID {
-                        // 削除対象ユーザーの他にチームメンバーが居なかった場合、全データをFirestoreから削除
-                        _ = await deleteAllTeamTags()
-                        _ = await deleteAllTeamItems()
-                        _ = try await teamRowDocument.reference.delete()
-
-                    } else {
-                        // 削除対象ユーザーの他にもチーム所属者がいた場合、自身のみmembersから処理し、保存
-//                        teamData.membersId.removeAll(where: { $0 == userID })
-                        try teamRowRef.setData(from: teamData)
-                    }
+                } else {
+                     // 削除対象ユーザーの他にもチーム所属者がいた場合、自身のみmembersサブコレクションから削除
+                    try await deleteTeamMemberDocuments(teamId: teamId, memberId: uid)
                 }
             }
         }
@@ -511,8 +565,12 @@ enum TeamRelatedError:Error {
     case failedCreateJoinTeam
     case filedAddFirstMember
     case failedFetchUser
+    case failedUpdateTeam
     case failedFetchAddedNewUser
     case failedTeamListen
     case failedUpdateLastLogIn
     case failedDeleteTeamDocuments
+    case failedDeleteEscapeTeamItems
+    case failedDeleteEscapeTeamTags
+    case failedDeleteMemberDocuments
 }

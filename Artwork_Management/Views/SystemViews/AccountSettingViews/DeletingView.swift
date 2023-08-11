@@ -66,9 +66,8 @@ struct DeletingView: View {
             guard let userID = userVM.user?.id else { return }
 
             do {
-                _ = try await logInVM.deleteAccountWithEmailLink()
-                _ = try await teamVM.deleteAccountRelatedTeamData(uid: userID,
-                                                                  joinsTeam: userVM.joins)
+                try await teamVM.deleteAllDocumentsController(joinsTeam: userVM.joins)
+                try await logInVM.deleteAccountWithEmailLink()
 
             } catch {
                 // アカウントデータの削除に失敗したら、一つ前のページに戻る
