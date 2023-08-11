@@ -491,7 +491,6 @@ struct SystemSideMenu: View {
                 // 対象チーム内のメンバーデータ（members）から自身のメンバーデータを消去
                 try await teamVM.deleteTeamMemberDocuments(teamId: selectedTeam.id,
                                                            memberId: userVM.uid)
-                try await teamVM.deleteMyMemberDataFromTeam(for: selectedTeam)
                 try await userVM.deleteJoinTeamFromMyData(for: selectedTeam)
                 /// 自身の所属チームデータ（joins）から対象チームデータを消去
                 /// この時、チーム内に他メンバーがいない場合は、チームデータごと削除する
@@ -503,7 +502,6 @@ struct SystemSideMenu: View {
                 input.showEscapeTeamProgress = false
                 //TODO: 削除完了アラートが表示されないぞ？？？
                 input.showdeletedAllTeamAlert = true
-
             }
         }
 
