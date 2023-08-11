@@ -489,6 +489,8 @@ struct SystemSideMenu: View {
             Task {
                 input.showEscapeTeamProgress = true
                 // 対象チーム内のメンバーデータ（members）から自身のメンバーデータを消去
+                try await teamVM.deleteTeamMemberDocuments(teamId: selectedTeam.id,
+                                                           memberId: userVM.uid)
                 try await teamVM.deleteMyMemberDataFromTeam(for: selectedTeam)
                 try await userVM.deleteJoinTeamFromMyData(for: selectedTeam)
                 /// 自身の所属チームデータ（joins）から対象チームデータを消去

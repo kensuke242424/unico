@@ -430,7 +430,7 @@ class TeamViewModel: ObservableObject {
         }
     }
     /// チームの保持しているアイテムドキュメントを全て削除するメソッド。
-    /// 主にチームの脱退処理を実行した際に使われる。
+    /// ユーザーがチーム脱退やアカウント削除を行った際に、"チームに他のメンバーが存在しない"場合に使用される。
     func deleteTeamItemsDocuments(teamId: String) async throws {
         guard let team else { return }
 
@@ -455,6 +455,7 @@ class TeamViewModel: ObservableObject {
     }
 
     /// チームの保持しているタグドキュメントを全て削除するメソッド。
+    /// ユーザーがチーム脱退やアカウント削除を行った際に、"チームに他のメンバーが存在しない"場合に使用される。
     func deleteTeamTagsDocuments(teamId: String) async throws {
         guard let team else { return }
 
@@ -475,10 +476,11 @@ class TeamViewModel: ObservableObject {
             throw TeamRelatedError.failedDeleteEscapeTeamTags
         }
     }
-    /// チーム内の所属メンバー一人分のデータ群を削除するメソッド。
-    /// メンバーがサブコレクションとして持つログデータ「logs」を削除した後、ドキュメント本体を削除する。
-    ///MEMO: ドキュメントだけを削除してもサブコレクションのデータは残るので注意
-    func deleteTeamMemberDocuments(teamId: String, memberId: String) async throws {
+    /// チーム内のサブコレクション「members」のドキュメントを削除するメソッド。
+    /// メンバーがサブコレクションとして持つログデータ「logs」を全て削除した後、ドキュメント本体を削除する。
+    ///MEMO: ドキュメント本体だけを削除してもサブコレクションのデータは残るので注意
+    func deleteTeamMemberDocuments(teamId: String?, memberId: String?) async throws {
+        guard let teamId, let memberId else { throw TeamRelatedError.missingData }
 
         do {
             // ログデータ全てのスナップショットを取得
@@ -507,15 +509,36 @@ class TeamViewModel: ObservableObject {
             throw TeamRelatedError.failedDeleteMemberDocuments
         }
     }
+    /// ユーザーが持つ所属チームデータサブコレクション「joins」のドキュメントを全て削除するメソッド。
+    func deleteUserAllJoinsDocuments(joins joinTeams: [JoinTeam]) async throws {
+        guard let uid else { throw TeamRelatedError.uidEmpty }
+
+        do {
+            // ユーザーが持つjoinsサブコレクションのスナップショット取得
+            let joinsSnapshot = try await db?
+                .collection("users")
+                .document(uid)
+                .collection("joins")
+                .getDocuments()
+
+            guard let joinsSnapshot else { throw TeamRelatedError.missingSnapshot }
+
+            for document in joinsSnapshot.documents {
+                try await document.reference.delete()
+            }
+        } catch {
+
+        }
+    }
 
     /// アカウント削除時に実行されるメソッド。削除実行アカウントが所属する全てのチームのデータを削除する
     /// ✅所属チームのメンバーが削除アカウントのユーザーのみだった場合 ⇨ チームデータを全て消去
     /// ✅所属チームのメンバーが削除アカウントのユーザー以外にも在籍している場合 ⇨ 関連ユーザーデータのみ削除
-    func deleteAllDocumentsController(joinsTeam: [JoinTeam]) async throws {
+    func deleteAllDocumentsController(joins joinTeams: [JoinTeam]) async throws {
         guard let uid else { throw TeamRelatedError.uidEmpty }
 
-        // ユーザーが所属している各チームのリファレンス群を取得
-        var teamRefs = joinsTeam.compactMap {
+        // ユーザーが所属している全チームのリファレンス群を取得
+        var teamRefs = joinTeams.compactMap {
             return db?
                 .collection("teams")
                 .document($0.id)
@@ -526,12 +549,12 @@ class TeamViewModel: ObservableObject {
             for teamRef in teamRefs {
                 /// チームのドキュメントId
                 let teamId = teamRef.documentID
-                /// 所属チームのメンバードキュメントを取得
+                /// 所属チームメンバー全員のスナップショットを取得
                 let membersSnapshot = try await teamRef
                     .collection("members")
                     .getDocuments()
 
-                // チームに所属しているメンバー全員のidを取得
+                // メンバー全員のidを取得
                 let membersId: [String] = membersSnapshot.documents.compactMap {$0.documentID}
 
                 if membersId.count == 1 &&
@@ -546,8 +569,8 @@ class TeamViewModel: ObservableObject {
                      // 削除対象ユーザーの他にもチーム所属者がいた場合、自身のみmembersサブコレクションから削除
                     try await deleteTeamMemberDocuments(teamId: teamId, memberId: uid)
                 }
-            }
-        }
+            } // for teamRef in teamRefs
+        } // do
     }
 
     deinit {

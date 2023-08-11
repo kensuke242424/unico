@@ -66,7 +66,7 @@ struct DeletingView: View {
             guard let userID = userVM.user?.id else { return }
 
             do {
-                try await teamVM.deleteAllDocumentsController(joinsTeam: userVM.joins)
+                try await teamVM.deleteAllDocumentsController(joins: userVM.joins)
                 try await logInVM.deleteAccountWithEmailLink()
 
             } catch {
