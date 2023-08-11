@@ -411,7 +411,7 @@ struct CreateAndJoinTeamView: View {
                         // 作成or参加したチームをView表示する用のプロパティ
                         self.joinedTeamData = joinTeamData
                         
-                        try await teamVM.addTeamToFirestore(teamData: teamData)
+                        try await teamVM.addNewTeam(team: teamData)
                         try await teamVM.addFirstMemberToFirestore(teamId: teamData.id, data: user)
                         try await userVM.addNewJoinTeam(data: joinTeamData)
                         try await userVM.updateLastLogInTeam(teamId: teamData.id)

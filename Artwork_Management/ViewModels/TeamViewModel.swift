@@ -60,20 +60,17 @@ class TeamViewModel: ObservableObject {
     /// チームデータの追加・更新・削除のステートを管理するリスナーメソッド。
     /// 初期実行時にリスニング対象ドキュメントのデータが全取得される。(フラグはadded)
     func teamListener(id currentTeamID: String) async throws {
-        let teamRef = db?
+
+        teamListener = db?
             .collection("teams")
             .document(currentTeamID)
-
-        guard let teamRef else { throw CustomError.getRef }
-
-        teamListener = teamRef.addSnapshotListener { snap, error in
+            .addSnapshotListener { snap, error in
             if let error {
                 print("teamListener失敗: \(error.localizedDescription)")
             } else {
-                print("teamListener起動")
 
                 do {
-                    let teamData = try snap?.data(as: Team.self)
+                    let teamData = try snap!.data(as: Team.self)
                     withAnimation {self.team = teamData}
                     print("チームデータを更新")
                 } catch {
@@ -86,45 +83,39 @@ class TeamViewModel: ObservableObject {
     /// チームのサブコレクション「members」における追加・更新・削除のステートを管理するリスナーメソッド。
     /// 初期実行時にリスニング対象ドキュメントのデータが全取得される。(フラグはadded)
     func membersListener(id currentTeamID: String) async {
-        let membersRef = db?
+
+        membersListener = db?
             .collection("teams")
             .document(currentTeamID)
             .collection("members")
-        guard let membersRef else { return }
+            .addSnapshotListener { snap, error in
 
-        membersListener = membersRef.addSnapshotListener { snapshot, error in
-            if let error {
-                print("membersListener起動失敗: \(error.localizedDescription)")
-            } else {
-                guard let documents = snapshot?.documents else { return }
-                print("teamListener開始")
+                if let error {
+                    print("ERROR: \(error.localizedDescription)")
+                } else {
 
-                do {
-                    self.members = documents.compactMap { (snap) -> JoinMember? in
-                        return try? snap.data(as: JoinMember.self, with: .estimate)
+                    do {
+                        self.members = snap!.documents.compactMap {
+                            return try? $0.data(as: JoinMember.self, with: .estimate)
+                        }
+                    } catch {
+                        print("メンバーデータ更新失敗")
                     }
-                    print("メンバーデータを更新")
-                } catch {
-                    print("メンバーデータ更新失敗")
                 }
             }
-        }
     }
-
-    func addTeamToFirestore(teamData: Team) async throws {
-        print("addTeamAndGetID実行")
-
-        let teamsRef = db?
-            .collection("teams")
-            .document(teamData.id)
+    /// Firestoreの「teams」コレクションに、新規チームを保存するメソッド。
+    func addNewTeam(team newAddTeam: Team) async throws {
 
         do {
-            _ = try teamsRef?.setData(from: teamData)
+            try db?
+                .collection("teams")
+                .document(newAddTeam.id)
+                .setData(from: newAddTeam)
         } catch {
-            print("Error: try db!.collection(collectionID).addDocument(from: itemData)")
+            print("ERROR: 新規チームの保存失敗")
             throw CustomError.setData
         }
-        print("addTeamAndGetID完了")
     }
 
     /// ユーザーが所属しているチーム全てに保存されている自身のメンバーデータを更新する。
@@ -154,66 +145,60 @@ class TeamViewModel: ObservableObject {
 
     /// 新規チーム作成時に使用するメソッド。作成者のメンバーデータを新規チームのサブコレクションに保存する。
     func addFirstMemberToFirestore(teamId: String, data userData: User) async throws {
-        print("addFirstMemberData実行")
-        let membersRef = db?
-            .collection("teams")
-            .document(teamId)
-            .collection("members")
 
         let newMemberData = JoinMember(id: userData.id,
                                        name: userData.name,
                                        iconURL: userData.iconURL)
         do {
-            _ = try membersRef?
+            try db?
+                .collection("teams")
+                .document(teamId)
+                .collection("members")
                 .document(userData.id)
                 .setData(from: newMemberData)
+        } catch {
+            throw TeamRelatedError.filedAddFirstMember
         }
     }
     /// チームのサブコレクション「members」に、新規加入したユーザーのデータを保存するメソッド。
-    ///
-    func addDetectedNewMember(for detectedUser: User) async throws {
+    func setDetectedNewMember(from detectedUser: User) async throws {
         guard let team else { throw CustomError.teamEmpty }
-        let memberRef = db?
-            .collection("teams")
-            .document(team.id)
-            .collection("members")
-            .document(detectedUser.id)
 
+        // 対象ユーザーがすでにメンバー加入済みであるかをチェック
+        for memberId in self.membersId where detectedUser.id == memberId {
+            throw CustomError.memberDuplication
+        }
+
+        let newMemberData = JoinMember(id: detectedUser.id,
+                                       name: detectedUser.name,
+                                       iconURL: detectedUser.iconURL)
         do {
-            for memberId in self.membersId where detectedUser.id == memberId {
-                throw CustomError.memberDuplication
-            }
-
-            let newMemberData = JoinMember(id: detectedUser.id,
-                                           name: detectedUser.name,
-                                           iconURL: detectedUser.iconURL)
-
-            _ = try memberRef?.setData(from: newMemberData)
+            try db?
+                .collection("teams")
+                .document(team.id)
+                .collection("members")
+                .document(detectedUser.id)
+                .setData(from: newMemberData)
         }
     }
 
     /// チーム作成時にデフォルトのサンプルアイテムを追加するメソッド。
-    func setSampleItem(itemsData: [Item] = sampleItems, teamID: String) async {
+    func setSampleItem(sampleItems: [Item] = sampleItems, teamID: String) async {
 
-        let itemsRef = db?
-            .collection("teams")
-            .document(teamID)
-            .collection("items")
+        sampleItems.compactMap { item in
+            /// サンプルアイテムのteamIdを新規チームのIdに更新する
+            var item = item
+            item.teamID = teamID
 
-        for itemData in itemsData {
             do {
-                /// サンプルアイテムデータのteamIDとタグを更新する
-                var itemData = itemData
-                itemData.teamID = teamID
-
                 try db?
                     .collection("teams")
                     .document(teamID)
                     .collection("items")
-                    .addDocument(from: itemData)
+                    .addDocument(from: item)
 
             } catch {
-                print("Error: addDocument(from: \(itemData.name)")
+                print("ERROR: サンプルアイテム\(item.name)の追加失敗")
             }
         }
     }
@@ -221,11 +206,13 @@ class TeamViewModel: ObservableObject {
     // メンバー招待画面で取得した相手のユーザIDを使って、Firestoreのusersからデータをフェッチ
     func fetchDetectUserData(id userID: String) async throws -> User? {
 
-        guard let userRef = db?.collection("users").document(userID) else { throw CustomError.getDocument }
-
         do {
-            let detectUserDocument = try await userRef.getDocument()
-            let detectUserData = try detectUserDocument.data(as: User.self)
+            let detectUserDocument = try await db?
+                .collection("users")
+                .document(userID)
+                .getDocument()
+
+            let detectUserData = try detectUserDocument?.data(as: User.self)
             return detectUserData
         } catch {
             print("detectUserFetchData_失敗")
@@ -234,22 +221,23 @@ class TeamViewModel: ObservableObject {
     }
     /// チーム参加を許可したユーザーに対して、チーム情報（joinTeam）を渡すメソッド。
     /// Firestoreのusersコレクションの中から、相手ユーザードキュメントのサブコレクション（joins）にデータをセットする。
-    func addJoinTeamToDetectedMember(for detectedUser: User) async throws {
-        guard let team else { throw CustomError.teamEmpty }
+    func passJoinTeamToDetectedMember(for detectedUser: User, from currentJoinTeam: JoinTeam?) async throws {
+        guard let currentJoinTeam else { throw TeamRelatedError.missingData }
 
-        /// 現在のチームのjoinTeamデータを生成
-        let joinTeamContainer = JoinTeam(id: team.id,
-                                         name: team.name,
-                                         iconURL: team.iconURL,
-                                         currentBackground: sampleBackground,
-                                         approved: false)
+        // 相手に渡すjoinTeamデータを生成
+        var passJoinTeam = currentJoinTeam
+        // 背景データはサンプル背景に差し替える
+        passJoinTeam.currentBackground = sampleBackground
+        // approvedをfalseとして渡すことで、相手に届いた時に参加通知が発火する
+        passJoinTeam.approved = false
+
         do {
             try db?
                 .collection("users")
                 .document(detectedUser.id)
                 .collection("joins")
-                .document(team.id)
-                .setData(from: joinTeamContainer)
+                .document(passJoinTeam.id)
+                .setData(from: passJoinTeam)
 
         } catch {
             throw CustomError.addTeamIDToJoinedUser
@@ -289,7 +277,7 @@ class TeamViewModel: ObservableObject {
     }
 
     /// ユーザー作成時のみ呼び出されるチーム画像保存メソッド
-    /// ユーザー作成時は既存のチームIDが存在しないため、View側で生成したidを引っ張ってくる
+    /// ユーザー作成時は既存のチームIDが存在しないため、View側で生成したidを受け取ってpathを生成する
     func firstUploadTeamImage(_ image: UIImage?, id createTeamID: String) async -> (url: URL?, filePath: String?) {
 
         guard let imageData = image?.jpegData(compressionQuality: 0.8) else {
@@ -331,7 +319,7 @@ class TeamViewModel: ObservableObject {
         }
     }
 
-    func deleteTeamImageData(path: String?) async {
+    func deleteTeamImage(path: String?) async {
 
         guard let path = path else { return }
 
@@ -345,38 +333,6 @@ class TeamViewModel: ObservableObject {
             } else {
                 print("imageRef.delete succsess!")
             }
-        }
-    }
-
-    /// デフォルト付属の背景イメージデータ群から一つのUIImageをランダムで取り出すメソッド
-    func getRandomBackgroundUIImage() -> UIImage? {
-
-        let pickUpBackground: UIImage?
-        let pickUpBackgroundCategory = BackgroundCategory.allCases.randomElement()
-
-        guard let getCategory = pickUpBackgroundCategory else { return nil }
-        guard let getImageString = getCategory.imageContents.randomElement() else {return nil }
-        pickUpBackground = UIImage(named: getImageString)
-        print(pickUpBackground)
-
-        return pickUpBackground
-    }
-
-    func updateTeamBackgroundImage(data: (url: URL?, filePath: String?)) async throws {
-
-        guard var team else { throw CustomError.teamEmpty }
-        guard let teamRef = db?.collection("teams").document(team.id) else { throw CustomError.getDocument }
-
-        print("storage保存に必要なデータ取得おけ")
-        do {
-            team.backgroundURL = data.url
-            team.backgroundPath = data.filePath
-            try teamRef.setData(from: team)
-            print("storageにヘッダー画像保存成功")
-            try await fetchNewTeamBackgroundImage(teamID: team.id)
-            print("新規ヘッダー画像取得成功")
-        } catch {
-            print("ヘッダーの保存に失敗")
         }
     }
 
@@ -395,45 +351,13 @@ class TeamViewModel: ObservableObject {
             _ = try teamRef?.setData(from: updatedTeamData)
             // アイコンデータは変えていない場合、削除処理をスキップする
             if defaultIconPath != updatedTeamData.iconPath {
-                await deleteTeamImageData(path: defaultIconPath)
+                await deleteTeamImage(path: defaultIconPath)
             }
         } catch {
             // アイコンデータ更新失敗のため、保存予定だったアイコンデータをfirestorageから削除
-            await deleteTeamImageData(path: updatedTeamData.iconPath)
+            await deleteTeamImage(path: updatedTeamData.iconPath)
             print("ERROR: updateTeam")
         }
-    }
-
-    @MainActor
-    func fetchNewTeamBackgroundImage(teamID: String) async throws {
-
-        guard let teamRef = db?.collection("teams").document(teamID) else { throw CustomError.getRef  }
-
-        do {
-            let teamDocument = try await teamRef.getDocument()
-            let teamData = try teamDocument.data(as: Team.self)
-            self.team?.backgroundURL = teamData.backgroundURL
-            self.team?.backgroundPath = teamData.backgroundPath
-        } catch {
-            throw CustomError.fetch
-        }
-    }
-    
-    func getUIImageByUrl(url: URL?) -> UIImage? {
-        guard let url else { return nil }
-        var iamge: UIImage?
-        DispatchQueue.global().async {
-            do {
-                let data = try Data(contentsOf: url)
-                iamge = UIImage(data: data)
-                print("teamIconのurl->UIImage成功")
-
-            } catch let err {
-                print("Error : \(err.localizedDescription)")
-            }
-        }
-        print("imageの返却")
-        return iamge
     }
 
     /// 選択されたチーム内の自身のメンバーデータを削除するメソッド。
@@ -487,6 +411,7 @@ class TeamViewModel: ObservableObject {
         do {
             let document = try await teamRef?.getDocument()
             let escapingTeam = try await document?.data(as: Team.self)
+            // Firestorageから画像データ削除
             await deleteEscapingTeamImages(for: escapingTeam)
             try await teamRef?.delete()
 
@@ -584,6 +509,7 @@ enum TeamRelatedError:Error {
     case missingData
     case missingSnapshot
     case failedCreateJoinTeam
+    case filedAddFirstMember
     case failedFetchUser
     case failedFetchAddedNewUser
     case failedTeamListen
