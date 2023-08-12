@@ -409,18 +409,19 @@ class TeamViewModel: ObservableObject {
             }
         } // for in
     }
-    /// ユーザーが選択したチームのデータを削除する
-    func deleteSelectedTeamDocuments(selected selectedTeam: JoinTeam) async throws {
+    /// ユーザーが選択したチームのデータを全て削除する
+    func deleteEscapedTeamDocuments(for selectedteam: JoinTeam?) async throws {
+        guard let selectedteam else { throw TeamRelatedError.missingData }
         let teamRef = db?
             .collection("teams")
-            .document(selectedTeam.id)
+            .document(selectedteam.id)
 
         do {
             let document = try await teamRef?.getDocument()
-            let escapingTeam = try document?.data(as: Team.self)
+            let escapedTeam = try document?.data(as: Team.self)
             // Firestorageから画像データ削除
-            await deleteImage(path: escapingTeam?.iconPath)
-            await deleteImage(path: escapingTeam?.backgroundPath)
+            await deleteImage(path: escapedTeam?.iconPath)
+            await deleteImage(path: escapedTeam?.backgroundPath)
             // チームドキュメントを削除
             try await teamRef?.delete()
 
@@ -432,7 +433,6 @@ class TeamViewModel: ObservableObject {
     /// チームの保持しているアイテムドキュメントを全て削除するメソッド。
     /// ユーザーがチーム脱退やアカウント削除を行った際に、"チームに他のメンバーが存在しない"場合に使用される。
     func deleteTeamItemsDocuments(teamId: String) async throws {
-        guard let team else { return }
 
         do {
             let snapshot = try await db?
@@ -479,7 +479,7 @@ class TeamViewModel: ObservableObject {
     /// チーム内のサブコレクション「members」のドキュメントを削除するメソッド。
     /// メンバーがサブコレクションとして持つログデータ「logs」を全て削除した後、ドキュメント本体を削除する。
     ///MEMO: ドキュメント本体だけを削除してもサブコレクションのデータは残るので注意
-    func deleteTeamMemberDocuments(teamId: String?, memberId: String?) async throws {
+    func deleteTeamMemberDocument(teamId: String?, memberId: String?) async throws {
         guard let teamId, let memberId else { throw TeamRelatedError.missingData }
 
         do {
@@ -530,6 +530,20 @@ class TeamViewModel: ObservableObject {
 
         }
     }
+    /// チームに所属しているメンバーのメンバーIdを取得するメソッド。
+    func getMembersId(teamId: String?) async throws -> [String]? {
+        guard let teamId else { throw TeamRelatedError.missingData }
+
+        /// 所属チームメンバー全員のスナップショットを取得
+        let membersSnapshot = try await db?
+            .collection("teams")
+            .document(teamId)
+            .collection("members")
+            .getDocuments()
+
+        // メンバー全員のidを取得
+        return membersSnapshot?.documents.compactMap {$0.documentID}
+    }
 
     /// アカウント削除時に実行されるメソッド。削除実行アカウントが所属する全てのチームのデータを削除する
     /// ✅所属チームのメンバーが削除アカウントのユーザーのみだった場合 ⇨ チームデータを全て消去
@@ -560,14 +574,14 @@ class TeamViewModel: ObservableObject {
                 if membersId.count == 1 &&
                     membersId.first == uid {
                     // ⚠️チーム内に自分以外のメンバーが居なかった場合、全データをFirestoreから削除
-                    try await deleteTeamMemberDocuments(teamId: teamId, memberId: uid)
+                    try await deleteTeamMemberDocument(teamId: teamId, memberId: uid)
                     try await deleteTeamTagsDocuments(teamId: teamId)
                     try await deleteTeamItemsDocuments(teamId: teamId)
                     try await teamRef.delete() // 最後にチームドキュメントを削除
 
                 } else {
                      // 削除対象ユーザーの他にもチーム所属者がいた場合、自身のみmembersサブコレクションから削除
-                    try await deleteTeamMemberDocuments(teamId: teamId, memberId: uid)
+                    try await deleteTeamMemberDocument(teamId: teamId, memberId: uid)
                 }
             } // for teamRef in teamRefs
         } // do

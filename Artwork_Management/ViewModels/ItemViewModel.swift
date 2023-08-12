@@ -239,7 +239,8 @@ class ItemViewModel: ObservableObject {
         }
     }
     
-    func deleteAllItemImages() async {
+    func deleteAllTeamItems(for team: Team?) async {
+        guard let team else { return }
         let storage = Storage.storage()
         let reference = storage.reference()
         

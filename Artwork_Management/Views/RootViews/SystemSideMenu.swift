@@ -477,27 +477,31 @@ struct SystemSideMenu: View {
             }
         }
         .task(id: teamEscaping) {
-            guard let _ = teamEscaping,
-                  let selectedTeam = input.selectedTeam else {
-                      print("チーム脱退処理失敗")
-                      teamEscaping = nil
-                      return
-                  }
+            guard let _ = teamEscaping else {return }
+            guard let selectedTeam = input.selectedTeam else {
+                print("チーム脱退処理失敗")
+                teamEscaping = nil
+                return
+            }
 
             // ⚠️ ------  チーム脱退処理実行  -----  ⚠️
-
             Task {
                 input.showEscapeTeamProgress = true
                 // 対象チーム内のメンバーデータ（members）から自身のメンバーデータを消去
-                try await teamVM.deleteTeamMemberDocuments(teamId: selectedTeam.id,
-                                                           memberId: userVM.uid)
+                try await teamVM.deleteTeamMemberDocument(teamId: selectedTeam.id, memberId: userVM.uid)
+                /// 自身の所属チームサブコレクション（joins）から対象チームデータを消去
                 try await userVM.deleteJoinTeamFromMyData(for: selectedTeam)
-                /// 自身の所属チームデータ（joins）から対象チームデータを消去
-                /// この時、チーム内に他メンバーがいない場合は、チームデータごと削除する
 
-                // 全部削除の場合の処理
-                await itemVM.deleteAllItemImages()
-                try await teamVM.deleteSelectedTeamDocuments(selected: selectedTeam)
+                /// チーム内のメンバーズドキュメントIdを取得し、他メンバーがいない場合は、チームデータごと削除する
+                let membersId = try await teamVM.getMembersId(teamId: selectedTeam.id)
+                if let membersId, membersId.isEmpty {
+                    // チームのアイテムデータ削除
+                    try await teamVM.deleteTeamItemsDocuments(teamId: selectedTeam.id)
+                    // チームのタグデータ削除
+                    try await teamVM.deleteTeamTagsDocuments(teamId: selectedTeam.id)
+                    // チームドキュメントの削除
+                    try await teamVM.deleteEscapedTeamDocuments(for: selectedTeam)
+                }
 
                 input.showEscapeTeamProgress = false
                 //TODO: 削除完了アラートが表示されないぞ？？？
