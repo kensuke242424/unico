@@ -48,7 +48,8 @@ class LogViewModel: ObservableObject {
     func addLog(to team: Team?, by user: User?,  type logType: LogType) {
         guard let team, let user else { return }
 
-        let newLog = Log(teamId    : team.id,
+        let newLog = Log(id: UUID().uuidString,
+                         teamId    : team.id,
                          createTime: Date(),
                          editByIcon: user.iconURL,
                          type      : logType)

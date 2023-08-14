@@ -308,6 +308,7 @@ class NotificationViewModel: ObservableObject {
         /// ログデータに削除済みデータのcreateTimeを格納
         var updatedElement = element
         updatedElement.canceledDatas.append(canceledDataDate)
+        let batch = db?.batch()
         /// チームのサブコレクションmembersリファレンス
         let membersRef = db?
             .collection("teams")
@@ -327,7 +328,8 @@ class NotificationViewModel: ObservableObject {
                 .collection("logs")
                 .document(element.id)
             /// メンバーのログデータにキャンセル済であることを反映
-            try await logRef?.setData(from: updatedElement)
+            try await logRef?.updateData(["canceledDatas": FieldValue.arrayUnion([canceledDataDate])])
+//            try await logRef?.setData(from: updatedElement)
         }
     }
 

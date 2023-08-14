@@ -243,8 +243,6 @@ class LogInViewModel: ObservableObject {
                                imageData: (url: URL?, filePath: String?),
                                color: ThemeColor) async throws {
 
-        let usersRef = db?.collection("users")
-
         guard let currentUser = Auth.auth().currentUser else {
             print("ERROR: guard let currentUser")
             throw CustomError.uidEmpty
