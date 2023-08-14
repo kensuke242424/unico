@@ -402,9 +402,15 @@ struct NewTabView: View {
                 }
             }
         }
+        /// 最後にログインしたチームのId「lastLogin」
         .onAppear {
             tagVM.setFirstActiveTag()
-            notificationVM.listener(id: teamVM.teamID)
+            // 通知リスナーはタブビュー生成時にスタート
+            notificationVM.listener(id: userVM.user?.lastLogIn)
+        }
+        /// 現在のデータリスナー群をリセットする
+        .onDisappear {
+            removeListeners()
         }
     } // body
     @ViewBuilder
@@ -507,5 +513,15 @@ struct NewTabView: View {
                         .ignoresSafeArea()
                 }
         )
+    }
+
+    /// タブビューの破棄時は、チーム切り替えorログアウトorアカウントデータ削除
+    /// よって、現在のデータリスナーをリリースする
+    func removeListeners() {
+        userVM.removeListener()
+        teamVM.removeListener()
+        tagVM.removeListener()
+        itemVM.removeListener()
+        notificationVM.removeListener()
     }
 } // View

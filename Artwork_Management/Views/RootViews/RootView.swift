@@ -135,6 +135,7 @@ struct RootView: View {
                         
                         /// 最後にログインしたチームIdをもとに、対象のチームの全データを取得
                         guard let lastLogInTeamID = user.lastLogIn else { return }
+                        print("ログインするチームのID: \(lastLogInTeamID)")
 
                         await tagVM.tagDataLister(teamID: lastLogInTeamID)
 
@@ -142,7 +143,7 @@ struct RootView: View {
                         try await teamVM.teamListener(id: lastLogInTeamID)
                             await teamVM.membersListener(id: lastLogInTeamID)
                         try await userVM.joinsListener(teamId: lastLogInTeamID)
-                            await itemVM.listener(id: lastLogInTeamID)
+                            await itemVM.itemsListener(id: lastLogInTeamID)
                         
                         /// ホーム画面へ遷移
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {

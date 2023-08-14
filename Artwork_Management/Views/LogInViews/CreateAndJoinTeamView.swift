@@ -351,6 +351,7 @@ struct CreateAndJoinTeamView: View {
         .overlay {
             if userVM.showJoinedTeamInformation {
                 JoinedTeamInformationView(presented: $userVM.showJoinedTeamInformation)
+                    .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
             }
         }
         // 新規チームへの加入が検知されたら、新規加入報告ビューを表示
@@ -452,6 +453,7 @@ struct CreateAndJoinTeamView: View {
         }
 
         .onAppear {
+
             // currentUserのuidをQRコードに変換
             userQRCodeImage = logInVM.generateUserQRCode(with: userVM.uid ?? "")
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {

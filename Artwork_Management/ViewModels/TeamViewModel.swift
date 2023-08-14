@@ -421,6 +421,7 @@ class TeamViewModel: ObservableObject {
             let escapedTeam = try document?.data(as: Team.self)
             // Firestorageから画像データ削除
             await deleteImage(path: escapedTeam?.iconPath)
+
             await deleteImage(path: escapedTeam?.backgroundPath)
             // チームドキュメントを削除
             try await teamRef?.delete()
@@ -432,7 +433,7 @@ class TeamViewModel: ObservableObject {
     }
     /// チームの保持しているアイテムドキュメントを全て削除するメソッド。
     /// ユーザーがチーム脱退やアカウント削除を行った際に、"チームに他のメンバーが存在しない"場合に使用される。
-    func deleteTeamItemsDocuments(teamId: String) async throws {
+    func deleteTeamItemsDocument(teamId: String) async throws {
 
         do {
             let snapshot = try await db?
@@ -456,8 +457,7 @@ class TeamViewModel: ObservableObject {
 
     /// チームの保持しているタグドキュメントを全て削除するメソッド。
     /// ユーザーがチーム脱退やアカウント削除を行った際に、"チームに他のメンバーが存在しない"場合に使用される。
-    func deleteTeamTagsDocuments(teamId: String) async throws {
-        guard let team else { return }
+    func deleteTeamTagsDocument(teamId: String) async throws {
 
         do {
             let snapshot = try await db?
@@ -575,8 +575,8 @@ class TeamViewModel: ObservableObject {
                     membersId.first == uid {
                     // ⚠️チーム内に自分以外のメンバーが居なかった場合、全データをFirestoreから削除
                     try await deleteTeamMemberDocument(teamId: teamId, memberId: uid)
-                    try await deleteTeamTagsDocuments(teamId: teamId)
-                    try await deleteTeamItemsDocuments(teamId: teamId)
+                    try await deleteTeamTagsDocument(teamId: teamId)
+                    try await deleteTeamItemsDocument(teamId: teamId)
                     try await teamRef.delete() // 最後にチームドキュメントを削除
 
                 } else {
@@ -585,6 +585,11 @@ class TeamViewModel: ObservableObject {
                 }
             } // for teamRef in teamRefs
         } // do
+    }
+
+    func removeListener() {
+        teamListener?.remove()
+        membersListener?.remove()
     }
 
     deinit {

@@ -495,17 +495,18 @@ struct SystemSideMenu: View {
                 /// チーム内のメンバーズドキュメントIdを取得し、他メンバーがいない場合は、チームデータごと削除する
                 let membersId = try await teamVM.getMembersId(teamId: selectedTeam.id)
                 if let membersId, membersId.isEmpty {
+                    print("\(selectedTeam.name)のチームデータ削除実行")
                     // チームのアイテムデータ削除
-                    try await teamVM.deleteTeamItemsDocuments(teamId: selectedTeam.id)
+                    try await teamVM.deleteTeamItemsDocument(teamId: selectedTeam.id)
                     // チームのタグデータ削除
-                    try await teamVM.deleteTeamTagsDocuments(teamId: selectedTeam.id)
+                    try await teamVM.deleteTeamTagsDocument(teamId: selectedTeam.id)
                     // チームドキュメントの削除
                     try await teamVM.deleteEscapedTeamDocuments(for: selectedTeam)
                 }
 
                 input.showEscapeTeamProgress = false
-                //TODO: 削除完了アラートが表示されないぞ？？？
-                input.showdeletedAllTeamAlert = true
+                input.selectedTeam = nil
+                teamEscaping = nil
             }
         }
 
@@ -579,6 +580,8 @@ struct SystemSideMenu: View {
                         }
                     } // List
                     .offset(y: -30)
+
+                    // チームの脱退
                     .alert("確認", isPresented: $input.showdeleteTeamAlert) {
                         Button("脱退する", role: .destructive) {
                             // ⚠️ ----  チーム脱退処理の実行 ------- ⚠️
@@ -587,6 +590,7 @@ struct SystemSideMenu: View {
                     } message: {
                         Text("\(input.selectedTeam?.name ?? "No Name")から脱退しますか？（他に所属メンバーがいない場合、チームデータはすべて削除されます）")
                     } // alert
+
                     .alert("", isPresented: $input.showdeletedAllTeamAlert) {
                         Button("OK") {
                             // TODO: 他のチームデータをfetch
@@ -595,6 +599,8 @@ struct SystemSideMenu: View {
                     } message: {
                         Text("チームデータの消去が完了しました")
                     } // team delete Alert
+
+                    // チーム移動
                     .alert("", isPresented: $input.isShowChangeTeamAlert) {
                         Button("キャンセル") {}
                         Button("移動する") {
@@ -690,6 +696,13 @@ struct SystemSideMenu: View {
         withAnimation(.spring()) {
             tagVM.tags.move(fromOffsets: from, toOffset: to)
         }
+    }
+    /// チーム移動時に、現在のチームデータのリスナーをリセットするメソッド。
+    func removeListeners() {
+        userVM.removeListener()
+        teamVM.removeListener()
+        tagVM.removeListener()
+        itemVM.removeListener()
     }
 }
 

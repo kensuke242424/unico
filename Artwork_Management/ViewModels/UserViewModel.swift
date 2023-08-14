@@ -555,7 +555,11 @@ class UserViewModel: ObservableObject {
             throw CustomError.deleteAccount
         }
     }
-        
+
+    func removeListener() {
+        userListener?.remove()
+        joinsListener?.remove()
+    }
 
     deinit {
         userListener?.remove()

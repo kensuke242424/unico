@@ -161,6 +161,10 @@ class TagViewModel: ObservableObject {
         }
     }
 
+    func removeListener() {
+        tagListener?.remove()
+    }
+
     deinit {
         print("<<<<<<<<<  TagViewModel_deinit  >>>>>>>>>")
         tagListener?.remove()

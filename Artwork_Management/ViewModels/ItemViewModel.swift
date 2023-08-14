@@ -33,14 +33,15 @@ class ItemViewModel: ObservableObject {
 
     /// アイテムデータの追加・更新・削除のステートを管理するリスナーメソッド。
     /// 初期実行時にリスニング対象ドキュメントのデータが全取得される。(フラグはadded)
-    func listener(id currentTeamID: String) async {
+    func itemsListener(id currentTeamID: String) async {
         print("itemsListener起動")
-        let itemsRef = db?.collection("teams").document(currentTeamID).collection("items")
-        guard let itemsRef else { return }
-
-        listener = itemsRef.addSnapshotListener { (snap, _) in
+        listener = db?
+            .collection("teams")
+            .document(currentTeamID)
+            .collection("items")
+            .addSnapshotListener { (snap, _) in
             guard let documents = snap?.documents else {
-                print("Error: guard let documents = snap?.documents")
+                print("ERROR: snapshot_nil")
                 return
             }
             // 取得できたアイテムをデコーダブル ⇨ Itemモデルを参照 ⇨ 「items」に詰めていく
@@ -239,7 +240,7 @@ class ItemViewModel: ObservableObject {
         }
     }
     
-    func deleteAllTeamItems(for team: Team?) async {
+    func deleteAllItemImages(for team: Team?) async {
         guard let team else { return }
         let storage = Storage.storage()
         let reference = storage.reference()
@@ -372,6 +373,10 @@ class ItemViewModel: ObservableObject {
                 before.updateTime < after.updateTime ? true : false
             }
         }
+    }
+    /// アイテムドキュメントのリスナーを削除するメソッド。
+    func removeListener() {
+        listener?.remove()
     }
 
     deinit {

@@ -327,6 +327,10 @@ class NotificationViewModel: ObservableObject {
         }
     }
 
+    func removeListener() {
+        listener?.remove()
+    }
+
     deinit {
         listener?.remove()
     }
