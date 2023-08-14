@@ -494,7 +494,7 @@ class LogInViewModel: ObservableObject {
         }
     }
     
-    func deleteAccountWithEmailLink() async throws {
+    func deleteAuthWithEmail() async throws {
         // 再認証成功時に保持していたアドレスとリンクを使ってcredentialを作成
         let credential = EmailAuthProvider.credential(withEmail: self.receivedAddressByLink,
                                                       link     : self.receivedLink)

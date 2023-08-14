@@ -454,6 +454,10 @@ struct CreateAndJoinTeamView: View {
 
         .onAppear {
 
+            Task {
+                try await userVM.joinsListener() // ← チームからの加入許可をリスニングするために必要
+            }
+
             // currentUserのuidをQRコードに変換
             userQRCodeImage = logInVM.generateUserQRCode(with: userVM.uid ?? "")
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {

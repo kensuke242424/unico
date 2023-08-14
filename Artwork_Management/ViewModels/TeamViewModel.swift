@@ -540,6 +540,7 @@ class TeamViewModel: ObservableObject {
             .document(teamId)
             .collection("members")
             .getDocuments()
+        
 
         // メンバー全員のidを取得
         return membersSnapshot?.documents.compactMap {$0.documentID}
@@ -548,10 +549,10 @@ class TeamViewModel: ObservableObject {
     /// アカウント削除時に実行されるメソッド。削除実行アカウントが所属する全てのチームのデータを削除する
     /// ✅所属チームのメンバーが削除アカウントのユーザーのみだった場合 ⇨ チームデータを全て消去
     /// ✅所属チームのメンバーが削除アカウントのユーザー以外にも在籍している場合 ⇨ 関連ユーザーデータのみ削除
-    func deleteAllDocumentsController(joins joinTeams: [JoinTeam]) async throws {
+    func deleteAllTeamDocumentsController(joins joinTeams: [JoinTeam]) async throws {
         guard let uid else { throw TeamRelatedError.uidEmpty }
 
-        // ユーザーが所属している全チームのリファレンス群を取得
+        // joinsデータのidを元に、ユーザーが所属している全チームのリファレンスIdを取得
         var teamRefs = joinTeams.compactMap {
             return db?
                 .collection("teams")
@@ -561,26 +562,26 @@ class TeamViewModel: ObservableObject {
         do {
             // 各所属チームのリファレンスごとに削除処理を実行していく
             for teamRef in teamRefs {
-                /// チームのドキュメントId
+                // チームのドキュメントId
                 let teamId = teamRef.documentID
-                /// 所属チームメンバー全員のスナップショットを取得
-                let membersSnapshot = try await teamRef
-                    .collection("members")
-                    .getDocuments()
-
-                // メンバー全員のidを取得
-                let membersId: [String] = membersSnapshot.documents.compactMap {$0.documentID}
+                // チームに所属するメンバーのId
+                let membersId = try await getMembersId(teamId: teamId)
+                // メンバーデータが存在しなかった場合は処理を中断し、別のチーム処理を再スタート
+                guard let membersId else {
+                    print("ERROR: チーム内にメンバーデータが存在しない")
+                    continue
+                }
 
                 if membersId.count == 1 &&
                     membersId.first == uid {
-                    // ⚠️チーム内に自分以外のメンバーが居なかった場合、全データをFirestoreから削除
+                    // ✅チーム内に自分以外のメンバーが居なかった場合、チームの全データをFirestoreから削除
                     try await deleteTeamMemberDocument(teamId: teamId, memberId: uid)
                     try await deleteTeamTagsDocument(teamId: teamId)
                     try await deleteTeamItemsDocument(teamId: teamId)
                     try await teamRef.delete() // 最後にチームドキュメントを削除
 
                 } else {
-                     // 削除対象ユーザーの他にもチーム所属者がいた場合、自身のみmembersサブコレクションから削除
+                     // ✅他にもチームメンバーが残っている場合、自身のmemberデータのみ削除
                     try await deleteTeamMemberDocument(teamId: teamId, memberId: uid)
                 }
             } // for teamRef in teamRefs

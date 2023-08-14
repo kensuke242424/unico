@@ -515,8 +515,9 @@ struct NewTabView: View {
         )
     }
 
-    /// タブビューの破棄時は、チーム切り替えorログアウトorアカウントデータ削除
-    /// よって、現在のデータリスナーをリリースする
+    /// タブビューの破棄時に、現在のリスナーをデタッチするメソッド。
+    /// チーム変更時は、前チームへのリスナーをデタッチしておく必要がある。
+    /// userListenerだけは、参照ドキュメントは変化しないため、リスナーを残す
     func removeListeners() {
         userVM.removeListener()
         teamVM.removeListener()

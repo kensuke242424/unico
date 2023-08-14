@@ -139,10 +139,12 @@ struct RootView: View {
 
                         await tagVM.tagDataLister(teamID: lastLogInTeamID)
 
+                        // ---- ユーザー関連データをリスニング ----
                         try await userVM.userListener()
+                        try await userVM.joinsListener()
+                        // ---- チーム関連データをリスニング ----
                         try await teamVM.teamListener(id: lastLogInTeamID)
                             await teamVM.membersListener(id: lastLogInTeamID)
-                        try await userVM.joinsListener(teamId: lastLogInTeamID)
                             await itemVM.itemsListener(id: lastLogInTeamID)
                         
                         /// ホーム画面へ遷移
