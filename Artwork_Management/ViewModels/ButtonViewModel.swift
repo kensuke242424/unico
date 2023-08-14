@@ -62,22 +62,3 @@ class ButtonViewModel: ObservableObject {
         }
     } // func buttonStyleChenged
 }
-
-// デバイスの振動によるフィードバック
-public func hapticSuccessNotification() {
-    let g = UINotificationFeedbackGenerator()
-    g.prepare()
-    g.notificationOccurred(.success)
-}
-
-public func hapticActionNotification() {
-    let g = UINotificationFeedbackGenerator()
-    g.prepare()
-    g.notificationOccurred(.warning)
-}
-
-public func hapticErrorNotification() {
-    let generator = UINotificationFeedbackGenerator()
-    generator.prepare()
-    generator.notificationOccurred(.error)
-}

@@ -73,6 +73,7 @@
 		BE86547E2A857EF8006AE163 /* JoinedTeamInformationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE86547D2A857EF8006AE163 /* JoinedTeamInformationView.swift */; };
 		BE8654802A8586C0006AE163 /* WebImageTypesIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE86547F2A8586C0006AE163 /* WebImageTypesIcon.swift */; };
 		BE8654822A8597C7006AE163 /* AnyShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8654812A8597C7006AE163 /* AnyShape.swift */; };
+		BE8654842A8A7DBF006AE163 /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8654832A8A7DBF006AE163 /* Haptics.swift */; };
 		BE8734DB2A5D53F1004AA246 /* SDWebImageBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8734DA2A5D53F1004AA246 /* SDWebImageBackgroundView.swift */; };
 		BE8734EE2A5EE99F004AA246 /* SelectionBackgroundCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8734EA2A5EE99F004AA246 /* SelectionBackgroundCards.swift */; };
 		BE8734EF2A5EE99F004AA246 /* EditTeamBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8734EB2A5EE99F004AA246 /* EditTeamBackgroundView.swift */; };
@@ -230,6 +231,7 @@
 		BE86547D2A857EF8006AE163 /* JoinedTeamInformationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinedTeamInformationView.swift; sourceTree = "<group>"; };
 		BE86547F2A8586C0006AE163 /* WebImageTypesIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebImageTypesIcon.swift; sourceTree = "<group>"; };
 		BE8654812A8597C7006AE163 /* AnyShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyShape.swift; sourceTree = "<group>"; };
+		BE8654832A8A7DBF006AE163 /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
 		BE8734DA2A5D53F1004AA246 /* SDWebImageBackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDWebImageBackgroundView.swift; sourceTree = "<group>"; };
 		BE8734EA2A5EE99F004AA246 /* SelectionBackgroundCards.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectionBackgroundCards.swift; sourceTree = "<group>"; };
 		BE8734EB2A5EE99F004AA246 /* EditTeamBackgroundView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditTeamBackgroundView.swift; sourceTree = "<group>"; };
@@ -437,6 +439,7 @@
 				BE07F1732A2732EE007ED1C4 /* CustomDragGesture.swift */,
 				BEB669CA2A2CD105008FC9DE /* CustomLongPressGesture.swift */,
 				BE8654812A8597C7006AE163 /* AnyShape.swift */,
+				BE8654832A8A7DBF006AE163 /* Haptics.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -923,6 +926,7 @@
 				E09F09CB28EFEA8700D07669 /* EditItemPhotoArea.swift in Sources */,
 				BE19FD6E2A79471300AE8165 /* CustomOneLineLimitText.swift in Sources */,
 				BE17B97329CB033100F08915 /* PreloadViewModel.swift in Sources */,
+				BE8654842A8A7DBF006AE163 /* Haptics.swift in Sources */,
 				BE19FD802A7AAF6200AE8165 /* NotificationView.swift in Sources */,
 				BE8734EE2A5EE99F004AA246 /* SelectionBackgroundCards.swift in Sources */,
 				BE245BCD29C5865300539A04 /* CartViewModel.swift in Sources */,

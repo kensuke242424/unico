@@ -295,8 +295,49 @@ class NotificationViewModel: ObservableObject {
         }
     }
     /// チームデータの更新をキャンセルし元に戻すメソッド。
-    func resetUpdateTeam(_ beforeUser: User?, to team: Team?, element: Log) async throws {
-        return
+    func resetUpdateTeam(to beforeTeam: Team?, element: Log) async throws {
+        guard let beforeTeam else {
+            throw NotificationError.missingData
+        }
+        // 👦 ------- 自身のユーザードキュメント処理 ---------👦
+        let teamRef = db?
+            .collection("teams")
+            .document(beforeTeam.id)
+
+        do {
+            try await teamRef?.setData(from: beforeTeam)
+            try await setReseted(to: beforeTeam, id: beforeTeam.id, element: element)
+        }
+        catch {
+            throw NotificationError.resetAddedItem
+        }
+
+        // 👦👩 ------- 自身の所属するチームのメンバーデータ処理 ---------👩👦
+
+        /// ユーザーが所属している全てのチームのmembersサブコレクションから、
+        /// 自身のドキュメントリファレンスを取り出す。
+//        getMembers
+//        let joinTeamsMembersRef = beforeUser.joinsId.compactMap { teamId in
+//            let teamMembersRef = db?
+//                .collection("teams")
+//                .document(teamId)
+//                .collection("members")
+//                .document(beforeUser.id)
+//            return teamMembersRef
+//        }
+//
+//        let resetMemberData = JoinMember(id: beforeUser.id,
+//                                         name: beforeUser.name,
+//                                         iconURL: beforeUser.iconURL)
+//
+//        for MyMemberRef in joinTeamsMembersRef {
+//            do {
+//                try await MyMemberRef.setData(from: resetMemberData)
+//            }
+//            catch {
+//                throw NotificationError.resetAddedItem
+//            }
+//        }
     }
 
     /// チームの各メンバーのログデータに、変更内容のキャンセル実行を反映させるメソッド。
