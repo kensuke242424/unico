@@ -663,25 +663,29 @@ fileprivate struct NotificationContainer: View {
     func checkReseted(element: Log) -> Bool {
         switch element.type {
         case .addItem(let item):
-            return element.canceledDatas.contains(item.createTime)
+            guard let itemId = item.id else { return false }
+            return element.canceledDatas.contains(itemId)
 
         case .updateItem(let item):
-            return element.canceledDatas.contains(item.before.createTime)
+            guard let itemId = item.before.id else { return false }
+            return element.canceledDatas.contains(itemId)
 
         case .deleteItem(let item):
-            return element.canceledDatas.contains(item.createTime)
+            guard let itemId = item.id else { return false }
+            return element.canceledDatas.contains(itemId)
 
         case .commerce(let items):
-            return element.canceledDatas.contains(items[showIndex].before.createTime)
+            guard let itemId = items[showIndex].before.id else { return false }
+            return element.canceledDatas.contains(itemId)
 
         case .join(let user):
-            return element.canceledDatas.contains(user.createTime)
+            return element.canceledDatas.contains(user.id)
 
         case .updateUser(let user):
-            return element.canceledDatas.contains(user.before.createTime)
+            return element.canceledDatas.contains(user.before.id)
 
         case .updateTeam(let team):
-            return element.canceledDatas.contains(team.before.createTime)
+            return element.canceledDatas.contains(team.before.id)
         }
     }
 }

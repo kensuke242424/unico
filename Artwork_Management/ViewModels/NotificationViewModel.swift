@@ -160,7 +160,7 @@ class NotificationViewModel: ObservableObject {
             let addedItemRef = itemsRef?.document(itemId)
             try await addedItemRef?.delete()
             /// リセット済みであることを各メンバーのログデータに書き込む
-            try await setReseted(to: team, date: addedItem.createTime, element: element)
+            try await setReseted(to: team, id: itemId, element: element)
         }
         catch {
             throw NotificationError.resetAddedItem
@@ -202,7 +202,7 @@ class NotificationViewModel: ObservableObject {
                 .document(itemId)
                 .setData(from: deletedItem)
 
-            try await setReseted(to: team, date: deletedItem.createTime, element: element)
+            try await setReseted(to: team, id: itemId, element: element)
         }
         catch {
             throw NotificationError.resetDeletedItem
@@ -242,7 +242,7 @@ class NotificationViewModel: ObservableObject {
             // 取り消し反映後のアイテムデータを再保存
             try await itemRef?.setData(from: itemData)
             // リセット済みであることを各メンバーのログに反映
-            try await setReseted(to: team, date: itemData.createTime, element: element)
+            try await setReseted(to: team, id: itemId, element: element)
         } catch {
             print("ERROR: カート精算アイテムのリセット失敗")
             throw NotificationError.resetCommerceItem
@@ -261,7 +261,7 @@ class NotificationViewModel: ObservableObject {
 
         do {
             try await userRef?.setData(from: beforeUser)
-            try await setReseted(to: team, date: beforeUser.createTime, element: element)
+            try await setReseted(to: team, id: beforeUser.id, element: element)
         }
         catch {
             throw NotificationError.resetAddedItem
@@ -302,12 +302,12 @@ class NotificationViewModel: ObservableObject {
     /// チームの各メンバーのログデータに、変更内容のキャンセル実行を反映させるメソッド。
     /// キャンセル処理の重複を避けるために必要である。
     /// ログデータの「canceledDatas」にデータのcreateTimeを格納する。
-    func setReseted(to team: Team?, date canceledDataDate: Date, element: Log) async throws {
+    func setReseted(to team: Team?, id canceledDataId: String, element: Log) async throws {
         guard let team else { throw NotificationError.missingData }
 
         /// ログデータに削除済みデータのcreateTimeを格納
         var updatedElement = element
-        updatedElement.canceledDatas.append(canceledDataDate)
+        updatedElement.canceledDatas.append(canceledDataId)
         let batch = db?.batch()
         /// チームのサブコレクションmembersリファレンス
         let membersRef = db?
@@ -328,7 +328,7 @@ class NotificationViewModel: ObservableObject {
                 .collection("logs")
                 .document(element.id)
             /// メンバーのログデータにキャンセル済であることを反映
-            try await logRef?.updateData(["canceledDatas": FieldValue.arrayUnion([canceledDataDate])])
+            try await logRef?.updateData(["canceledDatas": FieldValue.arrayUnion([canceledDataId])])
 //            try await logRef?.setData(from: updatedElement)
         }
     }
@@ -341,16 +341,16 @@ class NotificationViewModel: ObservableObject {
         case .addItem(let item):
             deleteBeforeUIImage(path: item.photoPath)
         case .deleteItem(let item):
-            if element.canceledDatas.contains(where:{ $0 == item.createTime}) { return }
+            if element.canceledDatas.contains(where:{ $0 == item.id}) { return }
             deleteBeforeUIImage(path: item.photoPath)
         case .updateItem(let item):
-            if element.canceledDatas.contains(where:{ $0 == item.before.createTime}) { return }
+            if element.canceledDatas.contains(where:{ $0 == item.before.id}) { return }
             deleteBeforeUIImage(path: item.before.photoPath)
         case .updateUser(let user):
-            if element.canceledDatas.contains(where:{ $0 == user.before.createTime}) { return }
+            if element.canceledDatas.contains(where:{ $0 == user.before.id}) { return }
             deleteBeforeUIImage(path: user.before.iconPath)
         case .updateTeam(let team):
-            if element.canceledDatas.contains(where:{ $0 == team.before.createTime}) { return }
+            if element.canceledDatas.contains(where:{ $0 == team.before.id}) { return }
             deleteBeforeUIImage(path: team.before.iconPath)
         case .commerce, .join:
             break
