@@ -91,30 +91,30 @@ fileprivate struct NotificationContainer: View {
 
                 case .addItem(let item):
                     AddItemDetail(item: item)
-                    ResetLogButton(element: element, reseted: reseted)
+                    ResetLogButton(element: element, commerceIndex: nil, reseted: reseted)
 
                 case .updateItem(let item):
                     UpdateItemDetail(item: item)
-                    ResetLogButton(element: element, reseted: reseted)
+                    ResetLogButton(element: element, commerceIndex: nil, reseted: reseted)
 
                 case .deleteItem(let item):
                     DeletedItemDetail(item: item)
-                    ResetLogButton(element: element, reseted: reseted)
+                    ResetLogButton(element: element, commerceIndex: nil, reseted: reseted)
 
                 case .commerce(let items):
                     CommerceItemDetail(items: items)
-                    ResetLogButton(element: element, reseted: reseted)
+                    ResetLogButton(element: element, commerceIndex: showIndex, reseted: reseted)
 
                 case .join(let user):
                     EmptyView()
 
                 case .updateUser(let user):
                     UpdateUserDetail(user: user)
-                    ResetLogButton(element: element, reseted: reseted)
+                    ResetLogButton(element: element, commerceIndex: nil, reseted: reseted)
 
                 case .updateTeam(let team):
                     UpdateTeamDetail(team: team)
-                    ResetLogButton(element: element, reseted: reseted)
+                    ResetLogButton(element: element, commerceIndex: nil, reseted: reseted)
                 }
             } // if detail
         }
@@ -472,6 +472,7 @@ fileprivate struct NotificationContainer: View {
                 .fontWeight(.bold)
         }
     }
+
     @ViewBuilder
     func UpdateTeamDetail(team: CompareTeam) -> some View {
         /// 表示アイテムが更新キャンセルされているかを判定する
@@ -529,6 +530,7 @@ fileprivate struct NotificationContainer: View {
         .fontWeight(.bold)
         .opacity(0.7)
     }
+
     @ViewBuilder
     func SingleTextGridRow(_ title: String, _ value: String) -> some View {
         GridRow {
@@ -541,6 +543,7 @@ fileprivate struct NotificationContainer: View {
         .fontWeight(.bold)
         .opacity(0.7)
     }
+
     /// 更新が発生したデータの更新内容を、比較で表示するためのグリッドビュー要素。
     /// 「<データ名> : <更新前バリュー> ▶︎ <更新後バリュー>」の形でGridRowを返す。
     @ViewBuilder
@@ -557,6 +560,7 @@ fileprivate struct NotificationContainer: View {
         .fontWeight(.bold)
         .opacity(0.7)
     }
+
     @ViewBuilder
     func CompareTextGridRow(_ title: String, _ before: String, _ after: String) -> some View {
         GridRow {
@@ -571,6 +575,7 @@ fileprivate struct NotificationContainer: View {
         .fontWeight(.bold)
         .opacity(0.7)
     }
+
     @ViewBuilder
     func CompareCircleImageGridRow(_ title: String, _ before: URL?, _ after: URL?, size: CGFloat) -> some View {
         GridRow {
@@ -583,6 +588,7 @@ fileprivate struct NotificationContainer: View {
         .font(.callout)
         .fontWeight(.bold)
     }
+
     @ViewBuilder
     func CompareRectImageGridRow(_ title: String, _ before: URL?, _ after: URL?, size: CGFloat) -> some View {
         GridRow {
@@ -595,6 +601,7 @@ fileprivate struct NotificationContainer: View {
         .font(.callout)
         .fontWeight(.bold)
     }
+
     @ViewBuilder
     func CircleIconView(url: URL?, size: CGFloat) -> some View {
         if let url {
@@ -614,6 +621,7 @@ fileprivate struct NotificationContainer: View {
                 .shadow(radius: 1)
         }
     }
+
     @ViewBuilder
     func RectIconView(url: URL?, size: CGFloat) -> some View {
         if let url = url {
@@ -635,6 +643,7 @@ fileprivate struct NotificationContainer: View {
                 .shadow(radius: 1)
         }
     }
+
     @ViewBuilder
     func ResetedStumpView(color: Color) -> some View {
         ZStack {
@@ -649,6 +658,7 @@ fileprivate struct NotificationContainer: View {
         .foregroundColor(color)
         .rotationEffect(Angle(degrees: -10))
     }
+
     /// ログデータのcanceledDatasDateを検索し、更新内容がキャンセル済みかどうかをBool値で返す
     func checkReseted(element: Log) -> Bool {
         switch element.type {
@@ -686,6 +696,7 @@ struct ResetLogButton: View {
     @EnvironmentObject var teamVM: TeamViewModel
 
     let element: Log
+    let commerceIndex: Int?
     let reseted: Bool
 
     let pressingMinTime: CGFloat = 1.0 // 取り消し実行に必要な長押しタイム設定
@@ -742,12 +753,13 @@ struct ResetLogButton: View {
                     pressingFrame = 0
                 }
             }
-            // idが更新されるたびに、タスクがキャンセル -> 再実行される
             .task(id: resetExecution) {
                 guard let resetExecution else { return }
 
                 do {
-                    try await vm.resetController(to: teamVM.team, element: element)
+                    try await vm.resetController(to: teamVM.team,
+                                                 element: element,
+                                                 index: commerceIndex)
                     self.resetExecution = nil
                 } catch {
                     print(error.localizedDescription)

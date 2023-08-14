@@ -69,13 +69,13 @@ class NotificationViewModel: ObservableObject {
     }
 
     /// ユーザーが既に表示した通知に既読を付けるメソッド。
+    /// 対象のログが持っているIdを用いて、ログの既読を管理する「read」プロパティをtrueにする。
     func setRead(team: Team?, element: Log) {
         guard let team, let uid else { return }
 
         do {
             var updatedElement = element
             updatedElement.read = true
-            print("既読処理実行")
 
             try db?.collection("teams")
                 .document(team.id)
@@ -90,6 +90,7 @@ class NotificationViewModel: ObservableObject {
             print("ERROR: 既読処理に失敗")
         }
     }
+
     /// ユーザーが通知ビューに記載している更新内容をキャンセルした場合に発火する、更新内容のリセットメソッドコントローラ。
     /// ログのタイプをメソッド内で参照し、タイプごとで実行メソッドを分岐ハンドリングする。
     /// - Parameters:
@@ -102,18 +103,21 @@ class NotificationViewModel: ObservableObject {
         switch element.type {
 
         case .addItem(let item):
-            try await self.resetAddedItem(item, to: team, element: element)
+            try await resetAddedItem(item, to: team, element: element)
 
         case .updateItem(let item):
-            try await
-            self.resetUpdatedItem(item, to: team, element: element)
+            try await resetUpdatedItem(item, to: team, element: element)
 
         case .deleteItem(let item):
-            try await
-            self.resetDeletedItem(item, to: team, element: element)
+            try await resetDeletedItem(item, to: team, element: element)
 
         case .commerce(let items):
-            break
+            guard let index = selectedIndex else {
+                print("カート精算アイテムのインデックス取得失敗")
+                throw NotificationError.missingCommerceIndex
+                break
+            }
+            try await resetCommerceItem(items[index], to: team, element: element)
 
         case .join:
             break
@@ -127,26 +131,6 @@ class NotificationViewModel: ObservableObject {
         }
     }
 
-    //MEMO:  単純にbeforeデータを上書きするだけだと、通知が発行された以降にもしデータの更新があった場合に、
-    // 以降の更新も一緒に上書きしてしまう。よって、beforeとafterの差分を先に求め、その値をデータに反映させる。
-    /// 更新されたアイテムデータの内容をリセットするメソッド。
-    /// 現在のアイテムデータをフェッチし、更新の差分値を反映させて保存し直す。
-    func resetUpdatedItem(_ item: CompareItem, to team: Team?, element: Log) async throws {
-        guard let team else { throw NotificationError.missingData }
-
-        let itemRef = db?
-            .collection("teams")
-            .document(team.id)
-            .collection("items")
-            .document(item.id)
-
-        do {
-            /// 削除済みであることを各メンバーのログデータに書き込む
-//            try await setCanceled(to: team, date: addedItem.createTime, element: element)
-        } catch {
-            throw NotificationError.resetUpdatedItem
-        }
-    }
     /// アイテムデータの追加をキャンセルし削除するメソッド。
     /// アイテムのidはFirestoreに保存される時に生成されるため、
     /// 一度アイテムをフェッチし、ドキュメントIDを取得する工程が必要である。
@@ -176,10 +160,31 @@ class NotificationViewModel: ObservableObject {
             let addedItemRef = itemsRef?.document(itemId)
             try await addedItemRef?.delete()
             /// リセット済みであることを各メンバーのログデータに書き込む
-            try await setCanceled(to: team, date: addedItem.createTime, element: element)
+            try await setReseted(to: team, date: addedItem.createTime, element: element)
         }
         catch {
             throw NotificationError.resetAddedItem
+        }
+    }
+
+    //MEMO:  単純にbeforeデータを上書きするだけだと、通知が発行された以降にもしデータの更新があった場合に、
+    // 以降の更新も一緒に上書きしてしまう。よって、beforeとafterの差分を先に求め、その値をデータに反映させる。
+    /// 更新されたアイテムデータの内容をリセットするメソッド。
+    /// 現在のアイテムデータをフェッチし、更新の差分値を反映させて保存し直す。
+    func resetUpdatedItem(_ item: CompareItem, to team: Team?, element: Log) async throws {
+        guard let team else { throw NotificationError.missingData }
+
+        let itemRef = db?
+            .collection("teams")
+            .document(team.id)
+            .collection("items")
+            .document(item.id)
+
+        do {
+            /// 削除済みであることを各メンバーのログデータに書き込む
+//            try await setCanceled(to: team, date: addedItem.createTime, element: element)
+        } catch {
+            throw NotificationError.resetUpdatedItem
         }
     }
 
@@ -189,6 +194,34 @@ class NotificationViewModel: ObservableObject {
             throw NotificationError.missingData
         }
 
+        do {
+            try await db?
+                .collection("teams")
+                .document(team.id)
+                .collection("items")
+                .document(itemId)
+                .setData(from: deletedItem)
+
+            try await setReseted(to: team, date: deletedItem.createTime, element: element)
+        }
+        catch {
+            throw NotificationError.resetDeletedItem
+        }
+    }
+
+    /// カート精算されたアイテムの処理をキャンセルし、データを元に戻すメソッド。
+    func resetCommerceItem(_ item: CompareItem, to team: Team?, element: Log) async throws {
+        guard let team, let itemId = item.before.id else {
+            throw NotificationError.missingData
+        }
+
+        print(itemId)
+
+        // 売り上げの取り消し値
+        let salesDiff = item.after.sales - item.before.sales
+        // 在庫の取り消し値
+        let inventoryDiff = item.before.inventory - item.after.inventory
+
         let itemRef = db?
             .collection("teams")
             .document(team.id)
@@ -196,11 +229,22 @@ class NotificationViewModel: ObservableObject {
             .document(itemId)
 
         do {
-            try await itemRef?.setData(from: deletedItem)
-            try await setCanceled(to: team, date: deletedItem.createTime, element: element)
-        }
-        catch {
-            throw NotificationError.resetDeletedItem
+            // 現在のアイテムデータを取得
+            let document = try await itemRef?.getDocument()
+            var itemData = try await document?.data(as: Item.self)
+
+            guard var itemData else { throw NotificationError.missingItem }
+
+            itemData.sales -= salesDiff // 現在のデータから売り上げを引く
+            itemData.inventory += inventoryDiff // 現在のデータから在庫を足す
+
+            // 取り消し反映後のアイテムデータを再保存
+            try await itemRef?.setData(from: itemData)
+            // リセット済みであることを各メンバーのログに反映
+            try await setReseted(to: team, date: itemData.createTime, element: element)
+        } catch {
+            print("ERROR: カート精算アイテムのリセット失敗")
+            throw NotificationError.resetCommerceItem
         }
     }
 
@@ -216,7 +260,7 @@ class NotificationViewModel: ObservableObject {
 
         do {
             try await userRef?.setData(from: beforeUser)
-            try await setCanceled(to: team, date: beforeUser.createTime, element: element)
+            try await setReseted(to: team, date: beforeUser.createTime, element: element)
         }
         catch {
             throw NotificationError.resetAddedItem
@@ -257,7 +301,7 @@ class NotificationViewModel: ObservableObject {
     /// チームの各メンバーのログデータに、変更内容のキャンセル実行を反映させるメソッド。
     /// キャンセル処理の重複を避けるために必要である。
     /// ログデータの「canceledDatas」にデータのcreateTimeを格納する。
-    func setCanceled(to team: Team?, date canceledDataDate: Date, element: Log) async throws {
+    func setReseted(to team: Team?, date canceledDataDate: Date, element: Log) async throws {
         guard let team else { throw NotificationError.missingData }
 
         /// ログデータに削除済みデータのcreateTimeを格納
@@ -339,10 +383,13 @@ class NotificationViewModel: ObservableObject {
 /// 通知関連のエラーを管理するクラス。
 enum NotificationError: Error {
     case missingData
+    case missingItem
     case resetUpdatedItem
     case resetAddedItem
     case resetDeletedItem
+    case resetCommerceItem
     case resetUpdatedUser
     case noSnapShotExist
     case noDocumentExist
+    case missingCommerceIndex
 }

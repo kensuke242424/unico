@@ -11,7 +11,7 @@ import FirebaseFirestoreSwift
 
 struct Item: Identifiable, Equatable, Hashable, Codable {
 
-    @DocumentID var id: String? = UUID().uuidString
+    @DocumentID var id: String?
     var createTime: Date = Date()
     var updateTime: Date = Date()
     var tag: String

@@ -77,6 +77,7 @@ class CartViewModel: ObservableObject {
                 let compareItem = CompareItem(id: defaultItem.id ?? "",
                                               before: defaultItem,
                                               after: updateItem)
+                print(defaultItem.id)
                 compareItems.append(compareItem)
             } catch {
                 print("Error: 「\(item.name)」try reference.document(itemID).setData(from: item)")
