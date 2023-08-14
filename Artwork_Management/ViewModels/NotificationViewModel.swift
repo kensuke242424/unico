@@ -215,12 +215,12 @@ class NotificationViewModel: ObservableObject {
             throw NotificationError.missingData
         }
 
-        print(itemId)
-
         // 売り上げの取り消し値
         let salesDiff = item.after.sales - item.before.sales
         // 在庫の取り消し値
         let inventoryDiff = item.before.inventory - item.after.inventory
+
+        let amountDiff = item.after.totalAmount - item.before.totalAmount
 
         let itemRef = db?
             .collection("teams")
@@ -237,6 +237,7 @@ class NotificationViewModel: ObservableObject {
 
             itemData.sales -= salesDiff // 現在のデータから売り上げを引く
             itemData.inventory += inventoryDiff // 現在のデータから在庫を足す
+            itemData.totalAmount -= amountDiff // 現在のデータから売個数を引く
 
             // 取り消し反映後のアイテムデータを再保存
             try await itemRef?.setData(from: itemData)

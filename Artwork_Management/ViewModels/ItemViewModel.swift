@@ -52,36 +52,6 @@ class ItemViewModel: ObservableObject {
                     return try? snap.data(as: Item.self, with: .estimate)
                 }
                 self.selectedTypesSort()
-
-
-
-//                guard let snap = snap else {
-//                    print("Error: itemsListener_snap nil")
-//                    return
-//                }
-            // リスナーが受け取ったフラグ(追加・更新・削除)によって、処理を分岐する。
-//            snap.documentChanges.forEach { diff in
-//                if (diff.type == .added) { // 追加
-//                    let item = try? diff.document.data(as: Item.self, with: .estimate)
-//                    guard let item else { return }
-//                    withAnimation {self.items.append(item)}
-//                    withAnimation {self.selectedTypesSort()}
-//                    print("新規アイテムの追加: \(item)")
-//                }
-//                if (diff.type == .modified) { // 更新
-//                    let item = try? diff.document.data(as: Item.self, with: .estimate)
-//                    guard let item else { return }
-//                    guard let index = self.items.firstIndex(where: {$0.id == item.id}) else { return }
-//                    withAnimation {self.items[index] = item}
-//                    withAnimation {self.selectedTypesSort()}
-//                    print("既存アイテムの更新: \(item)")
-//                }
-//                if (diff.type == .removed) { // 削除
-//                    let item = try? diff.document.data(as: Item.self, with: .estimate)
-//                    guard let item else { return }
-//                    withAnimation {self.items.removeAll(where: {$0.id == item.id})}
-//                    print("データ削除を確認: \(item)")
-//                }
             }
         }
     }
@@ -127,17 +97,19 @@ class ItemViewModel: ObservableObject {
     }
 
     func addItemToFirestore(_ itemData: Item) async {
-        print("addItem実行")
-        guard let teamId = currentTeamID else { return }
-        guard let itemRef = db?.collection("teams")
+        guard let teamId = currentTeamID, let itemId = itemData.id else { return }
+        let itemRef = db?.collection("teams")
             .document(teamId)
-            .collection("items") else {
-            print("error: guard let tagsRef")
-            return
-        }
+            .collection("items")
+            .document(itemId)
 
         do {
-            _ = try itemRef.addDocument(from: itemData)
+            _ = try db?
+                .collection("teams")
+                .document(teamId)
+                .collection("items")
+                .document(itemId)
+                .setData(from: itemData)
         } catch {
             print("Error: addDocument")
         }

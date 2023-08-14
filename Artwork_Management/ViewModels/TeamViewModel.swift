@@ -196,12 +196,15 @@ class TeamViewModel: ObservableObject {
             var item = item
             item.teamID = teamID
 
+            guard let itemId = item.id else { return }
+
             do {
                 try db?
                     .collection("teams")
                     .document(teamID)
                     .collection("items")
-                    .addDocument(from: item)
+                    .document(itemId)
+                    .setData(from: item)
 
             } catch {
                 print("ERROR: サンプルアイテム\(item.name)の追加失敗")
