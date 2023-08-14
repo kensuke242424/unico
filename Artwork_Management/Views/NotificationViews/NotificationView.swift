@@ -69,9 +69,9 @@ fileprivate struct NotificationContainer: View {
         VStack {
             /// 通知ボードのヘッドビュー
             HStack {
-                CircleIconView(url: element.type.imageURL, size: 60)
+                CircleIconView(url: element.logType.imageURL, size: 60)
 
-                Text(element.type.message)
+                Text(element.logType.message)
                     .tracking(1)
                     .fontWeight(.bold)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -87,7 +87,7 @@ fileprivate struct NotificationContainer: View {
                     .foregroundColor(.gray.opacity(0.6))
 
                 /// 通知ボードのタイプ別詳細ビュー
-                switch element.type {
+                switch element.logType {
 
                 case .addItem(let item):
                     AddItemDetail(item: item)
@@ -173,7 +173,7 @@ fileprivate struct NotificationContainer: View {
                 showLimitCount = 0
             } else {
                 showLimitCount += 1
-                if showLimitCount > Int(element.type.stayTime) {
+                if showLimitCount > Int(element.logType.stayTime) {
                     print("通知ボードの破棄時間")
                     withAnimation(.easeIn(duration: 0.3)) {
                         vm.currentNotification = nil
@@ -606,7 +606,7 @@ fileprivate struct NotificationContainer: View {
             Circle().fill(.gray.gradient)
                 .frame(width: size, height: size)
                 .overlay {
-                    Image(systemName: element.type.symbol)
+                    Image(systemName: element.logType.symbol)
                         .foregroundColor(.white)
                         .frame(width: size * 0.6, height: size * 0.6)
                 }
@@ -653,31 +653,31 @@ fileprivate struct NotificationContainer: View {
 
     /// ログデータのcanceledDatasDateを検索し、更新内容がキャンセル済みかどうかをBool値で返す
     func checkReseted(element: Log) -> Bool {
-        switch element.type {
+        switch element.logType {
         case .addItem(let item):
             guard let itemId = item.id else { return false }
-            return element.canceledDatas.contains(itemId)
+            return element.canceledIds.contains(itemId)
 
         case .updateItem(let item):
             guard let itemId = item.before.id else { return false }
-            return element.canceledDatas.contains(itemId)
+            return element.canceledIds.contains(itemId)
 
         case .deleteItem(let item):
             guard let itemId = item.id else { return false }
-            return element.canceledDatas.contains(itemId)
+            return element.canceledIds.contains(itemId)
 
         case .commerce(let items):
             guard let itemId = items[showIndex].before.id else { return false }
-            return element.canceledDatas.contains(itemId)
+            return element.canceledIds.contains(itemId)
 
         case .join(let user):
-            return element.canceledDatas.contains(user.id)
+            return element.canceledIds.contains(user.id)
 
         case .updateUser(let user):
-            return element.canceledDatas.contains(user.before.id)
+            return element.canceledIds.contains(user.before.id)
 
         case .updateTeam(let team):
-            return element.canceledDatas.contains(team.before.id)
+            return element.canceledIds.contains(team.before.id)
         }
     }
 }

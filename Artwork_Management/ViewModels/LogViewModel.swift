@@ -52,7 +52,7 @@ class LogViewModel: ObservableObject {
                          teamId    : team.id,
                          createTime: Date(),
                          editByIcon: user.iconURL,
-                         type      : logType)
+                         logType      : logType)
 
         let membersRef = db?
             .collection("teams")
@@ -67,11 +67,14 @@ class LogViewModel: ObservableObject {
 
                     let memberId = member.documentID
 
-                    try? membersRef?
-                        .document(memberId)
-                        .collection("logs")
-                        .document(newLog.id)
-                        .setData(from: newLog, merge: true) // 保存
+                    // ログのセットタイプが.localの場合、自身だけにログを追加する
+                    if logType.setRule == .global || memberId == user.id {
+                        try? membersRef?
+                            .document(memberId)
+                            .collection("logs")
+                            .document(newLog.id)
+                            .setData(from: newLog, merge: true) // 保存
+                    }
                 }
             }
         }

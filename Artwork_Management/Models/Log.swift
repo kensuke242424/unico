@@ -13,9 +13,9 @@ struct Log: Identifiable, Equatable, Hashable, Codable {
     var teamId: String
     var createTime: Date
     var editByIcon: URL?
-    var type: LogType
+    var logType: LogType
     var read: Bool = false
-    var canceledDatas: [String] = []
+    var canceledIds: [String] = []
 }
 
 /// 通知のセットタイプを管理する列挙体。

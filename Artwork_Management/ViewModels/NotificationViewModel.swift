@@ -100,7 +100,7 @@ class NotificationViewModel: ObservableObject {
     ///   リセット対象のアイテムをハンドリングするための配列インデックス。
     func resetController(to team: Team?, element: Log, index selectedIndex: Int? = nil) async throws {
 
-        switch element.type {
+        switch element.logType {
 
         case .addItem(let item):
             try await resetAddedItem(item, to: team, element: element)
@@ -352,14 +352,14 @@ class NotificationViewModel: ObservableObject {
 
     /// チームの各メンバーのログデータに、変更内容のキャンセル実行を反映させるメソッド。
     /// キャンセル処理の重複を避けるために必要である。
-    /// ログデータの「canceledDatas」にデータのcreateTimeを格納する。
+    /// ログデータの「canceledIds」にデータのcreateTimeを格納する。
     func setReseted(to team: Team?, id canceledDataId: String, element: Log) async throws {
-        guard let team else { throw NotificationError.missingData }
+        guard let team, let uid else { throw NotificationError.missingData }
 
         /// ログデータに削除済みデータのcreateTimeを格納
         var updatedElement = element
-        updatedElement.canceledDatas.append(canceledDataId)
-        let batch = db?.batch()
+        updatedElement.canceledIds.append(canceledDataId)
+
         /// チームのサブコレクションmembersリファレンス
         let membersRef = db?
             .collection("teams")
@@ -379,8 +379,10 @@ class NotificationViewModel: ObservableObject {
                 .collection("logs")
                 .document(element.id)
             /// メンバーのログデータにキャンセル済であることを反映
-            try await logRef?.updateData(["canceledDatas": FieldValue.arrayUnion([canceledDataId])])
-//            try await logRef?.setData(from: updatedElement)
+            // ログのセットタイプが.localの場合、自身のログのみ更新する
+            if element.logType.setRule == .global || memberId == uid {
+                try await logRef?.updateData(["canceledIds": FieldValue.arrayUnion([canceledDataId])])
+            }
         }
     }
 
@@ -388,20 +390,20 @@ class NotificationViewModel: ObservableObject {
     /// メソッド内部でログ通知のタイプを判定し、処理を分岐する。
     /// アイテム追加時を除き、対象アイテムがすでに取り消し実行済みだった場合、処理を行わない。
     func deleteBeforeUIImageController(element: Log) {
-        switch element.type {
+        switch element.logType {
         case .addItem(let item):
             deleteBeforeUIImage(path: item.photoPath)
         case .deleteItem(let item):
-            if element.canceledDatas.contains(where:{ $0 == item.id}) { return }
+            if element.canceledIds.contains(where:{ $0 == item.id}) { return }
             deleteBeforeUIImage(path: item.photoPath)
         case .updateItem(let item):
-            if element.canceledDatas.contains(where:{ $0 == item.before.id}) { return }
+            if element.canceledIds.contains(where:{ $0 == item.before.id}) { return }
             deleteBeforeUIImage(path: item.before.photoPath)
         case .updateUser(let user):
-            if element.canceledDatas.contains(where:{ $0 == user.before.id}) { return }
+            if element.canceledIds.contains(where:{ $0 == user.before.id}) { return }
             deleteBeforeUIImage(path: user.before.iconPath)
         case .updateTeam(let team):
-            if element.canceledDatas.contains(where:{ $0 == team.before.id}) { return }
+            if element.canceledIds.contains(where:{ $0 == team.before.id}) { return }
             deleteBeforeUIImage(path: team.before.iconPath)
         case .commerce, .join:
             break
