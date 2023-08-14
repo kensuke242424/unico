@@ -115,7 +115,6 @@ class NotificationViewModel: ObservableObject {
             guard let index = selectedIndex else {
                 print("カート精算アイテムのインデックス取得失敗")
                 throw NotificationError.missingCommerceIndex
-                break
             }
             try await resetCommerceItem(items[index], to: team, element: element)
 
@@ -123,11 +122,10 @@ class NotificationViewModel: ObservableObject {
             break
 
         case .updateUser(let user):
-            try await
-            self.resetUpdateUser(user.before, to: team, element: element)
+            try await resetUpdateUser(user.before, to: team, element: element)
 
         case .updateTeam(let team):
-            break
+            try await resetUpdateTeam(to: team.before, element: element)
         }
     }
 
@@ -264,15 +262,15 @@ class NotificationViewModel: ObservableObject {
             try await setReseted(to: team, id: beforeUser.id, element: element)
         }
         catch {
-            throw NotificationError.resetAddedItem
+            throw NotificationError.resetUpdatedUser
         }
 
         // 👦👩 ------- 自身の所属するチームのメンバーデータ処理 ---------👩👦
 
-        /// ユーザーが所属している全てのチームのmembersサブコレクションから、
-        /// 自身のドキュメントリファレンスを取り出す。
-        //TODO: ユーザーのjoins[JoinMember] -> joinsId[String]に変更する必要あり
-        let joinTeamsMembersRef = beforeUser.joinsId.compactMap { teamId in
+        /// ユーザーが所属している全てのチームのidを取り出す。
+        let joinTeamIds = try await getJoinsId()
+        // 各所属チームの「members」サブコレクション内にある自身のメンバーデータリファレンスを生成
+        let joinTeamsMyMemberRefs = joinTeamIds?.compactMap { teamId in
             let teamMembersRef = db?
                 .collection("teams")
                 .document(teamId)
@@ -281,25 +279,32 @@ class NotificationViewModel: ObservableObject {
             return teamMembersRef
         }
 
-        let resetMemberData = JoinMember(id: beforeUser.id,
-                                         name: beforeUser.name,
-                                         iconURL: beforeUser.iconURL)
+        guard let joinTeamsMyMemberRefs else { throw NotificationError.missingData }
 
-        for MyMemberRef in joinTeamsMembersRef {
+        // 各所属チームごとに自身のメンバーデータを更新していく
+        for TeamMyMemberRef in joinTeamsMyMemberRefs {
             do {
-                try await MyMemberRef.setData(from: resetMemberData)
+                // チームが持つ自身のメンバーデータを取得
+                let document = try await TeamMyMemberRef.getDocument()
+                var myMemberData = try await document.data(as: JoinMember.self)
+                // 取り消し内容を反映
+                myMemberData.name = beforeUser.name
+                myMemberData.iconURL = beforeUser.iconURL
+
+                try await TeamMyMemberRef.setData(from: myMemberData)
             }
             catch {
-                throw NotificationError.resetAddedItem
+                throw NotificationError.resetUpdatedUser
             }
         }
     }
+
     /// チームデータの更新をキャンセルし元に戻すメソッド。
     func resetUpdateTeam(to beforeTeam: Team?, element: Log) async throws {
         guard let beforeTeam else {
             throw NotificationError.missingData
         }
-        // 👦 ------- 自身のユーザードキュメント処理 ---------👦
+        // 👦 ------- チームドキュメント処理 ---------👦
         let teamRef = db?
             .collection("teams")
             .document(beforeTeam.id)
@@ -309,35 +314,40 @@ class NotificationViewModel: ObservableObject {
             try await setReseted(to: beforeTeam, id: beforeTeam.id, element: element)
         }
         catch {
-            throw NotificationError.resetAddedItem
+            throw NotificationError.resetUpdatedTeam
         }
 
-        // 👦👩 ------- 自身の所属するチームのメンバーデータ処理 ---------👩👦
+        // 👦👩 ------- チームに所属するメンバーのjoinTeamデータ処理 ---------👩👦
 
-        /// ユーザーが所属している全てのチームのmembersサブコレクションから、
-        /// 自身のドキュメントリファレンスを取り出す。
-//        getMembers
-//        let joinTeamsMembersRef = beforeUser.joinsId.compactMap { teamId in
-//            let teamMembersRef = db?
-//                .collection("teams")
-//                .document(teamId)
-//                .collection("members")
-//                .document(beforeUser.id)
-//            return teamMembersRef
-//        }
-//
-//        let resetMemberData = JoinMember(id: beforeUser.id,
-//                                         name: beforeUser.name,
-//                                         iconURL: beforeUser.iconURL)
-//
-//        for MyMemberRef in joinTeamsMembersRef {
-//            do {
-//                try await MyMemberRef.setData(from: resetMemberData)
-//            }
-//            catch {
-//                throw NotificationError.resetAddedItem
-//            }
-//        }
+        // チームに所属しているメンバーのIdを取得
+        let membersId = try await getMembersId(teamId: beforeTeam.id)
+        // 各メンバーが持つjoinsサブコレクション内の、編集対象チームリファレンスを作成
+        let membersJoinTeamRefs = membersId?.compactMap { memberId in
+            let memberJoinTeamRef = db?
+                .collection("users")
+                .document(memberId)
+                .collection("joins")
+                .document(beforeTeam.id)
+            return memberJoinTeamRef
+        }
+
+        guard let membersJoinTeamRefs else { throw NotificationError.missingData }
+
+        for memberJoinTeamRef in membersJoinTeamRefs {
+            do {
+                // メンバーが持つJoinTeamデータを取得
+                let document = try await memberJoinTeamRef.getDocument()
+                var joinTeamData = try await document.data(as: JoinTeam.self)
+                // 取り消し内容を反映
+                joinTeamData.name = beforeTeam.name
+                joinTeamData.iconURL = beforeTeam.iconURL
+                // 再保存
+                try await memberJoinTeamRef.setData(from: joinTeamData)
+            }
+            catch {
+                throw NotificationError.resetUpdatedTeam
+            }
+        }
     }
 
     /// チームの各メンバーのログデータに、変更内容のキャンセル実行を反映させるメソッド。
@@ -433,6 +443,7 @@ enum NotificationError: Error {
     case resetDeletedItem
     case resetCommerceItem
     case resetUpdatedUser
+    case resetUpdatedTeam
     case noSnapShotExist
     case noDocumentExist
     case missingCommerceIndex

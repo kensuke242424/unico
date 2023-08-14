@@ -74,6 +74,7 @@
 		BE8654802A8586C0006AE163 /* WebImageTypesIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE86547F2A8586C0006AE163 /* WebImageTypesIcon.swift */; };
 		BE8654822A8597C7006AE163 /* AnyShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8654812A8597C7006AE163 /* AnyShape.swift */; };
 		BE8654842A8A7DBF006AE163 /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8654832A8A7DBF006AE163 /* Haptics.swift */; };
+		BE8654862A8A7F00006AE163 /* GetDocumentIds.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8654852A8A7F00006AE163 /* GetDocumentIds.swift */; };
 		BE8734DB2A5D53F1004AA246 /* SDWebImageBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8734DA2A5D53F1004AA246 /* SDWebImageBackgroundView.swift */; };
 		BE8734EE2A5EE99F004AA246 /* SelectionBackgroundCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8734EA2A5EE99F004AA246 /* SelectionBackgroundCards.swift */; };
 		BE8734EF2A5EE99F004AA246 /* EditTeamBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8734EB2A5EE99F004AA246 /* EditTeamBackgroundView.swift */; };
@@ -232,6 +233,7 @@
 		BE86547F2A8586C0006AE163 /* WebImageTypesIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebImageTypesIcon.swift; sourceTree = "<group>"; };
 		BE8654812A8597C7006AE163 /* AnyShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyShape.swift; sourceTree = "<group>"; };
 		BE8654832A8A7DBF006AE163 /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
+		BE8654852A8A7F00006AE163 /* GetDocumentIds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetDocumentIds.swift; sourceTree = "<group>"; };
 		BE8734DA2A5D53F1004AA246 /* SDWebImageBackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDWebImageBackgroundView.swift; sourceTree = "<group>"; };
 		BE8734EA2A5EE99F004AA246 /* SelectionBackgroundCards.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectionBackgroundCards.swift; sourceTree = "<group>"; };
 		BE8734EB2A5EE99F004AA246 /* EditTeamBackgroundView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditTeamBackgroundView.swift; sourceTree = "<group>"; };
@@ -440,6 +442,7 @@
 				BEB669CA2A2CD105008FC9DE /* CustomLongPressGesture.swift */,
 				BE8654812A8597C7006AE163 /* AnyShape.swift */,
 				BE8654832A8A7DBF006AE163 /* Haptics.swift */,
+				BE8654852A8A7F00006AE163 /* GetDocumentIds.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -894,6 +897,7 @@
 				BE8734F02A5EE99F004AA246 /* BackgroundCategoriesTagView.swift in Sources */,
 				BE19FD882A7C928E00AE8165 /* MomentLogView.swift in Sources */,
 				BE8734F72A5EE9B7004AA246 /* NewEditItemView.swift in Sources */,
+				BE8654862A8A7F00006AE163 /* GetDocumentIds.swift in Sources */,
 				E01AA3A32916C674000FCD37 /* TagModel.swift in Sources */,
 				E08F273C28DDB61A00329C5E /* LibraryView.swift in Sources */,
 				BE254FBD29C092F5004FE9AE /* AsyncImageBackground.swift in Sources */,

@@ -424,10 +424,6 @@ fileprivate struct NotificationContainer: View {
     }
     @ViewBuilder
     func UpdateUserDetail(user: CompareUser) -> some View {
-        /// 表示アイテムが更新キャンセルされているかを判定する
-        var reseted: Bool {
-            return resetedLogs.contains(user.after.createTime)
-        }
 
         VStack(spacing: 10) {
             DetailTopToUser(user: user.after, size: 40)
@@ -475,10 +471,6 @@ fileprivate struct NotificationContainer: View {
 
     @ViewBuilder
     func UpdateTeamDetail(team: CompareTeam) -> some View {
-        /// 表示アイテムが更新キャンセルされているかを判定する
-        var reseted: Bool {
-            return resetedLogs.contains(team.after.createTime)
-        }
 
         VStack(spacing: 10) {
             DetailTopToTeam(team: team.after, size: 40)
