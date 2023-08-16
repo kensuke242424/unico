@@ -299,7 +299,7 @@ struct JoinUserDetectCheckView: View {
                         Button("招待する") {
                             Task {
                                 do {
-                                    guard let detectedUser else { return }
+                                    guard let detectedUser, let team = teamVM.team else { return }
 
                                     _ = try await teamVM.setDetectedNewMember(from: detectedUser)
                                     _ = try await teamVM.passJoinTeamToDetectedMember(for: detectedUser,
@@ -310,9 +310,9 @@ struct JoinUserDetectCheckView: View {
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                                         withAnimation(.spring(response: 0.5, blendDuration: 1)) {
                                             teamVM.isShowSearchedNewMemberJoinTeam.toggle()
-                                            logVM.addLog(to: teamVM.team,
+                                            logVM.addLog(to: team,
                                                          by: userVM.user,
-                                                         type: .join(detectedUser))
+                                                         type: .join(detectedUser, team))
                                         }
                                     }
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {

@@ -77,6 +77,16 @@ fileprivate struct NotificationContainer: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .opacity(0.7)
                     .padding(.horizontal, 10)
+
+                VStack {
+                    Text("30分前")
+                        .font(.footnote)
+                        .opacity(0.4)
+
+                    EditByIconView(url: element.editByIcon, size: 35)
+                }
+                .padding(.vertical, 7)
+                .padding(.horizontal, 7)
             }
 
             if detail {
@@ -105,7 +115,7 @@ fileprivate struct NotificationContainer: View {
                     CommerceItemDetail(items: items)
                     ResetLogButton(element: element, commerceIndex: showIndex, reseted: reseted)
 
-                case .join(let user):
+                case .join(let user, let team):
                     JoinMemberDetail(user: user)
 
                 case .updateUser(let user):
@@ -622,7 +632,7 @@ fileprivate struct NotificationContainer: View {
             Circle().fill(.gray.gradient)
                 .frame(width: size, height: size)
                 .overlay {
-                    Image(systemName: element.logType.symbol)
+                    Image(systemName: element.logType.notifySymbol)
                         .resizable().scaledToFit()
                         .foregroundColor(.white)
                         .frame(width: size * 0.4, height: size * 0.4)
@@ -648,6 +658,27 @@ fileprivate struct NotificationContainer: View {
                         .resizable().scaledToFit()
                         .foregroundColor(.white)
                         .frame(width: size * 0.6, height: size * 0.6)
+                }
+                .shadow(radius: 1)
+        }
+    }
+
+    @ViewBuilder
+    func EditByIconView(url: URL?, size: CGFloat) -> some View {
+        if let url {
+            WebImage(url: url)
+                .resizable().scaledToFill()
+                .frame(width: size, height: size)
+                .clipShape(Circle())
+                .shadow(radius: 1)
+        } else {
+            Circle().fill(.gray.gradient)
+                .frame(width: size, height: size)
+                .overlay {
+                    Image(systemName: element.logType.editBySymbol)
+                        .resizable().scaledToFit()
+                        .foregroundColor(.white)
+                        .frame(width: size * 0.4, height: size * 0.4)
                 }
                 .shadow(radius: 1)
         }
@@ -687,7 +718,7 @@ fileprivate struct NotificationContainer: View {
             guard let itemId = items[showIndex].before.id else { return false }
             return element.canceledIds.contains(itemId)
 
-        case .join(let user):
+        case .join(let user, _):
             return element.canceledIds.contains(user.id)
 
         case .updateUser(let user):
@@ -788,7 +819,7 @@ enum LogType: Codable, Equatable {
     case updateItem(CompareItem)
     case deleteItem(Item)
     case commerce([CompareItem])
-    case join(User)
+    case join(User, Team)
     case updateUser(CompareUser)
     case updateTeam(CompareTeam)
 
@@ -824,8 +855,8 @@ enum LogType: Codable, Equatable {
             return "アイテムが削除されました。"
         case .commerce(let items):
             return "カート内 \(items.count) 個のアイテムが精算されました。"
-        case .join(let user):
-            return "チームに新メンバーが加入しました！"
+        case .join(_, let team):
+            return "\(team.name) に新メンバーが加入しました！"
         case .updateUser:
             return "ユーザー情報が更新されました。"
         case .updateTeam:
@@ -844,7 +875,7 @@ enum LogType: Codable, Equatable {
             return item.photoURL
         case .commerce(let items):
             return items.first?.after.photoURL
-        case .join(let user):
+        case .join(let user, _):
             return user.iconURL
         case .updateUser(let user):
             return user.after.iconURL
@@ -852,7 +883,7 @@ enum LogType: Codable, Equatable {
             return team.after.iconURL
         }
     }
-    var symbol: String {
+    var notifySymbol: String {
         switch self {
         case .addItem, .updateItem, .deleteItem:
             return "shippingbox.fill"
@@ -863,6 +894,15 @@ enum LogType: Codable, Equatable {
         case .updateUser:
             return "person.fill"
         case .updateTeam:
+            return "cube.transparent"
+        }
+    }
+    /// 通知のトップ右側に表示される小さなアイコンのシンボル
+    var editBySymbol: String {
+        switch self {
+        case .addItem, .updateItem, .updateUser, .updateTeam, .commerce, .deleteItem:
+            return "person.fill"
+        case .join:
             return "cube.transparent"
         }
     }
