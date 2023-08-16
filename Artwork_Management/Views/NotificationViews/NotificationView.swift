@@ -58,6 +58,10 @@ fileprivate struct NotificationContainer: View {
     /// このcreateTime値を照らし合わせて、表示データがキャンセル実行済みかどうかを判定する。
     @State private var resetedLogs: [Date] = []
 
+    /// ログの生成時間と、現在の時間との差分を表す文字列データ。
+    /// onAppear内で値が算出される。
+    @State private var differenceDateFromNowTime: String?
+
     var reseted: Bool {
         return checkReseted(element: element)
     }
@@ -79,14 +83,19 @@ fileprivate struct NotificationContainer: View {
                     .padding(.horizontal, 10)
 
                 VStack {
-                    Text(element.createTime.getDifferenceFromNowTime())
+                    Text(differenceDateFromNowTime ?? "???")
                         .font(.footnote)
-                        .opacity(0.5)
+                        .foregroundColor(.gray.opacity(0.8))
 
-                    EditByIconView(url: element.editByIcon, size: 35)
+                    switch element.logType {
+                    case .addItem, .updateItem, .deleteItem, .commerce, .join, .updateTeam:
+                        EditByIconView(url: element.editByIconURL, size: 35)
+                    case .updateUser:
+                        EmptyView()
+                    }
                 }
                 .padding(.vertical, 7)
-                .padding(.horizontal, 7)
+                .padding(.trailing, 7)
             }
 
             if detail {
@@ -160,9 +169,6 @@ fileprivate struct NotificationContainer: View {
                         withAnimation(.spring(response: 0.4)) {
                             vm.currentNotification = nil
                         }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                            vm.setRead(team: teamVM.team, element: element)
-                        }
                     }
                 }
         )
@@ -171,12 +177,6 @@ fileprivate struct NotificationContainer: View {
                                         damping        : 80,
                                         initialVelocity: 0.1),
                                         value          : dragOffset)
-        .onAppear {
-            // WebImageの画像ロード完了を待つため、表示までに少しタイムラグを持たせている。
-            DispatchQueue.main.asyncAfter(deadline: .now() + loadWaitTime) {
-                withAnimation(.easeOut(duration: 0.5)) { showState = true }
-            }
-        }
         /// 通知ボードの自動破棄に用いるタイムカウントレシーバー。
         .onReceive(showLimitTimer) { _ in
             if dragOffset != .zero || detail {
@@ -188,12 +188,21 @@ fileprivate struct NotificationContainer: View {
                     withAnimation(.easeIn(duration: 0.3)) {
                         vm.currentNotification = nil
                     }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                        vm.setRead(team: teamVM.team, element: element)
-                        vm.deleteBeforeUIImageController(element: element)
-                    }
                 }
             }
+        }
+        .onAppear {
+            // ログの生成時間と現在の時間との差分を算出
+            self.differenceDateFromNowTime = element.createTime.getDifferenceFromNowTime()
+            // WebImageの画像ロード完了を待つため、表示までに少しタイムラグを持たせている。
+            DispatchQueue.main.asyncAfter(deadline: .now() + loadWaitTime) {
+                withAnimation(.easeOut(duration: 0.5)) { showState = true }
+            }
+        }
+        .onDisappear {
+            print("通知が破棄されました")
+            vm.setRead(team: teamVM.team, element: element)
+            vm.deleteBeforeUIImageController(element: element)
         }
     }
     // 🍎------  アイテム通知の詳細ビュー   -------🍎
@@ -654,10 +663,10 @@ fileprivate struct NotificationContainer: View {
                 .fill(element.logType.iconColor)
                 .frame(width: size, height: size)
                 .overlay {
-                    Image(systemName: "cube.transparent.fill")
+                    Image(systemName: element.logType.notifySymbol)
                         .resizable().scaledToFit()
                         .foregroundColor(.white)
-                        .frame(width: size * 0.6, height: size * 0.6)
+                        .frame(width: size * 0.4, height: size * 0.4)
                 }
                 .shadow(radius: 1)
         }

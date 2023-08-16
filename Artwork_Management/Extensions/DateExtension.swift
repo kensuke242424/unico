@@ -39,20 +39,17 @@ extension Date {
         if differenceValue <= minuteValue {
             return "今"
 
-        } else if differenceValue >= minuteValue {
+        } else if differenceValue < hoursValue {
             let divisionValue = floor(Double(differenceValue / minuteValue))
             return "\(String(Int(divisionValue)))分前"
 
-        } else if differenceValue >= hoursValue {
+        } else if differenceValue < dayValue {
             let divisionValue = floor(Double(differenceValue / hoursValue))
             return "\(String(Int(divisionValue)))時間前"
 
-        } else if differenceValue >= dayValue {
+        } else {
             let divisionValue = floor(Double(differenceValue / dayValue))
             return "\(String(Int(divisionValue)))日前"
-
-        } else {
-            return "???"
         }
     }
 }

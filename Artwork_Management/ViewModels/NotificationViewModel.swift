@@ -51,6 +51,9 @@ class NotificationViewModel: ObservableObject {
                 self.notifications = documents.compactMap { (snap) -> Log? in
                     return try? snap.data(as: Log.self, with: .estimate)
                 }
+                // 
+                self.createTimeSort()
+
                 // 現在表示されている通知が無く、かつ未読の通知が残っていれば新たに通知を格納する
                 if self.currentNotification == nil {
                     guard let nextElement = self.notifications.first else { return }
@@ -424,6 +427,12 @@ class NotificationViewModel: ObservableObject {
             } else {
                 print("beforeデータの画像削除成功!")
             }
+        }
+    }
+
+    func createTimeSort() {
+        notifications.sort { before, after in
+            before.createTime > after.createTime ? true : false
         }
     }
 

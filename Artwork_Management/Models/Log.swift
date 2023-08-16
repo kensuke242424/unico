@@ -12,7 +12,7 @@ struct Log: Identifiable, Equatable, Hashable, Codable {
     var id: String
     var teamId: String
     var createTime: Date
-    var editByIcon: URL?
+    var editByIconURL: URL?
     var logType: LogType
     var read: Bool = false
     var canceledIds: [String] = []

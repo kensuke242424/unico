@@ -24,12 +24,13 @@ class LogViewModel: ObservableObject {
     func listener(id currentTeamID: String?) {
         print("LogsViewModel_listener起動")
         guard let uid, let currentTeamID else { return }
-        guard let logsRef = db?
+        let logsRef = db?
             .collection("teams")
             .document(currentTeamID)
-            .collection("logs") else { return }
+            .collection("logs")
+            .limit(to: 30)
 
-        listener = logsRef.addSnapshotListener { (snapshot, _) in
+        listener = logsRef?.addSnapshotListener { (snapshot, _) in
             guard let documents = snapshot?.documents else { return }
 
             do {
@@ -51,7 +52,7 @@ class LogViewModel: ObservableObject {
         let newLog = Log(id: UUID().uuidString,
                          teamId    : team.id,
                          createTime: Date(),
-                         editByIcon: user.iconURL,
+                         editByIconURL: user.iconURL,
                          logType      : logType)
 
         let membersRef = db?
