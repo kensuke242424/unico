@@ -79,9 +79,9 @@ fileprivate struct NotificationContainer: View {
                     .padding(.horizontal, 10)
 
                 VStack {
-                    Text("30分前")
+                    Text(element.createTime.getNowTimeDifference())
                         .font(.footnote)
-                        .opacity(0.4)
+                        .opacity(0.5)
 
                     EditByIconView(url: element.editByIcon, size: 35)
                 }
@@ -629,7 +629,7 @@ fileprivate struct NotificationContainer: View {
                 .clipShape(Circle())
                 .shadow(radius: 1)
         } else {
-            Circle().fill(.gray.gradient)
+            Circle().fill(element.logType.iconColor)
                 .frame(width: size, height: size)
                 .overlay {
                     Image(systemName: element.logType.notifySymbol)
@@ -651,7 +651,7 @@ fileprivate struct NotificationContainer: View {
                 .shadow(radius: 1)
         } else {
             RoundedRectangle(cornerRadius: 5)
-                .fill(.gray.gradient)
+                .fill(element.logType.iconColor)
                 .frame(width: size, height: size)
                 .overlay {
                     Image(systemName: "cube.transparent.fill")
@@ -672,7 +672,7 @@ fileprivate struct NotificationContainer: View {
                 .clipShape(Circle())
                 .shadow(radius: 1)
         } else {
-            Circle().fill(.gray.gradient)
+            Circle().fill(element.logType.iconColor)
                 .frame(width: size, height: size)
                 .overlay {
                     Image(systemName: element.logType.editBySymbol)
@@ -894,7 +894,7 @@ enum LogType: Codable, Equatable {
         case .updateUser:
             return "person.fill"
         case .updateTeam:
-            return "cube.transparent"
+            return "cube.transparent.fill"
         }
     }
     /// 通知のトップ右側に表示される小さなアイコンのシンボル
@@ -903,20 +903,16 @@ enum LogType: Codable, Equatable {
         case .addItem, .updateItem, .updateUser, .updateTeam, .commerce, .deleteItem:
             return "person.fill"
         case .join:
-            return "cube.transparent"
+            return "cube.transparent.fill"
         }
     }
 
     /// 通知に用いられるカラー。主に通知アイコンの背景色に使う。
-    var color: Color {
+    var iconColor: Color {
         switch self {
-        case .addItem, .updateItem, .join, .updateUser:
+        case .addItem, .updateItem, .updateUser, .deleteItem:
             return Color.gray
-        case .commerce:
-            return Color.mint
-        case .deleteItem(_):
-            return Color.red
-        case .updateTeam:
+        case .updateTeam, .join, .commerce:
             return Color.userGray1
         }
     }
