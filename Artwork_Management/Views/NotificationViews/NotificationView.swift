@@ -79,7 +79,7 @@ fileprivate struct NotificationContainer: View {
                     .padding(.horizontal, 10)
 
                 VStack {
-                    Text(element.createTime.getNowTimeDifference())
+                    Text(element.createTime.getDifferenceFromNowTime())
                         .font(.footnote)
                         .opacity(0.5)
 

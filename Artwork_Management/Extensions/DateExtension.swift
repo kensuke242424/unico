@@ -26,7 +26,7 @@ extension Date {
     }
     /// 渡されたDate値と現在の時間とを比べて、差分によってどれぐらい前かをStringで出力するメソッド。
     /// 主に通知などのビューでの時間差分表示で使う。
-    func getNowTimeDifference() -> String {
+    func getDifferenceFromNowTime() -> String {
         let dayValue = (60 * 60 * 24)
         let hoursValue = (60 * 60)
         let minuteValue = 60
@@ -50,6 +50,7 @@ extension Date {
         } else if differenceValue >= dayValue {
             let divisionValue = floor(Double(differenceValue / dayValue))
             return "\(String(Int(divisionValue)))日前"
+
         } else {
             return "???"
         }
