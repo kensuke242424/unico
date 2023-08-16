@@ -379,7 +379,7 @@ class NotificationViewModel: ObservableObject {
                 .collection("logs")
                 .document(element.id)
             /// メンバーのログデータにキャンセル済であることを反映
-            // ログのセットタイプが.localの場合、自身のログのみ更新する
+            // ログのセットタイプが.localの場合、ユーザー自身のログのみ更新する
             if element.logType.setRule == .global || memberId == uid {
                 try await logRef?.updateData(["canceledIds": FieldValue.arrayUnion([canceledDataId])])
             }

@@ -8,7 +8,7 @@
 import Foundation
 
 /// ユーザーのローカルに通知される通知ボードのフレーム。
-/// このデータはFirestoreとの通信を介さない。
+/// このデータはFirestoreとの通信を介さず、ローカル内で追加と削除が実行される。
 struct MomentLog: Identifiable, Hashable {
     var id: UUID = .init()
     var type: LocalNotificationType

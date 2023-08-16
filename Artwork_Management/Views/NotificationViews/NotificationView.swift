@@ -106,7 +106,7 @@ fileprivate struct NotificationContainer: View {
                     ResetLogButton(element: element, commerceIndex: showIndex, reseted: reseted)
 
                 case .join(let user):
-                    EmptyView()
+                    JoinMemberDetail(user: user)
 
                 case .updateUser(let user):
                     UpdateUserDetail(user: user)
@@ -506,6 +506,22 @@ fileprivate struct NotificationContainer: View {
         }
     }
 
+    // 🍎------  新規メンバー加入通知の詳細ビュー   -------🍎
+    @ViewBuilder
+    func JoinMemberDetail(user newMember: User) -> some View {
+        VStack(spacing: 20) {
+            Text("新規メンバー")
+                .tracking(3)
+                .fontWeight(.bold)
+                .opacity(0.6)
+            CircleIconView(url: newMember.iconURL, size: 150)
+            Text(newMember.name)
+                .font(.title2)
+                .fontWeight(.bold)
+        }
+        .padding()
+    }
+
     // 🍎------  ビューパーツ類   -------🍎
     /// 主にデータ追加時の通知詳細セクションに用いるグリッドひとつ分のグリッドビュー要素。
     /// 「<データ名> : <データバリュー>」の形でGridRowを返す。
@@ -607,8 +623,9 @@ fileprivate struct NotificationContainer: View {
                 .frame(width: size, height: size)
                 .overlay {
                     Image(systemName: element.logType.symbol)
+                        .resizable().scaledToFit()
                         .foregroundColor(.white)
-                        .frame(width: size * 0.6, height: size * 0.6)
+                        .frame(width: size * 0.4, height: size * 0.4)
                 }
                 .shadow(radius: 1)
         }
@@ -808,7 +825,7 @@ enum LogType: Codable, Equatable {
         case .commerce(let items):
             return "カート内 \(items.count) 個のアイテムが精算されました。"
         case .join(let user):
-            return "\(user.name) さんがチームに参加しました！"
+            return "チームに新メンバーが加入しました！"
         case .updateUser:
             return "ユーザー情報が更新されました。"
         case .updateTeam:
