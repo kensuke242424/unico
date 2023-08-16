@@ -320,7 +320,7 @@ struct NewHomeView: View {
                             .opacity(0.8)
 
                         // Team members Icon...
-                        teamMembersIcon(members: teamVM.members)
+                        TeamMembersIcon(members: teamVM.members)
                     }
                     .offset(x: 20, y: 35)
                     .tracking(5)
@@ -356,22 +356,10 @@ struct NewHomeView: View {
         .position(x: homeSize.width - partsWidth / 2)
     }
     @ViewBuilder
-    func teamMembersIcon(members: [JoinMember]) -> some View {
-        Group {
-            if members.count <= 2 {
-                HStack {
-                    ForEach(members, id: \.self) { member in
-                        AsyncImageCircleIcon(photoURL: member.iconURL, size: 30)
-                    }
-                }
-            } else {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack {
-                        ForEach(members, id: \.self) { member in
-                            AsyncImageCircleIcon(photoURL: member.iconURL, size: 30)
-                        }
-                    }
-                }.frame(width: 80)
+    func TeamMembersIcon(members: [JoinMember]) -> some View {
+        HStack(spacing: CGFloat(members.count - 1 * 10)) {
+            ForEach(members, id: \.self) { member in
+                AsyncImageCircleIcon(photoURL: member.iconURL, size: 30)
             }
         }
     }

@@ -557,8 +557,8 @@ struct SystemSideMenu: View {
                             ForEach(joins.filter({ $0.id != current.id}), id: \.self) { teamRow in
                                 HStack(spacing: 20) {
                                     if input.teamsListSheetEdit {
-                                        Image(systemName: "trash.fill")
-                                            .foregroundColor(.red)
+                                        Image(systemName: "door.left.hand.open")
+                                            .foregroundColor(.orange)
                                             .transition(.opacity.combined(with: .offset(x: -30)))
                                             .onTapGesture {
                                                 input.selectedTeam = teamRow
