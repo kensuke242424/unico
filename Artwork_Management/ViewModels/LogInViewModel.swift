@@ -67,9 +67,7 @@ class LogInViewModel: ObservableObject {
 
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
     var listenerHandle: AuthStateDidChangeListenerHandle?
-    var uid: String? {
-        return Auth.auth().currentUser?.uid
-    }
+    var uid: String? { Auth.auth().currentUser?.uid }
 
     // sign in with Appleにてサインイン時に生成されるランダム文字列「ノンス」
     fileprivate var currentNonce: String?
@@ -240,22 +238,16 @@ class LogInViewModel: ObservableObject {
         }
     }
 
-    func setNewUserDocument(name     : String,
+    func setNewUserToFirestore(name     : String,
                                password : String?,
                                imageData: (url: URL?, filePath: String?),
                                color: ThemeColor) async throws {
-
-        print("setSignUpUserDocument実行")
-
-        guard let usersRef = db?.collection("users") else {
-            print("ERROR: guard let itemsRef = db?.collection(users), let uid = Auth.auth().currentUser?.uid")
-            throw CustomError.getRef
-        }
 
         guard let currentUser = Auth.auth().currentUser else {
             print("ERROR: guard let currentUser")
             throw CustomError.uidEmpty
         }
+        // currentUserのuidとドキュメントIDを同じにして生成
         let newUserData = User(id: currentUser.uid,
                                name: name,
                                address: currentUser.email,
@@ -263,13 +255,15 @@ class LogInViewModel: ObservableObject {
                                iconURL: imageData.url,
                                iconPath: imageData.filePath,
                                userColor: color,
-                               joins: [])
+                               joinsId: [])
         do {
-            // currentUserのuidとドキュメントIDを同じにして保存
-            _ = try usersRef.document(newUserData.id).setData(from: newUserData)
+            try db?
+                .collection("users")
+                .document(newUserData.id)
+                .setData(from: newUserData)
 
         } catch {
-            print("ERROR: try usersRef.document(newUserData.id).setData(from: newUserData)")
+            print("ERROR: 新規ユーザーデータ保存失敗")
             throw CustomError.setData
         }
     }
@@ -498,7 +492,7 @@ class LogInViewModel: ObservableObject {
         }
     }
     
-    func deleteAccountWithEmailLink() async throws {
+    func deleteAuthWithEmail() async throws {
         // 再認証成功時に保持していたアドレスとリンクを使ってcredentialを作成
         let credential = EmailAuthProvider.credential(withEmail: self.receivedAddressByLink,
                                                       link     : self.receivedLink)
@@ -754,4 +748,17 @@ class LogInViewModel: ObservableObject {
             Auth.auth().removeStateDidChangeListener(listenerHandle)
         }
     }
+}
+
+enum AuthRelatedError:Error {
+    case uidEmpty
+    case joinsEmpty
+    case referenceEmpty
+    case missingData
+    case missingSnapshot
+    case failedCreateJoinTeam
+    case failedFetchUser
+    case failedFetchAddedNewUser
+    case failedTeamListen
+    case failedUpdateLastLogIn
 }

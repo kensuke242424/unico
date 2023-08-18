@@ -34,7 +34,7 @@ struct SelectItemPhotoBackground: View {
                             .opacity(0.1)
                             .frame(width: getRect().width, height: height)
                         
-                        SDWebImageView(imageURL: photoURL,
+                        SDWebImageToItem(imageURL: photoURL,
                                           width: getRect().width,
                                           height: height)
                         .clipShape(RoundedRectangle(cornerRadius: 5))

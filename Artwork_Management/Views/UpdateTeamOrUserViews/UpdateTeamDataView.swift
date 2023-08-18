@@ -33,12 +33,13 @@ struct UpdateTeamDataView: View {
 
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var teamVM: TeamViewModel
+    @EnvironmentObject var logVM: LogViewModel
     
     @FocusState var showKeyboard: ShowKeyboard?
     /// キーボード出現時のViewOffsetを管理するプロパティ
     @State private var showKeyboardOffset: Bool = false
     /// View内でユーザーが入力するデータを管理するプロパティ群
-    @State private var inputUpdate = InputUpdateTeam()
+    @State private var input = InputUpdateTeam()
 
     var body: some View {
 
@@ -59,7 +60,7 @@ struct UpdateTeamDataView: View {
             if showContent {
 
                 VStack(spacing: 10) {
-                    if inputUpdate.savingWait {
+                    if input.savingWait {
                         HStack(spacing: 10) {
                             Text("保存中です...")
                             ProgressView()
@@ -74,10 +75,10 @@ struct UpdateTeamDataView: View {
                 .foregroundColor(.white)
                 .padding(.bottom, 8)
 
-                CaptureImageIcon(image: inputUpdate.captureImage)
-                    .onTapGesture { inputUpdate.showPicker.toggle() }
+                CaptureImageIcon(image: input.captureImage)
+                    .onTapGesture { input.showPicker.toggle() }
 
-                TextField("", text: $inputUpdate.nameText)
+                TextField("", text: $input.nameText)
                     .frame(width: 230)
                     .foregroundColor(.white)
                     .focused($showKeyboard, equals: .check)
@@ -85,7 +86,7 @@ struct UpdateTeamDataView: View {
                     .multilineTextAlignment(.center)
                     .background {
                         ZStack {
-                            Text(showKeyboard == nil && inputUpdate.nameText.isEmpty ? "チーム名を入力" : "")
+                            Text(showKeyboard == nil && input.nameText.isEmpty ? "チーム名を入力" : "")
                             .foregroundColor(.white.opacity(0.3))
                             Rectangle().foregroundColor(.white.opacity(0.3)).frame(height: 1)
                                 .offset(y: 20)
@@ -93,13 +94,13 @@ struct UpdateTeamDataView: View {
                     }
 
                 SavingButton()
-                    .disabled(inputUpdate.savingWait ? true : false)
-                    .opacity(inputUpdate.savingWait ? 0.2 : 1.0)
+                    .disabled(input.savingWait ? true : false)
+                    .opacity(input.savingWait ? 0.2 : 1.0)
                     .padding(.top)
 
                 CancelButton()
-                .disabled(inputUpdate.savingWait ? true : false)
-                .opacity(inputUpdate.savingWait ? 0.2 : 1.0)
+                .disabled(input.savingWait ? true : false)
+                .opacity(input.savingWait ? 0.2 : 1.0)
                 .padding(.top)
             }
         }
@@ -107,8 +108,8 @@ struct UpdateTeamDataView: View {
         .offset(y: showKeyboardOffset ? -100 : 0)
         // 写真ピッカー&クロップビュー
         .cropImagePicker(option: .circle,
-                         show: $inputUpdate.showPicker,
-                         croppedImage: $inputUpdate.captureImage)
+                         show: $input.showPicker,
+                         croppedImage: $input.captureImage)
         .background {
             Color(.black)
                 .opacity(0.8)
@@ -125,9 +126,9 @@ struct UpdateTeamDataView: View {
             }
         }
         .onAppear {
-            inputUpdate.defaultIconData = (url     : teamVM.team?.iconURL,
+            input.defaultIconData = (url     : teamVM.team?.iconURL,
                                            filePath : teamVM.team?.iconPath)
-            inputUpdate.nameText = teamVM.team?.name ?? ""
+            input.nameText = teamVM.team?.name ?? ""
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 withAnimation {
@@ -138,10 +139,10 @@ struct UpdateTeamDataView: View {
     } // body
     @ViewBuilder
     func CaptureImageIcon(image: UIImage?) -> some View {
-        if let captureImage = inputUpdate.captureImage {
+        if let captureImage = input.captureImage {
             UIImageCircleIcon(photoImage: captureImage, size: 150)
         } else {
-            if let iconURL = inputUpdate.defaultIconData.url {
+            if let iconURL = input.defaultIconData.url {
                 SDWebImageCircleIcon(imageURL: iconURL, width: 150, height: 150)
             } else {
                 CubeCircleIcon(size: 150)
@@ -152,52 +153,62 @@ struct UpdateTeamDataView: View {
     func SavingButton() -> some View {
         Button("保存する") {
 
-            guard let team = teamVM.team else { return }
-            guard let user = userVM.user else { return }
-            guard let currentTeamIndex = userVM.currentTeamIndex else { return }
+            guard let team = teamVM.team,
+                  let joinIndex = userVM.currentJoinsIndex else {
+                print("ERROR: チームデータの更新に失敗しました。")
+                withAnimation { showContent.toggle() }
+                return
+            }
 
             Task {
-                withAnimation(.spring(response: 0.3)) { inputUpdate.savingWait = true }
+                withAnimation(.spring(response: 0.3)) { input.savingWait = true }
 
                 // ーー保存に用いるデータコンテナ群ーー
-                var newIconDataContainer: (url: URL?, filePath: String?)?
-                var newNameContainer: String?
-                let defaultIconDataContainer = (url: team.iconURL, filePath: team.iconPath)
-                let defaultNameContainer = team.name
-                var updateJoinTeamContainer = user.joins[currentTeamIndex]
+                var beforeTeam = team
+                var afterTeam = team
+                var joinTeamContainer = userVM.joins[joinIndex]
 
-                // 新規アイコンデータが存在すれば、アップロード&コンテナに格納
-                if let updateIconImage = inputUpdate.captureImage {
+                // 新規アイコンデータが存在すれば、アップロード&アイコンコンテナに格納
+                if let updateIconImage = input.captureImage {
                     let uploadIconData = await teamVM.uploadTeamImage(updateIconImage)
-                    newIconDataContainer = uploadIconData
-                    updateJoinTeamContainer.iconURL = uploadIconData.url
+                    afterTeam.iconURL = uploadIconData.url
+                    afterTeam.iconPath = uploadIconData.filePath
+                    joinTeamContainer.iconURL = uploadIconData.url
                 }
-                // 名前に変更があれば、JoinTeamデータを更新&コンテナに格納
-                if team.name != inputUpdate.nameText {
-                    newNameContainer = inputUpdate.nameText
-                    updateJoinTeamContainer.name = inputUpdate.nameText
+                // 名前に変更があれば、JoinTeamコンテナを更新&名前コンテナに格納
+                if team.name != input.nameText {
+                    afterTeam.name = input.nameText
+                    joinTeamContainer.name = input.nameText
                 }
+                // データの変更があれば、Firebaseへの保存処理実行
+                if beforeTeam != afterTeam {
+                    try await teamVM.updateTeam(data: afterTeam)
+                    try await userVM.updateJoinTeamToMembers(data: joinTeamContainer,
+                                                             ids: teamVM.membersId)
 
-                if newIconDataContainer != nil || newNameContainer != nil {
-                    try await teamVM.updateTeamNameAndIcon(name: newNameContainer ?? defaultNameContainer,
-                                                           data: newIconDataContainer ?? defaultIconDataContainer)
-                    try await userVM.updateJoinTeamNameNameAndIcon(data: updateJoinTeamContainer, members: team.members)
+                    hapticSuccessNotification()
                 }
-
                 // 編集画面を閉じる
-                hapticSuccessNotification()
-
                 withAnimation {
                     showContent.toggle()
-                    inputUpdate.savingWait = false
+                    input.savingWait = false
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     withAnimation(.spring(response: 0.3)) { show = false }
+                    if beforeTeam != afterTeam {
+                        // 変更前・変更後のデータを使って通知の作成
+                        let compareTeam = CompareTeam(id: team.id,
+                                                      before: beforeTeam,
+                                                      after: afterTeam)
+                        logVM.addLog(to: teamVM.team,
+                                     by: userVM.user,
+                                     type: .updateTeam(compareTeam))
+                    }
                 }
             } // Task ここまで
         }
         .buttonStyle(.borderedProminent)
-        .disabled(inputUpdate.savingWait ? true : false)
+        .disabled(input.savingWait ? true : false)
     }
     @ViewBuilder
     func CancelButton() -> some View {

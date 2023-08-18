@@ -56,8 +56,7 @@ struct ItemSortManuView: View {
                                                         stiffness      : 100,
                                                         damping        : 80,
                                                         initialVelocity: 0.1),
-                                                        value          : dragOffset
-                        )
+                                                        value          : dragOffset)
 
                 } else {
                     userColor.color2.opacity(0.8)
@@ -184,7 +183,7 @@ struct ItemSortManuView: View {
                     .frame(width: 15, height: 15)
                     .overlay {
                         Circle().frame(width: 8)
-                            .scaleEffect(itemVM.filterFavorite ? 1 : 0.01)
+                            .scaleEffect(itemVM.filteringFavorite ? 1 : 0.01)
                     }
 
                 Text("お気に入りのみ表示").tracking(2)
@@ -193,12 +192,12 @@ struct ItemSortManuView: View {
             .background {
                 Capsule()
                     .foregroundColor(userColor.color1)
-                    .opacity(itemVM.filterFavorite ? 0.4 : 0.01)
+                    .opacity(itemVM.filteringFavorite ? 0.4 : 0.01)
                     .shadow(radius: 5, x: 2, y: 2)
             }
             .onTapGesture {
                 withAnimation(.spring(response: 0.5)) {
-                    itemVM.filterFavorite.toggle()
+                    itemVM.filteringFavorite.toggle()
                 }
             }
 

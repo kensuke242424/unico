@@ -534,8 +534,9 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             }
         }
         
-        // currentUserを監視するリスナーによってサインインが検知されたら、ユーザが選択したサインインフローに分岐して処理
-        // (ログイン or サインアップ)
+        /// currentUserを監視するリスナーによってサインインが検知されたら、
+        /// ユーザが選択したサインインフローに分岐して処理
+        /// (ログイン or サインアップ)
         .onChange(of: logInVM.signedInOrNotResult) { resultValue in
             
             print("logInVM.signedInOrNotResultの更新を検知")
@@ -552,7 +553,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 }
             }
             
-            /// ✅ 「.signIn」ならfetch開始。「.signUp」なら各データの生成後にfetch開始
+            /// ✅ 「.signIn」ならfetch開始。「.signUp」なら各データの生成後にfetch開始 ✅
             switch logInVM.resultSignInType {
 
             case .signIn:
@@ -576,7 +577,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         /// オリジナルアイコン画像が入力されている場合は、リサイズ処理しコンテナに格納
                         if let captureIconUIImage = inputLogIn.croppedUserIconImage {
                             iconImageContainer = logInVM.resizeUIImage(image: captureIconUIImage,
-                                                                    width: 60)
+                                                                       width: 60)
                         }
                         /// ーーーーアイコンデータのアップロード処理ーーーー
                         let uplaodIconImageData = await userVM.uploadUserImage(iconImageContainer)
@@ -584,7 +585,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         if inputLogIn.createUserNameText == "" { inputLogIn.createUserNameText = "名無し" }
 
                         /// ユーザーの入力値をもとにユーザーデータを作成し、Firestoreに保存⬇︎
-                        try await logInVM.setNewUserDocument(name     : inputLogIn.createUserNameText,
+                        try await logInVM.setNewUserToFirestore(name     : inputLogIn.createUserNameText,
                                                              password : inputLogIn.password,
                                                              imageData: uplaodIconImageData,
                                                              color    : inputLogIn.selectUserColor)
@@ -592,20 +593,16 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         // Firestoreに保存したデータをローカルに引っ張ってくる
                         try await userVM.fetchUser()
                         guard let user = userVM.user else { return }
-                        
-                        /// 新規チームデータに格納するjoinMemberデータの準備⬇︎
-                        let joinMember = JoinMember(memberUID: user.id,
-                                                    name     : user.name,
-                                                    iconURL  : user.iconURL)
 
                         // 新規チームのIDとして使用
                         let createTeamID = UUID().uuidString
-                        
-                        let teamData = Team(id     : createTeamID,
-                                            name   : "\(user.name)のチーム",
-                                            members: [joinMember])
 
-                        let joinTeamData = JoinTeam(teamID           : teamData.id,
+                        /// teamsコレクションに保存する新規チームデータ
+                        let teamData = Team(id     : createTeamID,
+                                            name   : "\(user.name)のチーム")
+
+                        /// ユーザードキュメントのサブコレクションに保存する所属チームの情報
+                        let joinTeamData = JoinTeam(id           : teamData.id,
                                                     name             : teamData.name,
                                                     currentBackground: backgroundVM.selectBackground ??
                                                                        backgroundVM.sampleBackground,
@@ -613,10 +610,14 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         
                         /// 準備したチームデータをFirestoreに保存していく
                         /// userDocument側にも新規作成したチームのidを保存しておく(addNewJoinTeam)
-                        try await teamVM.addTeam(teamData: teamData)
-                        try await userVM.addNewJoinTeam(newJoinTeam: joinTeamData)
+                        try await teamVM.addNewTeam(team: teamData)
+                        try await teamVM.addFirstMemberToFirestore(teamId: teamData.id, data: user)
+                        try await userVM.addNewJoinTeam(data: joinTeamData)
+                        // サンプルアイテム&タグをセット
                         await teamVM.setSampleItem(teamID: teamData.id)
-                        tagVM.addTag(tagData: tagVM.sampleTag, teamID: teamData.id)
+                        await tagVM.setSampleTag(teamID: teamData.id)
+                        // ユーザーのログイン先を新規チームに設定
+                        try await userVM.updateLastLogInTeam(teamId: teamData.id)
                         
                         /// データ生成の成功を知らせるアニメーションの後、データのフェッチとログイン開始
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {

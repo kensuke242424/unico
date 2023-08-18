@@ -31,10 +31,6 @@ struct DeletedView: View {
             Button("ログイン画面へ戻る") {
                 withAnimation(.easeIn(duration: 0.4)) {
                     logInVM.rootNavigation = .logIn
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
-                        userVM.user = nil
-                        teamVM.team = nil
-                    }
                 }
             }
             .padding(.top, 40)

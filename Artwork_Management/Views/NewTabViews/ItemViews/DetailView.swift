@@ -15,7 +15,9 @@ struct DetailView: View {
     @Environment(\.colorScheme) var colorScheme
 
     @EnvironmentObject var navigationVM: NavigationViewModel
+    @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
+    @EnvironmentObject var logVM: LogViewModel
 
     @StateObject var itemVM: ItemViewModel
     @StateObject var cartVM: CartViewModel
@@ -28,6 +30,10 @@ struct DetailView: View {
     @State private var openDetail: Bool = false
     @State private var showDetailBackground: Bool = false
     @State private var showDeleteAlert: Bool = false
+
+    var favoriteStatus: Bool {
+        return userVM.user?.favorites.contains(where: {$0 == item.id}) ?? false
+    }
     
     var body: some View {
         
@@ -64,7 +70,7 @@ struct DetailView: View {
                 let size = $0.size
                 
                 HStack(spacing: 20) {
-                    SDWebImageView(imageURL: item.photoURL,
+                    SDWebImageToItem(imageURL: item.photoURL,
                                       width: size.width / 2 - 15,
                                       height: size.height)
                         .clipShape(CustomCorners(corners: [.topRight, .bottomRight], radius: 10))
@@ -149,11 +155,11 @@ struct DetailView: View {
                 HStack(spacing: 0) {
                     
                     Button {
-                        itemVM.updateFavorite(item)
+                        userVM.updateFavorite(item.id)
                     } label: {
-                        Label("お気に入り", systemImage: item.favorite ? "heart.fill" : "suit.heart")
-                            .font(.callout)
-                            .foregroundColor(item.favorite ? .red : .gray)
+                        Label("お気に入り", systemImage: favoriteStatus ? "heart.fill" : "suit.heart")
+                        .font(.callout)
+                        .foregroundColor(favoriteStatus ? .red : .gray)
                     }
                     .frame(maxWidth: .infinity)
                     .disabled(openDetail ? true : false)
@@ -239,6 +245,10 @@ struct DetailView: View {
                         Task {
                             itemVM.deleteImage(path: item.photoPath)
                             itemVM.deleteItem(deleteItem: item, teamID: item.teamID)
+
+                            logVM.addLog(to: teamVM.team,
+                                         by: userVM.user,
+                                         type: .deleteItem(item))
                         }
                     }
                 }
@@ -324,12 +334,12 @@ struct DetailView: View {
                      "総売個数　:　　   -")
                 
                 Text(item.totalInventory != 0 ?
-                     "総在庫数　:　　 \(item.totalInventory) 個":
+                     "総仕入れ　:　　 \(item.totalInventory) 個":
                      "総仕入れ　:　　   -")
                     .padding(.bottom, 12)
 
-                Text("登録日　　:　　 \(asTimesString(item.createTime))")
-                Text("最終更新　:　　 \(asTimesString(item.updateTime))")
+                Text("登録日　　:　　 \(item.createTime.toStringWithCurrentLocale())")
+                Text("最終更新　:　　 \(item.updateTime.toStringWithCurrentLocale())")
             }
             
             Divider()
@@ -344,18 +354,6 @@ struct DetailView: View {
         .tracking(1)
         .lineLimit(1)
         .padding(.vertical, 10)
-    }
-
-    // 取得アイテムのタイムスタンプを◯年◯月◯日になおす
-    func asTimesString(_ time: Timestamp?) -> String {
-        
-        if let time {
-            let formatter = DateFormatter()
-            formatter.setTemplate(.date, .jaJP)
-            return formatter.string(from: time.dateValue())
-        } else {
-            return "???"
-        }
     }
     
     func checkHaveNotInventory(_ item: Item) -> Bool {

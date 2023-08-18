@@ -41,7 +41,7 @@ class BackgroundViewModel: ObservableObject {
     let sampleBackground = Background(category: "music",
                                       imageName: "music_1",
                                       imageURL: URL(string: "https://firebasestorage.googleapis.com/v0/b/unico-cc222.appspot.com/o/SampleBackgrounds%2Fmusic%2Fmusic_1_2023-07-30%2012%3A31%3A33%20%2B0000.jpeg?alt=media&token=a7c7ea84-2a68-4459-acf9-06fa583b6639"),
-                                      imagePath: "gs://unico-cc222.appspot.com/SampleBackgrounds/music/music_1_2023-07-30 12:31:33 +0000.jpeg")
+                                      imagePath: "")
 
 
     let categoryTag: [CategoryTag] =
@@ -117,22 +117,6 @@ class BackgroundViewModel: ObservableObject {
             print("背景データの取得失敗")
         }
     }
-
-    // TODO: 6.15 まだ実装できてない
-//    func createTimeSortBackgrounds(order: UpDownOrder) {
-//
-//        switch order {
-//        case .up:
-//            categoryBackgrounds.sort { before, after in
-//                before.createTime!.dateValue() > after.createTime!.dateValue() ? true : false
-//            }
-//
-//        case .down:
-//            categoryBackgrounds.sort { before, after in
-//                before.createTime!.dateValue() < after.createTime!.dateValue() ? true : false
-//            }
-//        }
-//    }
     /// サインアップ時に、ユーザーが写真フォルダから選択した画像をFirestorageに保存するメソッド。
     func uploadUserBackgroundAtSignUp(_ image: UIImage?) async -> (url: URL?, filePath: String?) {
 

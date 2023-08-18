@@ -12,6 +12,9 @@ import ResizableSheet
 struct CommerceSheet: View {
 
     @EnvironmentObject var userVM: UserViewModel
+    @EnvironmentObject var teamVM: TeamViewModel
+    @EnvironmentObject var notifyVM: MomentLogViewModel
+    @EnvironmentObject var logVM: LogViewModel
 
     @StateObject var cartVM: CartViewModel
     @Binding var inputTab: InputTab
@@ -73,11 +76,14 @@ struct CommerceSheet: View {
 
                 Button(
                     action: {
-                        cartVM.updateCommerceItems(teamID: teamID)
-                        cartVM.resultCartPrice = 0
-                        cartVM.resultCartAmount = 0
+                        /// カート内各アイテムの更新前・更新後データがメソッドの返り値として渡ってくる
+                        /// これらのデータを通知用の比較表示データとして渡す
+                        let compareItems = cartVM.updateCommerceItemsAndGetCompare(teamID: teamID)
+                        // 通知の作成
+                        logVM.addLog(to: teamVM.team,
+                                     by: userVM.user,
+                                     type: .commerce(compareItems))
                         cartVM.doCommerce = true
-
                         hapticSuccessNotification()
                     },
                     label: {
@@ -109,7 +115,6 @@ struct CommerceSheet: View {
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                     cartVM.doCommerce = false
-                    print("DispatchQueue2秒後doCommerceをfalse")
                 }
             }
         }

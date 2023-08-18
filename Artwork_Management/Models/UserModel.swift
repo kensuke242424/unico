@@ -9,40 +9,36 @@ import SwiftUI
 import FirebaseFirestore
 import FirebaseFirestoreSwift
 
-// Equatableメソッド
-extension User {
-    static func == (lhs: User, rhs: User) -> Bool {
-        return lhs.id == rhs.id
-    }
-}
-
 struct User: Identifiable, Codable, Equatable {
 
     var id: String
+    var createTime = Date()
     var name: String
     var address: String?
     var password: String?
     var iconURL: URL?
     var iconPath: String?
     var userColor: ThemeColor
-    var joins: [JoinTeam]
+    var joinsId: [String]
     var myBackgrounds: [Background] = []
     var favorites: [String] = []
     var lastLogIn: String?
 }
 
+
 struct JoinTeam: Codable, Hashable {
-    var teamID: String
+    var id: String
     var name: String
     var iconURL: URL?
     var currentBackground: Background?
     var myBackgrounds: [Background] = []
-    var homeEdits = HomePartsEditData(nowTime: NowTimeParts(),
+    var homeEdits = HomeEditData(nowTime: NowTimeParts(),
                                      teamNews: TeamNewsParts())
+    var approved: Bool?
 }
 
 /// Homeの各パーツ設定をまとめたデータモデル
-struct HomePartsEditData: Codable, Hashable {
+struct HomeEditData: Codable, Hashable {
     var nowTime: NowTimeParts
     var teamNews: TeamNewsParts
 }

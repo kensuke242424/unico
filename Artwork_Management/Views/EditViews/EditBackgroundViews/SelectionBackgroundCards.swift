@@ -19,7 +19,7 @@ struct SelectionBackgroundCards: View {
             LazyHStack(spacing: 30) {
                 Spacer().frame(width: 10)
 
-                let currentIndex = userVM.currentTeamIndex ?? 0
+                let currentIndex = userVM.currentJoinsIndex ?? 0
 
                 if backgroundVM.selectCategory == .original {
 
@@ -40,7 +40,7 @@ struct SelectionBackgroundCards: View {
                                     guard let deleteTargetImage = backgroundVM.deleteTarget else { return }
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                         backgroundVM.deleteBackground(path: background.imagePath)
-                                        userVM.deleteMyBackgroundToFirestore(deleteTargetImage)
+                                        userVM.deleteMyBackground(deleteTargetImage)
                                         if backgroundVM.selectBackground == background {
                                             backgroundVM.selectBackground = nil
                                         }
@@ -88,7 +88,7 @@ struct SelectionBackgroundCards: View {
     }
     @ViewBuilder
     func BackgroundCardView(_ background: Background) -> some View {
-        SDWebImageView(imageURL: background.imageURL,
+        SDWebImageToItem(imageURL: background.imageURL,
                        width: 110,
                        height: 220)
         .shadow(radius: 5, x: 2, y: 2)

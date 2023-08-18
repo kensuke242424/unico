@@ -81,7 +81,7 @@ struct EditTagView: View {
                                                     tagColor : .gray)
 
                             withAnimation(.easeInOut(duration: 0.3)) {
-                                tagVM.addTag(tagData: createTagData, teamID: teamVM.team!.id)
+                                tagVM.addTagToFirestore(tagData: createTagData, teamID: teamVM.team!.id)
                                 self.passTag = createTagData
                                 show = false
                             }

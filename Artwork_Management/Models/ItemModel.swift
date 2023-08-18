@@ -11,9 +11,9 @@ import FirebaseFirestoreSwift
 
 struct Item: Identifiable, Equatable, Hashable, Codable {
 
-    @DocumentID var id: String? = UUID().uuidString
-    @ServerTimestamp var createTime: Timestamp?
-    @ServerTimestamp var updateTime: Timestamp?
+    var id: String? = UUID().uuidString
+    var createTime: Date = Date()
+    var updateTime: Date = Date()
     var tag: String
     var teamID: String
     var name: String
@@ -88,34 +88,35 @@ enum ItemsSortType: CaseIterable {
 var sampleItems: [Item] =
 [
     Item(tag: "goods",
-             teamID: "",
-             name: "サンプル１",
-             author: "ユニコ太郎",
-             detail: "ここにアイテムの詳細メモが入ります。",
-             photoURL: URL(string: "https://firebasestorage.googleapis.com/v0/b/unico-cc222.appspot.com/o/sample%2Fgoods_sample6.jpg?alt=media&token=0f1ff906-46de-47d4-97f9-18011439e13c&_gl=1*1dexvqy*_ga*Njc5ODMwMzQzLjE2NzY5Nzg1MDE.*_ga_CW55HF8NVT*MTY4NjM4NTk5Ny42Mi4xLjE2ODYzODYxNDQuMC4wLjA."),
-             photoPath: nil,
-             favorite: false,
-             cost: 1000,
-             price: 2800,
-             amount: 0,
-             sales: 28000,
-             inventory: 50,
-             totalAmount: 0,
-             totalInventory: 0),
+         teamID: "",
+         name: "サンプル１",
+         author: "ユニコ太郎",
+         detail: "ここにアイテムの詳細メモが入ります。",
+         photoURL: URL(string: "https://firebasestorage.googleapis.com/v0/b/unico-cc222.appspot.com/o/sample%2Fgoods_sample6.jpg?alt=media&token=0f1ff906-46de-47d4-97f9-18011439e13c&_gl=1*1dexvqy*_ga*Njc5ODMwMzQzLjE2NzY5Nzg1MDE.*_ga_CW55HF8NVT*MTY4NjM4NTk5Ny42Mi4xLjE2ODYzODYxNDQuMC4wLjA."),
+         photoPath: nil,
+         favorite: false,
+         cost: 1000,
+         price: 2800,
+         amount: 0,
+         sales: 28000,
+         inventory: 50,
+         totalAmount: 0,
+         totalInventory: 50),
 
-    Item(tag: "goods",
-             teamID: "",
-             name: "サンプル２",
-             author: "ユニコ太郎",
-             detail: "ここにアイテムの詳細メモが入ります。",
+    Item(createTime: Date().plusOneHour(),
+         tag: "goods",
+         teamID: "",
+         name: "サンプル２",
+         author: "ユニコ太郎",
+         detail: "ここにアイテムの詳細メモが入ります。",
          photoURL: URL(string: "https://firebasestorage.googleapis.com/v0/b/unico-cc222.appspot.com/o/sample%2Fgoods_sample5.jpg?alt=media&token=1a44c529-0530-472f-a685-2f5d30c9486c&_gl=1*wbr9no*_ga*Njc5ODMwMzQzLjE2NzY5Nzg1MDE.*_ga_CW55HF8NVT*MTY4NjM4NTk5Ny42Mi4xLjE2ODYzODYxMjguMC4wLjA."),
-             photoPath: nil,
-             favorite: false,
-             cost: 1000,
-             price: 2000,
-             amount: 0,
-             sales: 40000,
-             inventory: 180,
-             totalAmount: 20,
-             totalInventory: 200),
+         photoPath: nil,
+         favorite: false,
+         cost: 1000,
+         price: 2000,
+         amount: 0,
+         sales: 40000,
+         inventory: 180,
+         totalAmount: 20,
+         totalInventory: 180),
 ]

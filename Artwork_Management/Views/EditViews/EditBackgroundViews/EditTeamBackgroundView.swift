@@ -62,7 +62,7 @@ struct EditTeamBackgroundView: View {
                         Task {
                             do {
                                 if let selectedBackground = backgroundVM.selectBackground {
-                                    _ = try await userVM.updateCurrentTeamBackground(data: selectedBackground)
+                                    _ = try await userVM.updateJoinTeamBackground(data: selectedBackground)
                                 }
                                 withAnimation(.spring(response: 0.3, blendDuration: 1)) {
                                     showContents = false
@@ -122,8 +122,8 @@ struct EditTeamBackgroundView: View {
             Task{
                 withAnimation { backgroundVM.savingWait = true }
                 let resizedImage = backgroundVM.resizeUIImage(image: newImage)
-                let uploadImage = await userVM.uploadMyBackgroundToFirestorage(resizedImage)
-                await userVM.addMyBackgroundToFirestore(url: uploadImage.url, path: uploadImage.filePath)
+                let uploadImage = await userVM.uploadMyNewBackground(resizedImage)
+                await userVM.setMyNewBackground(url: uploadImage.url, path: uploadImage.filePath)
                 withAnimation { backgroundVM.savingWait = false }
             }
         }

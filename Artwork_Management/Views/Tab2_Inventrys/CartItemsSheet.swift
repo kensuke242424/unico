@@ -147,6 +147,7 @@ struct CartItemRow: View {
                                 .frame(width: 22, height: 22)
                                 .foregroundColor(memberColor.color2)
                         }
+                        
                         Text(String(itemRow.amount))
                             .foregroundColor(.black)
                             .fontWeight(.black)

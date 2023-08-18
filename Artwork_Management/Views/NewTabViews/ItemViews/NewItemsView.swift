@@ -21,6 +21,8 @@ struct NewItemsView: View {
     
     /// Tab親Viewから受け取るViewModelと状態変数
     @EnvironmentObject var navigationVM: NavigationViewModel
+    @EnvironmentObject var momentLogVM: MomentLogViewModel
+    @EnvironmentObject var logVM: LogViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var tagVM : TagViewModel
@@ -74,7 +76,7 @@ struct NewItemsView: View {
                 ScrollView(.vertical, showsIndicators: false) {
                     LazyVStack(spacing: 35) {
                         ForEach(itemVM.items.filter(
-                            itemVM.filterFavorite ?
+                            itemVM.filteringFavorite ?
                             {   userVM.user?.favorites.firstIndex(of: $0.id ?? "") != nil &&
                                 ($0.tag == tagVM.activeTag?.tagName ||
                                  tagVM.activeTag?.tagName == "全て") } :
@@ -129,9 +131,12 @@ struct NewItemsView: View {
                                             guard let selectedItem else { return }
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                                 Task {
-                                                    itemVM.deleteImage(path: selectedItem.photoPath)
                                                     itemVM.deleteItem(deleteItem: selectedItem,
                                                                       teamID: selectedItem.teamID)
+
+                                                    logVM.addLog(to: teamVM.team,
+                                                                 by: userVM.user,
+                                                                 type: .deleteItem(selectedItem))
                                                 }
                                             }
                                         }
@@ -155,7 +160,7 @@ struct NewItemsView: View {
                     .padding(.bottom, bottomPadding(size))
                     .background {
                         ScrollViewDetector(carouselMode: $carouselMode,
-                                           totalContent: sampleBooks.count)
+                                           totalContent: itemVM.items.count)
                     }
                 }
                 /// グローバルビューからではなく、ここからのオフセットが必要なため
@@ -282,24 +287,25 @@ struct NewItemsView: View {
                 .zIndex(1)
                 /// カートにアイテムを入れるボタン
                 .overlay(alignment: .bottomTrailing) {
+                    // 取引かごに追加するボタン
+                    // タップするたびに、値段合計、個数、カート内アイテム要素にプラスする
                     Button {
-                        // 取引かごに追加するボタン
-                        // タップするたびに、値段合計、個数、カート内アイテム要素にプラスする
                         guard let newActionIndex = getActionIndex(item) else {
                             print("アクションIndexの取得に失敗しました")
                             return
                         }
-                        
-                        // TODO: カートに追加する在庫が無いことを知らせるアラートメッセージ
+                        // カートに追加する在庫が無いことを知らせる通知
                         if checkHaveNotInventory(item) {
-                            print("これ以上カートに追加する在庫がありません")
+                            withAnimation(.spring(response: 0.2)) {
+                                momentLogVM.setLog(type: .outItemStock)
+                                hapticErrorNotification()
+                            }
                             return
                         }
-                        
-                        /// actionItemIndexは、itemVMのアイテムとcartItemのアイテムで同期を取るため必要
+                        /// actionItemIndexは、itemVM内のアイテムとcartItem内のアイテムで同期を取るため必要
                         cartVM.actionItemIndex = newActionIndex
                         cartVM.addCartItem(item: item)
-                        
+
                     } label: {
                         Image(systemName: "cart.fill")
                             .foregroundColor(.gray)
@@ -324,7 +330,7 @@ struct NewItemsView: View {
                 /// アイテムのImageカード
                 ZStack {
                     if !(showDetailView && selectedItem?.id == item.id) {
-                        SDWebImageView(imageURL: item.photoURL,
+                        SDWebImageToItem(imageURL: item.photoURL,
                                           width: size.width / 2,
                                           height: size.width / 2)
                             /// Matched Geometry ID
@@ -382,10 +388,14 @@ struct NewItemsView: View {
     
     @ViewBuilder
     private func FavoriteButton(_ item: Item) -> some View {
+        /// ユーザーが対象アイテムをお気に入りに入れているかをBool値で返すプロパティ
+        var favoriteStatus: Bool {
+            return userVM.user?.favorites.contains(where: {$0 == item.id}) ?? false
+        }
         Button {
             userVM.updateFavorite(item.id)
         } label: {
-            if userVM.user?.favorites.firstIndex(of: item.id ?? "") != nil {
+            if favoriteStatus {
                 Image(systemName: "heart.fill")
             } else {
                 Image(systemName: "heart")
@@ -393,7 +403,7 @@ struct NewItemsView: View {
         }
         .particleEffect(systemImage: "heart.fill",
                         font: .title,
-                        status: userVM.user?.favorites.firstIndex(of: item.id ?? "") != nil,
+                        status: favoriteStatus,
                         activeTint: .red,
                         inActiveTint: .white
         )
@@ -406,22 +416,23 @@ struct NewItemsView: View {
         ZStack {
             Capsule()
                 .frame(width: 40, height: 12)
-                .foregroundColor(itemVM.filterFavorite ? .green.opacity(0.7) : .gray.opacity(0.5))
+                .foregroundColor(itemVM.filteringFavorite ? .green : .gray)
+                .opacity(itemVM.filteringFavorite ? 0.7 : 0.5)
             Image(systemName: "heart.fill")
                 .font(.title)
                 .foregroundColor(.black).opacity(0.6)
-                .offset(x: itemVM.filterFavorite ? 9 : -7)
+                .offset(x: itemVM.filteringFavorite ? 9 : -7)
             Image(systemName: "heart.fill")
                 .font(.title)
-                .foregroundColor(itemVM.filterFavorite ? .red : .white)
+                .foregroundColor(itemVM.filteringFavorite ? .red : .white)
                 .scaleEffect(0.95)
                 .padding()
-                .offset(x: itemVM.filterFavorite ? 9 : -7)
+                .offset(x: itemVM.filteringFavorite ? 9 : -7)
         }
         .opacity(itemVM.items.isEmpty ? 0 : 1)
         .onTapGesture {
             withAnimation(.spring(response: 0.4)) {
-                itemVM.filterFavorite.toggle()
+                itemVM.filteringFavorite.toggle()
             }
         }
     }

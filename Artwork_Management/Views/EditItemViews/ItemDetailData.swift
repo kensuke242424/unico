@@ -11,24 +11,24 @@ struct ItemDetailData: View {
 
     let item: Item
 
-    var createTime: String {
-        if let createTime = item.createTime {
-            let formatter = DateFormatter()
-            formatter.setTemplate(.date, .jaJP)
-            return formatter.string(from: createTime.dateValue())
-        } else {
-            return "???"
-        }
-    }
-    var updateTime: String {
-        if let updateTime = item.updateTime {
-            let formatter = DateFormatter()
-            formatter.setTemplate(.date, .jaJP)
-            return formatter.string(from: updateTime.dateValue())
-        } else {
-            return "???"
-        }
-    }
+//    var createTime: String {
+//        if let createTime = item.createTime {
+//            let formatter = DateFormatter()
+//            formatter.setTemplate(.date, .jaJP)
+//            return formatter.string(from: createTime.dateValue())
+//        } else {
+//            return "???"
+//        }
+//    }
+//    var updateTime: String {
+//        if let updateTime = item.updateTime {
+//            let formatter = DateFormatter()
+//            formatter.setTemplate(.date, .jaJP)
+//            return formatter.string(from: updateTime.dateValue())
+//        } else {
+//            return "???"
+//        }
+//    }
 
     var body: some View {
 
@@ -43,8 +43,8 @@ struct ItemDetailData: View {
                 .padding(.bottom, 12)
 
             // NOTE: 下記二つの要素にはTimestampによる登録日が記述されます
-            Text("登録日　　:　　 \(createTime)")
-            Text("最終更新　:　　 \(updateTime)")
+            Text("登録日　　:　　 \(item.createTime.toStringWithCurrentLocale())")
+            Text("最終更新　:　　 \(item.updateTime.toStringWithCurrentLocale())")
 
         } // VStack
         .font(.callout)

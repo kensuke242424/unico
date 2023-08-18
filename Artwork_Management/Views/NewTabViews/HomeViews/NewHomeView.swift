@@ -33,9 +33,10 @@ struct NewHomeView: View {
 
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
-    @EnvironmentObject var homeVM: HomeViewModel
     @EnvironmentObject var backgroundVM: BackgroundViewModel
+
     @StateObject var itemVM: ItemViewModel
+    @StateObject var homeVM: HomeViewModel
 
     /// Tab親Viewから受け取った状態変数群
     @Binding var inputTab: InputTab
@@ -114,12 +115,11 @@ struct NewHomeView: View {
             } // VStack
             /// 保存しているユーザーのHomeパーツ設定をViewプロパティに代入
             .onAppear {
-                let currentTeamIndex = userVM.getCurrentTeamIndex()
-                guard let user = userVM.user else { return }
-                guard let getIndex = currentTeamIndex else { return }
+                let currentJoinsIndex = userVM.getCurrentJoinsIndex()
+                guard let getIndex = currentJoinsIndex else { return }
 
-                nowTime = user.joins[getIndex].homeEdits.nowTime
-                teamNews = user.joins[getIndex].homeEdits.teamNews
+                nowTime = userVM.joins[getIndex].homeEdits.nowTime
+                teamNews = userVM.joins[getIndex].homeEdits.teamNews
             }
             /// Homeパーツのロングプレスを検知し、親ビューにステートを知らせる
             .frame(width: size.width, height: size.height)
@@ -168,10 +168,13 @@ struct NewHomeView: View {
                             }
 
                             Button {
-                                userVM.updateCurrentTeamHomeEdits(data: HomePartsEditData(nowTime: nowTime,
-                                                                                   teamNews: teamNews))
-                                withAnimation(.spring(response: 0.7, blendDuration: 1)) {
-                                    homeVM.isActiveEdit = false
+                                Task {
+                                    let editedData = HomeEditData(nowTime: nowTime, teamNews: teamNews)
+                                    try await userVM.updateHomeEdits(data: editedData)
+
+                                    withAnimation(.spring(response: 0.7, blendDuration: 1)) {
+                                        homeVM.isActiveEdit = false
+                                    }
                                 }
                             } label: {
                                 Circle()
@@ -187,13 +190,12 @@ struct NewHomeView: View {
                         }
 
                         Button {
-                            let currentTeamIndex = userVM.getCurrentTeamIndex()
-                            guard let user = userVM.user else { return }
-                            guard let getIndex = currentTeamIndex else { return }
+                            let currentJoinsIndex = userVM.getCurrentJoinsIndex()
+                            guard let getIndex = currentJoinsIndex else { return }
 
                             withAnimation(.spring(response: 0.7, blendDuration: 1)) {
-                                nowTime = user.joins[getIndex].homeEdits.nowTime
-                                teamNews = user.joins[getIndex].homeEdits.teamNews
+                                nowTime = userVM.joins[getIndex].homeEdits.nowTime
+                                teamNews = userVM.joins[getIndex].homeEdits.teamNews
                                 homeVM.isActiveEdit = false
                             }
                         } label: {
@@ -318,7 +320,7 @@ struct NewHomeView: View {
                             .opacity(0.8)
 
                         // Team members Icon...
-                        teamMembersIcon(members: teamVM.team!.members)
+                        TeamMembersIcon(members: teamVM.members)
                     }
                     .offset(x: 20, y: 35)
                     .tracking(5)
@@ -354,24 +356,10 @@ struct NewHomeView: View {
         .position(x: homeSize.width - partsWidth / 2)
     }
     @ViewBuilder
-    func teamMembersIcon(members: [JoinMember]?) -> some View {
-        if let members {
-            Group {
-                if members.count <= 2 {
-                    HStack {
-                        ForEach(members, id: \.self) { member in
-                            AsyncImageCircleIcon(photoURL: member.iconURL, size: 30)
-                        }
-                    }
-                } else {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack {
-                            ForEach(members, id: \.self) { member in
-                                AsyncImageCircleIcon(photoURL: member.iconURL, size: 30)
-                            }
-                        }
-                    }.frame(width: 80)
-                }
+    func TeamMembersIcon(members: [JoinMember]) -> some View {
+        HStack(spacing: CGFloat(members.count - 1 * 10)) {
+            ForEach(members, id: \.self) { member in
+                AsyncImageCircleIcon(photoURL: member.iconURL, size: 30)
             }
         }
     }
@@ -421,19 +409,5 @@ fileprivate struct CustomizeHomePartsButtons: View {
             }
             .transition(AnyTransition.opacity.combined(with: .offset(y: 20)))
         } // if
-    }
-}
-
-struct HomeView_Previews: PreviewProvider {
-    static var previews: some View {
-        NewHomeView(itemVM: ItemViewModel(),
-                    inputTab: .constant(InputTab()))
-        .environmentObject(BackgroundViewModel())
-        .background {
-            Image("background_4")
-                .resizable()
-                .scaledToFill()
-                .ignoresSafeArea()
-        }
     }
 }

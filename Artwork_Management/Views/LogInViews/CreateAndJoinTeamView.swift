@@ -267,9 +267,11 @@ struct CreateAndJoinTeamView: View {
                         .offset(x: selectTeamFase == .fase2 || selectTeamFase == .check ? 0 :
                                     selectTeamFase == .start || selectTeamFase == .fase1 ? getRect().width : -getRect().width)
                     }
-
+                    /// 相手チームのチーム名とアイコンを表示するビューメソッド。
+                    /// 相手チームからの参加許可に検知時に、参加アナウンスとともに表示される。
                     if selectTeamFase == .success {
-                        joinedTeamIconAndName(image:croppedIconUIImage, name: joinedTeamData?.name)
+                        joinedTeamIconAndName(url:joinedTeamData?.iconURL,
+                                              name: joinedTeamData?.name)
                     }
                 } // ZStack
                 
@@ -289,7 +291,7 @@ struct CreateAndJoinTeamView: View {
                     .opacity(selectTeamFase == .start || selectTeamFase == .success ? 0 : 1)
                     .opacity(selectedTeamCard == .join && selectTeamFase == .fase2 ? 0 : 1)
                     .disabled(selectedTeamCard == .start || selectTeamFase == .success ? true : false)
-                    .disabled(selectedTeamCard == .join && userVM.isAnonymous ? true : false)
+//                    .disabled(selectedTeamCard == .join && userVM.isAnonymous ? true : false) // 匿名は使えない
                     .padding(.top, 30)
                 }
                 
@@ -309,7 +311,7 @@ struct CreateAndJoinTeamView: View {
             .offset(y: 30)
             .opacity(selectTeamFase == .start ? 0.0 : 1.0)
 
-            
+
 
             // Go back login flow Button...
             Button {
@@ -346,19 +348,22 @@ struct CreateAndJoinTeamView: View {
                 Text("チーム追加をやめて戻りますか？")
             } // alert
         } // ZStack
+        .overlay {
+            if userVM.showJoinedTeamInformation {
+                JoinedTeamInformationView(presented: $userVM.showJoinedTeamInformation)
+                    .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
+            }
+        }
+        // 新規チームへの加入が検知されたら、新規加入報告ビューを表示
+        .task(id: userVM.newJoinedTeam) {
+            if logInVM.rootNavigation != .join { return }
+            guard let _ = userVM.newJoinedTeam else { return }
 
-        // 「チームに参加」により、相手から承認を受け、チーム情報を受け取ることでリスナーが変更を検知し、作動する
-        // 受け取ったチームの情報をもとに、ログインを行う
-        .onChange(of: userVM.updatedUser) { _ in
-            print("=========user情報の更新を検知=========")
-            if selectedTeamCard == .join {
-                guard let user = userVM.user else { return }
-                for joinTeam in user.joins where joinTeam.teamID == user.lastLogIn {
-                    self.joinedTeamData = joinTeam
-                }
-                withAnimation(.spring(response: 1.5, blendDuration: 1)) { selectTeamFase = .success }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                    withAnimation(.spring(response: 0.5)) { logInVM.rootNavigation = .fetch }
+            print("=========他チームからのチーム加入承諾を検知=========")
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                withAnimation {
+                    userVM.showJoinedTeamInformation = true
+                    hapticSuccessNotification()
                 }
             }
         }
@@ -380,7 +385,7 @@ struct CreateAndJoinTeamView: View {
                         
                         // 背景、アイコン画像をリサイズして保存していく
                         let createTeamID = UUID().uuidString
-                        var iconImageContainer      : UIImage?
+                        var iconImageContainer: UIImage?
                         var backgroundContainer: Background = backgroundVM.sampleBackground
 
                         // アイコン画像が入力されていれば、リサイズ処理をしてコンテナに格納
@@ -389,23 +394,17 @@ struct CreateAndJoinTeamView: View {
                                                                     width: 60)
                         }
                         /// 準備したチームアイコン&背景画像をFirestorageに保存
-                        let uplaodIconImageData       = await teamVM.firstUploadTeamImage(iconImageContainer,
-                                                                                          id: createTeamID)
+                        let uplaodIconImageData = await teamVM.firstUploadTeamImage(iconImageContainer,
+                                                                                    id: createTeamID)
                         
-                        // チームデータに格納するログインユーザのユーザデータ
-                        let joinMember = JoinMember(memberUID: user.id,
-                                                    name     : user.name,
-                                                    iconURL  : user.iconURL)
-                        
-                        let teamData = Team(id: createTeamID,
+                        let teamData = Team(id            : createTeamID,
                                             name          : inputTeamName,
                                             iconURL       : uplaodIconImageData.url,
                                             iconPath      : uplaodIconImageData.filePath,
                                             backgroundURL : backgroundContainer.imageURL,
-                                            backgroundPath: backgroundContainer.imagePath,
-                                            members       : [joinMember])
+                                            backgroundPath: backgroundContainer.imagePath)
                         
-                        let joinTeamData = JoinTeam(teamID : createTeamID,
+                        let joinTeamData = JoinTeam(id : createTeamID,
                                                     name   : inputTeamName,
                                                     iconURL: uplaodIconImageData.url,
                                                     currentBackground: backgroundContainer)
@@ -413,10 +412,12 @@ struct CreateAndJoinTeamView: View {
                         // 作成or参加したチームをView表示する用のプロパティ
                         self.joinedTeamData = joinTeamData
                         
-                        try await teamVM.addTeam(teamData: teamData)
-                        try await userVM.addNewJoinTeam(newJoinTeam: joinTeamData)
+                        try await teamVM.addNewTeam(team: teamData)
+                        try await teamVM.addFirstMemberToFirestore(teamId: teamData.id, data: user)
+                        try await userVM.addNewJoinTeam(data: joinTeamData)
+                        try await userVM.updateLastLogInTeam(teamId: teamData.id)
                             await teamVM.setSampleItem(teamID: teamData.id)
-                            tagVM.addTag(tagData: tagVM.sampleTag, teamID: teamData.id)
+                            await tagVM.setSampleTag(teamID: teamData.id)
 
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                             withAnimation(.spring(response: 1)) {
@@ -452,6 +453,11 @@ struct CreateAndJoinTeamView: View {
         }
 
         .onAppear {
+
+            Task {
+                try await userVM.joinsListener() // ← チームからの加入許可をリスニングするために必要
+            }
+
             // currentUserのuidをQRコードに変換
             userQRCodeImage = logInVM.generateUserQRCode(with: userVM.uid ?? "")
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
@@ -461,7 +467,9 @@ struct CreateAndJoinTeamView: View {
             }
         }
     }
-
+    /// 他チーム参加フェーズの選択を管理するカード型のビュー。
+    /// ユーザーが匿名アカウントの場合は、カード上にアカウント登録ボタンを表示し、
+    /// カードを選択できない状態になる。
     @ViewBuilder
     func joinTeamCardView() -> some View {
         ZStack {
@@ -532,7 +540,8 @@ struct CreateAndJoinTeamView: View {
                 .opacity(selectedTeamCard == .start ? 0.7 : 0.0)
         }
     }
-
+    /// チーム新規作成フェーズの選択を管理するカード型のビュー。
+    @ViewBuilder
     func createTeamCardView() -> some View {
         ZStack {
             BlurView(style: .systemUltraThinMaterialDark)
@@ -565,7 +574,9 @@ struct CreateAndJoinTeamView: View {
                 .opacity(selectedTeamCard == .start ? 0.7 : 0.0)
         }
     }
-
+    /// 新規作成したチームのチーム名とアイコンを表示するビュー。
+    /// 作成完了のアナウンスとともに、チーム部屋ログインの直前に表示される。
+    @ViewBuilder
     func createTeamIconAndName() -> some View {
         Group {
             VStack(spacing: 40) {
@@ -601,13 +612,15 @@ struct CreateAndJoinTeamView: View {
             }
         }
     }
-
-    func joinedTeamIconAndName(image iconUIImage: UIImage?, name teamName: String?) -> some View {
+    /// 相手チームのチーム名とアイコンを表示するビューメソッド。
+    /// 相手チームからの参加許可に検知時に、参加アナウンスとともに表示される。
+    @ViewBuilder
+    func joinedTeamIconAndName(url iconImageURL: URL?, name teamName: String?) -> some View {
         Group {
             VStack(spacing: 40) {
                 Group {
-                    if let iconUIImage {
-                        UIImageCircleIcon(photoImage: iconUIImage, size: 150)
+                    if let iconImageURL {
+                        SDWebImageCircleIcon(imageURL: iconImageURL, width: 150, height: 150)
                     } else {
                         CubeCircleIcon(size: 150)
                     }

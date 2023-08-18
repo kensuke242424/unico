@@ -58,16 +58,21 @@ struct InputTab {
 struct NewTabView: View {
     
     @EnvironmentObject var navigationVM: NavigationViewModel
+    @EnvironmentObject var notificationVM: NotificationViewModel
     @EnvironmentObject var logInVM: LogInViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var tagVM : TagViewModel
-    @EnvironmentObject var homeVM: HomeViewModel
     @EnvironmentObject var backgroundVM: BackgroundViewModel
+
+    @EnvironmentObject var logVM: LogViewModel
+    @EnvironmentObject var momentLogVM: MomentLogViewModel
 
     @StateObject var itemVM: ItemViewModel
     @StateObject var cartVM: CartViewModel
-    
+
+    @StateObject var homeVM = HomeViewModel()
+
     /// View Properties
     @State private var inputTab = InputTab()
 
@@ -79,7 +84,7 @@ struct NewTabView: View {
             let size = $0.size
             
             NavigationStack(path: $navigationVM.path) {
-                
+
                 VStack {
                     TabTopBarView()
                         .blur(radius: backgroundVM.checkMode ||
@@ -88,7 +93,7 @@ struct NewTabView: View {
                     Spacer(minLength: 0)
                     
                     TabView(selection: $inputTab.selectionTab) {
-                        NewHomeView(itemVM: itemVM, inputTab: $inputTab)
+                        NewHomeView(itemVM: itemVM, homeVM: homeVM, inputTab: $inputTab)
                             .tag(Tab.home)
 
                         NewItemsView(itemVM: itemVM,  cartVM: cartVM, inputTab: $inputTab)
@@ -104,6 +109,19 @@ struct NewTabView: View {
                 .sheet(isPresented: $backgroundVM.showPicker) {
                     PHPickerView(captureImage: $backgroundVM.croppedUIImage,
                                  isShowSheet : $backgroundVM.showPicker)
+                }
+                /// 新規チームへの加入が検知されたら、新規加入報告ビューを表示
+                .task(id: userVM.newJoinedTeam) {
+                    if logInVM.rootNavigation == .join { return }
+                    guard let _ = userVM.newJoinedTeam else { return }
+
+                    print("=========他チームからのチーム加入承諾を検知=========")
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                        withAnimation {
+                            userVM.showJoinedTeamInformation = true
+                            hapticSuccessNotification()
+                        }
+                    }
                 }
                 /// TabViewに紐づけているプロパティをアニメーションのトリガーとして使えないため
                 ///  タブのステートとタブ切り替えによるアニメーションのステートを切り分けている
@@ -138,8 +156,10 @@ struct NewTabView: View {
                             // タブのスワイプ遷移時と背景へのblurが重なると、動作が重くなる
                             // オーバーレイでブラー処理済み背景を重ねる
                             .overlay {
-                                BlurMaskingImageView(imageURL: userVM.currentTeamBackground?.imageURL)
-                                    .opacity(inputTab.animationTab == .item ? 1 : 0)
+                                BlurMaskingImageView(
+                                    imageURL: backgroundVM.selectBackground?.imageURL ??
+                                    userVM.currentTeamBackground?.imageURL)
+                                .opacity(inputTab.animationTab == .item ? 1 : 0)
                             }
                             .overlay {
                                 if homeVM.isActiveEdit {
@@ -177,7 +197,7 @@ struct NewTabView: View {
                                 }
                             })
                     }
-                    SystemSideMenu(itemVM: itemVM, inputTab: $inputTab)
+                    SystemSideMenu(itemVM: itemVM, homeVM: homeVM, inputTab: $inputTab)
                         .offset(x: inputTab.showSideMenu ? 0 : -size.width)
                 }
                 /// 🏷タグの追加や編集を行うView
@@ -191,22 +211,25 @@ struct NewTabView: View {
                         .transition(AnyTransition.opacity.combined(with: .offset(y: 50)))
                     }
                 }
-                /// チームへの招待View
+                /// チーム招待、チーム編集、ユーザー編集関連のView
                 .overlay {
-                    if teamVM.isShowSearchedNewMemberJoinTeam {
-                        JoinUserDetectCheckView(teamVM: teamVM)
-                            .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
-                    }
-                }
-                /// チームorユーザー情報の編集View
-                .overlay {
-                    if inputTab.showUpdateTeam {
-                        UpdateTeamDataView(show: $inputTab.showUpdateTeam)
-                            .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
-                    }
-                    if inputTab.showUpdateUser {
-                        UpdateUserDataView(show: $inputTab.showUpdateUser)
-                            .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
+                    Group {
+                        if teamVM.isShowSearchedNewMemberJoinTeam {
+                            JoinUserDetectCheckView(teamVM: teamVM)
+                                .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
+                        }
+                        if inputTab.showUpdateTeam {
+                            UpdateTeamDataView(show: $inputTab.showUpdateTeam)
+                                .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
+                        }
+                        if inputTab.showUpdateUser {
+                            UpdateUserDataView(show: $inputTab.showUpdateUser)
+                                .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
+                        }
+                        if userVM.showJoinedTeamInformation {
+                            JoinedTeamInformationView(presented: $userVM.showJoinedTeamInformation)
+                                .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
+                        }
                     }
                 }
                 // お試しアカウントユーザーに本登録のインフォメーションを表示するView
@@ -216,6 +239,13 @@ struct NewTabView: View {
                     }
                 }
                 .ignoresSafeArea()
+                /// カスタム通知ビュー
+                .overlay {
+                    Group {
+                        NotificationView()
+                        MomentLogView()
+                    }
+                }
                 .navigationDestination(for: SystemPath.self) { systemPath in
                     switch systemPath {
                     case .root:
@@ -279,6 +309,8 @@ struct NewTabView: View {
                         Spacer()
                         Button(
                             action: {
+                                inputTab.showCart = .hidden
+                                inputTab.showCommerce = .hidden
                                 cartVM.resetCart()
                             },
                             label: {
@@ -329,12 +361,16 @@ struct NewTabView: View {
         // 🧺決済リザルトのシート画面
         .resizableSheet($inputTab.showCommerce, id: "B") {builder in
             builder.content { _ in
-                
+
                 CommerceSheet(cartVM: cartVM,
                               inputTab: $inputTab,
-                              teamID: teamVM.team!.id,
+                              teamID: teamVM.team?.id ?? "",
                               memberColor: userVM.memberColor)
-                
+                // MEMO: resizableSheet内でEnvironmentObjectを使うには
+                // 再度参照を渡す必要がある↓
+                .environmentObject(logVM)
+                .environmentObject(teamVM)
+                .environmentObject(userVM)
             } // builder.content
             .supportedState([.medium])
             .sheetBackground { _ in
@@ -345,24 +381,36 @@ struct NewTabView: View {
                 EmptyView()
             }
         }
+        /// カートの状態を監視し、アイテムが入ったらカートビューを表示する。
         .onChange(of: cartVM.resultCartAmount) {
             [beforeCart = cartVM.resultCartAmount] afterCart in
             
             if beforeCart == 0 {
-                print("カートにアイテム追加を検知。シートを表示")
                 inputTab.showCommerce = .medium
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                     inputTab.showCart = .medium
                 }
             }
-            if afterCart == 0 {
-                print("カートアイテムが空になったのを検知。シートを閉じる")
+        }
+        /// カートの精算実行を監視する
+        .onChange(of: cartVM.doCommerce) { doCommerce in
+            if doCommerce {
                 inputTab.showCart = .hidden
                 inputTab.showCommerce = .hidden
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    cartVM.resetCart()
+                }
             }
         }
+        /// 最後にログインしたチームのId「lastLogin」
         .onAppear {
             tagVM.setFirstActiveTag()
+            // 通知リスナーはタブビュー生成時にスタート
+            notificationVM.listener(id: userVM.user?.lastLogIn)
+        }
+        /// 現在のデータリスナー群をリセットする
+        .onDisappear {
+            removeListeners()
         }
     } // body
     @ViewBuilder
@@ -467,28 +515,14 @@ struct NewTabView: View {
         )
     }
 
-} // View
-
-struct NewTabView_Previews: PreviewProvider {
-
-    static var previews: some View {
-
-        var windowScene: UIWindowScene? {
-                    let scenes = UIApplication.shared.connectedScenes
-                    let windowScene = scenes.first as? UIWindowScene
-                    return windowScene
-                }
-        var resizableSheetCenter: ResizableSheetCenter? {
-                   windowScene.flatMap(ResizableSheetCenter.resolve(for:))
-               }
-
-        return NewTabView(itemVM: ItemViewModel(), cartVM: CartViewModel())
-            .environment(\.resizableSheetCenter, resizableSheetCenter)
-            .environmentObject(NavigationViewModel())
-            .environmentObject(LogInViewModel())
-            .environmentObject(TeamViewModel())
-            .environmentObject(UserViewModel())
-            .environmentObject(TagViewModel())
-            .environmentObject(BackgroundViewModel())
+    /// タブビューの破棄時に、現在のリスナーをデタッチするメソッド。
+    /// チーム変更時は、前チームへのリスナーをデタッチしておく必要がある。
+    /// userListenerだけは、参照ドキュメントは変化しないため、リスナーを残す
+    func removeListeners() {
+        userVM.removeListener()
+        teamVM.removeListener()
+        tagVM.removeListener()
+        itemVM.removeListener()
+        notificationVM.removeListener()
     }
-}
+} // View

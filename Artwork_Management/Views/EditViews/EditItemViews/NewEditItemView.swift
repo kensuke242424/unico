@@ -6,60 +6,9 @@
 //
 
 import SwiftUI
-
-enum InputFormsStatus: CaseIterable {
-    case name, author ,inventory , price, sales ,totalAmount ,totalInventory
-    
-    struct Model {
-        let title: String
-        let example: String
-    }
-    
-    var model: Model {
-        switch self {
-        case .name          : return .name
-        case .author        : return .author
-        case .inventory     : return .inventory
-        case .price         : return .price
-        case .sales         : return .sales
-        case .totalAmount   : return .totalAmount
-        case .totalInventory: return .totalInventory
-        }
-    }
-}
-
-extension InputFormsStatus.Model {
-    static let name = InputFormsStatus.Model(          title: "アイテム名", example: "unico")
-    static let author = InputFormsStatus.Model(        title: "製作者"   , example: "ユニコ 太郎")
-    static let inventory = InputFormsStatus.Model(     title: "在庫"     , example: "100")
-    static let price = InputFormsStatus.Model(         title: "価格"     , example: "1500")
-    static let sales = InputFormsStatus.Model(         title: "総売上"    , example: "100000")
-    static let totalAmount = InputFormsStatus.Model(   title: "総売個数"  , example: "150")
-    static let totalInventory = InputFormsStatus.Model(title: "総仕入れ"  , example: "300")
-}
-
-struct InputEditItem {
-    /// アイテムの入力ステータス群
-    var croppedImage    : UIImage? = nil
-    var selectionTag    : Tag?
-    var selectionTagName: String = ""
-    var name            : String = ""
-    var author          : String = ""
-    var photoURL        : URL? = nil
-    var photoPath       : String? = nil
-    var detail          : String = ""
-    var inventory       : String = ""
-    var cost            : String = ""
-    var price           : String = ""
-    var sales           : String = ""
-    var totalAmount     : String = ""
-    var totalInventory   : String = ""
-    
-    /// view表示のステートを管理する
-    var showPicker     : Bool = false
-    var showTagEdit    : Bool = false
-    var showProgress   : Bool = false
-}
+import Firebase
+import FirebaseFirestore
+import FirebaseFirestoreSwift
 
 struct NewEditItemView: View {
     
@@ -68,7 +17,9 @@ struct NewEditItemView: View {
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var tagVM : TagViewModel
-    @StateObject var itemVM      : ItemViewModel
+    @EnvironmentObject var logVM : LogViewModel
+
+    @StateObject var itemVM: ItemViewModel
     
     @State private var input: InputEditItem = InputEditItem()
     
@@ -107,7 +58,7 @@ struct NewEditItemView: View {
                                 focused = nil; detailFocused = nil
                             }
                         } else if let passItemImageURL = input.photoURL {
-                            SDWebImageView(imageURL: passItemImageURL,
+                            SDWebImageToItem(imageURL: passItemImageURL,
                                               width: cardWidth,
                                               height: cardHeight)
                             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
@@ -257,7 +208,7 @@ struct NewEditItemView: View {
         .background {
             GeometryReader {
                 let size = $0.size
-                SDWebImageView(imageURL : userVM.currentTeamBackground?.imageURL,
+                SDWebImageToItem(imageURL : userVM.currentTeamBackground?.imageURL,
                                width : size.width,
                                height: size.height)
                     .opacity(0.1)
@@ -294,7 +245,7 @@ struct NewEditItemView: View {
                 input.sales            = passItem.sales != 0 ? String(passItem.sales) : ""
                 input.detail           = passItem.detail != "メモなし" ? passItem.detail : ""
                 input.totalAmount      = passItem.totalAmount != 0 ? String(passItem.totalAmount) : ""
-                input.totalInventory    = passItem.totalInventory != 0 ? String(passItem.totalInventory) : ""
+                input.totalInventory   = passItem.totalInventory != 0 ? String(passItem.totalInventory) : ""
             } else {
                 let filterTags = tagVM.tags.filter({ $0.tagName != "全て" })
                 input.selectionTag = filterTags.first
@@ -312,48 +263,48 @@ struct NewEditItemView: View {
             /// ✅ 追加 or 更新ボタン
             .overlay(alignment: .trailing) {
                 Button {
-                    /// passItemにデータがある -> update Item
-                    /// passItemにデータがない -> add item
-                    if let passItem {
 
+                    if let passItem {
+                        /// 🍎------------アイテム更新--------------🍎
                         Task {
-                            guard let defaultDataID = passItem.id else { return }
+
+                            guard let passItemId = passItem.id else { return }
                             guard let teamID = teamVM.team?.id else { return }
                             let editInventory = Int(input.inventory) ?? 0
 
                             // croppedImageに新しい画像があれば、元の画像データを更新
                             if let croppedImage = input.croppedImage {
                                 withAnimation(.easeIn(duration: 0.1)) { input.showProgress = true }
-                                itemVM.deleteImage(path: input.photoPath)
                                 let resizedImage = itemVM.resizeUIImage(image: croppedImage,
                                                                         width: width * 2)
-                                let newImageData =  await itemVM.uploadItemImage(resizedImage, teamID)
-                                input.photoURL = newImageData.url
-                                input.photoPath = newImageData.filePath
+                                let uploadImageData =  await itemVM.uploadItemImage(resizedImage, teamID)
+                                input.photoURL = uploadImageData.url
+                                input.photoPath = uploadImageData.filePath
                             }
 
-                            // NOTE: アイテムを更新
-                            let updateItemData = (Item(createTime : passItem.createTime,
-                                                       updateTime : nil,
-                                                       tag        : input.selectionTagName,
-                                                       teamID     : teamVM.team!.id,
-                                                       name       : input.name,
-                                                       author     : input.author,
-                                                       detail     : input.detail != "" ? input.detail : "メモなし",
-                                                       photoURL   : input.photoURL,
-                                                       photoPath  : input.photoPath,
-                                                       favorite   : false,
-                                                       cost       : Int( input.cost) ?? 0,
-                                                       price      : Int(input.price) ?? 0,
-                                                       amount     : 0,
-                                                       sales      : Int(input.sales) ?? 0,
-                                                       inventory  : editInventory,
-                                                       totalAmount: passItem.totalAmount,
-                                                       totalInventory: passItem.inventory < editInventory ?
-                                                       passItem.totalInventory + (editInventory - passItem.inventory) :
+                            // NOTE: Timestamp値がnilだと、データの保存&サーバー側でタイムスタンプで2回の更新が走るようだ
+                            let updatedItem = (Item(id: passItemId,
+                                                    createTime : passItem.createTime,
+                                                    updateTime : Date(),
+                                                    tag        : input.selectionTagName,
+                                                    teamID     : teamVM.team!.id,
+                                                    name       : input.name.isEmpty ? "No Name" : input.name,
+                                                    author     : input.author,
+                                                    detail     : input.detail != "" ? input.detail : "メモなし",
+                                                    photoURL   : input.photoURL,
+                                                    photoPath  : input.photoPath,
+                                                    favorite   : false,
+                                                    cost       : Int( input.cost) ?? 0,
+                                                    price      : Int(input.price) ?? 0,
+                                                    amount     : 0,
+                                                    sales      : Int(input.sales) ?? 0,
+                                                    inventory  : editInventory,
+                                                    totalAmount: passItem.totalAmount,
+                                                    totalInventory: passItem.inventory < editInventory ?
+                                                    passItem.totalInventory + (editInventory - passItem.inventory) :
                                                         passItem.totalInventory - (passItem.inventory - editInventory) ))
 
-                            itemVM.updateItem(updateData: updateItemData, defaultDataID: defaultDataID, teamID: teamVM.team!.id)
+                            itemVM.updateItemToFirestore(updatedItem)
                             /// 編集アイテムの新規タグ設定とアイテムタブビュー内の選択タグを合わせる
                             /// 編集画面から戻った時、アイテムカードが適切にアニメーションするために必要
                             if tagVM.activeTag != tagVM.tags.first {
@@ -362,52 +313,59 @@ struct NewEditItemView: View {
                             withAnimation(.easeIn(duration: 0.1)) {
                                 input.showProgress = false
                             }
+
+                            /// 通知データの作成
+                            let compareItemData = CompareItem(id: passItemId,
+                                                              before: passItem,
+                                                              after: updatedItem)
+                            logVM.addLog(to: teamVM.team,
+                                         by: userVM.user,
+                                         type: .updateItem(compareItemData))
                             dismiss()
+
                         } // Task(update Item)
                         
                     } else {
-                        
+                        /// 🍎------------アイテム追加--------------🍎
                         Task {
                             guard let teamID = teamVM.team?.id else { return }
                             
                             // croppedImageに新しい画像があれば、元の画像データを更新
                             if let croppedImage = input.croppedImage {
                                 withAnimation(.easeIn(duration: 0.1)) { input.showProgress = true }
-                                itemVM.deleteImage(path: input.photoPath)
                                 let resizedImage = itemVM.resizeUIImage(image: croppedImage, width: width)
                                 let newImageData =  await itemVM.uploadItemImage(resizedImage, teamID)
                                 input.photoURL = newImageData.url
                                 input.photoPath = newImageData.filePath
                             }
                             
-                            let itemData = Item(tag           : input.selectionTagName,
-                                                    teamID        : teamVM.team!.id,
-                                                    name          : input.name,
-                                                    author        : input.author,
-                                                    detail        : input.detail != "" ? input.detail : "メモなし",
-                                                    photoURL      : input.photoURL,
-                                                    photoPath     : input.photoPath,
-                                                    favorite      : false,
-                                                    cost          : 0,
-                                                    price         : Int(input.price) ?? 0,
-                                                    amount        : 0,
-                                                    sales         : 0,
-                                                    inventory     : Int(input.inventory) ??  0,
-                                                    totalAmount   : 0,
-                                                    totalInventory: Int(input.inventory) ?? 0)
+                            let newItem = Item(tag           : input.selectionTagName,
+                                               teamID        : teamID,
+                                               name          : input.name.isEmpty ? "No Name" : input.name,
+                                               author        : input.author,
+                                               detail        : input.detail != "" ? input.detail : "メモなし",
+                                               photoURL      : input.photoURL,
+                                               photoPath     : input.photoPath,
+                                               favorite      : false,
+                                               cost          : 0,
+                                               price         : Int(input.price) ?? 0,
+                                               amount        : 0,
+                                               sales         : 0,
+                                               inventory     : Int(input.inventory) ??  0,
+                                               totalAmount   : 0,
+                                               totalInventory: Int(input.inventory) ?? 0)
                             
                             // Firestoreにコーダブル保存
-                            itemVM.addItem(itemData: itemData,
-                                           tag: input.selectionTag?.tagName ?? "未グループ",
-                                           teamID: teamVM.team!.id)
-                            /// 編集アイテムの新規タグ設定とアイテムタブビュー内の選択タグを合わせる
-                            /// 編集画面から戻った時、アイテムカードが適切にアニメーションするために必要
+                            await itemVM.addItemToFirestore(newItem)
                             tagVM.setActiveTag(from: input.selectionTagName)
-                            
-                            withAnimation(.easeIn(duration: 0.1)) {
-                                input.showProgress = false
-                            }
+
+                            logVM.addLog(to: teamVM.team,
+                                         by: userVM.user,
+                                         type: .addItem(newItem))
+
+                            withAnimation(.easeIn(duration: 0.1)) { input.showProgress = false }
                             dismiss()
+
                         } // Task(add Item)
                     } // if let passItem
                         
@@ -428,7 +386,9 @@ struct NewEditItemView: View {
                 .padding(.leading)
             }
     }
-    
+
+    /// アイテムの各データを入力するためのフィールド群。
+    /// 作成か編集かによって、表示フィールド数が変化する。
     @ViewBuilder
     func InputForm(_ size: CGSize,_ value: InputFormsStatus) -> some View {
         
@@ -446,7 +406,7 @@ struct NewEditItemView: View {
                         .fontWeight(.semibold)
                         .tracking(1)
                         .opacity(0.5)
-                    /// 空白部分タップでフォーカスをnilにするためのほぼ透明の範囲View
+                    // 空白部分タップでフォーカスをnilにするためのほぼ透明の範囲View
                     Color.gray
                         .opacity(0.001)
                 }
@@ -509,6 +469,60 @@ struct NewEditItemView: View {
             }
         }
     }
+}
+
+enum InputFormsStatus: CaseIterable {
+    case name, author ,inventory , price, sales ,totalAmount ,totalInventory
+
+    struct Model {
+        let title: String
+        let example: String
+    }
+
+    var model: Model {
+        switch self {
+        case .name          : return .name
+        case .author        : return .author
+        case .inventory     : return .inventory
+        case .price         : return .price
+        case .sales         : return .sales
+        case .totalAmount   : return .totalAmount
+        case .totalInventory: return .totalInventory
+        }
+    }
+}
+
+extension InputFormsStatus.Model {
+    static let name = InputFormsStatus.Model(          title: "アイテム名", example: "unico")
+    static let author = InputFormsStatus.Model(        title: "製作者"   , example: "ユニコ 太郎")
+    static let inventory = InputFormsStatus.Model(     title: "在庫"     , example: "100")
+    static let price = InputFormsStatus.Model(         title: "価格"     , example: "1500")
+    static let sales = InputFormsStatus.Model(         title: "総売上"    , example: "100000")
+    static let totalAmount = InputFormsStatus.Model(   title: "総売個数"  , example: "150")
+    static let totalInventory = InputFormsStatus.Model(title: "総仕入れ"  , example: "300")
+}
+
+struct InputEditItem {
+    /// アイテムの入力ステータス群
+    var croppedImage    : UIImage? = nil
+    var selectionTag    : Tag?
+    var selectionTagName: String = ""
+    var name            : String = ""
+    var author          : String = ""
+    var photoURL        : URL? = nil
+    var photoPath       : String? = nil
+    var detail          : String = ""
+    var inventory       : String = ""
+    var cost            : String = ""
+    var price           : String = ""
+    var sales           : String = ""
+    var totalAmount     : String = ""
+    var totalInventory   : String = ""
+
+    /// view表示のステートを管理する
+    var showPicker     : Bool = false
+    var showTagEdit    : Bool = false
+    var showProgress   : Bool = false
 }
 
 struct NewEditItemView_Previews: PreviewProvider {

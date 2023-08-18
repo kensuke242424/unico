@@ -12,7 +12,7 @@ import FirebaseFirestore
 import FirebaseFirestoreSwift
 
 enum CustomError: Error {
-    case uidEmpty, getRef, fetch, setData, updateData, getDocument,getUserDocument, photoUrlEmpty, userEmpty, teamEmpty, getDetectUser, inputTextEmpty, memberDuplication, addTeamIDToJoinedUser, createAnonymous, existUserDocument, existAccountEmail, deleteAccount
+    case uidEmpty, getItemID, getRef, fetch, setData, updateData, getDocument,getUserDocument, photoUrlEmpty, userEmpty, teamEmpty, getDetectUser, inputTextEmpty, memberDuplication, addTeamIDToJoinedUser, createAnonymous, existUserDocument, existAccountEmail, deleteAccount
 }
 
 class UserViewModel: ObservableObject {
@@ -22,132 +22,235 @@ class UserViewModel: ObservableObject {
         isAnonymousCheck()
     }
 
-    var listener: ListenerRegistration?
+    var userListener: ListenerRegistration?
+    var joinsListener: ListenerRegistration?
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
     var uid: String? { return Auth.auth().currentUser?.uid }
+
+    @Published var user: User?
+    @Published var joins: [JoinTeam] = []
+
+    /// 新規加入チームのjoinTeamデータを保持するプロパティ。
+    /// リスナーが受け取ったjoinTeamのapprovedがfalseだと、
+    /// このプロパティにデータが格納される。
+    /// 加入通知をユーザーが確認した時点で、approvedはtrueとなる。
+    @Published var newJoinedTeam: JoinTeam?
+    @Published var showJoinedTeamInformation: Bool = false
+
     var memberColor: ThemeColor {
         return user?.userColor ?? ThemeColor.blue
     }
-    var currentTeamIndex: Int? {
-        let index = getCurrentTeamIndex()
+    var currentJoinsIndex: Int? {
+        let index = self.joins.firstIndex(where: { $0.id == user?.lastLogIn })
         return index
     }
     /// ユーザーが現在操作しているチームの背景データ
     var currentTeamBackground: Background? {
-        return user?.joins[currentTeamIndex ?? 0].currentBackground
+        guard let index = currentJoinsIndex else { return nil }
+        let container = self.joins[index].currentBackground
+        return container
+    }
+    var currentJoinTeam: JoinTeam? {
+        guard let index = currentJoinsIndex else { return nil }
+        return self.joins[index]
+    }
+    /// 自身が所属している全てのチームのチームIDを格納するプロパティ。
+    var joinsId: [String] {
+        return self.joins.compactMap { $0.id }
     }
 
-    @Published var user: User?
     @Published var isAnonymous: Bool = false
     @Published var showAlert = false
     @Published var userErrorMessage = ""
-    @Published var updatedUser: Bool = false
 
+    /// 自身のユーザードキュメントを取得するメソッド。
     @MainActor
     func fetchUser() async throws {
-        guard let uid = uid else { throw CustomError.uidEmpty }
-        guard let userRef = db?.collection("users").document(uid) else { throw CustomError.getRef }
+        guard let uid else { throw CustomError.uidEmpty }
+        let userRef = db?
+            .collection("users")
+            .document(uid)
 
         do {
-            let document = try await userRef.getDocument(source: .default)
-            let user = try document.data(as: User.self)
+            let document = try await userRef?.getDocument(source: .default)
+            let user = try await document?.data(as: User.self)
             self.user = user
         } catch {
-            throw CustomError.getUserDocument
+            throw UserRelatedError.failedFetchAddedNewUser
         }
     }
-    
+
+    /// 自身の所属するチームデータ「joins」を取得するメソッド。
+    @MainActor
+    func fetchJoinTeams() async throws {
+        guard let uid else { throw CustomError.uidEmpty }
+
+        do {
+            let snapshot = try await db?
+                .collection("users")
+                .document(uid)
+                .collection("joins")
+                .getDocuments(source: .default)
+
+            guard let documents = snapshot?.documents else {
+                throw UserRelatedError.missingSnapshot
+            }
+
+            for document in documents {
+                let joinTeam = try document.data(as: JoinTeam.self)
+
+                self.joins.append(joinTeam)
+            }
+        } catch {
+            print("ERROR: JoinTeam取得失敗")
+            return
+        }
+    }
+
+    /// ユーザーのアカウントステートを返すメソッド。
     func isAnonymousCheck() {
         
         if let user = Auth.auth().currentUser, user.isAnonymous {
-            print("アカウント: Anonymous")
             self.isAnonymous = true
         } else {
-            print("アカウント: Not Anonymous")
             self.isAnonymous = false
         }
     }
 
-    func userRealtimeListener() async throws {
-        guard let uid = uid else { throw CustomError.uidEmpty }
-        guard let userRef = db?.collection("users").document(uid) else { throw CustomError.getRef }
-        listener = userRef.addSnapshotListener { snap, error in
-            if let error {
-                print("userRealtimeListener失敗: \(error.localizedDescription)")
-            } else {
-                guard let snap else {
-                    print("userRealtimeListener_Error: snapがnilです")
+    /// ユーザーデータの更新をリスニングするスナップショットリスナー。
+    func userListener() async throws {
+        guard let uid else { throw UserRelatedError.uidEmpty }
+
+        userListener = db?
+            .collection("users")
+            .document(uid)
+            .addSnapshotListener { snap, error in
+                if let error {
+                    print("ERROR: \(error.localizedDescription)")
                     return
                 }
 
-                withAnimation {
-                    do {
-                        let userData = try snap.data(as: User.self)
-                        self.user = userData
+                do {
+                    let userData = try snap?.data(as: User.self)
+
+                    withAnimation {
+                            self.user = userData
                         DispatchQueue.main.async {
                             self.isAnonymousCheck()
-                            self.updatedUser.toggle()
                         }
-                    } catch {
-                        print("userRealtimeListener_Error: try snap?.data(as: User.self)")
+                    }
+                } catch {
+                    print("ERROR: ユーザーデータのリスナー失敗")
+                    return
+                }
+            }
+    }
+
+    /// 参加チームデータ群「joins」の更新をリスニングするスナップショットリスナー。
+    func joinsListener() async throws {
+        guard let uid else { throw UserRelatedError.uidEmpty }
+
+        joinsListener = db?
+            .collection("users")
+            .document(uid)
+            .collection("joins")
+            .addSnapshotListener { snap, error in
+            if let error {
+                print("ERROR: \(error.localizedDescription)")
+                return
+            }
+            guard let documents = snap?.documents else {
+                print("ERROR: snap_nil")
+                return
+            }
+
+            do {
+                DispatchQueue.main.async {
+                    self.joins = documents.compactMap {
+
+                        let getJoinTeam = try? $0.data(as: JoinTeam.self)
+
+                        // 取得したデータのapprovedがfalseなら、相手から承認を受けた新規加入チーム
+                        if let approved = getJoinTeam?.approved, !approved {
+                            self.newJoinedTeam = getJoinTeam
+                        }
+
+                        return getJoinTeam
                     }
                 }
             }
         }
     }
     
-    func updateLastLogInTeam(selected selectedTeam: JoinTeam?) async {
-        guard var user else { return }
-        guard let selectedTeam else { return }
-        guard let userRef = db?.collection("users").document(user.id) else { return }
+    func updateLastLogInTeam(teamId: String?) async throws {
+        guard var user, let teamId else { throw UserRelatedError.missingData }
+
+        user.lastLogIn = teamId
+
         do {
-            user.lastLogIn = selectedTeam.teamID
-            _ = try userRef.setData(from: user)
+            try db?
+                .collection("users")
+                .document(user.id)
+                .setData(from: user)
         } catch {
-            print("最新ログインチームのFirestoreへの保存に失敗しました")
-            return
+            throw UserRelatedError.failedUpdateLastLogIn
         }
     }
 
     /// 参加チーム群の配列から現在操作しているチームのインデックスを取得するメソッド
-    func getCurrentTeamIndex() -> Int? {
+    func getCurrentJoinsIndex() -> Int? {
         guard let user else { return nil }
         var getIndex: Int?
 
-        getIndex = user.joins.firstIndex(where: { $0.teamID == user.lastLogIn })
+        getIndex = self.joins.firstIndex(where: { $0.id == user.lastLogIn })
         return getIndex
     }
 
     func getCurrentTeamMyBackgrounds() -> [Background] {
-        guard let user else { return [] }
-        let myBackgrounds = user.joins[currentTeamIndex ?? 0].myBackgrounds
+        let myBackgrounds = self.joins[currentJoinsIndex ?? 0].myBackgrounds
         return myBackgrounds
     }
 
     /// Homeのパーツ編集設定をFirestoreのドキュメントに保存するメソッド
     /// 現在操作しているチームのJoinTeamデータモデルに保存される
-    func updateCurrentTeamHomeEdits(data EditsData: HomePartsEditData) {
-        guard var user = user else { return }
-        guard let userRef = db?.collection("users").document(user.id) else { return }
+    func updateHomeEdits(data EditedData: HomeEditData) async throws {
+        guard let uid else { return }
+
+        let currentIndex = getCurrentJoinsIndex()
+        guard let currentIndex else { return }
+        var myJoinTeam = self.joins[currentIndex]
+
+        // Homeエディットデータを更新
+        myJoinTeam.homeEdits = EditedData
 
         do {
-            let currentTeamIndex = getCurrentTeamIndex()
-            guard let currentTeamIndex else { return }
-            user.joins[currentTeamIndex].homeEdits = EditsData
-            try userRef.setData(from: user)
+            try db?
+                .collection("users")
+                .document(uid)
+                .collection("joins")
+                .document(myJoinTeam.id)
+                .setData(from: myJoinTeam)
         } catch {
-            print("ERROR: Homeパーツ設定の保存に失敗しました。")
+            throw UserRelatedError.failedHomeEdits
         }
     }
 
-    func updateCurrentTeamBackground(data backgroundData: Background) async throws {
-        guard var user else { throw CustomError.userEmpty }
-        guard let userRef = db?.collection("users").document(user.id) else { throw CustomError.getDocument }
+    func updateJoinTeamBackground(data newBackground: Background) async throws {
+        guard let uid, var currentJoinTeam else {
+            throw UserRelatedError.missingData
+        }
+        // 背景のアップデート
+        currentJoinTeam.currentBackground = newBackground
 
         do {
-            user.joins[currentTeamIndex ?? 0].currentBackground = backgroundData
-            try userRef.setData(from: user)
+            try db?
+                .collection("users")
+                .document(uid)
+                .collection("joins")
+                .document(currentJoinTeam.id)
+                .setData(from: currentJoinTeam)
         } catch {
+            throw UserRelatedError.failedUpdateBackground
             print("ERROR: チーム背景のアップデートに失敗しました")
         }
     }
@@ -156,7 +259,6 @@ class UserViewModel: ObservableObject {
     func updateFavorite(_ itemID: String?) {
         guard var userData = user else { return }
         guard let itemID else { return }
-        guard let userRef = db?.collection("users").document(userData.id) else { return }
 
         let index = userData.favorites.firstIndex(where: { $0 == itemID })
         if let index {
@@ -166,79 +268,56 @@ class UserViewModel: ObservableObject {
         }
 
         do {
-            _ = try? userRef.setData(from: userData)
+            try? db?
+                .collection("users")
+                .document(userData.id)
+                .setData(from: userData)
             hapticActionNotification()
         }
     }
 
-    func addNewJoinTeam(newJoinTeam: JoinTeam) async throws {
-
-        guard let uid = uid, var user = user else { throw CustomError.uidEmpty }
-        guard let userRef = db?.collection("users").document(uid) else { throw CustomError.getRef }
-
-        user.joins.append(newJoinTeam)
-        user.lastLogIn = newJoinTeam.teamID
+    /// 新規チーム作成時に使用するメソッド。作成者のメンバーデータを新規チームのサブコレクションに保存する。
+    func addNewJoinTeam(data newJoinTeam: JoinTeam) async throws {
+        guard let uid else { throw CustomError.uidEmpty }
+        let joinTeamRef = db?
+            .collection("users")
+            .document(uid)
+            .collection("joins")
+            .document(newJoinTeam.id)
 
         do {
-            try userRef.setData(from: user)
-        } catch {
-            throw CustomError.updateData
+            _ = try joinTeamRef?.setData(from: newJoinTeam)
+        }
+        catch {
+            throw UserRelatedError.failedCreateJoinTeam
         }
     }
 
-    func uploadUserImage(_ image: UIImage?) async -> (url: URL?, filePath: String?) {
-
-        guard let imageData = image?.jpegData(compressionQuality: 0.8) else {
-            return (url: nil, filePath: nil)
-        }
-        guard let user else { return (url: nil, filePath: nil) }
+    /// ユーザーデータの更新をFirestoreに保存するメソッド。
+    func updateUser(from updatedUserData: User) async throws {
+        guard let user else { throw CustomError.userEmpty }
 
         do {
-            let storage = Storage.storage()
-            let reference = storage.reference()
-            let filePath = "users/\(Date()).jpeg"
-            let imageRef = reference.child(filePath)
-            _ = try await imageRef.putDataAsync(imageData)
-            let url = try await imageRef.downloadURL()
-
-            return (url: url, filePath: filePath)
+            try db?
+                .collection("users")
+                .document(user.id)
+                .setData(from: updatedUserData)
         } catch {
-            return (url: nil, filePath: nil)
-        }
-    }
-
-    func updateUserNameAndIcon(name updateName: String, data updateIconData: (url: URL?, filePath: String?)) async throws {
-
-        // 取得アイコンデータurlがnilであれば更新しない
-        guard var userDataSource = user else { throw CustomError.userEmpty }
-        guard let userRef = db?.collection("users").document(userDataSource.id) else { throw CustomError.getDocument }
-
-        do {
-            // 更新前の元々のアイコンパスを保持しておく。更新成功後のデフォルトデータ削除に使う
-            let defaultIconPath = userDataSource.iconPath
-            userDataSource.name     = updateName
-            userDataSource.iconURL  = updateIconData.url
-            userDataSource.iconPath = updateIconData.filePath
-
-            _ = try userRef.setData(from: userDataSource)
-            // アイコンデータは変えていない場合、削除処理をスキップする
-            if defaultIconPath != updateIconData.filePath {
-                await deleteUserImageData(path: defaultIconPath)
-            }
-        } catch {
-            // アイコンデータ更新失敗のため、保存予定だったアイコンデータをfirestorageから削除
-            await deleteUserImageData(path: updateIconData.filePath)
-            print("error: updateTeamNameAndIcon_do_try_catch")
+            // 保存予定だったアイコンデータをfirestorageから削除
+            await deleteUserImageData(path: updatedUserData.iconPath)
+            print("ERROR: updateUser")
         }
     }
     
     func updateUserEmailAddress(email updateEmail: String) async {
         guard var user else { return }
-        guard let userRef = db?.collection("users").document(user.id) else { return }
         
         do {
             user.address = updateEmail
-            _ = try userRef.setData(from: user)
+            try db?
+                .collection("users")
+                .document(user.id)
+                .setData(from: user)
         } catch {
             print("新しいメールアドレスのFirebaseへの保存に失敗しました")
             return
@@ -248,55 +327,58 @@ class UserViewModel: ObservableObject {
     /// ユーザーのテーマカラーを更新するメソッド
     func updateUserThemeColor(selected selectedColor: ThemeColor) {
         guard var user else { return }
-        guard let userRef = db?.collection("users").document(user.id) else { return }
+        // テーマカラーを更新
+        user.userColor = selectedColor
 
         do {
-            user.userColor = selectedColor
-            _ = try userRef.setData(from: user)
+            try db?
+                .collection("users")
+                .document(user.id)
+                .setData(from: user)
         } catch {
-            print("ユーザーテーマカラーのFirebaseへの保存に失敗しました")
+            print("ユーザーテーマカラーの保存失敗")
             return
         }
     }
-    
-    func updateJoinTeamNameNameAndIcon(data updatedJoinTeamData: JoinTeam, members joinMembers: [JoinMember]) async throws {
-
-        var joinMembersID: [String] = []
-        // チームに所属している各メンバーのid文字列データを配列に格納(whereFieldクエリで使う)
-        for member in joinMembers {
-            joinMembersID.append(member.memberUID)
+    /// 更新されたJoinTeamデータを、チーム所属メンバーそれぞれが持つ所属チーム情報joinsに反映させる。
+    func updateJoinTeamToMembers(data updatedJoinTeam: JoinTeam, ids membersId: [String]) async throws {
+        // メンバー全員のアップデート対象JoinTeamサブコレクションリファレンスを取得
+        membersId.map { memberId in
+            do {
+                try db?
+                    .collection("users")
+                    .document(memberId)
+                    .collection("joins")
+                    .document(updatedJoinTeam.id)
+                    .setData(from: updatedJoinTeam)
+            } catch {
+                print("ERROR: \(memberId)のjoinTeam更新失敗")
+            }
         }
-
-        // 所属メンバーのid配列を使ってクエリを叩く
-        guard let joinMemberRefs = db?.collection("users")
-            .whereField("id", in: joinMembersID) else { throw CustomError.getRef }
+    }
+    /// joinTeamデータのプロパティ「approved」をtrueにするメソッド。
+    /// 他チームからの承諾によって新規チームが追加された時、ユーザーに追加を知らせるのに
+    /// approvedの値を用いる。
+    func setApprovedJoinTeam(to newJoinTeam: JoinTeam?) async throws {
+        guard let uid, var newJoinTeam else { throw UserRelatedError.uidEmpty }
+        // 加入の既読を付ける
+        newJoinTeam.approved = true
 
         do {
-            let snapshot = try await joinMemberRefs.getDocuments()
-
-            for memberDocument in snapshot.documents {
-
-                do {
-
-                    var memberData = try memberDocument.data(as: User.self)
-
-                    // ユーザのjoins配列からアップデート対象のチームを検出する
-                    for (index, joinTeam) in memberData.joins.enumerated() where joinTeam.teamID == updatedJoinTeamData.teamID {
-                        // 対象JoinTeamデータの名前とアイコンを更新
-                        memberData.joins[index].name = updatedJoinTeamData.name
-                        memberData.joins[index].iconURL = updatedJoinTeamData.iconURL
-                        // 更新後のユーザデータを再保存するためのリファレンスを取得
-                        guard let teamRef = db?.collection("users").document(memberData.id) else { throw CustomError.getRef }
-                        // リファレンスをもとにsetDataを実行
-                        try teamRef.setData(from: memberData)
-                    }
-                }
-            }
+            try db?
+                .collection("users")
+                .document(uid)
+                .collection("joins")
+                .document(newJoinTeam.id)
+                .setData(from: newJoinTeam)
+        } catch {
+            print("ERROR: 新規加入チームの既読失敗")
+            throw UserRelatedError.failedUpdateJoinTeamApproved
         }
     }
 
     /// ユーザーが現在のチーム内で選択した背景画像をFireStorageに保存する。
-    func uploadMyBackgroundToFirestorage(_ image: UIImage?) async -> (url: URL?, filePath: String?) {
+    func uploadMyNewBackground(_ image: UIImage?) async -> (url: URL?, filePath: String?) {
 
         guard let imageData = image?.jpegData(compressionQuality: 0.8) else {
             return (url: nil, filePath: nil)
@@ -306,23 +388,23 @@ class UserViewModel: ObservableObject {
         do {
             let storage = Storage.storage()
             let reference = storage.reference()
-            let filePath = "users/\(Date()).jpeg"
+            let filePath = "users/\(user.id)/myBackgrounds/\(Date()).jpeg"
             let imageRef = reference.child(filePath)
             _ = try await imageRef.putDataAsync(imageData)
             let url = try await imageRef.downloadURL()
 
             return (url: url, filePath: filePath)
         } catch {
+            print("背景データの保存失敗")
             return (url: nil, filePath: nil)
         }
     }
 
     /// ユーザーが写真フォルダから選択したオリジナル背景をFirestoreに保存するメソッド。
     /// 画像はユーザーのドキュメントデータ「myBackgrounds」に保管される。
-    func addMyBackgroundToFirestore(url imageURL: URL?, path imagePath: String?) async {
-        guard var user = user else { return }
-        guard let userRef = db?.collection("users").document(user.id) else { return }
-
+    func setMyNewBackground(url imageURL: URL?, path imagePath: String?) async {
+        guard var user else { return }
+        /// 受け取った画像データを元に、保存用の背景データ作成
         user.myBackgrounds.append(
             Background(category: "original",
                        imageName: "",
@@ -331,24 +413,53 @@ class UserViewModel: ObservableObject {
         )
 
         do {
-            try userRef.setData(from: user)
+            try db?
+                .collection("users")
+                .document(user.id)
+                .setData(from: user)
 
         } catch {
             print("ERROR: チーム背景の保存に失敗しました。")
         }
     }
 
-    func deleteMyBackgroundToFirestore(_ background: Background) {
+    func deleteMyBackground(_ background: Background) {
         guard var user = user else { return }
-        guard let userRef = db?.collection("users").document(user.id) else { return }
 
+        /// 対象背景データを削除
         user.myBackgrounds.removeAll(where: { $0 == background })
 
         do {
-            try userRef.setData(from: user)
+            try db?
+                .collection("users")
+                .document(user.id)
+                .setData(from: user, merge: true)
 
         } catch {
             print("ERROR: チーム背景の保存に失敗しました。")
+        }
+    }
+
+    /// ユーザーアイコンをFirestorageに保存するメソッド。
+    /// filePathは「users/\(Date()).jpeg」
+    func uploadUserImage(_ image: UIImage?) async -> (url: URL?, filePath: String?) {
+        guard let user,
+              let imageData = image?.jpegData(compressionQuality: 0.8) else {
+            print("ユーザーアイコンのアップロード失敗")
+            return (url: nil, filePath: nil)
+        }
+
+        do {
+            let storage = Storage.storage()
+            let reference = storage.reference()
+            let filePath = "users/\(user.id)\(Date()).jpeg"
+            let imageRef = reference.child(filePath)
+            _ = try await imageRef.putDataAsync(imageData)
+            let url = try await imageRef.downloadURL()
+
+            return (url: url, filePath: filePath) // 成功
+        } catch {
+            return (url: nil, filePath: nil)
         }
     }
 
@@ -373,6 +484,25 @@ class UserViewModel: ObservableObject {
         }
     }
 
+    /// 対象チーム内の自身のメンバーデータ「JoinMember」を削除するメソッド。
+    /// チーム脱退操作が実行された時に使われる。
+    func deleteJoinTeamFromMyData(for selectedTeam: JoinTeam) async throws {
+        guard let uid else { throw TeamRelatedError.uidEmpty }
+
+        do {
+            try await db?
+                .collection("users")
+                .document(uid)
+                .collection("joins")
+                .document(selectedTeam.id)
+                .delete() // 削除
+
+        } catch {
+            print("ERROR: JoinTeamの削除失敗")
+            throw UserRelatedError.failedEscapeTeam
+        }
+    }
+
     func deleteUserImageData(path: String?) async {
 
         guard let path = path else { return }
@@ -389,81 +519,103 @@ class UserViewModel: ObservableObject {
             }
         }
     }
-    
-    func deleteMembersJoinTeam(selected selectedTeam: JoinTeam, members joinMembers: [JoinMember]) async throws {
-        var joinMembersID: [String] = []
-        // チームに所属している各メンバーのid文字列データを配列に格納(whereFieldクエリで使う)
-        for member in joinMembers {
-            joinMembersID.append(member.memberUID)
-        }
-
-        // 所属メンバーのid配列を使ってクエリを叩く
-        guard let joinMemberRefs = db?.collection("users")
-            .whereField("id", in: joinMembersID) else { throw CustomError.getRef }
-
-        do {
-            let snapshot = try await joinMemberRefs.getDocuments()
-            
-            for memberDocument in snapshot.documents {
-                
-                var rowMemberData = try memberDocument.data(as: User.self)
-                let resultJoins = rowMemberData.joins.drop(while: { $0.teamID == selectedTeam.teamID })
-                rowMemberData.joins = Array(resultJoins)
-                
-                guard let userRef = db?.collection("users").document(rowMemberData.id) else {
-                    throw CustomError.getRef
-                }
-                _ = try userRef.setData(from: rowMemberData)
-                
-            } // for
-        } // do
-    }
 
     /// Firestorageに保存されているユーザーのオリジナル背景データを全て削除するメソッド。
-    func deleteAllMyBackgrounds() {
+    func deleteUserMyBackgrounds() {
         guard let user else { return }
         let storage = Storage.storage()
         let reference = storage.reference()
 
         Task {
-            for joinTeam in user.joins {
-                for background in joinTeam.myBackgrounds {
-                    guard let path = background.imagePath else { continue }
-                    let imageRef = reference.child(path)
-                    imageRef.delete { error in
-                        if let error = error {
-                            print(error)
-                        } else {
-                            print("オリジナル背景データを削除しました")
-                        }
+            for background in user.myBackgrounds {
+                guard let path = background.imagePath else { continue }
+                let imageRef = reference.child(path)
+                imageRef.delete { error in
+                    if let error {
+                        print("ERROR: \(error.localizedDescription)")
+                    } else {
+                        print("オリジナル背景データを削除")
                     }
                 }
             }
         }
     }
 
-    // アカウント削除対象ユーザーのユーザードキュメントを削除する
-    func deleteAccountRelatedUserData() async throws {
+    /// ユーザードキュメントがサブコレクションとして持っている「joins」データをFirestoreから削除するメソッド。
+    func deleteUserJoinsDocuments() async throws {
+        guard let uid else { throw CustomError.uidEmpty }
 
-        // ユーザが所属している各チームのid配列を使ってクエリを叩く
-        guard let userID = user?.id else { throw CustomError.uidEmpty }
-        guard let userRef = db?.collection("users").document(userID) else { throw CustomError.getRef }
+        let joinsRef = try await db?
+            .collection("users")
+            .document(uid)
+            .collection("joins")
+            .getDocuments()
 
-        do {
-            _ = try await userRef.getDocument().reference.delete()
-            deleteAllMyBackgrounds()
-        } catch {
-            throw CustomError.deleteAccount
+        joinsRef?.documents.compactMap {
+            $0.reference.delete()
         }
     }
-        
+    /// 「users」コレクション内に保存されている自身のユーザードキュメントを削除するメソッド。
+    func deleteUserDocument() async throws {
+        guard let uid else { throw CustomError.uidEmpty }
+
+        try await db?
+            .collection("users")
+            .document(uid)
+            .getDocument()
+            .reference.delete()
+    }
+
+    /// Firestore内に保存されているユーザードキュメントを全て削除するメソッド群。
+    /// ユーザーがアカウントを削除したときに実行される。
+    func deleteAllUserDocumentsController() async throws {
+        guard let uid else { throw CustomError.uidEmpty }
+
+        do {
+            // ユーザーのオリジナル背景データを削除
+            deleteUserMyBackgrounds()
+            // userドキュメントが持つ所属チームのサブコレクション「joins」を削除
+            try await deleteUserJoinsDocuments()
+            // userドキュメントを削除
+            try await deleteUserDocument()
+
+        } catch {
+            print("ERROR: ユーザードキュメント削除失敗")
+            throw UserRelatedError.failedDeleteAllUserDocuments
+        }
+    }
+
+    func removeListener() {
+        userListener?.remove()
+        joinsListener?.remove()
+    }
 
     deinit {
-        listener?.remove()
+        userListener?.remove()
+        joinsListener?.remove()
     }
+}
+
+enum UserRelatedError:Error {
+    case uidEmpty
+    case joinsEmpty
+    case referenceEmpty
+    case missingData
+    case missingSnapshot
+    case failedCreateJoinTeam
+    case failedFetchUser
+    case failedFetchAddedNewUser
+    case failedHomeEdits
+    case failedUserListen
+    case failedUpdateBackground
+    case failedUpdateJoinTeamApproved
+    case failedUpdateLastLogIn
+    case failedUpdateJoinsMyMemberData
+    case failedEscapeTeam
+    case failedDeleteAllUserDocuments
 }
 
 struct TestUser {
     let testUser: User = User(id: "sampleUserID(uid)", name: "SampleUser", address: "kennsuke242424@gmail.com",
-                              password: "ninnzinn2424", iconURL: nil, iconPath: nil, userColor: .red, joins: [])
+                              password: "ninnzinn2424", iconURL: nil, iconPath: nil, userColor: .red, joinsId: [])
 }

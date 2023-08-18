@@ -13,6 +13,9 @@ struct ApplicationSettingView: View {
     @State private var selectedColor: ThemeColor?
 
     @AppStorage("applicationDarkMode") var applicationDarkMode: Bool = false
+    @AppStorage("itemNotifications") var itemNotifications: Bool = false
+    @AppStorage("teamNotifications") var teamNotifications: Bool = false
+    @AppStorage("userNotifications") var userNotifications: Bool = false
 
     var body: some View {
         ScrollView {

@@ -92,9 +92,8 @@ struct RootView: View {
                     CreateAndJoinTeamView()
                     PHPickerView(captureImage: $preloads.captureImage, isShowSheet: $preloads.showSheet)
                     NewItemsView(itemVM: itemVM,  cartVM: cartVM, inputTab: $preloadVM.inputTab)
-//                    SelectBackgroundView()
                 }
-                .opacity(0)
+                .opacity(0.01)
             }
         }
         .onAppear {
@@ -106,22 +105,24 @@ struct RootView: View {
 
         // ☑️全データのフェッチ処理☑️
         .onChange(of: logInVM.rootNavigation) { navigation in
-            print("LogInVM.rootNavigation: \(logInVM.rootNavigation)")
             
             if navigation == .fetch {
                 Task {
                     do {
-                        /// ユーザーデータの取得
-                        _ = try await userVM.fetchUser()
-                        
+                        /// MEMO: スナップショットはasync/awaitに対応してないため、
+                        /// 先に取得しておく必要がある「user」と「joins」をasync/awaitメソッドで取得。
+                        /// 取得に成功すれば、以降のデータ取得が進む。
+                        try await userVM.fetchUser()
                         /// ユーザーデータの所得ができなければ、ログイン画面に遷移
                         guard let user = userVM.user else {
                             logInVM.rootNavigation = .logIn
                             return
                         }
-                        
+
+                        try await userVM.fetchJoinTeams()
+
                         /// チームデータを持っていなければ、チーム追加画面へ遷移
-                        if user.joins.isEmpty {
+                        if userVM.joins.isEmpty {
                             print("参加チーム無し。チーム作成画面へ遷移")
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                 withAnimation(.spring(response: 1)) {
@@ -132,16 +133,19 @@ struct RootView: View {
                             return
                         }
                         
-                        /// 最後にログインしたチーム情報をもとに、対象のチームの全データを取得
+                        /// 最後にログインしたチームIdをもとに、対象のチームの全データを取得
                         guard let lastLogInTeamID = user.lastLogIn else { return }
-                        
-                        try await teamVM.fetchTeam(teamID: lastLogInTeamID)
-                            await tagVM.fetchTag(  teamID: lastLogInTeamID)
-                            await itemVM.fetchItem(teamID: lastLogInTeamID)
+                        print("ログインするチームのID: \(lastLogInTeamID)")
 
-                        /// チームandユーザーデータのリスナーを起動
-                        _ = try await teamVM.teamRealtimeListener()
-                        _ = try await userVM.userRealtimeListener()
+                        await tagVM.tagDataLister(teamID: lastLogInTeamID)
+
+                        // ---- ユーザー関連データをリスニング ----
+                        try await userVM.userListener()
+                        try await userVM.joinsListener()
+                        // ---- チーム関連データをリスニング ----
+                        try await teamVM.teamListener(id: lastLogInTeamID)
+                            await teamVM.membersListener(id: lastLogInTeamID)
+                            await itemVM.itemsListener(id: lastLogInTeamID)
                         
                         /// ホーム画面へ遷移
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -270,6 +274,7 @@ struct RootView_Previews: PreviewProvider {
     static var previews: some View {
         RootView()
             .environmentObject(NavigationViewModel())
+            .environmentObject(MomentLogViewModel())
             .environmentObject(LogInViewModel())
             .environmentObject(TeamViewModel())
             .environmentObject(UserViewModel())

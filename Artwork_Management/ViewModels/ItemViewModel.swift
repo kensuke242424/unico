@@ -21,24 +21,29 @@ class ItemViewModel: ObservableObject {
     @Published var items: [Item] = []
     @Published var selectedSortType: ItemsSortType = .name
     @Published var selectedOder: UpDownOrder = .down
-    @Published var filterFavorite: Bool = false
+    @Published var filteringFavorite: Bool = false
 
-    func fetchItem(teamID: String) async {
+    var currentTeamID: String? {
+        guard let item = self.items.first else { return nil }
+        return item.teamID
+    }
+    /// 初回のデータフェッチが完了したかを判定するプロパティ。
+    /// アプリ起動によるFirestoreからの初期値フェッチ時、リスナーの「.added」に全アイテムの取得フラグが入ってくるため、
+    /// 初回のフラグのみをフラグ取得から除外するために使う。
 
-        print("fetchItem実行")
-
-        guard let itemsRef = db?.collection("teams").document(teamID).collection("items") else {
-            print("error: guard let tagsRef")
-            return
-        }
-
-        listener = itemsRef.addSnapshotListener { (snap, _) in
-
+    /// アイテムデータの追加・更新・削除のステートを管理するリスナーメソッド。
+    /// 初期実行時にリスニング対象ドキュメントのデータが全取得される。(フラグはadded)
+    func itemsListener(id currentTeamID: String) async {
+        print("itemsListener起動")
+        listener = db?
+            .collection("teams")
+            .document(currentTeamID)
+            .collection("items")
+            .addSnapshotListener { (snap, _) in
             guard let documents = snap?.documents else {
-                print("Error: guard let documents = snap?.documents")
+                print("ERROR: snapshot_nil")
                 return
             }
-
             // 取得できたアイテムをデコーダブル ⇨ Itemモデルを参照 ⇨ 「items」に詰めていく
             // with: ⇨ ServerTimestampを扱う際のオプションを指定
             withAnimation {
@@ -49,40 +54,83 @@ class ItemViewModel: ObservableObject {
                 self.selectedTypesSort()
             }
         }
-        print("fetchItem完了")
     }
 
-    func addItem(itemData: Item, tag: String, teamID: String) {
-
-        print("addItem実行")
-
-        guard let itemsRef = db?.collection("teams").document(teamID).collection("items") else {
-            print("error: guard let tagsRef")
+    /// Firestoreからチームの全アイテムをフェッチするメソッド。初回起動時に呼ばれる。
+    @MainActor
+    func fetchAllItem(teamID: String) async throws {
+        guard let itemRefs = db?.collection("teams")
+            .document(teamID)
+            .collection("items") else {
+            print("ERROR: fetchAllItem_guard let itemRefs")
             return
         }
+        let snapshot = try await itemRefs.getDocuments()
+        self.items = snapshot.documents.compactMap { (document) -> Item? in
+            return try? document.data(as: Item.self)
+        }
+        self.selectedTypesSort() // ソート
+    }
+    /// Firestoreから一つのアイテムを取得するメソッド。
+    /// 主に、新規追加したアイテムをすぐに使用したい場合に用いる。
+    /// ドキュメントIDはサーバーへ保存されたときに生成されるため、アイテムのcreateTimeをクエリに使う。
+    func getOneItemToFirestore(from item: Item) async -> Item? {
+        print("getOneItemToFirestore実行")
+        guard let teamId = currentTeamID else { return nil }
+        guard let itemsRef = db?.collection("teams")
+            .document(teamId)
+            .collection("items") else { return nil }
+
+        var resultItem: [Item]?
+        let oneItemQuery = itemsRef
+            .whereField("createTime", isEqualTo: item.createTime)
 
         do {
-            _ = try itemsRef.addDocument(from: itemData)
+            let snapshot = try await oneItemQuery.getDocuments()
+            resultItem = snapshot.documents.compactMap { (document) -> Item? in
+                return try? document.data(as: Item.self)
+            }
+            return resultItem?.first
         } catch {
-            print("Error: try db!.collection(collectionID).addDocument(from: itemData)")
+            return nil
+        }
+    }
+
+    func addItemToFirestore(_ itemData: Item) async {
+        guard let teamId = currentTeamID, let itemId = itemData.id else { return }
+        let itemRef = db?.collection("teams")
+            .document(teamId)
+            .collection("items")
+            .document(itemId)
+
+        do {
+            _ = try db?
+                .collection("teams")
+                .document(teamId)
+                .collection("items")
+                .document(itemId)
+                .setData(from: itemData)
+        } catch {
+            print("Error: addDocument")
         }
         print("addItem完了")
     }
 
-    func updateItem(updateData: Item, defaultDataID: String, teamID: String) {
-
+    func updateItemToFirestore(_ updateItem: Item) {
         print("updateItem実行")
-        print(defaultDataID)
 
-        guard let updateItemRef = db?.collection("teams").document(teamID).collection("items").document(defaultDataID) else {
-            print("error: guard let updateItemRef")
+        guard let teamId = currentTeamID else { return }
+        guard let itemId = updateItem.id else { return }
+        guard let itemRef = db?.collection("teams")
+            .document(teamId)
+            .collection("items")
+            .document(itemId) else {
+            print("ERROR: getItemRef")
             return
         }
 
         do {
-
-            try updateItemRef.setData(from: updateData)
-
+            try itemRef.setData(from: updateItem)
         } catch {
             print("updateItem失敗")
         }
@@ -92,34 +140,14 @@ class ItemViewModel: ObservableObject {
     func deleteItem(deleteItem: Item, teamID: String) {
 
         guard let itemID = deleteItem.id else { return }
-        guard let itemRef = db?.collection("teams").document(teamID).collection("items").document(itemID) else {
+        guard let itemRef = db?.collection("teams")
+            .document(teamID)
+            .collection("items")
+            .document(itemID) else {
             print("error: deleteItem_guard let ItemRef")
             return
         }
-
         itemRef.delete()
-    }
-    
-    func updateFavorite(_ item: Item) {
-        print("updateFavoriteメソッド実行")
-
-        guard let itemsRef = db?.collection("teams").document(item.teamID).collection("items") else {
-            print("error: guard let itemsRef")
-            return
-        }
-        guard let itemID = item.id else { return }
-        
-        var item = item
-        item.favorite.toggle()
-
-        do {
-            try itemsRef.document(itemID).setData(from: item)
-        } catch {
-            hapticErrorNotification()
-            print("updateFavoriteメソッド失敗")
-        }
-        hapticSuccessNotification()
-        print("updateFavoriteメソッド完了")
     }
     
     func resizeUIImage(image: UIImage?, width: CGFloat) -> UIImage? {
@@ -184,7 +212,8 @@ class ItemViewModel: ObservableObject {
         }
     }
     
-    func deleteAllItemImages() async {
+    func deleteAllItemImages(for team: Team?) async {
+        guard let team else { return }
         let storage = Storage.storage()
         let reference = storage.reference()
         
@@ -227,7 +256,7 @@ class ItemViewModel: ObservableObject {
 
             var item = item
 
-            item.updateTime = nil // nilを代入することで、保存時にTimestamp発火
+            item.updateTime = Date()
             item.sales += item.price * item.amount
             item.inventory -= item.amount
             item.totalAmount += item.amount
@@ -241,6 +270,7 @@ class ItemViewModel: ObservableObject {
         }
         print("updateCommerse完了")
     }
+
     /// 選択されているソートタイプに応じてitemsを並び替えするメソッド。
     func selectedTypesSort() {
         switch selectedSortType {
@@ -250,11 +280,9 @@ class ItemViewModel: ObservableObject {
         case .sales     : updateTimeSort()
         }
     }
-
     func upDownOderSort() {
         items.reverse()
     }
-
     func valueSort(order: UpDownOrder, status: IndicatorValueStatus) {
 
         switch order {
@@ -282,7 +310,6 @@ class ItemViewModel: ObservableObject {
             }
         }
     }
-
     func nameSort() {
 
         switch self.selectedOder {
@@ -294,32 +321,34 @@ class ItemViewModel: ObservableObject {
             items.sort(by: { $0.name < $1.name })
         }
     }
-
     func createTimeSort() {
 
         switch self.selectedOder {
         case .up:
             items.sort { before, after in
-                before.createTime!.dateValue() > after.createTime!.dateValue() ? true : false
+                before.createTime > after.createTime ? true : false
             }
         case .down:
             items.sort { before, after in
-                before.createTime!.dateValue() < after.createTime!.dateValue() ? true : false
+                before.createTime < after.createTime ? true : false
             }
         }
     }
-
     func updateTimeSort() {
         switch self.selectedOder {
         case .up:
             items.sort { before, after in
-                before.updateTime!.dateValue() > after.updateTime!.dateValue() ? true : false
+                before.updateTime > after.updateTime ? true : false
             }
         case .down:
             items.sort { before, after in
-                before.updateTime!.dateValue() < after.updateTime!.dateValue() ? true : false
+                before.updateTime < after.updateTime ? true : false
             }
         }
+    }
+    /// アイテムドキュメントのリスナーを削除するメソッド。
+    func removeListener() {
+        listener?.remove()
     }
 
     deinit {

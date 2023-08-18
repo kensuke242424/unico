@@ -12,15 +12,6 @@ struct UpdateUserDataView: View {
         case check
     }
 
-    struct InputUpdateUser {
-        var nameText: String = ""
-        var defaultIconData: (url: URL?, filePath: String?)
-        var showPicker: Bool = false
-        var captureImage: UIImage?
-        var captureError: Bool = false
-        var savingWait: Bool = false
-    }
-
     /// ビューの表示を管理するプロパティ
     @Binding var show: Bool
     /// ビュー内のコンテンツ表示を管理するプロパティ
@@ -28,12 +19,23 @@ struct UpdateUserDataView: View {
 
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var teamVM: TeamViewModel
+    @EnvironmentObject var logVM: LogViewModel
+    @EnvironmentObject var teamNotifyVM: NotificationViewModel
 
     @FocusState var showKeyboard: ShowKeyboard?
     /// キーボード出現時のViewOffsetを管理するプロパティ
     @State private var showKeyboardOffset: Bool = false
     /// View内でユーザーが入力するデータを管理するプロパティ群
-    @State private var inputUpdate = InputUpdateUser()
+    @State private var input = InputUpdateUser()
+
+    private struct InputUpdateUser {
+        var nameText: String = ""
+        var defaultIconData: (url: URL?, filePath: String?)
+        var showPicker: Bool = false
+        var captureImage: UIImage?
+        var captureError: Bool = false
+        var savingWait: Bool = false
+    }
 
     var body: some View {
 
@@ -54,7 +56,7 @@ struct UpdateUserDataView: View {
             if showContent {
 
                 VStack(spacing: 10) {
-                    if inputUpdate.savingWait {
+                    if input.savingWait {
                         HStack(spacing: 10) {
                             Text("保存中です...")
                             ProgressView()
@@ -69,10 +71,10 @@ struct UpdateUserDataView: View {
                 .foregroundColor(.white)
                 .padding(.bottom, 8)
 
-                CaptureImageIcon(image: inputUpdate.captureImage)
-                    .onTapGesture { inputUpdate.showPicker.toggle() }
+                CaptureImageIcon(image: input.captureImage)
+                    .onTapGesture { input.showPicker.toggle() }
 
-                TextField("", text: $inputUpdate.nameText)
+                TextField("", text: $input.nameText)
                     .frame(width: 230)
                     .foregroundColor(.white)
                     .focused($showKeyboard, equals: .check)
@@ -80,7 +82,7 @@ struct UpdateUserDataView: View {
                     .multilineTextAlignment(.center)
                     .background {
                         ZStack {
-                            Text(showKeyboard == nil && inputUpdate.nameText.isEmpty ?
+                            Text(showKeyboard == nil && input.nameText.isEmpty ?
                                  "ユーザー名を入力" : "")
                             .foregroundColor(.white.opacity(0.3))
                             Rectangle().foregroundColor(.white.opacity(0.3)).frame(height: 1)
@@ -89,13 +91,13 @@ struct UpdateUserDataView: View {
                     }
 
                 SavingButton()
-                    .disabled(inputUpdate.savingWait ? true : false)
-                    .opacity(inputUpdate.savingWait ? 0.2 : 1.0)
+                    .disabled(input.savingWait ? true : false)
+                    .opacity(input.savingWait ? 0.2 : 1.0)
                     .padding(.top)
 
                 CancelButton()
-                .disabled(inputUpdate.savingWait ? true : false)
-                .opacity(inputUpdate.savingWait ? 0.2 : 1.0)
+                .disabled(input.savingWait ? true : false)
+                .opacity(input.savingWait ? 0.2 : 1.0)
                 .padding(.top)
             }
         }
@@ -110,8 +112,8 @@ struct UpdateUserDataView: View {
         }
         // 写真ピッカー&クロップビュー
         .cropImagePicker(option: .circle,
-                         show: $inputUpdate.showPicker,
-                         croppedImage: $inputUpdate.captureImage)
+                         show: $input.showPicker,
+                         croppedImage: $input.captureImage)
         .background {
             Color(.black)
                 .opacity(0.8)
@@ -122,9 +124,9 @@ struct UpdateUserDataView: View {
         }
 
         .onAppear {
-            inputUpdate.defaultIconData = (url     : userVM.user?.iconURL,
-                                           filePath: userVM.user?.iconPath)
-            inputUpdate.nameText = userVM.user?.name ?? ""
+            input.defaultIconData = (url     : userVM.user?.iconURL,
+                                     filePath: userVM.user?.iconPath)
+            input.nameText = userVM.user?.name ?? ""
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 withAnimation { showContent.toggle() }
@@ -133,10 +135,10 @@ struct UpdateUserDataView: View {
     } // body
     @ViewBuilder
     func CaptureImageIcon(image: UIImage?) -> some View {
-        if let captureImage = inputUpdate.captureImage {
+        if let captureImage = input.captureImage {
             UIImageCircleIcon(photoImage: captureImage, size: 150)
         } else {
-            if let iconURL = inputUpdate.defaultIconData.url {
+            if let iconURL = input.defaultIconData.url {
                 SDWebImageCircleIcon(imageURL: iconURL, width: 150, height: 150)
             } else {
                 PersonCircleIcon(size: 150)
@@ -147,53 +149,59 @@ struct UpdateUserDataView: View {
     func SavingButton() -> some View {
         Button("保存する") {
 
-            guard let team = teamVM.team else { return }
-            guard let user = userVM.user else { return }
-            guard let myJoinMemberData = teamVM.getMyJoinMemberData(uid: user.id) else { return }
+            guard let team = teamVM.team,
+                  let user = userVM.user else {
+                print("ユーザーまたはチームがnil")
+                return
+            }
 
             Task {
-                withAnimation(.spring(response: 0.3)) { inputUpdate.savingWait = true }
+                withAnimation(.spring(response: 0.3)) { input.savingWait = true }
 
-                // ーー保存に用いるデータコンテナ群ーー
-                var newIconDataContainer: (url: URL?, filePath: String?)?
-                var newNameContainer: String?
-                let defaultIconDataContainer = (url: team.iconURL, filePath: team.iconPath)
-                let defaultNameContainer = team.name
-                var updateJoinMemberContainer = myJoinMemberData
+                // ーー保存時の比較に用いるデータコンテナーー
+                var beforeUser = user
+                var afterUser = user
 
-                // アイコンに変更があれば、アップロード&JoinMemberを更新&コンテナに格納
-                if let updateIconImage = inputUpdate.captureImage {
-                    let uploadIconData = await userVM.uploadUserImage(updateIconImage)
-                    newIconDataContainer = uploadIconData
-                    updateJoinMemberContainer.iconURL = uploadIconData.url
+                // ーーーー　アイコン画像の更新をチェック　ーーーーー
+                if let captureImage = input.captureImage {
+                    let uploadIconData = await userVM.uploadUserImage(captureImage)
+                    afterUser.iconURL = uploadIconData.url
+                    afterUser.iconPath = uploadIconData.filePath
                 }
-                // 名前に変更があれば、JoinMemberを更新&コンテナに格納
-                if team.name != inputUpdate.nameText {
-                    newNameContainer = inputUpdate.nameText
-                    updateJoinMemberContainer.name = inputUpdate.nameText
+                // ーーーー　名前の更新をチェック　ーーーーー
+                if user.name != input.nameText {
+                    afterUser.name = input.nameText
                 }
 
-                if newIconDataContainer != nil || newNameContainer != nil {
-                    /// 自身のユーザーデータ更新と、所属するチームが保持する自身のデータを更新
-                    try await userVM.updateUserNameAndIcon(name: newNameContainer ?? defaultNameContainer,
-                                                           data: newIconDataContainer ?? defaultIconDataContainer)
-                    try await teamVM.updateTeamJoinMemberData(data: updateJoinMemberContainer,
-                                                              joins: user.joins)
+                // ーーーー　データの更新が確認できたら実行　ーーーーー
+                if beforeUser != afterUser {
+                    /// 自身のユーザーデータ更新
+                    try await userVM.updateUser(from: afterUser)
+                    // 自身が所属するチーム群が保持している自身のメンバーデータを更新
+                    try await teamVM.updateJoinTeamsMyData(from: afterUser,
+                                                           joins: userVM.joins)
+                    hapticSuccessNotification()
                 }
-
-                hapticSuccessNotification()
 
                 withAnimation {
-                    showContent.toggle()
-                    inputUpdate.savingWait = false
+                    showContent = false
+                    input.savingWait = false
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     withAnimation(.spring(response: 0.3)) { show = false }
+                    if beforeUser != afterUser {
+                        let compareUser = CompareUser(id    : user.id,
+                                                      before: beforeUser,
+                                                      after : afterUser)
+                        logVM.addLog(to: team,
+                                     by: user,
+                                     type: .updateUser(compareUser))
+                    }
                 }
             } // Task ここまで
         }
         .buttonStyle(.borderedProminent)
-        .disabled(inputUpdate.savingWait ? true : false)
+        .disabled(input.savingWait ? true : false)
     }
     @ViewBuilder
     func CancelButton() -> some View {

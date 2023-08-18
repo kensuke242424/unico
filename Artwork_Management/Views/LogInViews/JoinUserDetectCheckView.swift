@@ -18,6 +18,7 @@ struct JoinUserDetectCheckView: View {
     }
 
     @EnvironmentObject var userVM: UserViewModel
+    @EnvironmentObject var logVM: LogViewModel
 
     @StateObject var qrReader: QRReader = QRReader()
     @StateObject var teamVM: TeamViewModel
@@ -165,8 +166,7 @@ struct JoinUserDetectCheckView: View {
                     do {
                         let detectUserID = qrReader.captureQRData
                         inputUserIDText = detectUserID
-                        detectedUser = try await teamVM.detectUserFetchData(id: detectUserID)
-                        print("detectedUser: \(detectedUser)")
+                        detectedUser = try await teamVM.fetchDetectUserData(id: detectUserID)
                         qrReader.isdetectQR.toggle()
                         withAnimation(.spring(response: 0.8, blendDuration: 1)) { joinUserCheckFase = .agree }
                     } catch {
@@ -253,7 +253,7 @@ struct JoinUserDetectCheckView: View {
                                 return
                             }
                             withAnimation{joinUserCheckFase = .check}
-                            detectedUser = try await teamVM.detectUserFetchData(id: inputUserIDText)
+                            detectedUser = try await teamVM.fetchDetectUserData(id: inputUserIDText)
                             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                                 if detectedUser != nil {
                                     withAnimation{ joinUserCheckFase = .agree }
@@ -299,14 +299,20 @@ struct JoinUserDetectCheckView: View {
                         Button("招待する") {
                             Task {
                                 do {
-                                    _ = try await teamVM.addNewTeamMember(data: detectedUser!)
-                                    _ = try await teamVM.addTeamIDToJoinedUser(to: detectedUser!.id)
+                                    guard let detectedUser, let team = teamVM.team else { return }
+
+                                    _ = try await teamVM.setDetectedNewMember(from: detectedUser)
+                                    _ = try await teamVM.passJoinTeamToDetectedMember(for: detectedUser,
+                                                                                     from: userVM.currentJoinTeam)
                                     withAnimation(.spring(response: 0.8, blendDuration: 1)) { isAgreed.toggle() }
                                     hapticSuccessNotification()
 
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                                         withAnimation(.spring(response: 0.5, blendDuration: 1)) {
                                             teamVM.isShowSearchedNewMemberJoinTeam.toggle()
+                                            logVM.addLog(to: team,
+                                                         by: userVM.user,
+                                                         type: .join(detectedUser, team))
                                         }
                                     }
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {
@@ -314,6 +320,7 @@ struct JoinUserDetectCheckView: View {
                                         isAgreed.toggle()
                                         joinUserCheckFase = .start
                                     }
+
                                 } catch CustomError.memberDuplication {
                                     hapticErrorNotification()
                                     teamVM.alertMessage = "こちらのユーザーは既にチームに所属しています。"
