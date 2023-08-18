@@ -10,9 +10,10 @@ import StoreKit
 import SafariServices
 
 struct SystemView: View {
-    
+
+    /// システム画面の各種リストのエレメントを管理する列挙体。
     enum SystemListContents: CaseIterable {
-        case infomation
+        case setting
         case account
         case twitter
         case review
@@ -24,8 +25,8 @@ struct SystemView: View {
         var icon: String {
             switch self {
 
-            case .infomation:
-                return "cube.transparent"
+            case .setting:
+                return "paintbrush.pointed.fill"
                 
             case .account:
                 return "person"
@@ -53,17 +54,17 @@ struct SystemView: View {
         var title: String {
             switch self {
 
-            case .infomation:
-                return "お知らせ"
+            case .setting:
+                return "アプリ設定"
                 
             case .account:
-                return "アカウント"
+                return "アカウント設定"
                 
             case .twitter:
                 return "公式X（旧Twitter）"
                 
             case .review:
-                return "アプリへのレビューを書く"
+                return "アプリのレビューを書く"
                 
             case .share:
                 return "アプリをシェア"
@@ -82,17 +83,17 @@ struct SystemView: View {
         var infomation: String {
             switch self {
 
-            case .infomation:
-                return "アプリのアップデートやお知らせを記載しています。"
+            case .setting:
+                return "アプリ内の設定を変更します。"
                 
             case .account:
                 return "アカウント情報の確認や変更、削除を含めた操作を行います。"
                 
             case .twitter:
-                return "unicoの公式X（旧Twitter）へ移動します。"
+                return "unicoの公式X（旧Twitter）アカウントへ移動します。"
 
             case .review:
-                return "App Storeにてunicoのレビュー評価を行います。"
+                return "AppStoreにてunicoのレビュー評価を行います。（レビューをいただけると大変嬉しいです）"
                 
             case .share:
                 return "シェア画面から他の人にunicoアプリをシェアします。"
@@ -122,6 +123,15 @@ struct SystemView: View {
                 
                 
                 switch listRow {
+
+                case .setting:
+                    Button {
+                        navigationVM.path.append(ApplicationSettingPath.root)
+                    } label: {
+                        ListRowView(icon : listRow.icon,
+                                    title: listRow.title,
+                                    text : listRow.infomation)
+                    }
                     
                 case .account:
                     Button {
@@ -160,15 +170,6 @@ struct SystemView: View {
                                     title: listRow.title,
                                     text : listRow.infomation)
                     }
-
-                case .infomation:
-                    Button {
-                        navigationVM.path.append(UpdateReportPath.root)
-                    } label: {
-                        ListRowView(icon : listRow.icon,
-                                    title: listRow.title,
-                                    text : listRow.infomation)
-                    }
                     
                 case .query:
                     NavigationLink {
@@ -202,7 +203,7 @@ struct SystemView: View {
             Spacer()
             
         } // VStack
-        .customNavigationTitle(title: "設定メニュー")
+        .customNavigationTitle(title: "システムメニュー")
         .customSystemBackground()
         .customBackButton()
         
