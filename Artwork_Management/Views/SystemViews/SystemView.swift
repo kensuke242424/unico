@@ -113,6 +113,8 @@ struct SystemView: View {
     @EnvironmentObject var logInVM: LogInViewModel
     @StateObject var itemVM: ItemViewModel
 
+    @StateObject var externalManager = ExternalManager()
+
     var body: some View {
 
         VStack(spacing: 10) {
@@ -132,6 +134,7 @@ struct SystemView: View {
                     
                 case .twitter:
                     Button {
+                        //TODO: unicoの公式アカウントを作った段階でurlを更新
                         let twitterURL = URL(string: "https://twitter.com/kenchan2n4n")!
                         UIApplication.shared.open(twitterURL)
                     } label: {
@@ -142,7 +145,7 @@ struct SystemView: View {
                     
                 case .review:
                     Button {
-                        logInVM.reviewApp()
+                        externalManager.reviewApp()
                     } label: {
                         ListRowView(icon : listRow.icon,
                                     title: listRow.title,
@@ -151,7 +154,7 @@ struct SystemView: View {
                     
                 case .share:
                     Button {
-                        logInVM.shareApp()
+                        externalManager.shareApp()
                     } label: {
                         ListRowView(icon : listRow.icon,
                                     title: listRow.title,
