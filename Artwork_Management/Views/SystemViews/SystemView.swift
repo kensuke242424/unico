@@ -60,7 +60,7 @@ struct SystemView: View {
                 return "アカウント"
                 
             case .twitter:
-                return "公式Twitter"
+                return "公式X（旧Twitter）"
                 
             case .review:
                 return "アプリへのレビューを書く"
@@ -89,7 +89,7 @@ struct SystemView: View {
                 return "アカウント情報の確認や変更、削除を含めた操作を行います。"
                 
             case .twitter:
-                return "unicoの公式Twitterへ移動します。"
+                return "unicoの公式X（旧Twitter）へ移動します。"
 
             case .review:
                 return "App Storeにてunicoのレビュー評価を行います。"
@@ -217,8 +217,8 @@ struct ListRowView: View {
         VStack {
             
             HStack {
-                if self.title == "公式Twitter" {
-                    Image("twitter_logo")
+                if self.title == "公式X（旧Twitter）" {
+                    Image("X_Logo")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 30, height: 20)
