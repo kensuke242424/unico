@@ -827,12 +827,12 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         Text("unicoの準備が完了しました！")
                         Text("ようこそ、\(inputLogIn.createUserNameText)さん")
                     }
-                    .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                 }
             } // Group
             .tracking(5)
             .font(.subheadline)
+            .foregroundColor(.white)
             .opacity(backgroundVM.checkMode ? 0 : 1)
             .opacity(inputLogIn.createAccountTitle ? 1.0 : 0.0)
             
