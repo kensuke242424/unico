@@ -79,7 +79,7 @@ struct UserEntryRecommendationView: View {
             // 下部の選択ボタンを保有するView
             VStack(spacing: 30) {
 
-                TermsAndPrivacyView(isCheck: $checkTermsAgree)
+                TermsAndPrivacyView()
 
                 Text("アカウント登録を行いますか？")
                     .foregroundColor(.white)

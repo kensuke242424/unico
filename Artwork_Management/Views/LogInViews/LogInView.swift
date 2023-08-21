@@ -725,7 +725,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         VStack(spacing: 25) {
 
             if logInVM.userSelectedSignInType == .signUp {
-                TermsAndPrivacyView(isCheck: $inputLogIn.checkTermsAgree)
+                TermsAndPrivacyView()
             }
             
             Button {
@@ -995,7 +995,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 .overlay {
                     VStack {
                         HStack {
-                            Text(logInVM.userSelectedSignInType == .logIn ?  "Mail Address  ログイン" : "メールアドレス  ユーザー登録")
+                            Text(logInVM.userSelectedSignInType == .logIn ?
+                                 "メールアドレス ログイン" : "メールアドレス アカウント登録")
                                 .font(.title3).fontWeight(.bold)
                             
                             Spacer()

@@ -207,8 +207,11 @@ class UserViewModel: ObservableObject {
     }
 
     func getCurrentTeamMyBackgrounds() -> [Background] {
-        let myBackgrounds = self.joins[currentJoinsIndex ?? 0].myBackgrounds
-        return myBackgrounds
+        if let index = currentJoinsIndex {
+            return self.joins[index].myBackgrounds
+        } else {
+            return []
+        }
     }
 
     /// Homeのパーツ編集設定をFirestoreのドキュメントに保存するメソッド
@@ -409,8 +412,7 @@ class UserViewModel: ObservableObject {
             Background(category: "original",
                        imageName: "",
                        imageURL: imageURL,
-                       imagePath: imagePath)
-        )
+                       imagePath: imagePath))
 
         do {
             try db?
@@ -521,7 +523,7 @@ class UserViewModel: ObservableObject {
     }
 
     /// Firestorageに保存されているユーザーのオリジナル背景データを全て削除するメソッド。
-    func deleteUserMyBackgrounds() {
+    func deleteAllUserMyBackgrounds() {
         guard let user else { return }
         let storage = Storage.storage()
         let reference = storage.reference()
@@ -573,7 +575,7 @@ class UserViewModel: ObservableObject {
 
         do {
             // ユーザーのオリジナル背景データを削除
-            deleteUserMyBackgrounds()
+            deleteAllUserMyBackgrounds()
             // userドキュメントが持つ所属チームのサブコレクション「joins」を削除
             try await deleteUserJoinsDocuments()
             // userドキュメントを削除

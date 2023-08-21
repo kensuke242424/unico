@@ -8,42 +8,13 @@
 import SwiftUI
 
 struct TermsAndPrivacyView: View {
-    @Binding var isCheck: Bool
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 10)
                 .fill(.white.gradient)
 
-            HStack {
-
-                Rectangle()
-                    .fill(isCheck ? .green : .white)
-                    .frame(width: 15, height: 15)
-                    .overlay {
-                        if isCheck {
-                            Image(systemName: "checkmark")
-                                .resizable()
-                                .frame(width: 12, height: 12)
-                                .foregroundColor(.black)
-                                .fontWeight(.bold)
-                                .offset(y: -1)
-                        }
-                    }
-                    .overlay {
-                        Rectangle()
-                            .stroke(Color.black, lineWidth: 1)
-                            .frame(width: 15, height: 15)
-                    }
-                    .onTapGesture(perform: {
-                        isCheck.toggle()
-                        hapticSuccessNotification()
-                    })
-                    .padding(5)
-
-                TermsAndPrivacyText()
-
-            }
-            .padding(8)
+            TermsAndPrivacyText()
+                .padding(8)
         }
         .frame(width: getRect().width - 80, height: 60)
     }
@@ -52,7 +23,7 @@ struct TermsAndPrivacyView: View {
 struct TermsAndPrivacyText: UIViewRepresentable {
     /// 属性付きのテキスト
     var attributedText: NSAttributedString {
-        let baseString = "利用規約とプライバシーポリシーを確認した上で、規約に同意します。"
+        let baseString = "利用規約とプライバシーポリシーをご確認の上、先に進んでください。"
         let attributedString = NSMutableAttributedString(string: baseString)
 
         // 文字色
