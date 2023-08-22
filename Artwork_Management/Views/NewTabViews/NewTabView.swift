@@ -9,52 +9,6 @@ import SwiftUI
 import ResizableSheet
 import Introspect
 
-struct InputTab {
-    // 各設定Viewの表示を管理するプロパティ
-    var showSideMenu       : Bool = false
-    var showEntryAccount   : Bool = false
-    var showUpdateTeam     : Bool = false
-    var showUpdateUser     : Bool = false
-    var isActiveEditHome   : Bool = false
-    var pressingAnimation  : Bool = false
-    var selectedUpdateData : SelectedUpdateData = .start
-    
-    /// NavigationPathによるエディット画面遷移時に渡す
-    var selectedItem: Item?
-    var selectedTag: Tag?
-    
-    /// バックグラウンドを管理するプロパティ
-    var teamBackground: URL?
-    var captureBackgroundImage: UIImage?
-    var showPickerView: Bool = false
-    var showSelectBackground: Bool = false
-    var checkBackgroundToggle: Bool = false
-    var checkBackgroundAnimation: Bool = false
-    var selectBackgroundCategory: BackgroundCategory = .music
-    var selectedBackgroundImage: UIImage?
-    
-    /// タブの選択状態を管理するプロパティ
-    var selectionTab    : Tab = .home
-    /// タブの切り替えによるアニメーションの状態を管理するプロパティ
-    var animationTab    : Tab = .home
-    var animationOpacity: CGFloat = 1
-    var animationScale  : CGFloat = 1
-    var scrollProgress  : CGFloat = .zero
-    var tabIndex: Int {
-        switch selectionTab {
-        case .home:
-            return 0
-        case .item:
-            return 1
-        }
-    }
-    /// MEMO: ItemsTab内でDetailが開かれている間はTopNavigateBarを隠すためのプロパティ
-    var reportShowDetail: Bool = false
-    
-    var showCart: ResizableSheetState = .hidden
-    var showCommerce: ResizableSheetState = .hidden
-}
-
 struct NewTabView: View {
     
     @EnvironmentObject var navigationVM: NavigationViewModel
@@ -249,7 +203,7 @@ struct NewTabView: View {
                 .navigationDestination(for: SystemPath.self) { systemPath in
                     switch systemPath {
                     case .root:
-                        SystemView(itemVM: itemVM)
+                        SystemView()
                     }
                 }
                 .navigationDestination(for: UpdateReportPath.self) { reportPath in
@@ -526,3 +480,49 @@ struct NewTabView: View {
         notificationVM.removeListener()
     }
 } // View
+
+struct InputTab {
+    // 各設定Viewの表示を管理するプロパティ
+    var showSideMenu       : Bool = false
+    var showEntryAccount   : Bool = false
+    var showUpdateTeam     : Bool = false
+    var showUpdateUser     : Bool = false
+    var isActiveEditHome   : Bool = false
+    var pressingAnimation  : Bool = false
+    var selectedUpdateData : SelectedUpdateData = .start
+
+    /// NavigationPathによるエディット画面遷移時に渡す
+    var selectedItem: Item?
+    var selectedTag: Tag?
+
+    /// バックグラウンドを管理するプロパティ
+    var teamBackground: URL?
+    var captureBackgroundImage: UIImage?
+    var showPickerView: Bool = false
+    var showSelectBackground: Bool = false
+    var checkBackgroundToggle: Bool = false
+    var checkBackgroundAnimation: Bool = false
+    var selectBackgroundCategory: BackgroundCategory = .music
+    var selectedBackgroundImage: UIImage?
+
+    /// タブの選択状態を管理するプロパティ
+    var selectionTab    : Tab = .home
+    /// タブの切り替えによるアニメーションの状態を管理するプロパティ
+    var animationTab    : Tab = .home
+    var animationOpacity: CGFloat = 1
+    var animationScale  : CGFloat = 1
+    var scrollProgress  : CGFloat = .zero
+    var tabIndex: Int {
+        switch selectionTab {
+        case .home:
+            return 0
+        case .item:
+            return 1
+        }
+    }
+    /// MEMO: ItemsTab内でDetailが開かれている間はTopNavigateBarを隠すためのプロパティ
+    var reportShowDetail: Bool = false
+
+    var showCart: ResizableSheetState = .hidden
+    var showCommerce: ResizableSheetState = .hidden
+}

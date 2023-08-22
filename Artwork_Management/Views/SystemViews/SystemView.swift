@@ -11,108 +11,8 @@ import SafariServices
 
 struct SystemView: View {
 
-    /// システム画面の各種リストのエレメントを管理する列挙体。
-    enum SystemListContents: CaseIterable {
-        case setting
-        case account
-        case twitter
-        case review
-        case share
-        case query
-        case rules
-        case privacy
-        
-        var icon: String {
-            switch self {
-
-            case .setting:
-                return "paintbrush.pointed.fill"
-                
-            case .account:
-                return "person"
-                
-            case .twitter:
-                return ""
-                
-            case .review:
-                return "star.bubble"
-                
-            case .share:
-                return "square.and.arrow.up"
-
-            case .query:
-                return "envelope.open"
-                
-            case .rules:
-                return "network.badge.shield.half.filled"
-                
-            case .privacy:
-                return "hand.raised.fingers.spread"
-            }
-        }
-        
-        var title: String {
-            switch self {
-
-            case .setting:
-                return "アプリ設定"
-                
-            case .account:
-                return "アカウント設定"
-                
-            case .twitter:
-                return "公式X（旧Twitter）"
-                
-            case .review:
-                return "アプリのレビューを書く"
-                
-            case .share:
-                return "アプリをシェア"
-
-            case .query:
-                return "お問い合わせ"
-                
-            case .rules:
-                return "利用規約"
-                
-            case .privacy:
-                return "プライバシーポリシー"
-            }
-        }
-        
-        var infomation: String {
-            switch self {
-
-            case .setting:
-                return "アプリ内の設定を変更します。"
-                
-            case .account:
-                return "アカウント情報の確認や変更、削除を含めた操作を行います。"
-                
-            case .twitter:
-                return "unicoの公式X（旧Twitter）アカウントへ移動します。"
-
-            case .review:
-                return "AppStoreにてunicoのレビュー評価を行います。（レビューをいただけると大変嬉しいです）"
-                
-            case .share:
-                return "シェア画面から他の人にunicoアプリをシェアします。"
-
-            case .query:
-                return "アプリのご利用に関してお問い合わせを行います。"
-                
-            case .rules:
-                return "アプリの利用規約について記載しています。"
-                
-            case .privacy:
-                return "アプリのプライバシーポリシーを記載しています。"
-            }
-        }
-    }
-
     @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var logInVM: LogInViewModel
-    @StateObject var itemVM: ItemViewModel
 
     @StateObject var externalManager = ExternalManager()
 
@@ -262,8 +162,107 @@ struct ListRowView: View {
     }
 }
 
+/// システム画面の各種リストのエレメントを管理する列挙体。
+enum SystemListContents: CaseIterable {
+    case setting
+    case account
+    case twitter
+    case review
+    case share
+    case query
+    case rules
+    case privacy
+
+    var icon: String {
+        switch self {
+
+        case .setting:
+            return "paintbrush.pointed.fill"
+
+        case .account:
+            return "person"
+
+        case .twitter:
+            return ""
+
+        case .review:
+            return "star.bubble"
+
+        case .share:
+            return "square.and.arrow.up"
+
+        case .query:
+            return "envelope.open"
+
+        case .rules:
+            return "network.badge.shield.half.filled"
+
+        case .privacy:
+            return "hand.raised.fingers.spread"
+        }
+    }
+
+    var title: String {
+        switch self {
+
+        case .setting:
+            return "アプリ設定"
+
+        case .account:
+            return "アカウント設定"
+
+        case .twitter:
+            return "公式X（旧Twitter）"
+
+        case .review:
+            return "アプリのレビューを書く"
+
+        case .share:
+            return "アプリをシェア"
+
+        case .query:
+            return "お問い合わせ"
+
+        case .rules:
+            return "利用規約"
+
+        case .privacy:
+            return "プライバシーポリシー"
+        }
+    }
+
+    var infomation: String {
+        switch self {
+
+        case .setting:
+            return "アプリ内の設定を変更します。"
+
+        case .account:
+            return "アカウント情報の確認や変更、削除を含めた操作を行います。"
+
+        case .twitter:
+            return "unicoの公式X（旧Twitter）アカウントへ移動します。"
+
+        case .review:
+            return "AppStoreにてunicoのレビュー評価を行います。（レビューをいただけると大変嬉しいです）"
+
+        case .share:
+            return "シェア画面から他の人にunicoアプリをシェアします。"
+
+        case .query:
+            return "アプリのご利用に関してお問い合わせを行います。"
+
+        case .rules:
+            return "アプリの利用規約について記載しています。"
+
+        case .privacy:
+            return "アプリのプライバシーポリシーを記載しています。"
+        }
+    }
+}
+
 struct SystemView_Previews: PreviewProvider {
     static var previews: some View {
-        SystemView(itemVM: ItemViewModel())
+        SystemView()
     }
 }

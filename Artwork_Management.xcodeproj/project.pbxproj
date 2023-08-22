@@ -490,15 +490,6 @@
 			path = PageTabNavigateViews;
 			sourceTree = "<group>";
 		};
-		BEFEF1872A8FAA1100131D41 /* Managers */ = {
-			isa = PBXGroup;
-			children = (
-				BEFEF1882A8FAB5100131D41 /* ExternalManager.swift */,
-			);
-			name = Managers;
-			path = ..;
-			sourceTree = "<group>";
-		};
 		E02FB03F291671B900F72E1A /* Recovered References */ = {
 			isa = PBXGroup;
 			children = (
@@ -564,7 +555,6 @@
 				E0455FDF292BBB74004F677D /* GoogleService-Info.plist */,
 				BE392FF129C2133B00BB5700 /* Helpers */,
 				E05FE94328F71BE400263F98 /* Extensions */,
-				BEFEF1872A8FAA1100131D41 /* Managers */,
 				E08F273228DDB3B200329C5E /* Views */,
 				E08F273328DDB3C400329C5E /* ViewModels */,
 				E08F273428DDB3CA00329C5E /* Models */,
@@ -605,6 +595,7 @@
 		E08F273328DDB3C400329C5E /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
+				BEFEF1882A8FAB5100131D41 /* ExternalManager.swift */,
 				BE6E007329CD5CCA009CBD38 /* NavigationViewModel.swift */,
 				E0455FDD292B2B83004F677D /* LogInViewModel.swift */,
 				E0DE98D728E2DBB800471AB4 /* TeamViewModel.swift */,
