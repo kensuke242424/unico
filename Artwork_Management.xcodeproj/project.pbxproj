@@ -670,9 +670,9 @@
 		E08F274228DEAD5900329C5E /* SystemViews */ = {
 			isa = PBXGroup;
 			children = (
+				E08F273928DDB53700329C5E /* SystemView.swift */,
 				BE599F902A20F66C00821E01 /* ApplicationSettingViews */,
 				BEAAD94929D1ED0C00C53138 /* UpdateReportViews */,
-				E08F273928DDB53700329C5E /* SystemView.swift */,
 				BE20B04229BAEA170078169B /* CustomBackButton.swift */,
 				BE599F6C2A1B25DF00821E01 /* customNavigationTitle.swift */,
 				BE20B04429BAEF000078169B /* AccountSettingViews */,

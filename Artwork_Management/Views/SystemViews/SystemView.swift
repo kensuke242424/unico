@@ -14,7 +14,7 @@ struct SystemView: View {
     @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var logInVM: LogInViewModel
 
-    @StateObject var externalManager = ExternalManager()
+//    @StateObject var externalManager = ExternalManager()
 
     var body: some View {
 
@@ -55,7 +55,7 @@ struct SystemView: View {
                     
                 case .review:
                     Button {
-                        externalManager.reviewApp()
+                        reviewApp()
                     } label: {
                         ListRowView(icon : listRow.icon,
                                     title: listRow.title,
@@ -64,7 +64,7 @@ struct SystemView: View {
                     
                 case .share:
                     Button {
-                        externalManager.shareApp()
+                        shareApp()
                     } label: {
                         ListRowView(icon : listRow.icon,
                                     title: listRow.title,
