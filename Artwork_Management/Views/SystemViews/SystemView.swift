@@ -14,8 +14,6 @@ struct SystemView: View {
     @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var logInVM: LogInViewModel
 
-//    @StateObject var externalManager = ExternalManager()
-
     var body: some View {
 
         VStack(spacing: 10) {
@@ -30,7 +28,7 @@ struct SystemView: View {
                     } label: {
                         ListRowView(icon : listRow.icon,
                                     title: listRow.title,
-                                    text : listRow.infomation)
+                                    text : listRow.information)
                     }
                     
                 case .account:
@@ -39,7 +37,7 @@ struct SystemView: View {
                     } label: {
                         ListRowView(icon : listRow.icon,
                                     title: listRow.title,
-                                    text : listRow.infomation)
+                                    text : listRow.information)
                     }
                     
                 case .twitter:
@@ -50,7 +48,7 @@ struct SystemView: View {
                     } label: {
                         ListRowView(icon : listRow.icon,
                                     title: listRow.title,
-                                    text : listRow.infomation)
+                                    text : listRow.information)
                     }
                     
                 case .review:
@@ -59,7 +57,7 @@ struct SystemView: View {
                     } label: {
                         ListRowView(icon : listRow.icon,
                                     title: listRow.title,
-                                    text : listRow.infomation)
+                                    text : listRow.information)
                     }
                     
                 case .share:
@@ -68,34 +66,34 @@ struct SystemView: View {
                     } label: {
                         ListRowView(icon : listRow.icon,
                                     title: listRow.title,
-                                    text : listRow.infomation)
+                                    text : listRow.information)
                     }
                     
-                case .query:
-                    NavigationLink {
-                        EmptyView()
+                case .contact:
+                    Button {
+                        sendContactUs()
                     } label: {
                         ListRowView(icon : listRow.icon,
                                     title: listRow.title,
-                                    text : listRow.infomation)
+                                    text : listRow.information)
                     }
                     
                 case .rules:
-                    NavigationLink {
-                        EmptyView()
+                    Button {
+                        sendTermsOfUse()
                     } label: {
                         ListRowView(icon : listRow.icon,
                                     title: listRow.title,
-                                    text : listRow.infomation)
+                                    text : listRow.information)
                     }
                     
                 case .privacy:
-                    NavigationLink {
-                        EmptyView()
+                    Button {
+                        sendPrivacyPolicy()
                     } label: {
                         ListRowView(icon : listRow.icon,
                                     title: listRow.title,
-                                    text : listRow.infomation)
+                                    text : listRow.information)
                     }
                 }
             }
@@ -169,7 +167,7 @@ enum SystemListContents: CaseIterable {
     case twitter
     case review
     case share
-    case query
+    case contact
     case rules
     case privacy
 
@@ -191,7 +189,7 @@ enum SystemListContents: CaseIterable {
         case .share:
             return "square.and.arrow.up"
 
-        case .query:
+        case .contact:
             return "envelope.open"
 
         case .rules:
@@ -220,7 +218,7 @@ enum SystemListContents: CaseIterable {
         case .share:
             return "アプリをシェア"
 
-        case .query:
+        case .contact:
             return "お問い合わせ"
 
         case .rules:
@@ -231,7 +229,7 @@ enum SystemListContents: CaseIterable {
         }
     }
 
-    var infomation: String {
+    var information: String {
         switch self {
 
         case .setting:
@@ -249,14 +247,14 @@ enum SystemListContents: CaseIterable {
         case .share:
             return "シェア画面から他の人にunicoアプリをシェアします。"
 
-        case .query:
-            return "アプリのご利用に関してお問い合わせを行います。"
+        case .contact:
+            return "unico公式サイトのお問い合わせフォームに接続します。"
 
         case .rules:
-            return "アプリの利用規約について記載しています。"
+            return "unico公式サイトのアプリ利用規約記載ページへ移動します。"
 
         case .privacy:
-            return "アプリのプライバシーポリシーを記載しています。"
+            return "unico公式サイトのプライバシーポリシー記載ページへ移動します。"
         }
     }
 }

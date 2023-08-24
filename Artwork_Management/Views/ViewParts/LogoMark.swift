@@ -11,23 +11,13 @@ struct LogoMark: View {
     var body: some View {
 
         VStack {
-
-//            Image(systemName: "cube.transparent")
-            Image("unico_logo_text_white2")
+            Image("unico_logo_a4")
                 .resizable()
                 .scaledToFit()
                 .foregroundColor(.white.opacity(0.7))
                 .opacity(0.9)
                 .frame(width: 200, height: 200)
                 .padding()
-
-//            Text("unico")
-//                .tracking(25)
-//                .font(.title3)
-//                .foregroundColor(.white.opacity(0.6))
-//                .opacity(0.6)
-//                .fontWeight(.heavy)
-//                .offset(x: 10)
         } // VStack
     } // body
 } // View
@@ -36,23 +26,13 @@ struct LargeLogoMark: View {
     var body: some View {
 
         VStack {
-
-//            Image(systemName: "cube.transparent")
-            Image("unico_logo_text_white2")
+            Image("unico_logo_a4")
                 .resizable()
                 .scaledToFit()
                 .foregroundColor(.white.opacity(0.7))
                 .opacity(0.9)
-                .frame(width: 250, height: 250)
+                .frame(width: 300, height: 300)
                 .padding()
-//
-//            Text("unico")
-//                .tracking(25)
-//                .font(.title3)
-//                .foregroundColor(.white.opacity(0.6))
-//                .opacity(0.6)
-//                .fontWeight(.heavy)
-//                .offset(x: 10)
         } // VStack
     } // body
 } // View

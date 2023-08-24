@@ -250,7 +250,7 @@ struct CreateAndJoinTeamView: View {
                                                 ShareLink(item: userVM.uid ?? "",
                                                           preview: SharePreview(
                                                             "ユーザーIDを共有",
-                                                            image: Image("share_logo")
+                                                            image: Image("unico_iconOnly")
                                                           )
                                                 ) {
                                                     Image(systemName: "square.and.arrow.up.fill")

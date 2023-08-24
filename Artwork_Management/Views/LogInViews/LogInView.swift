@@ -237,7 +237,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             
             LargeLogoMark()
                 .scaleEffect(logInVM.userSelectedSignInType == .signUp ? 0.4 : 1.0)
-                .offset(y: logInVM.userSelectedSignInType == .signUp ? -getRect().height / 2.5 : -getRect().height / 4)
+                .offset(y: logInVM.userSelectedSignInType == .signUp ? -getRect().height / 2.5 : -getRect().height / 4.5)
                 .offset(x: logInVM.userSelectedSignInType == .signUp ? getRect().width / 3 : 0)
                 .opacity(logInVM.userSelectedSignInType == .signUp ? 0.4 : 1.0)
             
