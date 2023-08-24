@@ -1,6 +1,7 @@
 {
   "images" : [
     {
+      "filename" : "unico_icon_navy.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
