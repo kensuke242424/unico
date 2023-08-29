@@ -338,7 +338,6 @@ struct CreateAndJoinTeamView: View {
                         }
                         // 匿名ユーザーがチームを作成せずにログイン画面へ戻った時の処理
                         // userドキュメントとAuthデータを削除しておく
-                        print("匿名チェック: \(userVM.isAnonymous)")
                         if userVM.isAnonymous {
                             Task {
                                 try await userVM.deleteUserDocument()
@@ -596,8 +595,7 @@ struct CreateAndJoinTeamView: View {
                     if let croppedIconUIImage {
                         UIImageCircleIcon(photoImage: croppedIconUIImage, size: 150)
                     } else {
-                        Image(systemName: "photo.circle.fill").resizable().scaledToFit()
-                            .foregroundColor(.white.opacity(0.8)).frame(width: 150)
+                        CubeCircleIcon(size: 150)
                     }
                 }
                 .onTapGesture { showPicker.toggle() }

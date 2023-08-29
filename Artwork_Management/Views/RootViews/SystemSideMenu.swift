@@ -289,8 +289,9 @@ struct SystemSideMenu: View {
                                         Button("はい") {
                                             withAnimation(.spring(response: 0.5)) {
                                                 inputTab.showSideMenu = false
+                                                input.showChangeTeamSheet = false
                                             }
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                                                 withAnimation(.spring(response: 0.7)) {
                                                     logInVM.rootNavigation = .join
                                                 }
@@ -638,12 +639,19 @@ struct SystemSideMenu: View {
                     } label: {
                         Image(systemName: "plus")
                     }
+                    /// MEMO: 同様のalertをsidemenu側にも実装しているが、
+                    /// シートビュー表示時、↑は反応しないため、こちらにも置いている
                     .alert("", isPresented: $input.isShowCreateTeamAlert) {
                         Button("戻る") {}
                         Button("はい") {
-                            input.showChangeTeamSheet.toggle()
                             withAnimation(.spring(response: 0.5)) {
-                                logInVM.rootNavigation = .join
+                                inputTab.showSideMenu = false
+                                input.showChangeTeamSheet = false
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                withAnimation(.spring(response: 0.7)) {
+                                    logInVM.rootNavigation = .join
+                                }
                             }
                         }
                     } message: {

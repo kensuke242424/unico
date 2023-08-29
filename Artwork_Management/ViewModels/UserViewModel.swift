@@ -19,7 +19,7 @@ class UserViewModel: ObservableObject {
 
     init() {
         print("<<<<<<<<<  UserViewModel_init  >>>>>>>>>")
-        isAnonymousCheck()
+//        isAnonymousCheck()
     }
 
     var userListener: ListenerRegistration?
@@ -59,7 +59,14 @@ class UserViewModel: ObservableObject {
         return self.joins.compactMap { $0.id }
     }
 
-    @Published var isAnonymous: Bool = false
+//    @Published var isAnonymous: Bool = false
+    var isAnonymous: Bool {
+        if let user = Auth.auth().currentUser, user.isAnonymous {
+            return true
+        } else {
+            return false
+        }
+    }
     @Published var showAlert = false
     @Published var userErrorMessage = ""
 
@@ -107,15 +114,15 @@ class UserViewModel: ObservableObject {
         }
     }
 
-    /// ユーザーのアカウントステートを返すメソッド。
-    func isAnonymousCheck() {
-        
-        if let user = Auth.auth().currentUser, user.isAnonymous {
-            self.isAnonymous = true
-        } else {
-            self.isAnonymous = false
-        }
-    }
+//    /// ユーザーのアカウントステートを返すメソッド。
+//    func isAnonymousCheck() {
+//        
+//        if let user = Auth.auth().currentUser, user.isAnonymous {
+//            self.isAnonymous = true
+//        } else {
+//            self.isAnonymous = false
+//        }
+//    }
 
     /// ユーザーデータの更新をリスニングするスナップショットリスナー。
     func userListener() async throws {
@@ -135,9 +142,9 @@ class UserViewModel: ObservableObject {
 
                     withAnimation {
                             self.user = userData
-                        DispatchQueue.main.async {
-                            self.isAnonymousCheck()
-                        }
+//                        DispatchQueue.main.async {
+//                            self.isAnonymousCheck()
+//                        }
                     }
                 } catch {
                     print("ERROR: ユーザーデータのリスナー失敗")

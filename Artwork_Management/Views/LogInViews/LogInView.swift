@@ -645,7 +645,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 } // Task end
             }
         }
-        .onAppear { userVM.isAnonymousCheck() }
+//        .onAppear { userVM.isAnonymousCheck() }
         .onDisappear {
             resetLogInFase()
         }

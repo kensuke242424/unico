@@ -149,7 +149,7 @@ struct UserEntryRecommendationView: View {
             // アカウントの登録を検知したら、匿名状態を確認するメソッドを実行して状態を更新する(ビューを更新するため)
             .onChange(of: logInVM.resultAccountLink) { result in
                 if result == true {
-                    userVM.isAnonymousCheck()
+//                    userVM.isAnonymousCheck()
                 }
             }
         }
