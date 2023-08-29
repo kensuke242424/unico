@@ -46,7 +46,7 @@ struct CreateAndJoinTeamView: View {
     @State private var selectTeamFase: SelectTeamFase = .start
     @State private var customFont: CustomFont = .avenirNextUltraLight
     @State private var backgroundColor: Color = .userGray1
-    @FocusState private var createNameFocused: ShowKyboard?
+    @FocusState private var createNameFocused: ShowKeyboard?
 
     var body: some View {
 

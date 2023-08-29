@@ -30,7 +30,7 @@ enum ResultSignInType {
     case signIn, signUp
 }
 
-enum ShowKyboard {
+enum ShowKeyboard {
     case check
 }
 
@@ -214,9 +214,9 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
     @State private var checkBackgroundAnimation: Bool = false
     @AppStorage("applicationDarkMode") var applicationDarkMode: Bool = true
     
-    @FocusState private var showEmailKyboard: ShowKyboard?
+    @FocusState private var showEmailKeyboard: ShowKeyboard?
 
-    @FocusState private var showUserNameKyboard: ShowKyboard?
+    @FocusState private var showUserNameKeyboard: ShowKeyboard?
     @State private var textFieldOffset: Bool = false
     
     var body: some View {
@@ -383,9 +383,10 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         .opacity(0.7)
                         .ignoresSafeArea()
                         .onTapGesture {
+                            if let showEmailKeyboard { return }
                             withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
                                 logInVM.showEmailHalfSheet.toggle()
-                                showEmailKyboard = nil
+                                showEmailKeyboard = nil
                             }
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                                 logInVM.showEmailSheetBackground.toggle()
@@ -394,13 +395,13 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         }
                 }
                 if logInVM.showEmailHalfSheet {
-                    inputAdressHalfSheet()
+                    inputAddressHalfSheet()
                         .transition(.offset(y: getRect().height / 2))
                 }
 
             } // Group
             .offset(y: textFieldOffset ? -100 : 0)
-            .onChange(of: showUserNameKyboard) { newValue in
+            .onChange(of: showUserNameKeyboard) { newValue in
                 if newValue == .check {
                     withAnimation { textFieldOffset = true }
                 } else {
@@ -516,7 +517,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                  logInVM.createAccountFase == .success ? 0.5 :
                                  0.2)
                         .ignoresSafeArea()
-                        .onTapGesture(perform: { showUserNameKyboard = nil })
+                        .onTapGesture(perform: { showUserNameKeyboard = nil })
                 }
             }
         }
@@ -675,6 +676,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 .opacity(0.4)
                 .frame(width: 60, height: 1)
         }
+        .foregroundColor(.white)
     }
     @ViewBuilder
     func firstSelectButtons() -> some View {
@@ -682,6 +684,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         VStack(spacing: 20) {
             Text("アカウントをお持ちですか？")
                 .tracking(10)
+                .foregroundColor(.white)
                 .font(.subheadline)
                 .opacity(0.8)
                 .padding(.bottom, 40)
@@ -777,8 +780,9 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             }
             
             Text("または")
-                .opacity(0.7)
                 .tracking(2)
+                .foregroundColor(.white)
+                .opacity(0.7)
 
             Button {
                 // お試しログイン選択時の処理
@@ -939,7 +943,9 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     }
                     .onTapGesture { inputLogIn.showPicker.toggle() }
                     .overlay(alignment: .top) {
-                        Text("ユーザ情報は後から変更できます。").font(.caption)
+                        Text("ユーザ情報は後から変更できます。")
+                            .font(.caption)
+                            .foregroundColor(.white)
                             .opacity(0.7)
                             .frame(width: 200)
                             .offset(y: -30)
@@ -948,22 +954,24 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     
                     TextField("", text: $inputLogIn.createUserNameText)
                         .frame(width: 230)
-                        .focused($showUserNameKyboard, equals: .check)
+                        .focused($showUserNameKeyboard, equals: .check)
                         .textInputAutocapitalization(.never)
                         .multilineTextAlignment(.center)
                         .background {
                             ZStack {
-                                Text(showUserNameKyboard == nil && inputLogIn.createUserNameText.isEmpty ? "名前を入力" : "")
+                                Text(showUserNameKeyboard == nil &&
+                                     inputLogIn.createUserNameText.isEmpty ? "ユーザー名を入力" : "")
                                     .opacity(0.6)
                                 Rectangle()
                                     .opacity(0.7)
                                     .frame(height: 1)
                                     .offset(y: 20)
                             }
+                            .foregroundColor(.white)
                         }
                     
                     Button {
-                        withAnimation { showUserNameKyboard = nil }
+                        withAnimation { showUserNameKeyboard = nil }
                         withAnimation(.spring(response: 0.9)) {
                             inputLogIn.createAccountTitle = false
                             inputLogIn.createAccountShowContents = false
@@ -1003,13 +1011,13 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         } // VStack
     }
     @ViewBuilder
-    func inputAdressHalfSheet() -> some View {
+    func inputAddressHalfSheet() -> some View {
         VStack {
             Spacer()
             RoundedRectangle(cornerRadius: 40)
                 .frame(width: getRect().width, height: getRect().height / 2)
                 .foregroundColor(colorScheme == .light ? .customHalfSheetForgroundLight : .customHalfSheetForgroundDark)
-                .onTapGesture { showEmailKyboard = nil }
+                .onTapGesture { showEmailKeyboard = nil }
                 .overlay {
                     VStack {
                         HStack {
@@ -1022,7 +1030,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             Button {
                                 withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
                                     logInVM.showEmailHalfSheet.toggle()
-                                    showEmailKyboard = nil
+                                    showEmailKeyboard = nil
                                 }
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                                     logInVM.showEmailSheetBackground.toggle()
@@ -1134,7 +1142,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         
                         
                         TextField("メールアドレスを入力", text: $inputLogIn.address)
-                            .focused($showEmailKyboard, equals: .check)
+                            .focused($showEmailKeyboard, equals: .check)
                             .autocapitalization(.none)
                             .padding()
                             .frame(width: getRect().width * 0.8, height: 30)
@@ -1142,7 +1150,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                                 RoundedRectangle(cornerRadius: 10)
                                     .foregroundColor(colorScheme == .dark ? .gray.opacity(0.2) : .white)
                                     .frame(height: 30)
-                                    .shadow(color: showEmailKyboard == .check ? .blue : .clear, radius: 3)
+                                    .shadow(color: showEmailKeyboard == .check ? .blue : .clear, radius: 3)
                             )
                             .padding(20)
                             .onChange(of: inputLogIn.address) { newValue in
@@ -1187,7 +1195,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         }
         .offset(y: logInVM.showEmailHalfSheet ? 0 : getRect().height / 2)
         .offset(y: inputLogIn.keyboardOffset)
-        .onChange(of: showEmailKyboard) { newValue in
+        .onChange(of: showEmailKeyboard) { newValue in
             if newValue == .check {
                 withAnimation(.spring(response: 0.4)) {
                     inputLogIn.keyboardOffset = -UIScreen.main.bounds.height / 3
