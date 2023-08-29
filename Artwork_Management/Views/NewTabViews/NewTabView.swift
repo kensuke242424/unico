@@ -255,7 +255,7 @@ struct NewTabView: View {
                     Spacer(minLength: 0)
                     
                     HStack(alignment: .bottom) {
-                        Text("カート内のアイテム")
+                        Text("処理中のアイテム")
                             .foregroundColor(.black)
                             .font(.headline)
                             .fontWeight(.black)
@@ -344,6 +344,10 @@ struct NewTabView: View {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                     inputTab.showCart = .medium
                 }
+            }
+            if afterCart == 0 {
+                inputTab.showCart = .hidden
+                inputTab.showCommerce = .hidden
             }
         }
         /// カートの精算実行を監視する

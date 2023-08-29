@@ -44,7 +44,7 @@ struct CartItemsSheet: View {
                     } // if
                 } // ForEach
             } else {
-                Text("かごの中にアイテムはありません")
+                Text("処理中のアイテムはありません")
                     .foregroundColor(.gray)
                     .frame(height: 100)
             } // if listLimit
@@ -187,7 +187,7 @@ struct CartItemRow: View {
                             cartVM.resultCartAmount -= 1
                         }
                     } message: {
-                        Text("かごから\(itemRow.name == "" ? "No Name" : itemRow.name)を削除しますか？")
+                        Text("\(itemRow.name == "" ? "No Name" : itemRow.name)の在庫処理を取り消しますか？")
                     }
                 } // VStack
             } // HStack
