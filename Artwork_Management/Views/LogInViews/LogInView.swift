@@ -594,31 +594,33 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         try await userVM.fetchUser()
                         guard let user = userVM.user else { return }
 
-                        // 新規チームのIDとして使用
-                        let createTeamID = UUID().uuidString
-
-                        /// teamsコレクションに保存する新規チームデータ
-                        let teamData = Team(id     : createTeamID,
-                                            name   : "\(user.name)のチーム")
-
-                        /// ユーザードキュメントのサブコレクションに保存する所属チームの情報
-                        let joinTeamData = JoinTeam(id           : teamData.id,
-                                                    name             : teamData.name,
-                                                    currentBackground: backgroundVM.selectBackground ??
-                                                                       backgroundVM.sampleBackground,
-                                                    myBackgrounds    : backgroundVM.pickMyBackgroundsAtSignUp)
+                        /// ----  新規チームデータを自動生成するフロー   ---------
                         
-                        /// 準備したチームデータをFirestoreに保存していく
-                        /// userDocument側にも新規作成したチームのidを保存しておく(addNewJoinTeam)
-                        try await teamVM.addNewTeam(team: teamData)
-                        try await teamVM.addFirstMemberToFirestore(teamId: teamData.id, data: user)
-                        try await userVM.addNewJoinTeam(data: joinTeamData)
-                        // サンプルアイテム&タグをセット
-                        await teamVM.setSampleItem(teamID: teamData.id)
-                        await tagVM.setSampleTag(teamID: teamData.id)
-                        // ユーザーのログイン先を新規チームに設定
-                        try await userVM.updateLastLogInTeam(teamId: teamData.id)
-                        
+//                        // 新規チームのIDとして使用
+//                        let createTeamID = UUID().uuidString
+//
+//                        /// teamsコレクションに保存する新規チームデータ
+//                        let teamData = Team(id     : createTeamID,
+//                                            name   : "\(user.name)のチーム")
+//
+//                        /// ユーザードキュメントのサブコレクションに保存する所属チームの情報
+//                        let joinTeamData = JoinTeam(id           : teamData.id,
+//                                                    name             : teamData.name,
+//                                                    currentBackground: backgroundVM.selectBackground ??
+//                                                                       backgroundVM.sampleBackground,
+//                                                    myBackgrounds    : backgroundVM.pickMyBackgroundsAtSignUp)
+//
+//                        /// 準備したチームデータをFirestoreに保存していく
+//                        /// userDocument側にも新規作成したチームのidを保存しておく(addNewJoinTeam)
+//                        try await teamVM.addNewTeam(team: teamData)
+//                        try await teamVM.addFirstMemberToFirestore(teamId: teamData.id, data: user)
+//                        try await userVM.addNewJoinTeam(data: joinTeamData)
+//                        // サンプルアイテム&タグをセット
+//                        await teamVM.setSampleItem(teamID: teamData.id)
+//                        await tagVM.setSampleTag(teamID: teamData.id)
+//                        // ユーザーのログイン先を新規チームに設定
+//                        try await userVM.updateLastLogInTeam(teamId: teamData.id)
+//
                         /// データ生成の成功を知らせるアニメーションの後、データのフェッチとログイン開始
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                             withAnimation(.spring(response: 1.3)) {
@@ -644,7 +646,19 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             }
         }
         .onAppear { userVM.isAnonymousCheck() }
+        .onDisappear {
+            resetLogInFase()
+        }
     } // body
+    /// ログイン画面の進行フローをリセットするメソッド。
+    /// ログインビューが破棄された時に使用する。
+    fileprivate func resetLogInFase() {
+        logInVM.addressSignInFase = .start
+        logInVM.createAccountFase = .start
+        logInVM.selectProviderType = .start
+        logInVM.resultSignInType = .signIn
+        logInVM.userSelectedSignInType = .start
+    }
     
     @ViewBuilder
     func signInTitle(title: String) -> some View {
@@ -662,6 +676,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 .frame(width: 60, height: 1)
         }
     }
+    @ViewBuilder
     func firstSelectButtons() -> some View {
         
         VStack(spacing: 20) {
@@ -721,6 +736,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             }
         }
     }
+    @ViewBuilder
     func logInSelectButtons() -> some View {
         VStack(spacing: 25) {
 
@@ -784,6 +800,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             }
         }
     }
+    @ViewBuilder
     func createAccountViews() -> some View {
         
         VStack(spacing: 50) {
@@ -985,6 +1002,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             
         } // VStack
     }
+    @ViewBuilder
     func inputAdressHalfSheet() -> some View {
         VStack {
             Spacer()
@@ -1181,7 +1199,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             }
         }
     }
-    
+    @ViewBuilder
     func createAccountIndicator() -> some View {
         Rectangle()
             .frame(width: 200, height: 2, alignment: .leading)

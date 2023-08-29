@@ -328,24 +328,36 @@ struct CreateAndJoinTeamView: View {
             .offset(x: -getRect().width / 2 + 40, y: getRect().height / 2 - 60 )
             .alert("", isPresented: $isShowGoBackAlert) {
 
-                Button {
-                    teamVM.isShowCreateAndJoinTeam.toggle()
-                } label: {
-                    Text("いいえ")
-                }
+                Button("いいえ") {}
 
-                Button {
-                    withAnimation(.spring(response: 1.0)) {
-                        logInVM.rootNavigation = .fetch
-                        
-                        teamVM.isShowCreateAndJoinTeam.toggle()
+                Button("はい") {
+                    if userVM.joins.isEmpty {
+                        withAnimation(.spring(response: 1.0)) {
+                            logInVM.rootNavigation = .logIn
+                            teamVM.isShowCreateAndJoinTeam.toggle()
+                        }
+                        // 匿名ユーザーがチームを作成せずにログイン画面へ戻った時の処理
+                        // userドキュメントとAuthデータを削除しておく
+                        print("匿名チェック: \(userVM.isAnonymous)")
+                        if userVM.isAnonymous {
+                            Task {
+                                try await userVM.deleteUserDocument()
+                                try await logInVM.deleteAuth()
+                            }
+                        }
+                    } else {
+                        withAnimation(.spring(response: 1.0)) {
+                            logInVM.rootNavigation = .fetch
+                            teamVM.isShowCreateAndJoinTeam.toggle()
+                        }
                     }
-                    
-                } label: {
-                    Text("はい")
                 }
             } message: {
-                Text("チーム追加をやめて戻りますか？")
+                if userVM.joins.isEmpty {
+                    Text("チーム作成をやめてログイン画面に戻りますか？")
+                } else {
+                    Text("チーム追加をやめて戻りますか？")
+                }
             } // alert
         } // ZStack
         .overlay {

@@ -91,7 +91,6 @@ class LogInViewModel: ObservableObject {
     }
     
     func signInAnonymously() {
-        
         print("＝＝＝＝＝signInAnonymouslyメソッド実行＝＝＝＝＝＝")
         
         Auth.auth().signInAnonymously { (authResult, error) in
@@ -460,10 +459,7 @@ class LogInViewModel: ObservableObject {
         }
     }
     
-    func deleteAuthWithEmail() async throws {
-        // 再認証成功時に保持していたアドレスとリンクを使ってcredentialを作成
-        let credential = EmailAuthProvider.credential(withEmail: self.receivedAddressByLink,
-                                                      link     : self.receivedLink)
+    func deleteAuth() async throws {
         guard let user = Auth.auth().currentUser else { throw CustomError.userEmpty }
 
         do {
@@ -476,7 +472,6 @@ class LogInViewModel: ObservableObject {
             print("アカウント削除失敗: \(error.localizedDescription)")
             throw CustomError.deleteAccount
         }
-
     }
     
     // サインイン要求で nonce の SHA256 ハッシュを送信すると、Apple はそれを応答で変更せずに渡します。
