@@ -75,7 +75,7 @@ struct AnonymousEntryRecomendationView: View {
             // 下部の選択ボタンを保有するView
             VStack(spacing: 30) {
 
-                TermsAndPrivacyView()
+                TermsAndPrivacyView(isCheck: $checkTermsAgree)
 
                 Text("今はアカウント登録せずに\nお試しアカウントで始めますか？")
                     .foregroundColor(.white)

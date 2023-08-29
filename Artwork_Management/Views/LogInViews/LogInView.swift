@@ -725,7 +725,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         VStack(spacing: 25) {
 
             if logInVM.userSelectedSignInType == .signUp {
-                TermsAndPrivacyView()
+                TermsAndPrivacyView(isCheck: $inputLogIn.checkTermsAgree)
             }
             
             Button {

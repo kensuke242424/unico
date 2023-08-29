@@ -193,10 +193,10 @@ struct RootView: View {
         .onAppear {
 
             if Auth.auth().currentUser != nil {
-                print("RootView_onAppear_currentUserが存在します。fetchを開始")
+                print("unicoのユーザーデータを作成済みです。fetchを開始")
                 logInVM.rootNavigation = .fetch
             } else {
-                print("RootView_onAppear_currentUserがnilです。ログイン画面に遷移します。")
+                print("unicoのユーザーデータをまだ作成していません。ログイン画面に遷移")
                 progressVM.showCubesProgress.toggle()
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
