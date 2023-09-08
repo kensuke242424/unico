@@ -242,7 +242,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 .opacity(logInVM.userSelectedSignInType == .signUp ? 0.4 : 1.0)
             
             /// ログインフロー全体的なコンテンツをまとめたGroup
-            /// View数が多いとコンパイルが通らないため現状こうしている
+            /// View数が多いとコンパイルが通らないため、Groupで囲むことで対応
             Group {
                 // 起動時最初のログイン画面で表示される「ログイン」「いえ、初めてです」ボタン
                 firstSelectButtons()
