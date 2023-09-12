@@ -91,7 +91,6 @@ class LogInViewModel: ObservableObject {
     }
     
     func signInAnonymously() {
-        
         print("＝＝＝＝＝signInAnonymouslyメソッド実行＝＝＝＝＝＝")
         
         Auth.auth().signInAnonymously { (authResult, error) in
@@ -450,38 +449,6 @@ class LogInViewModel: ObservableObject {
         return UIImage(cgImage: cgImage)
     }
     
-    func shareApp(){
-        let productURL:URL = URL(string: "https://apps.apple.com/us/app/unico/id1663765686")!
-        
-        let activityViewController = UIActivityViewController(
-            activityItems: [productURL],
-            applicationActivities: nil)
-        
-        let scenes = UIApplication.shared.connectedScenes
-        let windowScene = scenes.first as? UIWindowScene
-        let window = windowScene?.windows.first
-        
-        if let window {
-            window.rootViewController?.present(activityViewController, animated: true, completion: nil)
-        }
-    }
-    
-    func reviewApp(){
-            let productURL:URL = URL(string: "https://apps.apple.com/us/app/unico/id1663765686")!
-            
-            var components = URLComponents(url: productURL, resolvingAgainstBaseURL: false)
-            
-            components?.queryItems = [
-                URLQueryItem(name: "action", value: "write-review")
-            ]
-            
-            guard let writeReviewURL = components?.url else {
-                return
-            }
-            
-            UIApplication.shared.open(writeReviewURL)
-        }
-    
     func logOut() {
         do {
             try Auth.auth().signOut()
@@ -492,10 +459,7 @@ class LogInViewModel: ObservableObject {
         }
     }
     
-    func deleteAuthWithEmail() async throws {
-        // 再認証成功時に保持していたアドレスとリンクを使ってcredentialを作成
-        let credential = EmailAuthProvider.credential(withEmail: self.receivedAddressByLink,
-                                                      link     : self.receivedLink)
+    func deleteAuth() async throws {
         guard let user = Auth.auth().currentUser else { throw CustomError.userEmpty }
 
         do {
@@ -508,7 +472,6 @@ class LogInViewModel: ObservableObject {
             print("アカウント削除失敗: \(error.localizedDescription)")
             throw CustomError.deleteAccount
         }
-
     }
     
     // サインイン要求で nonce の SHA256 ハッシュを送信すると、Apple はそれを応答で変更せずに渡します。

@@ -856,20 +856,20 @@ enum LogType: Codable, Equatable {
     /// 通知に渡すメッセージテキスト。
     var message: String {
         switch self {
-        case .addItem:
-            return "新しいアイテムが追加されました。"
-        case .updateItem:
-            return "アイテム情報が更新されました。"
-        case .deleteItem:
-            return "アイテムが削除されました。"
+        case .addItem(let item):
+            return "\(item.name) が新規アイテムとして追加されました。"
+        case .updateItem(let item):
+            return "\(item.before.name) のアイテム情報が更新されました。"
+        case .deleteItem(let item):
+            return "\(item.name) のアイテムデータが削除されました。"
         case .commerce(let items):
-            return "カート内 \(items.count) 個のアイテムが精算されました。"
+            return "\(items.count) 個のアイテムが在庫処理されました。"
         case .join(_, let team):
             return "\(team.name) に新メンバーが加入しました！"
         case .updateUser:
-            return "ユーザー情報が更新されました。"
+            return "ユーザーに関する情報が更新されました。"
         case .updateTeam:
-            return "チーム情報が更新されました。"
+            return "チームに関する情報が更新されました。"
         }
     }
 

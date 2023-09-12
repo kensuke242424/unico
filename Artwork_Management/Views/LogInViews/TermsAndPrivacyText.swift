@@ -61,11 +61,11 @@ struct TermsAndPrivacyText: UIViewRepresentable {
 //                                      range: NSMakeRange(0, baseString.count))
         // 利用規約のリンク
         attributedString.addAttribute(.link,
-                                      value: "https://www.google.co.jp/",
+                                      value: "https://unicoapp.wixsite.com/mysite/%E5%88%A9%E7%94%A8%E8%A6%8F%E7%B4%84",
                                       range: NSString(string: baseString).range(of: "利用規約"))
         // プライバシーポリシーのリンク
         attributedString.addAttribute(.link,
-                                      value: "https://www.google.co.jp/",
+                                      value: "https://unicoapp.wixsite.com/mysite/%E3%83%97%E3%83%A9%E3%82%A4%E3%83%90%E3%82%B7%E3%83%BC%E3%83%9D%E3%83%AA%E3%82%B7%E3%83%BC",
                                       range: NSString(string: baseString).range(of: "プライバシーポリシー"))
         return attributedString
     }

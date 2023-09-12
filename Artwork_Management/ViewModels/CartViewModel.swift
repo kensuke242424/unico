@@ -77,16 +77,14 @@ class CartViewModel: ObservableObject {
                 let compareItem = CompareItem(id: defaultItem.id ?? "",
                                               before: defaultItem,
                                               after: updateItem)
-                print(defaultItem.id)
+                
                 compareItems.append(compareItem)
             } catch {
                 print("Error: 「\(item.name)」try reference.document(itemID).setData(from: item)")
             }
         }
 
-        resetCart()
         self.doCommerce = true
-
         return compareItems
     }
     /// カート内の総価格・総個数・選択アイテムを全てリセットするメソッド。

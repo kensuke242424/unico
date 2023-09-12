@@ -10,108 +10,9 @@ import StoreKit
 import SafariServices
 
 struct SystemView: View {
-    
-    enum SystemListContents: CaseIterable {
-        case infomation
-        case account
-        case twitter
-        case review
-        case share
-        case query
-        case rules
-        case privacy
-        
-        var icon: String {
-            switch self {
-
-            case .infomation:
-                return "cube.transparent"
-                
-            case .account:
-                return "person"
-                
-            case .twitter:
-                return ""
-                
-            case .review:
-                return "star.bubble"
-                
-            case .share:
-                return "square.and.arrow.up"
-
-            case .query:
-                return "envelope.open"
-                
-            case .rules:
-                return "network.badge.shield.half.filled"
-                
-            case .privacy:
-                return "hand.raised.fingers.spread"
-            }
-        }
-        
-        var title: String {
-            switch self {
-
-            case .infomation:
-                return "お知らせ"
-                
-            case .account:
-                return "アカウント"
-                
-            case .twitter:
-                return "公式Twitter"
-                
-            case .review:
-                return "アプリへのレビューを書く"
-                
-            case .share:
-                return "アプリをシェア"
-
-            case .query:
-                return "お問い合わせ"
-                
-            case .rules:
-                return "利用規約"
-                
-            case .privacy:
-                return "プライバシーポリシー"
-            }
-        }
-        
-        var infomation: String {
-            switch self {
-
-            case .infomation:
-                return "アプリのアップデートやお知らせを記載しています。"
-                
-            case .account:
-                return "アカウント情報の確認や変更、削除を含めた操作を行います。"
-                
-            case .twitter:
-                return "unicoの公式Twitterへ移動します。"
-
-            case .review:
-                return "App Storeにてunicoのレビュー評価を行います。"
-                
-            case .share:
-                return "シェア画面から他の人にunicoアプリをシェアします。"
-
-            case .query:
-                return "アプリのご利用に関してお問い合わせを行います。"
-                
-            case .rules:
-                return "アプリの利用規約について記載しています。"
-                
-            case .privacy:
-                return "アプリのプライバシーポリシーを記載しています。"
-            }
-        }
-    }
 
     @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var logInVM: LogInViewModel
-    @StateObject var itemVM: ItemViewModel
 
     var body: some View {
 
@@ -120,6 +21,15 @@ struct SystemView: View {
                 
                 
                 switch listRow {
+
+                case .setting:
+                    Button {
+                        navigationVM.path.append(ApplicationSettingPath.root)
+                    } label: {
+                        ListRowView(icon : listRow.icon,
+                                    title: listRow.title,
+                                    text : listRow.information)
+                    }
                     
                 case .account:
                     Button {
@@ -127,71 +37,63 @@ struct SystemView: View {
                     } label: {
                         ListRowView(icon : listRow.icon,
                                     title: listRow.title,
-                                    text : listRow.infomation)
+                                    text : listRow.information)
                     }
                     
                 case .twitter:
                     Button {
+                        //TODO: unicoの公式アカウントを作った段階でurlを更新
                         let twitterURL = URL(string: "https://twitter.com/kenchan2n4n")!
                         UIApplication.shared.open(twitterURL)
                     } label: {
                         ListRowView(icon : listRow.icon,
                                     title: listRow.title,
-                                    text : listRow.infomation)
+                                    text : listRow.information)
                     }
                     
                 case .review:
                     Button {
-                        logInVM.reviewApp()
+                        reviewApp()
                     } label: {
                         ListRowView(icon : listRow.icon,
                                     title: listRow.title,
-                                    text : listRow.infomation)
+                                    text : listRow.information)
                     }
                     
                 case .share:
                     Button {
-                        logInVM.shareApp()
+                        shareApp()
                     } label: {
                         ListRowView(icon : listRow.icon,
                                     title: listRow.title,
-                                    text : listRow.infomation)
-                    }
-
-                case .infomation:
-                    Button {
-                        navigationVM.path.append(UpdateReportPath.root)
-                    } label: {
-                        ListRowView(icon : listRow.icon,
-                                    title: listRow.title,
-                                    text : listRow.infomation)
+                                    text : listRow.information)
                     }
                     
-                case .query:
-                    NavigationLink {
-                        EmptyView()
+                case .contact:
+                    Button {
+                        sendContactUs()
                     } label: {
                         ListRowView(icon : listRow.icon,
                                     title: listRow.title,
-                                    text : listRow.infomation)
+                                    text : listRow.information)
                     }
                     
                 case .rules:
-                    NavigationLink {
-                        EmptyView()
+                    Button {
+                        sendTermsOfUse()
                     } label: {
                         ListRowView(icon : listRow.icon,
                                     title: listRow.title,
-                                    text : listRow.infomation)
+                                    text : listRow.information)
                     }
                     
                 case .privacy:
-                    NavigationLink {
-                        EmptyView()
+                    Button {
+                        sendPrivacyPolicy()
                     } label: {
                         ListRowView(icon : listRow.icon,
                                     title: listRow.title,
-                                    text : listRow.infomation)
+                                    text : listRow.information)
                     }
                 }
             }
@@ -199,7 +101,7 @@ struct SystemView: View {
             Spacer()
             
         } // VStack
-        .customNavigationTitle(title: "設定メニュー")
+        .customNavigationTitle(title: "システムメニュー")
         .customSystemBackground()
         .customBackButton()
         
@@ -217,8 +119,8 @@ struct ListRowView: View {
         VStack {
             
             HStack {
-                if self.title == "公式Twitter" {
-                    Image("twitter_logo")
+                if self.title == "公式X（旧Twitter）" {
+                    Image("X_Logo")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 30, height: 20)
@@ -258,8 +160,107 @@ struct ListRowView: View {
     }
 }
 
+/// システム画面の各種リストのエレメントを管理する列挙体。
+enum SystemListContents: CaseIterable {
+    case setting
+    case account
+    case twitter
+    case review
+    case share
+    case contact
+    case rules
+    case privacy
+
+    var icon: String {
+        switch self {
+
+        case .setting:
+            return "paintbrush.pointed.fill"
+
+        case .account:
+            return "person"
+
+        case .twitter:
+            return ""
+
+        case .review:
+            return "star.bubble"
+
+        case .share:
+            return "square.and.arrow.up"
+
+        case .contact:
+            return "envelope.open"
+
+        case .rules:
+            return "network.badge.shield.half.filled"
+
+        case .privacy:
+            return "hand.raised.fingers.spread"
+        }
+    }
+
+    var title: String {
+        switch self {
+
+        case .setting:
+            return "アプリ設定"
+
+        case .account:
+            return "アカウント設定"
+
+        case .twitter:
+            return "公式X（旧Twitter）"
+
+        case .review:
+            return "アプリのレビューを書く"
+
+        case .share:
+            return "アプリをシェア"
+
+        case .contact:
+            return "お問い合わせ"
+
+        case .rules:
+            return "利用規約"
+
+        case .privacy:
+            return "プライバシーポリシー"
+        }
+    }
+
+    var information: String {
+        switch self {
+
+        case .setting:
+            return "アプリ内の設定を変更します。"
+
+        case .account:
+            return "アカウント情報の確認や変更、削除を含めた操作を行います。"
+
+        case .twitter:
+            return "unicoの公式X（旧Twitter）アカウントへ移動します。"
+
+        case .review:
+            return "AppStoreにてunicoのレビュー評価を行います。（レビューをいただけると大変嬉しいです）"
+
+        case .share:
+            return "シェア画面から他の人にunicoアプリをシェアします。"
+
+        case .contact:
+            return "unico公式サイトのお問い合わせフォームに接続します。"
+
+        case .rules:
+            return "unico公式サイトのアプリ利用規約記載ページへ移動します。"
+
+        case .privacy:
+            return "unico公式サイトのプライバシーポリシー記載ページへ移動します。"
+        }
+    }
+}
+
 struct SystemView_Previews: PreviewProvider {
     static var previews: some View {
-        SystemView(itemVM: ItemViewModel())
+        SystemView()
     }
 }

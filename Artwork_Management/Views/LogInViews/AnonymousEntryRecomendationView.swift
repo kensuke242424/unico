@@ -93,31 +93,20 @@ struct AnonymousEntryRecomendationView: View {
 
                     Button("お試しで始める") {
 
-                        if userVM.isAnonymous {
-                            // すでにお試しアカウントでアプリを始めている場合の処理
-                            withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
-                                logInVM.handleUseReceivedEmailLink = .entryAccount
-                                /// ⬇︎関係ない値のように見えるが、メソッドのハンドリングに使われる値のため、消さない！！
-                                logInVM.userSelectedSignInType = .signUp
-                                logInVM.showEmailHalfSheet.toggle()
-                            }
+                        // すでにアカウントを作成しログイン済みの場合は弾く
+                        // if Auth.auth().currentUser != nil { return }
+                        logInVM.resultSignInType = .signUp
+                        logInVM.signInAnonymously()
 
-                        } else {
-                            // アプリをまだ始めてなくて、ログイン画面からのアクセスの場合の処理
-                            // すでにアカウントを作成しログイン済みの場合は弾く
-                            if Auth.auth().currentUser != nil { return }
-                            logInVM.resultSignInType = .signUp
-                            logInVM.signInAnonymously()
-
-                            withAnimation(.easeInOut(duration: 0.5)) {
-                                isShow.toggle()
-                            }
-                            withAnimation(.spring(response: 0.8).delay(0.5)) {
-                                logInVM.userSelectedSignInType = .signUp
-                                logInVM.createAccountFase      = .check
-                                logInVM.selectProviderType     = .trial
-                            }
+                        withAnimation(.easeInOut(duration: 0.5)) {
+                            isShow.toggle()
                         }
+                        withAnimation(.spring(response: 0.8).delay(0.5)) {
+                            logInVM.userSelectedSignInType = .signUp
+                            logInVM.createAccountFase      = .check
+                            logInVM.selectProviderType     = .trial
+                        }
+
                     }
                     .buttonStyle(.borderedProminent)
                     .disabled(checkTermsAgree ? false : true)

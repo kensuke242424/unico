@@ -117,7 +117,7 @@ struct ShowsItemDetail: View {
                                                 inputDetail.isShowAmountAlert.toggle()
                                             }
                                         } message: {
-                                            Text("カート内のアイテムは編集できません")
+                                            Text("処理中のアイテムは編集できません")
                                         } // alert
 
                                         .alert("確認", isPresented: $inputDetail.isShowDeleteItemAlert) {

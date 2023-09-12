@@ -95,6 +95,7 @@
 		BECAA8CC2A60434400B07B17 /* UpdateUserDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BECAA8CB2A60434400B07B17 /* UpdateUserDataView.swift */; };
 		BECEBE572A2F9B260059B0DC /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = BECEBE562A2F9B260059B0DC /* Introspect */; };
 		BECEBE592A2F9B260059B0DC /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = BECEBE582A2F9B260059B0DC /* SwiftUIIntrospect */; };
+		BEFEF1892A8FAB5100131D41 /* ExternalManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEFEF1882A8FAB5100131D41 /* ExternalManager.swift */; };
 		E0003D0328FD3BB0007308B0 /* TagTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0003D0228FD3BB0007308B0 /* TagTitle.swift */; };
 		E01AA3A129167F02000FCD37 /* ResizableSheet in Frameworks */ = {isa = PBXBuildFile; productRef = E01AA3A029167F02000FCD37 /* ResizableSheet */; };
 		E01AA3A32916C674000FCD37 /* TagModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E01AA3A22916C674000FCD37 /* TagModel.swift */; };
@@ -252,6 +253,7 @@
 		BEB669CA2A2CD105008FC9DE /* CustomLongPressGesture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomLongPressGesture.swift; sourceTree = "<group>"; };
 		BEB669ED2A2DF49E008FC9DE /* CGSizeExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGSizeExtension.swift; sourceTree = "<group>"; };
 		BECAA8CB2A60434400B07B17 /* UpdateUserDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateUserDataView.swift; sourceTree = "<group>"; };
+		BEFEF1882A8FAB5100131D41 /* ExternalManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalManager.swift; sourceTree = "<group>"; };
 		E0003D0228FD3BB0007308B0 /* TagTitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagTitle.swift; sourceTree = "<group>"; };
 		E01AA3A22916C674000FCD37 /* TagModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagModel.swift; sourceTree = "<group>"; };
 		E01AA3A429176FE7000FCD37 /* PHPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PHPickerView.swift; sourceTree = "<group>"; };
@@ -593,6 +595,7 @@
 		E08F273328DDB3C400329C5E /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
+				BEFEF1882A8FAB5100131D41 /* ExternalManager.swift */,
 				BE6E007329CD5CCA009CBD38 /* NavigationViewModel.swift */,
 				E0455FDD292B2B83004F677D /* LogInViewModel.swift */,
 				E0DE98D728E2DBB800471AB4 /* TeamViewModel.swift */,
@@ -667,9 +670,9 @@
 		E08F274228DEAD5900329C5E /* SystemViews */ = {
 			isa = PBXGroup;
 			children = (
+				E08F273928DDB53700329C5E /* SystemView.swift */,
 				BE599F902A20F66C00821E01 /* ApplicationSettingViews */,
 				BEAAD94929D1ED0C00C53138 /* UpdateReportViews */,
-				E08F273928DDB53700329C5E /* SystemView.swift */,
 				BE20B04229BAEA170078169B /* CustomBackButton.swift */,
 				BE599F6C2A1B25DF00821E01 /* customNavigationTitle.swift */,
 				BE20B04429BAEF000078169B /* AccountSettingViews */,
@@ -974,6 +977,7 @@
 				BE8734F12A5EE99F004AA246 /* EditBackgroundControlButtons.swift in Sources */,
 				BE20B04829BAEFDB0078169B /* UpdateAddressView.swift in Sources */,
 				E0F78FC42919F06D00A95CD1 /* DateFormatterExtension.swift in Sources */,
+				BEFEF1892A8FAB5100131D41 /* ExternalManager.swift in Sources */,
 				BE1F272D29C16E4200AD55DF /* DetailView.swift in Sources */,
 				BE19FD8E2A7DFD6C00AE8165 /* CompareModels.swift in Sources */,
 				BEAAD94629D068C000C53138 /* SuccessUpdateAddressView.swift in Sources */,
@@ -1174,9 +1178,12 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.-gmail.kennsuke242424.unico";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -1207,9 +1214,12 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.-gmail.kennsuke242424.unico";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

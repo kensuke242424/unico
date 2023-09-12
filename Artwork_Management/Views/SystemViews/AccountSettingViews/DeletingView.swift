@@ -56,7 +56,7 @@ struct DeletingView: View {
                     // -----  usersコレクション内のユーザー関連データを削除  ------
                     try await userVM.deleteAllUserDocumentsController()
                     // -----  ユーザーがアカウント登録したAuthデータを削除  ------
-                    try await logInVM.deleteAuthWithEmail()
+                    try await logInVM.deleteAuth()
                     // 全てのデータ削除が完了したら、削除完了画面へ遷移
                     navigationVM.path.append(SystemAccountPath.deletedAccount)
 
@@ -75,7 +75,7 @@ struct DeletingView: View {
 
             do {
                 try await teamVM.deleteAllTeamDocumentsController(joins: userVM.joins)
-                try await logInVM.deleteAuthWithEmail()
+                try await logInVM.deleteAuth()
 
             } catch {
                 // アカウントデータの削除に失敗したら、一つ前のページに戻る

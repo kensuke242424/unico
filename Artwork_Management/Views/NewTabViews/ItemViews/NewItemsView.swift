@@ -35,6 +35,8 @@ struct NewItemsView: View {
     /// View Properties
     @Environment(\.colorScheme) var colorScheme
     @State private var activeTag: Tag?
+    /// カートの表示に合わせてソートボタンを上にずらすためのプロパティ。
+    @State private var sortViewOffsetY: CGFloat = 0
     // TODO: アイテム表示のパターンを作成
     @State private var carouselMode: Bool = false
     /// For Matched Geometry Effect
@@ -185,6 +187,14 @@ struct NewItemsView: View {
         .overlay {
             ItemSortManuView(userColor: userVM.memberColor, itemVM: itemVM)
                 .opacity(showDetailView ? 0 : 1)
+                .offset(y: sortViewOffsetY)
+                .onChange(of: inputTab.showCart) { showCart in
+                    if showCart == .hidden {
+                        withAnimation { sortViewOffsetY = 0 }
+                    } else {
+                        withAnimation { sortViewOffsetY = -120 }
+                    }
+                }
         }
         .background {
             ZStack {
@@ -307,7 +317,8 @@ struct NewItemsView: View {
                         cartVM.addCartItem(item: item)
 
                     } label: {
-                        Image(systemName: "cart.fill")
+                        Image(systemName: "plus")
+                            .fontWeight(.black)
                             .foregroundColor(.gray)
                             .opacity(checkHaveNotInventory(item) ? 0.3 : 1)
                             .background {

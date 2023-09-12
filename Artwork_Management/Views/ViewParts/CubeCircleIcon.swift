@@ -20,7 +20,7 @@ struct CubeCircleIcon: View {
             .shadow(radius: 2, x: 1, y: 2)
             .shadow(radius: 2, x: 1, y: 2)
             .overlay {
-                Image(systemName: "cube.transparent")
+                Image(systemName: "cube.transparent.fill")
                     .resizable()
                     .scaledToFit()
                     .frame(width: size / 2)

@@ -19,7 +19,7 @@ class UserViewModel: ObservableObject {
 
     init() {
         print("<<<<<<<<<  UserViewModel_init  >>>>>>>>>")
-        isAnonymousCheck()
+//        isAnonymousCheck()
     }
 
     var userListener: ListenerRegistration?
@@ -59,7 +59,14 @@ class UserViewModel: ObservableObject {
         return self.joins.compactMap { $0.id }
     }
 
-    @Published var isAnonymous: Bool = false
+//    @Published var isAnonymous: Bool = false
+    var isAnonymous: Bool {
+        if let user = Auth.auth().currentUser, user.isAnonymous {
+            return true
+        } else {
+            return false
+        }
+    }
     @Published var showAlert = false
     @Published var userErrorMessage = ""
 
@@ -107,15 +114,15 @@ class UserViewModel: ObservableObject {
         }
     }
 
-    /// ユーザーのアカウントステートを返すメソッド。
-    func isAnonymousCheck() {
-        
-        if let user = Auth.auth().currentUser, user.isAnonymous {
-            self.isAnonymous = true
-        } else {
-            self.isAnonymous = false
-        }
-    }
+//    /// ユーザーのアカウントステートを返すメソッド。
+//    func isAnonymousCheck() {
+//        
+//        if let user = Auth.auth().currentUser, user.isAnonymous {
+//            self.isAnonymous = true
+//        } else {
+//            self.isAnonymous = false
+//        }
+//    }
 
     /// ユーザーデータの更新をリスニングするスナップショットリスナー。
     func userListener() async throws {
@@ -135,9 +142,9 @@ class UserViewModel: ObservableObject {
 
                     withAnimation {
                             self.user = userData
-                        DispatchQueue.main.async {
-                            self.isAnonymousCheck()
-                        }
+//                        DispatchQueue.main.async {
+//                            self.isAnonymousCheck()
+//                        }
                     }
                 } catch {
                     print("ERROR: ユーザーデータのリスナー失敗")
@@ -207,8 +214,11 @@ class UserViewModel: ObservableObject {
     }
 
     func getCurrentTeamMyBackgrounds() -> [Background] {
-        let myBackgrounds = self.joins[currentJoinsIndex ?? 0].myBackgrounds
-        return myBackgrounds
+        if let index = currentJoinsIndex {
+            return self.joins[index].myBackgrounds
+        } else {
+            return []
+        }
     }
 
     /// Homeのパーツ編集設定をFirestoreのドキュメントに保存するメソッド
@@ -409,8 +419,7 @@ class UserViewModel: ObservableObject {
             Background(category: "original",
                        imageName: "",
                        imageURL: imageURL,
-                       imagePath: imagePath)
-        )
+                       imagePath: imagePath))
 
         do {
             try db?
@@ -521,7 +530,7 @@ class UserViewModel: ObservableObject {
     }
 
     /// Firestorageに保存されているユーザーのオリジナル背景データを全て削除するメソッド。
-    func deleteUserMyBackgrounds() {
+    func deleteAllUserMyBackgrounds() {
         guard let user else { return }
         let storage = Storage.storage()
         let reference = storage.reference()
@@ -573,7 +582,7 @@ class UserViewModel: ObservableObject {
 
         do {
             // ユーザーのオリジナル背景データを削除
-            deleteUserMyBackgrounds()
+            deleteAllUserMyBackgrounds()
             // userドキュメントが持つ所属チームのサブコレクション「joins」を削除
             try await deleteUserJoinsDocuments()
             // userドキュメントを削除

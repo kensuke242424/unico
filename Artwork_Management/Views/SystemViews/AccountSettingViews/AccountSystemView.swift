@@ -98,7 +98,7 @@ struct AccountSystemView: View {
                         }
                         .onChange(of: logInVM.resultAccountLink) { result in
                             if result == true {
-                                userVM.isAnonymousCheck()
+//                                userVM.isAnonymousCheck()
                             }
                         }
                         .alert(logInVM.resultAccountLink ? "登録完了" : "登録失敗",
