@@ -80,6 +80,7 @@ fileprivate struct NotificationContainer: View {
 
                 Text(element.logType.message)
                     .tracking(1)
+                    .font(.subheadline)
                     .fontWeight(.bold)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .opacity(0.7)
@@ -866,7 +867,15 @@ enum LogType: Codable, Equatable {
         case .deleteItem(let item):
             return "\(item.name) のアイテムデータが削除されました。"
         case .commerce(let items):
-            return "\(items.count) 個のアイテムが在庫処理されました。"
+            guard let firstItem = items.first else {
+                return "在庫の処理に失敗しました。"
+            }
+            if items.count > 1 {
+                return "\(firstItem.after.name) 他、合計\(items.count) 個のアイテムが在庫処理されました。"
+            } else {
+                return "\(firstItem.after.name) が在庫処理されました。"
+            }
+
         case .join(_, let team):
             return "\(team.name) に新メンバーが加入しました！"
         case .updateUser:
