@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 enum DefaultEmailCheckFase {
     case start, check, failure, notMatches, sendEmail, waitDelete, success
@@ -56,24 +57,19 @@ struct DefaultEmailCheckView: View {
             .opacity(0.7)
             .multilineTextAlignment(.leading)
             .padding(.top)
-            
-            TextField("", text: $inputEmailAddress)
-                .textInputAutocapitalization(.never)
-                .foregroundColor(.black)
-                .padding()
-                .background {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(.white)
-                            .opacity(0.8)
-                            .frame(height: 32)
-                        
-                        Text(inputEmailAddress.isEmpty ? "登録済のメールアドレスを入力" : "")
-                            .foregroundColor(.black)
-                            .opacity(0.4)
-                    }
-                }
-                .padding()
+
+            VStack {
+                Text("- 現在登録されているメールアドレス -")
+                    .opacity(0.7)
+                    .padding(.bottom, 7)
+                Text(Auth.auth().currentUser?.email ?? "???")
+                    .opacity(0.5)
+            }
+            .font(.caption)
+            .fontWeight(.semibold)
+            .foregroundColor(.white)
+            .multilineTextAlignment(.leading)
+            .padding()
             
             Button("メールを送信") {
                 Task {
