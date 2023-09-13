@@ -9,10 +9,16 @@ import SwiftUI
 
 extension View {
 
+    /// ユーザーが使用しているデバイスのサイズ感を表すプロパティ。
+    /// UIScreen.main.bounds.heightがiPhoneSEの縦幅（667）より小さい場合、.smallとする。
+    var userDeviseSize: DeviseSize  {
+        return Self.getDeviseSize()
+    }
+
     /// ユーザーが使用しているデバイスのサイズ感を取得するメソッド。
     /// UIScreen.main.bounds.heightがiPhoneSEの縦幅（667）より小さい場合、.smallとする。
     /// それよりも大きい場合、.mediumとする。
-    func getDeviseSize() -> DeviseSize {
+    static func getDeviseSize() -> DeviseSize {
         if UIScreen.main.bounds.height <= 667 {
             return .small
         } else {

@@ -31,8 +31,8 @@ struct LargeLogoMark: View {
                 .scaledToFit()
                 .foregroundColor(.white.opacity(0.7))
                 .opacity(0.9)
-                .frame(width: getDeviseSize() == .small ? 250 : 300,
-                       height: getDeviseSize() == .small ? 250 : 300)
+                .frame(width: userDeviseSize == .small ? 250 : 300,
+                       height: userDeviseSize == .small ? 250 : 300)
                 .padding()
         } // VStack
     } // body

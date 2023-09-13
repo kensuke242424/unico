@@ -18,22 +18,13 @@ struct SelectionBackgroundCards: View {
     var imageCardSize: CGSize {
         let defaultHeight: CGFloat = 220
         let defaultWidth: CGFloat = 110
-        if getDeviseSize() == .small {
-            return CGSize(width: defaultWidth * 0.8,
-                          height: defaultHeight * 0.8)
-        } else {
-            return CGSize(width: defaultWidth,
-                          height: defaultHeight)
-        }
+        return CGSize(width: userDeviseSize == .medium ? defaultWidth : defaultWidth * 0.8,
+                      height: userDeviseSize == .medium ? defaultHeight: defaultHeight * 0.8)
     }
     /// 背景写真カードのスクロールビューサイズ。iPhoneSE以下のサイズの場合、返却するサイズ値を小さくする。
     var cardsScrollViewHeight: CGFloat {
-        let defaultSize: CGFloat = 280
-        if getDeviseSize() == .small {
-            return defaultSize * 0.8
-        } else {
-            return defaultSize
-        }
+        let defaultScrollHeight: CGFloat = 280
+        return userDeviseSize == .medium ? defaultScrollHeight : defaultScrollHeight * 0.8
     }
 
     var body: some View {
@@ -121,7 +112,8 @@ struct SelectionBackgroundCards: View {
         /// タップ範囲調整のため、本体の画像タップ判定はfalseにしてこちらで処理する
         .overlay {
             Rectangle()
-                .frame(width: 110, height: 220)
+                .frame(width: imageCardSize.width,
+                       height: imageCardSize.height)
                 .opacity(0.01)
                 .onTapGesture {
                     withAnimation(.spring(response: 0.5)) {
@@ -135,17 +127,20 @@ struct SelectionBackgroundCards: View {
                 .fill(.gray.gradient)
         }
         .scaleEffect(backgroundVM.selectBackground == background ? 1.15 : 1.0)
+        // 選択中の背景に付くバッジ
         .overlay(alignment: .topTrailing) {
             Image(systemName: "circlebadge.fill")
                 .resizable()
                 .scaledToFit()
                 .foregroundColor(.green)
-                .frame(width: 20, height: 20)
+                .frame(width: userDeviseSize == .small ? 15 : 20,
+                       height: userDeviseSize == .small ? 15 : 20)
                 .padding(1)
                 .background(Circle().fill(.white.gradient))
                 .scaleEffect(backgroundVM.selectBackground == background ? 1.0 : 1.15)
                 .opacity(backgroundVM.selectBackground == background ? 1.0 : 0.0)
-                .offset(x: 15, y: -25)
+                .offset(x: userDeviseSize == .small ? 10 : 15,
+                        y: userDeviseSize == .small ? -15 : -25)
         }
     }
 

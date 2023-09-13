@@ -269,10 +269,12 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 // アカウント登録の進捗を表すインジケーター
                 if logInVM.userSelectedSignInType == .signUp {
                     createAccountIndicator()
+                        .scaleEffect(userDeviseSize == .small ? 0.8 : 1)
                         .opacity(backgroundVM.checkMode ? 0 : 1)
                         .opacity(logInVM.createAccountFase == .check ||
                                  logInVM.createAccountFase == .success ? 0 : 1)
                         .offset(y: -getRect().height / 3 + 30)
+                        .offset(y: userDeviseSize == .small ? -20 : 0)
                         .padding(.bottom)
                 }
                 
@@ -316,7 +318,6 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         }
                     } label: {
                         Text("< 戻る")
-//                            .foregroundColor(applicationDarkMode ? .white : .black)
                             .foregroundColor(.white)
                             .fontWeight(.semibold)
                             .opacity(0.7)
@@ -334,6 +335,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                              !inputLogIn.createAccountShowContents ? 0.0 : 1.0)
                     .opacity(backgroundVM.checkMode ? 0 : 1)
                     .offset(y: getRect().height / 2 - 100)
+                    .offset(y: userDeviseSize == .small ? 30 : 0)
                 }
                 
                 // ログイン画面最初のページまで戻るボタン
@@ -595,33 +597,6 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         try await userVM.fetchUser()
                         guard let user = userVM.user else { return }
 
-                        /// ----  新規チームデータを自動生成するフロー   ---------
-                        
-//                        // 新規チームのIDとして使用
-//                        let createTeamID = UUID().uuidString
-//
-//                        /// teamsコレクションに保存する新規チームデータ
-//                        let teamData = Team(id     : createTeamID,
-//                                            name   : "\(user.name)のチーム")
-//
-//                        /// ユーザードキュメントのサブコレクションに保存する所属チームの情報
-//                        let joinTeamData = JoinTeam(id           : teamData.id,
-//                                                    name             : teamData.name,
-//                                                    currentBackground: backgroundVM.selectBackground ??
-//                                                                       backgroundVM.sampleBackground,
-//                                                    myBackgrounds    : backgroundVM.pickMyBackgroundsAtSignUp)
-//
-//                        /// 準備したチームデータをFirestoreに保存していく
-//                        /// userDocument側にも新規作成したチームのidを保存しておく(addNewJoinTeam)
-//                        try await teamVM.addNewTeam(team: teamData)
-//                        try await teamVM.addFirstMemberToFirestore(teamId: teamData.id, data: user)
-//                        try await userVM.addNewJoinTeam(data: joinTeamData)
-//                        // サンプルアイテム&タグをセット
-//                        await teamVM.setSampleItem(teamID: teamData.id)
-//                        await tagVM.setSampleTag(teamID: teamData.id)
-//                        // ユーザーのログイン先を新規チームに設定
-//                        try await userVM.updateLastLogInTeam(teamId: teamData.id)
-//
                         /// データ生成の成功を知らせるアニメーションの後、データのフェッチとログイン開始
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                             withAnimation(.spring(response: 1.3)) {
@@ -680,6 +655,12 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
     }
     @ViewBuilder
     func firstSelectButtons() -> some View {
+
+        var buttonSize: CGSize {
+            let buttonWidth: CGFloat = 250
+            let buttonHeight: CGFloat = 60
+            return CGSize(width: buttonWidth, height: buttonHeight)
+        }
         
         VStack(spacing: 20) {
             Text("アカウントをお持ちですか？")
@@ -697,7 +678,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 ZStack {
                     RoundedRectangle(cornerRadius: 15)
                         .foregroundColor(.black.opacity(0.1))
-                        .frame(width: 250, height: 60)
+                        .frame(width: buttonSize.width, height: buttonSize.height)
                         .background(BlurView(style: .systemMaterialDark))
                         .clipShape(RoundedRectangle(cornerRadius: 15))
                         .shadow(radius: 10, x: 5, y: 5)
@@ -852,7 +833,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 }
             } // Group
             .tracking(5)
-            .font(.subheadline)
+            .font(userDeviseSize == .small ? .footnote : .subheadline)
             .foregroundColor(.white)
             .opacity(backgroundVM.checkMode ? 0 : 1)
             .opacity(inputLogIn.createAccountTitle ? 1.0 : 0.0)
