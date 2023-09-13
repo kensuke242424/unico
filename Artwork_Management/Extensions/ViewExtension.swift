@@ -13,7 +13,7 @@ extension View {
     /// UIScreen.main.bounds.heightがiPhoneSEの縦幅（667）より小さい場合、.smallとする。
     /// それよりも大きい場合、.mediumとする。
     func getDeviseSize() -> DeviseSize {
-        if UIScreen.main.bounds.height < 667 {
+        if UIScreen.main.bounds.height <= 667 {
             return .small
         } else {
             return .medium

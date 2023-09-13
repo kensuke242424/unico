@@ -14,6 +14,28 @@ struct SelectionBackgroundCards: View {
     @EnvironmentObject var userVM: UserViewModel
     @Binding var showPicker: Bool
 
+    /// 背景写真カードのサイズ。iPhoneSE以下のサイズの場合、返却するサイズ値を小さくする。
+    var imageCardSize: CGSize {
+        let defaultHeight: CGFloat = 220
+        let defaultWidth: CGFloat = 110
+        if getDeviseSize() == .small {
+            return CGSize(width: defaultWidth * 0.8,
+                          height: defaultHeight * 0.8)
+        } else {
+            return CGSize(width: defaultWidth,
+                          height: defaultHeight)
+        }
+    }
+    /// 背景写真カードのスクロールビューサイズ。iPhoneSE以下のサイズの場合、返却するサイズ値を小さくする。
+    var cardsScrollViewHeight: CGFloat {
+        let defaultSize: CGFloat = 280
+        if getDeviseSize() == .small {
+            return defaultSize * 0.8
+        } else {
+            return defaultSize
+        }
+    }
+
     var body: some View {
         ScrollView(.horizontal, showsIndicators: true) {
             LazyHStack(spacing: 30) {
@@ -59,14 +81,15 @@ struct SelectionBackgroundCards: View {
                 }
                 Spacer().frame(width: 40)
             } // LazyHStack
-            .frame(height: 280)
+            .frame(height: cardsScrollViewHeight)
         } // ScrollView
     }
     @ViewBuilder
     func ShowPickerCardView() -> some View {
         RoundedRectangle(cornerRadius: 20)
             .fill(.gray.gradient)
-            .frame(width: 110, height: 220)
+            .frame(width: imageCardSize.width,
+                   height: imageCardSize.height)
             .opacity(0.7)
             .overlay {
                 Button {
@@ -89,8 +112,8 @@ struct SelectionBackgroundCards: View {
     @ViewBuilder
     func BackgroundCardView(_ background: Background) -> some View {
         SDWebImageToItem(imageURL: background.imageURL,
-                       width: 110,
-                       height: 220)
+                         width: imageCardSize.width,
+                       height: imageCardSize.height)
         .shadow(radius: 5, x: 2, y: 2)
         .shadow(radius: 5, x: 2, y: 2)
         .shadow(radius: 5, x: 2, y: 2)
