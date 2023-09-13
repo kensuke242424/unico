@@ -70,9 +70,9 @@ struct UserEntryRecommendationView: View {
                 VStack(alignment: .leading, spacing: 20) {
                     VStack(alignment: .leading) {
                         Text("※アカウント登録はお試し期間中いつでも可能です。")
-                        Text(" 登録が完了すると、お試しアカウントから")
-                        Text(" 登録済みアカウントに切り替わります。")
-                        Text(" 管理していたアイテムやデータは全て引き継がれます。")
+                        Text("  登録が完了すると、お試しアカウントから")
+                        Text("  登録済みアカウントに切り替わります。")
+                        Text("  管理していたアイテムやデータは全て引き継がれます。")
                     }
                     Text("※アカウント登録による料金の発生は一切ありません。")
                 }

@@ -191,12 +191,11 @@ struct RootView: View {
 
         // Auth check...
         .onAppear {
-
             if Auth.auth().currentUser != nil {
-                print("unicoのユーザーデータを作成済みです。fetchを開始")
+                print("unicoのアカウントデータが存在しました。データフェッチを開始")
                 logInVM.rootNavigation = .fetch
             } else {
-                print("unicoのユーザーデータをまだ作成していません。ログイン画面に遷移")
+                print("unicoのアカウントデータが存在しません。ログイン画面に遷移")
                 progressVM.showCubesProgress.toggle()
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
@@ -248,6 +247,8 @@ struct RootView: View {
                         if userVM.isAnonymous {
                             logInVM.entryAccountByEmailLink(email: email,
                                                             link: link)
+                        } else {
+                            print("ERROR: ユーザーは匿名アカウントではありません。")
                         }
                     case .deleteAccount:
                         logInVM.addressReauthenticateByEmailLink(email: email,
