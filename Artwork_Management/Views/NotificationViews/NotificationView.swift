@@ -27,7 +27,7 @@ struct NotificationView: View {
 }
 
 /// アイコン+メッセージ型の通知ボード。
-/// 受け取った通知フレームから通知のタイプを参照して、タイプに合わせた出力を行う。
+/// 受け取った通知データのエレメントから通知のタイプを参照して、タイプに合わせた出力を行う。
 fileprivate struct NotificationContainer: View {
 
     /// 通知のタイプと、タイプごとのデータ要素をもつ通知一個分のエレメント。
@@ -35,6 +35,7 @@ fileprivate struct NotificationContainer: View {
 
     @EnvironmentObject var vm: NotificationViewModel
     @EnvironmentObject var teamVM: TeamViewModel
+    @EnvironmentObject var userVM: UserViewModel
     @Environment(\.colorScheme) var colorScheme
 
     /// 通知ボードの表示有無を管理するプロパティ。
@@ -54,9 +55,6 @@ fileprivate struct NotificationContainer: View {
     let screen = UIScreen.main.bounds
     /// １秒ごとにカウントをプラスしていくタイマーパブリッシャー。自動破棄を管理するために用いる。
     let showLimitTimer = Timer.publish(every: 1, on: .current, in: .common).autoconnect()
-    /// キャンセルボタンによって更新キャンセルされたデータの「createTime」が格納されるプロパティ。
-    /// このcreateTime値を照らし合わせて、表示データがキャンセル実行済みかどうかを判定する。
-    @State private var resetedLogs: [Date] = []
 
     /// ログの生成時間と、現在の時間との差分を表す文字列データ。
     /// onAppear内で値が算出される。
@@ -73,10 +71,16 @@ fileprivate struct NotificationContainer: View {
         VStack {
             /// 通知ボードのヘッドビュー
             HStack {
-                CircleIconView(url: element.logType.imageURL, size: 60)
+                switch element.logType {
+                case .addItem, .updateItem, .deleteItem, .commerce, .join, .updateTeam:
+                    CircleIconView(url: teamVM.team?.iconURL, size: 60)
+                case .updateUser:
+                    CircleIconView(url: userVM.user?.iconURL, size: 60)
+                }
 
                 Text(element.logType.message)
                     .tracking(1)
+                    .font(.subheadline)
                     .fontWeight(.bold)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .opacity(0.7)
@@ -863,7 +867,15 @@ enum LogType: Codable, Equatable {
         case .deleteItem(let item):
             return "\(item.name) のアイテムデータが削除されました。"
         case .commerce(let items):
-            return "\(items.count) 個のアイテムが在庫処理されました。"
+            guard let firstItem = items.first else {
+                return "在庫の処理に失敗しました。"
+            }
+            if items.count > 1 {
+                return "\(firstItem.after.name) 他、合計\(items.count) 個のアイテムが在庫処理されました。"
+            } else {
+                return "\(firstItem.after.name) が在庫処理されました。"
+            }
+
         case .join(_, let team):
             return "\(team.name) に新メンバーが加入しました！"
         case .updateUser:

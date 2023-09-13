@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 enum DefaultEmailCheckFase {
     case start, check, failure, notMatches, sendEmail, waitDelete, success
@@ -56,48 +57,27 @@ struct DefaultEmailCheckView: View {
             .opacity(0.7)
             .multilineTextAlignment(.leading)
             .padding(.top)
-            
-            TextField("", text: $inputEmailAddress)
-                .textInputAutocapitalization(.never)
-                .foregroundColor(.black)
-                .padding()
-                .background {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(.white)
-                            .opacity(0.8)
-                            .frame(height: 32)
-                        
-                        Text(inputEmailAddress.isEmpty ? "登録済のメールアドレスを入力" : "")
-                            .foregroundColor(.black)
-                            .opacity(0.4)
-                    }
-                }
-                .padding()
+
+            VStack {
+                Text("- 現在登録されているメールアドレス -")
+                    .opacity(0.7)
+                    .padding(.bottom, 7)
+                Text(Auth.auth().currentUser?.email ?? "???")
+                    .opacity(0.5)
+            }
+            .font(.caption)
+            .fontWeight(.semibold)
+            .foregroundColor(.white)
+            .multilineTextAlignment(.leading)
+            .padding()
             
             Button("メールを送信") {
                 Task {
                     withAnimation(.easeInOut(duration: 0.2)) {
                         logInVM.defaultEmailCheckFase = .check
+                        logInVM.defaultEmailCheckFase = .sendEmail
                     }
-                    
-                    /// 入力されたアドレスが、登録アドレスと一致するか検証するメソッド
-                    let matchesCheckResult = await logInVM.verifyInputEmailMatchesCurrent(email: inputEmailAddress)
-
-                    if matchesCheckResult {
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            logInVM.handleUseReceivedEmailLink = .updateEmail
-                            logInVM.defaultEmailCheckFase = .sendEmail
-                        }
-                        // リンクメールを送る前に、認証リンクがどのように使われるかハンドルするために
-                        // 「handleUseReceivedEmailLink」に値を設定しておく必要がある
-                        logInVM.sendEmailLink(email: inputEmailAddress, useType: .updateEmail)
-                    } else {
-                        hapticErrorNotification()
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            logInVM.defaultEmailCheckFase = .notMatches
-                        }
-                    }
+                    logInVM.sendEmailLink(email: inputEmailAddress, useType: .updateEmail)
                 }
             }
             HStack(spacing: 10) {
