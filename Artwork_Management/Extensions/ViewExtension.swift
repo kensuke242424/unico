@@ -9,6 +9,17 @@ import SwiftUI
 
 extension View {
 
+    /// ユーザーが使用しているデバイスのサイズ感を取得するメソッド。
+    /// UIScreen.main.bounds.heightがiPhoneSEの縦幅（667）より小さい場合、.smallとする。
+    /// それよりも大きい場合、.mediumとする。
+    func getDeviseSize() -> DeviseSize {
+        if UIScreen.main.bounds.height < 667 {
+            return .small
+        } else {
+            return .medium
+        }
+    }
+
     func getSafeArea() -> UIEdgeInsets {
 
         guard let screen =
@@ -40,4 +51,10 @@ extension View {
                     .ignoresSafeArea()
             }
     }
+}
+
+/// ユーザーが使用しているデバイスのサイズを表す。
+/// iPhoneSEの縦幅（667）より小さい場合、smallとする。
+enum DeviseSize {
+    case small, medium
 }
