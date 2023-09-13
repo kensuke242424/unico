@@ -294,13 +294,15 @@ struct NewTabView: View {
                                 cartVM: cartVM,
                                 halfSheetScroll: .additional,
                                 memberColor: userVM.memberColor)
-                            
+
+                            // 全画面リスト表示時の下部の余白
                             Spacer()
                                 .frame(height: 100)
                         }
                     )
+                    // ミディアム表示時において、決済シートの重なり幅の分だけ、カートシートを上にずらす
                     Spacer()
-                        .frame(height: 80)
+                        .frame(height: userDeviseSize == .small ? 70 :  80)
                 } // VStack
             } // builder.content
             .sheetBackground { _ in
@@ -438,8 +440,9 @@ struct NewTabView: View {
                     Spacer()
                     /// Itemタブに移動した時に表示するアイテム追加タブボタン
                     if inputTab.animationTab == .item && !inputTab.reportShowDetail {
+                        // -- 新規アイテム追加ボタン --
                         Button {
-                            /// アイテム追加エディット画面に遷移
+                            // アイテム追加エディット画面に遷移
                             withAnimation(.spring(response: 0.4)) {
                                 navigationVM.path.append(EditItemPath.create)
                             }
@@ -447,8 +450,15 @@ struct NewTabView: View {
                             Image(systemName: "shippingbox.fill")
                                 .resizable()
                                 .scaledToFit()
-                                .foregroundColor(.primary)
                                 .frame(width: 30, height: 30)
+                                .overlay(alignment: .topTrailing) {
+                                    Image(systemName: "plus.circle.fill")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 10, height: 10)
+                                        .offset(x: 5, y: -5)
+                                }
+                                .foregroundColor(.primary)
                                 .opacity(inputTab.animationOpacity)
                         }
                         .transition(.asymmetric(
@@ -459,7 +469,7 @@ struct NewTabView: View {
                 } // HStack
                 .padding(.horizontal, 20)
             }
-            .padding(.top, userDeviseSize == .small ? 30 : 60)
+            .padding(.top, userDeviseSize == .small ? 35 : 60)
         } // Geometry
         .frame(height: userDeviseSize == .small ? 70 : 100)
         .background(

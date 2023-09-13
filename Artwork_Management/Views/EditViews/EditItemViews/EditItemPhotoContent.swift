@@ -17,7 +17,6 @@ struct SelectItemPhotoBackground: View {
         
         BlurView(style: .systemUltraThinMaterialDark)
             .frame(width: getRect().width, height: height)
-//            .opacity(0.9)
             .background {
                 if let photoImage = photoImage {
                     Image(uiImage: photoImage)

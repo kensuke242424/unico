@@ -72,7 +72,8 @@ struct NewItemsView: View {
             let size = $0.size
             VStack(spacing: 15) {
                 
-                TagsView(tags: tagVM.tags, items: itemVM.items)
+                ItemTagsView(tags: tagVM.tags, items: itemVM.items)
+                    .padding(.top, 5)
                     .opacity(showDetailView ? 0 : 1)
                 
                 ScrollView(.vertical, showsIndicators: false) {
@@ -101,7 +102,9 @@ struct NewItemsView: View {
                                             inputTab.selectedItem = item
                                         }
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                                            withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.7, blendDuration: 0.7)) {
+                                            withAnimation(.interactiveSpring(response: 0.6,
+                                                                             dampingFraction: 0.7,
+                                                                             blendDuration: 0.7)) {
                                                 showDetailView.toggle()
                                                 inputTab.reportShowDetail = true
                                             }
@@ -473,7 +476,7 @@ struct NewItemsView: View {
     }
     
     @ViewBuilder
-    func TagsView(tags: [Tag], items: [Item]) -> some View {
+    func ItemTagsView(tags: [Tag], items: [Item]) -> some View {
         HStack {
             
             ScrollView(.horizontal, showsIndicators: false) {
@@ -573,19 +576,5 @@ struct NewItemsView: View {
             .padding(.trailing, 15)
             .offset(y: -1)
         }
-        .padding(.top)
     }
 } // View
-
-struct NewItemsView_Previews: PreviewProvider {
-    static var previews: some View {
-        NewItemsView(itemVM  : ItemViewModel(),
-                     cartVM  : CartViewModel(),
-                     inputTab: .constant(InputTab()))
-        .environmentObject(LogInViewModel())
-        .environmentObject(TeamViewModel())
-        .environmentObject(UserViewModel())
-        .environmentObject(ItemViewModel())
-        .environmentObject(TagViewModel())
-    }
-}

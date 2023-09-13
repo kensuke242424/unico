@@ -127,7 +127,7 @@ struct UpdateTeamDataView: View {
         }
         .onAppear {
             input.defaultIconData = (url     : teamVM.team?.iconURL,
-                                           filePath : teamVM.team?.iconPath)
+                                     filePath : teamVM.team?.iconPath)
             input.nameText = teamVM.team?.name ?? ""
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {

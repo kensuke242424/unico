@@ -111,7 +111,7 @@ struct SystemSideMenu: View {
 
             /// チームアイコンとチーム名
             VStack(alignment: .leading, spacing: 15) {
-                let iconSize = getRect().width / 3 + 20
+                var iconSize: CGFloat { userDeviseSize == .small ? 140 : 160 }
                 let teamName: String = teamVM.team?.name ?? "No Name"
 
                 SDWebImageCircleIcon(imageURL: teamVM.team?.iconURL,
