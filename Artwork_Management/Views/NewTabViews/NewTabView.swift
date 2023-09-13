@@ -390,7 +390,6 @@ struct NewTabView: View {
                     .opacity(inputTab.animationTab == tab ? 1 : 0.5)
                     .frame(width: tabWidth)
                     .contentShape(Rectangle())
-                    .padding(.top, 60)
                     .onTapGesture(perform: {
                         if tab == .home && inputTab.selectionTab == .item {
                             inputTab.selectionTab = .home
@@ -459,10 +458,10 @@ struct NewTabView: View {
                     }
                 } // HStack
                 .padding(.horizontal, 20)
-                .padding(.top, 60)
             }
+            .padding(.top, userDeviseSize == .small ? 30 : 60)
         } // Geometry
-        .frame(height: 100)
+        .frame(height: userDeviseSize == .small ? 70 : 100)
         .background(
             Color.clear
                 .overlay {
