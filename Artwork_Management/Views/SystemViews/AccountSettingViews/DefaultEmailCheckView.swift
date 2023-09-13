@@ -75,25 +75,9 @@ struct DefaultEmailCheckView: View {
                 Task {
                     withAnimation(.easeInOut(duration: 0.2)) {
                         logInVM.defaultEmailCheckFase = .check
+                        logInVM.defaultEmailCheckFase = .sendEmail
                     }
-                    
-                    /// 入力されたアドレスが、登録アドレスと一致するか検証するメソッド
-                    let matchesCheckResult = await logInVM.verifyInputEmailMatchesCurrent(email: inputEmailAddress)
-
-                    if matchesCheckResult {
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            logInVM.handleUseReceivedEmailLink = .updateEmail
-                            logInVM.defaultEmailCheckFase = .sendEmail
-                        }
-                        // リンクメールを送る前に、認証リンクがどのように使われるかハンドルするために
-                        // 「handleUseReceivedEmailLink」に値を設定しておく必要がある
-                        logInVM.sendEmailLink(email: inputEmailAddress, useType: .updateEmail)
-                    } else {
-                        hapticErrorNotification()
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            logInVM.defaultEmailCheckFase = .notMatches
-                        }
-                    }
+                    logInVM.sendEmailLink(email: inputEmailAddress, useType: .updateEmail)
                 }
             }
             HStack(spacing: 10) {
