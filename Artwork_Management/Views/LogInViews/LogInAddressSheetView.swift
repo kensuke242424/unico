@@ -34,8 +34,9 @@ struct LogInAddressSheetView: View {
                     .overlay {
                         VStack {
                             HStack {
-                                Text("メールアドレス認証")
-                                    .font(.title3).fontWeight(.bold)
+                                Text(logInVM.isAnonymous ? "メールアドレス アカウント登録" : "メールアドレス認証")
+                                    .font(userDeviseSize == .small ? .subheadline : .title3)
+                                    .fontWeight(.bold)
                                 
                                 Spacer()
                                 

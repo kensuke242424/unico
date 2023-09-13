@@ -68,6 +68,13 @@ class LogInViewModel: ObservableObject {
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
     var listenerHandle: AuthStateDidChangeListenerHandle?
     var uid: String? { Auth.auth().currentUser?.uid }
+    var isAnonymous: Bool {
+        if let user = Auth.auth().currentUser, user.isAnonymous {
+            return true
+        } else {
+            return false
+        }
+    }
 
     // sign in with Appleにてサインイン時に生成されるランダム文字列「ノンス」
     fileprivate var currentNonce: String?

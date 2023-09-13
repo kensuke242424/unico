@@ -59,7 +59,6 @@ class UserViewModel: ObservableObject {
         return self.joins.compactMap { $0.id }
     }
 
-//    @Published var isAnonymous: Bool = false
     var isAnonymous: Bool {
         if let user = Auth.auth().currentUser, user.isAnonymous {
             return true
