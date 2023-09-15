@@ -103,7 +103,7 @@ struct CommerceSheet: View {
                 .disabled(cartVM.doCommerce)
                 .opacity(cartVM.doCommerce == true ? 0.3 : 1.0)
             } // HStack
-            .frame(height: 80)
+            .frame(height: userDeviseSize == .small ? 70 : 80)
             .padding(.horizontal, 20)
             .animation(nil, value: cartVM.resultCartPrice)
             .animation(nil, value: cartVM.resultCartAmount)

@@ -24,7 +24,7 @@ struct BackgroundCategoriesTagView: View {
 
                         Text(category.categoryName)
                             .tracking(3)
-                            .font(.title3)
+                            .font(userDeviseSize == .small ? .body : .title3)
                             .fontWeight(.light)
                             .foregroundColor(backgroundVM.selectCategory == category ? .white : .white.opacity(0.7))
                             .padding(.horizontal, 15)

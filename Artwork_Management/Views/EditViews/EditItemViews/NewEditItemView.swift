@@ -76,10 +76,10 @@ struct NewEditItemView: View {
                                 }
                                 
                             VStack(spacing: 20) {
-                                Image(systemName: "cube.transparent.fill")
+                                Image(systemName: "shippingbox.fill")
                                     .resizable()
                                     .scaledToFit()
-                                    .frame(width: 100)
+                                    .frame(width: 80)
                                     .foregroundColor(.white)
                                 
                                 Text("写真を選択")

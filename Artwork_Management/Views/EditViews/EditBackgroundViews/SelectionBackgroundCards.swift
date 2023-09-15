@@ -14,6 +14,19 @@ struct SelectionBackgroundCards: View {
     @EnvironmentObject var userVM: UserViewModel
     @Binding var showPicker: Bool
 
+    /// 背景写真カードのサイズ。iPhoneSE以下のサイズの場合、返却するサイズ値を小さくする。
+    var imageCardSize: CGSize {
+        let defaultHeight: CGFloat = 220
+        let defaultWidth: CGFloat = 110
+        return CGSize(width: userDeviseSize == .medium ? defaultWidth : defaultWidth * 0.8,
+                      height: userDeviseSize == .medium ? defaultHeight: defaultHeight * 0.8)
+    }
+    /// 背景写真カードのスクロールビューサイズ。iPhoneSE以下のサイズの場合、返却するサイズ値を小さくする。
+    var cardsScrollViewHeight: CGFloat {
+        let defaultScrollHeight: CGFloat = 280
+        return userDeviseSize == .medium ? defaultScrollHeight : defaultScrollHeight * 0.8
+    }
+
     var body: some View {
         ScrollView(.horizontal, showsIndicators: true) {
             LazyHStack(spacing: 30) {
@@ -59,14 +72,15 @@ struct SelectionBackgroundCards: View {
                 }
                 Spacer().frame(width: 40)
             } // LazyHStack
-            .frame(height: 280)
+            .frame(height: cardsScrollViewHeight)
         } // ScrollView
     }
     @ViewBuilder
     func ShowPickerCardView() -> some View {
         RoundedRectangle(cornerRadius: 20)
             .fill(.gray.gradient)
-            .frame(width: 110, height: 220)
+            .frame(width: imageCardSize.width,
+                   height: imageCardSize.height)
             .opacity(0.7)
             .overlay {
                 Button {
@@ -89,8 +103,8 @@ struct SelectionBackgroundCards: View {
     @ViewBuilder
     func BackgroundCardView(_ background: Background) -> some View {
         SDWebImageToItem(imageURL: background.imageURL,
-                       width: 110,
-                       height: 220)
+                         width: imageCardSize.width,
+                       height: imageCardSize.height)
         .shadow(radius: 5, x: 2, y: 2)
         .shadow(radius: 5, x: 2, y: 2)
         .shadow(radius: 5, x: 2, y: 2)
@@ -98,7 +112,8 @@ struct SelectionBackgroundCards: View {
         /// タップ範囲調整のため、本体の画像タップ判定はfalseにしてこちらで処理する
         .overlay {
             Rectangle()
-                .frame(width: 110, height: 220)
+                .frame(width: imageCardSize.width,
+                       height: imageCardSize.height)
                 .opacity(0.01)
                 .onTapGesture {
                     withAnimation(.spring(response: 0.5)) {
@@ -112,17 +127,20 @@ struct SelectionBackgroundCards: View {
                 .fill(.gray.gradient)
         }
         .scaleEffect(backgroundVM.selectBackground == background ? 1.15 : 1.0)
+        // 選択中の背景に付くバッジ
         .overlay(alignment: .topTrailing) {
             Image(systemName: "circlebadge.fill")
                 .resizable()
                 .scaledToFit()
                 .foregroundColor(.green)
-                .frame(width: 20, height: 20)
+                .frame(width: userDeviseSize == .small ? 15 : 20,
+                       height: userDeviseSize == .small ? 15 : 20)
                 .padding(1)
                 .background(Circle().fill(.white.gradient))
                 .scaleEffect(backgroundVM.selectBackground == background ? 1.0 : 1.15)
                 .opacity(backgroundVM.selectBackground == background ? 1.0 : 0.0)
-                .offset(x: 15, y: -25)
+                .offset(x: userDeviseSize == .small ? 10 : 15,
+                        y: userDeviseSize == .small ? -15 : -25)
         }
     }
 

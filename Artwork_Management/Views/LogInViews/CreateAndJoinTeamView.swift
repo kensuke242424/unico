@@ -48,6 +48,11 @@ struct CreateAndJoinTeamView: View {
     @State private var backgroundColor: Color = .userGray1
     @FocusState private var createNameFocused: ShowKeyboard?
 
+    var cardSize: CGSize {
+        return CGSize(width: userDeviseSize == .medium ? 150 : 130,
+                      height: userDeviseSize == .medium ? 200 : 180)
+    }
+
     var body: some View {
 
         ZStack {
@@ -85,7 +90,11 @@ struct CreateAndJoinTeamView: View {
 
                 case .join:
                     VStack(spacing: 10) {
-                        Text("チームに参加する").font(.title3.bold()).opacity(0.7).tracking(10)
+                        Text("チームに参加する")
+                            .font(userDeviseSize == .small ? .body : .title3)
+                            .fontWeight(.bold)
+                            .opacity(0.7)
+                            .tracking(10)
 
                         Group {
                             switch selectTeamFase {
@@ -132,7 +141,11 @@ struct CreateAndJoinTeamView: View {
                 case .create:
 
                     VStack(spacing: 10) {
-                        Text("チームを作る").font(.title3.bold()).opacity(0.7).tracking(10)
+                        Text("チームを作る")
+                            .font(userDeviseSize == .small ? .body : .title3)
+                            .fontWeight(.bold)
+                            .opacity(0.7)
+                            .tracking(10)
 
                         Group {
                             switch selectTeamFase {
@@ -175,7 +188,8 @@ struct CreateAndJoinTeamView: View {
                         .frame(height: 60)
                         .padding(.top, 20)
                     }
-                    .padding(.bottom, selectTeamFase == .success ? 0 : 40)
+                    .padding(.bottom, selectTeamFase == .success ? 0 :
+                                userDeviseSize == .small ? 20 : 40)
                 }
 
                 // create team contents...
@@ -207,7 +221,6 @@ struct CreateAndJoinTeamView: View {
                                             Image(uiImage: userQRCodeImage)
                                                 .resizable()
                                                 .frame(width: 150, height: 150)
-                                                .padding(.top, 30)
                                         } else {
                                             ZStack {
                                                 RoundedRectangle(cornerRadius: 5)
@@ -220,21 +233,21 @@ struct CreateAndJoinTeamView: View {
                                                         .foregroundColor(.white)
                                                 }
                                             }
-                                            .padding(.top, 30)
                                         }
 
                                         VStack {
                                             Text("あなたのユーザーID")
                                                 .opacity(0.6).tracking(4)
                                                 .font(.subheadline)
-                                            ZStack {
-                                                RoundedRectangle(cornerRadius: 3)
-                                                    .foregroundColor(.black)
-                                                    .padding(.horizontal, 40)
-                                                Text(userVM.uid ?? "ユーザーIDが見つかりません")
-                                                    .textSelection(.enabled)
-                                                    .padding(8)
-                                            }
+                                            Text(userVM.uid ?? "ユーザーIDが見つかりません")
+                                                .font(userDeviseSize == .medium ? .body : .callout)
+                                                .textSelection(.enabled)
+                                                .padding(8)
+                                                .background {
+                                                    RoundedRectangle(cornerRadius: 3)
+                                                        .foregroundColor(.black)
+                                                }
+                                                .padding(.horizontal, 40)
 
                                             HStack(spacing: 40) {
                                                 Button {
@@ -287,12 +300,13 @@ struct CreateAndJoinTeamView: View {
                             }
                         }
                     }
+                    .font(userDeviseSize == .small ? .callout : .body)
                     .buttonStyle(.borderedProminent)
                     .opacity(selectTeamFase == .start || selectTeamFase == .success ? 0 : 1)
                     .opacity(selectedTeamCard == .join && selectTeamFase == .fase2 ? 0 : 1)
                     .disabled(selectedTeamCard == .start || selectTeamFase == .success ? true : false)
-//                    .disabled(selectedTeamCard == .join && userVM.isAnonymous ? true : false) // 匿名は使えない
-                    .padding(.top, 30)
+                    .disabled(selectedTeamCard == .join && userVM.isAnonymous ? true : false) // 匿名は使えない
+                    .padding(.top, userDeviseSize == .small ? 15 : 30)
                 }
                 
                 Button("<戻る") {
@@ -300,6 +314,7 @@ struct CreateAndJoinTeamView: View {
                         selectTeamFase = .fase1
                     }
                 }
+                .font(userDeviseSize == .small ? .callout : .body)
                 .fontWeight(.semibold)
                 .foregroundColor(.white.opacity(0.5))
                 .opacity(selectTeamFase == .fase2 ? 1.0 : 0.0)
@@ -488,11 +503,14 @@ struct CreateAndJoinTeamView: View {
             Color.userBlue1
             RoundedRectangle(cornerRadius: 10)
                 .stroke(.white, lineWidth: 1).opacity(0.3)
-                .frame(width: getRect().width * 0.35, height: getRect().height * 0.23)
+                .frame(width: cardSize.width * 0.9, height: cardSize.height * 0.9)
 
             VStack(spacing: 50) {
-                Image(systemName: "person.3.fill").resizable().scaledToFit().frame(width: 80)
-                .foregroundColor(.white)
+                Image(systemName: "person.3.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: userDeviseSize == .small ? 70 : 80)
+                    .foregroundColor(.white)
                 cubeRow(color1: .userRed2, color2: .userRedAccent)
                     .background {
                         cubeRow(color1: .userBlue2, color2: .userBlueAccent).opacity(0.5)
@@ -508,7 +526,7 @@ struct CreateAndJoinTeamView: View {
                 RoundedRectangle(cornerRadius: 10)
                     .foregroundColor(.black)
                     .opacity(selectedTeamCard == .join ? 0.8 : 0)
-                    .frame(width: getRect().width * 0.4, height: getRect().height * 0.25)
+                    .frame(width: cardSize.width, height: cardSize.height)
 
                 VStack(spacing: 20) {
 
@@ -517,7 +535,7 @@ struct CreateAndJoinTeamView: View {
                         Text("アカウント登録が")
                         Text("必要です")
                     }
-                    .font(.footnote)
+                    .font(userDeviseSize == .medium ? .footnote : .caption2)
                     .fontWeight(.bold)
                     .tracking(4)
                     .foregroundColor(.white)
@@ -534,7 +552,7 @@ struct CreateAndJoinTeamView: View {
             }
         }
         .clipShape(RoundedRectangle(cornerRadius: 10))
-        .frame(width: getRect().width * 0.4, height: getRect().height * 0.25)
+        .frame(width: cardSize.width, height: cardSize.height)
         .scaleEffect(selectedTeamCard == .join ? 1.4 : selectedTeamCard == .create ? 0.8 : 1.0)
         .offset(x: selectedTeamCard == .join ? 30 : 0)
         .opacity(selectedTeamCard == .join ? 1.0 : selectedTeamCard == .start ? 0.8 : 0.2)
@@ -559,16 +577,19 @@ struct CreateAndJoinTeamView: View {
             Color.userRed1
             RoundedRectangle(cornerRadius: 10)
                 .stroke(.white, lineWidth: 1).opacity(0.3)
-                .frame(width: getRect().width * 0.35, height: getRect().height * 0.23)
+                .frame(width: cardSize.width * 0.9, height: cardSize.height * 0.9)
 
             VStack(spacing: 40) {
-                Image(systemName: "person.fill").resizable().scaledToFit().frame(width: 50)
-                .foregroundColor(.white)
+                Image(systemName: "person.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: userDeviseSize == .small ? 40 : 50)
+                    .foregroundColor(.white)
                 cubeRow(color1: .userYellow2, color2: .userYellowAccent)
             }
         }
         .clipShape(RoundedRectangle(cornerRadius: 10))
-        .frame(width: getRect().width * 0.4, height: getRect().height * 0.25)
+        .frame(width: cardSize.width, height: cardSize.height)
         .scaleEffect(selectedTeamCard == .create ? 1.4 : selectedTeamCard == .join ? 0.8 : 1.0)
         .offset(x: selectedTeamCard == .create ? -30 : 0)
         .opacity(selectedTeamCard == .create ? 1.0 : selectedTeamCard == .start ? 0.8 : 0.2)
@@ -595,7 +616,7 @@ struct CreateAndJoinTeamView: View {
                     if let croppedIconUIImage {
                         UIImageCircleIcon(photoImage: croppedIconUIImage, size: 150)
                     } else {
-                        CubeCircleIcon(size: 150)
+                        CubeCircleIcon(size: userDeviseSize == .medium ? 150 : 130)
                     }
                 }
                 .onTapGesture { showPicker.toggle() }

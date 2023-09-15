@@ -269,10 +269,12 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 // アカウント登録の進捗を表すインジケーター
                 if logInVM.userSelectedSignInType == .signUp {
                     createAccountIndicator()
+                        .scaleEffect(userDeviseSize == .small ? 0.8 : 1)
                         .opacity(backgroundVM.checkMode ? 0 : 1)
                         .opacity(logInVM.createAccountFase == .check ||
                                  logInVM.createAccountFase == .success ? 0 : 1)
                         .offset(y: -getRect().height / 3 + 30)
+                        .offset(y: userDeviseSize == .small ? -20 : 0)
                         .padding(.bottom)
                 }
                 
@@ -316,7 +318,6 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         }
                     } label: {
                         Text("< 戻る")
-//                            .foregroundColor(applicationDarkMode ? .white : .black)
                             .foregroundColor(.white)
                             .fontWeight(.semibold)
                             .opacity(0.7)
@@ -334,6 +335,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                              !inputLogIn.createAccountShowContents ? 0.0 : 1.0)
                     .opacity(backgroundVM.checkMode ? 0 : 1)
                     .offset(y: getRect().height / 2 - 100)
+                    .offset(y: userDeviseSize == .small ? 30 : 0)
                 }
                 
                 // ログイン画面最初のページまで戻るボタン
@@ -345,7 +347,6 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                             Text("<<")
                             Image(systemName: "house.fill")
                         }
-//                        .foregroundColor(applicationDarkMode ? .white : .black)
                         .foregroundColor(.white)
                         .opacity(0.6)
                     }
@@ -377,26 +378,16 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     } // alert
                     
                 }
-                // メールアドレス登録選択時に出現するアドレス入力ハーフシートView
-                if logInVM.showEmailSheetBackground {
-                    Color.black
-                        .opacity(0.7)
-                        .ignoresSafeArea()
-                        .onTapGesture {
-                            if let showEmailKeyboard { return }
-                            withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
-                                logInVM.showEmailHalfSheet.toggle()
-                                showEmailKeyboard = nil
-                            }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                                logInVM.showEmailSheetBackground.toggle()
-                                logInVM.addressSignInFase = .start
-                            }
-                        }
-                }
+                // メールアドレス入力ハーフシートView
                 if logInVM.showEmailHalfSheet {
-                    inputAddressHalfSheet()
-                        .transition(.offset(y: getRect().height / 2))
+                    switch logInVM.userSelectedSignInType {
+                    case .start:
+                        EmptyView()
+                    case .logIn:
+                        LogInAddressSheetView(useType: .signIn)
+                    case .signUp:
+                        LogInAddressSheetView(useType: .entryAccount)
+                    }
                 }
 
             } // Group
@@ -416,7 +407,6 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 AnonymousEntryRecomendationView(isShow: $inputLogIn.isShowAnonymousEntryRecomendation)
                     .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
             }
-            
         }
         .ignoresSafeArea()
         
@@ -586,7 +576,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         if inputLogIn.createUserNameText == "" { inputLogIn.createUserNameText = "名無し" }
 
                         /// ユーザーの入力値をもとにユーザーデータを作成し、Firestoreに保存⬇︎
-                        try await logInVM.setNewUserToFirestore(name     : inputLogIn.createUserNameText,
+                        try await logInVM.setNewUserDocumentToFirestore(name     : inputLogIn.createUserNameText,
                                                              password : inputLogIn.password,
                                                              imageData: uplaodIconImageData,
                                                              color    : inputLogIn.selectUserColor)
@@ -595,33 +585,6 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                         try await userVM.fetchUser()
                         guard let user = userVM.user else { return }
 
-                        /// ----  新規チームデータを自動生成するフロー   ---------
-                        
-//                        // 新規チームのIDとして使用
-//                        let createTeamID = UUID().uuidString
-//
-//                        /// teamsコレクションに保存する新規チームデータ
-//                        let teamData = Team(id     : createTeamID,
-//                                            name   : "\(user.name)のチーム")
-//
-//                        /// ユーザードキュメントのサブコレクションに保存する所属チームの情報
-//                        let joinTeamData = JoinTeam(id           : teamData.id,
-//                                                    name             : teamData.name,
-//                                                    currentBackground: backgroundVM.selectBackground ??
-//                                                                       backgroundVM.sampleBackground,
-//                                                    myBackgrounds    : backgroundVM.pickMyBackgroundsAtSignUp)
-//
-//                        /// 準備したチームデータをFirestoreに保存していく
-//                        /// userDocument側にも新規作成したチームのidを保存しておく(addNewJoinTeam)
-//                        try await teamVM.addNewTeam(team: teamData)
-//                        try await teamVM.addFirstMemberToFirestore(teamId: teamData.id, data: user)
-//                        try await userVM.addNewJoinTeam(data: joinTeamData)
-//                        // サンプルアイテム&タグをセット
-//                        await teamVM.setSampleItem(teamID: teamData.id)
-//                        await tagVM.setSampleTag(teamID: teamData.id)
-//                        // ユーザーのログイン先を新規チームに設定
-//                        try await userVM.updateLastLogInTeam(teamId: teamData.id)
-//
                         /// データ生成の成功を知らせるアニメーションの後、データのフェッチとログイン開始
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                             withAnimation(.spring(response: 1.3)) {
@@ -646,7 +609,6 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 } // Task end
             }
         }
-//        .onAppear { userVM.isAnonymousCheck() }
         .onDisappear {
             resetLogInFase()
         }
@@ -680,6 +642,12 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
     }
     @ViewBuilder
     func firstSelectButtons() -> some View {
+
+        var buttonSize: CGSize {
+            let buttonWidth: CGFloat = 250
+            let buttonHeight: CGFloat = 60
+            return CGSize(width: buttonWidth, height: buttonHeight)
+        }
         
         VStack(spacing: 20) {
             Text("アカウントをお持ちですか？")
@@ -697,7 +665,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 ZStack {
                     RoundedRectangle(cornerRadius: 15)
                         .foregroundColor(.black.opacity(0.1))
-                        .frame(width: 250, height: 60)
+                        .frame(width: buttonSize.width, height: buttonSize.height)
                         .background(BlurView(style: .systemMaterialDark))
                         .clipShape(RoundedRectangle(cornerRadius: 15))
                         .shadow(radius: 10, x: 5, y: 5)
@@ -753,13 +721,8 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     return
                 }
 
-                withAnimation(.easeIn(duration: 0.25)) {
-                    logInVM.showEmailSheetBackground.toggle()
-                }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                    withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
-                        logInVM.showEmailHalfSheet.toggle()
-                    }
+                withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
+                    logInVM.showEmailHalfSheet.toggle()
                 }
             } label: {
                 ZStack {
@@ -852,7 +815,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                 }
             } // Group
             .tracking(5)
-            .font(.subheadline)
+            .font(userDeviseSize == .small ? .footnote : .subheadline)
             .foregroundColor(.white)
             .opacity(backgroundVM.checkMode ? 0 : 1)
             .opacity(inputLogIn.createAccountTitle ? 1.0 : 0.0)
@@ -1009,203 +972,6 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
             .opacity(inputLogIn.createAccountShowContents ? 1.0 : 0.0)
             
         } // VStack
-    }
-    @ViewBuilder
-    func inputAddressHalfSheet() -> some View {
-        VStack {
-            Spacer()
-            RoundedRectangle(cornerRadius: 40)
-                .frame(width: getRect().width, height: getRect().height / 2)
-                .foregroundColor(colorScheme == .light ? .customHalfSheetForgroundLight : .customHalfSheetForgroundDark)
-                .onTapGesture { showEmailKeyboard = nil }
-                .overlay {
-                    VStack {
-                        HStack {
-                            Text(logInVM.userSelectedSignInType == .logIn ?
-                                 "メールアドレス ログイン" : "メールアドレス アカウント登録")
-                                .font(.title3).fontWeight(.bold)
-                            
-                            Spacer()
-                            
-                            Button {
-                                withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
-                                    logInVM.showEmailHalfSheet.toggle()
-                                    showEmailKeyboard = nil
-                                }
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                                    logInVM.showEmailSheetBackground.toggle()
-                                    logInVM.addressSignInFase = .start
-                                }
-                            } label: {
-                                Circle()
-                                    .frame(width: 30, height: 30)
-                                    .foregroundColor(.gray.opacity(0.2))
-                                    .overlay {
-                                        Image(systemName: "xmark")
-                                            .resizable()
-                                            .fontWeight(.semibold)
-                                            .foregroundColor(.primary.opacity(0.7))
-                                            .frame(width: 10, height: 10)
-                                    }
-                            }
-                            .disabled(logInVM.addressSignInFase == .check ? true : false)
-                            .opacity(logInVM.addressSignInFase == .check ? 0.3 : 1.0)
-                        }
-                        .padding([.horizontal, .top], 20)
-                        .padding(.bottom, 10)
-                        
-                        HStack(spacing: 10) {
-                            if logInVM.addressSignInFase == .check {
-                                ProgressView()
-                            } else {
-                                logInVM.addressSignInFase.checkIcon
-                                    .foregroundColor(
-                                        logInVM.addressSignInFase == .failure ||
-                                        logInVM.addressSignInFase == .notExist ? .red : .green)
-                            }
-                            Text(logInVM.addressSignInFase.checkText)
-                                .tracking(5)
-                                .opacity(0.5)
-                                .fontWeight(.semibold)
-                        }
-                        .frame(width: 300, height: 30)
-                        .opacity(logInVM.addressSignInFase != .start ? 1.0 : 0.0)
-                        
-                        HStack(spacing: 35) {
-                            
-                            Image(systemName: "envelope.fill")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 35)
-                                .scaleEffect(logInVM.addressSignInFase == .check ? 1.0 :
-                                                logInVM.addressSignInFase == .success ? 1.4 :
-                                                1.0)
-                                .opacity(logInVM.addressSignInFase == .check ? 0.8 :
-                                            logInVM.addressSignInFase == .failure ||
-                                            logInVM.addressSignInFase == .notExist ? 0.8 :
-                                            logInVM.addressSignInFase == .success ? 1.0 :
-                                            0.8)
-                                .overlay(alignment: .topTrailing) {
-                                    Image(systemName: "questionmark")
-                                        .font(.subheadline)
-                                        .fontWeight(.semibold)
-                                        .opacity(logInVM.addressSignInFase == .failure ||
-                                                 logInVM.addressSignInFase == .notExist ? 0.5 : 0.0)
-                                        .offset(x: 15, y: -15)
-                                }
-                            
-                            if logInVM.addressSignInFase != .success {
-                                Image(systemName: "arrowshape.turn.up.right.fill")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 20)
-                                    .opacity(logInVM.addressSignInFase == .check ? 1.0 :
-                                                logInVM.addressSignInFase == .failure ||
-                                                logInVM.addressSignInFase == .notExist ? 0.2 :
-                                                0.4)
-                                    .scaleEffect(inputLogIn.repeatAnimation ? 1.3 : 1.0)
-                                    .animation(.default.repeat(while: inputLogIn.repeatAnimation),
-                                               value: inputLogIn.repeatAnimation)
-                            }
-                            
-                            if logInVM.addressSignInFase != .success {
-                                Image(systemName: "person.fill")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 35)
-                                    .opacity(logInVM.addressSignInFase == .check ? 0.4 :
-                                                logInVM.addressSignInFase == .failure ||
-                                                logInVM.addressSignInFase == .notExist ? 0.2 :
-                                                0.8)
-                                    .scaleEffect(logInVM.addressSignInFase == .check ? 0.8 : 1.0)
-                            }
-                        }
-                        .frame(height: 60)
-                        .padding(.bottom)
-                        // リピートスケールアニメーションの発火トリガー(アドレス入力の.check時に使用)
-                        .onChange(of: logInVM.addressSignInFase) { newValue in
-                            if newValue == .check {
-                                inputLogIn.repeatAnimation = true
-                            } else {
-                                inputLogIn.repeatAnimation = false
-                            }
-                        }
-                        
-                        VStack(spacing: 5) {
-                            Text(logInVM.addressSignInFase.messageText.text1)
-                            Text(logInVM.addressSignInFase.messageText.text2)
-                        }
-                        .font(.subheadline)
-                        .tracking(1)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 40)
-                        
-                        
-                        TextField("メールアドレスを入力", text: $inputLogIn.address)
-                            .focused($showEmailKeyboard, equals: .check)
-                            .autocapitalization(.none)
-                            .padding()
-                            .frame(width: getRect().width * 0.8, height: 30)
-                            .background(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .foregroundColor(colorScheme == .dark ? .gray.opacity(0.2) : .white)
-                                    .frame(height: 30)
-                                    .shadow(color: showEmailKeyboard == .check ? .blue : .clear, radius: 3)
-                            )
-                            .padding(20)
-                            .onChange(of: inputLogIn.address) { newValue in
-                                if newValue.isEmpty {
-                                    inputLogIn.sendAddressButtonDisabled = true
-                                } else {
-                                    inputLogIn.sendAddressButtonDisabled = false
-                                }
-                            }
-                        
-                        // アドレス認証を行うボタン
-                        Button(logInVM.addressSignInFase == .start || logInVM.addressSignInFase == .check ? "メールを送信" : "もう一度送る") {
-                            
-                            withAnimation(.spring(response: 0.3)) {
-                                logInVM.addressSignInFase = .check
-                            }
-                            
-                            switch logInVM.userSelectedSignInType {
-
-                            case .start :
-                                print("処理なし")
-                                
-                            case .logIn :
-//                                logInVM.handleUseReceivedEmailLink = .signIn
-                                logInVM.existEmailCheckAndSendMailLink(inputLogIn.address,
-                                                                       selected: .logIn)
-                                
-                            case .signUp:
-//                                logInVM.handleUseReceivedEmailLink = .signUp
-                                logInVM.existEmailCheckAndSendMailLink(inputLogIn.address,
-                                                                       selected: .signUp)
-                            }
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .disabled(inputLogIn.sendAddressButtonDisabled)
-                        .opacity(logInVM.addressSignInFase == .check ? 0.3 : 1.0)
-                        .padding(.top, 10)
-                        
-                        Spacer()
-                    }
-                }
-        }
-        .offset(y: logInVM.showEmailHalfSheet ? 0 : getRect().height / 2)
-        .offset(y: inputLogIn.keyboardOffset)
-        .onChange(of: showEmailKeyboard) { newValue in
-            if newValue == .check {
-                withAnimation(.spring(response: 0.4)) {
-                    inputLogIn.keyboardOffset = -UIScreen.main.bounds.height / 3
-                }
-            } else {
-                withAnimation(.easeInOut(duration: 0.25)) {
-                    inputLogIn.keyboardOffset = 0
-                }
-            }
-        }
     }
     @ViewBuilder
     func createAccountIndicator() -> some View {

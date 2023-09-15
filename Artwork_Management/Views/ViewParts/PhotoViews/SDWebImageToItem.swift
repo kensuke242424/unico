@@ -48,7 +48,7 @@ struct SDWebImageToItem: View {
                 .shadow(radius: 1, x: 2, y: 2)
                 .overlay {
                     VStack(spacing: 20) {
-                        Image(systemName: "cube.transparent.fill")
+                        Image(systemName: "shippingbox.fill")
                             .resizable()
                             .scaledToFit()
                             .frame(width: 80)

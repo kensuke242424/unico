@@ -14,8 +14,18 @@ import FirebaseStorage
 import FirebaseFirestore
 import FirebaseFirestoreSwift
 
+/// メールリンクの使用用途を管理する列挙型。
 enum HandleUseReceivedEmailLink {
-    case signIn, signUp, entryAccount, updateEmail, deleteAccount
+    /// サインイン時に用いられるケース
+    case signIn
+    /// 初期画面からの新規登録時に用いられるケース
+    case signUp // 新規登録
+    /// 匿名ユーザーからのアカウント登録で用いられるケース
+    case entryAccount
+    /// メールアドレス更新で用いられるケース
+    case updateEmail
+    /// アカウント削除時に用いられるケース
+    case deleteAccount
 }
 
 class LogInViewModel: ObservableObject {
@@ -68,6 +78,13 @@ class LogInViewModel: ObservableObject {
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
     var listenerHandle: AuthStateDidChangeListenerHandle?
     var uid: String? { Auth.auth().currentUser?.uid }
+    var isAnonymous: Bool {
+        if let user = Auth.auth().currentUser, user.isAnonymous {
+            return true
+        } else {
+            return false
+        }
+    }
 
     // sign in with Appleにてサインイン時に生成されるランダム文字列「ノンス」
     fileprivate var currentNonce: String?
@@ -89,9 +106,10 @@ class LogInViewModel: ObservableObject {
             }
         }
     }
-    
-    func signInAnonymously() {
-        print("＝＝＝＝＝signInAnonymouslyメソッド実行＝＝＝＝＝＝")
+
+    /// ユーザーを匿名アカウントとして登録するメソッド。
+    func signUpAnonymously() {
+        print("＝＝＝＝＝signUpAnonymouslyメソッド実行＝＝＝＝＝＝")
         
         Auth.auth().signInAnonymously { (authResult, error) in
             
@@ -107,7 +125,8 @@ class LogInViewModel: ObservableObject {
             }
         }
     }
-    
+    /// メールリンクを経由してFirebaseAuthへアクセスし、匿名アカウント->会員登録アカウントへ更新するメソッド。
+    /// 登録に成功した場合、データをすべて引き継いで登録済みアカウントとなる。
     func entryAccountByEmailLink(email: String, link: String) {
         
         let credential = EmailAuthProvider.credential(withEmail: email, link: link)
@@ -237,7 +256,8 @@ class LogInViewModel: ObservableObject {
         }
     }
 
-    func setNewUserToFirestore(name     : String,
+    /// 新規ユーザードキュメントをFirestoreに保存するメソッド。
+    func setNewUserDocumentToFirestore(name     : String,
                                password : String?,
                                imageData: (url: URL?, filePath: String?),
                                color: ThemeColor) async throws {
@@ -265,10 +285,6 @@ class LogInViewModel: ObservableObject {
             print("ERROR: 新規ユーザーデータ保存失敗")
             throw CustomError.setData
         }
-    }
-
-    enum EmailLinkUseType {
-        case signUp, logIn, entry
     }
     
     // ダイナミックリンクによってメールアドレス認証でのサインインをするため、ユーザにメールを送信するメソッド
@@ -472,238 +488,6 @@ class LogInViewModel: ObservableObject {
             print("アカウント削除失敗: \(error.localizedDescription)")
             throw CustomError.deleteAccount
         }
-    }
-    
-    // サインイン要求で nonce の SHA256 ハッシュを送信すると、Apple はそれを応答で変更せずに渡します。
-    // Firebase は、元のノンスをハッシュし、それを Apple から渡された値と比較することで、応答を検証します。
-    @available(iOS 13, *)
-    private func sha256(_ input: String) -> String {
-        let inputData = Data(input.utf8)
-        let hashedData = SHA256.hash(data: inputData)
-        let hashString = hashedData.compactMap {
-            String(format: "%02x", $0)
-        }.joined()
-        
-        return hashString
-    }
-    
-    private func randomNonceString(length: Int = 32) -> String {
-      precondition(length > 0)
-      let charset: [Character] =
-        Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
-      var result = ""
-      var remainingLength = length
-
-      while remainingLength > 0 {
-        let randoms: [UInt8] = (0 ..< 16).map { _ in
-          var random: UInt8 = 0
-          let errorCode = SecRandomCopyBytes(kSecRandomDefault, 1, &random)
-          if errorCode != errSecSuccess {
-            fatalError(
-              "Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(errorCode)"
-            )
-          }
-          return random
-        }
-
-        randoms.forEach { random in
-          if remainingLength == 0 {
-            return
-          }
-
-          if random < charset.count {
-            result.append(charset[Int(random)])
-            remainingLength -= 1
-          }
-        }
-      }
-
-      return result
-    }
-
-    // MARK: - Sign in with Appleはまだ実装できていない⬇︎
-    
-    func handleSignInWithAppleRequest(_ request: ASAuthorizationAppleIDRequest) {
-        request.requestedScopes = [.fullName, .email]
-        let nonce = randomNonceString()
-        currentNonce = nonce
-        // sha256 ⇨ 256文字のハッシュ関数を生成し暗号化。サインイン認証時に照らし合わせる
-        // 元となる文字列の文字数に関係なく256文字が生成される。この値はサインイン処理のたびに異なる値を照らし合わせる。
-        request.nonce = sha256(nonce)
-    }
-    
-    @MainActor
-    func handleSignInWithAppleCompletion(_ result: Result<ASAuthorization, Error>) {
-        if case .failure(let failure) = result {
-            print(failure.localizedDescription)
-        }
-        else if case .success(let success) = result {
-            // ASAuthorizationAppleIDCredential: AppleID認証が成功した結果として得られる資格情報。
-            if let appleIDCredential = success.credential as? ASAuthorizationAppleIDCredential {
-                guard let nonce = currentNonce else {
-                    fatalError("fatalError: handleSignInWithAppleCompletion_currentNonceの値が存在しません。")
-                }
-                guard let appleIDToken = appleIDCredential.identityToken else {
-                    print("Unable to fetch identify token。識別トークンをフェッチできません。")
-                    return
-                }
-                guard let authorizationCode = appleIDCredential.authorizationCode else {
-                    print("Unable to fetch authorizationCode。")
-                    return
-                }
-                guard let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
-                    print("Unable to serialise token string from data: \(appleIDToken.debugDescription). データからトークン文字列をシリアライズできません。")
-                    return
-                }
-                
-                print("＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝")
-                print("appleIDToken: \(appleIDToken)")
-                print("authorizationCode: \(authorizationCode)")
-                print("＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝")
-
-                let credential = OAuthProvider.credential(withProviderID: "apple.com",
-                                                          idToken: idTokenString,
-                                                          rawNonce: nonce)
-                Task {
-                    do {
-                         _ = try await Auth.auth().signIn(with: credential)
-                        print("Sign In With Appleからのアカウント登録完了")
-                    } catch {
-                        print("Error authenticating: \(error.localizedDescription)")
-                    }
-                }
-            }
-        }
-    }
-    // --- 🔥アップルサインインアカウントのサインアウト&AppleID連携解除のメソッド🔥  ---
-    func signOutAndDeleteAccount(credencial:  ASAuthorizationAppleIDCredential?) {
-      // Firebase Authenticationからサインアウトする
-      do {
-        try Auth.auth().signOut()
-      } catch let signOutError as NSError {
-        print("Error signing out: %@", signOutError)
-        return
-      }
-
-      // Apple ID の identityToken と authorizationCode を取得する
-        guard let appleIDCredential = credencial else {
-        return
-      }
-
-      let identityToken = String(data: appleIDCredential.identityToken!, encoding: .utf8)!
-      let authorizationCode = String(data: appleIDCredential.authorizationCode!, encoding: .utf8)!
-
-      // identityTokenとauthorizationCodeを使用して、Apple IDとの連携を解除する
-      // （例えば、先ほど紹介したREST APIを呼び出すなど）
-      deleteAccountFromServer(identityToken: identityToken, authorizationCode: authorizationCode)
-    }
-    // アップルサインインデータを削除するために必要な「appleIDToken」「authorizationCode」を保持するASAuthorizationAppleIDCredentialを取得するメソッド
-    // TODO: Sign in with Appleはまだ実装できていない。
-    func getSignOutWithAppleCredential(_ result: Result<ASAuthorization, Error>) ->  ASAuthorizationAppleIDCredential? {
-        
-        print("getSignOutWithAppleCredentialメソッド実行")
-        
-        // 以下のプロパティ値を返す
-        var credential: ASAuthorizationAppleIDCredential?
-        
-        if case .failure(let failure) = result {
-            print(failure.localizedDescription)
-        }
-        else if case .success(let success) = result {
-            // ASAuthorizationAppleIDCredential: AppleID認証が成功した結果として得られる資格情報。
-            if let appleIDCredential = success.credential as? ASAuthorizationAppleIDCredential {
-                guard let nonce = currentNonce else {
-                    fatalError("fatalError: handleSignInWithAppleCompletion_currentNonceの値が存在しません。")
-                }
-                guard let appleIDToken = appleIDCredential.identityToken else {
-                    print("Unable to fetch identify token。識別トークンをフェッチできません。")
-                    return nil
-                }
-                guard let authorizationCode = appleIDCredential.authorizationCode else {
-                    print("Unable to fetch authorizationCode。")
-                    return nil
-                }
-                
-                print("＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝")
-                print("appleIDToken: \(appleIDToken)")
-                print("authorizationCode: \(authorizationCode)")
-                print("＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝")
-                credential = appleIDCredential
-            }
-        }
-        return credential
-    }
-    
-    func deleteAccountFromServer(identityToken: String, authorizationCode: String) {
-        // 認証用の秘密鍵の読み込み
-        guard let filePath = Bundle.main.path(forResource: "AuthKey_MWXRWWC3VP", ofType: "p8") else {
-            print("秘密鍵が見つかりません")
-            return
-        }
-        print("filePath: \(filePath)")
-        
-        let fileURL = URL(fileURLWithPath: filePath)
-        guard let privateKey = try? String(contentsOf: fileURL).trimmingCharacters(in: .whitespacesAndNewlines) else {
-            print("秘密鍵の読み込みに失敗しました")
-            return
-        }
-        print("fileURL: \(fileURL)")
-        print("privateKey: \(privateKey)")
-
-        // HTTPリクエストの作成
-        let url = URL(string: "https://appleid.apple.com/auth/token")!
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-
-        // HTTPリクエストのボディに必要な情報を設定
-        let requestBody = "client_id=com.example.app&client_secret=\(privateKey)&code=\(authorizationCode)&grant_type=authorization_code&redirect_uri=https://example.com/callback"
-        request.httpBody = requestBody.data(using: .utf8)
-        print("requestBody: \(requestBody)")
-
-        // HTTPリクエストの送信
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = error {
-                print("HTTPリクエストの送信に失敗しました：\(error.localizedDescription)")
-                return
-            }
-            guard let data = data else {
-                print("HTTPレスポンスがありません")
-                return
-            }
-            print("HTTPレスポンスdata: \(data)")
-            
-            // TODO: 一つずつチェック
-            guard let responseJson = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else {
-                print("responseJsonの取得に失敗")
-                return
-            }
-            print("responceJson: \(responseJson)") // ✅
-            
-            guard let identityToken_ = responseJson["id_token"] as? String else {
-                print("identityTokenの取得に失敗")
-                return
-            }
-            guard let refreshToken_ = responseJson["refresh_token"] as? String else {
-                print("refreshToken取得に失敗")
-                return
-            }
-
-            // HTTPレスポンスからトークンを取得
-//            guard let responseJson = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-//                  let identityToken = responseJson["id_token"] as? String,
-//                  let refreshToken = responseJson["refresh_token"] as? String else {
-//                print("レスポンスJSONからトークンの取得に失敗しました")
-//                return
-//            }
-
-            // identityTokenを使って、Appleからユーザー情報を取得
-            // ...
-
-            // ユーザー情報を使って、アカウントの削除処理を行う
-            // ...
-        }
-        task.resume()
     }
     
     deinit {
