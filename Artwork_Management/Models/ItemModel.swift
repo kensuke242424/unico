@@ -6,14 +6,14 @@
 //
 
 import SwiftUI
-import FirebaseFirestore
-import FirebaseFirestoreSwift
+import FirebaseFirestoreimport FirebaseFirestoreSwift
 
 struct Item: Identifiable, Equatable, Hashable, Codable {
 
     var id: String? = UUID().uuidString
     var createTime: Date = Date()
     var updateTime: Date = Date()
+    var useType: ItemUseType?
     var tag: String
     var teamID: String
     var name: String
@@ -50,6 +50,11 @@ extension Item {
         }
         return descriptions
     }
+}
+
+/// アイテムの用途、タイプを管理する列挙体。
+enum ItemUseType: Codable {
+    case sale, consumable
 }
 
 /// アイテムの昇順・降順を管理する列挙体。
