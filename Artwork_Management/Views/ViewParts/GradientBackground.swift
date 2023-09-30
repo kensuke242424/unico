@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct GradientBackbround: View {
+struct GradientBackground: View {
 
     let color1: Color
     let color2: Color
@@ -29,6 +29,6 @@ struct GradientBackbround: View {
 struct GradientBackbround_Previews: PreviewProvider {
     static let memberColor: ThemeColor = .brawn
     static var previews: some View {
-        GradientBackbround(color1: memberColor.color1, color2: memberColor.colorAccent)
+        GradientBackground(color1: memberColor.color1, color2: memberColor.colorAccent)
     }
 }

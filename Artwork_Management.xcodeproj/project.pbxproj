@@ -111,7 +111,7 @@
 		E0455FE4292C8EF0004F677D /* BounceAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0455FE3292C8EF0004F677D /* BounceAnimationView.swift */; };
 		E0455FE6292CA002004F677D /* ColorCubeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0455FE5292CA001004F677D /* ColorCubeView.swift */; };
 		E0455FE8292CCB39004F677D /* HashableExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0455FE7292CCB39004F677D /* HashableExtension.swift */; };
-		E0455FEA292D1947004F677D /* GradientBackbround.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0455FE9292D1947004F677D /* GradientBackbround.swift */; };
+		E0455FEA292D1947004F677D /* GradientBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0455FE9292D1947004F677D /* GradientBackground.swift */; };
 		E04ACF4128E6DD600054A6C4 /* ShowsItemDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04ACF4028E6DD600054A6C4 /* ShowsItemDetail.swift */; };
 		E04ACF4328E73C660054A6C4 /* IndicatorRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04ACF4228E73C660054A6C4 /* IndicatorRow.swift */; };
 		E05130E228F341620092FE46 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E05130E128F341610092FE46 /* RootView.swift */; };
@@ -268,7 +268,7 @@
 		E0455FE3292C8EF0004F677D /* BounceAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BounceAnimationView.swift; sourceTree = "<group>"; };
 		E0455FE5292CA001004F677D /* ColorCubeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorCubeView.swift; sourceTree = "<group>"; };
 		E0455FE7292CCB39004F677D /* HashableExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HashableExtension.swift; sourceTree = "<group>"; };
-		E0455FE9292D1947004F677D /* GradientBackbround.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientBackbround.swift; sourceTree = "<group>"; };
+		E0455FE9292D1947004F677D /* GradientBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientBackground.swift; sourceTree = "<group>"; };
 		E04ACF4028E6DD600054A6C4 /* ShowsItemDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowsItemDetail.swift; sourceTree = "<group>"; };
 		E04ACF4228E73C660054A6C4 /* IndicatorRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndicatorRow.swift; sourceTree = "<group>"; };
 		E05130E128F341610092FE46 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
@@ -757,7 +757,7 @@
 				E0DE33512928F48D008C7147 /* CustomLoadingView.swift */,
 				E0455FE3292C8EF0004F677D /* BounceAnimationView.swift */,
 				E0455FE5292CA001004F677D /* ColorCubeView.swift */,
-				E0455FE9292D1947004F677D /* GradientBackbround.swift */,
+				E0455FE9292D1947004F677D /* GradientBackground.swift */,
 				E0A7DE4F290DAB40008C3F3F /* BlurView.swift */,
 				BE30B5C52A3217D80034755B /* BlurMuskingImageView.swift */,
 				E09F09C828EE3B4900D07669 /* UsefulButton.swift */,
@@ -927,7 +927,7 @@
 				E04ACF4328E73C660054A6C4 /* IndicatorRow.swift in Sources */,
 				E09F09BC28EAF33500D07669 /* FocusedLineRow.swift in Sources */,
 				BE19FD842A7AB12600AE8165 /* Log.swift in Sources */,
-				E0455FEA292D1947004F677D /* GradientBackbround.swift in Sources */,
+				E0455FEA292D1947004F677D /* GradientBackground.swift in Sources */,
 				BE74E91D2A77EE9B00C1A5F2 /* Crop.swift in Sources */,
 				BE8734EF2A5EE99F004AA246 /* EditTeamBackgroundView.swift in Sources */,
 				E0B328932924A42100E94BC3 /* ManageCustomizeSideMenu.swift in Sources */,

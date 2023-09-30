@@ -19,7 +19,7 @@ struct CubesProgressView: View {
 
         ZStack {
 
-            GradientBackbround(color1: backgroundColor.color1,
+            GradientBackground(color1: backgroundColor.color1,
                                color2: backgroundColor.colorAccent)
             .frame(width: getRect().width, height: getRect().height)
             .ignoresSafeArea()
