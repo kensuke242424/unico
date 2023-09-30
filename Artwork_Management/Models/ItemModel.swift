@@ -6,7 +6,8 @@
 //
 
 import SwiftUI
-import FirebaseFirestoreimport FirebaseFirestoreSwift
+import FirebaseFirestore
+import FirebaseFirestoreSwift
 
 struct Item: Identifiable, Equatable, Hashable, Codable {
 
