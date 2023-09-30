@@ -9,16 +9,18 @@ import SwiftUI
 
 struct CubesProgressView: View {
 
+    @EnvironmentObject var userVM: UserViewModel
+
     private let columnsV: [GridItem] = Array(repeating: .init(.flexible()), count: 4)
-    @State private var memberColor: ThemeColor = .blue
+    @State private var backgroundColor: ThemeColor = ThemeColor.allCases.randomElement() ?? .blue
     @State private var cubeColors: [ThemeColor] = []
 
     var body: some View {
 
         ZStack {
 
-            GradientBackbround(color1: memberColor.color1,
-                               color2: memberColor.colorAccent)
+            GradientBackbround(color1: backgroundColor.color1,
+                               color2: backgroundColor.colorAccent)
             .frame(width: getRect().width, height: getRect().height)
             .ignoresSafeArea()
 
@@ -33,7 +35,7 @@ struct CubesProgressView: View {
                     ForEach(0..<cubeColors.count, id: \.self) { index in
 
                         ColorCubeRow(colorRow: cubeColors[index],
-                                     startTime: Double(index) * 0.5, colorSet: $memberColor)
+                                     startTime: Double(index) * 0.5, colorSet: $backgroundColor)
 
                     }
                 }
@@ -51,9 +53,3 @@ struct CubesProgressView: View {
 
     } // body
 } // View
-
-struct StandByView_Previews: PreviewProvider {
-    static var previews: some View {
-        CubesProgressView()
-    }
-}
