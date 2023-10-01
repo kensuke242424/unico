@@ -23,7 +23,7 @@ struct ManageView: View {
         NavigationView {
             ZStack {
 
-                GradientBackbround(color1: userVM.user!.userColor.color1,
+                GradientBackground(color1: userVM.user!.userColor.color1,
                                    color2: userVM.user!.userColor.colorAccent)
 
                 ScrollView(.vertical) {
