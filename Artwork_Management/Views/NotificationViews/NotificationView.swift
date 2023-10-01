@@ -909,7 +909,7 @@ enum LogType: Codable, Equatable {
         case .addItem, .updateItem, .deleteItem:
             return "shippingbox.fill"
         case .commerce:
-            return "cart.fill"
+            return "cube.transparent.fill"
         case .join:
             return "person.fill"
         case .updateUser:

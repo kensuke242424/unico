@@ -164,8 +164,8 @@ struct ListRowView: View {
 enum SystemListContents: CaseIterable {
     case setting
     case account
-    case twitter
     case review
+    case twitter
     case share
     case contact
     case rules
@@ -210,7 +210,7 @@ enum SystemListContents: CaseIterable {
             return "アカウント設定"
 
         case .twitter:
-            return "公式X（旧Twitter）"
+            return "開発者のX（旧Twitter）アカウント"
 
         case .review:
             return "アプリのレビューを書く"
