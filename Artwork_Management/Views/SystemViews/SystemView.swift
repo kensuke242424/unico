@@ -119,7 +119,7 @@ struct ListRowView: View {
         VStack {
             
             HStack {
-                if self.title == "公式X（旧Twitter）" {
+                if self.title == "開発者のX（旧Twitter）" {
                     Image("X_Logo")
                         .resizable()
                         .scaledToFit()
@@ -165,11 +165,11 @@ enum SystemListContents: CaseIterable {
     case setting
     case account
     case review
-    case twitter
     case share
     case contact
     case rules
     case privacy
+    case twitter
 
     var icon: String {
         switch self {
@@ -210,7 +210,7 @@ enum SystemListContents: CaseIterable {
             return "アカウント設定"
 
         case .twitter:
-            return "開発者のX（旧Twitter）アカウント"
+            return "開発者のX（旧Twitter）"
 
         case .review:
             return "アプリのレビューを書く"
@@ -239,7 +239,7 @@ enum SystemListContents: CaseIterable {
             return "アカウント情報の確認や変更、削除を含めた操作を行います。"
 
         case .twitter:
-            return "unicoの公式X（旧Twitter）アカウントへ移動します。"
+            return "unico開発者のX（旧Twitter）アカウントへ移動します。"
 
         case .review:
             return "AppStoreにてunicoのレビュー評価を行います。（レビューをいただけると大変嬉しいです）"
