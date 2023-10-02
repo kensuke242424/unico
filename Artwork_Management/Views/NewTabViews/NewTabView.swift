@@ -64,6 +64,10 @@ struct NewTabView: View {
                     PHPickerView(captureImage: $backgroundVM.croppedUIImage,
                                  isShowSheet : $backgroundVM.showPicker)
                 }
+                // お試しアカウントユーザーに本登録のインフォメーションを表示するView
+                .sheet(isPresented: $inputTab.showEntryAccount) {
+                    UserEntryRecommendationView(isShow: $inputTab.showEntryAccount)
+                }
                 /// 新規チームへの加入が検知されたら、新規加入報告ビューを表示
                 .task(id: userVM.newJoinedTeam) {
                     if logInVM.rootNavigation == .join { return }
@@ -186,12 +190,7 @@ struct NewTabView: View {
                         }
                     }
                 }
-                // お試しアカウントユーザーに本登録のインフォメーションを表示するView
-                .overlay {
-                    if inputTab.showEntryAccount {
-                        UserEntryRecommendationView(isShow: $inputTab.showEntryAccount)
-                    }
-                }
+
                 .ignoresSafeArea()
                 /// カスタム通知ビュー
                 .overlay {

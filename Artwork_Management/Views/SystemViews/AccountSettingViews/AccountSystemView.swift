@@ -72,7 +72,7 @@ struct AccountSystemView: View {
     @EnvironmentObject var logInVM: LogInViewModel
     @EnvironmentObject var userVM: UserViewModel
     
-    @State private var showEntryAccount     : Bool = false
+    @State private var showEntryAccount: Bool = false
     
     // アラートを管理するプロパティ
     @State private var showLogOutAlert         : Bool = false
