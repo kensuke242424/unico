@@ -527,6 +527,14 @@ struct CreateAndJoinTeamView: View {
                     .foregroundColor(.black)
                     .opacity(selectedTeamCard == .join ? 0.8 : 0)
                     .frame(width: cardSize.width, height: cardSize.height)
+                    .overlay(alignment: .topTrailing) {
+                        Image(systemName: "lock.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 30, height: 30)
+                            .foregroundColor(.yellow)
+                            .opacity(selectedTeamCard == .join ? 1 : 0)
+                    }
 
                 VStack(spacing: 20) {
 
