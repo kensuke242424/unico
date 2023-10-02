@@ -10,7 +10,7 @@ import SwiftUI
 struct CubesProgressView: View {
 
     private let columnsV: [GridItem] = Array(repeating: .init(.flexible()), count: 4)
-    @State private var backgroundColor: ThemeColor = ThemeColor.allCases.randomElement() ?? .blue
+    @State private var backgroundColor: ThemeColor = .blue
     @State private var cubeColors: [ThemeColor] = []
 
     var body: some View {
