@@ -281,6 +281,23 @@ struct SystemSideMenu: View {
                                             teamVM.isShowSearchedNewMemberJoinTeam.toggle()
                                         }
                                     }
+                                    // 匿名ユーザー時の制限表現ビュー
+                                    .overlay {
+                                        if userVM.isAnonymous {
+                                            RoundedRectangle(cornerRadius: 20)
+                                                .scaleEffect(1.3)
+                                                .foregroundColor(.black)
+                                                .opacity(0.5)
+                                                .overlay(alignment: .topTrailing) {
+                                                    Image(systemName: "lock.fill")
+                                                        .foregroundColor(.yellow)
+                                                        .offset(x: 25, y: -10)
+                                                }
+                                                .onTapGesture {
+                                                    inputTab.showEntryAccount.toggle()
+                                                }
+                                        }
+                                    }
 
                                 Label("チームを追加", systemImage: "person.2.crop.square.stack.fill")
                                     .onTapGesture { input.isShowCreateTeamAlert.toggle() }

@@ -13,6 +13,7 @@ struct DetailView: View {
     var item: Item
     let cardHeight: CGFloat
     @Environment(\.colorScheme) var colorScheme
+    @AppStorage("applicationDarkMode") var applicationDarkMode: Bool = true
 
     @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var teamVM: TeamViewModel
@@ -117,7 +118,8 @@ struct DetailView: View {
             .zIndex(1)
             
             Rectangle()
-                .fill(.gray.opacity(0.05))
+                .fill(.gray)
+                .opacity(applicationDarkMode ? 0.15 : 0.05)
                 .ignoresSafeArea()
                 .overlay(alignment: .top) {
                     ItemDetails()
