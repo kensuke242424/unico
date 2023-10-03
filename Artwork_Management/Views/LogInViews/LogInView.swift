@@ -386,7 +386,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
                     case .logIn:
                         LogInAddressSheetView(useType: .signIn)
                     case .signUp:
-                        LogInAddressSheetView(useType: .entryAccount)
+                        LogInAddressSheetView(useType: .signUp)
                     }
                 }
 
