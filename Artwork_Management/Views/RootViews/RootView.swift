@@ -262,7 +262,7 @@ struct RootView: View {
             }
             if linkHandled {
                 print("Link Handled")
-                return
+//                return
             } else {
                 print("NO linkHandled")
                 return

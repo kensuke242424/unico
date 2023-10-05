@@ -249,7 +249,7 @@ struct CreateAndJoinTeamView: View {
                                                 }
                                                 .padding(.horizontal, 40)
 
-                                            HStack(spacing: 40) {
+                                            HStack(spacing: 30) {
                                                 Button {
                                                     if let idString = userVM.uid {
                                                         UIPasteboard.general.string = idString
@@ -258,15 +258,29 @@ struct CreateAndJoinTeamView: View {
                                                     }
 
                                                 } label: {
-                                                    Image(systemName: "doc.on.doc.fill")
+                                                    Label("IDをコピー", systemImage: "doc.on.doc.fill")
+                                                        .font(.subheadline)
+                                                }
+                                                .padding(5)
+                                                .background {
+                                                    RoundedRectangle(cornerRadius: 10)
+                                                        .foregroundColor(.black)
+                                                        .opacity(0.3)
                                                 }
                                                 ShareLink(item: userVM.uid ?? "",
                                                           preview: SharePreview(
                                                             "ユーザーIDを共有",
-                                                            image: Image("unico_iconOnly")
+                                                            image: Image("unico_logo_a3")
                                                           )
                                                 ) {
-                                                    Image(systemName: "square.and.arrow.up.fill")
+                                                    Label("IDを送る", systemImage: "square.and.arrow.up.fill")
+                                                        .font(.subheadline)
+                                                }
+                                                .padding(5)
+                                                .background {
+                                                    RoundedRectangle(cornerRadius: 10)
+                                                        .foregroundColor(.black)
+                                                        .opacity(0.3)
                                                 }
                                             }
                                             .offset(y: 15)

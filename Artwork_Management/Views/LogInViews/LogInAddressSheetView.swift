@@ -225,6 +225,7 @@ struct LogInAddressSheetView: View {
                 }
             }
             .onAppear {
+                print("選択中のタイプ: \(useType)")
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                     withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
                         offsetAnimation.toggle()
