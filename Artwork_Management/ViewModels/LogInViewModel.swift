@@ -127,6 +127,9 @@ class LogInViewModel: ObservableObject {
     }
     /// メールリンクを経由してFirebaseAuthへアクセスし、匿名アカウント->会員登録アカウントへ更新するメソッド。
     /// 登録に成功した場合、データをすべて引き継いで登録済みアカウントとなる。
+    /// - Parameters:
+    ///   - email: ユーザーが自身の登録情報として入力したメールアドレス。
+    ///   - link: メールリンクから受信したリンク情報。
     func entryAccountByEmailLink(email: String, link: String) {
         
         let credential = EmailAuthProvider.credential(withEmail: email, link: link)
@@ -144,15 +147,6 @@ class LogInViewModel: ObservableObject {
             print("アカウントリンク成功")
             self.resultAccountLink = true
             self.showAccountLinkAlert.toggle()
-        }
-    }
-    
-    func verifyInputEmailMatchesCurrent(email: String) async -> Bool {
-        guard let user = Auth.auth().currentUser else  { return false }
-        if user.email == email {
-            return true
-        } else  {
-            return false
         }
     }
 
