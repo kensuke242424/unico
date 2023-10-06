@@ -150,20 +150,13 @@ class LogInViewModel: ObservableObject {
         }
     }
 
-    /// ユーザーの登録メールアドレスが認証済みかどうかをBool値で返すメソッド
-    func verifiedEmailCheck() -> Bool {
-        guard let verifiedCheck = Auth.auth().currentUser?.isEmailVerified else { return false }
-        if verifiedCheck {
-            print("メールアドレスは認証済みであることを確認しました")
-            return true
-        } else {
-            print("メールアドレスが認証できませんでした")
-            return false
-
-        }
-    }
-    
-    func existEmailCheckAndSendMailLink(_ email: String, selected: UserSelectedSignInType) {
+    /// 入力されたメールアドレスが既にFirebaseのAuthデータに登録されているかをチェックし、
+    /// アカウントの有無によって適切な処理を実行するメソッド。
+    /// 実行される処理は、ユーザーが選択したサインインタイプによって分岐する。
+    /// - Parameters:
+    ///   - email: ユーザーが入力したメールアドレス。
+    ///   - selected: ユーザーが操作の中で選択したサインインタイプ。
+    func existEmailCheckAndSendMailLink(email: String, selected: UserSelectedSignInType) {
         
         /// 受け取ったメールアドレスを使って、Auth内から既存アカウントの有無を調べる
         Auth.auth().fetchSignInMethods(forEmail: email) { (providers, error) in
@@ -180,10 +173,10 @@ class LogInViewModel: ObservableObject {
                 }
                 return
             }
-            /// Authの判定後、ユーザが選択したサインインタイプによってさらに処理がスイッチ分岐する
             /// アカウントが既に存在していた場合の処理
             if let providers = providers, providers.count > 0 {
 
+                /// Authの判定後、ユーザが選択したサインインタイプによってさらに処理がスイッチ分岐する
                 switch selected {
                     
                 case .start :
@@ -230,15 +223,15 @@ class LogInViewModel: ObservableObject {
     
     func existUserDocumentCheck() async throws {
         print("checkExistsUserDocumentメソッド実行")
+
         guard let uid = uid else { throw CustomError.uidEmpty }
+
         if let doc = db?.collection("users").document(uid) {
-            
-            print(doc)
+
             do {
                 let document = try await doc.getDocument(source: .default)
                 let user = try document.data(as: User.self)
                 print("このアカウントには既に作成しているuserドキュメントが存在します")
-                print("userデータ: \(user)")
                 self.logInAlertMessage = .existsUserDocument
                 self.isShowLogInFlowAlert.toggle()
                 throw CustomError.existUserDocument
