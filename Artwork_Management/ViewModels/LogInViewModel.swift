@@ -221,6 +221,8 @@ class LogInViewModel: ObservableObject {
         }
     }
     
+    /// ユーザーのuidをFirestoreの"users"ドキュメントと照らし合わせ、
+    /// ドキュメントがすでに存在するかをチェックするメソッド。
     func existUserDocumentCheck() async throws {
         print("checkExistsUserDocumentメソッド実行")
 
@@ -244,10 +246,16 @@ class LogInViewModel: ObservableObject {
     }
 
     /// 新規ユーザードキュメントをFirestoreに保存するメソッド。
-    func setNewUserDocumentToFirestore(name     : String,
-                               password : String?,
-                               imageData: (url: URL?, filePath: String?),
-                               color: ThemeColor) async throws {
+    /// - Parameters:
+    ///   - name: ユーザーが入力したアプリ内のユーザー名。
+    ///   - password: ユーザーが入力したパスワード。
+    ///   - imageData: ユーザーが設定したユーザーアイコンデータ。タプル型でurlとpathが含まれている。
+    ///   - color: ユーザーが選択したカスタムシステムカラー。
+    func setNewUserDocumentToFirestore(name: String,
+                                       password: String?,
+                                       imageData: (url: URL?, filePath: String?),
+                                       color: ThemeColor) 
+    async throws {
 
         guard let currentUser = Auth.auth().currentUser else {
             print("ERROR: guard let currentUser")
