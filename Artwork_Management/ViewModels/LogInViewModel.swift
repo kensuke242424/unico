@@ -67,7 +67,7 @@ class LogInViewModel: ObservableObject {
     @Published var defaultEmailCheckFase: DefaultEmailCheckFase = .start
     @Published var updateEmailCheckFase: UpdateEmailCheckFase = .success
     @Published var deleteAccountCheckFase: DeleteAccountCheckFase = .start
-    @Published var addressReauthenticateResult: Bool = false
+    @Published var addressReAuthenticateResult: Bool = false
 
     // アカウント削除時に必要な値
     // リンクからの再認証が成功した後、ユーザーに最終確認を行うため、
@@ -254,8 +254,7 @@ class LogInViewModel: ObservableObject {
     func setNewUserDocumentToFirestore(name: String,
                                        password: String?,
                                        imageData: (url: URL?, filePath: String?),
-                                       color: ThemeColor) 
-    async throws {
+                                       color: ThemeColor) async throws {
 
         guard let currentUser = Auth.auth().currentUser else {
             print("ERROR: guard let currentUser")
@@ -283,6 +282,9 @@ class LogInViewModel: ObservableObject {
     }
     
     // ダイナミックリンクによってメールアドレス認証でのサインインをするため、ユーザにメールを送信するメソッド
+    /// - Parameters:
+    ///   - email: ユーザーが入力したメールアドレス。
+    ///   - useType: メールリンクの利用用途を表現する値。
     func sendEmailLink(email: String, useType: HandleUseReceivedEmailLink) {
         
         withAnimation(.easeInOut(duration: 0.3)) {
@@ -291,7 +293,6 @@ class LogInViewModel: ObservableObject {
         
         let actionCodeSettings = ActionCodeSettings()
         actionCodeSettings.url = URL(string: "https://unicoaddress.page.link/open")
-        actionCodeSettings.handleCodeInApp = true
         actionCodeSettings.handleCodeInApp = true
         actionCodeSettings.setIOSBundleID(Bundle.main.bundleIdentifier!)
         actionCodeSettings.setAndroidPackageName("com.example.android",
@@ -308,8 +309,7 @@ class LogInViewModel: ObservableObject {
             }
             print("Sign in link sent successfully.")
             hapticSuccessNotification()
-            
-            // TODO: ⬇︎の処理まだできてない。どうやってリンク側のアドレスを取得するかまだわかってない。
+
             // リンクから再度アプリに戻ってきた後の処理で、リンクから飛んできたアドレスと保存アドレスの差分がないかチェック
             UserDefaults.standard.set(email, forKey: "Email")
 
@@ -320,7 +320,12 @@ class LogInViewModel: ObservableObject {
             }
         }
     }
-    
+
+    /// ユーザーのメールからのリンクアクセスを検知して実行するメソッド。
+    /// 受け取ったリンクとメールアドレスを用いて、Firebase.Authにアタッチする。
+    /// - Parameters:
+    ///   - email: ユーザーが入力したメールアドレス。
+    ///   - link: メールリンクからのアクセスによって検知したリンク値。
     func signInEmailLink(email: String, link: String) {
         Auth.auth().signIn(withEmail: email, link: link)
         { authResult, error in
@@ -332,13 +337,14 @@ class LogInViewModel: ObservableObject {
                 return
             }
             // メールリンクからのサインイン成功時の処理
-            if let authResult {
+            if authResult != nil {
                 print("メールリンクからのログイン成功")
-                print("currentUser: \(Auth.auth().currentUser)")
             }
         }
     }
     
+    /// ユーザーの登録メールアドレスを更新するメソッド。
+    /// - Parameter email: 新しく登録するメールアドレス。
     func updateEmailAddress(email: String) {
         Auth.auth().currentUser?.updateEmail(to: email) { error in
             if let error {
@@ -349,7 +355,6 @@ class LogInViewModel: ObservableObject {
                 }
             } else {
                 print("メールアドレスの更新に成功しました")
-                hapticSuccessNotification()
                 withAnimation(.easeInOut(duration: 0.2)) {
                     self.updateEmailCheckFase = .success
                 }
@@ -359,7 +364,7 @@ class LogInViewModel: ObservableObject {
     
     /// メールリンクからcredentialを作成してアカウント再認証を行う。
     /// 再認証に成功したら、handleUseReceivedEmailLinkの状態によって適切な処理を行う
-    func addressReauthenticateByEmailLink(email: String, link: String, handle: HandleUseReceivedEmailLink) {
+    func addressReAuthenticateByEmailLink(email: String, link: String, handle: HandleUseReceivedEmailLink) {
         guard let user = Auth.auth().currentUser else { return }
         let credential = EmailAuthProvider.credential(withEmail: email, link: link)
 
@@ -373,7 +378,7 @@ class LogInViewModel: ObservableObject {
                 // 再認証によって受け取った値を保持しておく(アカウント削除時、最終確認アラートを挟むため)
                 self.receivedAddressByLink = email
                 self.receivedLink = link
-                self.addressReauthenticateResult = true
+                self.addressReAuthenticateResult = true
             }
         }
     }

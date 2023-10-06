@@ -105,7 +105,7 @@ struct DeleteAccountView: View {
             }
         }
         // メールリンクによるアドレス再認証がOKだったら、最終確認アラートの表示
-        .onChange(of: logInVM.addressReauthenticateResult) { result in
+        .onChange(of: logInVM.addressReAuthenticateResult) { result in
             if result == true {
                 withAnimation(.spring(response: 0.1, dampingFraction: 1.0, blendDuration: 0.5)) {
                     logInVM.showEmailHalfSheet = false
@@ -121,7 +121,7 @@ struct DeleteAccountView: View {
         }
         // 再認証結果通知プロパティの初期化
         .onDisappear() {
-            logInVM.addressReauthenticateResult = false
+            logInVM.addressReAuthenticateResult = false
         }
     }
 }

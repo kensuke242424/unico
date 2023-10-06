@@ -240,7 +240,7 @@ struct RootView: View {
                         logInVM.signInEmailLink(email: email, link: link)
                         
                     case .updateEmail:
-                        logInVM.addressReauthenticateByEmailLink(email: email,
+                        logInVM.addressReAuthenticateByEmailLink(email: email,
                                                                  link: link,
                                                                  handle: .updateEmail)
                     case .entryAccount:
@@ -251,7 +251,7 @@ struct RootView: View {
                             print("ERROR: ユーザーは匿名アカウントではありません。")
                         }
                     case .deleteAccount:
-                        logInVM.addressReauthenticateByEmailLink(email: email,
+                        logInVM.addressReAuthenticateByEmailLink(email: email,
                                                                  link: link,
                                                                  handle: .deleteAccount)
                     } // switch

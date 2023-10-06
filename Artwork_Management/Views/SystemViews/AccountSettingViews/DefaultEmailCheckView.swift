@@ -101,7 +101,7 @@ struct DefaultEmailCheckView: View {
         .customBackButton()
         .customNavigationTitle(title: "メールアドレスの変更")
         // メールリンクによる再認証結果「addressReauthenticateResult」のtrueを検知したら、アドレス更新画面へ遷移
-        .onChange(of: logInVM.addressReauthenticateResult) { newValue in
+        .onChange(of: logInVM.addressReAuthenticateResult) { newValue in
             if newValue {
                 navigationVM.path.append(SystemAccountPath.updateEmail)
             }
