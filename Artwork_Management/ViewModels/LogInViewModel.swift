@@ -363,7 +363,7 @@ class LogInViewModel: ObservableObject {
     }
     
     /// メールリンクからcredentialを作成してアカウント再認証を行う。
-    /// 再認証に成功したら、handleUseReceivedEmailLinkの状態によって適切な処理を行う
+    /// 再認証に成功したら、メールリンクの使用用途によって処理が分岐する。
     func addressReAuthenticateByEmailLink(email: String, link: String, handle: HandleUseReceivedEmailLink) {
         guard let user = Auth.auth().currentUser else { return }
         let credential = EmailAuthProvider.credential(withEmail: email, link: link)
@@ -380,26 +380,6 @@ class LogInViewModel: ObservableObject {
                 self.receivedLink = link
                 self.addressReAuthenticateResult = true
             }
-        }
-    }
-
-    func uploadImage(_ image: UIImage?) async -> (url: URL?, filePath: String?) {
-
-        guard let imageData = image?.jpegData(compressionQuality: 0.8) else {
-            return (url: nil, filePath: nil)
-        }
-
-        do {
-            let storage = Storage.storage()
-            let reference = storage.reference()
-            let filePath = "images/\(Date()).jpeg"
-            let imageRef = reference.child(filePath)
-            _ = try await imageRef.putDataAsync(imageData)
-            let url = try await imageRef.downloadURL()
-
-            return (url: url, filePath: filePath)
-        } catch {
-            return (url: nil, filePath: nil)
         }
     }
     
@@ -423,22 +403,10 @@ class LogInViewModel: ObservableObject {
             return nil
         }
     }
-
-    func deleteImage(path: String) async {
-
-        let storage = Storage.storage()
-        let reference = storage.reference()
-        let imageRef = reference.child(path)
-
-        imageRef.delete { error in
-            if let error = error {
-                print(error)
-            } else {
-                print("imageRef.delete succsess!")
-            }
-        }
-    }
-
+    /// StringデータからQRコードを生成するメソッド。
+    /// - Parameter 
+    /// - inputText: QRコード化する対象のStringデータ。
+    /// - Returns: UIImageデータとしてQRコード画像を返す。
     func generateUserQRCode(with inputText: String) -> UIImage? {
         guard let qrFilter = CIFilter(name: "CIQRCodeGenerator")
         else { return nil }
@@ -465,6 +433,7 @@ class LogInViewModel: ObservableObject {
         return UIImage(cgImage: cgImage)
     }
     
+    /// FirebaseのAuthにアタッチし、アカウントをログアウトするメソッド。
     func logOut() {
         do {
             try Auth.auth().signOut()
@@ -475,6 +444,7 @@ class LogInViewModel: ObservableObject {
         }
     }
     
+    /// Firebase Authのアカウントデータを消去する破壊的メソッド。
     func deleteAuth() async throws {
         guard let user = Auth.auth().currentUser else { throw CustomError.userEmpty }
 
@@ -497,6 +467,7 @@ class LogInViewModel: ObservableObject {
     }
 }
 
+/// Authフロー関連におけるエラーの列挙。
 enum AuthRelatedError:Error {
     case uidEmpty
     case joinsEmpty

@@ -319,7 +319,7 @@ struct CreateAndJoinTeamView: View {
                     .opacity(selectTeamFase == .start || selectTeamFase == .success ? 0 : 1)
                     .opacity(selectedTeamCard == .join && selectTeamFase == .fase2 ? 0 : 1)
                     .disabled(selectedTeamCard == .start || selectTeamFase == .success ? true : false)
-                    .disabled(selectedTeamCard == .join && userVM.isAnonymous ? true : false) // 匿名は使えない
+//                    .disabled(selectedTeamCard == .join && userVM.isAnonymous ? true : false) // 匿名は使えない
                     .padding(.top, userDeviseSize == .small ? 15 : 30)
                 }
                 
