@@ -18,11 +18,6 @@ struct CustomOneLineLimitText: View {
                 Text(text)
                     .lineLimit(1)
             }
-            /// スクロール時の引っ掛かりを無くす
-            .introspectScrollView { scrollView in
-                 scrollView.isDirectionalLockEnabled = true
-                 scrollView.bounces = false
-            }
         } else {
             Text(text)
                 .lineLimit(1)

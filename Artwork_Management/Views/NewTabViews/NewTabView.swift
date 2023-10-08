@@ -520,7 +520,7 @@ struct InputTab {
     /// タブの選択状態を管理するプロパティ
     var selectionTab    : Tab = .item
     /// タブの切り替えによるアニメーションの状態を管理するプロパティ
-    var animationTab    : Tab = .home
+    var animationTab    : Tab = .item
     var animationOpacity: CGFloat = 1
     var animationScale  : CGFloat = 1
     var scrollProgress  : CGFloat = .zero

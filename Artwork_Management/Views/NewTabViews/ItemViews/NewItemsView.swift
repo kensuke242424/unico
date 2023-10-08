@@ -87,7 +87,7 @@ struct NewItemsView: View {
                                     tagVM.activeTag?.tagName == "全て"
                                 
                             })) { item in
-                            ItemsCardView(item)
+                            ItemCardView(item)
                                     .opacity(showDetailView && inputTab.selectedItem != item ? 0 : 1)
                                     .onTapGesture {
                                         withAnimation(.easeInOut(duration: 0.25)) {
@@ -242,11 +242,11 @@ struct NewItemsView: View {
     func bottomPadding(_ size: CGSize = .zero) -> CGFloat {
         let cardHeight: CGFloat = size.width / 2
         let scrollViewHeight: CGFloat = size.height
-        return scrollViewHeight - cardHeight - 100
+        return scrollViewHeight - cardHeight - 90
     }
     
     @ViewBuilder
-    func ItemsCardView(_ item: Item) -> some View {
+    func ItemCardView(_ item: Item) -> some View {
 
         GeometryReader {
             let size = $0.size
@@ -257,7 +257,7 @@ struct NewItemsView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Spacer(minLength: 5)
 
-                    CustomOneLineLimitText(text: item.name == "" ? "No Name" : item.name, limit: 6)
+                    CustomOneLineLimitText(text: item.name, limit: 6)
                         .fontWeight(.semibold)
                         .foregroundColor(.black)
                     
