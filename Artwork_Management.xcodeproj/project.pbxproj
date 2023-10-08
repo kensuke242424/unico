@@ -414,9 +414,9 @@
 		BE30B5CF2A33CA890034755B /* EditViews */ = {
 			isa = PBXGroup;
 			children = (
+				BE0E580929C4050600F5E42F /* EditItemViews */,
 				BE74E9192A77E5AA00C1A5F2 /* EditImageViews */,
 				BE30B5D02A33CB520034755B /* EditBackgroundViews */,
-				BE0E580929C4050600F5E42F /* EditItemViews */,
 			);
 			path = EditViews;
 			sourceTree = "<group>";

@@ -518,7 +518,7 @@ struct InputTab {
     var selectedBackgroundImage: UIImage?
 
     /// タブの選択状態を管理するプロパティ
-    var selectionTab    : Tab = .home
+    var selectionTab    : Tab = .item
     /// タブの切り替えによるアニメーションの状態を管理するプロパティ
     var animationTab    : Tab = .home
     var animationOpacity: CGFloat = 1

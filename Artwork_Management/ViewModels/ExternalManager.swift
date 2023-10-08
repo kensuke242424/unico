@@ -26,7 +26,7 @@ public func shareApp() {
 }
 
 /// App Storeのアプリレビュー画面と接続するメソッド。
-public func reviewApp() {
+public func requestReviewAppStore() {
     let productURL:URL = URL(string: "https://apps.apple.com/us/app/unico/id1663765686")!
 
     var components = URLComponents(url: productURL, resolvingAgainstBaseURL: false)

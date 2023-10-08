@@ -9,11 +9,13 @@ import SwiftUI
 import Firebase
 import FirebaseFirestore
 import FirebaseFirestoreSwift
+import StoreKit
 
 struct NewEditItemView: View {
     
     @Environment(\.dismiss) var dismiss
-    
+    @Environment(\.requestReview) var requestReview
+
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var tagVM : TagViewModel
@@ -26,7 +28,22 @@ struct NewEditItemView: View {
     @FocusState var focused: InputFormsStatus?
     // アイテム詳細テキストフィールド専用のフォーカス制御
     @FocusState var detailFocused: Bool?
-    
+
+    @AppStorage("createItemCount") var createItemCount: Int = 0
+
+    /// アイテム作成回数をチェックするメソッド。
+    /// 設定されたアイテム作成個数タイミングで、アプリのレビューを促すアラートを発火する。
+    private func countUpItemCreate() {
+        createItemCount += 1
+
+        switch createItemCount {
+        case 1, 10, 20:
+            requestReview()
+        default:
+            break
+        }
+    }
+
     let passItem: Item?
     
     var body: some View {
@@ -362,6 +379,9 @@ struct NewEditItemView: View {
                             logVM.addLog(to: teamVM.team,
                                          by: userVM.user,
                                          type: .addItem(newItem))
+
+                            // アイテム作成数カウントをインクリメント
+                            countUpItemCreate()
 
                             withAnimation(.easeIn(duration: 0.1)) { input.showProgress = false }
                             dismiss()
