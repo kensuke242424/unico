@@ -229,16 +229,17 @@ struct RootView: View {
                     }
                     print("メールリンクで受け取ったユーザーのメールアドレス: \(email)")
                     print("メールリンクによって行う処理の種類: \(logInVM.handleUseReceivedEmailLink)")
-                    
+
                     switch logInVM.handleUseReceivedEmailLink {
+
                     case .signIn:
                         logInVM.resultSignInType = .signIn
                         logInVM.signInEmailLink(email: email, link: link)
-                        
+
                     case .signUp:
                         logInVM.resultSignInType = .signUp
                         logInVM.signInEmailLink(email: email, link: link)
-                        
+
                     case .updateEmail:
                         logInVM.addressReauthenticateByEmailLink(email: email,
                                                                  link: link,
