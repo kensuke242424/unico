@@ -235,7 +235,7 @@ struct NewEditItemView: View {
         }
         .overlay {
             if input.showProgress {
-                SavingProgressView()
+                WaitingProgressView(text: "アイテム画像を保存しています...")
                     .transition(AnyTransition.opacity.combined(with: .offset(y: 20)))
             }
         }

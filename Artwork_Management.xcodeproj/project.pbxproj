@@ -42,11 +42,12 @@
 		BE245BCF29C5A41200539A04 /* NewItemUrlToUIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE245BCE29C5A41200539A04 /* NewItemUrlToUIImage.swift */; };
 		BE245BD229C5DA4F00539A04 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = BE245BD129C5DA4F00539A04 /* SDWebImageSwiftUI */; };
 		BE245BD429C5DA9E00539A04 /* SDWebImageToItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE245BD329C5DA9E00539A04 /* SDWebImageToItem.swift */; };
-		BE245BE129C75DDF00539A04 /* SavingProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE245BE029C75DDF00539A04 /* SavingProgressView.swift */; };
+		BE245BE129C75DDF00539A04 /* WaitingProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE245BE029C75DDF00539A04 /* WaitingProgressView.swift */; };
 		BE254F9329BF1104004FE9AE /* UserEntryRecommendationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE254F9229BF1104004FE9AE /* UserEntryRecommendationView.swift */; };
 		BE254FBD29C092F5004FE9AE /* AsyncImageBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE254FBC29C092F5004FE9AE /* AsyncImageBackground.swift */; };
 		BE254FBF29C0C396004FE9AE /* CubeCircleIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE254FBE29C0C396004FE9AE /* CubeCircleIcon.swift */; };
 		BE254FC129C0CA0B004FE9AE /* PersonCircleIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE254FC029C0CA0B004FE9AE /* PersonCircleIcon.swift */; };
+		BE26E2552AD41F6500A6D01A /* LoadingIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE26E2542AD41F6500A6D01A /* LoadingIndicatorView.swift */; };
 		BE2B808129E42CE70081439C /* CustomToggleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE2B808029E42CE60081439C /* CustomToggleButton.swift */; };
 		BE30B5C62A3217D80034755B /* BlurMuskingImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE30B5C52A3217D80034755B /* BlurMuskingImageView.swift */; };
 		BE30B5CC2A335D550034755B /* Background.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE30B5CB2A335D550034755B /* Background.swift */; };
@@ -203,11 +204,12 @@
 		BE245BCC29C5865300539A04 /* CartViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartViewModel.swift; sourceTree = "<group>"; };
 		BE245BCE29C5A41200539A04 /* NewItemUrlToUIImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewItemUrlToUIImage.swift; sourceTree = "<group>"; };
 		BE245BD329C5DA9E00539A04 /* SDWebImageToItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDWebImageToItem.swift; sourceTree = "<group>"; };
-		BE245BE029C75DDF00539A04 /* SavingProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavingProgressView.swift; sourceTree = "<group>"; };
+		BE245BE029C75DDF00539A04 /* WaitingProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaitingProgressView.swift; sourceTree = "<group>"; };
 		BE254F9229BF1104004FE9AE /* UserEntryRecommendationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserEntryRecommendationView.swift; sourceTree = "<group>"; };
 		BE254FBC29C092F5004FE9AE /* AsyncImageBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncImageBackground.swift; sourceTree = "<group>"; };
 		BE254FBE29C0C396004FE9AE /* CubeCircleIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CubeCircleIcon.swift; sourceTree = "<group>"; };
 		BE254FC029C0CA0B004FE9AE /* PersonCircleIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonCircleIcon.swift; sourceTree = "<group>"; };
+		BE26E2542AD41F6500A6D01A /* LoadingIndicatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingIndicatorView.swift; sourceTree = "<group>"; };
 		BE2B808029E42CE60081439C /* CustomToggleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomToggleButton.swift; sourceTree = "<group>"; };
 		BE30B5C52A3217D80034755B /* BlurMuskingImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurMuskingImageView.swift; sourceTree = "<group>"; };
 		BE30B5CB2A335D550034755B /* Background.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Background.swift; sourceTree = "<group>"; };
@@ -411,6 +413,16 @@
 			path = AccountSettingViews;
 			sourceTree = "<group>";
 		};
+		BE26E2532AD41C4900A6D01A /* ProgressViews */ = {
+			isa = PBXGroup;
+			children = (
+				E0455FE1292C5B1C004F677D /* CubesProgressView.swift */,
+				BE245BE029C75DDF00539A04 /* WaitingProgressView.swift */,
+				BE26E2542AD41F6500A6D01A /* LoadingIndicatorView.swift */,
+			);
+			path = ProgressViews;
+			sourceTree = "<group>";
+		};
 		BE30B5CF2A33CA890034755B /* EditViews */ = {
 			isa = PBXGroup;
 			children = (
@@ -525,7 +537,6 @@
 			children = (
 				E05130E128F341610092FE46 /* RootView.swift */,
 				E08F273D28DDB65F00329C5E /* HomeTabView.swift */,
-				E0455FE1292C5B1C004F677D /* CubesProgressView.swift */,
 				E01E138F291D168B0001F2DA /* SystemSideMenu.swift */,
 				E0B3288B2921577F00E94BC3 /* ElementSwitchingPickerView.swift */,
 				E0B328922924A42100E94BC3 /* ManageCustomizeSideMenu.swift */,
@@ -580,6 +591,7 @@
 			isa = PBXGroup;
 			children = (
 				BEF415E12AC8509300AF6FD5 /* Launches */,
+				BE26E2532AD41C4900A6D01A /* ProgressViews */,
 				E0796AD828F48D530094E50C /* RootViews */,
 				E094F0FE28E20BB800D3C845 /* LogInViews */,
 				BE19FD712A7AAC4D00AE8165 /* NotificationViews */,
@@ -764,7 +776,6 @@
 				E0FCADA329708B9800BA6A75 /* LogoMark.swift */,
 				BE254FBE29C0C396004FE9AE /* CubeCircleIcon.swift */,
 				BE254FC029C0CA0B004FE9AE /* PersonCircleIcon.swift */,
-				BE245BE029C75DDF00539A04 /* SavingProgressView.swift */,
 			);
 			path = ViewParts;
 			sourceTree = "<group>";
@@ -979,6 +990,7 @@
 				BE86547E2A857EF8006AE163 /* JoinedTeamInformationView.swift in Sources */,
 				E08F272528DDA08E00329C5E /* Artwork_ManagementApp.swift in Sources */,
 				BE8734F12A5EE99F004AA246 /* EditBackgroundControlButtons.swift in Sources */,
+				BE26E2552AD41F6500A6D01A /* LoadingIndicatorView.swift in Sources */,
 				BE20B04829BAEFDB0078169B /* UpdateAddressView.swift in Sources */,
 				E0F78FC42919F06D00A95CD1 /* DateFormatterExtension.swift in Sources */,
 				BEFEF1892A8FAB5100131D41 /* ExternalManager.swift in Sources */,
@@ -994,7 +1006,7 @@
 				E0A3B996292EFCE600209ADC /* CreateAndJoinTeamView.swift in Sources */,
 				E01E1392291F961A0001F2DA /* TagViewModel.swift in Sources */,
 				BE30B5D42A33D2430034755B /* BackgroundViewModel.swift in Sources */,
-				BE245BE129C75DDF00539A04 /* SavingProgressView.swift in Sources */,
+				BE245BE129C75DDF00539A04 /* WaitingProgressView.swift in Sources */,
 				E0796ADD28F5F2830094E50C /* CartItemsSheet.swift in Sources */,
 				E094F10028E20F1000D3C845 /* LogInView.swift in Sources */,
 				BE1F272B29C16E2000AD55DF /* CustomCorners.swift in Sources */,
