@@ -67,7 +67,7 @@ class LogInViewModel: ObservableObject {
     @Published var defaultEmailCheckFase: DefaultEmailCheckFase = .start
     @Published var updateEmailCheckFase: UpdateEmailCheckFase = .success
     @Published var deleteAccountCheckFase: DeleteAccountCheckFase = .start
-    @Published var addressReauthenticateResult: Bool = false
+    @Published var addressReAuthenticateResult: Bool = false
 
     // アカウント削除時に必要な値
     // リンクからの再認証が成功した後、ユーザーに最終確認を行うため、
@@ -127,6 +127,9 @@ class LogInViewModel: ObservableObject {
     }
     /// メールリンクを経由してFirebaseAuthへアクセスし、匿名アカウント->会員登録アカウントへ更新するメソッド。
     /// 登録に成功した場合、データをすべて引き継いで登録済みアカウントとなる。
+    /// - Parameters:
+    ///   - email: ユーザーが自身の登録情報として入力したメールアドレス。
+    ///   - link: メールリンクから受信したリンク情報。
     func entryAccountByEmailLink(email: String, link: String) {
         
         let credential = EmailAuthProvider.credential(withEmail: email, link: link)
@@ -146,30 +149,14 @@ class LogInViewModel: ObservableObject {
             self.showAccountLinkAlert.toggle()
         }
     }
-    
-    func verifyInputEmailMatchesCurrent(email: String) async -> Bool {
-        guard let user = Auth.auth().currentUser else  { return false }
-        if user.email == email {
-            return true
-        } else  {
-            return false
-        }
-    }
 
-    /// ユーザーの登録メールアドレスが認証済みかどうかをBool値で返すメソッド
-    func verifiedEmailCheck() -> Bool {
-        guard let verifiedCheck = Auth.auth().currentUser?.isEmailVerified else { return false }
-        if verifiedCheck {
-            print("メールアドレスは認証済みであることを確認しました")
-            return true
-        } else {
-            print("メールアドレスが認証できませんでした")
-            return false
-
-        }
-    }
-    
-    func existEmailCheckAndSendMailLink(_ email: String, selected: UserSelectedSignInType) {
+    /// 入力されたメールアドレスが既にFirebaseのAuthデータに登録されているかをチェックし、
+    /// アカウントの有無によって適切な処理を実行するメソッド。
+    /// 実行される処理は、ユーザーが選択したサインインタイプによって分岐する。
+    /// - Parameters:
+    ///   - email: ユーザーが入力したメールアドレス。
+    ///   - selected: ユーザーが操作の中で選択したサインインタイプ。
+    func existEmailCheckAndSendMailLink(email: String, selected: UserSelectedSignInType) {
         
         /// 受け取ったメールアドレスを使って、Auth内から既存アカウントの有無を調べる
         Auth.auth().fetchSignInMethods(forEmail: email) { (providers, error) in
@@ -186,10 +173,10 @@ class LogInViewModel: ObservableObject {
                 }
                 return
             }
-            /// Authの判定後、ユーザが選択したサインインタイプによってさらに処理がスイッチ分岐する
             /// アカウントが既に存在していた場合の処理
             if let providers = providers, providers.count > 0 {
 
+                /// Authの判定後、ユーザが選択したサインインタイプによってさらに処理がスイッチ分岐する
                 switch selected {
                     
                 case .start :
@@ -234,17 +221,19 @@ class LogInViewModel: ObservableObject {
         }
     }
     
+    /// ユーザーのuidをFirestoreの"users"ドキュメントと照らし合わせ、
+    /// ドキュメントがすでに存在するかをチェックするメソッド。
     func existUserDocumentCheck() async throws {
         print("checkExistsUserDocumentメソッド実行")
+
         guard let uid = uid else { throw CustomError.uidEmpty }
+
         if let doc = db?.collection("users").document(uid) {
-            
-            print(doc)
+
             do {
                 let document = try await doc.getDocument(source: .default)
                 let user = try document.data(as: User.self)
                 print("このアカウントには既に作成しているuserドキュメントが存在します")
-                print("userデータ: \(user)")
                 self.logInAlertMessage = .existsUserDocument
                 self.isShowLogInFlowAlert.toggle()
                 throw CustomError.existUserDocument
@@ -257,10 +246,15 @@ class LogInViewModel: ObservableObject {
     }
 
     /// 新規ユーザードキュメントをFirestoreに保存するメソッド。
-    func setNewUserDocumentToFirestore(name     : String,
-                               password : String?,
-                               imageData: (url: URL?, filePath: String?),
-                               color: ThemeColor) async throws {
+    /// - Parameters:
+    ///   - name: ユーザーが入力したアプリ内のユーザー名。
+    ///   - password: ユーザーが入力したパスワード。
+    ///   - imageData: ユーザーが設定したユーザーアイコンデータ。タプル型でurlとpathが含まれている。
+    ///   - color: ユーザーが選択したカスタムシステムカラー。
+    func setNewUserDocumentToFirestore(name: String,
+                                       password: String?,
+                                       imageData: (url: URL?, filePath: String?),
+                                       color: ThemeColor) async throws {
 
         guard let currentUser = Auth.auth().currentUser else {
             print("ERROR: guard let currentUser")
@@ -288,6 +282,9 @@ class LogInViewModel: ObservableObject {
     }
     
     // ダイナミックリンクによってメールアドレス認証でのサインインをするため、ユーザにメールを送信するメソッド
+    /// - Parameters:
+    ///   - email: ユーザーが入力したメールアドレス。
+    ///   - useType: メールリンクの利用用途を表現する値。
     func sendEmailLink(email: String, useType: HandleUseReceivedEmailLink) {
         
         withAnimation(.easeInOut(duration: 0.3)) {
@@ -296,7 +293,6 @@ class LogInViewModel: ObservableObject {
         
         let actionCodeSettings = ActionCodeSettings()
         actionCodeSettings.url = URL(string: "https://unicoaddress.page.link/open")
-        actionCodeSettings.handleCodeInApp = true
         actionCodeSettings.handleCodeInApp = true
         actionCodeSettings.setIOSBundleID(Bundle.main.bundleIdentifier!)
         actionCodeSettings.setAndroidPackageName("com.example.android",
@@ -313,8 +309,7 @@ class LogInViewModel: ObservableObject {
             }
             print("Sign in link sent successfully.")
             hapticSuccessNotification()
-            
-            // TODO: ⬇︎の処理まだできてない。どうやってリンク側のアドレスを取得するかまだわかってない。
+
             // リンクから再度アプリに戻ってきた後の処理で、リンクから飛んできたアドレスと保存アドレスの差分がないかチェック
             UserDefaults.standard.set(email, forKey: "Email")
 
@@ -325,7 +320,12 @@ class LogInViewModel: ObservableObject {
             }
         }
     }
-    
+
+    /// ユーザーのメールからのリンクアクセスを検知して実行するメソッド。
+    /// 受け取ったリンクとメールアドレスを用いて、Firebase.Authにアタッチする。
+    /// - Parameters:
+    ///   - email: ユーザーが入力したメールアドレス。
+    ///   - link: メールリンクからのアクセスによって検知したリンク値。
     func signInEmailLink(email: String, link: String) {
         Auth.auth().signIn(withEmail: email, link: link)
         { authResult, error in
@@ -337,13 +337,14 @@ class LogInViewModel: ObservableObject {
                 return
             }
             // メールリンクからのサインイン成功時の処理
-            if let authResult {
+            if authResult != nil {
                 print("メールリンクからのログイン成功")
-                print("currentUser: \(Auth.auth().currentUser)")
             }
         }
     }
     
+    /// ユーザーの登録メールアドレスを更新するメソッド。
+    /// - Parameter email: 新しく登録するメールアドレス。
     func updateEmailAddress(email: String) {
         Auth.auth().currentUser?.updateEmail(to: email) { error in
             if let error {
@@ -354,7 +355,6 @@ class LogInViewModel: ObservableObject {
                 }
             } else {
                 print("メールアドレスの更新に成功しました")
-                hapticSuccessNotification()
                 withAnimation(.easeInOut(duration: 0.2)) {
                     self.updateEmailCheckFase = .success
                 }
@@ -363,8 +363,8 @@ class LogInViewModel: ObservableObject {
     }
     
     /// メールリンクからcredentialを作成してアカウント再認証を行う。
-    /// 再認証に成功したら、handleUseReceivedEmailLinkの状態によって適切な処理を行う
-    func addressReauthenticateByEmailLink(email: String, link: String, handle: HandleUseReceivedEmailLink) {
+    /// 再認証に成功したら、メールリンクの使用用途によって処理が分岐する。
+    func addressReAuthenticateByEmailLink(email: String, link: String, handle: HandleUseReceivedEmailLink) {
         guard let user = Auth.auth().currentUser else { return }
         let credential = EmailAuthProvider.credential(withEmail: email, link: link)
 
@@ -378,28 +378,8 @@ class LogInViewModel: ObservableObject {
                 // 再認証によって受け取った値を保持しておく(アカウント削除時、最終確認アラートを挟むため)
                 self.receivedAddressByLink = email
                 self.receivedLink = link
-                self.addressReauthenticateResult = true
+                self.addressReAuthenticateResult = true
             }
-        }
-    }
-
-    func uploadImage(_ image: UIImage?) async -> (url: URL?, filePath: String?) {
-
-        guard let imageData = image?.jpegData(compressionQuality: 0.8) else {
-            return (url: nil, filePath: nil)
-        }
-
-        do {
-            let storage = Storage.storage()
-            let reference = storage.reference()
-            let filePath = "images/\(Date()).jpeg"
-            let imageRef = reference.child(filePath)
-            _ = try await imageRef.putDataAsync(imageData)
-            let url = try await imageRef.downloadURL()
-
-            return (url: url, filePath: filePath)
-        } catch {
-            return (url: nil, filePath: nil)
         }
     }
     
@@ -423,22 +403,10 @@ class LogInViewModel: ObservableObject {
             return nil
         }
     }
-
-    func deleteImage(path: String) async {
-
-        let storage = Storage.storage()
-        let reference = storage.reference()
-        let imageRef = reference.child(path)
-
-        imageRef.delete { error in
-            if let error = error {
-                print(error)
-            } else {
-                print("imageRef.delete succsess!")
-            }
-        }
-    }
-
+    /// StringデータからQRコードを生成するメソッド。
+    /// - Parameter 
+    /// - inputText: QRコード化する対象のStringデータ。
+    /// - Returns: UIImageデータとしてQRコード画像を返す。
     func generateUserQRCode(with inputText: String) -> UIImage? {
         guard let qrFilter = CIFilter(name: "CIQRCodeGenerator")
         else { return nil }
@@ -465,6 +433,7 @@ class LogInViewModel: ObservableObject {
         return UIImage(cgImage: cgImage)
     }
     
+    /// FirebaseのAuthにアタッチし、アカウントをログアウトするメソッド。
     func logOut() {
         do {
             try Auth.auth().signOut()
@@ -475,6 +444,7 @@ class LogInViewModel: ObservableObject {
         }
     }
     
+    /// Firebase Authのアカウントデータを消去する破壊的メソッド。
     func deleteAuth() async throws {
         guard let user = Auth.auth().currentUser else { throw CustomError.userEmpty }
 
@@ -497,6 +467,7 @@ class LogInViewModel: ObservableObject {
     }
 }
 
+/// Authフロー関連におけるエラーの列挙。
 enum AuthRelatedError:Error {
     case uidEmpty
     case joinsEmpty

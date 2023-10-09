@@ -186,9 +186,9 @@ struct LogInAddressSheetView: View {
 
                         switch useType {
                         case .signUp:
-                            logInVM.existEmailCheckAndSendMailLink(inputLogIn.address, selected: .signUp)
+                            logInVM.existEmailCheckAndSendMailLink(email: inputLogIn.address, selected: .signUp)
                         case.signIn:
-                            logInVM.existEmailCheckAndSendMailLink(inputLogIn.address, selected: .logIn)
+                            logInVM.existEmailCheckAndSendMailLink(email: inputLogIn.address, selected: .logIn)
                         case .entryAccount:
                             logInVM.sendEmailLink(email: inputLogIn.address, useType: .entryAccount)
                         case .updateEmail:
