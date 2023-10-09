@@ -31,19 +31,6 @@ struct NewEditItemView: View {
 
     @AppStorage("createItemCount") var createItemCount: Int = 0
 
-    /// アイテム作成回数をチェックするメソッド。
-    /// 設定されたアイテム作成個数タイミングで、アプリのレビューを促すアラートを発火する。
-    private func countUpItemCreate() {
-        createItemCount += 1
-
-        switch createItemCount {
-        case 1, 10, 20:
-            requestReview()
-        default:
-            break
-        }
-    }
-
     let passItem: Item?
     
     var body: some View {
@@ -405,6 +392,19 @@ struct NewEditItemView: View {
                 }
                 .padding(.leading)
             }
+    }
+
+    /// アイテム作成回数をチェックするメソッド。
+    /// 設定されたアイテム作成個数タイミングで、アプリのレビューを促すアラートを発火する。
+    private func countUpItemCreate() {
+        createItemCount += 1
+
+        switch createItemCount {
+        case 2, 10, 20:
+            requestReview()
+        default:
+            break
+        }
     }
 
     /// アイテムの各データを入力するためのフィールド群。
