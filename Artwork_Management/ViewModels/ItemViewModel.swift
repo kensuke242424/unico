@@ -80,10 +80,10 @@ class ItemViewModel: ObservableObject {
         print("addItem完了")
     }
 
-    func updateItemToFirestore(_ updateItem: Item) {
+    func updateItemToFirestore(_ updateItem: Item, teamId: String?) {
         print("updateItem実行")
 
-        guard let teamId = currentTeamID else { return }
+        guard let teamId else { return }
         guard let itemId = updateItem.id else { return }
         guard let itemRef = db?.collection("teams")
             .document(teamId)
@@ -101,11 +101,11 @@ class ItemViewModel: ObservableObject {
         print("updateItem完了")
     }
 
-    func deleteItem(deleteItem: Item, teamID: String) {
+    func deleteItem(deleteItem: Item, teamId: String) {
 
         guard let itemID = deleteItem.id else { return }
         guard let itemRef = db?.collection("teams")
-            .document(teamID)
+            .document(teamId)
             .collection("items")
             .document(itemID) else {
             print("error: deleteItem_guard let ItemRef")

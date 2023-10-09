@@ -131,7 +131,7 @@ struct ShowsItemDetail: View {
                                                     }
                                                     Task {
                                                         await itemVM.deleteImage(path: item.photoPath)
-                                                        itemVM.deleteItem(deleteItem: item, teamID: teamID)
+                                                        itemVM.deleteItem(deleteItem: item, teamId: teamID)
                                                     }
                                                 }
                                             }

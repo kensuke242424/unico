@@ -321,7 +321,7 @@ struct NewEditItemView: View {
                                                     passItem.totalInventory + (editInventory - passItem.inventory) :
                                                         passItem.totalInventory - (passItem.inventory - editInventory) ))
 
-                            itemVM.updateItemToFirestore(updatedItem)
+                            itemVM.updateItemToFirestore(updatedItem, teamId: teamVM.teamID)
                             /// 編集アイテムの新規タグ設定とアイテムタブビュー内の選択タグを合わせる
                             /// 編集画面から戻った時、アイテムカードが適切にアニメーションするために必要
                             if tagVM.activeTag != tagVM.tags.first {

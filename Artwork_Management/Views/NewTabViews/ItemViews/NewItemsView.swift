@@ -137,7 +137,7 @@ struct NewItemsView: View {
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                                 Task {
                                                     itemVM.deleteItem(deleteItem: selectedItem,
-                                                                      teamID: selectedItem.teamID)
+                                                                      teamId: selectedItem.teamID)
 
                                                     logVM.addLog(to: teamVM.team,
                                                                  by: userVM.user,
