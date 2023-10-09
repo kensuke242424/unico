@@ -9,11 +9,13 @@ import SwiftUI
 import Firebase
 import FirebaseFirestore
 import FirebaseFirestoreSwift
+import StoreKit
 
 struct NewEditItemView: View {
     
     @Environment(\.dismiss) var dismiss
-    
+    @Environment(\.requestReview) var requestReview
+
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var tagVM : TagViewModel
@@ -26,7 +28,9 @@ struct NewEditItemView: View {
     @FocusState var focused: InputFormsStatus?
     // アイテム詳細テキストフィールド専用のフォーカス制御
     @FocusState var detailFocused: Bool?
-    
+
+    @AppStorage("createItemCount") var createItemCount: Int = 0
+
     let passItem: Item?
     
     var body: some View {
@@ -218,7 +222,7 @@ struct NewEditItemView: View {
         }
         .overlay {
             if input.showProgress {
-                SavingProgressView()
+                WaitingProgressView(text: "アイテム画像を保存しています...")
                     .transition(AnyTransition.opacity.combined(with: .offset(y: 20)))
             }
         }
@@ -304,7 +308,7 @@ struct NewEditItemView: View {
                                                     passItem.totalInventory + (editInventory - passItem.inventory) :
                                                         passItem.totalInventory - (passItem.inventory - editInventory) ))
 
-                            itemVM.updateItemToFirestore(updatedItem)
+                            itemVM.updateItemToFirestore(updatedItem, teamId: teamVM.teamID)
                             /// 編集アイテムの新規タグ設定とアイテムタブビュー内の選択タグを合わせる
                             /// 編集画面から戻った時、アイテムカードが適切にアニメーションするために必要
                             if tagVM.activeTag != tagVM.tags.first {
@@ -356,12 +360,15 @@ struct NewEditItemView: View {
                                                totalInventory: Int(input.inventory) ?? 0)
                             
                             // Firestoreにコーダブル保存
-                            await itemVM.addItemToFirestore(newItem)
+                            await itemVM.addItemToFirestore(newItem, teamId: teamVM.teamID)
                             tagVM.setActiveTag(from: input.selectionTagName)
 
                             logVM.addLog(to: teamVM.team,
                                          by: userVM.user,
                                          type: .addItem(newItem))
+
+                            // アイテム作成数カウントをインクリメント
+                            countUpItemCreate()
 
                             withAnimation(.easeIn(duration: 0.1)) { input.showProgress = false }
                             dismiss()
@@ -385,6 +392,19 @@ struct NewEditItemView: View {
                 }
                 .padding(.leading)
             }
+    }
+
+    /// アイテム作成回数をチェックするメソッド。
+    /// 設定されたアイテム作成個数タイミングで、アプリのレビューを促すアラートを発火する。
+    private func countUpItemCreate() {
+        createItemCount += 1
+
+        switch createItemCount {
+        case 2, 10, 20:
+            requestReview()
+        default:
+            break
+        }
     }
 
     /// アイテムの各データを入力するためのフィールド群。

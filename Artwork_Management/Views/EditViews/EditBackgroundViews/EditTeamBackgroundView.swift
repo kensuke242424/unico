@@ -113,7 +113,7 @@ struct EditTeamBackgroundView: View {
                          croppedImage: $backgroundVM.croppedUIImage)
         .overlay {
             if showProgress {
-                SavingProgressView()
+                WaitingProgressView(text: "背景を保存しています...")
                     .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
             }
         }

@@ -49,55 +49,19 @@ class ItemViewModel: ObservableObject {
             withAnimation {
                 self.items = documents.compactMap { (snap) -> Item? in
 
-                    return try? snap.data(as: Item.self, with: .estimate)
+                    let item = try? snap.data(as: Item.self, with: .estimate)
+                    print("アイテム: \(item?.name ?? "nil")がサーバーからフェッチされました")
+                    return item
                 }
                 self.selectedTypesSort()
             }
         }
     }
 
-    /// Firestoreからチームの全アイテムをフェッチするメソッド。初回起動時に呼ばれる。
-    @MainActor
-    func fetchAllItem(teamID: String) async throws {
-        guard let itemRefs = db?.collection("teams")
-            .document(teamID)
-            .collection("items") else {
-            print("ERROR: fetchAllItem_guard let itemRefs")
-            return
-        }
-        let snapshot = try await itemRefs.getDocuments()
-        self.items = snapshot.documents.compactMap { (document) -> Item? in
-            return try? document.data(as: Item.self)
-        }
-        self.selectedTypesSort() // ソート
-    }
-    /// Firestoreから一つのアイテムを取得するメソッド。
-    /// 主に、新規追加したアイテムをすぐに使用したい場合に用いる。
-    /// ドキュメントIDはサーバーへ保存されたときに生成されるため、アイテムのcreateTimeをクエリに使う。
-    func getOneItemToFirestore(from item: Item) async -> Item? {
-        print("getOneItemToFirestore実行")
-        guard let teamId = currentTeamID else { return nil }
-        guard let itemsRef = db?.collection("teams")
-            .document(teamId)
-            .collection("items") else { return nil }
+    func addItemToFirestore(_ itemData: Item, teamId: String?) async {
+        guard let teamId else { return }
+        guard let itemId = itemData.id else { return }
 
-        var resultItem: [Item]?
-        let oneItemQuery = itemsRef
-            .whereField("createTime", isEqualTo: item.createTime)
-
-        do {
-            let snapshot = try await oneItemQuery.getDocuments()
-            resultItem = snapshot.documents.compactMap { (document) -> Item? in
-                return try? document.data(as: Item.self)
-            }
-            return resultItem?.first
-        } catch {
-            return nil
-        }
-    }
-
-    func addItemToFirestore(_ itemData: Item) async {
-        guard let teamId = currentTeamID, let itemId = itemData.id else { return }
         let itemRef = db?.collection("teams")
             .document(teamId)
             .collection("items")
@@ -116,10 +80,10 @@ class ItemViewModel: ObservableObject {
         print("addItem完了")
     }
 
-    func updateItemToFirestore(_ updateItem: Item) {
+    func updateItemToFirestore(_ updateItem: Item, teamId: String?) {
         print("updateItem実行")
 
-        guard let teamId = currentTeamID else { return }
+        guard let teamId else { return }
         guard let itemId = updateItem.id else { return }
         guard let itemRef = db?.collection("teams")
             .document(teamId)
@@ -137,11 +101,11 @@ class ItemViewModel: ObservableObject {
         print("updateItem完了")
     }
 
-    func deleteItem(deleteItem: Item, teamID: String) {
+    func deleteItem(deleteItem: Item, teamId: String) {
 
         guard let itemID = deleteItem.id else { return }
         guard let itemRef = db?.collection("teams")
-            .document(teamID)
+            .document(teamId)
             .collection("items")
             .document(itemID) else {
             print("error: deleteItem_guard let ItemRef")

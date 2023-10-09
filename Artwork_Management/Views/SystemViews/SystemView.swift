@@ -53,7 +53,7 @@ struct SystemView: View {
                     
                 case .review:
                     Button {
-                        reviewApp()
+                        requestReviewAppStore()
                     } label: {
                         ListRowView(icon : listRow.icon,
                                     title: listRow.title,

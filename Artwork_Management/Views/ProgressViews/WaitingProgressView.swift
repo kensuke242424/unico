@@ -7,21 +7,24 @@
 
 import SwiftUI
 
-struct SavingProgressView: View {
+/// 何らかの処理中であることをユーザーに伝え、操作を待ってもらうために表示するマスクビュー。
+struct WaitingProgressView: View {
+    let text: String
+
     var body: some View {
         VStack(spacing: 20) {
             
-            Text("画像を保存しています...")
+            Text(text)
                 .foregroundColor(.white)
                 .tracking(3)
-            
-            ProgressView()
-                .foregroundColor(.white)
+                .padding()
+
+            LoadingIndicatorView(isLoading: true)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background {
             Rectangle()
-                .fill(.black.opacity(0.5))
+                .fill(.black.opacity(0.6))
                 .ignoresSafeArea()
         }
     }
@@ -29,6 +32,6 @@ struct SavingProgressView: View {
 
 struct SavingProgressView_Previews: PreviewProvider {
     static var previews: some View {
-        SavingProgressView()
+        WaitingProgressView(text: "保存しています...")
     }
 }
