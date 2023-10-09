@@ -49,7 +49,9 @@ class ItemViewModel: ObservableObject {
             withAnimation {
                 self.items = documents.compactMap { (snap) -> Item? in
 
-                    return try? snap.data(as: Item.self, with: .estimate)
+                    let item = try? snap.data(as: Item.self, with: .estimate)
+                    print("アイテム: \(item?.name ?? "nil")がサーバーからフェッチされました")
+                    return item
                 }
                 self.selectedTypesSort()
             }

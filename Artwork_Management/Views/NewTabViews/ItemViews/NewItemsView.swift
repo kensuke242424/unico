@@ -359,7 +359,10 @@ struct NewItemsView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             .frame(width: size.width)
-            .rotation3DEffect(.init(degrees: convertOffsetToRotation(rect)), axis: (x: 1, y: 0, z: 0), anchor: .bottom, anchorZ: 1, perspective: 0.5)
+            .rotation3DEffect(.init(degrees: convertOffsetToRotation(rect)),
+                              axis: (x: 1, y: 0, z: 0),
+                              anchor: .bottom, anchorZ: 1,
+                              perspective: 0.5)
         }
         .frame(height: cardHeight)
     }
