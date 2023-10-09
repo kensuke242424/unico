@@ -58,48 +58,9 @@ class ItemViewModel: ObservableObject {
         }
     }
 
-    /// Firestoreからチームの全アイテムをフェッチするメソッド。初回起動時に呼ばれる。
-    @MainActor
-    func fetchAllItem(teamID: String) async throws {
-        guard let itemRefs = db?.collection("teams")
-            .document(teamID)
-            .collection("items") else {
-            print("ERROR: fetchAllItem_guard let itemRefs")
-            return
-        }
-        let snapshot = try await itemRefs.getDocuments()
-        self.items = snapshot.documents.compactMap { (document) -> Item? in
-            return try? document.data(as: Item.self)
-        }
-        self.selectedTypesSort() // ソート
-    }
-    /// Firestoreから一つのアイテムを取得するメソッド。
-    /// 主に、新規追加したアイテムをすぐに使用したい場合に用いる。
-    /// ドキュメントIDはサーバーへ保存されたときに生成されるため、アイテムのcreateTimeをクエリに使う。
-    func getOneItemToFirestore(from item: Item) async -> Item? {
-        print("getOneItemToFirestore実行")
-        guard let teamId = currentTeamID else { return nil }
-        guard let itemsRef = db?.collection("teams")
-            .document(teamId)
-            .collection("items") else { return nil }
-
-        var resultItem: [Item]?
-        let oneItemQuery = itemsRef
-            .whereField("createTime", isEqualTo: item.createTime)
-
-        do {
-            let snapshot = try await oneItemQuery.getDocuments()
-            resultItem = snapshot.documents.compactMap { (document) -> Item? in
-                return try? document.data(as: Item.self)
-            }
-            return resultItem?.first
-        } catch {
-            return nil
-        }
-    }
-
     func addItemToFirestore(_ itemData: Item) async {
-        guard let teamId = currentTeamID, let itemId = itemData.id else { return }
+        guard let teamId = currentTeamID else { return }
+        guard let itemId = itemData.id else { return }
         let itemRef = db?.collection("teams")
             .document(teamId)
             .collection("items")
