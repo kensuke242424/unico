@@ -373,7 +373,7 @@ struct NewEditItemView: View {
                                                totalInventory: Int(input.inventory) ?? 0)
                             
                             // Firestoreにコーダブル保存
-                            await itemVM.addItemToFirestore(newItem)
+                            await itemVM.addItemToFirestore(newItem, teamId: teamVM.teamID)
                             tagVM.setActiveTag(from: input.selectionTagName)
 
                             logVM.addLog(to: teamVM.team,

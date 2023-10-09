@@ -58,9 +58,10 @@ class ItemViewModel: ObservableObject {
         }
     }
 
-    func addItemToFirestore(_ itemData: Item) async {
-        guard let teamId = currentTeamID else { return }
+    func addItemToFirestore(_ itemData: Item, teamId: String?) async {
+        guard let teamId else { return }
         guard let itemId = itemData.id else { return }
+
         let itemRef = db?.collection("teams")
             .document(teamId)
             .collection("items")
