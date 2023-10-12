@@ -5,30 +5,37 @@
 ![スクリーンショット 2023-10-10 16 35 16のコピー](https://github.com/kensuke242424/unico/assets/100055504/daedf12f-7bfe-4469-829f-0270f917a72e)
 <br>
 <br>
-## サービスURL
+## アプリのダウンロード
 
-#### ◼️ダウンロード（App Store）
+#### App Store:
 https://onl.bz/nPb5KTg
 
 PCの方はこちらから↓
 
 ![unico_store_qr](https://github.com/kensuke242424/unico/assets/100055504/bf97638f-b6a4-48b7-ad13-e30d84b39b10)
 
-#### ◼️サービスWebサイト
+##### <ログイン方法について>
+
+> ◽️本アプリではログイン機能としてFirebaseの[Dynamic Links](https://firebase.google.com/docs/dynamic-links?hl=ja)を利用しています。  
+> 　入力メールアドレス宛に届くリンクからアプリに再アクセスすることで、アカウント認証を行います。  
+> ◽️アドレス登録不要の簡易ログインも用意しています。ぜひご利用ください。
+<br>
+
+## サービスWebサイト
 https://unicoapp.wixsite.com/mysite
 
 <br>
 
-##### <アプリのログイン方法について>
-
-・本アプリではログイン機能としてFirebaseの[Dynamic Links](https://firebase.google.com/docs/dynamic-links?hl=ja)を利用しています。  
-入力メールアドレス宛に届くリンクからアプリに再アクセスすることで、アカウント認証を行います。  
-・アドレス登録不要の簡易ログインも用意しています。ぜひご利用ください。
-<br>
-<br>
-
 ## 使用技術
 
+- Swift 5.8.1
+- Firebase 10.15.0
+  - Firestore Database
+  - Authentication
+  - Storage
+  - Dynamic Links
+- swiftui-introspect
+- Resizable Sheet
 
 ## 想定ユーザー
 - aaa
