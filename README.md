@@ -26,8 +26,9 @@ https://unicoapp.wixsite.com/mysite
 
 <br>
 
-## 使用技術
+## 🔧使用技術
 
+#### ◽️使用ライブラリ
 - Swift 5.8.1
 - Firebase 10.15.0
   - Firestore Database
@@ -36,6 +37,12 @@ https://unicoapp.wixsite.com/mysite
   - Dynamic Links
 - swiftui-introspect
 - Resizable Sheet
+
+#### ◽️ライブラリ管理
+- Swift Package Manager
+<br>
+
+# このアプリについて
 
 ## 想定ユーザー
 - aaa
