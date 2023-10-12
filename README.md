@@ -5,7 +5,7 @@
 ![スクリーンショット 2023-10-10 16 35 16のコピー](https://github.com/kensuke242424/unico/assets/100055504/daedf12f-7bfe-4469-829f-0270f917a72e)
 <br>
 <br>
-## アプリのダウンロード
+## 🍎アプリのダウンロード
 
 #### App Store:
 https://onl.bz/nPb5KTg
@@ -21,7 +21,7 @@ PCの方はこちらから↓
 > ◽️アドレス登録不要の簡易ログインも用意しています。ぜひご利用ください。
 <br>
 
-## サービスWebサイト
+## 🌐サービスWebサイト
 https://unicoapp.wixsite.com/mysite
 
 <br>
@@ -29,17 +29,19 @@ https://unicoapp.wixsite.com/mysite
 ## 🔧使用技術
 
 #### ◽️使用ライブラリ
-- Swift 5.8.1
-- Firebase 10.15.0
+- Swift *5.8.1*
+- Firebase *10.15.0*
   - Firestore Database
   - Authentication
   - Storage
   - Dynamic Links
-- swiftui-introspect
+- SDWebImageSwiftUI *2.2.2*
+- swiftui-introspect *0.6.0*
 - Resizable Sheet
 
 #### ◽️ライブラリ管理
 - Swift Package Manager
+
 <br>
 
 # このアプリについて
