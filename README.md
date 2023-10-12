@@ -29,15 +29,16 @@ https://unicoapp.wixsite.com/mysite
 ## 🔧使用技術
 
 #### ◽️使用ライブラリ
-- Swift *5.8.1*
-- Firebase *10.15.0*
-  - Firestore Database
-  - Authentication
-  - Storage
-  - Dynamic Links
-- SDWebImageSwiftUI *2.2.2*
-- swiftui-introspect *0.6.0*
-- Resizable Sheet
+- Swift 5.8.1
+- [firebase-ios-sdk 10.15.0](https://github.com/firebase/firebase-ios-sdk)
+  - [Firestore Database]()
+  - [Authentication](https://firebase.google.com/docs/auth?hl=ja)
+  - [Cloud Storage](https://firebase.google.com/docs/storage?hl=ja)
+  - [Dynamic Links](https://firebase.google.com/docs/dynamic-links?hl=ja) （※2025.8.25よりサービス停止）
+    
+- [SDWebImageSwiftUI 2.2.2](https://github.com/SDWebImage/SDWebImageSwiftUI)
+- [swiftui-introspect 0.6.0](https://github.com/siteline/swiftui-introspect/tree/main)
+- [Resizable Sheet](https://github.com/mtj0928/ResizableSheet)
 
 #### ◽️ライブラリ管理
 - Swift Package Manager
