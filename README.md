@@ -1,4 +1,4 @@
-# unico
+# 在庫管理アプリ『unico』
 ユーザーの"個性"や"色"を反映させることができる、  
 カスタマイズ性に重点を置いた在庫管理アプリです。
 
@@ -7,10 +7,11 @@
 <br>
 ## 🍎アプリのダウンロード
 
-### App Store:
-https://onl.bz/nPb5KTg
+##### ◽️ログイン方法:  メールアドレス
+##### ◽️簡易ログイン:  あり
+[![apple store リンクボタン](https://github.com/kensuke242424/unico/assets/100055504/62d8add4-869a-4899-a148-74c5b4dc09d0)](https://onl.bz/nPb5KTg)
 
-PCの方はこちらから↓
+PCの方はこちらからどうぞ！
 
 ![unico_store_qrのコピー](https://github.com/kensuke242424/unico/assets/100055504/f7f2b942-1368-44ea-9866-cd2cdce31afa)
 
@@ -53,6 +54,18 @@ https://unicoapp.wixsite.com/mysite
 
 <br>
 
+## ER図
+
+準備中
+
+## 画面遷移図
+
+#### - ログイン画面周り -
+<img width="879" alt="スクリーンショット 2023-10-15 17 42 15" src="https://github.com/kensuke242424/unico/assets/100055504/1ba84bad-16ca-4fbf-bf39-e5313d7ae5be">
+
+#### - メイン画面周り -
+<img width="920" alt="スクリーンショット 2023-10-15 17 42 39" src="https://github.com/kensuke242424/unico/assets/100055504/0a118811-5015-4b41-abd7-cc7929783b51">
+
 # 📦このアプリについて
 
 ## 想定ユーザー
@@ -66,19 +79,6 @@ https://unicoapp.wixsite.com/mysite
 - bbb
 - ccc
 <br>
-
-## ER図
-
-準備中
-
-## 画面遷移図
-
-#### - ログイン画面周り -
-<img width="879" alt="スクリーンショット 2023-10-15 17 42 15" src="https://github.com/kensuke242424/unico/assets/100055504/1ba84bad-16ca-4fbf-bf39-e5313d7ae5be">
-
-#### - メイン画面周り -
-<img width="920" alt="スクリーンショット 2023-10-15 17 42 39" src="https://github.com/kensuke242424/unico/assets/100055504/0a118811-5015-4b41-abd7-cc7929783b51">
-
 
 
 ## このアプリを作った背景と想い
@@ -96,7 +96,7 @@ https://unicoapp.wixsite.com/mysite
 ◽️食品など日用品の管理に特化したアプリ  
 ◽️企業の利用を想定したデザインやUIUXのアプリ  
 
-といったものが多く、中間的な位置付けのアプリが中々ありませんでした。
+といったものが多く、中間的な位置付けのアプリは中々見つけられませんでした。
 
 > "作品"や"商品"に込められた  
 > オリジナルな世界観やイメージを、  
