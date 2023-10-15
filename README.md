@@ -74,12 +74,10 @@ https://unicoapp.wixsite.com/mysite
 ## 画面遷移図
 
 #### - ログイン画面周り -
-<img width="660" alt="スクリーンショット 2023-10-14 16 16 30" src="https://github.com/kensuke242424/unico/assets/100055504/0ecf250f-249c-4773-b905-a17b0c02c7a8">
+<img width="879" alt="スクリーンショット 2023-10-15 17 42 15" src="https://github.com/kensuke242424/unico/assets/100055504/1ba84bad-16ca-4fbf-bf39-e5313d7ae5be">
 
 #### - メイン画面周り -
-<img width="759" alt="スクリーンショット 2023-10-15 16 49 06" src="https://github.com/kensuke242424/unico/assets/100055504/d3be656c-75c5-4490-bcd0-8b58f4e4d7b1">
-
-
+<img width="920" alt="スクリーンショット 2023-10-15 17 42 39" src="https://github.com/kensuke242424/unico/assets/100055504/0a118811-5015-4b41-abd7-cc7929783b51">
 
 
 
