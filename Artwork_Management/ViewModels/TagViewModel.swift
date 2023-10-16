@@ -73,10 +73,12 @@ class TagViewModel: ObservableObject {
     }
 
     func addTagToFirestore(tagData: Tag, teamID: String) {
-        let tagsRef = db?
+        guard let newTagId = tagData.id else { return }
+        let tagRef = db?
             .collection("teams/\(teamID)/tags")
+            .document(newTagId)
         do {
-            _ = try tagsRef?.addDocument(from: tagData)
+            _ = try tagRef?.setData(from: tagData)
         } catch {
             print("Error: try db!.collection(collectionID).addDocument(from: itemData)")
         }
@@ -123,14 +125,14 @@ class TagViewModel: ObservableObject {
         }
 
     }
-    /// タグの削除と同時に、紐づいていたアイテムのタグを「未グループ」に更新するメソッド
-    func deleteTag(deleteTag: Tag, teamID: String) {
+    /// 削除されたタグに紐づいていたアイテムのタグを「未グループ」に更新するメソッド
+    func updateItemsDeletedTag(id deletedTagId: String?, tag deletedTag: Tag, teamID: String) {
 
-        guard let tagID = deleteTag.id else { return }
+        guard let tagID = deletedTagId else { return }
         guard let tagRef = db?.collection("teams/\(teamID)/tags").document(tagID) else { return }
         guard let itemsRef = db?.collection("teams/\(teamID)/items") else { return }
 
-        itemsRef.whereField("tag", isEqualTo: deleteTag.tagName).getDocuments { (snaps, error) in
+        itemsRef.whereField("tag", isEqualTo: deletedTag.tagName).getDocuments { (snaps, error) in
 
             if let error = error {
                 print("Error: \(error)")
@@ -146,15 +148,47 @@ class TagViewModel: ObservableObject {
         }
     }
 
+    /// タグを削除するメソッド。
+    /// 削除されたタグに紐づいているアイテムのタグを「未グループ」に更新する。
+    func deleteTag(deleteTag: Tag, teamID: String) {
+
+        guard let tagRef = db?
+            .collection("teams")
+            .document(teamID)
+            .collection("tags")
+            .whereField("tagName", isEqualTo: deleteTag.tagName)
+        else {
+            return
+        }
+
+        tagRef.getDocuments() { snap, error in
+            if let error {
+                print("タグ削除失敗: \(error.localizedDescription)")
+            } else {
+                for document in snap!.documents {
+                    // タグデータの削除
+                    document.reference.delete()
+                    // 削除タグに紐づいていたアイテムのタグを「未グループ」に更新
+                    self.updateItemsDeletedTag(id: document.documentID,
+                                               tag: deleteTag,
+                                               teamID: teamID)
+                }
+            }
+        }
+    }
+
     /// チーム作成時にデフォルトのサンプルタグを追加するメソッド。
     func setSampleTag(teamID: String) async {
+
+        guard let sampleTagId = self.sampleTag.id else { return }
 
         do {
             try db?
                 .collection("teams")
                 .document(teamID)
                 .collection("tags")
-                .addDocument(from: self.sampleTag)
+                .document(sampleTagId)
+                .setData(from: self.sampleTag)
 
         } catch {
             print("ERROR: サンプルタグの保存失敗")
