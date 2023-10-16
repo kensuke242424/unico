@@ -61,11 +61,7 @@ PCからの方はこちらをどうぞ！
 
 ## ER図
 
-### ユーザーデータ関連
-<img width="1051" alt="スクリーンショット 2023-10-16 15 23 49" src="https://github.com/kensuke242424/unico/assets/100055504/e5973cfc-b9b8-4cb3-8a4b-db202e65a8a8">
-
-### チームデータ関連
-<img width="569" alt="スクリーンショット 2023-10-16 15 24 19" src="https://github.com/kensuke242424/unico/assets/100055504/37aa2761-d535-4f9b-a5f4-57993a79ada5">
+<img width="637" alt="スクリーンショット 2023-10-16 15 46 22" src="https://github.com/kensuke242424/unico/assets/100055504/d75275a8-f65e-4850-ac13-f5570c216043">
 
 ## 画面遷移図
 
