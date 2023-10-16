@@ -73,10 +73,12 @@ class TagViewModel: ObservableObject {
     }
 
     func addTagToFirestore(tagData: Tag, teamID: String) {
-        let tagsRef = db?
+        guard let newTagId = tagData.id else { return }
+        let tagRef = db?
             .collection("teams/\(teamID)/tags")
+            .document(newTagId)
         do {
-            _ = try tagsRef?.addDocument(from: tagData)
+            _ = try tagRef?.setData(from: tagData)
         } catch {
             print("Error: try db!.collection(collectionID).addDocument(from: itemData)")
         }
@@ -124,24 +126,48 @@ class TagViewModel: ObservableObject {
 
     }
     /// タグの削除と同時に、紐づいていたアイテムのタグを「未グループ」に更新するメソッド
+//    func deleteTag(deleteTag: Tag, teamID: String) {
+//
+//        guard let tagID = deleteTag.id else { return }
+//        guard let tagRef = db?.collection("teams/\(teamID)/tags").document(tagID) else { return }
+//        guard let itemsRef = db?.collection("teams/\(teamID)/items") else { return }
+//
+//        itemsRef.whereField("tag", isEqualTo: deleteTag.tagName).getDocuments { (snaps, error) in
+//
+//            if let error = error {
+//                print("Error: \(error)")
+//            } else {
+//                guard let snaps = snaps else { return }
+//                for document in snaps.documents {
+//                    let itemID = document.documentID
+//                    // タグの削除と、紐ずくアイテムのタグ解除
+//                    itemsRef.document(itemID).updateData(["tag": self.tags.last!.tagName])
+//                }
+//                tagRef.delete()
+//            }
+//        }
+//    }
+
+    /// FirestoreのタグドキュメントIDを取得するメソッド。
     func deleteTag(deleteTag: Tag, teamID: String) {
 
-        guard let tagID = deleteTag.id else { return }
-        guard let tagRef = db?.collection("teams/\(teamID)/tags").document(tagID) else { return }
-        guard let itemsRef = db?.collection("teams/\(teamID)/items") else { return }
+        guard let tagRef = db?
+            .collection("teams")
+            .document(teamID)
+            .collection("tags")
+            .whereField("tagName", isEqualTo: deleteTag.tagName)
+        else {
+            return
+        }
 
-        itemsRef.whereField("tag", isEqualTo: deleteTag.tagName).getDocuments { (snaps, error) in
-
-            if let error = error {
-                print("Error: \(error)")
+        tagRef.getDocuments() { snap, error in
+            if let error {
+                print("タグ削除失敗: \(error.localizedDescription)")
             } else {
-                guard let snaps = snaps else { return }
-                for document in snaps.documents {
-                    let itemID = document.documentID
-                    // タグの削除と、紐ずくアイテムのタグ解除
-                    itemsRef.document(itemID).updateData(["tag": self.tags.last!.tagName])
+                for document in snap!.documents {
+                    document.reference.delete()
+                    print("タグ削除成功")
                 }
-                tagRef.delete()
             }
         }
     }
