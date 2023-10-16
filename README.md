@@ -26,24 +26,7 @@ PCからの方はこちらをどうぞ！
 
 ### ◽️ログイン画面の動作
 
-### ◽️アイテム画面の動作
-
-### ◽️ホーム画面の動作
-
-<br>
-
-## 🌐サービスWebサイト
-
-【サイトの内容】  
-
-・アプリの紹介  
-・利用規約、プライバシーポリシー  
-・お問い合わせ  
-・開発者について  
-
-https://unicoapp.wixsite.com/mysite  
-
-[<img width="541" alt="スクリーンショット 2023-10-16 2 01 35" src="https://github.com/kensuke242424/unico/assets/100055504/50dbe0bb-3664-4404-ac99-32d0532e7280">](https://unicoapp.wixsite.com/mysite)
+### ◽️メイン画面の動作
 
 <br>
 
@@ -52,7 +35,7 @@ https://unicoapp.wixsite.com/mysite
 #### ◽️開発環境
 - Xcode `15.0`
 - Swift `5.8.1`
-- macOS Ventura`13.5.2`
+- macOS Ventura `13.5.2`
 
 #### ◽️アーキテクチャ
 - MVVM
@@ -78,7 +61,11 @@ https://unicoapp.wixsite.com/mysite
 
 ## ER図
 
-準備中
+### ユーザーデータ関連
+<img width="1051" alt="スクリーンショット 2023-10-16 15 23 49" src="https://github.com/kensuke242424/unico/assets/100055504/e5973cfc-b9b8-4cb3-8a4b-db202e65a8a8">
+
+### チームデータ関連
+<img width="569" alt="スクリーンショット 2023-10-16 15 24 19" src="https://github.com/kensuke242424/unico/assets/100055504/37aa2761-d535-4f9b-a5f4-57993a79ada5">
 
 ## 画面遷移図
 
@@ -102,6 +89,20 @@ https://unicoapp.wixsite.com/mysite
 - ccc
 <br>
 
+## 🌐サービスWebサイト
+
+【サイトの内容】  
+
+・アプリの紹介  
+・利用規約、プライバシーポリシー  
+・お問い合わせ  
+・開発者について  
+
+https://unicoapp.wixsite.com/mysite  
+
+[<img width="541" alt="スクリーンショット 2023-10-16 2 01 35" src="https://github.com/kensuke242424/unico/assets/100055504/50dbe0bb-3664-4404-ac99-32d0532e7280">](https://unicoapp.wixsite.com/mysite)
+
+<br>
 
 ## このアプリを作った背景と想い
 
@@ -112,13 +113,6 @@ https://unicoapp.wixsite.com/mysite
 このようなアプリのコンセプトに至ったのは、  
 私自身が大阪を拠点にバンドを組んで音楽活動を行い、  
 活動の中でCDやグッズを販売していた経験が大きな動機となっています。
-
-在庫管理と情報共有のために、当時色々な在庫管理アプリを試しましたが、
-
-◽️食品など日用品の管理に特化したアプリ  
-◽️企業の利用を想定したデザインやUIUXのアプリ  
-
-といったものが多く、中間的な位置付けのアプリは中々見つけられませんでした。
 
 > "作品"や"商品"に込めたオリジナリティを感じながら、  
 > 個人やチームでの在庫管理が出来るようなアプリがあればな。
@@ -131,5 +125,8 @@ unicoを利用しているユーザー同士で、
 
 ## アプリの開発者
 
+https://twitter.com/kenchan2n4n
+
+<br>
 
 
