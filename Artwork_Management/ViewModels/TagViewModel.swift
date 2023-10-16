@@ -149,12 +149,15 @@ class TagViewModel: ObservableObject {
     /// チーム作成時にデフォルトのサンプルタグを追加するメソッド。
     func setSampleTag(teamID: String) async {
 
+        guard let sampleTagId = self.sampleTag.id else { return }
+
         do {
             try db?
                 .collection("teams")
                 .document(teamID)
                 .collection("tags")
-                .addDocument(from: self.sampleTag)
+                .document(sampleTagId)
+                .setData(from: self.sampleTag)
 
         } catch {
             print("ERROR: サンプルタグの保存失敗")
