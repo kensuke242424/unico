@@ -83,8 +83,7 @@ PCからの方はこちらをどうぞ！
 <br>
 
 ## ER図
-
-<img width="637" alt="スクリーンショット 2023-10-16 15 46 22" src="https://github.com/kensuke242424/unico/assets/100055504/d75275a8-f65e-4850-ac13-f5570c216043">
+<img width="615" alt="スクリーンショット 2023-10-17 23 04 21" src="https://github.com/kensuke242424/unico/assets/100055504/28acc15c-cf55-48d8-aac8-4da182dd96b0">
 
 ### - エンティティ詳細 -
 
