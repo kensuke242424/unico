@@ -9,7 +9,8 @@
 
 ##### ◽️ログイン方法:  メールアドレス
 ##### ◽️簡易ログイン:  あり
-[![apple store リンクボタン](https://github.com/kensuke242424/unico/assets/100055504/62d8add4-869a-4899-a148-74c5b4dc09d0)](https://onl.bz/nPb5KTg)
+
+[![apple store リンクボタン](https://user-images.githubusercontent.com/68992872/204145956-f5cc0fa8-d4c9-4f2c-b1d4-3c3b1d2e2aba.png)](https://apps.apple.com/us/app/unico-%E3%81%8A%E3%81%97%E3%82%83%E3%82%8C%E3%81%AB%E3%83%A2%E3%83%8E%E3%82%92%E7%AE%A1%E7%90%86/id1663765686)
 
 PCからの方はこちらをどうぞ！
 
