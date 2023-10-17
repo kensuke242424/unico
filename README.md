@@ -106,11 +106,7 @@ https://unicoapp.wixsite.com/mysite
 
 ### 2.フローチャート
 
-<br>
-
 #### ◽️アプリ起動〜メイン画面遷移まで
-
-<br>
 
 #### ◽️メイン画面
 
