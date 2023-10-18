@@ -96,7 +96,7 @@ https://unicoapp.wixsite.com/mysite
 
 ### 1.画面遷移フロー
 
-#### ◽️ログイン/アカウント作成
+#### ◽️ログイン/アカウント作成/チーム作成
 <img width="879" alt="スクリーンショット 2023-10-15 17 42 15" src="https://github.com/kensuke242424/unico/assets/100055504/1ba84bad-16ca-4fbf-bf39-e5313d7ae5be">
 
 #### ◽️メイン画面
@@ -105,6 +105,8 @@ https://unicoapp.wixsite.com/mysite
 <br>
 
 ### 2.シーケンス図
+<img width="1065" alt="スクリーンショット 2023-10-19 1 29 40" src="https://github.com/kensuke242424/unico/assets/100055504/161f7f5e-8e6b-4e77-a506-212579d73798">
+<img width="1110" alt="スクリーンショット 2023-10-19 1 29 55" src="https://github.com/kensuke242424/unico/assets/100055504/79d1edaa-fb5d-4563-bc78-10ae12761971">
 
 <br>
 
