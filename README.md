@@ -94,7 +94,7 @@ https://unicoapp.wixsite.com/mysite
 
 ## 🗺️アプリの設計
 
-### 1.画面遷移図
+### 1.画面遷移フロー
 
 #### ◽️ログイン/アカウント作成
 <img width="879" alt="スクリーンショット 2023-10-15 17 42 15" src="https://github.com/kensuke242424/unico/assets/100055504/1ba84bad-16ca-4fbf-bf39-e5313d7ae5be">
@@ -104,23 +104,15 @@ https://unicoapp.wixsite.com/mysite
 
 <br>
 
-### 2.フローチャート
-
-#### ◽️アプリ起動〜メイン画面遷移まで
-
-#### ◽️メイン画面
+### 2.シーケンス図
 
 <br>
 
-### 3.シーケンス図
+### 3.MVVM設計
 
 <br>
 
-### 4.MVVM設計
-
-<br>
-
-### 5.ER図
+### 4.ER図
 <img width="615" alt="スクリーンショット 2023-10-17 23 04 21" src="https://github.com/kensuke242424/unico/assets/100055504/28acc15c-cf55-48d8-aac8-4da182dd96b0">
 
 #### ◽️エンティティ詳細
@@ -182,5 +174,12 @@ https://twitter.com/kenchan2n4n
 https://blog.code-candy.com/category/swiftui/
 
 <br>
+
+### README構築ツール
+
+- GIPHY CAPTURE（アプリの動作のgif撮影）
+- Figma（画面遷移フロー）
+- GitMind（シーケンス図）
+- draw.io（ER図）
 
 
