@@ -35,7 +35,6 @@ struct RootView: View {
     }
     
     @EnvironmentObject var progressVM: ProgressViewModel
-
     @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var logInVM: LogInViewModel
     @EnvironmentObject var teamVM: TeamViewModel
