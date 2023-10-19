@@ -114,7 +114,6 @@
 		E0455FE8292CCB39004F677D /* HashableExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0455FE7292CCB39004F677D /* HashableExtension.swift */; };
 		E0455FEA292D1947004F677D /* GradientBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0455FE9292D1947004F677D /* GradientBackground.swift */; };
 		E04ACF4128E6DD600054A6C4 /* ShowsItemDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04ACF4028E6DD600054A6C4 /* ShowsItemDetail.swift */; };
-		E04ACF4328E73C660054A6C4 /* IndicatorRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E04ACF4228E73C660054A6C4 /* IndicatorRow.swift */; };
 		E05130E228F341620092FE46 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E05130E128F341610092FE46 /* RootView.swift */; };
 		E05FE94528F71BFB00263F98 /* ColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E05FE94428F71BFB00263F98 /* ColorExtension.swift */; };
 		E0796AD328F46CC90094E50C /* ItemCardRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0796AD228F46CC90094E50C /* ItemCardRow.swift */; };
@@ -126,7 +125,6 @@
 		E08F272928DDA09000329C5E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E08F272828DDA09000329C5E /* Assets.xcassets */; };
 		E08F272C28DDA09000329C5E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E08F272B28DDA09000329C5E /* Preview Assets.xcassets */; };
 		E08F273628DDB48100329C5E /* StockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E08F273528DDB48100329C5E /* StockView.swift */; };
-		E08F273828DDB51600329C5E /* ManageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E08F273728DDB51600329C5E /* ManageView.swift */; };
 		E08F273A28DDB53700329C5E /* SystemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E08F273928DDB53700329C5E /* SystemView.swift */; };
 		E08F273C28DDB61A00329C5E /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E08F273B28DDB61A00329C5E /* LibraryView.swift */; };
 		E08F273E28DDB65F00329C5E /* HomeTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E08F273D28DDB65F00329C5E /* HomeTabView.swift */; };
@@ -272,7 +270,6 @@
 		E0455FE7292CCB39004F677D /* HashableExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HashableExtension.swift; sourceTree = "<group>"; };
 		E0455FE9292D1947004F677D /* GradientBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientBackground.swift; sourceTree = "<group>"; };
 		E04ACF4028E6DD600054A6C4 /* ShowsItemDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowsItemDetail.swift; sourceTree = "<group>"; };
-		E04ACF4228E73C660054A6C4 /* IndicatorRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndicatorRow.swift; sourceTree = "<group>"; };
 		E05130E128F341610092FE46 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		E05FE94428F71BFB00263F98 /* ColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorExtension.swift; sourceTree = "<group>"; };
 		E0796AD228F46CC90094E50C /* ItemCardRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemCardRow.swift; sourceTree = "<group>"; };
@@ -285,7 +282,6 @@
 		E08F272828DDA09000329C5E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E08F272B28DDA09000329C5E /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		E08F273528DDB48100329C5E /* StockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StockView.swift; sourceTree = "<group>"; };
-		E08F273728DDB51600329C5E /* ManageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageView.swift; sourceTree = "<group>"; };
 		E08F273928DDB53700329C5E /* SystemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemView.swift; sourceTree = "<group>"; };
 		E08F273B28DDB61A00329C5E /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
 		E08F273D28DDB65F00329C5E /* HomeTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTabView.swift; sourceTree = "<group>"; };
@@ -603,7 +599,6 @@
 				E09F09BA28EAF2DD00D07669 /* EditItemViews */,
 				E08F273F28DEAD1100329C5E /* Tab1_Librarys */,
 				E08F274028DEAD3B00329C5E /* Tab2_Inventrys */,
-				E08F274128DEAD4D00329C5E /* Tab3_Manages */,
 				E08F274228DEAD5900329C5E /* SystemViews */,
 			);
 			path = Views;
@@ -673,15 +668,6 @@
 				E0003D0228FD3BB0007308B0 /* TagTitle.swift */,
 			);
 			path = Tab2_Inventrys;
-			sourceTree = "<group>";
-		};
-		E08F274128DEAD4D00329C5E /* Tab3_Manages */ = {
-			isa = PBXGroup;
-			children = (
-				E08F273728DDB51600329C5E /* ManageView.swift */,
-				E04ACF4228E73C660054A6C4 /* IndicatorRow.swift */,
-			);
-			path = Tab3_Manages;
 			sourceTree = "<group>";
 		};
 		E08F274228DEAD5900329C5E /* SystemViews */ = {
@@ -923,7 +909,6 @@
 				E0FCADA429708B9800BA6A75 /* LogoMark.swift in Sources */,
 				BE8654802A8586C0006AE163 /* WebImageTypesIcon.swift in Sources */,
 				E01AA3A9291780DD000FCD37 /* UIImageExtension.swift in Sources */,
-				E08F273828DDB51600329C5E /* ManageView.swift in Sources */,
 				BE1F271E29C162B300AD55DF /* NewTabView.swift in Sources */,
 				BEB669A12A2A370A008FC9DE /* HomeViewModel.swift in Sources */,
 				BE4663F42A150A440072C025 /* AnonymousEntryRecomendationView.swift in Sources */,
@@ -935,7 +920,6 @@
 				E0BE39AF29335317002499C4 /* ShowsItemAsyncImagePhoto.swift in Sources */,
 				E0796AD728F485850094E50C /* ButtonViewModel.swift in Sources */,
 				E0BFE1C929746B06005481CA /* QRReaderView.swift in Sources */,
-				E04ACF4328E73C660054A6C4 /* IndicatorRow.swift in Sources */,
 				E09F09BC28EAF33500D07669 /* FocusedLineRow.swift in Sources */,
 				BE19FD842A7AB12600AE8165 /* Log.swift in Sources */,
 				E0455FEA292D1947004F677D /* GradientBackground.swift in Sources */,
