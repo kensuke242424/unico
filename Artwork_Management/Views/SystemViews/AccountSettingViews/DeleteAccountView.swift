@@ -16,7 +16,7 @@ enum DeleteAccountCheckFase {
 struct DeleteAccountView: View {
     
     @EnvironmentObject var navigationVM: NavigationViewModel
-    @EnvironmentObject var logInVM: LogInViewModel
+    @EnvironmentObject var logInVM: AuthViewModel
     @EnvironmentObject var userVM: UserViewModel
 
     @State private var showEmailLinkHalfSheet: Bool = false
@@ -132,7 +132,7 @@ struct DeleteAccountView_Previews: PreviewProvider {
             VStack {
                 DeleteAccountView()
                     .environmentObject(NavigationViewModel())
-                    .environmentObject(LogInViewModel())
+                    .environmentObject(AuthViewModel())
             }
             .navigationTitle("アカウントの削除")
             .navigationBarTitleDisplayMode(.inline)

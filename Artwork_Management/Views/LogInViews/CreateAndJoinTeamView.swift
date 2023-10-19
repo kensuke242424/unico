@@ -25,7 +25,7 @@ struct CreateAndJoinTeamView: View {
         case start, fase1, fase2, check, success
     }
 
-    @EnvironmentObject var logInVM: LogInViewModel
+    @EnvironmentObject var logInVM: AuthViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var tagVM: TagViewModel

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct DeletedView: View {
 
-    @EnvironmentObject var logInVM: LogInViewModel
+    @EnvironmentObject var logInVM: AuthViewModel
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var navigationVM: NavigationViewModel

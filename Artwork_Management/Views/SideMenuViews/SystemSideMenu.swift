@@ -51,7 +51,7 @@ struct SystemSideMenu: View {
     @EnvironmentObject var progressVM: ProgressViewModel
     @EnvironmentObject var backgroundVM: BackgroundViewModel
 
-    @EnvironmentObject var logInVM : LogInViewModel
+    @EnvironmentObject var logInVM : AuthViewModel
     @EnvironmentObject var teamVM  : TeamViewModel
     @EnvironmentObject var userVM  : UserViewModel
     @EnvironmentObject var tagVM   : TagViewModel

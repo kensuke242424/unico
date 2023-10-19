@@ -30,7 +30,7 @@ struct UpdateAddressView: View {
     @Environment(\.dismiss) var dismiss
     
     @EnvironmentObject var navigationVM: NavigationViewModel
-    @EnvironmentObject var logInVM: LogInViewModel
+    @EnvironmentObject var logInVM: AuthViewModel
     @EnvironmentObject var userVM : UserViewModel
     @State private var inputEmailAddress: String = ""
     @State private var showBackAlert: Bool = false
@@ -137,7 +137,7 @@ struct UpadateAddressView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationStack {
             UpdateAddressView()
-                .environmentObject(LogInViewModel())
+                .environmentObject(AuthViewModel())
         }
         .navigationBarTitleDisplayMode(.inline)
     }

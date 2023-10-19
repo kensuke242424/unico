@@ -13,7 +13,7 @@ struct ParentTabView: View {
 
     @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var notificationVM: NotificationViewModel
-    @EnvironmentObject var logInVM: LogInViewModel
+    @EnvironmentObject var logInVM: AuthViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var tagVM : TagViewModel

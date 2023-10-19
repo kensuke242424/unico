@@ -33,7 +33,7 @@ enum DefaultEmailCheckFase {
 
 struct DefaultEmailCheckView: View {
     
-    @EnvironmentObject var logInVM: LogInViewModel
+    @EnvironmentObject var logInVM: AuthViewModel
     @EnvironmentObject var navigationVM: NavigationViewModel
     
     @State private var inputEmailAddress: String = ""
@@ -112,6 +112,6 @@ struct DefaultEmailCheckView: View {
 struct DefaultEmailCheckView_Previews: PreviewProvider {
     static var previews: some View {
         DefaultEmailCheckView()
-            .environmentObject(LogInViewModel())
+            .environmentObject(AuthViewModel())
     }
 }

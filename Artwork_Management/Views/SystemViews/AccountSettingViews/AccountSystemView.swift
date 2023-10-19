@@ -69,7 +69,7 @@ struct AccountSystemView: View {
     
     @EnvironmentObject var progress: ProgressViewModel
     @EnvironmentObject var navigationVM: NavigationViewModel
-    @EnvironmentObject var logInVM: LogInViewModel
+    @EnvironmentObject var logInVM: AuthViewModel
     @EnvironmentObject var userVM: UserViewModel
     
     @State private var showEntryAccount: Bool = false
@@ -194,7 +194,7 @@ struct AccountSystemView: View {
 struct AccountSetting_Previews: PreviewProvider {
     static var previews: some View {
         AccountSystemView()
-            .environmentObject(LogInViewModel())
+            .environmentObject(AuthViewModel())
             .environmentObject(NavigationViewModel())
             .environmentObject(UserViewModel())
     }
