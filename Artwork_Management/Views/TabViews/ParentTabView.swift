@@ -177,11 +177,11 @@ struct ParentTabView: View {
                                 .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
                         }
                         if inputTab.showUpdateTeam {
-                            UpdateTeamDataView(show: $inputTab.showUpdateTeam)
+                            TeamProfileEditView(show: $inputTab.showUpdateTeam)
                                 .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
                         }
                         if inputTab.showUpdateUser {
-                            UpdateUserDataView(show: $inputTab.showUpdateUser)
+                            UserProfileEditView(show: $inputTab.showUpdateUser)
                                 .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
                         }
                         if userVM.showJoinedTeamInformation {

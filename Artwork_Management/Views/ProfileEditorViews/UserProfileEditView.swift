@@ -1,5 +1,5 @@
 //
-//  UpdateUserDataView.swift
+//  UserProfileEditView.swift
 //  Artwork_Management
 //
 //  Created by Kensuke Nakagawa on 2023/07/13.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct UpdateUserDataView: View {
+struct UserProfileEditView: View {
     enum ShowKeyboard {
         case check
     }
@@ -217,8 +217,8 @@ struct UpdateUserDataView: View {
     }
 }
 
-//struct UpdateUserDataView_Previews: PreviewProvider {
+//struct UserProfileEditView_Previews: PreviewProvider {
 //    static var previews: some View {
-//        UpdateUserDataView()
+//        UserProfileEditView()
 //    }
 //}

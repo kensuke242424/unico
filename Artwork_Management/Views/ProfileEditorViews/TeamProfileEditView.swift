@@ -1,5 +1,5 @@
 //
-//  UpdateTeamDataView.swift
+//  TeamProfileEditView.swift
 //  Artwork_Management
 //
 //  Created by 中川賢亮 on 2023/02/05.
@@ -11,7 +11,7 @@ enum SelectedUpdateData {
     case start, user, team
 }
 
-struct UpdateTeamDataView: View {
+struct TeamProfileEditView: View {
 
     enum ShowKeyboard {
         case check
@@ -224,9 +224,9 @@ struct UpdateTeamDataView: View {
     }
 } // View
 
-struct UpdateTeamDataView_Previews: PreviewProvider {
+struct TeamProfileEditView_Previews: PreviewProvider {
     static var previews: some View {
-        UpdateTeamDataView(show: .constant(true))
+        TeamProfileEditView(show: .constant(true))
             .environmentObject(TeamViewModel())
             .environmentObject(UserViewModel())
     }
