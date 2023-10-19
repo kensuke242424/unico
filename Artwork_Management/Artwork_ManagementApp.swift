@@ -29,7 +29,7 @@ struct ArtworkManagementApp: App {
                 .environmentObject(MomentLogViewModel())
                 .environmentObject(LogViewModel())
                 .environmentObject(NotificationViewModel())
-                .environmentObject(LogInViewModel())
+                .environmentObject(AuthViewModel())
                 .environmentObject(TeamViewModel())
                 .environmentObject(UserViewModel())
                 .environmentObject(TagViewModel())

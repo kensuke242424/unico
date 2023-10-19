@@ -11,7 +11,7 @@ struct LogInAddressSheetView: View {
     
     @Environment(\.colorScheme) var colorScheme
     
-    @EnvironmentObject var logInVM: LogInViewModel
+    @EnvironmentObject var logInVM: AuthViewModel
     @FocusState var showEmailKyboard: Bool?
     
     @State private var inputLogIn: InputLogIn = InputLogIn()

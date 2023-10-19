@@ -14,7 +14,7 @@ struct UserEntryRecommendationView: View {
         case inputAddress
     }
     
-    @EnvironmentObject var logInVM: LogInViewModel
+    @EnvironmentObject var logInVM: AuthViewModel
     @EnvironmentObject var userVM : UserViewModel
     @Binding var isShow: Bool
 
@@ -186,7 +186,7 @@ struct UserEntryRecommendationView: View {
 struct UserEntryRecommendationView_Previews: PreviewProvider {
     static var previews: some View {
         UserEntryRecommendationView(isShow: .constant(true))
-            .environmentObject(LogInViewModel())
+            .environmentObject(AuthViewModel())
             .environmentObject(UserViewModel())
     }
 }

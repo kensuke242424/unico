@@ -14,7 +14,7 @@ struct AnonymousEntryRecomendationView: View {
         case inputAddress
     }
 
-    @EnvironmentObject var logInVM: LogInViewModel
+    @EnvironmentObject var logInVM: AuthViewModel
     @EnvironmentObject var userVM : UserViewModel
     @Binding var isShow: Bool
 
@@ -143,7 +143,7 @@ struct AnonymousEntryRecomendationView: View {
 struct AnonymousEntryRecomendationView_Previews: PreviewProvider {
     static var previews: some View {
         AnonymousEntryRecomendationView(isShow: .constant(true))
-            .environmentObject(LogInViewModel())
+            .environmentObject(AuthViewModel())
             .environmentObject(UserViewModel())
     }
 }

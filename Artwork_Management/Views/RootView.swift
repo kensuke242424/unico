@@ -15,7 +15,8 @@ enum RootNavigation {
 }
 
 struct RootView: View {
-    
+
+    // ----- ResizableSheetを起動するために必要 -------
     var windowScene: UIWindowScene? {
         let scenes = UIApplication.shared.connectedScenes
         let windowScene = scenes.first as? UIWindowScene
@@ -24,7 +25,8 @@ struct RootView: View {
     var resizableSheetCenter: ResizableSheetCenter? {
         windowScene.flatMap(ResizableSheetCenter.resolve(for:))
     }
-    
+    // -----  -------  -------  -------  -------
+
     private struct PreloadProperty {
         var startPreload: Bool = false
         var inputTab    : InputTab = InputTab()
@@ -33,9 +35,8 @@ struct RootView: View {
     }
     
     @EnvironmentObject var progressVM: ProgressViewModel
-
     @EnvironmentObject var navigationVM: NavigationViewModel
-    @EnvironmentObject var logInVM: LogInViewModel
+    @EnvironmentObject var authVM: AuthViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var tagVM: TagViewModel
@@ -55,7 +56,7 @@ struct RootView: View {
     var body: some View {
 
         ZStack {
-            switch logInVM.rootNavigation {
+            switch authVM.rootNavigation {
             case .logIn:
                 LogInView()
 
@@ -67,7 +68,7 @@ struct RootView: View {
                 CreateAndJoinTeamView()
 
             case .home:
-                NewTabView(itemVM: itemVM, cartVM: cartVM)
+                ParentTabView(itemVM: itemVM, cartVM: cartVM)
                     .environment(\.resizableSheetCenter, resizableSheetCenter)
             }
         } // ZStack
@@ -88,7 +89,7 @@ struct RootView: View {
             if preloads.startPreload {
                 Group {
                     NewItemsView(itemVM: itemVM, cartVM: cartVM, inputTab: $preloads.inputTab)
-                    NewEditItemView(itemVM: itemVM, passItem: nil)
+                    ItemEditingView(itemVM: itemVM, passItem: nil)
                     CreateAndJoinTeamView()
                     PHPickerView(captureImage: $preloads.captureImage, isShowSheet: $preloads.showSheet)
                     NewItemsView(itemVM: itemVM,  cartVM: cartVM, inputTab: $preloadVM.inputTab)
@@ -104,7 +105,7 @@ struct RootView: View {
         }
 
         // ☑️全データのフェッチ処理☑️
-        .onChange(of: logInVM.rootNavigation) { navigation in
+        .onChange(of: authVM.rootNavigation) { navigation in
             
             if navigation == .fetch {
                 Task {
@@ -115,7 +116,7 @@ struct RootView: View {
                         try await userVM.fetchUser()
                         /// ユーザーデータの所得ができなければ、ログイン画面に遷移
                         guard let user = userVM.user else {
-                            logInVM.rootNavigation = .logIn
+                            authVM.rootNavigation = .logIn
                             return
                         }
 
@@ -126,7 +127,7 @@ struct RootView: View {
                             print("参加チーム無し。チーム作成画面へ遷移")
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                 withAnimation(.spring(response: 1)) {
-                                    logInVM.rootNavigation = .join
+                                    authVM.rootNavigation = .join
                                     teamVM.isShowCreateAndJoinTeam.toggle()
                                 }
                             }
@@ -151,39 +152,39 @@ struct RootView: View {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                             withAnimation(.spring(response: 1)) {
                                 progressVM.showCubesProgress = false
-                                logInVM.rootNavigation = .home
+                                authVM.rootNavigation = .home
                                 /// ログインが完了したら、LogInViewの操作フローを初期化
-                                logInVM.createAccountFase          = .start
-                                logInVM.userSelectedSignInType     = .start
-                                logInVM.selectProviderType         = .start
-                                logInVM.addressSignInFase          = .start
+                                authVM.createAccountFase          = .start
+                                authVM.userSelectedSignInType     = .start
+                                authVM.selectProviderType         = .start
+                                authVM.addressSignInFase          = .start
                             }
                         }
 
                     } catch CustomError.uidEmpty {
                         print("Error: uidEmpty")
-                        logInVM.logOut()
-                        withAnimation(.spring(response: 1)) { logInVM.rootNavigation = .logIn }
+                        authVM.logOut()
+                        withAnimation(.spring(response: 1)) { authVM.rootNavigation = .logIn }
                     } catch CustomError.getRef {
                         print("Error: getRef")
-                        logInVM.logOut()
-                        withAnimation(.spring(response: 1)) { logInVM.rootNavigation = .logIn }
+                        authVM.logOut()
+                        withAnimation(.spring(response: 1)) { authVM.rootNavigation = .logIn }
                     } catch CustomError.fetch {
                         print("Error: fetch")
-                        logInVM.logOut()
-                        withAnimation(.spring(response: 1)) { logInVM.rootNavigation = .logIn }
+                        authVM.logOut()
+                        withAnimation(.spring(response: 1)) { authVM.rootNavigation = .logIn }
                     } catch CustomError.getDocument {
                         print("Error: getDocument")
-                        logInVM.logOut()
-                        withAnimation(.spring(response: 1)) { logInVM.rootNavigation = .logIn }
+                        authVM.logOut()
+                        withAnimation(.spring(response: 1)) { authVM.rootNavigation = .logIn }
                     } catch CustomError.getUserDocument {
                         print("Error: getUserDocument")
-                        logInVM.logOut()
-                        withAnimation(.spring(response: 1)) { logInVM.rootNavigation = .logIn }
+                        authVM.logOut()
+                        withAnimation(.spring(response: 1)) { authVM.rootNavigation = .logIn }
                     } catch {
                         print("Error")
-                        logInVM.logOut()
-                        withAnimation(.spring(response: 1)) { logInVM.rootNavigation = .logIn }
+                        authVM.logOut()
+                        withAnimation(.spring(response: 1)) { authVM.rootNavigation = .logIn }
                     }
                 } // Task
             }
@@ -193,7 +194,7 @@ struct RootView: View {
         .onAppear {
             if Auth.auth().currentUser != nil {
                 print("unicoのアカウントデータが存在しました。データフェッチを開始")
-                logInVM.rootNavigation = .fetch
+                authVM.rootNavigation = .fetch
             } else {
                 print("unicoのアカウントデータが存在しません。ログイン画面に遷移")
                 progressVM.showCubesProgress.toggle()
@@ -224,35 +225,35 @@ struct RootView: View {
                 if let email = defaults.string(forKey: "Email") {
                     withAnimation(.spring(response: 0.35, dampingFraction: 1.0, blendDuration: 0.5)) {
                         // View側で開かれているアドレス入力ハーフシートを閉じる
-                        logInVM.showEmailHalfSheet       = false
-                        logInVM.showEmailSheetBackground = false
+                        authVM.showEmailHalfSheet       = false
+                        authVM.showEmailSheetBackground = false
                     }
                     print("メールリンクで受け取ったユーザーのメールアドレス: \(email)")
-                    print("メールリンクによって行う処理の種類: \(logInVM.handleUseReceivedEmailLink)")
+                    print("メールリンクによって行う処理の種類: \(authVM.handleUseReceivedEmailLink)")
 
-                    switch logInVM.handleUseReceivedEmailLink {
+                    switch authVM.handleUseReceivedEmailLink {
 
                     case .signIn:
-                        logInVM.resultSignInType = .signIn
-                        logInVM.signInEmailLink(email: email, link: link)
+                        authVM.resultSignInType = .signIn
+                        authVM.signInEmailLink(email: email, link: link)
 
                     case .signUp:
-                        logInVM.resultSignInType = .signUp
-                        logInVM.signInEmailLink(email: email, link: link)
+                        authVM.resultSignInType = .signUp
+                        authVM.signInEmailLink(email: email, link: link)
 
                     case .updateEmail:
-                        logInVM.addressReAuthenticateByEmailLink(email: email,
+                        authVM.addressReAuthenticateByEmailLink(email: email,
                                                                  link: link,
                                                                  handle: .updateEmail)
                     case .entryAccount:
                         if userVM.isAnonymous {
-                            logInVM.entryAccountByEmailLink(email: email,
+                            authVM.entryAccountByEmailLink(email: email,
                                                             link: link)
                         } else {
                             print("ERROR: ユーザーは匿名アカウントではありません。")
                         }
                     case .deleteAccount:
-                        logInVM.addressReAuthenticateByEmailLink(email: email,
+                        authVM.addressReAuthenticateByEmailLink(email: email,
                                                                  link: link,
                                                                  handle: .deleteAccount)
                     } // switch
@@ -263,7 +264,6 @@ struct RootView: View {
             }
             if linkHandled {
                 print("Link Handled")
-//                return
             } else {
                 print("NO linkHandled")
                 return
@@ -277,7 +277,7 @@ struct RootView_Previews: PreviewProvider {
         RootView()
             .environmentObject(NavigationViewModel())
             .environmentObject(MomentLogViewModel())
-            .environmentObject(LogInViewModel())
+            .environmentObject(AuthViewModel())
             .environmentObject(TeamViewModel())
             .environmentObject(UserViewModel())
             .environmentObject(ItemViewModel())

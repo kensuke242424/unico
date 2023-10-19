@@ -11,7 +11,7 @@ import SwiftUI
 /// ユーザーがチームへの移動を選択した場合、対象チームへの移動処理を行う。
 struct JoinedTeamInformationView: View {
 
-    @EnvironmentObject var logInVM: LogInViewModel
+    @EnvironmentObject var logInVM: AuthViewModel
     @EnvironmentObject var progressVM: ProgressViewModel
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var teamVM: TeamViewModel
@@ -141,6 +141,6 @@ struct JoinedTeamInformationView_Previews: PreviewProvider {
         JoinedTeamInformationView(presented: .constant(true))
             .environmentObject(TeamViewModel())
             .environmentObject(UserViewModel())
-            .environmentObject(LogInViewModel())
+            .environmentObject(AuthViewModel())
     }
 }

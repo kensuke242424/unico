@@ -12,7 +12,7 @@ import SafariServices
 struct SystemView: View {
 
     @EnvironmentObject var navigationVM: NavigationViewModel
-    @EnvironmentObject var logInVM: LogInViewModel
+    @EnvironmentObject var logInVM: AuthViewModel
 
     var body: some View {
 

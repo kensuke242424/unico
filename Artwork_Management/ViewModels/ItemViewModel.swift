@@ -247,33 +247,7 @@ class ItemViewModel: ObservableObject {
     func upDownOderSort() {
         items.reverse()
     }
-    func valueSort(order: UpDownOrder, status: IndicatorValueStatus) {
 
-        switch order {
-
-        case .up:
-
-            switch status {
-            case .stock:
-                items.sort(by: { $0.inventory > $1.inventory })
-            case .price:
-                items.sort(by: { $0.price > $1.price })
-            case .sales:
-                items.sort(by: { $0.sales > $1.sales })
-            }
-
-        case .down:
-
-            switch status {
-            case .stock:
-                items.sort(by: { $0.inventory < $1.inventory })
-            case .price:
-                items.sort(by: { $0.price < $1.price })
-            case .sales:
-                items.sort(by: { $0.sales < $1.sales })
-            }
-        }
-    }
     func nameSort() {
 
         switch self.selectedOder {

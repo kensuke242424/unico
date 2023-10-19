@@ -28,7 +28,7 @@ enum HandleUseReceivedEmailLink {
     case deleteAccount
 }
 
-class LogInViewModel: ObservableObject {
+class AuthViewModel: ObservableObject {
 
     init() {
         print("<<<<<<<<<  LogInViewModel_init  >>>>>>>>>")

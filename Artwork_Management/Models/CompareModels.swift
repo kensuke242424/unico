@@ -14,7 +14,6 @@ struct CompareItem: Codable, Equatable {
     var createTime = Date()
     let before: Item
     let after: Item
-//    var cancel: Bool? // 取り消しが実行されるとtrue
 }
 
 /// ユーザーデータの更新前と更新後の比較値を使いたい時に用いるモデル。
@@ -24,7 +23,6 @@ struct CompareUser: Codable, Equatable {
     var createTime = Date()
     let before: User
     let after: User
-//    var cancel: Bool? // 取り消しが実行されるとtrue
 }
 
 /// チームデータの更新前と更新後の比較値を使いたい時に用いるモデル。
@@ -34,5 +32,4 @@ struct CompareTeam: Codable, Equatable {
     var createTime = Date()
     let before: Team
     let after: Team
-//    var cancel: Bool? // 取り消しが実行されるとtrue
 }

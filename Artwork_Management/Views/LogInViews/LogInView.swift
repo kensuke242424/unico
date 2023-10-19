@@ -198,7 +198,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
 
     @EnvironmentObject var progress: ProgressViewModel
     
-    @EnvironmentObject var logInVM: LogInViewModel
+    @EnvironmentObject var logInVM: AuthViewModel
     @EnvironmentObject var teamVM : TeamViewModel
     @EnvironmentObject var userVM : UserViewModel
     @EnvironmentObject var tagVM : TagViewModel

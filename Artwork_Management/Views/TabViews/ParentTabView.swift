@@ -9,11 +9,11 @@ import SwiftUI
 import ResizableSheet
 import Introspect
 
-struct NewTabView: View {
-    
+struct ParentTabView: View {
+
     @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var notificationVM: NotificationViewModel
-    @EnvironmentObject var logInVM: LogInViewModel
+    @EnvironmentObject var logInVM: AuthViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
     @EnvironmentObject var tagVM : TagViewModel
@@ -177,11 +177,11 @@ struct NewTabView: View {
                                 .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
                         }
                         if inputTab.showUpdateTeam {
-                            UpdateTeamDataView(show: $inputTab.showUpdateTeam)
+                            TeamProfileEditView(show: $inputTab.showUpdateTeam)
                                 .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
                         }
                         if inputTab.showUpdateUser {
-                            UpdateUserDataView(show: $inputTab.showUpdateUser)
+                            UserProfileEditView(show: $inputTab.showUpdateUser)
                                 .transition(.opacity.combined(with: .offset(x: 0, y: 40)))
                         }
                         if userVM.showJoinedTeamInformation {
@@ -203,12 +203,6 @@ struct NewTabView: View {
                     switch systemPath {
                     case .root:
                         SystemView()
-                    }
-                }
-                .navigationDestination(for: UpdateReportPath.self) { reportPath in
-                    switch reportPath {
-                    case .root:
-                        UpdateReportView()
                     }
                 }
                 .navigationDestination(for: ApplicationSettingPath.self) { settingPath in

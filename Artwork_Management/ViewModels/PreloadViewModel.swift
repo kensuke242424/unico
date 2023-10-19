@@ -21,13 +21,10 @@ class PreloadViewModel: ObservableObject {
     
     @ViewBuilder
     func userCircleIcon(width: CGFloat, height: CGFloat) -> some View  {
-        SDWebImageCircleIcon(imageURL: userVM.user?.iconURL,
-                             width   : width,
-                             height  : height)
+        SDWebImageCircleIcon(imageURL: userVM.user?.iconURL, width: width, height: height)
     }
 
-    /// チーム背景変更時に、
-    /// SDWebImageにキャッシュを作るための画像URLプリロードメソッド
+    /// チーム背景変更時にSDWebImageにキャッシュを作るための画像URLプリロードメソッド
     func startPreloadBackground() {
         self.preloadBackground = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
