@@ -69,7 +69,7 @@ struct RootView: View {
                 CreateAndJoinTeamView()
 
             case .home:
-                NewTabView(itemVM: itemVM, cartVM: cartVM)
+                ParentTabView(itemVM: itemVM, cartVM: cartVM)
                     .environment(\.resizableSheetCenter, resizableSheetCenter)
             }
         } // ZStack
@@ -90,7 +90,7 @@ struct RootView: View {
             if preloads.startPreload {
                 Group {
                     NewItemsView(itemVM: itemVM, cartVM: cartVM, inputTab: $preloads.inputTab)
-                    NewEditItemView(itemVM: itemVM, passItem: nil)
+                    ItemEditingView(itemVM: itemVM, passItem: nil)
                     CreateAndJoinTeamView()
                     PHPickerView(captureImage: $preloads.captureImage, isShowSheet: $preloads.showSheet)
                     NewItemsView(itemVM: itemVM,  cartVM: cartVM, inputTab: $preloadVM.inputTab)

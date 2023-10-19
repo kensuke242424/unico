@@ -9,8 +9,8 @@ import SwiftUI
 import ResizableSheet
 import Introspect
 
-struct NewTabView: View {
-    
+struct ParentTabView: View {
+
     @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var notificationVM: NotificationViewModel
     @EnvironmentObject var logInVM: LogInViewModel

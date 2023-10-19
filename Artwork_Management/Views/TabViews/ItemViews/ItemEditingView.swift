@@ -11,7 +11,7 @@ import FirebaseFirestore
 import FirebaseFirestoreSwift
 import StoreKit
 
-struct NewEditItemView: View {
+struct ItemEditingView: View {
     
     @Environment(\.dismiss) var dismiss
     @Environment(\.requestReview) var requestReview
@@ -547,7 +547,7 @@ struct InputEditItem {
 
 struct NewEditItemView_Previews: PreviewProvider {
     static var previews: some View {
-        NewEditItemView(itemVM: ItemViewModel(), passItem: sampleItems.first)
+        ItemEditingView(itemVM: ItemViewModel(), passItem: sampleItems.first)
             .environmentObject(TagViewModel())
     }
 }

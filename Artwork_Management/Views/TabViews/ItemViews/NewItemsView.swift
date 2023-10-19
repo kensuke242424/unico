@@ -214,11 +214,11 @@ struct NewItemsView: View {
         .navigationDestination(for: EditItemPath.self) { itemPath in
             switch itemPath {
             case .create:
-                NewEditItemView(itemVM: itemVM, passItem: nil)
+                ItemEditingView(itemVM: itemVM, passItem: nil)
 
             case .edit:
                 if let index = selectedItemIndex {
-                    NewEditItemView(itemVM: itemVM,
+                    ItemEditingView(itemVM: itemVM,
                                     passItem: itemVM.items[index])
                 }
             }
