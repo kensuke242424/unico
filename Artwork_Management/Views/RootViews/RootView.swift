@@ -15,7 +15,8 @@ enum RootNavigation {
 }
 
 struct RootView: View {
-    
+
+    // ----- ResizableSheetを起動するために必要 -------
     var windowScene: UIWindowScene? {
         let scenes = UIApplication.shared.connectedScenes
         let windowScene = scenes.first as? UIWindowScene
@@ -24,7 +25,8 @@ struct RootView: View {
     var resizableSheetCenter: ResizableSheetCenter? {
         windowScene.flatMap(ResizableSheetCenter.resolve(for:))
     }
-    
+    // -----  -------  -------  -------  -------
+
     private struct PreloadProperty {
         var startPreload: Bool = false
         var inputTab    : InputTab = InputTab()
@@ -263,7 +265,6 @@ struct RootView: View {
             }
             if linkHandled {
                 print("Link Handled")
-//                return
             } else {
                 print("NO linkHandled")
                 return
