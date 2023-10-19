@@ -205,12 +205,6 @@ struct NewTabView: View {
                         SystemView()
                     }
                 }
-                .navigationDestination(for: UpdateReportPath.self) { reportPath in
-                    switch reportPath {
-                    case .root:
-                        UpdateReportView()
-                    }
-                }
                 .navigationDestination(for: ApplicationSettingPath.self) { settingPath in
                     switch settingPath {
                     case .root:

@@ -85,8 +85,6 @@
 		BEAAD8F829CDCE3300C53138 /* DeletedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAAD8F729CDCE3300C53138 /* DeletedView.swift */; };
 		BEAAD8FA29CDEF6200C53138 /* DefaultEmailCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAAD8F929CDEF6200C53138 /* DefaultEmailCheckView.swift */; };
 		BEAAD94629D068C000C53138 /* SuccessUpdateAddressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAAD94529D068C000C53138 /* SuccessUpdateAddressView.swift */; };
-		BEAAD94B29D1ED7800C53138 /* UpdateReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAAD94A29D1ED7800C53138 /* UpdateReportView.swift */; };
-		BEAAD94E29D1F86200C53138 /* Version10.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAAD94D29D1F86200C53138 /* Version10.swift */; };
 		BEAB502E29A7C6D400ECCB4F /* PageTabNavigateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAB502D29A7C6D400ECCB4F /* PageTabNavigateView.swift */; };
 		BEB669A12A2A370A008FC9DE /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEB669A02A2A370A008FC9DE /* HomeViewModel.swift */; };
 		BEB669CB2A2CD105008FC9DE /* CustomLongPressGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEB669CA2A2CD105008FC9DE /* CustomLongPressGesture.swift */; };
@@ -243,8 +241,6 @@
 		BEAAD8F729CDCE3300C53138 /* DeletedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeletedView.swift; sourceTree = "<group>"; };
 		BEAAD8F929CDEF6200C53138 /* DefaultEmailCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultEmailCheckView.swift; sourceTree = "<group>"; };
 		BEAAD94529D068C000C53138 /* SuccessUpdateAddressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuccessUpdateAddressView.swift; sourceTree = "<group>"; };
-		BEAAD94A29D1ED7800C53138 /* UpdateReportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateReportView.swift; sourceTree = "<group>"; };
-		BEAAD94D29D1F86200C53138 /* Version10.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Version10.swift; sourceTree = "<group>"; };
 		BEAB502D29A7C6D400ECCB4F /* PageTabNavigateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageTabNavigateView.swift; sourceTree = "<group>"; };
 		BEB669A02A2A370A008FC9DE /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
 		BEB669CA2A2CD105008FC9DE /* CustomLongPressGesture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomLongPressGesture.swift; sourceTree = "<group>"; };
@@ -471,23 +467,6 @@
 			path = EditImageViews;
 			sourceTree = "<group>";
 		};
-		BEAAD94929D1ED0C00C53138 /* UpdateReportViews */ = {
-			isa = PBXGroup;
-			children = (
-				BEAAD94A29D1ED7800C53138 /* UpdateReportView.swift */,
-				BEAAD94C29D1F82400C53138 /* ReportContents */,
-			);
-			path = UpdateReportViews;
-			sourceTree = "<group>";
-		};
-		BEAAD94C29D1F82400C53138 /* ReportContents */ = {
-			isa = PBXGroup;
-			children = (
-				BEAAD94D29D1F86200C53138 /* Version10.swift */,
-			);
-			path = ReportContents;
-			sourceTree = "<group>";
-		};
 		BEAB502C29A7C5E300ECCB4F /* PageTabNavigateViews */ = {
 			isa = PBXGroup;
 			children = (
@@ -675,7 +654,6 @@
 			children = (
 				E08F273928DDB53700329C5E /* SystemView.swift */,
 				BE599F902A20F66C00821E01 /* ApplicationSettingViews */,
-				BEAAD94929D1ED0C00C53138 /* UpdateReportViews */,
 				BE20B04229BAEA170078169B /* CustomBackButton.swift */,
 				BE599F6C2A1B25DF00821E01 /* customNavigationTitle.swift */,
 				BE20B04429BAEF000078169B /* AccountSettingViews */,
@@ -915,7 +893,6 @@
 				E01AA3A529176FE7000FCD37 /* PHPickerView.swift in Sources */,
 				BEAB502E29A7C6D400ECCB4F /* PageTabNavigateView.swift in Sources */,
 				E01AA3AB291780ED000FCD37 /* StringExtension.swift in Sources */,
-				BEAAD94B29D1ED7800C53138 /* UpdateReportView.swift in Sources */,
 				BE245BC929C5718A00539A04 /* NewItemUIImage.swift in Sources */,
 				E0BE39AF29335317002499C4 /* ShowsItemAsyncImagePhoto.swift in Sources */,
 				E0796AD728F485850094E50C /* ButtonViewModel.swift in Sources */,
@@ -1006,7 +983,6 @@
 				BE254F9329BF1104004FE9AE /* UserEntryRecommendationView.swift in Sources */,
 				BE1F272329C166E700AD55DF /* NewHomeView.swift in Sources */,
 				BE1F272529C1673900AD55DF /* NewItemsView.swift in Sources */,
-				BEAAD94E29D1F86200C53138 /* Version10.swift in Sources */,
 				BE17B97529CC2D8F00F08915 /* LogInAddressSheetView.swift in Sources */,
 				BE23A16229C33E7E00876194 /* TimesFormatter.swift in Sources */,
 				BE3CD65B29B72B0700C19442 /* ProgressViewModel.swift in Sources */,
