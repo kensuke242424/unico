@@ -1,7 +1,9 @@
 # 在庫管理アプリ『unico』
+***
+**『 ユニークな空間は、在庫管理をもっと楽しくする。 』**
+***
 ユーザーの商品/作品が持っている"個性"や"色"を反映させることができる、  
 外観のカスタマイズ性を持たせた在庫管理アプリです。
-
 ![スクリーンショット 2023-10-10 16 35 16のコピー](https://github.com/kensuke242424/unico/assets/100055504/daedf12f-7bfe-4469-829f-0270f917a72e)
 <br>
 <br>
@@ -31,13 +33,7 @@ https://unicoapp.wixsite.com/mysite
 
 <br>
 
-## 🧭コンセプト
-
-***
-**『 ユニークな空間は、在庫管理をもっと楽しくする。 』**
-***
-
-#### 機能要件
+## 🧭機能要件
 
 - [x] アイテムの情報管理ができる
 - [x] アプリ内の外観をカスタマイズできる
@@ -96,6 +92,8 @@ https://unicoapp.wixsite.com/mysite
 
 ### 1.画面遷移フロー
 
+[Figmaで全体像を見る>>](https://www.figma.com/file/HcpcVbLFT195io673bv2Cs/unico-%E8%A8%AD%E8%A8%88%E5%9B%B3?type=whiteboard&node-id=0%3A1&t=ZFTwPEQdZsNGcLwm-1)
+
 #### ◽️ログイン/アカウント作成/チーム作成
 <img width="879" alt="スクリーンショット 2023-10-15 17 42 15" src="https://github.com/kensuke242424/unico/assets/100055504/1ba84bad-16ca-4fbf-bf39-e5313d7ae5be">
 
@@ -115,7 +113,7 @@ https://unicoapp.wixsite.com/mysite
 <br>
 
 ### 4.ER図
-<img width="615" alt="スクリーンショット 2023-10-17 23 04 21" src="https://github.com/kensuke242424/unico/assets/100055504/28acc15c-cf55-48d8-aac8-4da182dd96b0">
+<img width="637" alt="スクリーンショット 2023-10-26 2 10 57" src="https://github.com/kensuke242424/unico/assets/100055504/7cdb69fd-2907-4bf2-bf03-80c6886a885d">
 
 #### ◽️エンティティ詳細
 
