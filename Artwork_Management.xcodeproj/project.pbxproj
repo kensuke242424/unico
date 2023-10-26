@@ -323,22 +323,22 @@
 			isa = PBXGroup;
 			children = (
 				BE1F271D29C162B300AD55DF /* ParentTabView.swift */,
-				BE1F272029C166A400AD55DF /* HomeViews */,
-				BE1F272129C166B200AD55DF /* ItemViews */,
+				BE1F272029C166A400AD55DF /* HomeTabViews */,
+				BE1F272129C166B200AD55DF /* ItemTabViews */,
 			);
 			path = TabViews;
 			sourceTree = "<group>";
 		};
-		BE1F272029C166A400AD55DF /* HomeViews */ = {
+		BE1F272029C166A400AD55DF /* HomeTabViews */ = {
 			isa = PBXGroup;
 			children = (
 				BE1F272229C166E700AD55DF /* HomeTabView.swift */,
 				BE23A16129C33E7E00876194 /* TimesFormatter.swift */,
 			);
-			path = HomeViews;
+			path = HomeTabViews;
 			sourceTree = "<group>";
 		};
-		BE1F272129C166B200AD55DF /* ItemViews */ = {
+		BE1F272129C166B200AD55DF /* ItemTabViews */ = {
 			isa = PBXGroup;
 			children = (
 				BE1F272429C1673900AD55DF /* NewItemsView.swift */,
@@ -353,7 +353,7 @@
 				BE8734F22A5EE9B7004AA246 /* EditItemPhotoContent.swift */,
 				BE8734F32A5EE9B7004AA246 /* EditTagView.swift */,
 			);
-			path = ItemViews;
+			path = ItemTabViews;
 			sourceTree = "<group>";
 		};
 		BE20B04429BAEF000078169B /* AccountSettingViews */ = {
