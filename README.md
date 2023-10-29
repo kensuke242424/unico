@@ -130,7 +130,7 @@ https://unicoapp.wixsite.com/mysite
 
 ### 1.画面遷移フロー
 
-[Figmaで全体像を見る>>](https://www.figma.com/file/HcpcVbLFT195io673bv2Cs/unico-%E8%A8%AD%E8%A8%88%E5%9B%B3?type=whiteboard&node-id=0%3A1&t=ZFTwPEQdZsNGcLwm-1)
+[Figmaの全体像>>](https://www.figma.com/file/HcpcVbLFT195io673bv2Cs/unico-%E8%A8%AD%E8%A8%88%E5%9B%B3?type=whiteboard&node-id=0%3A1&t=ZFTwPEQdZsNGcLwm-1)
 
 #### ◽️ログイン/アカウント作成/チーム作成
 <img width="879" alt="スクリーンショット 2023-10-15 17 42 15" src="https://github.com/kensuke242424/unico/assets/100055504/1ba84bad-16ca-4fbf-bf39-e5313d7ae5be">
