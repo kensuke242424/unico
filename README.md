@@ -26,6 +26,13 @@ PCの方はQRからどうぞ！
 
 <br>
 
+## 🌐サービスWebサイト
+
+https://unicoapp.wixsite.com/mysite  
+[<img width="541" alt="スクリーンショット 2023-10-16 2 01 35" src="https://github.com/kensuke242424/unico/assets/100055504/50dbe0bb-3664-4404-ac99-32d0532e7280">](https://unicoapp.wixsite.com/mysite)
+
+<br>
+
 ## 👤想定ユーザー
 
 - **自身の作品/商品を持ち、販売や在庫管理をしている活動者**
@@ -62,13 +69,6 @@ PCの方はQRからどうぞ！
 unicoを利用しているユーザー同士で、  
 お互いの画面を見せ合いたくなるような、  
 そんな"愛着"が生まれるアプリを目指して、今後もアップデートを続けていきます。
-
-<br>
-
-## 🌐サービスWebサイト
-
-https://unicoapp.wixsite.com/mysite  
-[<img width="541" alt="スクリーンショット 2023-10-16 2 01 35" src="https://github.com/kensuke242424/unico/assets/100055504/50dbe0bb-3664-4404-ac99-32d0532e7280">](https://unicoapp.wixsite.com/mysite)
 
 <br>
 
@@ -118,7 +118,7 @@ https://unicoapp.wixsite.com/mysite
   - [Dynamic Links](https://firebase.google.com/docs/dynamic-links?hl=ja) （メールリンクでのアカウント認証）
     
 - [SDWebImageSwiftUI `2.2.2`](https://github.com/SDWebImage/SDWebImageSwiftUI)（サーバー内の画像データを非同期取得/表示）
-- [swiftui-introspect `0.6.0`](https://github.com/siteline/swiftui-introspect/tree/main)（SwiftUI内で定義されたUIKitソースの変更/更新）
+- [swiftui-introspect `0.6.0`](https://github.com/siteline/swiftui-introspect/tree/main)（SwiftUIコンポーネント内で構築されているUIKitソースのオプション変更/更新）
 - [Resizable Sheet](https://github.com/mtj0928/ResizableSheet)（カートとして表示されるハーフモーダル画面）
 
 #### ◽️ライブラリ管理
