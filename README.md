@@ -175,21 +175,58 @@ unicoを利用しているユーザー同士で、
 
 ## 📓開発の振り返り
 
-<br>
-
-### ◽️こだわりポイント/力を入れた実装
-
-#### 1.アニメーションを活用した小気味の良いUI
-
-#### 2.
+### 1.こだわりポイント/力を入れた実装
 
 <br>
 
-### ◽️難しかった実装/出来なかったこと
+#### 1-1.アニメーションを活用した触り心地の良いUI
 
-#### 1. 
+このアプリでは、**『UIで惹きつけ、UXで掴む。』**を念頭に置き、開発を進めました。  
 
-#### 2. 
+<br>
+
+◽️`rotation3DEffect`を用いた奥行きのあるアイテムカード操作
+```
+@ViewBuilder
+func ItemCardView() {
+  HStack {...} // カードビュー
+    .rotation3DEffect(.init(degrees: convertOffsetToRotation(rect)),
+                              axis: (x: 1, y: 0, z: 0),
+                              anchor: .bottom, anchorZ: 1,
+                              perspective: 0.5)
+}
+```
+![Nov-02-2023 15-36-58](https://github.com/kensuke242424/unico/assets/100055504/0ce8542f-b326-4562-85b5-eccdf5694f1b)
+
+<br>
+
+◽️`rotation3DEffect`を用いた奥行きのあるアイテムカード操作
+
+![Nov-02-2023 15-36-58](https://github.com/kensuke242424/unico/assets/100055504/0ce8542f-b326-4562-85b5-eccdf5694f1b)
+
+<br>
+
+◽️`rotation3DEffect`を用いた奥行きのあるアイテムカード操作
+
+![Nov-02-2023 15-36-58](https://github.com/kensuke242424/unico/assets/100055504/0ce8542f-b326-4562-85b5-eccdf5694f1b)
+
+<br>
+
+#### 1-2.複数人でのデータ共有 & 複数チームへの所属システム
+
+aaa
+
+<br>
+
+### 2.実現できなかった実装/課題に感じたこと
+
+#### 2-1. Sign In With Appleを用いたサインイン
+
+aaa
+
+#### 2-2. オリジナルなUIにおいてのUXの両立
+
+aaa
 
 <br>
 
