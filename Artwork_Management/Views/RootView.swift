@@ -88,11 +88,11 @@ struct RootView: View {
         .background {
             if preloads.startPreload {
                 Group {
-                    NewItemsView(itemVM: itemVM, cartVM: cartVM, inputTab: $preloads.inputTab)
+                    ItemTabView(itemVM: itemVM, cartVM: cartVM, inputTab: $preloads.inputTab)
                     ItemEditingView(itemVM: itemVM, passItem: nil)
                     CreateAndJoinTeamView()
                     PHPickerView(captureImage: $preloads.captureImage, isShowSheet: $preloads.showSheet)
-                    NewItemsView(itemVM: itemVM,  cartVM: cartVM, inputTab: $preloadVM.inputTab)
+                    ItemTabView(itemVM: itemVM,  cartVM: cartVM, inputTab: $preloadVM.inputTab)
                 }
                 .opacity(0.01)
             }

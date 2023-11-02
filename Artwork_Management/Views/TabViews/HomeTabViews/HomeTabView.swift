@@ -7,29 +7,7 @@
 
 import SwiftUI
 
-/// Homeの時計パーツのユーザー設定を管理する
-struct NowTimeParts: Codable, Hashable {
-    var transitionOffset: CGSize = .zero
-    var initialOffset: CGSize = .zero
-    var transitionScale: CGFloat = 1.0
-    var initialScale: CGFloat = 1.0
-    var desplayState: Bool = true
-    var backState: Bool = true
-    var pressingAnimation: Bool = false
-}
-
-/// Homeのチーム情報パーツのユーザー設定を管理する
-struct TeamNewsParts: Codable, Hashable {
-    var transitionOffset: CGSize = .zero
-    var initialOffset: CGSize = .zero
-    var transitionScale: CGFloat = 1.0
-    var initialScale: CGFloat = 1.0
-    var desplayState: Bool = true
-    var backState: Bool = true
-    var pressingAnimation: Bool = false
-}
-
-struct NewHomeView: View {
+struct HomeTabView: View {
 
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel

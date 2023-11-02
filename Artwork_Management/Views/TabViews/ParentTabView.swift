@@ -47,10 +47,10 @@ struct ParentTabView: View {
                     Spacer(minLength: 0)
                     
                     TabView(selection: $inputTab.selectionTab) {
-                        NewHomeView(itemVM: itemVM, homeVM: homeVM, inputTab: $inputTab)
+                        HomeTabView(itemVM: itemVM, homeVM: homeVM, inputTab: $inputTab)
                             .tag(Tab.home)
 
-                        NewItemsView(itemVM: itemVM,  cartVM: cartVM, inputTab: $inputTab)
+                        ItemTabView(itemVM: itemVM,  cartVM: cartVM, inputTab: $inputTab)
                             .tag(Tab.item)
                     } // TabView
                     .tabViewStyle(.page(indexDisplayMode: .never))
