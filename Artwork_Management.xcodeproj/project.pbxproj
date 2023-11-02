@@ -26,7 +26,7 @@
 		BE1DC39C2AE16EE5002971AE /* CustomImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1DC39B2AE16EE5002971AE /* CustomImagePicker.swift */; };
 		BE1F271E29C162B300AD55DF /* ParentTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1F271D29C162B300AD55DF /* ParentTabView.swift */; };
 		BE1F272329C166E700AD55DF /* HomeTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1F272229C166E700AD55DF /* HomeTabView.swift */; };
-		BE1F272529C1673900AD55DF /* NewItemsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1F272429C1673900AD55DF /* NewItemsView.swift */; };
+		BE1F272529C1673900AD55DF /* ItemTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1F272429C1673900AD55DF /* ItemTabView.swift */; };
 		BE1F272729C16DEB00AD55DF /* RatingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1F272629C16DEB00AD55DF /* RatingView.swift */; };
 		BE1F272929C16E0800AD55DF /* ScrollViewDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1F272829C16E0800AD55DF /* ScrollViewDetector.swift */; };
 		BE1F272B29C16E2000AD55DF /* CustomCorners.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1F272A29C16E2000AD55DF /* CustomCorners.swift */; };
@@ -166,7 +166,7 @@
 		BE1DC39B2AE16EE5002971AE /* CustomImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomImagePicker.swift; sourceTree = "<group>"; };
 		BE1F271D29C162B300AD55DF /* ParentTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParentTabView.swift; sourceTree = "<group>"; };
 		BE1F272229C166E700AD55DF /* HomeTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTabView.swift; sourceTree = "<group>"; };
-		BE1F272429C1673900AD55DF /* NewItemsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewItemsView.swift; sourceTree = "<group>"; };
+		BE1F272429C1673900AD55DF /* ItemTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemTabView.swift; sourceTree = "<group>"; };
 		BE1F272629C16DEB00AD55DF /* RatingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingView.swift; sourceTree = "<group>"; };
 		BE1F272829C16E0800AD55DF /* ScrollViewDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollViewDetector.swift; sourceTree = "<group>"; };
 		BE1F272A29C16E2000AD55DF /* CustomCorners.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCorners.swift; sourceTree = "<group>"; };
@@ -341,7 +341,7 @@
 		BE1F272129C166B200AD55DF /* ItemTabViews */ = {
 			isa = PBXGroup;
 			children = (
-				BE1F272429C1673900AD55DF /* NewItemsView.swift */,
+				BE1F272429C1673900AD55DF /* ItemTabView.swift */,
 				BE1F272629C16DEB00AD55DF /* RatingView.swift */,
 				BE1F272829C16E0800AD55DF /* ScrollViewDetector.swift */,
 				BE1F272A29C16E2000AD55DF /* CustomCorners.swift */,
@@ -865,7 +865,7 @@
 				E01E1390291D168B0001F2DA /* SystemSideMenu.swift in Sources */,
 				BE254F9329BF1104004FE9AE /* UserEntryRecommendationView.swift in Sources */,
 				BE1F272329C166E700AD55DF /* HomeTabView.swift in Sources */,
-				BE1F272529C1673900AD55DF /* NewItemsView.swift in Sources */,
+				BE1F272529C1673900AD55DF /* ItemTabView.swift in Sources */,
 				BE17B97529CC2D8F00F08915 /* LogInAddressSheetView.swift in Sources */,
 				BE23A16229C33E7E00876194 /* TimesFormatter.swift in Sources */,
 				BE3CD65B29B72B0700C19442 /* ProgressViewModel.swift in Sources */,

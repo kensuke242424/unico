@@ -17,7 +17,7 @@ struct InputCart {
     var resultCartPrice: Int = 0
 }
 
-struct NewItemsView: View {
+struct ItemTabView: View {
     
     /// Tab親Viewから受け取るViewModelと状態変数
     @EnvironmentObject var navigationVM: NavigationViewModel

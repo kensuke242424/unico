@@ -7,39 +7,6 @@
 
 import SwiftUI
 
-struct InputSideMenu {
-    // メニュー各項目の状態を管理
-    var account: Bool = false
-    var team: Bool = false
-    var item: Bool = false
-    var tag: Bool = false
-    var help: Bool = false
-    
-    // タグリストの状態を管理
-    var editMode: EditMode = .inactive
-    var selectTag: Tag = Tag(oderIndex: 1, tagName: "", tagColor: .red)
-    
-    // サイドメニュー内でのアラートを管理
-    var isShowLogOutAlert    : Bool = false
-    var isShowCreateTeamAlert: Bool = false
-    var isShowChangeTeamAlert: Bool = false
-    var showdeleteTeamAlert  : Bool = false
-    
-    // チームデータ消去時の状態を管理するプロパティ
-    var showdeletedAllTeamAlert   : Bool = false
-    var showEscapeTeamProgress: Bool = false
-    
-    // 操作チームを変更するハーフモーダルを管理
-    var showChangeTeamSheet: Bool = false
-    var teamsListSheetEdit: Bool = false
-
-    // ユーザー登録シートモーダルの管理プロパティ
-    var showUserEntrySheet: Bool = false
-
-    // ユーザーが移動先に選択したチームが格納される
-    var selectedTeam: JoinTeam?
-}
-
 struct SystemSideMenu: View {
 
     @Environment(\.colorScheme) var colorScheme: ColorScheme
@@ -784,4 +751,37 @@ struct SideMenuShape: Shape {
 
         }
     }
+}
+
+struct InputSideMenu {
+    // メニュー各項目の状態を管理
+    var account: Bool = false
+    var team: Bool = false
+    var item: Bool = false
+    var tag: Bool = false
+    var help: Bool = false
+
+    // タグリストの状態を管理
+    var editMode: EditMode = .inactive
+    var selectTag: Tag = Tag(oderIndex: 1, tagName: "", tagColor: .red)
+
+    // サイドメニュー内でのアラートを管理
+    var isShowLogOutAlert    : Bool = false
+    var isShowCreateTeamAlert: Bool = false
+    var isShowChangeTeamAlert: Bool = false
+    var showdeleteTeamAlert  : Bool = false
+
+    // チームデータ消去時の状態を管理するプロパティ
+    var showdeletedAllTeamAlert   : Bool = false
+    var showEscapeTeamProgress: Bool = false
+
+    // 操作チームを変更するハーフモーダルを管理
+    var showChangeTeamSheet: Bool = false
+    var teamsListSheetEdit: Bool = false
+
+    // ユーザー登録シートモーダルの管理プロパティ
+    var showUserEntrySheet: Bool = false
+
+    // ユーザーが移動先に選択したチームが格納される
+    var selectedTeam: JoinTeam?
 }
