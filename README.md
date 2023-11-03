@@ -200,8 +200,8 @@ Homeタブ画面での編集可能パーツには、
 
 これら３種のジェスチャーを持たせる必要がありました。
 
-[`simultaneousGesture`](https://developer.apple.com/documentation/swiftui/simultaneousgesture)で各ジェスチャーを包んだカスタムモディファイアを作成し、  
-パーツに付与することで、複数ジェスチャーの共存を実装しています。
+各ジェスチャーを[`simultaneousGesture`](https://developer.apple.com/documentation/swiftui/simultaneousgesture)で包んだカスタムモディファイアを作成し、  
+パーツに付与することで、複数ジェスチャーを共存させています。
 
 https://github.com/kensuke242424/unico/blob/61255ebf9eac0cf6d4022455ef95653d0bb5cd9c/Artwork_Management/Views/TabViews/HomeTabViews/HomeTabView.swift#L41-L64
 
@@ -213,36 +213,37 @@ https://github.com/kensuke242424/unico/blob/61255ebf9eac0cf6d4022455ef95653d0bb5
 
 ### 4.在庫処理をまとめて操作できるカートシステム
 
-![Nov-02-2023 16-42-06](https://github.com/kensuke242424/unico/assets/100055504/a5a19944-1751-406c-bc67-f1a328f48ec2)
+![Nov-04-2023 01-36-27](https://github.com/kensuke242424/unico/assets/100055504/91b5fd70-4101-413e-aa3b-5302862747f2)
 
 複数のアイテムをまとめて在庫処理できるシステムとして、カート機能を実装しました。  
 こちらのハーフモーダルビュー[`Resizable Sheet`](https://github.com/mtj0928/ResizableSheet)は、  
 [まつじ](https://twitter.com/mtj_j)さんというエンジニアの方が個人で作成しているライブラリです。  
 （実装が中々上手くいかなくて、でもどうしても使いたくて、本人にDMを送って使い方を教わったのは良い思い出です。）  
 
-少し独特なゆったりした振る舞いで出現するので、大変気に入っています。
+少し独特にニョキっと画面から出現するので、大変気に入っています。
 
 https://github.com/kensuke242424/unico/blob/61255ebf9eac0cf6d4022455ef95653d0bb5cd9c/Artwork_Management/Views/TabViews/ParentTabView.swift#L240-L332
 
-- 開閉可能な処理アイテムリストシート
-- 合計表示、処理の決定ボタンシート
+- 処理アイテムリストの可変型シート
+- 合計表示と処理の決定ボタンを持つ固定型シート
 
-これら二つのシートを重ね合わせるようにレイアウトし、  
+これら二つのシートを重ね合わせてコンパクトに配置し、  
 アイテムカードの操作とカート操作を両立できるようにしています。
 
-![Nov-02-2023 16-42-06](https://github.com/kensuke242424/unico/assets/100055504/a5a19944-1751-406c-bc67-f1a328f48ec2)
+![Nov-04-2023 01-40-43](https://github.com/kensuke242424/unico/assets/100055504/41650294-f50a-45eb-b338-ca688ad7a9fb)
 
 https://github.com/kensuke242424/unico/blob/61255ebf9eac0cf6d4022455ef95653d0bb5cd9c/Artwork_Management/Views/TabViews/ItemTabViews/CartItemsSheet.swift#L11-L230
 
 https://github.com/kensuke242424/unico/blob/61255ebf9eac0cf6d4022455ef95653d0bb5cd9c/Artwork_Management/Views/TabViews/ItemTabViews/CommerceSheet.swift#L12-L135
 
 ***
+<br>
 
 ### --- 実装から感じた課題点 ---
 
-**1. ポピュラーではないUIにおけるUXとの両立**
+**1. ポピュラーではないUIにおけるUXとのバランス**
 
-今回のようにポピュラーなUIとは少し離れたレイアウトを実装した時、UXと両立することの難しさを感じた。  
+今回のようにポピュラーなUIとは少し離れたレイアウトを実装した時、  
 ユーザーにとっては、普段慣れている感覚とは違う操作方法やパーツの配置はストレスになり、  
 アプリから離脱してしまう原因となる可能性に十分気をつけなければならない。  
 「次どう操作すればいいのかわからない」と感じるポイントをユーザー目線で探って、  
@@ -254,7 +255,7 @@ https://github.com/kensuke242424/unico/blob/61255ebf9eac0cf6d4022455ef95653d0bb5
 動的なレイアウトを実装するため、Viewファイルの中で`@State`によるプロパティの状態管理が随所で行われている。  
 これによってか、意図しないタイミングや場所で画面の再描画が走ってしまったり、  
 更新処理のバッティング（？）よってアニメーションが正常に動作しないといったことがしばしば発生した。  
-また、iOS17でのみ発生するようなアニメーションの不具合もいくつか発見している。  
+また、iOS17でのみ発生するようなアニメーションの不具合も発見している。  
 これらをうまくコントロールしていくためには、SwiftUIをはじめ、  
 各メソッドやAPIが内部で行なっている処理を知ることが必要だと感じた。
 
@@ -262,15 +263,16 @@ https://github.com/kensuke242424/unico/blob/61255ebf9eac0cf6d4022455ef95653d0bb5
 管理が難しくなっていくことに開発の後半になればなるほど悩んだ。  
 思考コストが少ない、管理がしやすいプログラムの書き方の引き出しが必要。
 
-***
-
 <br>
 
-## 総括/まとめ
+## 全体の総括/自身への教訓
 
-- aaa
-- bbb
-- ccc
+- 客観的な目を失うな、お前の個人的こだわりはユーザーの満足度に関係ない
+- 同じ部分でいつまでも悩むな、他のアプローチを試せ
+- 適切なコメントログは未来の自分を救う
+- その場しのぎなコーディングは未来の憎しみを生む
+- その場しのぎな変数名は未来の誤解を生む
+- アプリ開発最高
 
 <br>
 
