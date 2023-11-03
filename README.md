@@ -143,94 +143,70 @@ unicoを利用しているユーザー同士で、
 
 <br>
 
-### 3.MVVM設計
-
-<br>
-
 ### 4.ER図
 <img width="637" alt="スクリーンショット 2023-10-26 2 10 57" src="https://github.com/kensuke242424/unico/assets/100055504/7cdb69fd-2907-4bf2-bf03-80c6886a885d">
 
-#### ◽️エンティティ詳細
+<br>
+<br>
+<br>
 
-##### 👤ユーザー関連データ
-| エンティティ名 | 用途 |
-----|---- 
-| User | ユーザーに関するデータ（名前,アイコンURL,etc...）を保持する。1アカウントにつき1つ、Userデータを持つ。 |
-| JoinTeam | ユーザーが所属するチームの一部データ（名前、アイコン）および、ユーザーが所属チームごとで設定したカスタマイズ（背景,Home画面パーツ編集など）の内容を保持する。このエンティティはFirestore内でuserドキュメントのサブコレクションとして保存される。 |
-| HomeEdit | Home画面における、2つのパーツの編集設定を保持する。所属チームごとで別々の設定が保持される。 |
-| NowTimeNewsPart | Home画面における、現在時刻を表示するパーツのエディット（サイズ,位置,表示/非表示）を保持する。所属チームごとで別々の設定が保持される。 |
-| TeamNewsPart | Home画面における、現在の操作チームに関する情報を表示するパーツのエディット（サイズ,位置,表示/非表示）を保持する。所属チームごとで別々の設定が保持される。 |
-| Background | アプリ内のサンプル背景データおよび、ユーザーが自身の画像フォルダから保存した背景データを保持する。 |
-
-##### 📦チーム関連データ
-| エンティティ名 | 用途 |
-----|---- 
-| Team | アイテムやタグなど、チームメンバー間で"共有"のデータを保持する。ユーザーは複数のチームデータを作成可能。 |
-| JoinUser | チームに所属しているユーザーの一部データ（名前、アイコン）および、チーム内で発生した追加,更新,削除に関するログを保持する。このエンティティはFirestore内でteamドキュメントのサブコレクションとして保存される。 |
-| Item | ユーザーがチーム内に保存したアイテムに関する情報を保持する。 |
-| Tag | アイテムのカテゴリを整理するためのタグデータ。1つのItemに1つのタグ情報を持つ。 |
-| Log | チーム内で発生した各データの追加,更新,削除内容を履歴として保持する。各メンバーに発信される通知機能は、このLogデータの内容を用いて作成される。 |
+# 開発の振り返り
 
 <br>
 
-## 📓開発の振り返り
+## ✅こだわったポイント/力を入れた実装
 
-### 1.こだわりポイント/力を入れた実装
+### ポイント1: アニメーションやジェスチャーを活用した触り心地の良いUI
 
-<br>
-
-#### 1-1.アニメーションを活用した触り心地の良いUI
-
-このアプリでは、**『UIで惹きつけ、UXで掴む。』**を念頭に置き、開発を進めました。  
-
-<br>
-
-◽️`rotation3DEffect`を用いた奥行きのあるアイテムカード操作
-```
-@ViewBuilder
-func ItemCardView() {
-  HStack {...} // カードビュー
-    .rotation3DEffect(.init(degrees: convertOffsetToRotation(rect)),
-                              axis: (x: 1, y: 0, z: 0),
-                              anchor: .bottom, anchorZ: 1,
-                              perspective: 0.5)
-}
-```
-![Nov-02-2023 15-36-58](https://github.com/kensuke242424/unico/assets/100055504/0ce8542f-b326-4562-85b5-eccdf5694f1b)
-
-<br>
-
-◽️`rotation3DEffect`を用いた奥行きのあるアイテムカード操作
+◽️[`rotation3DEffect`](https://developer.apple.com/documentation/swiftui/view/rotation3deffect(_:axis:anchor:anchorz:perspective:))を用いた奥行きのあるアイテムカード操作  
 
 ![Nov-02-2023 15-36-58](https://github.com/kensuke242424/unico/assets/100055504/0ce8542f-b326-4562-85b5-eccdf5694f1b)
 
-<br>
-
-◽️`rotation3DEffect`を用いた奥行きのあるアイテムカード操作
-
-![Nov-02-2023 15-36-58](https://github.com/kensuke242424/unico/assets/100055504/0ce8542f-b326-4562-85b5-eccdf5694f1b)
+https://github.com/kensuke242424/unico/blob/61255ebf9eac0cf6d4022455ef95653d0bb5cd9c/Artwork_Management/Views/TabViews/ItemTabViews/ItemTabView.swift#L249-L368
 
 <br>
 
-#### 1-2.複数人でのデータ共有 & 複数チームへの所属システム
+◽️[`matchedGeometryEffect`](https://developer.apple.com/documentation/swiftui/view/matchedgeometryeffect(id:in:properties:anchor:issource:))を用いたアイテム詳細への動的な遷移モーション
 
-aaa
+![Nov-02-2023 16-16-47](https://github.com/kensuke242424/unico/assets/100055504/fd437af6-0448-431a-b6fb-4906929fa195)
 
-<br>
-
-### 2.実現できなかった実装/課題に感じたこと
-
-#### 2-1. Sign In With Appleを用いたサインイン
-
-aaa
-
-#### 2-2. オリジナルなUIにおいてのUXの両立
-
-aaa
+https://github.com/kensuke242424/unico/blob/61255ebf9eac0cf6d4022455ef95653d0bb5cd9c/Artwork_Management/Views/TabViews/ItemTabViews/ItemTabView.swift#L344-L359
 
 <br>
 
-### ◽️総括
+◽️[`simultaneousGesture`](https://developer.apple.com/documentation/swiftui/simultaneousgesture)を用いた複数ジェスチャーの共存
+
+![Nov-02-2023 16-42-06](https://github.com/kensuke242424/unico/assets/100055504/a5a19944-1751-406c-bc67-f1a328f48ec2)
+
+https://github.com/kensuke242424/unico/blob/61255ebf9eac0cf6d4022455ef95653d0bb5cd9c/Artwork_Management/Views/TabViews/HomeTabViews/HomeTabView.swift#L41-L64
+
+https://github.com/kensuke242424/unico/blob/61255ebf9eac0cf6d4022455ef95653d0bb5cd9c/Artwork_Management/Helpers/CustomDragGesture.swift#L10-L34
+
+<br>
+
+### ポイント2: 複数人でのデータ共有 & 複数チームへの所属システム
+<br>
+
+本アプリにおける想定ユーザーの使用ケースとして、以下のようなケースが考えられました。
+
+> 1.ユーザーが複数のチームに在籍しており、チームごとに別々でアイテム管理したい  
+> 2.一つのチームに複数のメンバーが在籍しており、メンバーと一緒にアイテム管理したい
+
+これらのケースに対応できるように、データ設計をしています。
+
+<br>
+
+また、Firebaseからのデータ読み取り量をスリムにするため、以下のようなデータ構造にしています。
+
+> 1.「User」オブジェクトは、自身が所属するチーム群の"最小限の情報"を保持する「JoinTeam」オブジェクトを持つ  
+> 2.「Team」オブジェクトは、自身に所属しているメンバー群の"最小限の情報"を保持する「JoinMember」オブジェクトを持つ
+
+これにより、アプリ起動のたびに「所属メンバー」「所属チーム」全てのドキュメントを叩く必要がなくなり、  
+「User」「Team」ドキュメントの二つを引っ張ってくるだけで、UI表示に必要な情報を全て満たせるようにしています。
+
+<br>
+
+### ◽️総括/今後に活かす点
 
 - aaa
 - bbb
