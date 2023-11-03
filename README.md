@@ -9,11 +9,6 @@
 <br>
 ## 🍎アプリのダウンロード（iOSのみ）
 
-##### <ログイン方法について>
-
-> ◽️アカウント登録時に入力したアドレス宛に、アカウント認証用のリンクが届きます。
-> ◽️アドレス登録不要のゲストログインも用意しています。ぜひご利用ください。
-
 [![apple store リンクボタン](https://user-images.githubusercontent.com/68992872/204145956-f5cc0fa8-d4c9-4f2c-b1d4-3c3b1d2e2aba.png)](https://apps.apple.com/us/app/unico-%E3%81%8A%E3%81%97%E3%82%83%E3%82%8C%E3%81%AB%E3%83%A2%E3%83%8E%E3%82%92%E7%AE%A1%E7%90%86/id1663765686)
 
 PCの方はQRからどうぞ！
@@ -85,11 +80,11 @@ https://unicoapp.wixsite.com/mysite
 **◽️特に用事がなくても、ついついアプリを起動して触ってしまうようなUI&UX**
 ***
 
-これをアプリ価値としての最大の目標とし、開発をしてきました。
+これをアプリ価値を作る上での最大の目標とし、開発をしてきました。
 
 unicoを利用しているユーザー同士で、  
 お互いの画面を見せ合いたくなるような、  
-ユーザー個々にそんな"愛着"が生まれるアプリを目指して、
+ユーザー個々にそんな"愛着"が生まれるアプリを目指して、  
 今後もアップデートを続けていきます。
 
 <br>
@@ -158,11 +153,21 @@ unicoを利用しているユーザー同士で、
 
 ### ポイント1: アニメーションやジェスチャーを活用した触り心地の良いUI
 
-◽️[`rotation3DEffect`](https://developer.apple.com/documentation/swiftui/view/rotation3deffect(_:axis:anchor:anchorz:perspective:))を用いた奥行きのあるアイテムカード操作  
+今回このunicoというアプリを作る上で、  
+「管理する」という基本的な機能に加えて、「眺める」というギャラリー的な視点でも  
+ユーザーに楽しんでいただけるようなアプリにしたいと考えました。  
 
-![Nov-02-2023 15-36-58](https://github.com/kensuke242424/unico/assets/100055504/0ce8542f-b326-4562-85b5-eccdf5694f1b)
+アプリ内のパーツを拡大したり移動させたりといったカスタマイズ性としての楽しみと、  
+ユーザーのアイテムを華やかに演出できるようなUIやアニメーションを意識して実装しています。
 
+***
+
+#### ◽️[`rotation3DEffect`](https://developer.apple.com/documentation/swiftui/view/rotation3deffect(_:axis:anchor:anchorz:perspective:))を用いた奥行きのあるアイテムカード操作  
+
+![Nov-02-2023 15-36-58](https://github.com/kensuke242424/unico/assets/100055504/0ce8542f-b326-4562-85b5-eccdf5694f1b)  
 https://github.com/kensuke242424/unico/blob/61255ebf9eac0cf6d4022455ef95653d0bb5cd9c/Artwork_Management/Views/TabViews/ItemTabViews/ItemTabView.swift#L249-L368
+
+***
 
 <br>
 
@@ -171,6 +176,8 @@ https://github.com/kensuke242424/unico/blob/61255ebf9eac0cf6d4022455ef95653d0bb5
 ![Nov-02-2023 16-16-47](https://github.com/kensuke242424/unico/assets/100055504/fd437af6-0448-431a-b6fb-4906929fa195)
 
 https://github.com/kensuke242424/unico/blob/61255ebf9eac0cf6d4022455ef95653d0bb5cd9c/Artwork_Management/Views/TabViews/ItemTabViews/ItemTabView.swift#L344-L359
+
+***
 
 <br>
 
@@ -181,6 +188,16 @@ https://github.com/kensuke242424/unico/blob/61255ebf9eac0cf6d4022455ef95653d0bb5
 https://github.com/kensuke242424/unico/blob/61255ebf9eac0cf6d4022455ef95653d0bb5cd9c/Artwork_Management/Views/TabViews/HomeTabViews/HomeTabView.swift#L41-L64
 
 https://github.com/kensuke242424/unico/blob/61255ebf9eac0cf6d4022455ef95653d0bb5cd9c/Artwork_Management/Helpers/CustomDragGesture.swift#L10-L34
+
+***
+
+#### --- 気付いたところ/課題点 ---
+
+aaa  
+bbb  
+ccc  
+
+***
 
 <br>
 
@@ -194,19 +211,15 @@ https://github.com/kensuke242424/unico/blob/61255ebf9eac0cf6d4022455ef95653d0bb5
 
 これらのケースに対応できるように、データ設計をしています。
 
-<br>
+#### --- 気付いたところ/課題点 ---
 
-また、Firebaseからのデータ読み取り量をスリムにするため、以下のようなデータ構造にしています。
-
-> 1.「User」オブジェクトは、自身が所属するチーム群の"最小限の情報"を保持する「JoinTeam」オブジェクトを持つ  
-> 2.「Team」オブジェクトは、自身に所属しているメンバー群の"最小限の情報"を保持する「JoinMember」オブジェクトを持つ
-
-これにより、アプリ起動のたびに「所属メンバー」「所属チーム」全てのドキュメントを叩く必要がなくなり、  
-「User」「Team」ドキュメントの二つを引っ張ってくるだけで、UI表示に必要な情報を全て満たせるようにしています。
+aaa  
+bbb  
+ccc  
 
 <br>
 
-### ◽️総括/今後に活かす点
+### 総括/今後に活かす点
 
 - aaa
 - bbb
