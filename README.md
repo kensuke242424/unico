@@ -151,8 +151,6 @@ unicoを利用しているユーザー同士で、
 
 ## ✅こだわったポイント/力を入れた実装
 
-### ポイント1: アニメーションやジェスチャーを活用した触り心地の良いUI
-
 今回このunicoというアプリを作っていく上で、  
 「管理する」という基本的な機能に加えて、「眺める」というギャラリー的な視点でも  
 ユーザーに楽しんでいただけるようなアプリを目指しました。
@@ -160,20 +158,29 @@ unicoを利用しているユーザー同士で、
 アプリ内のパーツを編集したり移動させたりといったカスタマイズ性としての楽しみと、  
 ユーザーのアイテムが綺麗に見えるようなUIやアニメーションを意識して実装しています。
 
-***
+<br>
 
-#### ◽️[`rotation3DEffect`](https://developer.apple.com/documentation/swiftui/view/rotation3deffect(_:axis:anchor:anchorz:perspective:))を用いた奥行きのあるアイテムカード操作  
+### 1.奥行きのあるアイテムカードのスクロール操作  
 
 ![Nov-02-2023 15-36-58](https://github.com/kensuke242424/unico/assets/100055504/0ce8542f-b326-4562-85b5-eccdf5694f1b)  
+
+[`rotation3DEffect`](https://developer.apple.com/documentation/swiftui/view/rotation3deffect(_:axis:anchor:anchorz:perspective:))を用いて、アイテムカードが奥に畳まれていくようなスクロールアニメーションを実装しています。
+
 https://github.com/kensuke242424/unico/blob/61255ebf9eac0cf6d4022455ef95653d0bb5cd9c/Artwork_Management/Views/TabViews/ItemTabViews/ItemTabView.swift#L249-L368
 
 ***
 
 <br>
 
-◽️[`matchedGeometryEffect`](https://developer.apple.com/documentation/swiftui/view/matchedgeometryeffect(id:in:properties:anchor:issource:))を用いたアイテム詳細への動的な遷移モーション
+### 2.選択アイテム以外の要素をマスクで隠し、情報の閲覧に集中できるように
 
 ![Nov-02-2023 16-16-47](https://github.com/kensuke242424/unico/assets/100055504/fd437af6-0448-431a-b6fb-4906929fa195)
+
+ユーザーによってアイテムが選択されると、  
+Viewファイル内の状態変数`selectedItem`に選択アイテムが保持され、  
+それ以外の要素を隠すマスク付き詳細Viewを出現させます。  
+
+また、動きのあるアイテムカードの振る舞いは[`matchedGeometryEffect`](https://developer.apple.com/documentation/swiftui/view/matchedgeometryeffect(id:in:properties:anchor:issource:))によって実装しています。  
 
 https://github.com/kensuke242424/unico/blob/61255ebf9eac0cf6d4022455ef95653d0bb5cd9c/Artwork_Management/Views/TabViews/ItemTabViews/ItemTabView.swift#L344-L359
 
@@ -181,13 +188,53 @@ https://github.com/kensuke242424/unico/blob/61255ebf9eac0cf6d4022455ef95653d0bb5
 
 <br>
 
-◽️[`simultaneousGesture`](https://developer.apple.com/documentation/swiftui/simultaneousgesture)を用いた複数ジェスチャーの共存
+### 3.複数ジェスチャーを使った直感的なカスタマイズ操作
 
 ![Nov-02-2023 16-42-06](https://github.com/kensuke242424/unico/assets/100055504/a5a19944-1751-406c-bc67-f1a328f48ec2)
+
+Homeタブ画面での編集可能パーツには、
+
+- ドラッグ
+- ロングタップ
+- ピンチアウト
+
+これら３種のジェスチャーを持たせる必要がありました。
+
+[`simultaneousGesture`](https://developer.apple.com/documentation/swiftui/simultaneousgesture)で各ジェスチャーを包んだカスタムモディファイアを作成し、  
+パーツに付与することで、複数ジェスチャーの共存を実装しています。
 
 https://github.com/kensuke242424/unico/blob/61255ebf9eac0cf6d4022455ef95653d0bb5cd9c/Artwork_Management/Views/TabViews/HomeTabViews/HomeTabView.swift#L41-L64
 
 https://github.com/kensuke242424/unico/blob/61255ebf9eac0cf6d4022455ef95653d0bb5cd9c/Artwork_Management/Helpers/CustomDragGesture.swift#L10-L34
+
+***
+
+<br>
+
+### 4.在庫処理をまとめて操作できるカートシステム
+
+![Nov-02-2023 16-42-06](https://github.com/kensuke242424/unico/assets/100055504/a5a19944-1751-406c-bc67-f1a328f48ec2)
+
+複数のアイテムをまとめて在庫処理できるシステムとして、カート機能を実装しました。  
+こちらのハーフモーダルビュー[`Resizable Sheet`](https://github.com/mtj0928/ResizableSheet)は、  
+[まつじ](https://twitter.com/mtj_j)さんというエンジニアの方が個人で作成しているライブラリです。  
+（実装が中々上手くいかなくて、でもどうしても使いたくて、本人にDMを送って使い方を教わったのは良い思い出です。）  
+
+少し独特なゆったりした振る舞いで出現するので、大変気に入っています。
+
+https://github.com/kensuke242424/unico/blob/61255ebf9eac0cf6d4022455ef95653d0bb5cd9c/Artwork_Management/Views/TabViews/ParentTabView.swift#L240-L332
+
+- 開閉可能な処理アイテムリストシート
+- 合計表示、処理の決定ボタンシート
+
+これら二つのシートを重ね合わせるようにレイアウトし、  
+アイテムカードの操作とカート操作を両立できるようにしています。
+
+![Nov-02-2023 16-42-06](https://github.com/kensuke242424/unico/assets/100055504/a5a19944-1751-406c-bc67-f1a328f48ec2)
+
+https://github.com/kensuke242424/unico/blob/61255ebf9eac0cf6d4022455ef95653d0bb5cd9c/Artwork_Management/Views/TabViews/ItemTabViews/CartItemsSheet.swift#L11-L230
+
+https://github.com/kensuke242424/unico/blob/61255ebf9eac0cf6d4022455ef95653d0bb5cd9c/Artwork_Management/Views/TabViews/ItemTabViews/CommerceSheet.swift#L12-L135
 
 ***
 
@@ -211,28 +258,11 @@ https://github.com/kensuke242424/unico/blob/61255ebf9eac0cf6d4022455ef95653d0bb5
 これらをうまくコントロールしていくためには、SwiftUIをはじめ、  
 各メソッドやAPIが内部で行なっている処理を知ることが必要だと感じた。
 
-また、そもそも状態変数が増えれば増えるほど管理が難しくなっていくという点での課題も感じた。  
-思考コストが少ない、管理がしやすいプログラムを書くための引き出しが必要。
+また、状態変数を含めたプロパティの数が増えれば増えるほど、  
+管理が難しくなっていくことに開発の後半になればなるほど悩んだ。  
+思考コストが少ない、管理がしやすいプログラムの書き方の引き出しが必要。
 
 ***
-
-<br>
-
-### ポイント2: 複数人でのデータ共有 & 複数チームへの所属システム
-<br>
-
-本アプリにおける想定ユーザーの使用ケースとして、以下のようなケースが考えられました。
-
-> 1.ユーザーが複数のチームに在籍しており、チームごとに別々でアイテム管理したい  
-> 2.一つのチームに複数のメンバーが在籍しており、メンバーと一緒にアイテム管理したい
-
-これらのケースに対応できるように、データ設計をしています。
-
-### --- 実装から感じた課題点 ---
-
-aaa  
-bbb  
-ccc  
 
 <br>
 
