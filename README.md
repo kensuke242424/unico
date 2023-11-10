@@ -293,4 +293,11 @@ https://blog.code-candy.com/category/swiftui/
 - [GitMind](https://gitmind.com/app/templates?lang=jp)（シーケンス図）
 - [draw.io](https://app.diagrams.net/)（ER図）
 
+<br>
 
+### ✉️お問い合わせ
+
+アプリケーションについてや開発者へのご質問があれば、  
+お気軽に以下の窓口からご連絡くださいませ！
+
+[お問い合わせ窓口へ>>](https://unicoapp.wixsite.com/mysite/blank-2)
