@@ -394,14 +394,15 @@ class NotificationViewModel: ObservableObject {
     /// アイテム追加時を除き、対象アイテムがすでに取り消し実行済みだった場合、処理を行わない。
     func deleteBeforeUIImageController(element: Log) {
         switch element.logType {
-        case .addItem(let item):
-            deleteBeforeUIImage(path: item.photoPath)
-        case .deleteItem(let item):
-            if element.canceledIds.contains(where:{ $0 == item.id}) { return }
-            deleteBeforeUIImage(path: item.photoPath)
+        case .addItem:
+            break
+        case .deleteItem:
+            break
         case .updateItem(let item):
             if element.canceledIds.contains(where:{ $0 == item.before.id}) { return }
-            deleteBeforeUIImage(path: item.before.photoPath)
+            if item.before.photoPath != item.after.photoPath {
+                deleteBeforeUIImage(path: item.before.photoPath)
+            }
         case .updateUser(let user):
             if element.canceledIds.contains(where:{ $0 == user.before.id}) { return }
             deleteBeforeUIImage(path: user.before.iconPath)

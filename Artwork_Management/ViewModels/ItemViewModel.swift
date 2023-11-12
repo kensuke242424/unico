@@ -50,7 +50,6 @@ class ItemViewModel: ObservableObject {
                 self.items = documents.compactMap { (snap) -> Item? in
 
                     let item = try? snap.data(as: Item.self, with: .estimate)
-                    print("アイテム: \(item?.name ?? "nil")がサーバーからフェッチされました")
                     return item
                 }
                 self.selectedTypesSort()
@@ -150,8 +149,8 @@ class ItemViewModel: ObservableObject {
             let imageRef = reference.child(filePath)
             _ = try await imageRef.putDataAsync(imageData)
             let url = try await imageRef.downloadURL()
-            print("uploadImage完了")
 
+            print("uploadImage完了")
             return (url: url, filePath: filePath)
         } catch {
             print("uploadImage失敗")

@@ -18,8 +18,7 @@ struct InputCart {
 }
 
 struct ItemTabView: View {
-    
-    /// Tab親Viewから受け取るViewModelと状態変数
+
     @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var momentLogVM: MomentLogViewModel
     @EnvironmentObject var logVM: LogViewModel
@@ -37,7 +36,6 @@ struct ItemTabView: View {
     @State private var activeTag: Tag?
     /// カートの表示に合わせてソートボタンを上にずらすためのプロパティ。
     @State private var sortViewOffsetY: CGFloat = 0
-    // TODO: アイテム表示のパターンを作成
     @State private var carouselMode: Bool = false
     /// For Matched Geometry Effect
     @Namespace private var animation
@@ -347,11 +345,10 @@ struct ItemTabView: View {
                         SDWebImageToItem(imageURL: item.photoURL,
                                           width: size.width / 2,
                                           height: size.width / 2)
-                            /// Matched Geometry ID
                             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                             .transition(.asymmetric(insertion: .slide, removal: .identity))
+                            /// Matched Geometry ID
                             .matchedGeometryEffect(id: item.id, in: animation)
-                            // Applying Shadow
                             .shadow(color: .black.opacity(0.1), radius: 5, x: 5, y: -5)
                             .shadow(color: .black.opacity(0.1), radius: 5, x: -5, y: -5)
                     }
