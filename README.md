@@ -138,7 +138,7 @@ unicoを利用しているユーザー同士で、
 
 <br>
 
-### 4.ER図
+### 3.ER図
 <img width="637" alt="スクリーンショット 2023-10-26 2 10 57" src="https://github.com/kensuke242424/unico/assets/100055504/7cdb69fd-2907-4bf2-bf03-80c6886a885d">
 
 <br>
