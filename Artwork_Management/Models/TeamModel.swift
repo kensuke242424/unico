@@ -9,7 +9,11 @@ import FirebaseFirestore
 import FirebaseFirestoreSwift
 
 // チーム情報
-struct Team: Identifiable, Codable, Equatable {
+struct Team: FirestoreSerializable, Identifiable, Codable, Equatable {
+    static func firestorePath() -> FirestorePath {
+        return .teams
+    }
+
     var createTime = Date()
     var id: String
     var name: String
