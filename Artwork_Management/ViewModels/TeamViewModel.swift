@@ -44,23 +44,6 @@ class TeamViewModel: ObservableObject {
         return self.members.compactMap {$0.id}
     }
 
-    @MainActor
-    func fetchTeam(teamID: String) async throws {
-
-        do {
-            let teamDocument = try await db?
-                .collection("teams")
-                .document(teamID)
-                .getDocument()
-
-            let teamData = try teamDocument?.data(as: Team.self)
-            self.team =  teamData
-        } catch {
-            print("ERROR: チームデータ取得失敗")
-            throw CustomError.fetch
-        }
-    }
-
     /// チームデータの追加・更新・削除のステートを管理するリスナーメソッド。
     /// 初期実行時にリスニング対象ドキュメントのデータが全取得される。(フラグはadded)
     func teamListener(id currentTeamID: String) async throws {
