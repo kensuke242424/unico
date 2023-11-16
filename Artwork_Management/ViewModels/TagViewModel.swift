@@ -23,9 +23,6 @@ class TagViewModel: ObservableObject {
     /// アイテムページの選択アイテムタグを管理するプロパティ。
     @Published var activeTag: Tag?
 
-    /// チーム作成時にデフォルトで挿入するサンプルタグ
-    let sampleTag = Tag(oderIndex: 1, tagName: "goods", tagColor: .gray)
-
     func tagDataLister(teamID: String) async {
         let tagsRef = db?
             .collection("teams")
@@ -174,24 +171,6 @@ class TagViewModel: ObservableObject {
                                                teamID: teamID)
                 }
             }
-        }
-    }
-
-    /// チーム作成時にデフォルトのサンプルタグを追加するメソッド。
-    func setSampleTag(teamID: String) async {
-
-        guard let sampleTagId = self.sampleTag.id else { return }
-
-        do {
-            try db?
-                .collection("teams")
-                .document(teamID)
-                .collection("tags")
-                .document(sampleTagId)
-                .setData(from: self.sampleTag)
-
-        } catch {
-            print("ERROR: サンプルタグの保存失敗")
         }
     }
 

@@ -456,8 +456,7 @@ struct CreateAndJoinTeamView: View {
                         try await teamVM.addFirstMemberToFirestore(teamId: teamData.id, data: user)
                         try await userVM.addNewJoinTeam(data: joinTeamData)
                         try await userVM.updateLastLogInTeam(teamId: teamData.id)
-                            await teamVM.setSampleItem(teamID: teamData.id)
-                            await tagVM.setSampleTag(teamID: teamData.id)
+                            await teamVM.setSampleData(teamId: teamData.id)
 
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                             withAnimation(.spring(response: 1)) {

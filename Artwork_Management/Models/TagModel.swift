@@ -9,11 +9,15 @@ import SwiftUI
 import FirebaseFirestore
 import FirebaseFirestoreSwift
 
-struct Tag: Identifiable, Equatable, Codable, Hashable {
+struct Tag: FirestoreSerializable, Identifiable, Equatable, Codable, Hashable {
     var id: String? = UUID().uuidString
     var oderIndex: Int
     var tagName: String
     var tagColor: UsedColor
+
+    static let sampleTag = Tag(oderIndex: 1, tagName: "goods", tagColor: .gray)
+
+    static func firestorePath() -> FirestorePath { .tags }
 }
 
 var testTag: [Tag] {

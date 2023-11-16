@@ -5,16 +5,11 @@
 //  Created by Kensuke Nakagawa on 2023/11/16.
 //
 
-import FirebaseFirestore
-
 enum FirestorePath {
     case teams
     case users
-    case items(teamId: String)
-
-    var referense: DocumentReference? {
-        return nil
-    }
+    case items
+    case tags
 
     var collectionPath: String {
         switch self {
@@ -22,8 +17,10 @@ enum FirestorePath {
             return "teams"
         case .users:
             return "users"
-        case .items(let teamId):
-            return "teams/\(teamId)/items"
+        case .items:
+            return "teams"
+        case .tags:
+            return "tags"
         }
     }
 }

@@ -8,16 +8,12 @@
 import FirebaseFirestore
 
 protocol FirestoreSerializable {
-    var id: String { get }
     static func firestorePath() -> FirestorePath
 }
 
+// 各モデルデータ共通で使用されるロジック
 extension FirestoreSerializable {
 
-    // ジェネリクス「T」がFirestoreSerializableとDecodableに準拠している必要がある
-    /// Firestoreのドキュメントから一つのモデルデータを取得するメソッド。
-    /// - Parameter id: 取得対象データのドキュメントID
-    /// - Returns: Firestoreから取得したオブジェクト
     static func fetch<T: FirestoreSerializable & Decodable>(withId id: String) async throws -> T {
 
         do {
@@ -48,6 +44,47 @@ extension FirestoreSerializable {
 
         } catch {
             throw FirestoreError.updateError
+        }
+    }
+}
+
+// 初期値サンプルデータの追加ロジック
+extension FirestoreSerializable {
+
+    static func setSampleItems(teamId: String) async {
+
+        for item in sampleItems {
+
+            var item = item
+            item.teamID = teamId
+
+            guard let itemId = item.id else { return }
+
+            do {
+                try Firestore.firestore()
+                    .collection("teams")
+                    .document(teamId)
+                    .collection("items")
+                    .document(itemId)
+                    .setData(from: item) // データセット
+            } catch {
+                print("ERROR: サンプルアイテム\(item.name)の追加失敗")
+            }
+        }
+    }
+
+    static func setSampleTag(teamId: String) async {
+        guard let sampleTagId = Tag.sampleTag.id else { return }
+
+        do {
+            try Firestore.firestore()
+                .collection("teams")
+                .document(teamId)
+                .collection("tags")
+                .document(sampleTagId)
+                .setData(from: Tag.sampleTag) // データセット
+        } catch {
+            print("ERROR: サンプルタグの保存失敗")
         }
     }
 }

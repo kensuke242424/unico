@@ -171,28 +171,9 @@ class TeamViewModel: ObservableObject {
         }
     }
 
-    /// チーム作成時にデフォルトのサンプルアイテムを追加するメソッド。
-    func setSampleItem(sampleItems: [Item] = sampleItems, teamID: String) async {
-
-        sampleItems.compactMap { item in
-            /// サンプルアイテムのteamIdを新規チームのIdに更新する
-            var item = item
-            item.teamID = teamID
-
-            guard let itemId = item.id else { return }
-
-            do {
-                try db?
-                    .collection("teams")
-                    .document(teamID)
-                    .collection("items")
-                    .document(itemId)
-                    .setData(from: item)
-
-            } catch {
-                print("ERROR: サンプルアイテム\(item.name)の追加失敗")
-            }
-        }
+    func setSampleData(teamId: String) async {
+        await Team.setSampleItems(teamId: teamId)
+        await Tag.setSampleTag(teamId: teamId)
     }
 
     // メンバー招待画面で取得した相手のユーザIDを使って、Firestoreのusersからデータをフェッチ
@@ -235,27 +216,6 @@ class TeamViewModel: ObservableObject {
         } catch {
             print("ERROR: 新規参加ユーザーへのJoinTeam譲渡失敗")
             throw CustomError.addTeamIDToJoinedUser
-        }
-    }
-    
-    func resizeUIImage(image: UIImage?, width: CGFloat) -> UIImage? {
-        
-        if let originalImage = image {
-            // オリジナル画像のサイズからアスペクト比を計算
-            let aspectScale = originalImage.size.height / originalImage.size.width
-            
-            // widthからアスペクト比を元にリサイズ後のサイズを取得
-            let resizedSize = CGSize(width: width * 3, height: width * Double(aspectScale) * 3)
-            
-            // リサイズ後のUIImageを生成して返却
-            UIGraphicsBeginImageContext(resizedSize)
-            originalImage.draw(in: CGRect(x: 0, y: 0, width: resizedSize.width, height: resizedSize.height))
-            let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
-            UIGraphicsEndImageContext()
-            
-            return resizedImage
-        } else {
-            return nil
         }
     }
 
