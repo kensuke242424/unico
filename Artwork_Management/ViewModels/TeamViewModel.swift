@@ -330,25 +330,13 @@ class TeamViewModel: ObservableObject {
         }
     }
 
-    func updateTeam(data updatedTeamData: Team) async throws {
-        guard let team else { throw CustomError.teamEmpty }
-
-        // 更新前の元々のアイコンパスを保持しておく
-        // 更新成功が確認できてから以前のアイコンデータを削除する
-        let defaultIconPath = team.iconPath
-
+    func updateTeam(data: Team) async throws {
         do {
-            try db?
-                .collection("teams")
-                .document(team.id)
-                .setData(from: updatedTeamData)
+         try await data.update(withId: data.id, data: data)
+        } catch let error as FirestoreError {
+            print(error.localizedDescription)
         } catch {
-            // アイコンデータが変更されていた場合は、firestorageから画像を削除
-            if defaultIconPath != updatedTeamData.iconPath {
-                await deleteImage(path: updatedTeamData.iconPath)
-            }
-            print("ERROR: チーム更新失敗")
-            throw TeamRelatedError.failedUpdateTeam
+            print("未知のエラー: \(error.localizedDescription)")
         }
     }
 
