@@ -84,6 +84,9 @@
 		BE8734F52A5EE9B7004AA246 /* EditItemPhotoContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8734F22A5EE9B7004AA246 /* EditItemPhotoContent.swift */; };
 		BE8734F62A5EE9B7004AA246 /* EditTagView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8734F32A5EE9B7004AA246 /* EditTagView.swift */; };
 		BE8734F72A5EE9B7004AA246 /* ItemEditingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8734F42A5EE9B7004AA246 /* ItemEditingView.swift */; };
+		BEA0A5CC2B05FDEC0082B445 /* FirestoreSerializable.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA0A5CB2B05FDEC0082B445 /* FirestoreSerializable.swift */; };
+		BEA0A5CE2B05FE5C0082B445 /* FirestorePath.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA0A5CD2B05FE5C0082B445 /* FirestorePath.swift */; };
+		BEA0A5D02B0647B60082B445 /* FirestoreError.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA0A5CF2B0647B60082B445 /* FirestoreError.swift */; };
 		BEAAD8F829CDCE3300C53138 /* DeletedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAAD8F729CDCE3300C53138 /* DeletedView.swift */; };
 		BEAAD8FA29CDEF6200C53138 /* DefaultEmailCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAAD8F929CDEF6200C53138 /* DefaultEmailCheckView.swift */; };
 		BEAAD94629D068C000C53138 /* SuccessUpdateAddressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAAD94529D068C000C53138 /* SuccessUpdateAddressView.swift */; };
@@ -221,6 +224,9 @@
 		BE8734F22A5EE9B7004AA246 /* EditItemPhotoContent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditItemPhotoContent.swift; sourceTree = "<group>"; };
 		BE8734F32A5EE9B7004AA246 /* EditTagView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditTagView.swift; sourceTree = "<group>"; };
 		BE8734F42A5EE9B7004AA246 /* ItemEditingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ItemEditingView.swift; sourceTree = "<group>"; };
+		BEA0A5CB2B05FDEC0082B445 /* FirestoreSerializable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestoreSerializable.swift; sourceTree = "<group>"; };
+		BEA0A5CD2B05FE5C0082B445 /* FirestorePath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestorePath.swift; sourceTree = "<group>"; };
+		BEA0A5CF2B0647B60082B445 /* FirestoreError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestoreError.swift; sourceTree = "<group>"; };
 		BEAAD8F729CDCE3300C53138 /* DeletedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeletedView.swift; sourceTree = "<group>"; };
 		BEAAD8F929CDEF6200C53138 /* DefaultEmailCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultEmailCheckView.swift; sourceTree = "<group>"; };
 		BEAAD94529D068C000C53138 /* SuccessUpdateAddressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuccessUpdateAddressView.swift; sourceTree = "<group>"; };
@@ -422,6 +428,16 @@
 			path = ApplicationSettingViews;
 			sourceTree = "<group>";
 		};
+		BEA0A5CA2B05FDA70082B445 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				BEA0A5CB2B05FDEC0082B445 /* FirestoreSerializable.swift */,
+				BEA0A5CD2B05FE5C0082B445 /* FirestorePath.swift */,
+				BEA0A5CF2B0647B60082B445 /* FirestoreError.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
 		BEF415E12AC8509300AF6FD5 /* LaunchViews */ = {
 			isa = PBXGroup;
 			children = (
@@ -478,6 +494,7 @@
 				E0FCADA2296F289A00BA6A75 /* Artwork_Management.entitlements */,
 				E08F272428DDA08E00329C5E /* Artwork_ManagementApp.swift */,
 				E0455FDF292BBB74004F677D /* GoogleService-Info.plist */,
+				BEA0A5CA2B05FDA70082B445 /* Utilities */,
 				BE392FF129C2133B00BB5700 /* Helpers */,
 				E05FE94328F71BE400263F98 /* Extensions */,
 				E08F273228DDB3B200329C5E /* Views */,
@@ -812,6 +829,7 @@
 				BE6E007429CD5CCA009CBD38 /* NavigationViewModel.swift in Sources */,
 				BECAA8CC2A60434400B07B17 /* UserProfileEditView.swift in Sources */,
 				E0CF7EF228DF166700735142 /* ItemViewModel.swift in Sources */,
+				BEA0A5CC2B05FDEC0082B445 /* FirestoreSerializable.swift in Sources */,
 				E0CF7EF028DF152D00735142 /* ItemModel.swift in Sources */,
 				BE07F1282A220AD5007ED1C4 /* Particle.swift in Sources */,
 				E0F0180E2975A9E10063C96B /* JoinUserDetectCheckView.swift in Sources */,
@@ -867,6 +885,7 @@
 				BE1F272329C166E700AD55DF /* HomeTabView.swift in Sources */,
 				BE1F272529C1673900AD55DF /* ItemTabView.swift in Sources */,
 				BE17B97529CC2D8F00F08915 /* LogInAddressSheetView.swift in Sources */,
+				BEA0A5CE2B05FE5C0082B445 /* FirestorePath.swift in Sources */,
 				BE23A16229C33E7E00876194 /* TimesFormatter.swift in Sources */,
 				BE3CD65B29B72B0700C19442 /* ProgressViewModel.swift in Sources */,
 				E05FE94528F71BFB00263F98 /* ColorExtension.swift in Sources */,
@@ -874,6 +893,7 @@
 				BEB669EE2A2DF49E008FC9DE /* CGSizeExtension.swift in Sources */,
 				E0B328912923AD9D00E94BC3 /* GradientLine.swift in Sources */,
 				E08F273A28DDB53700329C5E /* SystemView.swift in Sources */,
+				BEA0A5D02B0647B60082B445 /* FirestoreError.swift in Sources */,
 				E0CC79B628E761EA00CE0B19 /* UserModel.swift in Sources */,
 				BE8654822A8597C7006AE163 /* AnyShape.swift in Sources */,
 				E0455FE4292C8EF0004F677D /* BounceAnimationView.swift in Sources */,
