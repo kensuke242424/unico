@@ -15,7 +15,6 @@ protocol FirestoreSerializable {
 extension FirestoreSerializable {
 
     // ジェネリクス「T」がFirestoreSerializableとDecodableに準拠している必要がある
-    
     /// Firestoreのドキュメントから一つのモデルデータを取得するメソッド。
     /// - Parameter id: 取得対象データのドキュメントID
     /// - Returns: Firestoreから取得したオブジェクト
@@ -36,6 +35,19 @@ extension FirestoreSerializable {
             } else {
                 throw FirestoreError.other(error)
             }
+        }
+    }
+
+    func update<T: FirestoreSerializable & Codable>(withId id: String, data: T) async throws {
+
+        do {
+            try Firestore.firestore()
+                .collection(Self.firestorePath().collectionPath)
+                .document(id)
+                .setData(from: data)
+
+        } catch {
+            throw FirestoreError.updateError
         }
     }
 }
