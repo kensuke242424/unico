@@ -22,16 +22,20 @@ extension FirestoreSerializable {
     static func fetch<T: FirestoreSerializable & Decodable>(withId id: String) async throws -> T {
 
         do {
-            let teamDocument = try await Firestore.firestore()
+            let document = try await Firestore.firestore()
                 .collection(firestorePath().collectionPath)
                 .document(id)
                 .getDocument()
 
-            let data = try teamDocument.data(as: T.self) // 取得データ
+            let data = try document.data(as: T.self)
             return data
+
         } catch {
-            print("ERROR: データ取得失敗")
-            throw CustomError.fetch
+            if let firestoreError = error as? FirestoreError {
+                throw firestoreError
+            } else {
+                throw FirestoreError.other(error)
+            }
         }
     }
 }
