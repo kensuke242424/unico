@@ -478,7 +478,7 @@ struct SystemSideMenu: View {
                 try await userVM.deleteJoinTeamFromMyData(for: selectedTeam)
 
                 /// チーム内のメンバーズドキュメントIdを取得し、他メンバーがいない場合は、チームデータごと削除する
-                let membersId = try await teamVM.getMembersId(teamId: selectedTeam.id)
+                let membersId = try await teamVM.fetchMembersId(teamId: selectedTeam.id)
                 if let membersId, membersId.isEmpty {
                     print("\(selectedTeam.name)のチームデータ削除実行")
                     // チームのアイテムデータ削除

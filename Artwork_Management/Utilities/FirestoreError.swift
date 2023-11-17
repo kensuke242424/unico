@@ -8,7 +8,7 @@
 enum FirestoreError: Error {
     case dataNotFound
     case decodeError
-    case updateError
+    case setDataError
     case other(Error)
 
     var localizedDescription: String {
@@ -17,8 +17,8 @@ enum FirestoreError: Error {
             return "データが見つかりません。"
         case .decodeError:
             return "データのデコードに失敗しました。"
-        case .updateError:
-            return "データの更新に失敗しました。"
+        case .setDataError:
+            return "データのセットに失敗しました。"
         case .other(let error):
             return error.localizedDescription
         }

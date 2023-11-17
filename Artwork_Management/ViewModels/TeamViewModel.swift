@@ -92,17 +92,13 @@ class TeamViewModel: ObservableObject {
             }
     }
 
-    /// Firestoreの「teams」コレクションに、新規チームを保存するメソッド。
-    func addNewTeam(team newAddTeam: Team) async throws {
-
+    func setTeam(data: Team) async throws {
         do {
-            try db?
-                .collection("teams")
-                .document(newAddTeam.id)
-                .setData(from: newAddTeam)
+            try await Team.setData(withId: data.id, data: data)
+        } catch let error as FirestoreError {
+            print(error.localizedDescription)
         } catch {
-            print("ERROR: 新規チームの保存失敗")
-            throw CustomError.setData
+            print("未知のエラー: \(error.localizedDescription)")
         }
     }
 
@@ -169,11 +165,6 @@ class TeamViewModel: ObservableObject {
                 .document(detectedUser.id)
                 .setData(from: newMemberData)
         }
-    }
-
-    func setSampleData(teamId: String) async {
-        await Team.setSampleItems(teamId: teamId)
-        await Tag.setSampleTag(teamId: teamId)
     }
 
     // メンバー招待画面で取得した相手のユーザIDを使って、Firestoreのusersからデータをフェッチ
@@ -290,14 +281,23 @@ class TeamViewModel: ObservableObject {
         }
     }
 
-    func updateTeam(data: Team) async throws {
-        do {
-         try await data.update(withId: data.id, data: data)
-        } catch let error as FirestoreError {
-            print(error.localizedDescription)
-        } catch {
-            print("未知のエラー: \(error.localizedDescription)")
-        }
+    func setSampleData(teamId: String) async {
+        await Team.setSampleItems(teamId: teamId)
+        await Tag.setSampleTag(teamId: teamId)
+    }
+
+    /// チームに所属しているメンバーのメンバーIdを取得するメソッド。
+    func fetchMembersId(teamId: String?) async throws -> [String]? {
+        guard let teamId else { throw TeamRelatedError.missingData }
+
+        /// 所属チームメンバー全員のスナップショットを取得
+        let membersSnapshot = try await db?
+            .collection("teams")
+            .document(teamId)
+            .collection("members")
+            .getDocuments()
+        // メンバー全員のidを取得
+        return membersSnapshot?.documents.compactMap {$0.documentID}
     }
 
     /// 選択されたチーム内の自身のメンバーデータを削除するメソッド。
@@ -355,7 +355,6 @@ class TeamViewModel: ObservableObject {
             let escapedTeam = try document?.data(as: Team.self)
             // Firestorageから画像データ削除
             await deleteImage(path: escapedTeam?.iconPath)
-
             await deleteImage(path: escapedTeam?.backgroundPath)
             // チームドキュメントを削除
             try await teamRef?.delete()
@@ -464,21 +463,6 @@ class TeamViewModel: ObservableObject {
 
         }
     }
-    /// チームに所属しているメンバーのメンバーIdを取得するメソッド。
-    func getMembersId(teamId: String?) async throws -> [String]? {
-        guard let teamId else { throw TeamRelatedError.missingData }
-
-        /// 所属チームメンバー全員のスナップショットを取得
-        let membersSnapshot = try await db?
-            .collection("teams")
-            .document(teamId)
-            .collection("members")
-            .getDocuments()
-        
-
-        // メンバー全員のidを取得
-        return membersSnapshot?.documents.compactMap {$0.documentID}
-    }
 
     /// アカウント削除時に実行されるメソッド。削除実行アカウントが所属する全てのチームのデータを削除する
     /// ✅所属チームのメンバーが削除アカウントのユーザーのみだった場合 ⇨ チームデータを全て消去
@@ -496,18 +480,15 @@ class TeamViewModel: ObservableObject {
         do {
             // 各所属チームのリファレンスごとに削除処理を実行していく
             for teamRef in teamRefs {
-                // チームのドキュメントId
                 let teamId = teamRef.documentID
-                // チームに所属するメンバーのId
-                let membersId = try await getMembersId(teamId: teamId)
+                let membersId = try await fetchMembersId(teamId: teamId)
                 // メンバーデータが存在しなかった場合は処理を中断し、別のチーム処理を再スタート
                 guard let membersId else {
                     print("ERROR: チーム内にメンバーデータが存在しない")
                     continue
                 }
 
-                if membersId.count == 1 &&
-                    membersId.first == uid {
+                if membersId.count == 1 && membersId.first == uid {
                     // ✅チーム内に自分以外のメンバーが居なかった場合、チームの全データをFirestoreから削除
                     try await deleteTeamMemberDocument(teamId: teamId, memberId: uid)
                     try await deleteTeamTagsDocument(teamId: teamId)
@@ -528,8 +509,7 @@ class TeamViewModel: ObservableObject {
     }
 
     deinit {
-        teamListener?.remove()
-        membersListener?.remove()
+        removeListener()
     }
 }
 

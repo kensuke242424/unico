@@ -182,7 +182,7 @@ struct TeamProfileEditView: View {
                 }
                 // データの変更があれば、Firebaseへの保存処理実行
                 if beforeTeam != afterTeam {
-                    try await teamVM.updateTeam(data: afterTeam)
+                    try await teamVM.setTeam(data: afterTeam)
                     try await userVM.updateJoinTeamToMembers(data: joinTeamContainer,
                                                              ids: teamVM.membersId)
 

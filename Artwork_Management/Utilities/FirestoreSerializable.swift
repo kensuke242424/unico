@@ -34,7 +34,7 @@ extension FirestoreSerializable {
         }
     }
 
-    func update<T: FirestoreSerializable & Codable>(withId id: String, data: T) async throws {
+    static func setData<T: FirestoreSerializable & Codable>(withId id: String, data: T) async throws {
 
         do {
             try Firestore.firestore()
@@ -43,9 +43,14 @@ extension FirestoreSerializable {
                 .setData(from: data)
 
         } catch {
-            throw FirestoreError.updateError
+            throw FirestoreError.setDataError
         }
     }
+}
+
+// チームデータ専用のロジック
+extension FirestoreSerializable {
+    
 }
 
 // 初期値サンプルデータの追加ロジック

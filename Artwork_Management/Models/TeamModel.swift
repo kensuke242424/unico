@@ -10,10 +10,6 @@ import FirebaseFirestoreSwift
 
 // チーム情報
 struct Team: FirestoreSerializable, Identifiable, Codable, Equatable {
-    static func firestorePath() -> FirestorePath {
-        return .teams
-    }
-
     var createTime = Date()
     var id: String
     var name: String
@@ -22,6 +18,8 @@ struct Team: FirestoreSerializable, Identifiable, Codable, Equatable {
     var backgroundURL: URL?
     var backgroundPath: String?
     var logs: [Log] = []
+
+    static func firestorePath() -> FirestorePath { return .teams }
 }
 
 /// teamsドキュメントのサブコレクションとして保存されるメンバー一人分の要素を持つデータ
