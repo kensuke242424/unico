@@ -307,8 +307,7 @@ struct JoinUserDetectCheckView: View {
 
                                     } else {
                                         _ = await teamVM.setMember(teamId: team.id, data: detectedUser)
-                                        _ = try await teamVM.passJoinTeamToDetectedMember(for: detectedUser,
-                                                                                         from: userVM.currentJoinTeam)
+                                        _ = try await userVM.passJoinTeamToNewMember(for: detectedUser)
                                         withAnimation(.spring(response: 0.8, blendDuration: 1)) { isAgreed.toggle() }
                                         hapticSuccessNotification()
 

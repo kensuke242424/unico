@@ -379,6 +379,29 @@ class UserViewModel: ObservableObject {
             }
         }
     }
+    /// チーム参加を許可したユーザーに対して、チーム情報（joinTeam）を渡すメソッド。
+    /// Firestoreのusersコレクションの中から、相手ユーザードキュメントのサブコレクション（joins）にデータをセットする。
+    func passJoinTeamToNewMember(for newMember: User) async {
+        guard let joinTeamData = self.currentJoinTeam else {
+            assertionFailure("joinTeamデータが存在しません")
+            return
+        }
+
+        // 自身のjoinTeamデータを相手に渡すデータとしてコピー
+        var passJoinTeam = joinTeamData
+        // approvedをfalseとして渡すことで、相手に届いた時に参加通知が発火する
+        passJoinTeam.approved = false
+
+        do {
+            try await User.setJoinTeam(userId: newMember.id, data: passJoinTeam)
+
+        } catch let error as FirestoreError {
+            print(error.localizedDescription)
+        } catch {
+            print("未知のエラー: \(error.localizedDescription)")
+        }
+    }
+
     /// joinTeamデータのプロパティ「approved」をtrueにするメソッド。
     /// 他チームからの承諾によって新規チームが追加された時、ユーザーに追加を知らせるのに
     /// approvedの値を用いる。

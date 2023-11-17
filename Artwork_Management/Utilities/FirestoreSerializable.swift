@@ -50,13 +50,13 @@ extension FirestoreSerializable {
 
 // チームドキュメント専用で用いられるロジック
 extension FirestoreSerializable {
-    static func setMember(teamId: String, memberId: String, data: JoinMember) async throws {
+    static func setMember(teamId: String, data: JoinMember) async throws {
 
         do {
             try FirestoreReference
                 .members(teamId: teamId)
                 .collectionReference
-                .document(memberId)
+                .document(data.id)
                 .setData(from: data) // データ保存
         } catch {
             throw FirestoreError.setDataError
@@ -66,8 +66,16 @@ extension FirestoreSerializable {
 
 // ユーザードキュメント専用で用いられるロジック
 extension FirestoreSerializable {
-    func setJoinTeamData(teamId: String) {
-
+    static func setJoinTeam(userId: String, data: JoinTeam) async throws {
+        do {
+            try FirestoreReference
+                .joins(userId: userId)
+                .collectionReference
+                .document(data.id)
+                .setData(from: data) // データ保存
+        } catch {
+            throw FirestoreError.setDataError
+        }
     }
 }
 

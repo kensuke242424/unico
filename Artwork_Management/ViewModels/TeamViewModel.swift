@@ -93,34 +93,11 @@ class TeamViewModel: ObservableObject {
     func setTeam(data: Team) async {
         do {
             try await Team.setData(withId: data.id, data: data)
+
         } catch let error as FirestoreError {
             print(error.localizedDescription)
         } catch {
             print("未知のエラー: \(error.localizedDescription)")
-        }
-    }
-
-    /// ユーザーが所属しているチーム全てに保存されている自身のメンバーデータを更新する。
-    /// ユーザーデータの変更を行った時に、各チームのユーザーステートを揃えるために使う。
-    func updateJoinTeamsMyMemberData(from updatedData: User, joins: [JoinTeam]) async {
-        assert(self.myJoinMemberData != nil, "自身のメンバーデータが存在しません")
-        var myMemberData = self.myJoinMemberData!
-
-        /// データの更新
-        myMemberData.name = updatedData.name
-        myMemberData.iconURL = updatedData.iconURL
-
-        for team in joins {
-            do {
-                try await Team.setMember(teamId: team.id,
-                                         memberId: myMemberData.id,
-                                         data: myMemberData)
-
-            } catch let error as FirestoreError {
-                print(error.localizedDescription)
-            } catch {
-                print("未知のエラー: \(error.localizedDescription)")
-            }
         }
     }
 
@@ -131,9 +108,7 @@ class TeamViewModel: ObservableObject {
                                        name: userData.name,
                                        iconURL: userData.iconURL)
         do {
-            try await Team.setMember(teamId: teamId,
-                                     memberId: userData.id,
-                                     data: newMemberData)
+            try await Team.setMember(teamId: teamId, data: newMemberData)
 
         } catch let error as FirestoreError {
             print(error.localizedDescription)
@@ -142,35 +117,33 @@ class TeamViewModel: ObservableObject {
         }
     }
 
+    /// ユーザーが所属しているチーム全てに保存されている自身のメンバーデータを更新する。
+    /// ユーザーデータの変更を行った時に、各チームのユーザーステートを揃えるために使う。
+    func updateJoinTeamsMyMemberData(from updatedData: User, joins: [JoinTeam]) async {
+        guard var myMemberData = self.self.myJoinMemberData else {
+            assertionFailure("自身のメンバーデータが存在しません")
+            return
+        }
+
+        /// データの更新
+        myMemberData.name = updatedData.name
+        myMemberData.iconURL = updatedData.iconURL
+
+        for team in joins {
+            do {
+                try await Team.setMember(teamId: team.id, data: myMemberData)
+
+            } catch let error as FirestoreError {
+                print(error.localizedDescription)
+            } catch {
+                print("未知のエラー: \(error.localizedDescription)")
+            }
+        }
+    }
+
     /// 対象ユーザーがすでにメンバー加入済みであるかをチェックするメソッド
     func isUserAlreadyMember(userId: String) -> Bool {
         return self.membersId.contains(userId)
-    }
-
-    /// チーム参加を許可したユーザーに対して、チーム情報（joinTeam）を渡すメソッド。
-    /// Firestoreのusersコレクションの中から、相手ユーザードキュメントのサブコレクション（joins）にデータをセットする。
-    func passJoinTeamToDetectedMember(for detectedUser: User, from currentJoinTeam: JoinTeam?) async throws {
-        guard let currentJoinTeam else { throw TeamRelatedError.missingData }
-
-        // 相手に渡すjoinTeamデータを生成
-        var passJoinTeam = currentJoinTeam
-        // 背景データはサンプル背景に差し替える
-        passJoinTeam.currentBackground = sampleBackground
-        // approvedをfalseとして渡すことで、相手に届いた時に参加通知が発火する
-        passJoinTeam.approved = false
-
-        do {
-            try db?
-                .collection("users")
-                .document(detectedUser.id)
-                .collection("joins")
-                .document(passJoinTeam.id)
-                .setData(from: passJoinTeam)
-
-        } catch {
-            print("ERROR: 新規参加ユーザーへのJoinTeam譲渡失敗")
-            throw CustomError.addTeamIDToJoinedUser
-        }
     }
 
     /// 現在操作しているチームのcreateTime(Date)から、現在までの使用日数を算出するメソッド。
