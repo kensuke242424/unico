@@ -453,7 +453,7 @@ struct CreateAndJoinTeamView: View {
                         self.joinedTeamData = joinTeamData
                         
                         try await teamVM.setTeam(data: teamData)
-                        try await teamVM.addFirstMemberToFirestore(teamId: teamData.id, data: user)
+                        try await teamVM.setMember(teamId: teamData.id, data: user)
                         try await userVM.addNewJoinTeam(data: joinTeamData)
                         try await userVM.updateLastLogInTeam(teamId: teamData.id)
                             await teamVM.setSampleData(teamId: teamData.id)

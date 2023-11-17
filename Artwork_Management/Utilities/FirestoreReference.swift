@@ -26,7 +26,7 @@ enum FirestoreReference {
         case .tags(let teamId):
             return Firestore.firestore().collection("teams/\(teamId)/tags")
         case .members(teamId: let teamId):
-            return Firestore.firestore().collection("teams/\(teamId)/items")
+            return Firestore.firestore().collection("teams/\(teamId)/members")
         case .joins(userId: let userId):
             return Firestore.firestore().collection("users/\(userId)/joins")
         }

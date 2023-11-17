@@ -86,6 +86,20 @@ class UserViewModel: ObservableObject {
         }
     }
 
+    func getUserData(id userId: String) async -> User? {
+
+        do {
+            return try await User.fetch(withId: userId)
+
+        } catch let error as FirestoreError {
+            print(error.localizedDescription)
+            return nil
+        } catch {
+            print("未知のエラー: \(error.localizedDescription)")
+            return nil
+        }
+    }
+
     /// 自身の所属するチームデータ「joins」を取得するメソッド。
     @MainActor
     func fetchJoinTeams() async throws {

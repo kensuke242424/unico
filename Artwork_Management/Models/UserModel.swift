@@ -9,7 +9,7 @@ import SwiftUI
 import FirebaseFirestore
 import FirebaseFirestoreSwift
 
-struct User: Identifiable, Codable, Equatable {
+struct User: FirestoreSerializable, Identifiable, Codable, Equatable {
 
     var id: String
     var createTime = Date()
@@ -23,6 +23,8 @@ struct User: Identifiable, Codable, Equatable {
     var myBackgrounds: [Background] = []
     var favorites: [String] = []
     var lastLogIn: String?
+
+    static func firestorePath() -> FirestorePath { .users }
 }
 
 

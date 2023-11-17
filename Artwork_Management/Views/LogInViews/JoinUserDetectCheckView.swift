@@ -166,14 +166,16 @@ struct JoinUserDetectCheckView: View {
                     do {
                         let detectUserID = qrReader.captureQRData
                         inputUserIDText = detectUserID
-                        detectedUser = try await teamVM.fetchDetectUserData(id: detectUserID)
-                        qrReader.isdetectQR.toggle()
-                        withAnimation(.spring(response: 0.8, blendDuration: 1)) { joinUserCheckFase = .agree }
-                    } catch {
-                        qrReader.isdetectQR.toggle()
-                        teamVM.alertMessage = "ユーザが見つかりませんでした。"
-                        teamVM.showErrorAlert.toggle()
-                        withAnimation(.spring(response: 0.8, blendDuration: 1)) { joinUserCheckFase = .start }
+                        detectedUser = await userVM.getUserData(id: detectUserID)
+                        if let detectedUser {
+                            qrReader.isdetectQR.toggle()
+                            withAnimation(.spring(response: 0.8, blendDuration: 1)) { joinUserCheckFase = .agree }
+                        } else {
+                            qrReader.isdetectQR.toggle()
+                            teamVM.alertMessage = "ユーザが見つかりませんでした。"
+                            teamVM.showErrorAlert.toggle()
+                            withAnimation(.spring(response: 0.8, blendDuration: 1)) { joinUserCheckFase = .start }
+                        }
                     }
                 }
             }
@@ -253,22 +255,18 @@ struct JoinUserDetectCheckView: View {
                                 return
                             }
                             withAnimation{joinUserCheckFase = .check}
-                            detectedUser = try await teamVM.fetchDetectUserData(id: inputUserIDText)
+                            detectedUser = await userVM.getUserData(id: inputUserIDText)
+
                             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                                 if detectedUser != nil {
                                     withAnimation{ joinUserCheckFase = .agree }
                                 } else {
+                                    teamVM.alertMessage = "入力したidのユーザーは見つかりませんでした。"
+                                    teamVM.showErrorAlert.toggle()
                                     withAnimation{ joinUserCheckFase = .start }
+                                    return
                                 }
                             }
-
-
-                        } catch {
-                            print("uid検索の結果、Firestoreにユーザーが存在しませんでした")
-                            teamVM.alertMessage = "入力したidのユーザーは見つかりませんでした。"
-                            teamVM.showErrorAlert.toggle()
-                            joinUserCheckFase = .start
-                            return
                         }
                     }
                 }
@@ -301,34 +299,33 @@ struct JoinUserDetectCheckView: View {
                                 do {
                                     guard let detectedUser, let team = teamVM.team else { return }
 
-                                    _ = try await teamVM.setDetectedNewMember(from: detectedUser)
-                                    _ = try await teamVM.passJoinTeamToDetectedMember(for: detectedUser,
-                                                                                     from: userVM.currentJoinTeam)
-                                    withAnimation(.spring(response: 0.8, blendDuration: 1)) { isAgreed.toggle() }
-                                    hapticSuccessNotification()
+                                    // すでに加入済みでないかチェック
+                                    if teamVM.isUserAlreadyMember(userId: detectedUser.id) {
+                                        hapticErrorNotification()
+                                        teamVM.alertMessage = "こちらのユーザーは既にチームに所属しています。"
+                                        teamVM.showErrorAlert.toggle()
 
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                                        withAnimation(.spring(response: 0.5, blendDuration: 1)) {
-                                            teamVM.isShowSearchedNewMemberJoinTeam.toggle()
-                                            logVM.addLog(to: team,
-                                                         by: userVM.user,
-                                                         type: .join(detectedUser, team))
+                                    } else {
+                                        _ = await teamVM.setDetectedNewMember(from: detectedUser)
+                                        _ = try await teamVM.passJoinTeamToDetectedMember(for: detectedUser,
+                                                                                         from: userVM.currentJoinTeam)
+                                        withAnimation(.spring(response: 0.8, blendDuration: 1)) { isAgreed.toggle() }
+                                        hapticSuccessNotification()
+
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                                            withAnimation(.spring(response: 0.5, blendDuration: 1)) {
+                                                teamVM.isShowSearchedNewMemberJoinTeam.toggle()
+                                                logVM.addLog(to: team,
+                                                             by: userVM.user,
+                                                             type: .join(detectedUser, team))
+                                            }
+                                        }
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {
+                                            inputUserIDText = ""
+                                            isAgreed.toggle()
+                                            joinUserCheckFase = .start
                                         }
                                     }
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {
-                                        inputUserIDText = ""
-                                        isAgreed.toggle()
-                                        joinUserCheckFase = .start
-                                    }
-
-                                } catch CustomError.memberDuplication {
-                                    hapticErrorNotification()
-                                    teamVM.alertMessage = "こちらのユーザーは既にチームに所属しています。"
-                                    teamVM.showErrorAlert.toggle()
-                                } catch {
-                                    hapticErrorNotification()
-                                    teamVM.alertMessage = "ユーザーの紹介に失敗しました。もう一度試してみてください。"
-                                    teamVM.showErrorAlert.toggle()
                                 }
                             }
                         }

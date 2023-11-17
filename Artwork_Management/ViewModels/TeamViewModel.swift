@@ -47,9 +47,8 @@ class TeamViewModel: ObservableObject {
     /// チームデータの追加・更新・削除のステートを管理するリスナーメソッド。
     /// 初期実行時にリスニング対象ドキュメントのデータが全取得される。(フラグはadded)
     func teamListener(id currentTeamID: String) async throws {
-
-        teamListener = db?
-            .collection("teams")
+        teamListener = FirestoreReference
+            .teams.collectionReference
             .document(currentTeamID)
             .addSnapshotListener { snap, error in
             if let error {
@@ -71,10 +70,9 @@ class TeamViewModel: ObservableObject {
     /// 初期実行時にリスニング対象ドキュメントのデータが全取得される。(フラグはadded)
     func membersListener(id currentTeamID: String) async {
 
-        membersListener = db?
-            .collection("teams")
-            .document(currentTeamID)
-            .collection("members")
+        membersListener = FirestoreReference
+            .members(teamId: currentTeamID)
+            .collectionReference
             .addSnapshotListener { snap, error in
 
                 if let error {
@@ -92,7 +90,7 @@ class TeamViewModel: ObservableObject {
             }
     }
 
-    func setTeam(data: Team) async throws {
+    func setTeam(data: Team) async {
         do {
             try await Team.setData(withId: data.id, data: data)
         } catch let error as FirestoreError {
@@ -104,84 +102,62 @@ class TeamViewModel: ObservableObject {
 
     /// ユーザーが所属しているチーム全てに保存されている自身のメンバーデータを更新する。
     /// ユーザーデータの変更を行った時に、各チームのユーザーステートを揃えるために使う。
-    func updateJoinTeamsMyData(from updatedData: User, joins: [JoinTeam]) async throws {
-        guard var myJoinMember = self.myJoinMemberData else {
-            throw TeamRelatedError.missingData
-        }
+    func updateJoinTeamsMyMemberData(from updatedData: User, joins: [JoinTeam]) async {
+        assert(self.myJoinMemberData != nil, "自身のメンバーデータが存在しません")
+        var myMemberData = self.myJoinMemberData!
 
         /// データの更新
-        myJoinMember.name = updatedData.name
-        myJoinMember.iconURL = updatedData.iconURL
+        myMemberData.name = updatedData.name
+        myMemberData.iconURL = updatedData.iconURL
 
-        joins.compactMap { team in
+        for team in joins {
             do {
-                try db?
-                    .collection("teams")
-                    .document(team.id) // 所属チームの一つ
-                    .collection("members")
-                    .document(myJoinMember.id)
-                    .setData(from: myJoinMember)
+                try await Team.setMember(teamId: team.id,
+                                         memberId: myMemberData.id,
+                                         data: myMemberData)
+
+            } catch let error as FirestoreError {
+                print(error.localizedDescription)
             } catch {
-                print("ERROR: JoinTeam更新失敗")
-                UserRelatedError.failedUpdateJoinsMyMemberData
+                print("未知のエラー: \(error.localizedDescription)")
             }
         }
     }
 
-    /// 新規チーム作成時に使用するメソッド。作成者のメンバーデータを新規チームのサブコレクションに保存する。
-    func addFirstMemberToFirestore(teamId: String, data userData: User) async throws {
+    /// メンバーデータを指定チームのサブコレクション「members」に保存する。
+    func setMember(teamId: String, data userData: User) async {
 
         let newMemberData = JoinMember(id: userData.id,
                                        name: userData.name,
                                        iconURL: userData.iconURL)
         do {
-            try db?
-                .collection("teams")
-                .document(teamId)
-                .collection("members")
-                .document(userData.id)
-                .setData(from: newMemberData)
+            try await Team.setMember(teamId: teamId,
+                                     memberId: userData.id,
+                                     data: newMemberData)
+
+        } catch let error as FirestoreError {
+            print(error.localizedDescription)
         } catch {
-            throw TeamRelatedError.filedAddFirstMember
+            print("未知のエラー: \(error.localizedDescription)")
         }
     }
-    /// チームのサブコレクション「members」に、新規加入したユーザーのデータを保存するメソッド。
-    func setDetectedNewMember(from detectedUser: User) async throws {
-        guard let team else { throw CustomError.teamEmpty }
+
+    /// チームに新規加入するメンバーのデータを保存するメソッド。
+    func setDetectedNewMember(from detectedUser: User) async {
+        assert(team != nil, "チームデータが存在しません")
 
         // 対象ユーザーがすでにメンバー加入済みであるかをチェック
-        for memberId in self.membersId where detectedUser.id == memberId {
-            throw CustomError.memberDuplication
+        if isUserAlreadyMember(userId: detectedUser.id) {
+            print("対象ユーザーはすでにチーム加入済みです")
+            return
         }
 
-        let newMemberData = JoinMember(id: detectedUser.id,
-                                       name: detectedUser.name,
-                                       iconURL: detectedUser.iconURL)
-        do {
-            try db?
-                .collection("teams")
-                .document(team.id)
-                .collection("members")
-                .document(detectedUser.id)
-                .setData(from: newMemberData)
-        }
+        await setMember(teamId: team!.id, data: detectedUser)
     }
 
-    // メンバー招待画面で取得した相手のユーザIDを使って、Firestoreのusersからデータをフェッチ
-    func fetchDetectUserData(id userID: String) async throws -> User? {
-
-        do {
-            let detectUserDocument = try await db?
-                .collection("users")
-                .document(userID)
-                .getDocument()
-
-            let detectUserData = try detectUserDocument?.data(as: User.self)
-            return detectUserData
-        } catch {
-            print("detectUserFetchData_失敗")
-            throw CustomError.getDetectUser
-        }
+    /// 対象ユーザーがすでにメンバー加入済みであるかをチェックするメソッド
+    func isUserAlreadyMember(userId: String) -> Bool {
+        return self.membersId.contains(userId)
     }
 
     /// チーム参加を許可したユーザーに対して、チーム情報（joinTeam）を渡すメソッド。

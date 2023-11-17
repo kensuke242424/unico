@@ -48,9 +48,27 @@ extension FirestoreSerializable {
     }
 }
 
-// チームデータ専用のロジック
+// チームドキュメント専用で用いられるロジック
 extension FirestoreSerializable {
-    
+    static func setMember(teamId: String, memberId: String, data: JoinMember) async throws {
+
+        do {
+            try FirestoreReference
+                .members(teamId: teamId)
+                .collectionReference
+                .document(memberId)
+                .setData(from: data) // データ保存
+        } catch {
+            throw FirestoreError.setDataError
+        }
+    }
+}
+
+// ユーザードキュメント専用で用いられるロジック
+extension FirestoreSerializable {
+    func setJoinTeamData(teamId: String) {
+
+    }
 }
 
 // 初期値サンプルデータの追加ロジック

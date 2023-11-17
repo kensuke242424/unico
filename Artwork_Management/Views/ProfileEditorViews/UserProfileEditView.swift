@@ -178,8 +178,8 @@ struct UserProfileEditView: View {
                     /// 自身のユーザーデータ更新
                     try await userVM.updateUser(from: afterUser)
                     // 自身が所属するチーム群が保持している自身のメンバーデータを更新
-                    try await teamVM.updateJoinTeamsMyData(from: afterUser,
-                                                           joins: userVM.joins)
+                    try await teamVM.updateJoinTeamsMyMemberData(from: afterUser, joins: userVM.joins)
+
                     hapticSuccessNotification()
                 }
 
@@ -216,9 +216,3 @@ struct UserProfileEditView: View {
         }
     }
 }
-
-//struct UserProfileEditView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        UserProfileEditView()
-//    }
-//}
