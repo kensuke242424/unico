@@ -142,19 +142,6 @@ class TeamViewModel: ObservableObject {
         }
     }
 
-    /// チームに新規加入するメンバーのデータを保存するメソッド。
-    func setDetectedNewMember(from detectedUser: User) async {
-        assert(team != nil, "チームデータが存在しません")
-
-        // 対象ユーザーがすでにメンバー加入済みであるかをチェック
-        if isUserAlreadyMember(userId: detectedUser.id) {
-            print("対象ユーザーはすでにチーム加入済みです")
-            return
-        }
-
-        await setMember(teamId: team!.id, data: detectedUser)
-    }
-
     /// 対象ユーザーがすでにメンバー加入済みであるかをチェックするメソッド
     func isUserAlreadyMember(userId: String) -> Bool {
         return self.membersId.contains(userId)

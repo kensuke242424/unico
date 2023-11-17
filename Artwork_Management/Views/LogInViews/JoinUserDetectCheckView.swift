@@ -306,7 +306,7 @@ struct JoinUserDetectCheckView: View {
                                         teamVM.showErrorAlert.toggle()
 
                                     } else {
-                                        _ = await teamVM.setDetectedNewMember(from: detectedUser)
+                                        _ = await teamVM.setMember(teamId: team.id, data: detectedUser)
                                         _ = try await teamVM.passJoinTeamToDetectedMember(for: detectedUser,
                                                                                          from: userVM.currentJoinTeam)
                                         withAnimation(.spring(response: 0.8, blendDuration: 1)) { isAgreed.toggle() }
