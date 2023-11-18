@@ -52,15 +52,15 @@ class TeamViewModel: ObservableObject {
             .document(currentTeamID)
             .addSnapshotListener { snap, error in
             if let error {
-                print("teamListener失敗: \(error.localizedDescription)")
+                assertionFailure("teamListener失敗: \(error.localizedDescription)")
             } else {
 
                 do {
                     let teamData = try snap!.data(as: Team.self)
                     withAnimation {self.team = teamData}
-                    print("チームデータを更新")
+                    assertionFailure("チームデータを更新")
                 } catch {
-                    print("チームデータ更新失敗")
+                    assertionFailure("チームデータ更新失敗")
                 }
             }
         }
@@ -76,7 +76,7 @@ class TeamViewModel: ObservableObject {
             .addSnapshotListener { snap, error in
 
                 if let error {
-                    print("ERROR: \(error.localizedDescription)")
+                    assertionFailure("ERROR: \(error.localizedDescription)")
                 } else {
 
                     do {
@@ -84,7 +84,7 @@ class TeamViewModel: ObservableObject {
                             return try? $0.data(as: JoinMember.self, with: .estimate)
                         }
                     } catch {
-                        print("メンバーデータ更新失敗")
+                        assertionFailure("メンバーデータ更新失敗")
                     }
                 }
             }
@@ -95,13 +95,13 @@ class TeamViewModel: ObservableObject {
             try await Team.setData(path: .teams, docId: data.id, data: data)
 
         } catch let error as FirestoreError {
-            print(error.localizedDescription)
+            assertionFailure(error.localizedDescription)
         } catch {
-            print("未知のエラー: \(error.localizedDescription)")
+            assertionFailure("未知のエラー: \(error.localizedDescription)")
         }
     }
 
-    /// メンバーデータを指定チームのサブコレクション「members」に保存する。
+    /// 渡されたユーザーデータからメンバーデータを作り、指定チームのサブコレクション「members」に保存する。
     func setMember(teamId: String, data userData: User) async {
 
         let newMemberData = JoinMember(id: userData.id,
@@ -113,9 +113,9 @@ class TeamViewModel: ObservableObject {
                                          data: newMemberData)
 
         } catch let error as FirestoreError {
-            print(error.localizedDescription)
+            assertionFailure(error.localizedDescription)
         } catch {
-            print("未知のエラー: \(error.localizedDescription)")
+            assertionFailure("未知のエラー: \(error.localizedDescription)")
         }
     }
 
@@ -227,17 +227,25 @@ class TeamViewModel: ObservableObject {
     }
 
     /// チームに所属しているメンバーのメンバーIdを取得するメソッド。
-    func fetchMembersId(teamId: String?) async throws -> [String]? {
-        guard let teamId else { throw TeamRelatedError.missingData }
+    func getMembersId(teamId: String?) async -> [String]? {
+        guard let teamId else {
+            assertionFailure("ERROR: チームIDが存在しません")
+            return nil
+        }
 
-        /// 所属チームメンバー全員のスナップショットを取得
-        let membersSnapshot = try await db?
-            .collection("teams")
-            .document(teamId)
-            .collection("members")
-            .getDocuments()
-        // メンバー全員のidを取得
-        return membersSnapshot?.documents.compactMap {$0.documentID}
+        do {
+            /// 所属チームメンバー全員のスナップショットを取得
+            let membersSnapshot = try await JoinMember.getDocuments(path: .members(teamId: teamId))
+
+            return membersSnapshot?.documents.compactMap {$0.documentID}
+
+        } catch let error as FirestoreError {
+            assertionFailure(error.localizedDescription)
+            return nil
+        } catch {
+            assertionFailure("未知のエラー: \(error.localizedDescription)")
+            return nil
+        }
     }
 
     /// 選択されたチーム内の自身のメンバーデータを削除するメソッド。
@@ -421,7 +429,7 @@ class TeamViewModel: ObservableObject {
             // 各所属チームのリファレンスごとに削除処理を実行していく
             for teamRef in teamRefs {
                 let teamId = teamRef.documentID
-                let membersId = try await fetchMembersId(teamId: teamId)
+                let membersId = try await getMembersId(teamId: teamId)
                 // メンバーデータが存在しなかった場合は処理を中断し、別のチーム処理を再スタート
                 guard let membersId else {
                     print("ERROR: チーム内にメンバーデータが存在しない")
