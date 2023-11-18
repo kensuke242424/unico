@@ -136,7 +136,7 @@ class NotificationViewModel: ObservableObject {
     /// アイテムのidはFirestoreに保存される時に生成されるため、
     /// 一度アイテムをフェッチし、ドキュメントIDを取得する工程が必要である。
     func resetAddedItem(_ addedItem: Item, to team: Team?, element: Log) async throws {
-        guard let team, let itemId = addedItem.id else {
+        guard let team else {
             throw NotificationError.missingData
         }
         let itemsRef = db?
@@ -191,7 +191,7 @@ class NotificationViewModel: ObservableObject {
 
     /// アイテムデータの削除をキャンセルし、元に戻すメソッド。
     func resetDeletedItem(_ deletedItem: Item, to team: Team?, element: Log) async throws {
-        guard let team, let itemId = deletedItem.id else {
+        guard let team else {
             throw NotificationError.missingData
         }
 
@@ -200,10 +200,10 @@ class NotificationViewModel: ObservableObject {
                 .collection("teams")
                 .document(team.id)
                 .collection("items")
-                .document(itemId)
+                .document(deletedItem.id)
                 .setData(from: deletedItem)
 
-            try await setReseted(to: team, id: itemId, element: element)
+            try await setReseted(to: team, id: deletedItem.id, element: element)
         }
         catch {
             throw NotificationError.resetDeletedItem
@@ -212,7 +212,7 @@ class NotificationViewModel: ObservableObject {
 
     /// カート精算されたアイテムの処理をキャンセルし、データを元に戻すメソッド。
     func resetCommerceItem(_ item: CompareItem, to team: Team?, element: Log) async throws {
-        guard let team, let itemId = item.before.id else {
+        guard let team else {
             throw NotificationError.missingData
         }
 
@@ -227,7 +227,7 @@ class NotificationViewModel: ObservableObject {
             .collection("teams")
             .document(team.id)
             .collection("items")
-            .document(itemId)
+            .document(item.before.id)
 
         do {
             // 現在のアイテムデータを取得
@@ -243,7 +243,7 @@ class NotificationViewModel: ObservableObject {
             // 取り消し反映後のアイテムデータを再保存
             try await itemRef?.setData(from: itemData)
             // リセット済みであることを各メンバーのログに反映
-            try await setReseted(to: team, id: itemId, element: element)
+            try await setReseted(to: team, id: itemData.id, element: element)
         } catch {
             print("ERROR: カート精算アイテムのリセット失敗")
             throw NotificationError.resetCommerceItem

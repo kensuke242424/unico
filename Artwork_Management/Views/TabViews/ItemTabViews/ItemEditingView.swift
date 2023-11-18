@@ -272,7 +272,6 @@ struct ItemEditingView: View {
                         /// 🍎------------アイテム更新--------------🍎
                         Task {
 
-                            guard let passItemId = passItem.id else { return }
                             guard let teamID = teamVM.team?.id else { return }
                             let editInventory = Int(input.inventory) ?? 0
 
@@ -287,7 +286,7 @@ struct ItemEditingView: View {
                             }
 
                             // NOTE: Timestamp値がnilだと、データの保存&サーバー側でタイムスタンプで2回の更新が走るようだ
-                            let updatedItem = (Item(id: passItemId,
+                            let updatedItem = (Item(id: passItem.id,
                                                     createTime : passItem.createTime,
                                                     updateTime : Date(),
                                                     tag        : input.selectionTagName,
@@ -319,7 +318,7 @@ struct ItemEditingView: View {
                             }
 
                             /// 通知データの作成
-                            let compareItemData = CompareItem(id: passItemId,
+                            let compareItemData = CompareItem(id: passItem.id,
                                                               before: passItem,
                                                               after: updatedItem)
                             logVM.addLog(to: teamVM.team,

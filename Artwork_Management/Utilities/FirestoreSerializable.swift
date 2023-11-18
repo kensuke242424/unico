@@ -139,14 +139,12 @@ extension FirestoreSerializable {
             var item = item
             item.teamID = teamId
 
-            guard let itemId = item.id else { return }
-
             do {
                 try Firestore.firestore()
                     .collection("teams")
                     .document(teamId)
                     .collection("items")
-                    .document(itemId)
+                    .document(item.id)
                     .setData(from: item) // データセット
             } catch {
                 print("ERROR: サンプルアイテム\(item.name)の追加失敗")

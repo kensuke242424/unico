@@ -57,10 +57,6 @@ class CartViewModel: ObservableObject {
 
         for item in cartItems where item.amount != 0 {
 
-            guard let itemID = item.id else {
-                print("Error: 「\(item.name)」 guard let = item.id")
-                continue
-            }
             // 更新前・更新後を分けるためのアイテムコンテナを用意
             let defaultItem = item
             var updateItem = item
@@ -72,9 +68,9 @@ class CartViewModel: ObservableObject {
             updateItem.amount = 0
 
             do {
-                try itemsRef.document(itemID).setData(from: updateItem)
+                try itemsRef.document(item.id).setData(from: updateItem)
                 // Firestoreへの保存が成功すれば、更新比較アイテム情報CompareItemを返す
-                let compareItem = CompareItem(id: defaultItem.id ?? "",
+                let compareItem = CompareItem(id: defaultItem.id,
                                               before: defaultItem,
                                               after: updateItem)
                 

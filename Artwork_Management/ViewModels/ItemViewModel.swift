@@ -59,19 +59,18 @@ class ItemViewModel: ObservableObject {
 
     func addItemToFirestore(_ itemData: Item, teamId: String?) async {
         guard let teamId else { return }
-        guard let itemId = itemData.id else { return }
 
         let itemRef = db?.collection("teams")
             .document(teamId)
             .collection("items")
-            .document(itemId)
+            .document(itemData.id)
 
         do {
             _ = try db?
                 .collection("teams")
                 .document(teamId)
                 .collection("items")
-                .document(itemId)
+                .document(itemData.id)
                 .setData(from: itemData)
         } catch {
             print("Error: addDocument")
@@ -80,14 +79,12 @@ class ItemViewModel: ObservableObject {
     }
 
     func updateItemToFirestore(_ updateItem: Item, teamId: String?) {
-        print("updateItem実行")
-
         guard let teamId else { return }
-        guard let itemId = updateItem.id else { return }
+
         guard let itemRef = db?.collection("teams")
             .document(teamId)
             .collection("items")
-            .document(itemId) else {
+            .document(updateItem.id) else {
             print("ERROR: getItemRef")
             return
         }
@@ -101,12 +98,11 @@ class ItemViewModel: ObservableObject {
     }
 
     func deleteItem(deleteItem: Item, teamId: String) {
-
-        guard let itemID = deleteItem.id else { return }
         guard let itemRef = db?.collection("teams")
+
             .document(teamId)
             .collection("items")
-            .document(itemID) else {
+            .document(deleteItem.id) else {
             print("error: deleteItem_guard let ItemRef")
             return
         }
@@ -212,11 +208,6 @@ class ItemViewModel: ObservableObject {
 
         for item in items where item.amount != 0 {
 
-            guard let itemID = item.id else {
-                print("Error: 「\(item.name)」 guard let = item.id")
-                continue
-            }
-
             var item = item
 
             item.updateTime = Date()
@@ -226,7 +217,7 @@ class ItemViewModel: ObservableObject {
             item.amount = 0
 
             do {
-                try itemsRef.document(itemID).setData(from: item)
+                try itemsRef.document(item.id).setData(from: item)
             } catch {
                 print("Error: 「\(item.name)」try reference.document(itemID).setData(from: item)")
             }

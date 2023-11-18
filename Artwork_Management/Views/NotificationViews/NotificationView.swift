@@ -716,20 +716,16 @@ fileprivate struct NotificationContainer: View {
     func checkReseted(element: Log) -> Bool {
         switch element.logType {
         case .addItem(let item):
-            guard let itemId = item.id else { return false }
-            return element.canceledIds.contains(itemId)
+            return element.canceledIds.contains(item.id)
 
         case .updateItem(let item):
-            guard let itemId = item.before.id else { return false }
-            return element.canceledIds.contains(itemId)
+            return element.canceledIds.contains(item.before.id)
 
         case .deleteItem(let item):
-            guard let itemId = item.id else { return false }
-            return element.canceledIds.contains(itemId)
+            return element.canceledIds.contains(item.id)
 
         case .commerce(let items):
-            guard let itemId = items[showIndex].before.id else { return false }
-            return element.canceledIds.contains(itemId)
+            return element.canceledIds.contains(items[showIndex].before.id)
 
         case .join(let user, _):
             return element.canceledIds.contains(user.id)
