@@ -473,7 +473,7 @@ struct SystemSideMenu: View {
             Task {
                 input.showEscapeTeamProgress = true
                 // 対象チーム内のメンバーデータ（members）から自身のメンバーデータを消去
-                try await teamVM.deleteTeamMemberDocument(teamId: selectedTeam.id, memberId: userVM.uid)
+                await teamVM.deleteTeamMemberDocument(teamId: selectedTeam.id, memberId: userVM.uid)
                 /// 自身の所属チームサブコレクション（joins）から対象チームデータを消去
                 try await userVM.deleteJoinTeamFromMyData(for: selectedTeam)
 
