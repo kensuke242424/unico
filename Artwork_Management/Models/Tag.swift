@@ -10,7 +10,7 @@ import FirebaseFirestore
 import FirebaseFirestoreSwift
 
 struct Tag: FirestoreSerializable, Identifiable, Equatable, Codable, Hashable {
-    var id: String? = UUID().uuidString
+    var id: String = UUID().uuidString
     var oderIndex: Int
     var tagName: String
     var tagColor: UsedColor

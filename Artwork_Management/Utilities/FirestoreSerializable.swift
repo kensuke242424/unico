@@ -153,14 +153,13 @@ extension FirestoreSerializable {
     }
 
     static func setSampleTag(teamId: String) async {
-        guard let sampleTagId = Tag.sampleTag.id else { return }
 
         do {
             try Firestore.firestore()
                 .collection("teams")
                 .document(teamId)
                 .collection("tags")
-                .document(sampleTagId)
+                .document(Tag.sampleTag.id)
                 .setData(from: Tag.sampleTag) // データセット
         } catch {
             print("ERROR: サンプルタグの保存失敗")

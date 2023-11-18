@@ -70,10 +70,9 @@ class TagViewModel: ObservableObject {
     }
 
     func addTagToFirestore(tagData: Tag, teamID: String) {
-        guard let newTagId = tagData.id else { return }
         let tagRef = db?
             .collection("teams/\(teamID)/tags")
-            .document(newTagId)
+            .document(tagData.id)
         do {
             _ = try tagRef?.setData(from: tagData)
         } catch {
@@ -87,16 +86,13 @@ class TagViewModel: ObservableObject {
 
         for (index, tag) in tags.enumerated() {
             if index == 0 && index == tags.count - 1 { continue }
-            guard let tagID = tag.id else { continue }
-            tagsRef.document(tagID).updateData(["oderIndex": index])
+            tagsRef.document(tag.id).updateData(["oderIndex": index])
             print("\(tags[index].tagName).oderIndex: \(index)")
         }
     }
 
     func updateTagData(updateData: Tag, defaultData: Tag, teamID: String) {
-
-        guard let defaultDataID = defaultData.id else { return }
-        guard let updateTagRef = db?.collection("teams/\(teamID)/tags").document(defaultDataID) else { return }
+        guard let updateTagRef = db?.collection("teams/\(teamID)/tags").document(defaultData.id) else { return }
         guard let updateItemsRef = db?.collection("teams/\(teamID)/items") else { return }
 
         do {
