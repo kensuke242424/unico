@@ -92,7 +92,7 @@ class TeamViewModel: ObservableObject {
 
     func setTeam(data: Team) async {
         do {
-            try await Team.setData(withId: data.id, data: data)
+            try await data.setData(withId: data.id, data: data)
 
         } catch let error as FirestoreError {
             print(error.localizedDescription)
@@ -108,7 +108,9 @@ class TeamViewModel: ObservableObject {
                                        name: userData.name,
                                        iconURL: userData.iconURL)
         do {
-            try await Team.setMember(teamId: teamId, data: newMemberData)
+//            try await Team.setMember(teamId: teamId, data: newMemberData)
+            try await Team.setData(type: .members(teamId: teamId),
+                                   withId: <#T##String#>, data: <#T##FirestoreSerializable & Decodable & Encodable#>)(teamId: teamId, data: newMemberData)
 
         } catch let error as FirestoreError {
             print(error.localizedDescription)

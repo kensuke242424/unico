@@ -14,11 +14,11 @@ protocol FirestoreSerializable {
 // 各モデルデータ共通で使用されるロジック
 extension FirestoreSerializable {
 
-    static func fetch<T: FirestoreSerializable & Decodable>(withId id: String) async throws -> T {
+    static func fetch<T: FirestoreSerializable & Decodable>(type dataType: FirestoreDataType, withId id: String) async throws -> T {
 
         do {
             let document = try await Firestore.firestore()
-                .collection(firestorePath().collectionPath)
+                .collection(dataType.collectionPath)
                 .document(id)
                 .getDocument()
 
@@ -34,13 +34,13 @@ extension FirestoreSerializable {
         }
     }
 
-    static func setData<T: FirestoreSerializable & Codable>(withId id: String, data: T) async throws {
+    static func setData<T: FirestoreSerializable & Codable>(type dataType: FirestoreDataType, withId id: String, data: T) async throws {
 
         do {
             try Firestore.firestore()
-                .collection(Self.firestorePath().collectionPath)
+                .collection(firestorePath().collectionPath)
                 .document(id)
-                .setData(from: data)
+                .setData(from: data, merge: true)
 
         } catch {
             throw FirestoreError.setDataError
