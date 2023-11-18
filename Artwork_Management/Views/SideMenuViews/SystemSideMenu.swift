@@ -482,12 +482,10 @@ struct SystemSideMenu: View {
 
                 if let membersId, membersId.isEmpty {
                     print("\(selectedTeam.name)のチームデータ削除実行")
-                    // チームのアイテムデータ削除
-                    try await teamVM.deleteTeamItemsDocument(teamId: selectedTeam.id)
-                    // チームのタグデータ削除
-                    try await teamVM.deleteTeamTagsDocument(teamId: selectedTeam.id)
-                    // チームドキュメントの削除
-                    try await teamVM.deleteEscapedTeamDocuments(for: selectedTeam)
+                    // チームが持っている各データ削除
+                    await teamVM.deleteItemDocuments(teamId: selectedTeam.id)
+                    await teamVM.deleteTagDocuments(teamId: selectedTeam.id)
+                    await teamVM.deleteTeamDocument(for: selectedTeam.id)
                 }
 
                 input.showEscapeTeamProgress = false

@@ -9,7 +9,7 @@ import SwiftUI
 import FirebaseFirestore
 import FirebaseFirestoreSwift
 
-struct Item: Identifiable, Equatable, Hashable, Codable {
+struct Item: FirestoreSerializable, Identifiable, Equatable, Hashable, Codable {
 
     var id: String? = UUID().uuidString
     var createTime: Date = Date()
@@ -30,6 +30,8 @@ struct Item: Identifiable, Equatable, Hashable, Codable {
     var inventory: Int
     var totalAmount: Int
     var totalInventory: Int
+
+    static func firestorePath() -> FirestorePath { .items }
 }
 
 extension Item {

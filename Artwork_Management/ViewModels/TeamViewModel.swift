@@ -113,9 +113,9 @@ class TeamViewModel: ObservableObject {
                                          data: newMemberData)
 
         } catch let error as FirestoreError {
-            assertionFailure(error.localizedDescription)
+            print(error.localizedDescription)
         } catch {
-            assertionFailure("未知のエラー: \(error.localizedDescription)")
+            print("未知のエラー: \(error.localizedDescription)")
         }
     }
 
@@ -232,72 +232,61 @@ class TeamViewModel: ObservableObject {
         }
     }
 
-    /// ユーザーが選択したチームのデータを全て削除する
-    func deleteEscapedTeamDocuments(for selectedteam: JoinTeam?) async throws {
-        guard let selectedteam else { throw TeamRelatedError.missingData }
-        let teamRef = db?
-            .collection("teams")
-            .document(selectedteam.id)
+    /// ユーザーが選択したチームのドキュメントを削除する
+    func deleteTeamDocument(for teamId: String?) async {
+        guard let teamId else {
+            assertionFailure("削除対象のチームIDが存在しませんでした")
+            return
+        }
 
         do {
-            let document = try await teamRef?.getDocument()
-            let escapedTeam = try document?.data(as: Team.self)
-            // Firestorageから画像データ削除
-            await FirebaseStorageManager.deleteImage(path: escapedTeam?.iconPath)
-            await FirebaseStorageManager.deleteImage(path: escapedTeam?.backgroundPath)
+            let escapedTeam: Team = try await Team.fetch(path: .teams, docId: teamId)
             // チームドキュメントを削除
-            try await teamRef?.delete()
+            try await Team.deleteDocument(path: .teams, docId: teamId)
+            // チームドキュメントの削除成功後に画像消去
+            await FirebaseStorageManager.deleteImage(path: escapedTeam.iconPath)
+            await FirebaseStorageManager.deleteImage(path: escapedTeam.backgroundPath)
 
+        } catch let error as FirestoreError {
+            print(error.localizedDescription)
         } catch {
-            print("脱退チームのドキュメント削除失敗")
-            throw TeamRelatedError.failedDeleteTeamDocuments
+            print("未知のエラー: \(error.localizedDescription)")
         }
     }
+
     /// チームの保持しているアイテムドキュメントを全て削除するメソッド。
     /// ユーザーがチーム脱退やアカウント削除を行った際に、"チームに他のメンバーが存在しない"場合に使用される。
-    func deleteTeamItemsDocument(teamId: String) async throws {
+    func deleteItemDocuments(teamId: String) async {
 
         do {
-            let snapshot = try await db?
-                .collection("teams")
-                .document(teamId)
-                .collection("items")
-                .getDocuments()
+            let itemsSnapshot = try await Item.getDocuments(path: .items(teamId: teamId))
+            guard let itemsSnapshot else { return }
 
-            guard let snapshot else { return }
-
-            for document in snapshot.documents {
+            for document in itemsSnapshot.documents {
                 let item = try document.data(as: Item.self)
                 try await document.reference.delete() // ドキュメント削除
                 await FirebaseStorageManager.deleteImage(path: item.photoPath)
             }
+        } catch let error as FirestoreError {
+            print(error.localizedDescription)
         } catch {
-            print("ERROR: 脱退チームのアイテム削除失敗")
-            throw TeamRelatedError.failedDeleteEscapeTeamItems
+            print("未知のエラー: \(error.localizedDescription)")
         }
     }
 
     /// チームの保持しているタグドキュメントを全て削除するメソッド。
     /// ユーザーがチーム脱退やアカウント削除を行った際に、"チームに他のメンバーが存在しない"場合に使用される。
-    func deleteTeamTagsDocument(teamId: String) async throws {
+    func deleteTagDocuments(teamId: String) async {
 
         do {
-            let snapshot = try await db?
-                .collection("teams")
-                .document(teamId)
-                .collection("tags")
-                .getDocuments()
-
-            guard let snapshot else { throw TeamRelatedError.missingSnapshot }
-
-            for document in snapshot.documents {
-                try await document.reference.delete() // タグ削除
-            }
+            try await Tag.deleteDocuments(path: .tags(teamId: teamId))
+        } catch let error as FirestoreError {
+            print(error.localizedDescription)
         } catch {
-            print("チームタグの削除失敗")
-            throw TeamRelatedError.failedDeleteEscapeTeamTags
+            print("未知のエラー: \(error.localizedDescription)")
         }
     }
+
     /// チーム内のサブコレクション「members」のドキュメントを削除するメソッド。
     /// メンバーがサブコレクションとして持つログデータ「logs」を全て削除した後、ドキュメント本体を削除する。
     ///MEMO: ドキュメント本体だけを削除してもサブコレクションのデータは残るので注意
@@ -370,7 +359,7 @@ class TeamViewModel: ObservableObject {
             // 各所属チームのリファレンスごとに削除処理を実行していく
             for teamRef in teamRefs {
                 let teamId = teamRef.documentID
-                let membersId = try await getMembersId(teamId: teamId)
+                let membersId = await getMembersId(teamId: teamId)
                 // メンバーデータが存在しなかった場合は処理を中断し、別のチーム処理を再スタート
                 guard let membersId else {
                     print("ERROR: チーム内にメンバーデータが存在しない")
@@ -380,9 +369,9 @@ class TeamViewModel: ObservableObject {
                 if membersId.count == 1 && membersId.first == uid {
                     // ✅チーム内に自分以外のメンバーが居なかった場合、チームの全データをFirestoreから削除
                     try await deleteTeamMemberDocument(teamId: teamId, memberId: uid)
-                    try await deleteTeamTagsDocument(teamId: teamId)
-                    try await deleteTeamItemsDocument(teamId: teamId)
-                    try await teamRef.delete() // 最後にチームドキュメントを削除
+                    await deleteTagDocuments(teamId: teamId)
+                    await deleteItemDocuments(teamId: teamId)
+                    await deleteTeamDocument(for: teamId)
 
                 } else {
                      // ✅他にもチームメンバーが残っている場合、自身のmemberデータのみ削除
