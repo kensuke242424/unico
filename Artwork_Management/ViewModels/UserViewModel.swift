@@ -89,7 +89,7 @@ class UserViewModel: ObservableObject {
     func getUserData(id userId: String) async -> User? {
 
         do {
-            return try await User.fetch(withId: userId)
+            return try await User.fetch(path: .users, docId: userId)
 
         } catch let error as FirestoreError {
             print(error.localizedDescription)

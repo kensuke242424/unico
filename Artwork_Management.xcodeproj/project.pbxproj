@@ -88,6 +88,7 @@
 		BEA0A5CE2B05FE5C0082B445 /* FirestorePath.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA0A5CD2B05FE5C0082B445 /* FirestorePath.swift */; };
 		BEA0A5D02B0647B60082B445 /* FirestoreError.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA0A5CF2B0647B60082B445 /* FirestoreError.swift */; };
 		BEA0A5D22B0748BF0082B445 /* FirestoreReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA0A5D12B0748BF0082B445 /* FirestoreReference.swift */; };
+		BEA0A5D42B0888FE0082B445 /* FirestoreDataType.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA0A5D32B0888FE0082B445 /* FirestoreDataType.swift */; };
 		BEAAD8F829CDCE3300C53138 /* DeletedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAAD8F729CDCE3300C53138 /* DeletedView.swift */; };
 		BEAAD8FA29CDEF6200C53138 /* DefaultEmailCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAAD8F929CDEF6200C53138 /* DefaultEmailCheckView.swift */; };
 		BEAAD94629D068C000C53138 /* SuccessUpdateAddressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAAD94529D068C000C53138 /* SuccessUpdateAddressView.swift */; };
@@ -229,6 +230,7 @@
 		BEA0A5CD2B05FE5C0082B445 /* FirestorePath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestorePath.swift; sourceTree = "<group>"; };
 		BEA0A5CF2B0647B60082B445 /* FirestoreError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestoreError.swift; sourceTree = "<group>"; };
 		BEA0A5D12B0748BF0082B445 /* FirestoreReference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestoreReference.swift; sourceTree = "<group>"; };
+		BEA0A5D32B0888FE0082B445 /* FirestoreDataType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestoreDataType.swift; sourceTree = "<group>"; };
 		BEAAD8F729CDCE3300C53138 /* DeletedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeletedView.swift; sourceTree = "<group>"; };
 		BEAAD8F929CDEF6200C53138 /* DefaultEmailCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultEmailCheckView.swift; sourceTree = "<group>"; };
 		BEAAD94529D068C000C53138 /* SuccessUpdateAddressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuccessUpdateAddressView.swift; sourceTree = "<group>"; };
@@ -437,6 +439,7 @@
 				BEA0A5CD2B05FE5C0082B445 /* FirestorePath.swift */,
 				BEA0A5CF2B0647B60082B445 /* FirestoreError.swift */,
 				BEA0A5D12B0748BF0082B445 /* FirestoreReference.swift */,
+				BEA0A5D32B0888FE0082B445 /* FirestoreDataType.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -845,6 +848,7 @@
 				E094B78A298EB84200A2E33C /* TeamProfileEditView.swift in Sources */,
 				E0455FE8292CCB39004F677D /* HashableExtension.swift in Sources */,
 				E0796AE328F6D77A0094E50C /* CommerceSheet.swift in Sources */,
+				BEA0A5D42B0888FE0082B445 /* FirestoreDataType.swift in Sources */,
 				E0A7DE4B290B9E0A008C3F3F /* ShowItemUIImagePhoto.swift in Sources */,
 				E0455FDE292B2B83004F677D /* AuthViewModel.swift in Sources */,
 				BE30B5CC2A335D550034755B /* BackgroundModel.swift in Sources */,

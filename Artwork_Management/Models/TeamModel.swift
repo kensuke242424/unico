@@ -23,9 +23,11 @@ struct Team: FirestoreSerializable, Identifiable, Codable, Equatable {
 }
 
 /// teamsドキュメントのサブコレクションとして保存されるメンバー一人分の要素を持つデータ
-struct JoinMember: Hashable, Codable {
+struct JoinMember: FirestoreSerializable, Hashable, Codable {
     var id: String
     var name: String
     var iconURL: URL?
     var notifications: [Log] = []
+
+    static func firestorePath() -> FirestorePath { return .teams }
 }
