@@ -119,8 +119,8 @@ class TeamViewModel: ObservableObject {
         }
     }
 
-    /// ユーザーが所属しているチーム全てに保存されている自身のメンバーデータを更新する。
     /// ユーザーデータの変更を行った時に、各チームのユーザーステートを揃えるために使う。
+    /// ユーザーが所属しているチーム全てに保存されている自身のメンバーデータを更新する。
     func updateJoinTeamsMyMemberData(from updatedData: User, joins: [JoinTeam]) async {
         guard var myMemberData = self.self.myJoinMemberData else {
             assertionFailure("自身のメンバーデータが存在しません")
@@ -133,7 +133,9 @@ class TeamViewModel: ObservableObject {
 
         for team in joins {
             do {
-                try await Team.setMember(teamId: team.id, data: myMemberData)
+                try await JoinMember.setData(path: .members(teamId: team.id),
+                                             docId: myMemberData.id,
+                                             data: myMemberData)
 
             } catch let error as FirestoreError {
                 print(error.localizedDescription)

@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum FirestoreDataType {
+enum FirestorePathType {
     case teams
     case users
     case items(teamId: String)
