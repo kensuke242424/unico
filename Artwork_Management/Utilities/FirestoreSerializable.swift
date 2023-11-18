@@ -46,6 +46,24 @@ extension FirestoreSerializable {
             throw FirestoreError.setDataError
         }
     }
+
+    static func getDocuments(path pathType: FirestorePathType) async throws -> QuerySnapshot? {
+
+        do {
+            let snapShot = try await Firestore.firestore()
+                .collection(pathType.collectionPath)
+                .getDocuments()
+
+            return snapShot
+
+        } catch {
+            if let firestoreError = error as? FirestoreError {
+                throw firestoreError
+            } else {
+                throw FirestoreError.other(error)
+            }
+        }
+    }
 }
 
 // チームドキュメント専用で用いられるロジック
