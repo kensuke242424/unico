@@ -28,7 +28,8 @@ struct User: FirestoreSerializable, Identifiable, Codable, Equatable {
 }
 
 
-struct JoinTeam: Codable, Hashable {
+struct JoinTeam: FirestoreSerializable, Codable, Hashable {
+
     var id: String
     var name: String
     var iconURL: URL?
@@ -37,6 +38,8 @@ struct JoinTeam: Codable, Hashable {
     var homeEdits = HomeEditData(nowTime: NowTimeParts(),
                                      teamNews: TeamNewsParts())
     var approved: Bool?
+
+    static func firestorePath() -> FirestorePath { .users }
 }
 
 /// Homeの各パーツ設定をまとめたデータモデル

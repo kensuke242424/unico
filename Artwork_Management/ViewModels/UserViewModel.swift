@@ -393,7 +393,9 @@ class UserViewModel: ObservableObject {
         passJoinTeam.approved = false
 
         do {
-            try await User.setJoinTeam(userId: newMember.id, data: passJoinTeam)
+            try await User.setData(path: .joins(userId: newMember.id),
+                                   docId: passJoinTeam.id,
+                                   data: passJoinTeam)
 
         } catch let error as FirestoreError {
             print(error.localizedDescription)

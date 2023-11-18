@@ -58,7 +58,7 @@ class TeamViewModel: ObservableObject {
                 do {
                     let teamData = try snap!.data(as: Team.self)
                     withAnimation {self.team = teamData}
-                    assertionFailure("チームデータを更新")
+                    print("チームデータを更新")
                 } catch {
                     assertionFailure("チームデータ更新失敗")
                 }
@@ -95,9 +95,9 @@ class TeamViewModel: ObservableObject {
             try await Team.setData(path: .teams, docId: data.id, data: data)
 
         } catch let error as FirestoreError {
-            assertionFailure(error.localizedDescription)
+            print(error.localizedDescription)
         } catch {
-            assertionFailure("未知のエラー: \(error.localizedDescription)")
+            print("未知のエラー: \(error.localizedDescription)")
         }
     }
 
@@ -187,23 +187,6 @@ class TeamViewModel: ObservableObject {
         }
     }
 
-    func deleteImage(path: String?) async {
-
-        guard let path = path else { return }
-
-        let storage = Storage.storage()
-        let reference = storage.reference()
-        let imageRef = reference.child(path)
-
-        imageRef.delete { error in
-            if let error = error {
-                print(error)
-            } else {
-                print("imageRef.delete succsess!")
-            }
-        }
-    }
-
     func setSampleData(teamId: String) async {
         await Team.setSampleItems(teamId: teamId)
         await Tag.setSampleTag(teamId: teamId)
@@ -231,49 +214,24 @@ class TeamViewModel: ObservableObject {
         }
     }
 
-    /// 選択されたチーム内の自身のメンバーデータを削除するメソッド。
-    /// チーム脱退操作が実行された時に使う。
-    func deleteMyMemberDataFromTeam(for selectedTeam: JoinTeam) async throws {
-        guard let uid else { throw TeamRelatedError.uidEmpty }
-
-        do {
-            try await db?
-                .collection("teams")
-                .document(selectedTeam.id)
-                .collection("members")
-                .document(uid)
-                .delete() // 削除
-
-        } catch {
-            print("ERROR: 脱退チームのドキュメント削除失敗")
-            throw UserRelatedError.failedEscapeTeam
-        }
-    }
-
     /// 選択されたチームの画像関連データをFirestorageから削除するメソッド。
     /// 主にチーム脱退処理が行われた際に使う。
     func deleteTeamImages(for team: Team?) async {
-        guard let team else { return }
+        guard let team else {
+            assertionFailure("チームデータが存在しません")
+            return
+        }
 
-        /// 削除する画像データのファイルパスを配列に格納
-        var teamImagesPath: [String?]
-        teamImagesPath = [team.iconPath,
-                          team.backgroundPath]
-        
-        let storage = Storage.storage()
-        let reference = storage.reference()
+        // アイコンと背景のパスを配列に格納
+        let teamImagesPath = [team.iconPath, team.backgroundPath]
         
         for path in teamImagesPath {
             guard let path else { continue }
-            let imageRef = reference.child(path)
-            imageRef.delete { error in
-                if let error {
-                    print("チーム画像の削除失敗")
-                    print(error.localizedDescription)
-                }
-            }
-        } // for in
+
+            await FirebaseStorageManager.deleteImage(path: path)
+        }
     }
+
     /// ユーザーが選択したチームのデータを全て削除する
     func deleteEscapedTeamDocuments(for selectedteam: JoinTeam?) async throws {
         guard let selectedteam else { throw TeamRelatedError.missingData }
@@ -285,8 +243,8 @@ class TeamViewModel: ObservableObject {
             let document = try await teamRef?.getDocument()
             let escapedTeam = try document?.data(as: Team.self)
             // Firestorageから画像データ削除
-            await deleteImage(path: escapedTeam?.iconPath)
-            await deleteImage(path: escapedTeam?.backgroundPath)
+            await FirebaseStorageManager.deleteImage(path: escapedTeam?.iconPath)
+            await FirebaseStorageManager.deleteImage(path: escapedTeam?.backgroundPath)
             // チームドキュメントを削除
             try await teamRef?.delete()
 
@@ -311,7 +269,7 @@ class TeamViewModel: ObservableObject {
             for document in snapshot.documents {
                 let item = try document.data(as: Item.self)
                 try await document.reference.delete() // ドキュメント削除
-                await deleteImage(path: item.photoPath) // 画像データ削除
+                await FirebaseStorageManager.deleteImage(path: item.photoPath)
             }
         } catch {
             print("ERROR: 脱退チームのアイテム削除失敗")

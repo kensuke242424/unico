@@ -43,7 +43,11 @@ extension FirestoreSerializable {
                 .setData(from: data, merge: true)
 
         } catch {
-            throw FirestoreError.setDataError
+            if let firestoreError = error as? FirestoreError {
+                throw firestoreError
+            } else {
+                throw FirestoreError.other(error)
+            }
         }
     }
 
@@ -64,38 +68,56 @@ extension FirestoreSerializable {
             }
         }
     }
-}
 
-// チームドキュメント専用で用いられるロジック
-extension FirestoreSerializable {
-    static func setMember(teamId: String, data: JoinMember) async throws {
-
+    static func deleteDocument(path pathType: FirestorePathType, docId: String) async throws {
         do {
-            try FirestoreReference
-                .members(teamId: teamId)
-                .collectionReference
-                .document(data.id)
-                .setData(from: data) // データ保存
+            try await Firestore.firestore()
+                .collection(pathType.collectionPath)
+                .document(docId)
+                .delete() // 削除
         } catch {
-            throw FirestoreError.setDataError
+            if let firestoreError = error as? FirestoreError {
+                throw firestoreError
+            } else {
+                throw FirestoreError.other(error)
+            }
+        }
+    }
+
+    static func deleteDocuments(path pathType: FirestorePathType) async throws {
+        do {
+            let snapshot = try await Firestore.firestore()
+                .collection(pathType.collectionPath)
+                .getDocuments()
+
+            for document in snapshot.documents {
+                try await document.reference.delete() // ドキュメント削除
+            }
+
+        } catch {
+            if let firestoreError = error as? FirestoreError {
+                throw firestoreError
+            } else {
+                throw FirestoreError.other(error)
+            }
         }
     }
 }
 
 // ユーザードキュメント専用で用いられるロジック
-extension FirestoreSerializable {
-    static func setJoinTeam(userId: String, data: JoinTeam) async throws {
-        do {
-            try FirestoreReference
-                .joins(userId: userId)
-                .collectionReference
-                .document(data.id)
-                .setData(from: data) // データ保存
-        } catch {
-            throw FirestoreError.setDataError
-        }
-    }
-}
+//extension FirestoreSerializable {
+//    static func setJoinTeam(userId: String, data: JoinTeam) async throws {
+//        do {
+//            try FirestoreReference
+//                .joins(userId: userId)
+//                .collectionReference
+//                .document(data.id)
+//                .setData(from: data) // データ保存
+//        } catch {
+//            throw FirestoreError.setDataError
+//        }
+//    }
+//}
 
 // 初期値サンプルデータの追加ロジック
 extension FirestoreSerializable {
@@ -137,3 +159,5 @@ extension FirestoreSerializable {
         }
     }
 }
+
+
