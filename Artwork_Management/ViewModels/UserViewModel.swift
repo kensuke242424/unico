@@ -534,7 +534,10 @@ class UserViewModel: ObservableObject {
     /// 対象チーム内の自身のメンバーデータ「JoinMember」を削除するメソッド。
     /// チーム脱退操作が実行された時に使われる。
     func deleteJoinTeamFromMyData(for selectedTeam: JoinTeam) async throws {
-        guard let uid else { throw TeamRelatedError.uidEmpty }
+        guard let uid else {
+            assertionFailure("uidが存在しません")
+            return
+        }
 
         do {
             try await db?

@@ -308,7 +308,7 @@ struct ItemEditingView: View {
                                                     passItem.totalInventory + (editInventory - passItem.inventory) :
                                                         passItem.totalInventory - (passItem.inventory - editInventory) ))
 
-                            itemVM.updateItemToFirestore(updatedItem, teamId: teamVM.teamID)
+                            itemVM.updateItemToFirestore(updatedItem, teamId: teamVM.team?.id)
                             /// 編集アイテムの新規タグ設定とアイテムタブビュー内の選択タグを合わせる
                             /// 編集画面から戻った時、アイテムカードが適切にアニメーションするために必要
                             if tagVM.activeTag != tagVM.tags.first {
@@ -360,7 +360,7 @@ struct ItemEditingView: View {
                                                totalInventory: Int(input.inventory) ?? 0)
                             
                             // Firestoreにコーダブル保存
-                            await itemVM.addItemToFirestore(newItem, teamId: teamVM.teamID)
+                            await itemVM.addItemToFirestore(newItem, teamId: teamVM.team?.id)
                             tagVM.setActiveTag(from: input.selectionTagName)
 
                             logVM.addLog(to: teamVM.team,
