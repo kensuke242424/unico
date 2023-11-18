@@ -396,19 +396,28 @@ class NotificationViewModel: ObservableObject {
         switch element.logType {
         case .addItem:
             break
+
         case .deleteItem:
             break
+
         case .updateItem(let item):
             if element.canceledIds.contains(where:{ $0 == item.before.id}) { return }
             if item.before.photoPath != item.after.photoPath {
                 deleteBeforeUIImage(path: item.before.photoPath)
             }
+
         case .updateUser(let user):
             if element.canceledIds.contains(where:{ $0 == user.before.id}) { return }
-            deleteBeforeUIImage(path: user.before.iconPath)
+            if user.before.iconPath != user.after.iconPath {
+                deleteBeforeUIImage(path: user.before.iconPath)
+            }
+
         case .updateTeam(let team):
             if element.canceledIds.contains(where:{ $0 == team.before.id}) { return }
-            deleteBeforeUIImage(path: team.before.iconPath)
+            if team.before.iconPath != team.after.iconPath {
+                deleteBeforeUIImage(path: team.before.iconPath)
+            }
+
         case .commerce, .join:
             break
         }
