@@ -19,19 +19,18 @@ class TeamViewModel: ObservableObject {
 
     var teamListener: ListenerRegistration?
     var membersListener: ListenerRegistration?
-    var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
-    var uid: String? { Auth.auth().currentUser?.uid }
 
     @Published var team: Team?
     @Published var members: [JoinMember] = []
 
     @Published var isShowCreateAndJoinTeam: Bool = false
     @Published var isShowSearchedNewMemberJoinTeam: Bool = false
+
     @Published var showErrorAlert = false
     @Published var alertMessage = ""
 
-    var teamID: String? { team?.id }
-    /// 現在の操作チーム「members」内のフィールドから自身のmemberデータインデックスを取得するプロパティ。
+    var uid: String? { Auth.auth().currentUser?.uid }
+
     var myMemberIndex: Int? {
         return self.members.firstIndex(where: {$0.id == uid})
     }
@@ -46,9 +45,9 @@ class TeamViewModel: ObservableObject {
 
     /// チームデータの追加・更新・削除のステートを管理するリスナーメソッド。
     /// 初期実行時にリスニング対象ドキュメントのデータが全取得される。(フラグはadded)
-    func teamListener(id currentTeamID: String) async throws {
-        teamListener = FirestoreReference
-            .teams.collectionReference
+    func teamListener(id currentTeamID: String) async {
+        teamListener = Firestore.firestore()
+            .collection("teams")
             .document(currentTeamID)
             .addSnapshotListener { snap, error in
             if let error {
@@ -57,7 +56,7 @@ class TeamViewModel: ObservableObject {
 
                 do {
                     let teamData = try snap!.data(as: Team.self)
-                    withAnimation { self.team = teamData }
+                    self.team = teamData
                 } catch {
                     print("チームデータ更新失敗")
                 }
@@ -69,9 +68,10 @@ class TeamViewModel: ObservableObject {
     /// 初期実行時にリスニング対象ドキュメントのデータが全取得される。(フラグはadded)
     func membersListener(id currentTeamID: String) async {
 
-        membersListener = FirestoreReference
-            .members(teamId: currentTeamID)
-            .collectionReference
+        membersListener = Firestore.firestore()
+            .collection("teams")
+            .document(currentTeamID)
+            .collection("members")
             .addSnapshotListener { snap, error in
                 if let error {
                     assertionFailure("ERROR: \(error.localizedDescription)")
@@ -297,7 +297,10 @@ class TeamViewModel: ObservableObject {
     /// ✅所属チームのメンバーが削除アカウントのユーザーのみだった場合 ⇨ チームデータを全て消去
     /// ✅所属チームのメンバーが削除アカウントのユーザー以外にも在籍している場合 ⇨ 関連ユーザーデータのみ削除
     func deleteAllTeamDocumentsController(joins joinTeams: [JoinTeam]) async throws {
-        guard let uid else { throw TeamRelatedError.uidEmpty }
+        guard let uid else {
+            assertionFailure("uidが存在しません")
+            return
+        }
 
         // ユーザーが所属している全チームのリファレンスを取得
         let teamRefs = joinTeams.compactMap {
@@ -339,23 +342,4 @@ class TeamViewModel: ObservableObject {
     deinit {
         removeListener()
     }
-}
-
-enum TeamRelatedError:Error {
-    case uidEmpty
-    case joinsEmpty
-    case referenceEmpty
-    case missingData
-    case missingSnapshot
-    case failedCreateJoinTeam
-    case filedAddFirstMember
-    case failedFetchUser
-    case failedUpdateTeam
-    case failedFetchAddedNewUser
-    case failedTeamListen
-    case failedUpdateLastLogIn
-    case failedDeleteTeamDocuments
-    case failedDeleteEscapeTeamItems
-    case failedDeleteEscapeTeamTags
-    case failedDeleteMemberDocuments
 }
