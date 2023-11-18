@@ -68,20 +68,4 @@ struct DeletingView: View {
             }
         }
     }
-
-    private func excutionDeleteAll() {
-        Task {
-            guard let userID = userVM.user?.id else { return }
-
-            do {
-                try await teamVM.deleteAllTeamDocumentsController(joins: userVM.joins)
-                try await logInVM.deleteAuth()
-
-            } catch {
-                // アカウントデータの削除に失敗したら、一つ前のページに戻る
-                logInVM.deleteAccountCheckFase = .failure
-                dismiss()
-            }
-        }
-    }
 }
