@@ -10,7 +10,7 @@ import FirebaseStorage
 
 class FirebaseStorageManager {
 
-    func uploadImage(_ imageType: SaveStorageImageType, _ image: UIImage?) async -> (url: URL?, filePath: String?) {
+    static func uploadImage( _ image: UIImage?, _ imageType: SaveStorageImageType) async throws -> (url: URL?, filePath: String?) {
 
         guard let imageData = image?.jpegData(compressionQuality: 0.8) else {
             return (url: nil, filePath: nil)
@@ -25,13 +25,10 @@ class FirebaseStorageManager {
             let url = try await imageRef.downloadURL()
 
             return (url: url, filePath: filePath)
-        } catch {
-            assertionFailure("ERROR: 画像のアップロードに失敗")
-            return (url: nil, filePath: nil)
         }
     }
 
-    func deleteImage(path: String?) async {
+    static func deleteImage(path: String?) async {
         guard let path = path else { return }
 
         let storage = Storage.storage()

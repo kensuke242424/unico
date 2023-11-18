@@ -131,9 +131,9 @@ class TeamViewModel: ObservableObject {
         myMemberData.name = updatedData.name
         myMemberData.iconURL = updatedData.iconURL
 
-        for team in joins {
+        for joinTeam in joins {
             do {
-                try await JoinMember.setData(path: .members(teamId: team.id),
+                try await JoinMember.setData(path: .members(teamId: joinTeam.id),
                                              docId: myMemberData.id,
                                              data: myMemberData)
 
@@ -163,43 +163,26 @@ class TeamViewModel: ObservableObject {
 
     /// ユーザー作成時のみ呼び出されるチーム画像保存メソッド
     /// ユーザー作成時は既存のチームIDが存在しないため、View側で生成したidを受け取ってpathを生成する
-    func firstUploadTeamImage(_ image: UIImage?, id createTeamID: String) async -> (url: URL?, filePath: String?) {
-
-        guard let imageData = image?.jpegData(compressionQuality: 0.8) else {
-            return (url: nil, filePath: nil)
-        }
+    func firstUploadTeamImage(_ image: UIImage?, id teamId: String) async -> (url: URL?, filePath: String?) {
 
         do {
-            let storage = Storage.storage()
-            let reference = storage.reference()
-            let filePath = "teams/\(createTeamID)/\(Date()).jpeg"
-            let imageRef = reference.child(filePath)
-            _ = try await imageRef.putDataAsync(imageData)
-            let url = try await imageRef.downloadURL()
-
-            return (url: url, filePath: filePath)
+            return try await FirebaseStorageManager.uploadImage(image, .team(teamId: teamId))
         } catch {
+            print("ERROR: 画像のアップロードに失敗")
             return (url: nil, filePath: nil)
         }
     }
 
     func uploadTeamImage(_ image: UIImage?) async -> (url: URL?, filePath: String?) {
-
-        guard let imageData = image?.jpegData(compressionQuality: 0.8) else {
+        guard let teamId = team?.id else {
+            assertionFailure("teamIdが存在しません")
             return (url: nil, filePath: nil)
         }
-        guard let teamID = team?.id else { return (url: nil, filePath: nil) }
 
         do {
-            let storage = Storage.storage()
-            let reference = storage.reference()
-            let filePath = "teams/\(teamID)/\(Date()).jpeg"
-            let imageRef = reference.child(filePath)
-            _ = try await imageRef.putDataAsync(imageData)
-            let url = try await imageRef.downloadURL()
-
-            return (url: url, filePath: filePath)
+            return try await FirebaseStorageManager.uploadImage(image, .team(teamId: teamId))
         } catch {
+            print("ERROR: 画像のアップロードに失敗")
             return (url: nil, filePath: nil)
         }
     }
