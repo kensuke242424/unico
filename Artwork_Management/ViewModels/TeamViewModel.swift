@@ -57,10 +57,9 @@ class TeamViewModel: ObservableObject {
 
                 do {
                     let teamData = try snap!.data(as: Team.self)
-                    withAnimation {self.team = teamData}
-                    print("チームデータを更新")
+                    withAnimation { self.team = teamData }
                 } catch {
-                    assertionFailure("チームデータ更新失敗")
+                    print("チームデータ更新失敗")
                 }
             }
         }
@@ -74,7 +73,6 @@ class TeamViewModel: ObservableObject {
             .members(teamId: currentTeamID)
             .collectionReference
             .addSnapshotListener { snap, error in
-
                 if let error {
                     assertionFailure("ERROR: \(error.localizedDescription)")
                 } else {
@@ -83,8 +81,6 @@ class TeamViewModel: ObservableObject {
                         self.members = snap!.documents.compactMap {
                             return try? $0.data(as: JoinMember.self, with: .estimate)
                         }
-                    } catch {
-                        assertionFailure("メンバーデータ更新失敗")
                     }
                 }
             }
@@ -122,12 +118,12 @@ class TeamViewModel: ObservableObject {
     /// ユーザーデータの変更を行った時に、各チームのユーザーステートを揃えるために使う。
     /// ユーザーが所属しているチーム全てに保存されている自身のメンバーデータを更新する。
     func updateJoinTeamsMyMemberData(from updatedData: User, joins: [JoinTeam]) async {
-        guard var myMemberData = self.self.myJoinMemberData else {
+        guard var myMemberData = self.myJoinMemberData else {
             assertionFailure("自身のメンバーデータが存在しません")
             return
         }
 
-        /// データの更新
+        // データの更新
         myMemberData.name = updatedData.name
         myMemberData.iconURL = updatedData.iconURL
 
@@ -194,7 +190,6 @@ class TeamViewModel: ObservableObject {
 
     /// チームに所属しているメンバーのメンバーIdを取得するメソッド。
     func getMembersId(teamId: String) async -> [String]? {
-
         do {
             /// 所属チームメンバー全員のスナップショットを取得
             let membersSnapshot = try await JoinMember.getDocuments(path: .members(teamId: teamId))
@@ -217,7 +212,6 @@ class TeamViewModel: ObservableObject {
             assertionFailure("チームデータが存在しません")
             return
         }
-
         // アイコンと背景のパスを配列に格納
         let teamImagesPath = [team.iconPath, team.backgroundPath]
         
@@ -229,12 +223,7 @@ class TeamViewModel: ObservableObject {
     }
 
     /// ユーザーが選択したチームのドキュメントを削除する
-    func deleteTeamDocument(for teamId: String?) async {
-        guard let teamId else {
-            assertionFailure("削除対象のチームIDが存在しませんでした")
-            return
-        }
-
+    func deleteTeamDocument(for teamId: String) async {
         do {
             let escapedTeam: Team = try await Team.fetch(path: .teams, docId: teamId)
             // チームドキュメントを削除
@@ -253,16 +242,17 @@ class TeamViewModel: ObservableObject {
     /// チームの保持しているアイテムドキュメントを全て削除するメソッド。
     /// ユーザーがチーム脱退やアカウント削除を行った際に、"チームに他のメンバーが存在しない"場合に使用される。
     func deleteItemDocuments(teamId: String) async {
-
         do {
-            let itemsSnapshot = try await Item.getDocuments(path: .items(teamId: teamId))
-            guard let itemsSnapshot else { return }
+            let snapshot = try await Item.getDocuments(path: .items(teamId: teamId))
+            guard let snapshot else { return }
 
-            for document in itemsSnapshot.documents {
+            for document in snapshot.documents {
                 let item = try document.data(as: Item.self)
+
                 try await document.reference.delete() // ドキュメント削除
                 await FirebaseStorageManager.deleteImage(path: item.photoPath)
             }
+
         } catch let error as FirestoreError {
             print(error.localizedDescription)
         } catch {
@@ -288,7 +278,7 @@ class TeamViewModel: ObservableObject {
     ///MEMO: ドキュメント本体だけを削除してもサブコレクションのデータは残るので注意
     func deleteTeamMemberDocument(teamId: String?, memberId: String?) async {
         guard let teamId, let memberId else {
-            assertionFailure("削除対象のチームメンバー情報が存在しません")
+            assertionFailure("チームまたは自身のメンバーIDが存在しません")
             return
         }
 
@@ -303,39 +293,15 @@ class TeamViewModel: ObservableObject {
         }
     }
 
-    /// ユーザーが持つ所属チームデータサブコレクション「joins」のドキュメントを全て削除するメソッド。
-    func deleteUserAllJoinsDocuments(joins joinTeams: [JoinTeam]) async throws {
-        guard let uid else { throw TeamRelatedError.uidEmpty }
-
-        do {
-            // ユーザーが持つjoinsサブコレクションのスナップショット取得
-            let joinsSnapshot = try await db?
-                .collection("users")
-                .document(uid)
-                .collection("joins")
-                .getDocuments()
-
-            guard let joinsSnapshot else { throw TeamRelatedError.missingSnapshot }
-
-            for document in joinsSnapshot.documents {
-                try await document.reference.delete()
-            }
-        } catch {
-
-        }
-    }
-
     /// アカウント削除時に実行されるメソッド。削除実行アカウントが所属する全てのチームのデータを削除する
     /// ✅所属チームのメンバーが削除アカウントのユーザーのみだった場合 ⇨ チームデータを全て消去
     /// ✅所属チームのメンバーが削除アカウントのユーザー以外にも在籍している場合 ⇨ 関連ユーザーデータのみ削除
     func deleteAllTeamDocumentsController(joins joinTeams: [JoinTeam]) async throws {
         guard let uid else { throw TeamRelatedError.uidEmpty }
 
-        // joinsデータのidを元に、ユーザーが所属している全チームのリファレンスIdを取得
-        var teamRefs = joinTeams.compactMap {
-            return db?
-                .collection("teams")
-                .document($0.id)
+        // ユーザーが所属している全チームのリファレンスを取得
+        let teamRefs = joinTeams.compactMap {
+            return Team.getReference(path: .teams, docId: $0.id)
         }
 
         do {
@@ -343,9 +309,10 @@ class TeamViewModel: ObservableObject {
             for teamRef in teamRefs {
                 let teamId = teamRef.documentID
                 let membersId = await getMembersId(teamId: teamId)
+
                 // メンバーデータが存在しなかった場合は処理を中断し、別のチーム処理を再スタート
                 guard let membersId else {
-                    print("ERROR: チーム内にメンバーデータが存在しない")
+                    print("ERROR: チーム内にメンバーデータが存在しません")
                     continue
                 }
 
@@ -360,8 +327,8 @@ class TeamViewModel: ObservableObject {
                      // ✅他にもチームメンバーが残っている場合、自身のmemberデータのみ削除
                     await deleteTeamMemberDocument(teamId: teamId, memberId: uid)
                 }
-            } // for teamRef in teamRefs
-        } // do
+            }
+        }
     }
 
     func removeListener() {

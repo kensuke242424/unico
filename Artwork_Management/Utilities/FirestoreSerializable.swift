@@ -69,6 +69,16 @@ extension FirestoreSerializable {
         }
     }
 
+    static func getReference(path pathType: FirestorePathType, docId: String) -> DocumentReference {
+        do {
+            let documentRef = Firestore.firestore()
+                .collection(pathType.collectionPath)
+                .document(docId)
+
+            return documentRef
+        }
+    }
+
     static func deleteDocument(path pathType: FirestorePathType, docId: String) async throws {
         do {
             try await Firestore.firestore()
