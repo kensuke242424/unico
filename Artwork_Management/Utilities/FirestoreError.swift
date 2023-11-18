@@ -6,25 +6,25 @@
 //
 
 enum FirestoreError: Error {
-    case dataNotFound
-    case decodeError
-    case setDataError
-    case fetchDocumentError
-    case deleteError
+    case dataNotFound(String)
+    case decodeError(Error)
+    case setDataError(Error)
+    case fetchDocumentError(Error)
+    case deleteError(Error)
     case other(Error)
 
     var localizedDescription: String {
         switch self {
-        case .dataNotFound:
-            return "データが見つかりません。"
-        case .decodeError:
-            return "データのデコードに失敗しました。"
-        case .setDataError:
-            return "データの保存に失敗しました。"
-        case .fetchDocumentError:
-            return "ドキュメントスナップショットの取得に失敗しました。"
-        case .deleteError:
-            return "データの削除に失敗しました"
+        case .dataNotFound(let id):
+            return "データが見つかりません。ID: \(id)"
+        case .decodeError(let error):
+            return "データのデコードに失敗しました。エラー: \(error.localizedDescription)"
+        case .setDataError(let error):
+            return "データの保存に失敗しました。エラー: \(error.localizedDescription)"
+        case .fetchDocumentError(let error):
+            return "ドキュメントスナップショットの取得に失敗しました。エラー: \(error.localizedDescription)"
+        case .deleteError(let error):
+            return "データの削除に失敗しました。エラー: \(error.localizedDescription)"
         case .other(let error):
             return error.localizedDescription
         }

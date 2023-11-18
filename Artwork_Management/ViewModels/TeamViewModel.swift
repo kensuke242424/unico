@@ -193,11 +193,7 @@ class TeamViewModel: ObservableObject {
     }
 
     /// チームに所属しているメンバーのメンバーIdを取得するメソッド。
-    func getMembersId(teamId: String?) async -> [String]? {
-        guard let teamId else {
-            assertionFailure("ERROR: チームIDが存在しません")
-            return nil
-        }
+    func getMembersId(teamId: String) async -> [String]? {
 
         do {
             /// 所属チームメンバー全員のスナップショットを取得
@@ -306,6 +302,7 @@ class TeamViewModel: ObservableObject {
             print("未知のエラー: \(error.localizedDescription)")
         }
     }
+
     /// ユーザーが持つ所属チームデータサブコレクション「joins」のドキュメントを全て削除するメソッド。
     func deleteUserAllJoinsDocuments(joins joinTeams: [JoinTeam]) async throws {
         guard let uid else { throw TeamRelatedError.uidEmpty }
