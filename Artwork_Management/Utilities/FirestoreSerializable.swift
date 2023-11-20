@@ -34,6 +34,29 @@ extension FirestoreSerializable {
         }
     }
 
+    static func fetchDatas<T: FirestoreSerializable & Decodable>(path pathType: FirestorePathType) async throws -> [T] {
+
+        do {
+            let snapshot = try await Firestore.firestore()
+                .collection(pathType.collectionPath)
+                .getDocuments()
+
+            let datas = try snapshot.documents.compactMap { document in
+                let data = try document.data(as: T.self)
+                return data
+            }
+
+            return datas
+
+        } catch {
+            if let firestoreError = error as? FirestoreError {
+                throw firestoreError
+            } else {
+                throw FirestoreError.other(error)
+            }
+        }
+    }
+
     static func setData<T: FirestoreSerializable & Codable>(path pathType: FirestorePathType, docId id: String, data: T) async throws {
 
         do {

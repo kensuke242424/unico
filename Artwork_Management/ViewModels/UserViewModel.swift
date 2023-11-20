@@ -65,7 +65,7 @@ class UserViewModel: ObservableObject {
     @Published var showAlert = false
     @Published var userErrorMessage = ""
 
-    /// 自身のユーザードキュメントを取得するメソッド。
+    /// 自身のユーザードキュメントを取得し、userプロパティにセットするメソッド。
     @MainActor
     func fetchUser() async {
         guard let uid else { assertionFailure("uidが存在しません"); return }
@@ -76,12 +76,12 @@ class UserViewModel: ObservableObject {
 
         } catch let error as FirestoreError {
             print(error.localizedDescription)
-
         } catch {
             print("未知のエラー: \(error.localizedDescription)")
         }
     }
 
+    /// FirestoreからUserデータを取得するメソッド。返り値あり。
     func getUserData(id userId: String) async -> User? {
 
         do {
@@ -96,10 +96,10 @@ class UserViewModel: ObservableObject {
         }
     }
 
-    /// 自身の所属するチームデータ「joins」を取得するメソッド。
+    /// 自身が所属するチーム群のデータを「joins」サブコレクションから取得し、joinsプロパティにセットするメソッド。
     @MainActor
     func fetchJoinTeams() async throws {
-        guard let uid else { throw CustomError.uidEmpty }
+        guard let uid else { assertionFailure("uidが存在しません"); return }
 
         do {
             let snapshot = try await db?
