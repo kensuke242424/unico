@@ -7,7 +7,7 @@
 
 import SwiftUI
 import Firebase
-import FirebaseFirestore
+//import FirebaseFirestore
 import FirebaseStorage
 import FirebaseFirestoreSwift
 
@@ -39,6 +39,7 @@ class TeamViewModel: ObservableObject {
         guard let index = myMemberIndex else { return nil }
         return self.members[index]
     }
+
     /// 現在の操作しているチームのメンバー全員のIdを格納するプロパティ。
     var memberIds: [String] {
         return self.members.compactMap {$0.id}
