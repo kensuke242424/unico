@@ -363,7 +363,7 @@ class UserViewModel: ObservableObject {
         passJoinTeam.approved = false
 
         do {
-            try await User.setData(path: .joins(userId: newMember.id),
+            try await User.setData(.joins(userId: newMember.id),
                                    docId: passJoinTeam.id,
                                    data: passJoinTeam)
 

@@ -57,7 +57,7 @@ extension FirestoreSerializable {
         }
     }
 
-    static func setData<T: FirestoreSerializable & Codable>(path pathType: FirestorePathType, docId id: String, data: T) async throws {
+    static func setData<T: FirestoreSerializable & Codable>(_ pathType: FirestorePathType, docId id: String, data: T) async throws {
 
         do {
             try Firestore.firestore()
@@ -74,7 +74,7 @@ extension FirestoreSerializable {
         }
     }
 
-    static func getDocuments(path pathType: FirestorePathType) async throws -> QuerySnapshot? {
+    static func getDocuments(_ pathType: FirestorePathType) async throws -> QuerySnapshot? {
 
         do {
             let snapShot = try await Firestore.firestore()
@@ -92,7 +92,7 @@ extension FirestoreSerializable {
         }
     }
 
-    static func getReference(path pathType: FirestorePathType, docId: String) -> DocumentReference {
+    static func getReference(_ pathType: FirestorePathType, docId: String) -> DocumentReference {
         do {
             let documentRef = Firestore.firestore()
                 .collection(pathType.collectionPath)
@@ -102,7 +102,7 @@ extension FirestoreSerializable {
         }
     }
 
-    static func deleteDocument(path pathType: FirestorePathType, docId: String) async throws {
+    static func deleteDocument(_ pathType: FirestorePathType, docId: String) async throws {
         do {
             try await Firestore.firestore()
                 .collection(pathType.collectionPath)
@@ -117,7 +117,7 @@ extension FirestoreSerializable {
         }
     }
 
-    static func deleteDocuments(path pathType: FirestorePathType) async throws {
+    static func deleteDocuments(_ pathType: FirestorePathType) async throws {
         do {
             let snapshot = try await Firestore.firestore()
                 .collection(pathType.collectionPath)

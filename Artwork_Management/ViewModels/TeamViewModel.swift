@@ -88,7 +88,7 @@ class TeamViewModel: ObservableObject {
 
     func setTeam(data: Team) async {
         do {
-            try await Team.setData(path: .teams, docId: data.id, data: data)
+            try await Team.setData(.teams, docId: data.id, data: data)
 
         } catch let error as FirestoreError {
             print(error.localizedDescription)
@@ -104,7 +104,7 @@ class TeamViewModel: ObservableObject {
                                        name: userData.name,
                                        iconURL: userData.iconURL)
         do {
-            try await JoinMember.setData(path: .members(teamId: teamId),
+            try await JoinMember.setData(.members(teamId: teamId),
                                          docId: newMemberData.id,
                                          data: newMemberData)
 
@@ -129,7 +129,7 @@ class TeamViewModel: ObservableObject {
 
         for joinTeam in joins {
             do {
-                try await JoinMember.setData(path: .members(teamId: joinTeam.id),
+                try await JoinMember.setData(.members(teamId: joinTeam.id),
                                              docId: myMemberData.id,
                                              data: myMemberData)
 
@@ -194,7 +194,7 @@ class TeamViewModel: ObservableObject {
 
         do {
             /// 所属チームメンバー全員のスナップショットを取得
-            let membersSnapshot = try await JoinMember.getDocuments(path: .members(teamId: teamId))
+            let membersSnapshot = try await JoinMember.getDocuments(.members(teamId: teamId))
 
             return membersSnapshot?.documents.compactMap {$0.documentID}
 
@@ -228,9 +228,9 @@ class TeamViewModel: ObservableObject {
     /// ユーザーが選択したチームのドキュメントを削除する
     func deleteTeamDocument(for teamId: String) async {
         do {
-            let escapedTeam: Team = try await Team.fetch(path: .teams, docId: teamId)
+            let escapedTeam: Team = try await Team.fetch(.teams, docId: teamId)
             // チームドキュメントを削除
-            try await Team.deleteDocument(path: .teams, docId: teamId)
+            try await Team.deleteDocument(.teams, docId: teamId)
             // チームドキュメントの削除成功後に画像消去
             await FirebaseStorageManager.deleteImage(path: escapedTeam.iconPath)
             await FirebaseStorageManager.deleteImage(path: escapedTeam.backgroundPath)
@@ -248,7 +248,7 @@ class TeamViewModel: ObservableObject {
     func deleteItemDocuments(teamId: String) async {
 
         do {
-            let snapshot = try await Item.getDocuments(path: .items(teamId: teamId))
+            let snapshot = try await Item.getDocuments(.items(teamId: teamId))
             guard let snapshot else { return }
 
             for document in snapshot.documents {
@@ -271,7 +271,7 @@ class TeamViewModel: ObservableObject {
     func deleteTagDocuments(teamId: String) async {
 
         do {
-            try await Tag.deleteDocuments(path: .tags(teamId: teamId))
+            try await Tag.deleteDocuments(.tags(teamId: teamId))
 
         } catch let error as FirestoreError {
             print(error.localizedDescription)
@@ -290,8 +290,8 @@ class TeamViewModel: ObservableObject {
         }
 
         do {
-            try await JoinMember.deleteDocuments(path: .logs(teamId: teamId, memberId: memberId))
-            try await Team.deleteDocument(path: .members(teamId: teamId), docId: memberId)
+            try await JoinMember.deleteDocuments(.logs(teamId: teamId, memberId: memberId))
+            try await Team.deleteDocument(.members(teamId: teamId), docId: memberId)
 
         } catch let error as FirestoreError {
             print(error.localizedDescription)
@@ -312,7 +312,7 @@ class TeamViewModel: ObservableObject {
 
         // ユーザーが所属している全チームのリファレンスを取得
         let teamRefs = joinTeams.compactMap {
-            return Team.getReference(path: .teams, docId: $0.id)
+            return Team.getReference(.teams, docId: $0.id)
         }
 
         do {
