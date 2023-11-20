@@ -14,7 +14,7 @@ protocol FirestoreSerializable {
 // 各モデルデータ共通で使用されるロジック
 extension FirestoreSerializable {
 
-    static func fetch<T: FirestoreSerializable & Decodable>(path pathType: FirestorePathType, docId id: String) async throws -> T {
+    static func fetch<T: FirestoreSerializable & Decodable>(_ pathType: FirestorePathType, docId id: String) async throws -> T {
 
         do {
             let document = try await Firestore.firestore()
@@ -34,7 +34,7 @@ extension FirestoreSerializable {
         }
     }
 
-    static func fetchDatas<T: FirestoreSerializable & Decodable>(path pathType: FirestorePathType) async throws -> [T] {
+    static func fetchDatas<T: FirestoreSerializable & Decodable>(_ pathType: FirestorePathType) async throws -> [T] {
 
         do {
             let snapshot = try await Firestore.firestore()

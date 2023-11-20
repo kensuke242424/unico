@@ -120,7 +120,7 @@ struct RootView: View {
                             return
                         }
 
-                        try await userVM.fetchJoinTeams()
+                        try await userVM.getJoinTeams()
 
                         /// チームデータを持っていなければ、チーム追加画面へ遷移
                         if userVM.joins.isEmpty {

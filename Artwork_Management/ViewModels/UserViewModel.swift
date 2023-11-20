@@ -65,77 +65,9 @@ class UserViewModel: ObservableObject {
     @Published var showAlert = false
     @Published var userErrorMessage = ""
 
-    /// 自身のユーザードキュメントを取得し、userプロパティにセットするメソッド。
-    @MainActor
-    func fetchUser() async {
+    /// FirestoreのUserデータの更新をリスニングするスナップショットリスナー。
+    func userListener() async {
         guard let uid else { assertionFailure("uidが存在しません"); return }
-
-        do {
-            let data: User = try await User.fetch(path: .users, docId: uid)
-            self.user = data
-
-        } catch let error as FirestoreError {
-            print(error.localizedDescription)
-        } catch {
-            print("未知のエラー: \(error.localizedDescription)")
-        }
-    }
-
-    /// FirestoreからUserデータを取得するメソッド。返り値あり。
-    func getUserData(id userId: String) async -> User? {
-
-        do {
-            return try await User.fetch(path: .users, docId: userId)
-
-        } catch let error as FirestoreError {
-            print(error.localizedDescription)
-            return nil
-        } catch {
-            print("未知のエラー: \(error.localizedDescription)")
-            return nil
-        }
-    }
-
-    /// 自身が所属するチーム群のデータを「joins」サブコレクションから取得し、joinsプロパティにセットするメソッド。
-    @MainActor
-    func fetchJoinTeams() async throws {
-        guard let uid else { assertionFailure("uidが存在しません"); return }
-
-        do {
-            let snapshot = try await db?
-                .collection("users")
-                .document(uid)
-                .collection("joins")
-                .getDocuments(source: .default)
-
-            guard let documents = snapshot?.documents else {
-                throw UserRelatedError.missingSnapshot
-            }
-
-            for document in documents {
-                let joinTeam = try document.data(as: JoinTeam.self)
-
-                self.joins.append(joinTeam)
-            }
-        } catch {
-            print("ERROR: JoinTeam取得失敗")
-            return
-        }
-    }
-
-//    /// ユーザーのアカウントステートを返すメソッド。
-//    func isAnonymousCheck() {
-//        
-//        if let user = Auth.auth().currentUser, user.isAnonymous {
-//            self.isAnonymous = true
-//        } else {
-//            self.isAnonymous = false
-//        }
-//    }
-
-    /// ユーザーデータの更新をリスニングするスナップショットリスナー。
-    func userListener() async throws {
-        guard let uid else { throw UserRelatedError.uidEmpty }
 
         userListener = db?
             .collection("users")
@@ -148,13 +80,8 @@ class UserViewModel: ObservableObject {
 
                 do {
                     let userData = try snap?.data(as: User.self)
+                    self.user = userData
 
-                    withAnimation {
-                            self.user = userData
-//                        DispatchQueue.main.async {
-//                            self.isAnonymousCheck()
-//                        }
-                    }
                 } catch {
                     print("ERROR: ユーザーデータのリスナー失敗")
                     return
@@ -163,8 +90,8 @@ class UserViewModel: ObservableObject {
     }
 
     /// 参加チームデータ群「joins」の更新をリスニングするスナップショットリスナー。
-    func joinsListener() async throws {
-        guard let uid else { throw UserRelatedError.uidEmpty }
+    func joinsListener() async {
+        guard let uid else { assertionFailure("uidが存在しません"); return }
 
         joinsListener = db?
             .collection("users")
@@ -195,6 +122,53 @@ class UserViewModel: ObservableObject {
                     }
                 }
             }
+        }
+    }
+
+    /// 自身のユーザードキュメントを取得し、userプロパティにセットするメソッド。
+    @MainActor
+    func fetchUser() async {
+        guard let uid else { assertionFailure("uidが存在しません"); return }
+
+        do {
+            let data: User = try await User.fetch(.users, docId: uid)
+            self.user = data
+
+        } catch let error as FirestoreError {
+            print(error.localizedDescription)
+        } catch {
+            print("未知のエラー: \(error.localizedDescription)")
+        }
+    }
+
+    /// 自身が所属するチーム群のデータを「joins」サブコレクションから取得し、joinsプロパティにセットするメソッド。
+    @MainActor
+    func getJoinTeams() async throws {
+        guard let uid else { assertionFailure("uidが存在しません"); return }
+
+        do {
+            let datas: [JoinTeam] = try await JoinTeam.fetchDatas(.joins(userId: uid))
+            self.joins = datas
+
+        } catch let error as FirestoreError {
+            print(error.localizedDescription)
+        } catch {
+            print("未知のエラー: \(error.localizedDescription)")
+        }
+    }
+
+    /// FirestoreからUserデータを取得するメソッド。返り値あり。
+    func getUserData(id userId: String) async -> User? {
+
+        do {
+            return try await User.fetch(.users, docId: userId)
+
+        } catch let error as FirestoreError {
+            print(error.localizedDescription)
+            return nil
+        } catch {
+            print("未知のエラー: \(error.localizedDescription)")
+            return nil
         }
     }
     
