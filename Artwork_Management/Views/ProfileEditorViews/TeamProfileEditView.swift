@@ -184,7 +184,7 @@ struct TeamProfileEditView: View {
                 if beforeTeam != afterTeam {
                     try await teamVM.setTeam(data: afterTeam)
                     try await userVM.updateJoinTeamToMembers(data: joinTeamContainer,
-                                                             ids: teamVM.membersId)
+                                                             ids: teamVM.memberIds)
 
                     hapticSuccessNotification()
                 }

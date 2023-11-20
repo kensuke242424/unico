@@ -34,17 +34,17 @@ class TeamViewModel: ObservableObject {
     var myMemberIndex: Int? {
         return self.members.firstIndex(where: {$0.id == uid})
     }
-    var myJoinMemberData: JoinMember? {
+
+    var myMemberData: JoinMember? {
         guard let index = myMemberIndex else { return nil }
         return self.members[index]
     }
     /// 現在の操作しているチームのメンバー全員のIdを格納するプロパティ。
-    var membersId: [String] {
+    var memberIds: [String] {
         return self.members.compactMap {$0.id}
     }
 
-    /// チームデータの追加・更新・削除のステートを管理するリスナーメソッド。
-    /// 初期実行時にリスニング対象ドキュメントのデータが全取得される。(フラグはadded)
+    /// Firestoreへのチームデータ追加・更新・削除のステートを監視するリスナーメソッド。
     func teamListener(id currentTeamID: String) async {
         teamListener = Firestore.firestore()
             .collection("teams")
@@ -64,8 +64,7 @@ class TeamViewModel: ObservableObject {
         }
     }
 
-    /// チームのサブコレクション「members」における追加・更新・削除のステートを管理するリスナーメソッド。
-    /// 初期実行時にリスニング対象ドキュメントのデータが全取得される。(フラグはadded)
+    /// Firestoreのチームサブコレクション「members」における追加・更新・削除のステートを監視するリスナーメソッド。
     func membersListener(id currentTeamID: String) async {
 
         membersListener = Firestore.firestore()
@@ -118,7 +117,7 @@ class TeamViewModel: ObservableObject {
     /// ユーザーデータの変更を行った時に、各チームのユーザーステートを揃えるために使う。
     /// ユーザーが所属しているチーム全てに保存されている自身のメンバーデータを更新する。
     func updateJoinTeamsMyMemberData(from updatedData: User, joins: [JoinTeam]) async {
-        guard var myMemberData = self.myJoinMemberData else {
+        guard var myMemberData = self.myMemberData else {
             assertionFailure("自身のメンバーデータが存在しません")
             return
         }
@@ -143,7 +142,7 @@ class TeamViewModel: ObservableObject {
 
     /// 対象ユーザーがすでにメンバー加入済みであるかをチェックするメソッド
     func isUserAlreadyMember(userId: String) -> Bool {
-        return self.membersId.contains(userId)
+        return self.memberIds.contains(userId)
     }
 
     /// 現在操作しているチームのcreateTime(Date)から、現在までの使用日数を算出するメソッド。
@@ -182,7 +181,8 @@ class TeamViewModel: ObservableObject {
             return (url: nil, filePath: nil)
         }
     }
-
+    
+    /// 初期値のサンプルアイテム&タグをFirestoreに保存する。新規チーム作成時に使用。
     func setSampleData(teamId: String) async {
         await Team.setSampleItems(teamId: teamId)
         await Tag.setSampleTag(teamId: teamId)
@@ -190,6 +190,7 @@ class TeamViewModel: ObservableObject {
 
     /// チームに所属しているメンバーのメンバーIdを取得するメソッド。
     func getMembersId(teamId: String) async -> [String]? {
+
         do {
             /// 所属チームメンバー全員のスナップショットを取得
             let membersSnapshot = try await JoinMember.getDocuments(path: .members(teamId: teamId))
@@ -199,6 +200,7 @@ class TeamViewModel: ObservableObject {
         } catch let error as FirestoreError {
             assertionFailure(error.localizedDescription)
             return nil
+
         } catch {
             assertionFailure("未知のエラー: \(error.localizedDescription)")
             return nil
@@ -234,6 +236,7 @@ class TeamViewModel: ObservableObject {
 
         } catch let error as FirestoreError {
             print(error.localizedDescription)
+
         } catch {
             print("未知のエラー: \(error.localizedDescription)")
         }
@@ -242,6 +245,7 @@ class TeamViewModel: ObservableObject {
     /// チームの保持しているアイテムドキュメントを全て削除するメソッド。
     /// ユーザーがチーム脱退やアカウント削除を行った際に、"チームに他のメンバーが存在しない"場合に使用される。
     func deleteItemDocuments(teamId: String) async {
+
         do {
             let snapshot = try await Item.getDocuments(path: .items(teamId: teamId))
             guard let snapshot else { return }
@@ -255,6 +259,7 @@ class TeamViewModel: ObservableObject {
 
         } catch let error as FirestoreError {
             print(error.localizedDescription)
+
         } catch {
             print("未知のエラー: \(error.localizedDescription)")
         }
@@ -266,6 +271,7 @@ class TeamViewModel: ObservableObject {
 
         do {
             try await Tag.deleteDocuments(path: .tags(teamId: teamId))
+
         } catch let error as FirestoreError {
             print(error.localizedDescription)
         } catch {
@@ -288,6 +294,7 @@ class TeamViewModel: ObservableObject {
 
         } catch let error as FirestoreError {
             print(error.localizedDescription)
+
         } catch {
             print("未知のエラー: \(error.localizedDescription)")
         }

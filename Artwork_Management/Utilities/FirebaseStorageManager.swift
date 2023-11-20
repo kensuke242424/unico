@@ -37,30 +37,10 @@ class FirebaseStorageManager {
 
         imageRef.delete { error in
             if let error = error {
-                assertionFailure("ERROR: 画像削除に失敗。")
+                assertionFailure("ERROR: 画像削除に失敗。\(error.localizedDescription)")
             } else {
                 print("画像削除に成功")
             }
-        }
-    }
-}
-
-enum SaveStorageImageType {
-    case user(userId: String)
-    case team(teamId: String)
-    case item(teamId: String)
-    case myBackground(userId: String)
-
-    var storageFilePath: String {
-        switch self {
-        case .user(let userId):
-            return "users/\(userId)"
-        case .team(let teamId):
-            return "teams/\(teamId)"
-        case .item(let teamId):
-            return "teams/\(teamId)/items"
-        case .myBackground(let userId):
-            return "users/\(userId)/myBackgrounds"
         }
     }
 }
