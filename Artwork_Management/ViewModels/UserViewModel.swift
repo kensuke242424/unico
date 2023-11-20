@@ -11,10 +11,6 @@ import FirebaseStorage
 import FirebaseFirestore
 import FirebaseFirestoreSwift
 
-enum CustomError: Error {
-    case uidEmpty, getItemID, getRef, fetch, setData, updateData, getDocument,getUserDocument, photoUrlEmpty, userEmpty, teamEmpty, getDetectUser, inputTextEmpty, memberDuplication, addTeamIDToJoinedUser, createAnonymous, existUserDocument, existAccountEmail, deleteAccount
-}
-
 class UserViewModel: ObservableObject {
 
     init() {
@@ -665,7 +661,6 @@ enum UserRelatedError:Error {
     case failedDeleteAllUserDocuments
 }
 
-struct TestUser {
-    let testUser: User = User(id: "sampleUserID(uid)", name: "SampleUser", address: "kennsuke242424@gmail.com",
-                              password: "ninnzinn2424", iconURL: nil, iconPath: nil, userColor: .red, joinsId: [])
+enum CustomError: Error {
+    case uidEmpty, getItemID, getRef, fetch, setData, updateData, getDocument,getUserDocument, photoUrlEmpty, userEmpty, teamEmpty, getDetectUser, inputTextEmpty, memberDuplication, addTeamIDToJoinedUser, createAnonymous, existUserDocument, existAccountEmail, deleteAccount
 }
