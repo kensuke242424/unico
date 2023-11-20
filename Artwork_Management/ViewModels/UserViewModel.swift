@@ -67,18 +67,18 @@ class UserViewModel: ObservableObject {
 
     /// 自身のユーザードキュメントを取得するメソッド。
     @MainActor
-    func fetchUser() async throws {
-        guard let uid else { throw CustomError.uidEmpty }
-        let userRef = db?
-            .collection("users")
-            .document(uid)
+    func fetchUser() async {
+        guard let uid else { assertionFailure("uidが存在しません"); return }
 
         do {
-            let document = try await userRef?.getDocument(source: .default)
-            let user = try await document?.data(as: User.self)
-            self.user = user
+            let data: User = try await User.fetch(path: .users, docId: uid)
+            self.user = data
+
+        } catch let error as FirestoreError {
+            print(error.localizedDescription)
+
         } catch {
-            throw UserRelatedError.failedFetchAddedNewUser
+            print("未知のエラー: \(error.localizedDescription)")
         }
     }
 
