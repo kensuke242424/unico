@@ -93,8 +93,7 @@ struct HomeTabView: View {
             } // VStack
             /// 保存しているユーザーのHomeパーツ設定をViewプロパティに代入
             .onAppear {
-                let currentJoinsIndex = userVM.getCurrentJoinsIndex()
-                guard let getIndex = currentJoinsIndex else { return }
+                guard let getIndex = userVM.currentJoinsIndex else { return }
 
                 nowTime = userVM.joins[getIndex].homeEdits.nowTime
                 teamNews = userVM.joins[getIndex].homeEdits.teamNews
@@ -168,8 +167,7 @@ struct HomeTabView: View {
                         }
 
                         Button {
-                            let currentJoinsIndex = userVM.getCurrentJoinsIndex()
-                            guard let getIndex = currentJoinsIndex else { return }
+                            guard let getIndex = userVM.currentJoinsIndex else { return }
 
                             withAnimation(.spring(response: 0.7, blendDuration: 1)) {
                                 nowTime = userVM.joins[getIndex].homeEdits.nowTime

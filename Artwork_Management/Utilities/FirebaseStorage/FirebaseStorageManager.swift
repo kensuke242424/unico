@@ -13,7 +13,7 @@ class FirebaseStorageManager {
     static func uploadImage( _ image: UIImage?, _ imageType: SaveStorageImageType) async throws -> (url: URL?, filePath: String?) {
 
         guard let imageData = image?.jpegData(compressionQuality: 0.8) else {
-            return (url: nil, filePath: nil)
+            throw FirebaseStorageError.imageConversionFailed
         }
 
         do {
@@ -22,25 +22,29 @@ class FirebaseStorageManager {
             let filePath = "\(imageType.storageFilePath)/\(Date()).jpeg"
             let imageRef = reference.child(filePath)
             _ = try await imageRef.putDataAsync(imageData)
-            let url = try await imageRef.downloadURL()
+            guard let url = try? await imageRef.downloadURL() else {
+                throw FirebaseStorageError.urlRetrievalFailed
+            }
 
             return (url: url, filePath: filePath)
+        } catch {
+            throw FirebaseStorageError.uploadFailed(errorDescription: error.localizedDescription)
         }
     }
 
-    static func deleteImage(path: String?) async {
-        guard let path = path else { return }
+    static func deleteImage(path: String?) async throws {
+        guard let path = path else {
+                throw FirebaseStorageError.invalidPath
+            }
 
         let storage = Storage.storage()
         let reference = storage.reference()
         let imageRef = reference.child(path)
 
-        imageRef.delete { error in
-            if let error = error {
-                assertionFailure("ERROR: 画像削除に失敗。\(error.localizedDescription)")
-            } else {
-                print("画像削除に成功")
-            }
+        do {
+            try await imageRef.delete()
+        } catch {
+            throw FirebaseStorageError.deleteFailed(errorDescription: error.localizedDescription)
         }
     }
 }

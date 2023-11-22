@@ -407,7 +407,9 @@ struct ItemTabView: View {
             return userVM.user?.favorites.contains(where: {$0 == item.id}) ?? false
         }
         Button {
-            userVM.updateFavorite(item.id)
+            Task {
+              await userVM.updateFavorite(item.id)
+            }
         } label: {
             if favoriteStatus {
                 Image(systemName: "heart.fill")

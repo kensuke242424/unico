@@ -221,7 +221,13 @@ class TeamViewModel: ObservableObject {
         for path in teamImagesPath {
             guard let path else { continue }
 
-            await FirebaseStorageManager.deleteImage(path: path)
+            do {
+                try await FirebaseStorageManager.deleteImage(path: path)
+            } catch let error as FirebaseStorageError {
+                print(error.localizedDescription)
+            } catch {
+                print("未知のエラー: \(error.localizedDescription)")
+            }
         }
     }
 
@@ -232,12 +238,14 @@ class TeamViewModel: ObservableObject {
             // チームドキュメントを削除
             try await Team.deleteDocument(.teams, docId: teamId)
             // チームドキュメントの削除成功後に画像消去
-            await FirebaseStorageManager.deleteImage(path: escapedTeam.iconPath)
-            await FirebaseStorageManager.deleteImage(path: escapedTeam.backgroundPath)
+            try await FirebaseStorageManager.deleteImage(path: escapedTeam.iconPath)
+            try await FirebaseStorageManager.deleteImage(path: escapedTeam.backgroundPath)
 
         } catch let error as FirestoreError {
             print(error.localizedDescription)
 
+        } catch let error as FirebaseStorageError {
+            print(error.localizedDescription)
         } catch {
             print("未知のエラー: \(error.localizedDescription)")
         }
@@ -255,12 +263,14 @@ class TeamViewModel: ObservableObject {
                 let item = try document.data(as: Item.self)
 
                 try await document.reference.delete() // ドキュメント削除
-                await FirebaseStorageManager.deleteImage(path: item.photoPath)
+                try await FirebaseStorageManager.deleteImage(path: item.photoPath)
             }
 
         } catch let error as FirestoreError {
             print(error.localizedDescription)
 
+        } catch let error as FirebaseStorageError {
+            print(error.localizedDescription)
         } catch {
             print("未知のエラー: \(error.localizedDescription)")
         }

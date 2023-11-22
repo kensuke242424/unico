@@ -155,9 +155,11 @@ struct DetailView: View {
         VStack(spacing: 0) {
             if !openDetail {
                 HStack(spacing: 0) {
-                    
+
                     Button {
-                        userVM.updateFavorite(item.id)
+                        Task{
+                            await userVM.updateFavorite(item.id)
+                        }
                     } label: {
                         Label("お気に入り", systemImage: favoriteStatus ? "heart.fill" : "suit.heart")
                         .font(.callout)

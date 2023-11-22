@@ -176,7 +176,7 @@ struct UserProfileEditView: View {
                 // ーーーー　データの更新が確認できたら実行　ーーーーー
                 if beforeUser != afterUser {
                     /// 自身のユーザーデータ更新
-                    try await userVM.updateUser(from: afterUser)
+                    try await userVM.addOrUpdateUser(userData: afterUser)
                     // 自身が所属するチーム群が保持している自身のメンバーデータを更新
                     try await teamVM.updateJoinTeamsMyMemberData(from: afterUser, joins: userVM.joins)
 

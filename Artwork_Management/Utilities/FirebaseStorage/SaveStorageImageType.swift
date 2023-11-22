@@ -5,6 +5,8 @@
 //  Created by Kensuke Nakagawa on 2023/11/20.
 //
 
+import Foundation.NSDate
+
 enum SaveStorageImageType {
     case user(userId: String)
     case team(teamId: String)
@@ -14,13 +16,13 @@ enum SaveStorageImageType {
     var storageFilePath: String {
         switch self {
         case .user(let userId):
-            return "users/\(userId)"
+            return "users/\(userId)\(Date())"
         case .team(let teamId):
-            return "teams/\(teamId)"
+            return "teams/\(teamId)\(Date())"
         case .item(let teamId):
-            return "teams/\(teamId)/items"
+            return "teams/\(teamId)/items\(Date())"
         case .myBackground(let userId):
-            return "users/\(userId)/myBackgrounds"
+            return "users/\(userId)/myBackgrounds\(Date())"
         }
     }
 }
