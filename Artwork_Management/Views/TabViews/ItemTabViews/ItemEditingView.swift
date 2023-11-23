@@ -278,9 +278,7 @@ struct ItemEditingView: View {
                             // croppedImageに新しい画像があれば、元の画像データを更新
                             if let croppedImage = input.croppedImage {
                                 withAnimation(.easeIn(duration: 0.1)) { input.showProgress = true }
-                                let resizedImage = itemVM.resizeUIImage(image: croppedImage,
-                                                                        width: width * 2)
-                                let uploadImageData =  await itemVM.uploadItemImage(resizedImage, teamID)
+                                let uploadImageData =  await itemVM.uploadItemImage(croppedImage, teamID)
                                 input.photoURL = uploadImageData.url
                                 input.photoPath = uploadImageData.filePath
                             }
@@ -307,7 +305,7 @@ struct ItemEditingView: View {
                                                     passItem.totalInventory + (editInventory - passItem.inventory) :
                                                         passItem.totalInventory - (passItem.inventory - editInventory) ))
 
-                            itemVM.updateItemToFirestore(updatedItem, teamId: teamVM.team?.id)
+                            await itemVM.addOrUpdateItem(updatedItem, teamId: teamVM.team?.id)
                             /// 編集アイテムの新規タグ設定とアイテムタブビュー内の選択タグを合わせる
                             /// 編集画面から戻った時、アイテムカードが適切にアニメーションするために必要
                             if tagVM.activeTag != tagVM.tags.first {
@@ -336,10 +334,9 @@ struct ItemEditingView: View {
                             // croppedImageに新しい画像があれば、元の画像データを更新
                             if let croppedImage = input.croppedImage {
                                 withAnimation(.easeIn(duration: 0.1)) { input.showProgress = true }
-                                let resizedImage = itemVM.resizeUIImage(image: croppedImage, width: width)
-                                let newImageData =  await itemVM.uploadItemImage(resizedImage, teamID)
-                                input.photoURL = newImageData.url
-                                input.photoPath = newImageData.filePath
+                                let uploadImageData =  await itemVM.uploadItemImage(croppedImage, teamID)
+                                input.photoURL = uploadImageData.url
+                                input.photoPath = uploadImageData.filePath
                             }
                             
                             let newItem = Item(tag           : input.selectionTagName,
@@ -359,7 +356,7 @@ struct ItemEditingView: View {
                                                totalInventory: Int(input.inventory) ?? 0)
                             
                             // Firestoreにコーダブル保存
-                            await itemVM.addItemToFirestore(newItem, teamId: teamVM.team?.id)
+                            await itemVM.addOrUpdateItem(newItem, teamId: teamVM.team?.id)
                             tagVM.setActiveTag(from: input.selectionTagName)
 
                             logVM.addLog(to: teamVM.team,

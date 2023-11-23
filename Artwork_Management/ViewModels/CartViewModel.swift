@@ -10,8 +10,8 @@ import ResizableSheet
 import FirebaseFirestore
 import FirebaseFirestoreSwift
 
-class CartViewModel: ObservableObject {
-    
+class CartViewModel: ObservableObject, FirebaseErrorHandling {
+
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
     
     @Published var showCart    : ResizableSheetState = .hidden
@@ -24,6 +24,9 @@ class CartViewModel: ObservableObject {
     @Published var actionItemIndex: Int = 0
     @Published var resultCartAmount: Int = 0
     @Published var resultCartPrice: Int = 0
+
+    @Published var showErrorAlert: Bool = false
+    @Published var errorMessage: String = ""
 
     /// カート内に選択アイテムを格納するメソッド。
     /// 新規追加アイテムの場合は、カート内にリスト要素を追加する。
@@ -43,40 +46,58 @@ class CartViewModel: ObservableObject {
             cartItems.append(item)
         }
     }
-    /// カート内の各アイテムを精算し、アイテム情報を更新するメソッド。
-    /// 同時に、アイテムの更新前・更新後二つのデータを入れたCompareItemモデルを配列で返す。
-    /// CompareItemは通知の比較表示などで用いる。
-    func updateCommerceItemsAndGetCompare(teamID: String) -> [CompareItem] {
+    
+    func updateCommerceItems(items: [Item], teamId: String) async {
 
         var compareItems: [CompareItem] = []
 
-        guard let itemsRef = db?.collection("teams").document(teamID).collection("items") else {
-            print("error: guard let tagsRef")
-            return compareItems
+        for item in items where item.amount != 0 {
+            let updatedItem = commerceItemCalculate(item)
+
+            do {
+                try await Item.setData(.items(teamId: teamId), docId: item.id, data: updatedItem)
+            } catch {
+                handleErrors([error])
+            }
         }
+    }
+
+    /// 在庫処理が実行されたアイテムのパラメータを更新し返すメソッド。
+    private func commerceItemCalculate(_ item: Item) -> Item {
+        var item = item
+
+        item.updateTime = Date()
+        item.sales += item.price * item.amount
+        item.inventory -= item.amount
+        item.totalAmount += item.amount
+        item.amount = 0
+
+        return item
+    }
+
+    /// カート内の各アイテムを精算し、アイテム情報を更新するメソッド。
+    /// 同時に、アイテムの更新前・更新後二つのデータを入れたCompareItemモデルを配列で返す。
+    /// CompareItemは通知の比較表示などで用いる。
+    func updateCommerceItemsAndGetCompare(teamId: String) async -> [CompareItem] {
+
+        var compareItems: [CompareItem] = []
 
         for item in cartItems where item.amount != 0 {
 
             // 更新前・更新後を分けるためのアイテムコンテナを用意
             let defaultItem = item
-            var updateItem = item
-
-            updateItem.updateTime = Date()
-            updateItem.sales += item.price * item.amount
-            updateItem.inventory -= item.amount
-            updateItem.totalAmount += item.amount
-            updateItem.amount = 0
+            var updatedItem = commerceItemCalculate(item)
 
             do {
-                try itemsRef.document(item.id).setData(from: updateItem)
+                try await Item.setData(.items(teamId: teamId), docId: item.id, data: updatedItem)
                 // Firestoreへの保存が成功すれば、更新比較アイテム情報CompareItemを返す
                 let compareItem = CompareItem(id: defaultItem.id,
                                               before: defaultItem,
-                                              after: updateItem)
-                
+                                              after: updatedItem)
                 compareItems.append(compareItem)
+
             } catch {
-                print("Error: 「\(item.name)」try reference.document(itemID).setData(from: item)")
+                handleErrors([error])
             }
         }
 

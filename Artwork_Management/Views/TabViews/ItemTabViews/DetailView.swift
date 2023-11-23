@@ -247,8 +247,8 @@ struct DetailView: View {
                             itemVM.items.removeAll(where: { $0.id == item.id })
                         }
                         Task {
-                            itemVM.deleteImage(path: item.photoPath)
-                            itemVM.deleteItem(deleteItem: item, teamId: item.teamID)
+                            await itemVM.deleteImage(path: item.photoPath)
+                            await itemVM.deleteItem(deleteItem: item, teamId: item.teamID)
 
                             logVM.addLog(to: teamVM.team,
                                          by: userVM.user,

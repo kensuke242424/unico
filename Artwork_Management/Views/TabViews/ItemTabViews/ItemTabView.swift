@@ -134,7 +134,7 @@ struct ItemTabView: View {
                                             guard let selectedItem else { return }
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                                 Task {
-                                                    itemVM.deleteItem(deleteItem: selectedItem,
+                                                    await itemVM.deleteItem(deleteItem: selectedItem,
                                                                       teamId: selectedItem.teamID)
 
                                                     logVM.addLog(to: teamVM.team,
