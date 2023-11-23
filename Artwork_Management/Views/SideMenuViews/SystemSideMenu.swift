@@ -475,7 +475,7 @@ struct SystemSideMenu: View {
                 // 対象チーム内のメンバーデータ（members）から自身のメンバーデータを消去
                 await teamVM.deleteTeamMemberDocument(teamId: selectedTeam.id, memberId: userVM.uid)
                 /// 自身の所属チームサブコレクション（joins）から対象チームデータを消去
-                try await userVM.deleteJoinTeamFromMyData(for: selectedTeam)
+                try await userVM.deleteJoinTeamMyMemberData(for: selectedTeam)
 
                 /// チーム内のメンバーズドキュメントIdを取得し、他メンバーがいない場合は、チームデータごと削除する
                 let membersId = await teamVM.getMembersId(teamId: selectedTeam.id)

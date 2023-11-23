@@ -471,59 +471,49 @@ class UserViewModel: ObservableObject {
         }
     }
 
-    /// 対象チーム内の自身のメンバーデータ「JoinMember」を削除するメソッド。
+    /// ユーザーが選択した対象チーム内の自身のメンバーデータ「JoinMember」を削除するメソッド。
     /// チーム脱退操作が実行された時に使われる。
-    func deleteJoinTeamFromMyData(for selectedTeam: JoinTeam) async throws {
+    func deleteJoinTeamMyMemberData(for selectedTeam: JoinTeam) async {
         guard let uid else { assertionFailure("uid: nil"); return }
 
         do {
-            try await db?
-                .collection("users")
-                .document(uid)
-                .collection("joins")
-                .document(selectedTeam.id)
-                .delete() // 削除
+            try await JoinTeam.deleteDocument(.joins(userId: uid), docId: selectedTeam.id)
+
+        } catch let error as FirestoreError {
+            print(error.localizedDescription)
 
         } catch {
-            print("ERROR: JoinTeamの削除失敗")
-            throw UserRelatedError.failedEscapeTeam
+            print("未知のエラー: \(error.localizedDescription)")
         }
     }
 
     func deleteUserImageData(path: String?) async {
+        guard let path else { return }
 
-        guard let path = path else { return }
+        do {
+            try await FirebaseStorageManager.deleteImage(path: path)
 
-        let storage = Storage.storage()
-        let reference = storage.reference()
-        let imageRef = reference.child(path)
+        } catch let error as FirebaseStorageError {
+            print(error.localizedDescription)
 
-        imageRef.delete { error in
-            if let error = error {
-                print(error)
-            } else {
-                print("imageRef.delete succsess!")
-            }
+        } catch {
+            print("未知のエラー: \(error.localizedDescription)")
         }
     }
 
     /// Firestorageに保存されているユーザーのオリジナル背景データを全て削除するメソッド。
-    func deleteAllUserMyBackgrounds() {
-        guard let user else { return }
-        let storage = Storage.storage()
-        let reference = storage.reference()
+    func deleteAllUserMyBackgrounds() async {
+        guard let user else { assertionFailure("user: nil"); return }
 
-        Task {
-            for background in user.myBackgrounds {
-                guard let path = background.imagePath else { continue }
-                let imageRef = reference.child(path)
-                imageRef.delete { error in
-                    if let error {
-                        print("ERROR: \(error.localizedDescription)")
-                    } else {
-                        print("オリジナル背景データを削除")
-                    }
-                }
+        for background in user.myBackgrounds {
+            do {
+                try await FirebaseStorageManager.deleteImage(path: background.imagePath)
+
+            } catch let error as FirebaseStorageError {
+                print(error.localizedDescription)
+
+            } catch {
+                print("未知のエラー: \(error.localizedDescription)")
             }
         }
     }
