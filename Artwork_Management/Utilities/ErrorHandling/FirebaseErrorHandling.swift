@@ -5,13 +5,13 @@
 //  Created by Kensuke Nakagawa on 2023/11/23.
 //
 
-protocol ErrorHandling {
+protocol FirebaseErrorHandling {
     var showErrorAlert: Bool { get set }
     var errorMessage: String { get set }
     func handleErrors(_ errors: [Error])
 }
 
-extension ErrorHandling {
+extension FirebaseErrorHandling {
     func handleErrors(_ errors: [Error]) {
         if errors.isEmpty { return }
 

@@ -11,7 +11,7 @@ import FirebaseStorage
 import FirebaseFirestore
 import FirebaseFirestoreSwift
 
-class UserViewModel: ObservableObject, ErrorHandling {
+class UserViewModel: ObservableObject, FirebaseErrorHandling {
 
     init() {
         print("<<<<<<<<<  UserViewModel_init  >>>>>>>>>")
@@ -454,7 +454,7 @@ class UserViewModel: ObservableObject, ErrorHandling {
     }
 
     /// Firestorageに保存されているユーザーのオリジナル背景データを全て削除するメソッド。
-    func deleteAllUserMyBackgrounds() async {
+    func deleteUserMyBackgrounds() async {
         guard let user else { assertionFailure("user: nil"); return }
 
         for background in user.myBackgrounds {
@@ -468,47 +468,32 @@ class UserViewModel: ObservableObject, ErrorHandling {
     }
 
     /// ユーザードキュメントがサブコレクションとして持っている「joins」データをFirestoreから削除するメソッド。
-    func deleteUserJoinsDocuments() async throws {
-        guard let uid else { throw CustomError.uidEmpty }
+    func deleteUserJoinsDocuments() async {
+        guard let user else { assertionFailure("user: nil"); return }
 
-        let joinsRef = try await db?
-            .collection("users")
-            .document(uid)
-            .collection("joins")
-            .getDocuments()
-
-        joinsRef?.documents.compactMap {
-            $0.reference.delete()
+        do {
+            try await User.deleteDocuments(.joins(userId: user.id))
+        } catch {
+            handleErrors([error])
         }
     }
     /// 「users」コレクション内に保存されている自身のユーザードキュメントを削除するメソッド。
-    func deleteUserDocument() async throws {
-        guard let uid else { throw CustomError.uidEmpty }
+    func deleteUserDocument() async {
+        guard let user else { assertionFailure("user: nil"); return }
 
-        try await db?
-            .collection("users")
-            .document(uid)
-            .getDocument()
-            .reference.delete()
+        do {
+            try await User.deleteDocument(.users, docId: user.id)
+        } catch {
+            handleErrors([error])
+        }
     }
 
     /// Firestore内に保存されているユーザードキュメントを全て削除するメソッド群。
     /// ユーザーがアカウントを削除したときに実行される。
-    func deleteAllUserDocumentsController() async throws {
-        guard let uid else { throw CustomError.uidEmpty }
-
-        do {
-            // ユーザーのオリジナル背景データを削除
-            await deleteAllUserMyBackgrounds()
-            // userドキュメントが持つ所属チームのサブコレクション「joins」を削除
-            try await deleteUserJoinsDocuments()
-            // userドキュメントを削除
-            try await deleteUserDocument()
-
-        } catch {
-            print("ERROR: ユーザードキュメント削除失敗")
-            throw UserRelatedError.failedDeleteAllUserDocuments
-        }
+    func deleteAllUserDocumentsController() async {
+        await deleteUserMyBackgrounds()
+        await deleteUserJoinsDocuments()
+        await deleteUserDocument()
     }
 
     func removeListener() {
@@ -517,28 +502,8 @@ class UserViewModel: ObservableObject, ErrorHandling {
     }
 
     deinit {
-        userListener?.remove()
-        joinsListener?.remove()
+        removeListener()
     }
-}
-
-enum UserRelatedError:Error {
-    case uidEmpty
-    case joinsEmpty
-    case referenceEmpty
-    case missingData
-    case missingSnapshot
-    case failedCreateJoinTeam
-    case failedFetchUser
-    case failedFetchAddedNewUser
-    case failedHomeEdits
-    case failedUserListen
-    case failedUpdateBackground
-    case failedUpdateJoinTeamApproved
-    case failedUpdateLastLogIn
-    case failedUpdateJoinsMyMemberData
-    case failedEscapeTeam
-    case failedDeleteAllUserDocuments
 }
 
 enum CustomError: Error {

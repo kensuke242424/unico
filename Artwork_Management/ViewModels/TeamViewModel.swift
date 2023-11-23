@@ -11,7 +11,7 @@ import FirebaseFirestore
 import FirebaseStorage
 import FirebaseFirestoreSwift
 
-class TeamViewModel: ObservableObject, ErrorHandling {
+class TeamViewModel: ObservableObject, FirebaseErrorHandling {
 
     init() {
         print("<<<<<<<<<  TeamViewModel_init  >>>>>>>>>")
