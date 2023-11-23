@@ -11,11 +11,10 @@ import FirebaseStorage
 import FirebaseFirestore
 import FirebaseFirestoreSwift
 
-class UserViewModel: ObservableObject {
+class UserViewModel: ObservableObject, ErrorHandling {
 
     init() {
         print("<<<<<<<<<  UserViewModel_init  >>>>>>>>>")
-//        isAnonymousCheck()
     }
 
     var userListener: ListenerRegistration?
@@ -26,12 +25,12 @@ class UserViewModel: ObservableObject {
     @Published var user: User?
     @Published var joins: [JoinTeam] = []
 
-    @Published var showAlert = false
-    @Published var userErrorMessage = ""
+    @Published var showErrorAlert = false
+    @Published var errorMessage = ""
 
     /// 新規加入チームのjoinTeamデータを保持するプロパティ。
-    /// リスナーが受け取ったjoinTeamのapprovedがfalseだと、このプロパティにデータが格納される。
-    /// 加入通知をユーザーが確認した時点で、approvedはtrueとなる。
+    /// リスナーが受け取ったjoinTeamのapprovedがfalseだと、このプロパティにデータが格納され、通知Viewが表示される。
+    /// 加入通知ビューでユーザーが確認操作を行うと、approvedはtrueに更新される。
     @Published var newJoinedTeam: JoinTeam?
     @Published var showJoinedTeamInformation: Bool = false
 
@@ -67,14 +66,14 @@ class UserViewModel: ObservableObject {
 
     /// FirestoreのUserデータの更新をリスニングするスナップショットリスナー。
     func userListener() async {
-        guard let uid else { assertionFailure("uidが存在しません"); return }
+        guard let uid else { assertionFailure("uid: nil"); return }
 
         userListener = db?
             .collection("users")
             .document(uid)
             .addSnapshotListener { snap, error in
                 if let error {
-                    print("ERROR: \(error.localizedDescription)")
+                    assertionFailure("ERROR: \(error.localizedDescription)")
                     return
                 }
 
@@ -83,7 +82,7 @@ class UserViewModel: ObservableObject {
                     self.user = userData
 
                 } catch {
-                    print("ERROR: ユーザーデータのリスナー失敗")
+                    self.handleErrors([error])
                     return
                 }
             }
@@ -91,36 +90,44 @@ class UserViewModel: ObservableObject {
 
     /// 参加チームデータ群「joins」の更新をリスニングするスナップショットリスナー。
     func joinsListener() async {
-        guard let uid else { assertionFailure("uidが存在しません"); return }
+        guard let uid else { assertionFailure("uid: nil"); return }
 
         joinsListener = db?
             .collection("users")
             .document(uid)
             .collection("joins")
             .addSnapshotListener { snap, error in
-            if let error {
-                print("ERROR: \(error.localizedDescription)")
-                return
-            }
-            guard let documents = snap?.documents else {
-                print("ERROR: snap_nil")
-                return
-            }
+                if let error {
+                    assertionFailure("ERROR: \(error.localizedDescription)")
+                    return
+                }
+                guard let documents = snap?.documents else {
+                    print("ERROR: snap_nil")
+                    return
+                }
 
-            do {
-                DispatchQueue.main.async {
-                    self.joins = documents.compactMap {
+                self.joins = documents.compactMap {
 
-                        let getJoinTeam = try? $0.data(as: JoinTeam.self)
+                    do {
+                        let data = try $0.data(as: JoinTeam.self)
 
-                        // 取得したデータのapprovedがfalseなら、相手から承認を受けた新規加入チーム
-                        if let approved = getJoinTeam?.approved, !approved {
-                            self.newJoinedTeam = getJoinTeam
-                        }
+                        self.checkApprovedNewJoinTeam(data) // 新規加入チェック
 
-                        return getJoinTeam
+                        return data
+
+                    } catch {
+                        return nil
                     }
                 }
+            }
+    }
+
+    /// 受け取ったJoinTeamのapprovedパラメータをチェックし、新規加入チームかどうかを判定する。
+    private func checkApprovedNewJoinTeam(_ joinTeam: JoinTeam) {
+        // falseなら、相手から承認を受けた新規加入チーム
+        if let approved = joinTeam.approved, !approved {
+            DispatchQueue.main.async {
+                self.newJoinedTeam = joinTeam
             }
         }
     }
@@ -134,10 +141,8 @@ class UserViewModel: ObservableObject {
             let data: User = try await User.fetch(.users, docId: uid)
             self.user = data
 
-        } catch let error as FirestoreError {
-            print(error.localizedDescription)
         } catch {
-            print("未知のエラー: \(error.localizedDescription)")
+            handleErrors([error])
         }
     }
 
@@ -150,10 +155,8 @@ class UserViewModel: ObservableObject {
             let datas: [JoinTeam] = try await JoinTeam.fetchDatas(.joins(userId: uid))
             self.joins = datas
 
-        } catch let error as FirestoreError {
-            print(error.localizedDescription)
         } catch {
-            print("未知のエラー: \(error.localizedDescription)")
+            handleErrors([error])
         }
     }
 
@@ -163,11 +166,8 @@ class UserViewModel: ObservableObject {
         do {
             return try await User.fetch(.users, docId: userId)
 
-        } catch let error as FirestoreError {
-            print(error.localizedDescription)
-            return nil
         } catch {
-            print("未知のエラー: \(error.localizedDescription)")
+            handleErrors([error])
             return nil
         }
     }
@@ -178,10 +178,8 @@ class UserViewModel: ObservableObject {
         do {
             try await User.setData(.users, docId: user.id, data: userData)
 
-        } catch let error as FirestoreError {
-            print(error.localizedDescription)
         } catch {
-            print("未知のエラー: \(error.localizedDescription)")
+            handleErrors([error])
         }
     }
 
@@ -194,11 +192,8 @@ class UserViewModel: ObservableObject {
             try await JoinTeam.setData(.joins(userId: uid),
                                        docId: joinTeamData.id,
                                        data: joinTeamData)
-
-        } catch let error as FirestoreError {
-            print(error.localizedDescription)
         } catch {
-            print("未知のエラー: \(error.localizedDescription)")
+            handleErrors([error])
         }
     }
 
@@ -212,10 +207,8 @@ class UserViewModel: ObservableObject {
         do {
             try await User.setData(.users, docId: user.id, data: user)
 
-        } catch let error as FirestoreError {
-            print(error.localizedDescription)
         } catch {
-            print("未知のエラー: \(error.localizedDescription)")
+            handleErrors([error])
         }
     }
 
@@ -247,11 +240,8 @@ class UserViewModel: ObservableObject {
             try await JoinTeam.setData(.joins(userId: uid),
                                        docId: currentJoinTeam.id,
                                        data: currentJoinTeam)
-
-        } catch let error as FirestoreError {
-            print(error.localizedDescription)
         } catch {
-            print("未知のエラー: \(error.localizedDescription)")
+            handleErrors([error])
         }
     }
 
@@ -266,11 +256,8 @@ class UserViewModel: ObservableObject {
             try await JoinTeam.setData(.joins(userId: uid),
                                        docId: currentJoinTeam.id,
                                        data: currentJoinTeam)
-
-        } catch let error as FirestoreError {
-            print(error.localizedDescription)
         } catch {
-            print("未知のエラー: \(error.localizedDescription)")
+            handleErrors([error])
         }
     }
     /// ユーザーのお気に入りアイテム追加or削除を管理するメソッド。
@@ -284,10 +271,8 @@ class UserViewModel: ObservableObject {
             try await User.setData(.users, docId: user.id, data: updatedUser)
             hapticActionNotification()
 
-        } catch let error as FirestoreError {
-            print(error.localizedDescription)
         } catch {
-            print("未知のエラー: \(error.localizedDescription)")
+            handleErrors([error])
         }
     }
 
@@ -314,10 +299,8 @@ class UserViewModel: ObservableObject {
         do {
             try await User.setData(.users, docId: user.id, data: user)
 
-        } catch let error as FirestoreError {
-            print(error.localizedDescription)
         } catch {
-            print("未知のエラー: \(error.localizedDescription)")
+            handleErrors([error])
         }
     }
 
@@ -330,10 +313,8 @@ class UserViewModel: ObservableObject {
         do {
             try await User.setData(.users, docId: user.id, data: user)
 
-        } catch let error as FirestoreError {
-            print(error.localizedDescription)
         } catch {
-            print("未知のエラー: \(error.localizedDescription)")
+            handleErrors([error])
         }
     }
 
@@ -345,11 +326,8 @@ class UserViewModel: ObservableObject {
                 try await JoinTeam.setData(.joins(userId: memberId),
                                            docId: updatedJoinTeam.id,
                                            data: updatedJoinTeam)
-
-            } catch let error as FirestoreError {
-                print(error.localizedDescription)
             } catch {
-                print("未知のエラー: \(error.localizedDescription)")
+                handleErrors([error])
             }
         }
     }
@@ -367,11 +345,8 @@ class UserViewModel: ObservableObject {
             try await User.setData(.joins(userId: newMember.id),
                                    docId: passJoinTeam.id,
                                    data: passJoinTeam)
-
-        } catch let error as FirestoreError {
-            print(error.localizedDescription)
         } catch {
-            print("未知のエラー: \(error.localizedDescription)")
+            handleErrors([error])
         }
     }
 
@@ -387,11 +362,8 @@ class UserViewModel: ObservableObject {
             try await JoinTeam.setData(.joins(userId: uid),
                                        docId: newJoinTeam.id,
                                        data: newJoinTeam)
-
-        } catch let error as FirestoreError {
-            print(error.localizedDescription)
         } catch {
-            print("未知のエラー: \(error.localizedDescription)")
+            handleErrors([error])
         }
     }
 
@@ -402,12 +374,8 @@ class UserViewModel: ObservableObject {
         do {
             return try await FirebaseStorageManager.uploadImage(image, .myBackground(userId: uid))
 
-        } catch let error as FirebaseStorageError {
-            print(error.localizedDescription)
-            return (url: nil, filePath: nil)
-
         } catch {
-            print("未知のエラー: \(error.localizedDescription)")
+            handleErrors([error])
             return (url: nil, filePath: nil)
         }
     }
@@ -428,11 +396,8 @@ class UserViewModel: ObservableObject {
         do {
             try await User.setData(.users, docId: user.id, data: user)
 
-        } catch let error as FirestoreError {
-            print(error.localizedDescription)
-
         } catch {
-            print("未知のエラー: \(error.localizedDescription)")
+            handleErrors([error])
         }
     }
 
@@ -445,11 +410,8 @@ class UserViewModel: ObservableObject {
         do {
             try await User.setData(.users, docId: user.id, data: user)
 
-        } catch let error as FirestoreError {
-            print(error.localizedDescription)
-
         } catch {
-            print("未知のエラー: \(error.localizedDescription)")
+            handleErrors([error])
         }
     }
 
@@ -461,12 +423,8 @@ class UserViewModel: ObservableObject {
         do {
             return try await FirebaseStorageManager.uploadImage(image, .user(userId: uid))
 
-        } catch let error as FirebaseStorageError {
-            print(error.localizedDescription)
-            return (url: nil, filePath: nil)
-
         } catch {
-            print("未知のエラー: \(error.localizedDescription)")
+            handleErrors([error])
             return (url: nil, filePath: nil)
         }
     }
@@ -479,11 +437,8 @@ class UserViewModel: ObservableObject {
         do {
             try await JoinTeam.deleteDocument(.joins(userId: uid), docId: selectedTeam.id)
 
-        } catch let error as FirestoreError {
-            print(error.localizedDescription)
-
         } catch {
-            print("未知のエラー: \(error.localizedDescription)")
+            handleErrors([error])
         }
     }
 
@@ -493,11 +448,8 @@ class UserViewModel: ObservableObject {
         do {
             try await FirebaseStorageManager.deleteImage(path: path)
 
-        } catch let error as FirebaseStorageError {
-            print(error.localizedDescription)
-
         } catch {
-            print("未知のエラー: \(error.localizedDescription)")
+            handleErrors([error])
         }
     }
 
@@ -509,11 +461,8 @@ class UserViewModel: ObservableObject {
             do {
                 try await FirebaseStorageManager.deleteImage(path: background.imagePath)
 
-            } catch let error as FirebaseStorageError {
-                print(error.localizedDescription)
-
             } catch {
-                print("未知のエラー: \(error.localizedDescription)")
+                handleErrors([error])
             }
         }
     }
