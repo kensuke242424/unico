@@ -11,7 +11,7 @@ import FirebaseFirestore
 import FirebaseStorage
 import FirebaseFirestoreSwift
 
-class TeamViewModel: ObservableObject {
+class TeamViewModel: ObservableObject, ErrorHandling {
 
     init() {
         print("<<<<<<<<<  TeamViewModel_init  >>>>>>>>>")
@@ -27,7 +27,7 @@ class TeamViewModel: ObservableObject {
     @Published var isShowSearchedNewMemberJoinTeam: Bool = false
 
     @Published var showErrorAlert = false
-    @Published var alertMessage = ""
+    @Published var errorMessage = ""
 
     var uid: String? { Auth.auth().currentUser?.uid }
 
@@ -59,7 +59,7 @@ class TeamViewModel: ObservableObject {
                     let teamData = try snap!.data(as: Team.self)
                     self.team = teamData
                 } catch {
-                    print("チームデータ更新失敗")
+                    self.handleErrors([error])
                 }
             }
         }
@@ -74,12 +74,17 @@ class TeamViewModel: ObservableObject {
             .collection("members")
             .addSnapshotListener { snap, error in
                 if let error {
-                    assertionFailure("ERROR: \(error.localizedDescription)")
+                    assertionFailure("teamListener失敗: \(error.localizedDescription)")
                 } else {
 
-                    do {
-                        self.members = snap!.documents.compactMap {
-                            return try? $0.data(as: JoinMember.self, with: .estimate)
+                    self.members = snap!.documents.compactMap {
+                        do {
+                            let member = try $0.data(as: JoinMember.self, with: .estimate)
+                            return member
+
+                        } catch {
+                            self.handleErrors([error])
+                            return nil
                         }
                     }
                 }
@@ -90,10 +95,8 @@ class TeamViewModel: ObservableObject {
         do {
             try await Team.setData(.teams, docId: data.id, data: data)
 
-        } catch let error as FirestoreError {
-            print(error.localizedDescription)
         } catch {
-            print("未知のエラー: \(error.localizedDescription)")
+            handleErrors([error])
         }
     }
 
@@ -107,11 +110,8 @@ class TeamViewModel: ObservableObject {
             try await JoinMember.setData(.members(teamId: teamId),
                                          docId: newMemberData.id,
                                          data: newMemberData)
-
-        } catch let error as FirestoreError {
-            print(error.localizedDescription)
         } catch {
-            print("未知のエラー: \(error.localizedDescription)")
+            handleErrors([error])
         }
     }
 
@@ -132,11 +132,8 @@ class TeamViewModel: ObservableObject {
                 try await JoinMember.setData(.members(teamId: joinTeam.id),
                                              docId: myMemberData.id,
                                              data: myMemberData)
-
-            } catch let error as FirestoreError {
-                print(error.localizedDescription)
             } catch {
-                print("未知のエラー: \(error.localizedDescription)")
+                handleErrors([error])
             }
         }
     }
@@ -163,8 +160,9 @@ class TeamViewModel: ObservableObject {
 
         do {
             return try await FirebaseStorageManager.uploadImage(image, .team(teamId: teamId))
+
         } catch {
-            print("ERROR: 画像のアップロードに失敗")
+            handleErrors([error])
             return (url: nil, filePath: nil)
         }
     }
@@ -177,8 +175,9 @@ class TeamViewModel: ObservableObject {
 
         do {
             return try await FirebaseStorageManager.uploadImage(image, .team(teamId: teamId))
+
         } catch {
-            print("ERROR: 画像のアップロードに失敗")
+            handleErrors([error])
             return (url: nil, filePath: nil)
         }
     }
@@ -186,7 +185,7 @@ class TeamViewModel: ObservableObject {
     /// 初期値のサンプルアイテム&タグをFirestoreに保存する。新規チーム作成時に使用。
     func setSampleData(teamId: String) async {
         await Team.setSampleItems(teamId: teamId)
-        await Tag.setSampleTag(teamId: teamId)
+        await Team.setSampleTag(teamId: teamId)
     }
 
     /// チームに所属しているメンバーのメンバーIdを取得するメソッド。
@@ -198,12 +197,8 @@ class TeamViewModel: ObservableObject {
 
             return membersSnapshot?.documents.compactMap {$0.documentID}
 
-        } catch let error as FirestoreError {
-            assertionFailure(error.localizedDescription)
-            return nil
-
         } catch {
-            assertionFailure("未知のエラー: \(error.localizedDescription)")
+            handleErrors([error])
             return nil
         }
     }
@@ -223,10 +218,9 @@ class TeamViewModel: ObservableObject {
 
             do {
                 try await FirebaseStorageManager.deleteImage(path: path)
-            } catch let error as FirebaseStorageError {
-                print(error.localizedDescription)
+
             } catch {
-                print("未知のエラー: \(error.localizedDescription)")
+                handleErrors([error])
             }
         }
     }
@@ -241,13 +235,8 @@ class TeamViewModel: ObservableObject {
             try await FirebaseStorageManager.deleteImage(path: escapedTeam.iconPath)
             try await FirebaseStorageManager.deleteImage(path: escapedTeam.backgroundPath)
 
-        } catch let error as FirestoreError {
-            print(error.localizedDescription)
-
-        } catch let error as FirebaseStorageError {
-            print(error.localizedDescription)
         } catch {
-            print("未知のエラー: \(error.localizedDescription)")
+            handleErrors([error])
         }
     }
 
@@ -266,13 +255,8 @@ class TeamViewModel: ObservableObject {
                 try await FirebaseStorageManager.deleteImage(path: item.photoPath)
             }
 
-        } catch let error as FirestoreError {
-            print(error.localizedDescription)
-
-        } catch let error as FirebaseStorageError {
-            print(error.localizedDescription)
         } catch {
-            print("未知のエラー: \(error.localizedDescription)")
+            handleErrors([error])
         }
     }
 
@@ -283,10 +267,8 @@ class TeamViewModel: ObservableObject {
         do {
             try await Tag.deleteDocuments(.tags(teamId: teamId))
 
-        } catch let error as FirestoreError {
-            print(error.localizedDescription)
         } catch {
-            print("未知のエラー: \(error.localizedDescription)")
+            handleErrors([error])
         }
     }
 
@@ -303,22 +285,16 @@ class TeamViewModel: ObservableObject {
             try await JoinMember.deleteDocuments(.logs(teamId: teamId, memberId: memberId))
             try await Team.deleteDocument(.members(teamId: teamId), docId: memberId)
 
-        } catch let error as FirestoreError {
-            print(error.localizedDescription)
-
         } catch {
-            print("未知のエラー: \(error.localizedDescription)")
+            handleErrors([error])
         }
     }
 
     /// アカウント削除時に実行されるメソッド。削除実行アカウントが所属する全てのチームのデータを削除する
     /// ✅所属チームのメンバーが削除アカウントのユーザーのみだった場合 ⇨ チームデータを全て消去
     /// ✅所属チームのメンバーが削除アカウントのユーザー以外にも在籍している場合 ⇨ 関連ユーザーデータのみ削除
-    func deleteAllTeamDocumentsController(joins joinTeams: [JoinTeam]) async throws {
-        guard let uid else {
-            assertionFailure("uidが存在しません")
-            return
-        }
+    func deleteAllJoinsTeamDocumentsController(joins joinTeams: [JoinTeam]) async {
+        guard let uid else { assertionFailure("uid: nil"); return }
 
         // ユーザーが所属している全チームのリファレンスを取得
         let teamRefs = joinTeams.compactMap {
@@ -348,7 +324,7 @@ class TeamViewModel: ObservableObject {
                      // ✅他にもチームメンバーが残っている場合、自身のmemberデータのみ削除
                     await deleteTeamMemberDocument(teamId: teamId, memberId: uid)
                 }
-            }
+            } // for文
         }
     }
 

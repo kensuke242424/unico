@@ -550,7 +550,7 @@ class UserViewModel: ObservableObject {
 
         do {
             // ユーザーのオリジナル背景データを削除
-            deleteAllUserMyBackgrounds()
+            await deleteAllUserMyBackgrounds()
             // userドキュメントが持つ所属チームのサブコレクション「joins」を削除
             try await deleteUserJoinsDocuments()
             // userドキュメントを削除

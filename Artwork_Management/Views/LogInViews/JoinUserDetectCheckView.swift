@@ -132,11 +132,11 @@ struct JoinUserDetectCheckView: View {
                     }
                     .alert("エラー", isPresented: $teamVM.showErrorAlert) {
                         Button("OK") {
-                            teamVM.alertMessage = ""
+                            teamVM.errorMessage = ""
                             teamVM.showErrorAlert.toggle()
                         }
                     } message: {
-                        Text(teamVM.alertMessage)
+                        Text(teamVM.errorMessage)
                     } // alert
                     .opacity(isAgreed ? 0.0 : 1.0)
                     .padding(.top)
@@ -172,7 +172,7 @@ struct JoinUserDetectCheckView: View {
                             withAnimation(.spring(response: 0.8, blendDuration: 1)) { joinUserCheckFase = .agree }
                         } else {
                             qrReader.isdetectQR.toggle()
-                            teamVM.alertMessage = "ユーザが見つかりませんでした。"
+                            teamVM.errorMessage = "ユーザが見つかりませんでした。"
                             teamVM.showErrorAlert.toggle()
                             withAnimation(.spring(response: 0.8, blendDuration: 1)) { joinUserCheckFase = .start }
                         }
@@ -241,17 +241,17 @@ struct JoinUserDetectCheckView: View {
                         do {
                             if inputUserIDText.isEmpty {
                                 teamVM.showErrorAlert.toggle()
-                                teamVM.alertMessage = "ユーザーIDを入力してください"
+                                teamVM.errorMessage = "ユーザーIDを入力してください"
                                 return
                             }
                             if inputUserIDText.count != 28 { // ユーザーIDは28文字
                                 teamVM.showErrorAlert.toggle()
-                                teamVM.alertMessage = "IDが正しくありません。入力IDを再度確認してください。"
+                                teamVM.errorMessage = "IDが正しくありません。入力IDを再度確認してください。"
                                 return
                             }
                             if inputUserIDText == userVM.uid ?? "" {
                                 teamVM.showErrorAlert.toggle()
-                                teamVM.alertMessage = "入力したIDはあなた自身のユーザーIDです。"
+                                teamVM.errorMessage = "入力したIDはあなた自身のユーザーIDです。"
                                 return
                             }
                             withAnimation{joinUserCheckFase = .check}
@@ -261,7 +261,7 @@ struct JoinUserDetectCheckView: View {
                                 if detectedUser != nil {
                                     withAnimation{ joinUserCheckFase = .agree }
                                 } else {
-                                    teamVM.alertMessage = "入力したidのユーザーは見つかりませんでした。"
+                                    teamVM.errorMessage = "入力したidのユーザーは見つかりませんでした。"
                                     teamVM.showErrorAlert.toggle()
                                     withAnimation{ joinUserCheckFase = .start }
                                     return
@@ -302,7 +302,7 @@ struct JoinUserDetectCheckView: View {
                                     // すでに加入済みでないかチェック
                                     if teamVM.isUserAlreadyMember(userId: detectedUser.id) {
                                         hapticErrorNotification()
-                                        teamVM.alertMessage = "こちらのユーザーは既にチームに所属しています。"
+                                        teamVM.errorMessage = "こちらのユーザーは既にチームに所属しています。"
                                         teamVM.showErrorAlert.toggle()
 
                                     } else {
