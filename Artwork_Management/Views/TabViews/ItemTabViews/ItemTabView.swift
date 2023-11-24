@@ -24,9 +24,9 @@ struct ItemTabView: View {
     @EnvironmentObject var logVM: LogViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
+    @EnvironmentObject var itemVM: ItemViewModel
     @EnvironmentObject var tagVM : TagViewModel
-    
-    @StateObject var itemVM: ItemViewModel
+
     @StateObject var cartVM: CartViewModel
     
     @Binding var inputTab: InputTab
@@ -177,7 +177,6 @@ struct ItemTabView: View {
             if let selectedItem, let selectedItemIndex, showDetailView {
                 DetailView(item: itemVM.items[selectedItemIndex],
                            cardHeight: cardHeight,
-                           itemVM: itemVM,
                            cartVM: cartVM,
                            inputTab: $inputTab,
                            show: $showDetailView,
@@ -186,7 +185,7 @@ struct ItemTabView: View {
             }
         }
         .overlay {
-            ItemSortManuView(userColor: userVM.memberColor, itemVM: itemVM)
+            ItemSortManuView(userColor: userVM.memberColor)
                 .opacity(showDetailView ? 0 : 1)
                 .offset(y: sortViewOffsetY)
                 .onChange(of: inputTab.showCart) { showCart in
@@ -212,12 +211,11 @@ struct ItemTabView: View {
         .navigationDestination(for: EditItemPath.self) { itemPath in
             switch itemPath {
             case .create:
-                ItemEditingView(itemVM: itemVM, passItem: nil)
+                ItemEditingView(passItem: nil)
 
             case .edit:
                 if let index = selectedItemIndex {
-                    ItemEditingView(itemVM: itemVM,
-                                    passItem: itemVM.items[index])
+                    ItemEditingView(passItem: itemVM.items[index])
                 }
             }
         }

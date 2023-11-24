@@ -11,9 +11,9 @@ struct HomeTabView: View {
 
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
+    @EnvironmentObject var itemVM: ItemViewModel
     @EnvironmentObject var backgroundVM: BackgroundViewModel
 
-    @StateObject var itemVM: ItemViewModel
     @StateObject var homeVM: HomeViewModel
 
     /// Tab親Viewから受け取った状態変数群

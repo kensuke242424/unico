@@ -18,9 +18,9 @@ struct DetailView: View {
     @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
+    @EnvironmentObject var itemVM: ItemViewModel
     @EnvironmentObject var logVM: LogViewModel
 
-    @StateObject var itemVM: ItemViewModel
     @StateObject var cartVM: CartViewModel
     @Binding var inputTab: InputTab
     @Binding var show: Bool
@@ -391,7 +391,6 @@ struct DetailView_Previews: PreviewProvider {
     static var previews: some View {
         DetailView(item: sampleItems.first!,
                    cardHeight: 200,
-                   itemVM: ItemViewModel(),
                    cartVM: CartViewModel(),
                    inputTab: .constant(InputTab()),
                    show: .constant(true),

@@ -21,7 +21,7 @@ struct ItemSortManuView: View {
     @GestureState var dragOffset:CGSize = .zero
     @Namespace private var animation
 
-    @StateObject var itemVM: ItemViewModel
+    @EnvironmentObject var itemVM: ItemViewModel
 
     var body: some View {
 
@@ -211,9 +211,7 @@ struct ItemSortManuView: View {
 
 struct SortItemView_Previews: PreviewProvider {
     static var previews: some View {
-        ItemSortManuView(userColor: .blue,
-                         itemVM: ItemViewModel()
-        )
+        ItemSortManuView(userColor: .blue)
     }
 }
 

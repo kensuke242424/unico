@@ -18,10 +18,9 @@ struct ItemEditingView: View {
 
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
+    @EnvironmentObject var itemVM: ItemViewModel
     @EnvironmentObject var tagVM : TagViewModel
     @EnvironmentObject var logVM : LogViewModel
-
-    @StateObject var itemVM: ItemViewModel
     
     @State private var input: InputEditItem = InputEditItem()
     
@@ -543,7 +542,7 @@ struct InputEditItem {
 
 struct NewEditItemView_Previews: PreviewProvider {
     static var previews: some View {
-        ItemEditingView(itemVM: ItemViewModel(), passItem: sampleItems.first)
+        ItemEditingView(passItem: sampleItems.first)
             .environmentObject(TagViewModel())
     }
 }

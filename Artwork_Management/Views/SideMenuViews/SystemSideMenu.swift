@@ -11,7 +11,6 @@ struct SystemSideMenu: View {
 
     @Environment(\.colorScheme) var colorScheme: ColorScheme
 
-    @StateObject var itemVM: ItemViewModel
     @StateObject var homeVM: HomeViewModel
     
     @EnvironmentObject var navigationVM: NavigationViewModel
@@ -21,6 +20,7 @@ struct SystemSideMenu: View {
     @EnvironmentObject var logInVM : AuthViewModel
     @EnvironmentObject var teamVM  : TeamViewModel
     @EnvironmentObject var userVM  : UserViewModel
+    @EnvironmentObject var itemVM  : ItemViewModel
     @EnvironmentObject var tagVM   : TagViewModel
 
     @Binding var inputTab: InputTab

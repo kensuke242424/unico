@@ -43,7 +43,7 @@ struct RootView: View {
     @EnvironmentObject var preloadVM: PreloadViewModel
     @EnvironmentObject var backgroundVM: BackgroundViewModel
 
-    @StateObject var itemVM: ItemViewModel = ItemViewModel()
+    @EnvironmentObject var itemVM: ItemViewModel
     @StateObject var cartVM: CartViewModel = CartViewModel()
 
     @State private var isShowStandBy: Bool = false
@@ -68,7 +68,7 @@ struct RootView: View {
                 CreateAndJoinTeamView()
 
             case .home:
-                ParentTabView(itemVM: itemVM, cartVM: cartVM)
+                ParentTabView(cartVM: cartVM)
                     .environment(\.resizableSheetCenter, resizableSheetCenter)
             }
         } // ZStack
@@ -88,11 +88,10 @@ struct RootView: View {
         .background {
             if preloads.startPreload {
                 Group {
-                    ItemTabView(itemVM: itemVM, cartVM: cartVM, inputTab: $preloads.inputTab)
-                    ItemEditingView(itemVM: itemVM, passItem: nil)
+                    ItemTabView(cartVM: cartVM, inputTab: $preloads.inputTab)
+                    ItemEditingView(passItem: nil)
                     CreateAndJoinTeamView()
                     PHPickerView(captureImage: $preloads.captureImage, isShowSheet: $preloads.showSheet)
-                    ItemTabView(itemVM: itemVM,  cartVM: cartVM, inputTab: $preloadVM.inputTab)
                 }
                 .opacity(0.01)
             }

@@ -16,13 +16,13 @@ struct ParentTabView: View {
     @EnvironmentObject var logInVM: AuthViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
+    @EnvironmentObject var itemVM: ItemViewModel
     @EnvironmentObject var tagVM : TagViewModel
     @EnvironmentObject var backgroundVM: BackgroundViewModel
 
     @EnvironmentObject var logVM: LogViewModel
     @EnvironmentObject var momentLogVM: MomentLogViewModel
 
-    @StateObject var itemVM: ItemViewModel
     @StateObject var cartVM: CartViewModel
 
     @StateObject var homeVM = HomeViewModel()
@@ -47,10 +47,10 @@ struct ParentTabView: View {
                     Spacer(minLength: 0)
                     
                     TabView(selection: $inputTab.selectionTab) {
-                        HomeTabView(itemVM: itemVM, homeVM: homeVM, inputTab: $inputTab)
+                        HomeTabView(homeVM: homeVM, inputTab: $inputTab)
                             .tag(Tab.home)
 
-                        ItemTabView(itemVM: itemVM,  cartVM: cartVM, inputTab: $inputTab)
+                        ItemTabView(cartVM: cartVM, inputTab: $inputTab)
                             .tag(Tab.item)
                     } // TabView
                     .tabViewStyle(.page(indexDisplayMode: .never))
@@ -155,7 +155,7 @@ struct ParentTabView: View {
                                 }
                             })
                     }
-                    SystemSideMenu(itemVM: itemVM, homeVM: homeVM, inputTab: $inputTab)
+                    SystemSideMenu(homeVM: homeVM, inputTab: $inputTab)
                         .offset(x: inputTab.showSideMenu ? 0 : -size.width)
                 }
                 /// 🏷タグの追加や編集を行うView
