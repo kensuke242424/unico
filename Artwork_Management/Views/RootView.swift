@@ -138,7 +138,7 @@ struct RootView: View {
                         guard let lastLogInTeamID = user.lastLogIn else { return }
                         print("ログインするチームのID: \(lastLogInTeamID)")
 
-                        await tagVM.tagDataLister(teamID: lastLogInTeamID)
+                        await tagVM.tagsLister(teamID: lastLogInTeamID)
 
                         // ---- ユーザー関連データをリスニング ----
                         try await userVM.userListener()

@@ -448,7 +448,9 @@ struct SystemSideMenu: View {
         // NOTE: ローカルのタグ順番操作をfirestoreに保存
         .onChange(of: input.editMode) { newEdit in
             if newEdit == .inactive {
-                tagVM.updateOderTagIndex(teamID: teamVM.team!.id)
+                Task {
+                  await tagVM.updateOderTagIndex(teamID: teamVM.team!.id)
+                }
             }
         }
         .onChange(of: inputTab.showSideMenu) { newValue in

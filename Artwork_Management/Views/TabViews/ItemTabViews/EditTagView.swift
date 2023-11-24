@@ -8,22 +8,23 @@
 import SwiftUI
 
 struct EditTagView: View {
-    
+
     @Environment(\.colorScheme) var colorScheme
-    
+
     @EnvironmentObject var teamVM: TeamViewModel
+    @EnvironmentObject var itemVM: ItemViewModel
     @EnvironmentObject var tagVM : TagViewModel
-    
+
     @Binding var passTag: Tag?
     @Binding var show: Bool
-    
+
     @State private var tagName     : String = ""
     @State private var openContent : Bool = true
     @State private var nameEmpty   : Bool = true
     @State private var containsName: Bool = false
-    
+
     @FocusState var focused: Bool?
-    
+
     var body: some View {
         VStack(spacing: 40) {
 
@@ -62,26 +63,34 @@ struct EditTagView: View {
 
                     Button(passTag == nil ? "追加" : "完了") {
 
+                        // 🏷️タグ更新の場合
                         if let defaultTag = passTag {
-                            var updateTagData     = defaultTag
+
+                            var updateTagData = defaultTag
                             updateTagData.tagName = tagName
 
-                            withAnimation(.easeInOut(duration: 0.3)) {
-                                tagVM.updateTagData(updateData : updateTagData,
-                                                    defaultData: defaultTag,
-                                                    teamID     : teamVM.team!.id)
+                            Task {
+                                await tagVM.updateTargetItemsTag(before: defaultTag,
+                                                                 after: updateTagData,
+                                                                 teamId: teamVM.team?.id,
+                                                                 items: itemVM.items)
+                            }
 
+                            withAnimation(.easeInOut(duration: 0.3)) {
                                 self.passTag = updateTagData
                                 show = false
                             }
 
+                        // 🏷️タグ追加の場合
                         } else {
                             let createTagData = Tag(oderIndex: tagVM.tags.count,
                                                     tagName  : tagName,
                                                     tagColor : .gray)
 
                             withAnimation(.easeInOut(duration: 0.3)) {
-                                tagVM.addTagToFirestore(tagData: createTagData, teamID: teamVM.team!.id)
+                                Task {
+                                    await tagVM.addOrUpdateTag(createTagData, teamId: teamVM.team!.id)
+                                }
                                 self.passTag = createTagData
                                 show = false
                             }
@@ -100,7 +109,7 @@ struct EditTagView: View {
                     }
                     .onChange(of: tagName) { newValue in
                         if passTag?.tagName != tagName &&
-                           tagVM.tags.contains(where: {$0.tagName == tagName}) {
+                            tagVM.tags.contains(where: {$0.tagName == tagName}) {
                             withAnimation(.easeInOut(duration: 0.3)) { containsName = true }
                         } else {
                             withAnimation(.easeInOut(duration: 0.3)) { containsName = false }

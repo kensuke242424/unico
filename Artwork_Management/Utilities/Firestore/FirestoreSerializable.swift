@@ -92,6 +92,25 @@ extension FirestoreSerializable {
         }
     }
 
+    static func getMatchingDocuments<T>(_ pathType: FirestorePathType, field: String, equalTo: T) async throws -> QuerySnapshot? {
+
+        do {
+            let snapShot = try await Firestore.firestore()
+                .collection(pathType.collectionPath)
+                .whereField(field, isEqualTo: equalTo)
+                .getDocuments()
+
+            return snapShot
+
+        } catch {
+            if let firestoreError = error as? FirestoreError {
+                throw firestoreError
+            } else {
+                throw FirestoreError.other(error)
+            }
+        }
+    }
+
     static func getReference(_ pathType: FirestorePathType, docId: String) -> DocumentReference {
         do {
             let documentRef = Firestore.firestore()
@@ -136,21 +155,6 @@ extension FirestoreSerializable {
         }
     }
 }
-
-// ユーザードキュメント専用で用いられるロジック
-//extension FirestoreSerializable {
-//    static func setJoinTeam(userId: String, data: JoinTeam) async throws {
-//        do {
-//            try FirestoreReference
-//                .joins(userId: userId)
-//                .collectionReference
-//                .document(data.id)
-//                .setData(from: data) // データ保存
-//        } catch {
-//            throw FirestoreError.setDataError
-//        }
-//    }
-//}
 
 // 初期値サンプルデータの追加ロジック
 extension FirestoreSerializable {

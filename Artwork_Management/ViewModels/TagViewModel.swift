@@ -9,7 +9,7 @@ import SwiftUI
 import FirebaseFirestore
 import FirebaseFirestoreSwift
 
-class TagViewModel: ObservableObject {
+class TagViewModel: ObservableObject, FirebaseErrorHandling {
 
     init() {
         print("<<<<<<<<<  TagViewModel_init  >>>>>>>>>")
@@ -19,11 +19,14 @@ class TagViewModel: ObservableObject {
     var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
 
     @Published var tags: [Tag] = []
-    @Published var showEdit: Bool = false
-    /// アイテムページの選択アイテムタグを管理するプロパティ。
-    @Published var activeTag: Tag?
+    @Published var activeTag: Tag? // 選択中のタグ
 
-    func tagDataLister(teamID: String) async {
+    @Published var showEdit: Bool = false
+
+    @Published var showErrorAlert: Bool = false
+    @Published var errorMessage: String = ""
+
+    func tagsLister(teamID: String) async {
         let tagsRef = db?
             .collection("teams")
             .document(teamID)
@@ -41,7 +44,6 @@ class TagViewModel: ObservableObject {
             }
 
             self.tags = documents.compactMap { (snap) -> Tag? in
-
                 do {
                     return try snap.data(as: Tag.self, with: .estimate)
                 } catch {
@@ -49,7 +51,6 @@ class TagViewModel: ObservableObject {
                     return Tag(oderIndex: 1, tagName: "???", tagColor: .gray)
                 }
             }
-            
 
             self.tags.sort { $0.oderIndex < $1.oderIndex }
 
@@ -57,38 +58,87 @@ class TagViewModel: ObservableObject {
             self.tags.insert(Tag(oderIndex: 0, tagName: "全て", tagColor: .gray), at: 0)
             self.tags.append(Tag(oderIndex: self.tags.count, tagName: "未グループ", tagColor: .gray))
         }
-        print("fetchTag終了")
     }
+
     /// タグデータをFireStoreから取得した後、アイテムタブビュー内にある選択タグの初期値をセットするメソッド。
     func setFirstActiveTag() {
         self.activeTag = tags.first
     }
+
     /// アイテム編集画面で選択されたタグを、アイテムタブビュー内のアクティブタグと同期させるメソッド。
     func setActiveTag(from setTagName: String) {
         let setTag = self.tags.first(where: { $0.tagName == setTagName })
         self.activeTag = setTag
     }
 
-    func addTagToFirestore(tagData: Tag, teamID: String) {
-        let tagRef = db?
-            .collection("teams/\(teamID)/tags")
-            .document(tagData.id)
+    func addOrUpdateTag(_ tagData: Tag, teamId: String) async {
+
         do {
-            _ = try tagRef?.setData(from: tagData)
+            try await Tag.setData(.tags(teamId: teamId), docId: tagData.id, data: tagData)
         } catch {
-            print("Error: try db!.collection(collectionID).addDocument(from: itemData)")
+            handleErrors([error])
         }
     }
 
-    func updateOderTagIndex(teamID: String) {
-
-        guard let tagsRef = db?.collection("teams/\(teamID)/tags") else { return }
-
+    func updateOderTagIndex(teamID: String) async {
         for (index, tag) in tags.enumerated() {
+            // 最初のタグ("全て")と最後のタグ("未グループ")は位置固定&ローカル管理のため、スルー
             if index == 0 && index == tags.count - 1 { continue }
-            tagsRef.document(tag.id).updateData(["oderIndex": index])
-            print("\(tags[index].tagName).oderIndex: \(index)")
+
+            var tag = tag
+            tag.oderIndex = index // 更新
+
+            do {
+                try await Tag.setData(.tags(teamId: teamID), docId: tag.id, data: tag)
+            } catch {
+                handleErrors([error])
+            }
         }
+    }
+
+    /// タグが更新された際に使う。更新対象のタグが付与されている全てのアイテムを、新しいタグ名に変更する。
+    func updateTargetItemsTag(before: Tag, after: Tag, teamId: String?, items: [Item]) async {
+        guard let teamId else { assertionFailure("teamId: nil"); return }
+
+        let targetItems = items.filter { $0.tag == before.tagName }
+
+        for item in targetItems {
+            var item = item
+            item.tag = after.tagName // タグを更新
+
+            do {
+                try await Item.setData(.items(teamId: teamId), docId: item.id, data: item)
+            } catch {
+                handleErrors([error])
+            }
+        }
+
+//        do {
+//
+//            for document in snapshot.documents {
+//                let itemID = document.documentID
+//                snapshot.document(itemID).updateData(["tag": after.tagName])
+//            }
+//
+//            guard let updateItemsRef = db?.collection("teams/\(teamId)/items") else { return }
+//
+//            // 更新したタグに紐づいていたアイテムをwhereFieldで検出し、まとめて更新
+//            updateItemsRef.whereField("tag", isEqualTo: before.tagName).getDocuments { (snaps, error) in
+//
+//                if let error = error {
+//                    print("Error: \(error)")
+//                } else {
+//                    guard let snaps = snaps else { return }
+//
+//                    for document in snaps.documents {
+//                        let itemID = document.documentID
+//                        updateItemsRef.document(itemID).updateData(["tag": after.tagName])
+//                    }
+//                }
+//            }
+//        } catch {
+//
+//        }
     }
 
     func updateTagData(updateData: Tag, defaultData: Tag, teamID: String) {
