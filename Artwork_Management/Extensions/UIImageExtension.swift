@@ -9,6 +9,10 @@ import SwiftUI
 
 extension UIImage {
 
+    func resize() -> UIImage? {
+        return nil
+    }
+
     func toBase64String() -> String? {
 
         guard let imageData = self.jpegData(compressionQuality: 1.0) else {
