@@ -449,7 +449,7 @@ struct SystemSideMenu: View {
         .onChange(of: input.editMode) { newEdit in
             if newEdit == .inactive {
                 Task {
-                  await tagVM.updateOderTagIndex(teamID: teamVM.team!.id)
+                  await tagVM.updateOderTagIndex(teamId: teamVM.team!.id)
                 }
             }
         }
@@ -680,8 +680,13 @@ struct SystemSideMenu: View {
 
     func rowRemove(offsets: IndexSet) {
         for tagIndex in offsets {
-            print(tagIndex)
-            tagVM.deleteTag(deleteTag: tagVM.tags[tagIndex], teamID: teamVM.team!.id)
+            let tagToDelete = tagVM.tags[tagIndex]
+            Task {
+                await tagVM.deleteTag(deleteTag: tagToDelete,
+                                      teamId: teamVM.team!.id,
+                                      items: itemVM.items)
+            }
+
         }
     }
 

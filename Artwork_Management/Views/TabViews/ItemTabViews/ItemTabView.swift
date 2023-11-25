@@ -531,8 +531,11 @@ struct ItemTabView: View {
                                     }
                                     withAnimation(.easeInOut(duration: 0.3)) {
                                         tagVM.tags.removeAll(where: {$0 == tag})
-                                        tagVM.deleteTag(deleteTag: tag,
-                                                        teamID: teamVM.team!.id)
+                                    }
+                                    Task {
+                                        await tagVM.deleteTag(deleteTag: tag,
+                                                              teamId: teamVM.team!.id,
+                                                              items: itemVM.items)
                                     }
                                 }
                             }

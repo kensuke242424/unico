@@ -27,15 +27,14 @@ class TagViewModel: ObservableObject, FirebaseErrorHandling {
     @Published var errorMessage: String = ""
 
     func tagsLister(teamID: String) async {
-        let tagsRef = db?
+        tagListener = db?
             .collection("teams")
             .document(teamID)
             .collection("tags")
+            .addSnapshotListener { (snaps, error) in
 
-        tagListener = tagsRef?.addSnapshotListener { (snaps, error) in
-
-            if let error = error?.localizedDescription {
-                print("ERROR: \(error)")
+            if let error {
+                assertionFailure("ERROR: \(error.localizedDescription)")
                 return
             }
             guard let documents = snaps?.documents else {
@@ -47,8 +46,8 @@ class TagViewModel: ObservableObject, FirebaseErrorHandling {
                 do {
                     return try snap.data(as: Tag.self, with: .estimate)
                 } catch {
-                    print("Error: try snap.data(as: Tag.self, with: .estimate)")
-                    return Tag(oderIndex: 1, tagName: "???", tagColor: .gray)
+                    self.handleErrors([error])
+                    return nil
                 }
             }
 
@@ -80,7 +79,7 @@ class TagViewModel: ObservableObject, FirebaseErrorHandling {
         }
     }
 
-    func updateOderTagIndex(teamID: String) async {
+    func updateOderTagIndex(teamId: String) async {
         for (index, tag) in tags.enumerated() {
             // 最初のタグ("全て")と最後のタグ("未グループ")は位置固定&ローカル管理のため、スルー
             if index == 0 && index == tags.count - 1 { continue }
@@ -89,7 +88,7 @@ class TagViewModel: ObservableObject, FirebaseErrorHandling {
             tag.oderIndex = index // 更新
 
             do {
-                try await Tag.setData(.tags(teamId: teamID), docId: tag.id, data: tag)
+                try await Tag.setData(.tags(teamId: teamId), docId: tag.id, data: tag)
             } catch {
                 handleErrors([error])
             }
@@ -97,14 +96,15 @@ class TagViewModel: ObservableObject, FirebaseErrorHandling {
     }
 
     /// タグが更新された際に使う。更新対象のタグが付与されている全てのアイテムを、新しいタグ名に変更する。
-    func updateTargetItemsTag(before: Tag, after: Tag, teamId: String?, items: [Item]) async {
+    /// 引数afterがnilの場合、対象アイテムのタグを"未グループ"に更新。
+    func updateTargetItemsTag(before: Tag, after: Tag?, teamId: String?, items: [Item]) async {
         guard let teamId else { assertionFailure("teamId: nil"); return }
 
         let targetItems = items.filter { $0.tag == before.tagName }
 
         for item in targetItems {
             var item = item
-            item.tag = after.tagName // タグを更新
+            item.tag = after?.tagName ?? "未グループ" // タグを更新
 
             do {
                 try await Item.setData(.items(teamId: teamId), docId: item.id, data: item)
@@ -112,111 +112,20 @@ class TagViewModel: ObservableObject, FirebaseErrorHandling {
                 handleErrors([error])
             }
         }
-
-//        do {
-//
-//            for document in snapshot.documents {
-//                let itemID = document.documentID
-//                snapshot.document(itemID).updateData(["tag": after.tagName])
-//            }
-//
-//            guard let updateItemsRef = db?.collection("teams/\(teamId)/items") else { return }
-//
-//            // 更新したタグに紐づいていたアイテムをwhereFieldで検出し、まとめて更新
-//            updateItemsRef.whereField("tag", isEqualTo: before.tagName).getDocuments { (snaps, error) in
-//
-//                if let error = error {
-//                    print("Error: \(error)")
-//                } else {
-//                    guard let snaps = snaps else { return }
-//
-//                    for document in snaps.documents {
-//                        let itemID = document.documentID
-//                        updateItemsRef.document(itemID).updateData(["tag": after.tagName])
-//                    }
-//                }
-//            }
-//        } catch {
-//
-//        }
     }
 
-    func updateTagData(updateData: Tag, defaultData: Tag, teamID: String) {
-        guard let updateTagRef = db?.collection("teams/\(teamID)/tags").document(defaultData.id) else { return }
-        guard let updateItemsRef = db?.collection("teams/\(teamID)/items") else { return }
-
+    func deleteTag(deleteTag: Tag, teamId: String, items: [Item]) async {
         do {
-            try updateTagRef.setData(from: updateData)
+            // Firestore内のタグ削除
+            try await Tag.deleteDocument(.tags(teamId: teamId), docId: deleteTag.id)
+
+            // 削除タグが付与されていたアイテムを"未グループ"に更新
+            await updateTargetItemsTag(before: deleteTag,
+                                       after: nil,
+                                       teamId: teamId,
+                                       items: items)
         } catch {
-            print("Error: try updateTagRef.setData(from: updateData)")
-            return
-        }
-
-        // 更新したタグに紐づいていたアイテムをwhereFieldで検出し、まとめて更新
-        updateItemsRef.whereField("tag", isEqualTo: defaultData.tagName).getDocuments { (snaps, error) in
-
-            if let error = error {
-                print("Error: \(error)")
-            } else {
-                guard let snaps = snaps else { return }
-
-                for document in snaps.documents {
-                    let itemID = document.documentID
-                    updateItemsRef.document(itemID).updateData(["tag": updateData.tagName])
-                }
-            }
-        }
-
-    }
-    /// 削除されたタグに紐づいていたアイテムのタグを「未グループ」に更新するメソッド
-    func updateItemsDeletedTag(id deletedTagId: String?, tag deletedTag: Tag, teamID: String) {
-
-        guard let tagID = deletedTagId else { return }
-        guard let tagRef = db?.collection("teams/\(teamID)/tags").document(tagID) else { return }
-        guard let itemsRef = db?.collection("teams/\(teamID)/items") else { return }
-
-        itemsRef.whereField("tag", isEqualTo: deletedTag.tagName).getDocuments { (snaps, error) in
-
-            if let error = error {
-                print("Error: \(error)")
-            } else {
-                guard let snaps = snaps else { return }
-                for document in snaps.documents {
-                    let itemID = document.documentID
-                    // タグの削除と、紐ずくアイテムのタグ解除
-                    itemsRef.document(itemID).updateData(["tag": self.tags.last!.tagName])
-                }
-                tagRef.delete()
-            }
-        }
-    }
-
-    /// タグを削除するメソッド。
-    /// 削除されたタグに紐づいているアイテムのタグを「未グループ」に更新する。
-    func deleteTag(deleteTag: Tag, teamID: String) {
-
-        guard let tagRef = db?
-            .collection("teams")
-            .document(teamID)
-            .collection("tags")
-            .whereField("tagName", isEqualTo: deleteTag.tagName)
-        else {
-            return
-        }
-
-        tagRef.getDocuments() { snap, error in
-            if let error {
-                print("タグ削除失敗: \(error.localizedDescription)")
-            } else {
-                for document in snap!.documents {
-                    // タグデータの削除
-                    document.reference.delete()
-                    // 削除タグに紐づいていたアイテムのタグを「未グループ」に更新
-                    self.updateItemsDeletedTag(id: document.documentID,
-                                               tag: deleteTag,
-                                               teamID: teamID)
-                }
-            }
+            handleErrors([error])
         }
     }
 
@@ -226,7 +135,6 @@ class TagViewModel: ObservableObject, FirebaseErrorHandling {
 
     deinit {
         print("<<<<<<<<<  TagViewModel_deinit  >>>>>>>>>")
-        tagListener?.remove()
+        removeListener()
     }
-
 }
