@@ -426,7 +426,7 @@ struct CreateAndJoinTeamView: View {
                         // 背景、アイコン画像をリサイズして保存していく
                         let createTeamID = UUID().uuidString
                         var iconImageContainer: UIImage?
-                        var backgroundContainer: Background = backgroundVM.sampleBackground
+                        var backgroundContainer = Background.sampleData
 
                         // アイコン画像が入力されていれば、リサイズ処理をしてコンテナに格納
                         if let croppedIconUIImage {
@@ -452,11 +452,11 @@ struct CreateAndJoinTeamView: View {
                         // 作成or参加したチームをView表示する用のプロパティ
                         self.joinedTeamData = joinTeamData
                         
-                        try await teamVM.setTeam(data: teamData)
-                        try await teamVM.setMember(teamId: teamData.id, data: user)
-                        try await userVM.addOrUpdateJoinTeam(data: joinTeamData)
-                        try await userVM.updateLastLogInTeam(teamId: teamData.id)
-                            await teamVM.setSampleData(teamId: teamData.id)
+                        await teamVM.setTeam(data: teamData)
+                        await teamVM.setMember(teamId: teamData.id, data: user)
+                        await userVM.addOrUpdateJoinTeam(data: joinTeamData)
+                        await userVM.updateLastLogInTeam(teamId: teamData.id)
+                        await teamVM.setSampleData(teamId: teamData.id)
 
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                             withAnimation(.spring(response: 1)) {
