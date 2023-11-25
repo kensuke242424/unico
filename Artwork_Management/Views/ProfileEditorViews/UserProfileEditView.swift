@@ -193,9 +193,11 @@ struct UserProfileEditView: View {
                         let compareUser = CompareUser(id    : user.id,
                                                       before: beforeUser,
                                                       after : afterUser)
-                        logVM.addLog(to: team,
-                                     by: user,
-                                     type: .updateUser(compareUser))
+                        Task {
+                            await logVM.addLog(to: team,
+                                               by: user,
+                                               type: .updateUser(compareUser))
+                        }
                     }
                 }
             } // Task ここまで

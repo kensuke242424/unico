@@ -318,9 +318,9 @@ struct ItemEditingView: View {
                             let compareItemData = CompareItem(id: passItem.id,
                                                               before: passItem,
                                                               after: updatedItem)
-                            logVM.addLog(to: teamVM.team,
-                                         by: userVM.user,
-                                         type: .updateItem(compareItemData))
+                            await logVM.addLog(to: teamVM.team,
+                                               by: userVM.user,
+                                               type: .updateItem(compareItemData))
                             dismiss()
 
                         } // Task(update Item)
@@ -358,9 +358,9 @@ struct ItemEditingView: View {
                             await itemVM.addOrUpdateItem(newItem, teamId: teamVM.team?.id)
                             tagVM.setActiveTag(from: input.selectionTagName)
 
-                            logVM.addLog(to: teamVM.team,
-                                         by: userVM.user,
-                                         type: .addItem(newItem))
+                            await logVM.addLog(to: teamVM.team,
+                                               by: userVM.user,
+                                               type: .addItem(newItem))
 
                             // アイテム作成数カウントをインクリメント
                             countUpItemCreate()

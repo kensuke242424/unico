@@ -8,7 +8,7 @@
 import SwiftUI
 
 /// チームおよびユーザーが行った編集履歴のエレメントを管理する。
-struct Log: Identifiable, Equatable, Hashable, Codable {
+struct Log: Identifiable, Equatable, Hashable, Codable, FirestoreSerializable {
     var id: String
     var teamId: String
     var createTime: Date
@@ -16,6 +16,8 @@ struct Log: Identifiable, Equatable, Hashable, Codable {
     var logType: LogType
     var read: Bool = false
     var canceledIds: [String] = []
+
+    static func firestorePath() -> FirestorePath { .teams }
 }
 
 /// 通知のセットタイプを管理する列挙体。

@@ -312,11 +312,12 @@ struct JoinUserDetectCheckView: View {
                                         hapticSuccessNotification()
 
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                                            Task {
+                                                await logVM.addLog(to: team, by: userVM.user,
+                                                                   type: .join(detectedUser, team))
+                                            }
                                             withAnimation(.spring(response: 0.5, blendDuration: 1)) {
                                                 teamVM.isShowSearchedNewMemberJoinTeam.toggle()
-                                                logVM.addLog(to: team,
-                                                             by: userVM.user,
-                                                             type: .join(detectedUser, team))
                                             }
                                         }
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {

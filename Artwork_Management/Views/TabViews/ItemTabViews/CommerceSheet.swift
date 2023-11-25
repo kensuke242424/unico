@@ -81,7 +81,7 @@ struct CommerceSheet: View {
                             /// これらのデータを通知用の比較表示データとして渡す
                             let compareItems = await cartVM.updateCommerceItemsAndGetCompare(teamId: teamID)
                             // 通知の作成
-                            logVM.addLog(to: teamVM.team, by: userVM.user, type: .commerce(compareItems))
+                            await logVM.addLog(to: teamVM.team, by: userVM.user, type: .commerce(compareItems))
                             cartVM.doCommerce = true
                             hapticSuccessNotification()
                         }

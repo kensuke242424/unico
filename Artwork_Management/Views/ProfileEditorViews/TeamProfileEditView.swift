@@ -200,9 +200,11 @@ struct TeamProfileEditView: View {
                         let compareTeam = CompareTeam(id: team.id,
                                                       before: beforeTeam,
                                                       after: afterTeam)
-                        logVM.addLog(to: teamVM.team,
-                                     by: userVM.user,
-                                     type: .updateTeam(compareTeam))
+                        Task {
+                            await logVM.addLog(to: teamVM.team,
+                                               by: userVM.user,
+                                               type: .updateTeam(compareTeam))
+                        }
                     }
                 }
             } // Task ここまで

@@ -348,8 +348,10 @@ struct ParentTabView: View {
         /// カートの精算実行を監視する
         .onChange(of: cartVM.doCommerce) { doCommerce in
             if doCommerce {
-                inputTab.showCart = .hidden
-                inputTab.showCommerce = .hidden
+                DispatchQueue.main.async {
+                    inputTab.showCart = .hidden
+                    inputTab.showCommerce = .hidden
+                }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     cartVM.resetCart()
                 }

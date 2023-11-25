@@ -137,9 +137,9 @@ struct ItemTabView: View {
                                                     await itemVM.deleteItem(deleteItem: selectedItem,
                                                                       teamId: selectedItem.teamID)
 
-                                                    logVM.addLog(to: teamVM.team,
-                                                                 by: userVM.user,
-                                                                 type: .deleteItem(selectedItem))
+                                                    await logVM.addLog(to: teamVM.team,
+                                                                       by: userVM.user,
+                                                                       type: .deleteItem(selectedItem))
                                                 }
                                             }
                                         }
@@ -313,7 +313,7 @@ struct ItemTabView: View {
                         }
                         /// actionItemIndexは、itemVM内のアイテムとcartItem内のアイテムで同期を取るため必要
                         cartVM.actionItemIndex = newActionIndex
-                        cartVM.addCartItem(item: item)
+                        cartVM.setItemToCart(item: item)
 
                     } label: {
                         Image(systemName: "plus")

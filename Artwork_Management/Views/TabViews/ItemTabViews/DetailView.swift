@@ -169,7 +169,7 @@ struct DetailView: View {
                     .disabled(openDetail ? true : false)
                     
                     Button {
-                        cartVM.addCartItem(item: item)
+                        cartVM.setItemToCart(item: item)
                     } label: {
                         Label("カートに追加", systemImage: "cart.fill.badge.plus")
                             .font(.callout)
@@ -250,9 +250,9 @@ struct DetailView: View {
                             await itemVM.deleteImage(path: item.photoPath)
                             await itemVM.deleteItem(deleteItem: item, teamId: item.teamID)
 
-                            logVM.addLog(to: teamVM.team,
-                                         by: userVM.user,
-                                         type: .deleteItem(item))
+                            await logVM.addLog(to: teamVM.team,
+                                               by: userVM.user,
+                                               type: .deleteItem(item))
                         }
                     }
                 }

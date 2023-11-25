@@ -11,11 +11,6 @@ import FirebaseFirestore
 import FirebaseFirestoreSwift
 
 class CartViewModel: ObservableObject, FirebaseErrorHandling {
-
-    var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
-    
-    @Published var showCart    : ResizableSheetState = .hidden
-    @Published var showCommerce: ResizableSheetState = .hidden
     
     @Published var cartItems: [Item] = []
     
@@ -31,7 +26,7 @@ class CartViewModel: ObservableObject, FirebaseErrorHandling {
     /// カート内に選択アイテムを格納するメソッド。
     /// 新規追加アイテムの場合は、カート内にリスト要素を追加する。
     /// すでにカート内にアイテムが存在した場合、amountカウントを+1する。
-    func addCartItem(item: Item) {
+    func setItemToCart(item: Item) {
         let index = cartItems.firstIndex(where: { $0.id == item.id })
         
         if let index {
@@ -47,12 +42,12 @@ class CartViewModel: ObservableObject, FirebaseErrorHandling {
         }
     }
     
-    func updateCommerceItems(items: [Item], teamId: String) async {
+    func updateCommercedItems(items: [Item], teamId: String) async {
 
         var compareItems: [CompareItem] = []
 
         for item in items where item.amount != 0 {
-            let updatedItem = commerceItemCalculate(item)
+            let updatedItem = calculateCommercedItemStatus(item)
 
             do {
                 try await Item.setData(.items(teamId: teamId), docId: item.id, data: updatedItem)
@@ -63,7 +58,7 @@ class CartViewModel: ObservableObject, FirebaseErrorHandling {
     }
 
     /// 在庫処理が実行されたアイテムのパラメータを更新し返すメソッド。
-    private func commerceItemCalculate(_ item: Item) -> Item {
+    private func calculateCommercedItemStatus(_ item: Item) -> Item {
         var item = item
 
         item.updateTime = Date()
@@ -86,7 +81,7 @@ class CartViewModel: ObservableObject, FirebaseErrorHandling {
 
             // 更新前・更新後を分けるためのアイテムコンテナを用意
             let defaultItem = item
-            var updatedItem = commerceItemCalculate(item)
+            var updatedItem = calculateCommercedItemStatus(item)
 
             do {
                 try await Item.setData(.items(teamId: teamId), docId: item.id, data: updatedItem)
