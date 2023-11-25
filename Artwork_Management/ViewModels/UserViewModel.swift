@@ -197,7 +197,7 @@ class UserViewModel: ObservableObject, FirebaseErrorHandling {
     }
 
     /// ユーザーがチーム移動操作時に実行する。自身の操作チーム対象を保持するUserフィールドを更新するメソッド。
-    func updateLastLogInTeam(teamId: String?) async throws {
+    func updateLastLogInTeam(teamId: String?) async {
         guard var user else { assertionFailure("user: nil"); return }
         guard let teamId else { assertionFailure("teamId: nil"); return }
 
