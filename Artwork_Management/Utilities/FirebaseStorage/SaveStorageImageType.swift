@@ -16,13 +16,13 @@ enum SaveStorageImageType {
     var storageFilePath: String {
         switch self {
         case .user(let userId):
-            return "users/\(userId)\(Date())"
+            return "users/\(userId)/\(Date())"
         case .team(let teamId):
-            return "teams/\(teamId)\(Date())"
+            return "teams/\(teamId)/\(Date())"
         case .item(let teamId):
-            return "teams/\(teamId)/items\(Date())"
+            return "teams/\(teamId)/items/\(Date())"
         case .myBackground(let userId):
-            return "users/\(userId)/myBackgrounds\(Date())"
+            return "users/\(userId)/myBackgrounds/\(Date())"
         }
     }
 }
