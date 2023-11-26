@@ -495,7 +495,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
 
                         SDWebImageBackgroundView(
                             imageURL: backgroundVM.selectBackground?.imageURL ??
-                                      backgroundVM.sampleBackground.imageURL,
+                                      Background.sampleData.imageURL,
                             width: proxy.size.width,
                             height: proxy.size.height
                         )

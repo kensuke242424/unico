@@ -370,8 +370,12 @@ class UserViewModel: ObservableObject, FirebaseErrorHandling {
     func uploadMyNewBackground(_ image: UIImage?) async -> (url: URL?, filePath: String?) {
         guard let uid else { assertionFailure("uid: nil"); return (url: nil, filePath: nil) }
 
+        // リサイズ
+        let width = await UIScreen.main.bounds.width
+        let resizedImage = image?.resize(width: width)
+
         do {
-            return try await FirebaseStorageManager.uploadImage(image, .myBackground(userId: uid))
+            return try await FirebaseStorageManager.uploadImage(resizedImage, .myBackground(userId: uid))
 
         } catch {
             handleErrors([error])
