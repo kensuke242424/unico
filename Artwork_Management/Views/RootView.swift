@@ -68,7 +68,7 @@ struct RootView: View {
                 CreateAndJoinTeamView()
 
             case .home:
-                ParentTabView(cartVM: cartVM)
+                ParentTabView()
                     .environment(\.resizableSheetCenter, resizableSheetCenter)
             }
         } // ZStack

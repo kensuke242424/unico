@@ -23,7 +23,8 @@ struct ParentTabView: View {
     @EnvironmentObject var logVM: LogViewModel
     @EnvironmentObject var momentLogVM: MomentLogViewModel
 
-    @StateObject var cartVM: CartViewModel
+//    @StateObject var cartVM: CartViewModel
+    @StateObject var cartVM: CartViewModel = CartViewModel()
 
     @StateObject var homeVM = HomeViewModel()
 
