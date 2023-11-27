@@ -442,7 +442,7 @@
 			path = ApplicationSettingViews;
 			sourceTree = "<group>";
 		};
-		BEA0A5CA2B05FDA70082B445 /* Utilities */ = {
+		BEA0A5CA2B05FDA70082B445 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
 				BEFEF1882A8FAB5100131D41 /* ExternalManager.swift */,
@@ -450,7 +450,7 @@
 				BEA0A5DB2B0DE3BE0082B445 /* Firestore */,
 				BEA0A5DC2B0DE3CA0082B445 /* FirebaseStorage */,
 			);
-			path = Utilities;
+			path = Utils;
 			sourceTree = "<group>";
 		};
 		BEA0A5DB2B0DE3BE0082B445 /* Firestore */ = {
@@ -539,12 +539,12 @@
 				E0FCADA2296F289A00BA6A75 /* Artwork_Management.entitlements */,
 				E08F272428DDA08E00329C5E /* Artwork_ManagementApp.swift */,
 				E0455FDF292BBB74004F677D /* GoogleService-Info.plist */,
-				BEA0A5CA2B05FDA70082B445 /* Utilities */,
+				BEA0A5CA2B05FDA70082B445 /* Utils */,
 				BE392FF129C2133B00BB5700 /* Helpers */,
 				E05FE94328F71BE400263F98 /* Extensions */,
-				E08F273228DDB3B200329C5E /* Views */,
-				E08F273328DDB3C400329C5E /* ViewModels */,
 				E08F273428DDB3CA00329C5E /* Models */,
+				E08F273328DDB3C400329C5E /* ViewModels */,
+				E08F273228DDB3B200329C5E /* Views */,
 				E08F272828DDA09000329C5E /* Assets.xcassets */,
 				E08F272A28DDA09000329C5E /* Preview Content */,
 			);
