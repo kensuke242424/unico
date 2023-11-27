@@ -196,7 +196,7 @@ class TeamViewModel: ObservableObject, FirebaseErrorHandling {
             /// 所属チームメンバー全員のスナップショットを取得
             let membersSnapshot = try await JoinMember.getDocuments(.members(teamId: teamId))
 
-            return membersSnapshot?.documents.compactMap {$0.documentID}
+            return membersSnapshot.documents.compactMap {$0.documentID}
 
         } catch {
             handleErrors([error])
@@ -247,7 +247,6 @@ class TeamViewModel: ObservableObject, FirebaseErrorHandling {
 
         do {
             let snapshot = try await Item.getDocuments(.items(teamId: teamId))
-            guard let snapshot else { return }
 
             for document in snapshot.documents {
                 let item = try document.data(as: Item.self)

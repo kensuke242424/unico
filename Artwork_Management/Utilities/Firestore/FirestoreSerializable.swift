@@ -74,7 +74,7 @@ extension FirestoreSerializable {
         }
     }
 
-    static func getDocuments(_ pathType: FirestorePathType) async throws -> QuerySnapshot? {
+    static func getDocuments(_ pathType: FirestorePathType) async throws -> QuerySnapshot {
 
         do {
             let snapShot = try await Firestore.firestore()

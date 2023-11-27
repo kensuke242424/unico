@@ -60,7 +60,7 @@ class LogViewModel: ObservableObject, FirebaseErrorHandling {
         do {
             let memberRefs = try await JoinMember.getDocuments(.members(teamId: team.id))
 
-            for member in memberRefs!.documents {
+            for member in memberRefs.documents {
                 let memberId = member.documentID
                 // ログのセットタイプが.localの場合、自身だけにログを追加する
                 if logType.setRule == .global || memberId == user.id {

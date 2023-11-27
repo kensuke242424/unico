@@ -15,6 +15,7 @@ enum FirestorePathType {
     case members(teamId: String)
     case joins(userId: String)
     case logs(teamId: String, memberId: String)
+    case backgrounds(documentId: String, collectionId: String)
 
     var collectionPath: String {
         switch self {
@@ -32,6 +33,8 @@ enum FirestorePathType {
             return "users/\(userId)/joins"
         case .logs(let teamId, let memberId):
             return "teams/\(teamId)/members/\(memberId)/logs"
+        case .backgrounds(let documentId, let collectionId):
+            return "backgrounds/\(documentId)/\(collectionId)"
         }
     }
 }
