@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-/// チームおよびユーザーが行った編集履歴のエレメントを管理する。
+/// 自身を含めたチームメンバーが行った編集履歴のエレメントを管理する。
 struct Log: Identifiable, Equatable, Hashable, Codable, FirestoreSerializable {
     var id: String
     var teamId: String
