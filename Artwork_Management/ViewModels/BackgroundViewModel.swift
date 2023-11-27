@@ -13,7 +13,7 @@ import FirebaseFirestoreSwift
 
 class BackgroundViewModel: ObservableObject, FirebaseErrorHandling {
 
-    var db: Firestore? = Firestore.firestore()
+//    var db: Firestore = Firestore.firestore()
     var uid: String? { return Auth.auth().currentUser?.uid }
 
     /// カテゴリ指定によって取得した背景サンプルデータが格納されるプロパティ
@@ -65,24 +65,20 @@ class BackgroundViewModel: ObservableObject, FirebaseErrorHandling {
 
     func fetchCategoryBackgroundImage(category: String) async {
 
+        // カテゴリ背景のFirestoreリファレンス取得用のidを準備
         let containerID = "\(category)Backgrounds"
         let documentId = containerID.uppercased()
         let collectionId = containerID.lowercased()
 
-        guard let categoryBackgroundRefs = db?.collection("backgrounds")
-            .document(documentId)
-            .collection(collectionId) else {
-            return
-        }
-
         do {
-            let snapshot = try await categoryBackgroundRefs.getDocuments()
-            let documents = snapshot.documents
+            let snapshot = try await Background.getDocuments(.backgrounds(documentId: documentId,
+                                                                          collectionId: collectionId))
 
-            let fetchImages = documents.compactMap { document in
+            let fetchImages = snapshot.documents.compactMap { document in
                 do {
                     let fetchImage = try document.data(as: Background.self)
                     return fetchImage
+
                 } catch {
                     handleErrors([error])
                     return nil
@@ -169,8 +165,8 @@ private extension BackgroundViewModel {
     /// ⚠️このメソッドは開発者のみ使用する。各サンプル背景データをFirestoreにまとめて保存するメソッド⚠️
     /// ユーザー共通で一つのサンプル背景データ群をフェッチして利用する
     func settingAllSampleBackgrounds() {
-        print("settingAllBackgrounds実行")
-        guard let backgroundRef = db?.collection("backgrounds") else { return }
+        let backgroundRef = Firestore.firestore()
+            .collection("backgrounds")
 
         BackgroundCategory.allCases.forEach { category in
             print("\(category.categoryName)カテゴリ背景グループの保存開始")
