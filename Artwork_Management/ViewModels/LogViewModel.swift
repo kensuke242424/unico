@@ -72,31 +72,6 @@ class LogViewModel: ObservableObject, FirebaseErrorHandling {
         } catch {
             handleErrors([error])
         }
-
-//        let membersRef = db?
-//            .collection("teams")
-//            .document(team.id)
-//            .collection("members")
-//
-//        do {
-//            membersRef?.getDocuments { (snapshot, _) in
-//                guard let snapshot else { return }
-//
-//                snapshot.documents.compactMap { (member) -> () in
-//
-//                    let memberId = member.documentID
-//
-//                    // ログのセットタイプが.localの場合、自身だけにログを追加する
-//                    if logType.setRule == .global || memberId == user.id {
-//                        try? membersRef?
-//                            .document(memberId)
-//                            .collection("logs")
-//                            .document(newLog.id)
-//                            .setData(from: newLog, merge: true) // 保存
-//                    }
-//                }
-//            }
-//        }
     }
 
     deinit {
