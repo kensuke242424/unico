@@ -12,7 +12,7 @@ import FirebaseFirestore
 
 /// チーム全体に届くデータの追加・更新・削除通知を管理するクラス。
 /// チームドキュメントのサブコレクション「logs」から、自身が未読のログをクエリ取得して通知表示する。
-class NotificationViewModel: ObservableObject {
+class NotificationViewModel: ObservableObject, FirebaseErrorHandling {
 
     init() { print("<<<<<<<<<  NotificationViewModel_init  >>>>>>>>>") }
 
@@ -26,15 +26,18 @@ class NotificationViewModel: ObservableObject {
     /// currentNotificationへの格納 -> 破棄 -> 格納 が続く。
     @Published var notifications: [Log] = []
 
-    func listener(id currentTeamID: String?) {
-        guard let uid, let currentTeamID else {
+    @Published var showErrorAlert: Bool = false
+    @Published var errorMessage: String = ""
+
+    func listener(id currentTeamId: String?) {
+        guard let uid, let currentTeamId else {
             print("ERROR: 通知のリスニング失敗")
             return
         }
 
         let myLogsRef = db?
             .collection("teams")
-            .document(currentTeamID)
+            .document(currentTeamId)
             .collection("members")
             .document(uid)
             .collection("logs")
