@@ -167,9 +167,10 @@ class TeamViewModel: ObservableObject, FirebaseErrorHandling {
         }
     }
 
-    func uploadTeamImage(_ image: UIImage?) async -> (url: URL?, filePath: String?) {
-        guard let teamId = team?.id else {
-            assertionFailure("teamIdが存在しません")
+    func uploadTeamImage(_ image: UIImage?, teamId: String?) async -> (url: URL?, filePath: String?) {
+
+        guard let teamId else {
+            assertionFailure("teamId: nil")
             return (url: nil, filePath: nil)
         }
 
@@ -301,31 +302,29 @@ class TeamViewModel: ObservableObject, FirebaseErrorHandling {
             return Team.getReference(.teams, docId: $0.id)
         }
 
-        do {
-            // 各所属チームのリファレンスごとに削除処理を実行していく
-            for teamRef in teamRefs {
-                let teamId = teamRef.documentID
-                let membersId = await getMembersId(teamId: teamId)
+        // 各所属チームのリファレンスごとに削除処理を実行していく
+        for teamRef in teamRefs {
+            let teamId = teamRef.documentID
+            let membersId = await getMembersId(teamId: teamId)
 
-                // メンバーデータが存在しなかった場合は処理を中断し、別のチーム処理を再スタート
-                guard let membersId else {
-                    print("ERROR: チーム内にメンバーデータが存在しません")
-                    continue
-                }
+            // メンバーデータが存在しなかった場合は処理を中断し、別のチーム処理を再スタート
+            guard let membersId else {
+                print("ERROR: チーム内にメンバーデータが存在しません")
+                continue
+            }
 
-                if membersId.count == 1 && membersId.first == uid {
-                    // ✅チーム内に自分以外のメンバーが居なかった場合、チームの全データをFirestoreから削除
-                    await deleteTeamMemberDocument(teamId: teamId, memberId: uid)
-                    await deleteTagDocuments(teamId: teamId)
-                    await deleteItemDocuments(teamId: teamId)
-                    await deleteTeamDocument(for: teamId)
+            if membersId.count == 1 && membersId.first == uid {
+                // ✅チーム内に自分以外のメンバーが居なかった場合、チームの全データをFirestoreから削除
+                await deleteTeamMemberDocument(teamId: teamId, memberId: uid)
+                await deleteTagDocuments(teamId: teamId)
+                await deleteItemDocuments(teamId: teamId)
+                await deleteTeamDocument(for: teamId)
 
-                } else {
-                     // ✅他にもチームメンバーが残っている場合、自身のmemberデータのみ削除
-                    await deleteTeamMemberDocument(teamId: teamId, memberId: uid)
-                }
-            } // for文
-        }
+            } else {
+                // ✅他にもチームメンバーが残っている場合、自身のmemberデータのみ削除
+                await deleteTeamMemberDocument(teamId: teamId, memberId: uid)
+            }
+        } // for文
     }
 
     func removeListener() {

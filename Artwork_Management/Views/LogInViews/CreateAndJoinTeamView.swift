@@ -455,7 +455,7 @@ struct CreateAndJoinTeamView: View {
                         await teamVM.setTeam(data: teamData)
                         await teamVM.setMember(teamId: teamData.id, data: user)
                         await userVM.addOrUpdateJoinTeam(data: joinTeamData)
-                        await userVM.updateLastLogInTeam(teamId: teamData.id)
+                        await userVM.updateLastLogInTeamId(teamId: teamData.id)
                         await teamVM.setSampleData(teamId: teamData.id)
 
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
@@ -470,16 +470,6 @@ struct CreateAndJoinTeamView: View {
                             }
                         }
 
-                    } catch CustomError.uidEmpty {
-                        print("Error: uidEmpty")
-                    } catch CustomError.getRef {
-                        print("Error: getRef")
-                    } catch CustomError.fetch {
-                        print("Error: fetch")
-                    } catch CustomError.getDocument {
-                        print("Error: getDocument")
-                    } catch {
-                        print("Error: other.")
                     }
                 }
             }
@@ -494,7 +484,7 @@ struct CreateAndJoinTeamView: View {
         .onAppear {
 
             Task {
-                try await userVM.joinsListener() // ← チームからの加入許可をリスニングするために必要
+                await userVM.joinsListener() // ← チームからの加入許可をリスニングするために必要
             }
 
             // currentUserのuidをQRコードに変換

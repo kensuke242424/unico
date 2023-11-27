@@ -7,15 +7,7 @@
 
 import SwiftUI
 
-enum SelectedUpdateData {
-    case start, user, team
-}
-
 struct TeamProfileEditView: View {
-
-    enum ShowKeyboard {
-        case check
-    }
 
     struct InputUpdateTeam {
         var nameText: String = ""
@@ -170,7 +162,7 @@ struct TeamProfileEditView: View {
 
                 // 新規アイコンデータが存在すれば、アップロード&アイコンコンテナに格納
                 if let updateIconImage = input.captureImage {
-                    let uploadIconData = await teamVM.uploadTeamImage(updateIconImage)
+                    let uploadIconData = await teamVM.uploadTeamImage(updateIconImage, teamId: team.id)
                     afterTeam.iconURL = uploadIconData.url
                     afterTeam.iconPath = uploadIconData.filePath
                     joinTeamContainer.iconURL = uploadIconData.url

@@ -497,7 +497,6 @@ struct InputTab {
     var showUpdateUser     : Bool = false
     var isActiveEditHome   : Bool = false
     var pressingAnimation  : Bool = false
-    var selectedUpdateData : SelectedUpdateData = .start
 
     /// NavigationPathによるエディット画面遷移時に渡す
     var selectedItem: Item?

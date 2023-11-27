@@ -6,13 +6,15 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 import FirebaseStorage
 import FirebaseFirestore
 import FirebaseFirestoreSwift
 
-class BackgroundViewModel: ObservableObject {
+class BackgroundViewModel: ObservableObject, FirebaseErrorHandling {
 
     var db: Firestore? = Firestore.firestore()
+    var uid: String? { return Auth.auth().currentUser?.uid }
 
     /// カテゴリ指定によって取得した背景サンプルデータが格納されるプロパティ
     @Published var categoryBackgrounds: [Background] = []
@@ -35,6 +37,9 @@ class BackgroundViewModel: ObservableObject {
     @Published var checkModeToggle: Bool = false
     @Published var checkMode: Bool = false
     @Published var savingWait: Bool = false
+
+    @Published var showErrorAlert: Bool = false
+    @Published var errorMessage: String = ""
 
     func resetSelectBackgroundImages() async {
         withAnimation(.easeInOut(duration: 0.5)) {
@@ -61,16 +66,14 @@ class BackgroundViewModel: ObservableObject {
     func fetchCategoryBackgroundImage(category: String) async {
 
         let containerID = "\(category)Backgrounds"
-        let upperCasedID = containerID.uppercased()
-        let lowercasedID = containerID.lowercased()
+        let documentId = containerID.uppercased()
+        let collectionId = containerID.lowercased()
 
         guard let categoryBackgroundRefs = db?.collection("backgrounds")
-            .document(upperCasedID)
-            .collection(lowercasedID) else {
+            .document(documentId)
+            .collection(collectionId) else {
             return
         }
-
-        print("背景データ取得開始")
 
         do {
             let snapshot = try await categoryBackgroundRefs.getDocuments()
@@ -81,7 +84,7 @@ class BackgroundViewModel: ObservableObject {
                     let fetchImage = try document.data(as: Background.self)
                     return fetchImage
                 } catch {
-                    print("背景データの取得失敗")
+                    handleErrors([error])
                     return nil
                 }
             }
@@ -92,67 +95,36 @@ class BackgroundViewModel: ObservableObject {
                 }
             }
         } catch {
-            print("背景データの取得失敗")
+            handleErrors([error])
         }
     }
-    /// サインアップ時に、ユーザーが写真フォルダから選択した画像をFirestorageに保存するメソッド。
-    func uploadUserBackgroundAtSignUp(_ image: UIImage?) async -> (url: URL?, filePath: String?) {
 
-        guard let imageData = image?.jpegData(compressionQuality: 0.8) else {
-            return (url: nil, filePath: nil)
-        }
+    /// ユーザーが現在のチーム内で選択した背景画像をFirebaseStorageに保存する。
+    func uploadMyNewBackground(_ image: UIImage?) async -> (url: URL?, filePath: String?) {
+        guard let uid else { assertionFailure("uid: nil"); return (url: nil, filePath: nil) }
+
+        // リサイズ
+        let width = await UIScreen.main.bounds.width
+        let resizedImage = image?.resize(width: width)
 
         do {
-            let storage = Storage.storage()
-            let reference = storage.reference()
-            let filePath = "users/\(Date()).jpeg"
-            let imageRef = reference.child(filePath)
-            _ = try await imageRef.putDataAsync(imageData)
-            let url = try await imageRef.downloadURL()
+            return try await FirebaseStorageManager.uploadImage(resizedImage, .myBackground(userId: uid))
 
-            return (url: url, filePath: filePath)
         } catch {
+            handleErrors([error])
             return (url: nil, filePath: nil)
         }
     }
 
-    func resizeUIImage(image: UIImage?) -> UIImage? {
-
-        let width: CGFloat = UIScreen.main.bounds.width
-
-        if let originalImage = image {
-            // オリジナル画像のサイズからアスペクト比を計算
-            let aspectScale = originalImage.size.height / originalImage.size.width
-
-            // widthからアスペクト比を元にリサイズ後のサイズを取得
-            let resizedSize = CGSize(width: width * 3, height: width * Double(aspectScale) * 3)
-
-            // リサイズ後のUIImageを生成して返却
-            UIGraphicsBeginImageContext(resizedSize)
-            originalImage.draw(in: CGRect(x: 0, y: 0, width: resizedSize.width, height: resizedSize.height))
-            let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
-            UIGraphicsEndImageContext()
-
-            return resizedImage
-        } else {
-            return nil
-        }
-    }
-
-    func deleteBackground(path: String?) {
+    func deleteBackgroundImage(path: String?) async {
 
         guard let path = path else { return }
 
-        let storage = Storage.storage()
-        let reference = storage.reference()
-        let imageRef = reference.child(path)
+        do {
+            return try await FirebaseStorageManager.deleteImage(path: path)
 
-        imageRef.delete { error in
-            if let error = error {
-                print(error)
-            } else {
-                print("Backgroundの削除完了")
-            }
+        } catch {
+            handleErrors([error])
         }
     }
 }
@@ -165,12 +137,13 @@ class BackgroundViewModel: ObservableObject {
 private extension BackgroundViewModel {
 
     func uploadSampleBackgroundImage(category: String, imageName: String) async -> (url: URL?, filePath: String?) {
-        print("uploadBackgroundImage実行")
+
+        let width = await UIScreen.main.bounds.width // 背景の横幅
 
         guard let backgroundUIImage = UIImage(named: imageName) else {
             return (url: nil, filePath: nil)
         }
-        guard let resizedUIImage = resizeUIImage(image: backgroundUIImage) else {
+        guard let resizedUIImage = backgroundUIImage.resize(width: width) else {
             return (url: nil, filePath: nil)
         }
         guard let imageJpegData = resizedUIImage.jpegData(compressionQuality: 0.8) else {

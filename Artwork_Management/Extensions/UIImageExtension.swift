@@ -15,7 +15,7 @@ extension UIImage {
         let aspectScale = self.size.height / self.size.width
 
         // widthからアスペクト比を元にリサイズ後のサイズを取得
-        let resizedSize = CGSize(width: imageWidth, height: imageWidth * Double(aspectScale))
+        let resizedSize = CGSize(width: imageWidth * 2, height: imageWidth * Double(aspectScale) * 2)
 
         // リサイズ後のUIImageを生成して返却
         UIGraphicsBeginImageContext(resizedSize)

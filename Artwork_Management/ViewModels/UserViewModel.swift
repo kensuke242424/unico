@@ -197,7 +197,7 @@ class UserViewModel: ObservableObject, FirebaseErrorHandling {
     }
 
     /// ユーザーがチーム移動操作時に実行する。自身の操作チーム対象を保持するUserフィールドを更新するメソッド。
-    func updateLastLogInTeam(teamId: String?) async {
+    func updateLastLogInTeamId(teamId: String?) async {
         guard var user else { assertionFailure("user: nil"); return }
         guard let teamId else { assertionFailure("teamId: nil"); return }
 
@@ -366,34 +366,17 @@ class UserViewModel: ObservableObject, FirebaseErrorHandling {
         }
     }
 
-    /// ユーザーが現在のチーム内で選択した背景画像をFirebaseStorageに保存する。
-    func uploadMyNewBackground(_ image: UIImage?) async -> (url: URL?, filePath: String?) {
-        guard let uid else { assertionFailure("uid: nil"); return (url: nil, filePath: nil) }
-
-        // リサイズ
-        let width = await UIScreen.main.bounds.width
-        let resizedImage = image?.resize(width: width)
-
-        do {
-            return try await FirebaseStorageManager.uploadImage(resizedImage, .myBackground(userId: uid))
-
-        } catch {
-            handleErrors([error])
-            return (url: nil, filePath: nil)
-        }
-    }
-
     /// ユーザーが写真フォルダから選択したオリジナル背景をFirestoreに保存するメソッド。
     /// 画像はユーザーのドキュメントデータ「myBackgrounds」に保管される。
-    func setMyNewBackground(url imageURL: URL?, path imagePath: String?) async {
+    func setMyNewBackground(imageData: (url: URL?, filePath: String?)) async {
         guard var user else { assertionFailure("user: nil"); return }
 
         /// 受け取った画像データを元に、保存用の背景データ作成
         user.myBackgrounds.append(
             Background(category: "original",
                        imageName: "",
-                       imageURL: imageURL,
-                       imagePath: imagePath)
+                       imageURL: imageData.url,
+                       imagePath: imageData.filePath)
         )
 
         do {
@@ -404,7 +387,7 @@ class UserViewModel: ObservableObject, FirebaseErrorHandling {
         }
     }
 
-    func deleteMyBackground(_ background: Background) async {
+    func removeMyBackground(_ background: Background) async {
         guard var user else { assertionFailure("user: nil"); return }
 
         /// 対象背景データを削除

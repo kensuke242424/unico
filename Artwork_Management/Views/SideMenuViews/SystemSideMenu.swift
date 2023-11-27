@@ -56,7 +56,7 @@ struct SystemSideMenu: View {
                             // フェッチするチームデータを管理するUserModel内のlastLogInの値を更新後に、再fetchを実行
                             Task {
                                 input.showChangeTeamSheet = false
-                                try await userVM.updateLastLogInTeam(teamId: input.selectedTeam?.id)
+                                try await userVM.updateLastLogInTeamId(teamId: input.selectedTeam?.id)
                                 withAnimation(.spring(response: 0.5)) {
                                     progressVM.showCubesProgress = true
                                     inputTab.showSideMenu = false
@@ -593,7 +593,7 @@ struct SystemSideMenu: View {
                             // フェッチするチームデータを管理するUserModel内のlastLogInの値を更新後に、再fetchを実行
                             Task {
                                 input.showChangeTeamSheet = false
-                                try await userVM.updateLastLogInTeam(teamId: input.selectedTeam?.id)
+                                try await userVM.updateLastLogInTeamId(teamId: input.selectedTeam?.id)
                                 withAnimation(.spring(response: 0.5)) {
                                     progressVM.showCubesProgress = true
                                     inputTab.showSideMenu = false

@@ -112,7 +112,7 @@ struct JoinedTeamInformationView: View {
             /* -- チーム移動処理 -- */
 
             do {
-                try await userVM.updateLastLogInTeam(teamId: joinedTeam?.id)
+                try await userVM.updateLastLogInTeamId(teamId: joinedTeam?.id)
                 presented = false
                 logInVM.rootNavigation = .fetch
             } catch {

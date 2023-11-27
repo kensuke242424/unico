@@ -34,8 +34,8 @@ class FirebaseStorageManager {
 
     static func deleteImage(path: String?) async throws {
         guard let path = path else {
-                throw FirebaseStorageError.invalidPath
-            }
+            throw FirebaseStorageError.invalidPath
+        }
 
         let storage = Storage.storage()
         let reference = storage.reference()

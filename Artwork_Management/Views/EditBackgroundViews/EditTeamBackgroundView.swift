@@ -119,11 +119,13 @@ struct EditTeamBackgroundView: View {
         }
         .onChange(of: backgroundVM.croppedUIImage) { newImage in
             guard let newImage else { return }
-            Task{
+
+            Task {
                 withAnimation { backgroundVM.savingWait = true }
-                let resizedImage = backgroundVM.resizeUIImage(image: newImage)
-                let uploadImage = await userVM.uploadMyNewBackground(resizedImage)
-                await userVM.setMyNewBackground(url: uploadImage.url, path: uploadImage.filePath)
+
+                let uploadImage = await backgroundVM.uploadMyNewBackground(newImage)
+                await userVM.setMyNewBackground(imageData: uploadImage)
+
                 withAnimation { backgroundVM.savingWait = false }
             }
         }

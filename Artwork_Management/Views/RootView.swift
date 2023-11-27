@@ -112,14 +112,14 @@ struct RootView: View {
                         /// MEMO: スナップショットはasync/awaitに対応してないため、
                         /// 先に取得しておく必要がある「user」と「joins」をasync/awaitメソッドで取得。
                         /// 取得に成功すれば、以降のデータ取得が進む。
-                        try await userVM.fetchUser()
+                        await userVM.fetchUser()
                         /// ユーザーデータの所得ができなければ、ログイン画面に遷移
                         guard let user = userVM.user else {
                             authVM.rootNavigation = .logIn
                             return
                         }
 
-                        try await userVM.getJoinTeams()
+                        await userVM.getJoinTeams()
 
                         /// チームデータを持っていなければ、チーム追加画面へ遷移
                         if userVM.joins.isEmpty {
@@ -140,12 +140,12 @@ struct RootView: View {
                         await tagVM.tagsLister(teamID: lastLogInTeamID)
 
                         // ---- ユーザー関連データをリスニング ----
-                        try await userVM.userListener()
-                        try await userVM.joinsListener()
+                        await userVM.userListener()
+                        await userVM.joinsListener()
                         // ---- チーム関連データをリスニング ----
-                        try await teamVM.teamListener(id: lastLogInTeamID)
-                            await teamVM.membersListener(id: lastLogInTeamID)
-                            await itemVM.itemsListener(id: lastLogInTeamID)
+                        await teamVM.teamListener(id: lastLogInTeamID)
+                        await teamVM.membersListener(id: lastLogInTeamID)
+                        await itemVM.itemsListener(id: lastLogInTeamID)
                         
                         /// ホーム画面へ遷移
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -159,31 +159,6 @@ struct RootView: View {
                                 authVM.addressSignInFase          = .start
                             }
                         }
-
-                    } catch CustomError.uidEmpty {
-                        print("Error: uidEmpty")
-                        authVM.logOut()
-                        withAnimation(.spring(response: 1)) { authVM.rootNavigation = .logIn }
-                    } catch CustomError.getRef {
-                        print("Error: getRef")
-                        authVM.logOut()
-                        withAnimation(.spring(response: 1)) { authVM.rootNavigation = .logIn }
-                    } catch CustomError.fetch {
-                        print("Error: fetch")
-                        authVM.logOut()
-                        withAnimation(.spring(response: 1)) { authVM.rootNavigation = .logIn }
-                    } catch CustomError.getDocument {
-                        print("Error: getDocument")
-                        authVM.logOut()
-                        withAnimation(.spring(response: 1)) { authVM.rootNavigation = .logIn }
-                    } catch CustomError.getUserDocument {
-                        print("Error: getUserDocument")
-                        authVM.logOut()
-                        withAnimation(.spring(response: 1)) { authVM.rootNavigation = .logIn }
-                    } catch {
-                        print("Error")
-                        authVM.logOut()
-                        withAnimation(.spring(response: 1)) { authVM.rootNavigation = .logIn }
                     }
                 } // Task
             }

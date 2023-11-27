@@ -53,8 +53,8 @@ struct SelectionBackgroundCards: View {
                                     // 一瞬ずらさないとアラートが瞬間だけ再表示されてしまう🧐
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                         Task {
-                                            backgroundVM.deleteBackground(path: background.imagePath)
-                                            await userVM.deleteMyBackground(deleteTargetImage)
+                                            await backgroundVM.deleteBackgroundImage(path: background.imagePath)
+                                            await userVM.removeMyBackground(deleteTargetImage)
                                             if backgroundVM.selectBackground == background {
                                                 backgroundVM.selectBackground = nil
                                             }
