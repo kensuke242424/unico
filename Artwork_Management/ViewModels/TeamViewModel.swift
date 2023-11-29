@@ -298,7 +298,7 @@ class TeamViewModel: ObservableObject, FirebaseErrorHandling {
 
         // ユーザーが所属している全チームのリファレンスを取得
         let teamRefs = joinTeams.compactMap {
-            return Team.getReference(.teams, docId: $0.id)
+            return Team.getDocument(.teams, docId: $0.id)
         }
 
         // 各所属チームのリファレンスごとに削除処理を実行していく
