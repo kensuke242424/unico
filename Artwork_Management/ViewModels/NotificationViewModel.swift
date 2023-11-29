@@ -352,6 +352,11 @@ class NotificationViewModel: ObservableObject, FirebaseErrorHandling {
         }
     }
 
+    /// 対象ログをメンバー全員が既読したかどうかを判定するメソッド。
+    private func checkMembersToReadLog() -> Bool {
+        return false
+    }
+
     /// 対象データの 追加/更新/削除/在庫処理 の操作が取り消しされているかを判定するメソッド。
     private func checkReseted(log: Log, to dataId: String) -> Bool {
         return log.canceledIds.contains(where:{ $0 == dataId})

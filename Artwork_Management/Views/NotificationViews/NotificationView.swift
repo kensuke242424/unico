@@ -204,9 +204,10 @@ fileprivate struct NotificationContainer: View {
             }
         }
         .onDisappear {
-            print("通知が破棄されました")
-            vm.setRead(team: teamVM.team, element: element)
-            vm.deleteBeforeUIImageController(element: element)
+            Task {
+                await vm.setRead(team: teamVM.team, element: element)
+                      vm.deleteImageController(element: element)
+            }
         }
     }
     // 🍎------  アイテム通知の詳細ビュー   -------🍎
@@ -810,7 +811,7 @@ struct ResetLogButton: View {
                 guard let resetExecution else { return }
 
                 do {
-                    try await vm.resetController(to: teamVM.team,
+                    try await vm.resetLogController(to: teamVM.team,
                                                  element: element,
                                                  index: commerceIndex)
                     self.resetExecution = nil
