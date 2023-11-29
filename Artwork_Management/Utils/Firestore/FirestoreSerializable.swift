@@ -74,6 +74,16 @@ extension FirestoreSerializable {
         }
     }
 
+    static func getDocument(_ pathType: FirestorePathType, docId: String) -> DocumentReference {
+        do {
+            let documentRef = Firestore.firestore()
+                .collection(pathType.collectionPath)
+                .document(docId)
+
+            return documentRef
+        }
+    }
+
     static func getDocuments(_ pathType: FirestorePathType) async throws -> QuerySnapshot {
 
         do {
@@ -111,16 +121,6 @@ extension FirestoreSerializable {
         }
     }
 
-    static func getReference(_ pathType: FirestorePathType, docId: String) -> DocumentReference {
-        do {
-            let documentRef = Firestore.firestore()
-                .collection(pathType.collectionPath)
-                .document(docId)
-
-            return documentRef
-        }
-    }
-
     static func deleteDocument(_ pathType: FirestorePathType, docId: String) async throws {
         do {
             try await Firestore.firestore()
@@ -153,6 +153,42 @@ extension FirestoreSerializable {
                 throw FirestoreError.other(error)
             }
         }
+    }
+}
+
+// Log操作専用のロジック
+extension FirestoreSerializable {
+
+    /// 対象ログをメンバー全員が既読済みかどうかを検索判定するメソッド。
+    static func isLogReadByAllMembers(log: Log, teamId: String, members: [JoinMember]) async throws -> Bool {
+
+        var unreadMemberLogRefs: [QuerySnapshot] = []
+
+        for member in members {
+            let query = Firestore.firestore()
+                .collection("teams")
+                .document(teamId)
+                .collection("members")
+                .document(member.id)
+                .collection("logs")
+                .whereField("id", isEqualTo: log.id)
+                .whereField("read", isEqualTo: false) // falseなら未読
+
+            do {
+                let querySnapshot = try await query.getDocuments()
+                if !querySnapshot.isEmpty {
+                    unreadMemberLogRefs.append(querySnapshot)
+                }
+            } catch {
+                if let firestoreError = error as? FirestoreError {
+                    throw firestoreError
+                } else {
+                    throw FirestoreError.other(error)
+                }
+            }
+        }
+
+        return unreadMemberLogRefs.isEmpty
     }
 }
 

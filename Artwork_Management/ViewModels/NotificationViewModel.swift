@@ -266,7 +266,7 @@ class NotificationViewModel: ObservableObject, FirebaseErrorHandling {
     /// キャンセル処理の重複を避けるために必要である。
     /// ログデータの「canceledIds」にデータのcreateTimeを格納する。
     private func setReseted(to team: Team?, id canceledDataId: String, element: Log) async throws {
-        guard let team, let uid else { throw NotificationError.missingData }
+        guard let team, let uid else { assertionFailure("team, uid: nil"); return }
 
         /// ログデータに削除済みデータのcreateTimeを格納
         var updatedElement = element
@@ -300,7 +300,7 @@ class NotificationViewModel: ObservableObject, FirebaseErrorHandling {
 
     /// ログ通知が画面から破棄された時に実行される画像データ削除コントローラ。
     /// メソッド内部でログ通知のタイプを判定し、処理を分岐する。
-    func deleteImageController(element: Log) {
+    func deleteUnusedImageController(element: Log) {
 
         switch element.logType {
 
@@ -352,9 +352,18 @@ class NotificationViewModel: ObservableObject, FirebaseErrorHandling {
         }
     }
 
-    /// 対象ログをメンバー全員が既読したかどうかを判定するメソッド。
-    private func checkMembersToReadLog() -> Bool {
-        return false
+    /// 対象ログをメンバー全員が既読済みかどうかを検索判定するメソッド。
+    func isLogReadByAllMembers(log: Log, teamId: String?, members: [JoinMember]) async -> Bool {
+
+        guard let teamId else { assertionFailure("teamId: nil"); return false }
+
+        do {
+            return try await Log.isLogReadByAllMembers(log: log, teamId: teamId, members: members)
+
+        } catch {
+            handleErrors([error])
+            return false
+        }
     }
 
     /// 対象データの 追加/更新/削除/在庫処理 の操作が取り消しされているかを判定するメソッド。

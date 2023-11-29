@@ -205,8 +205,18 @@ fileprivate struct NotificationContainer: View {
         }
         .onDisappear {
             Task {
+                // 既読セット
                 await vm.setRead(team: teamVM.team, element: element)
-                      vm.deleteImageController(element: element)
+
+                // メンバー全員が既読済みかチェック
+                let isLogReadAll = await vm.isLogReadByAllMembers(log: element,
+                                                                  teamId: teamVM.team?.id,
+                                                                  members: teamVM.members)
+
+                //
+                if isLogReadAll {
+                    vm.deleteUnusedImageController(element: element)
+                }
             }
         }
     }
