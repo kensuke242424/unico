@@ -7,7 +7,7 @@
 
 import SwiftUI
 import Firebase
-import FirebaseStorage
+//import FirebaseStorage
 import FirebaseFirestore
 
 /// チーム全体に届くデータの追加・更新・削除通知を管理するクラス。
@@ -185,8 +185,8 @@ class NotificationViewModel: ObservableObject, FirebaseErrorHandling {
         }
     }
 
-    /// 在庫処理がキャンセルされた時に使用するメソッド。
-    /// 在庫処理された当時のbeforeとafterの差分を計算し、現在のアイテムステータスに差分を反映させて返す。
+    /// 在庫処理が取り消しされた時に使用するメソッド。
+    /// 在庫処理された当時のbeforeとafterの差分を計算し、現在のアイテムステータスに対して差分を反映させたデータを返す。
     private func resetCommerceDiffCalculate(compare: CompareItem, currentItem: Item) -> Item {
 
         // 在庫処理前と後の差分を算出
@@ -300,20 +300,20 @@ class NotificationViewModel: ObservableObject, FirebaseErrorHandling {
 
     /// ログ通知が画面から破棄された時に実行される画像データ削除コントローラ。
     /// メソッド内部でログ通知のタイプを判定し、処理を分岐する。
-    func deleteUnusedImageController(element: Log) {
+    func deleteUnusedImageController(element: Log) async {
 
         switch element.logType {
 
         case .addItem(let item):
             // アイテム追加が取り消しされていた場合、画像を削除
             if checkReseted(log: element, to: item.id) {
-                deleteImage(path: item.photoPath)
+                await deleteImage(path: item.photoPath)
             }
 
         case .deleteItem(let item):
             // アイテム削除が取り消しされていない場合、画像を削除
             if !checkReseted(log: element, to: item.id) {
-                deleteImage(path: item.photoPath)
+                await deleteImage(path: item.photoPath)
             }
 
         case .updateItem(let item):
@@ -321,9 +321,9 @@ class NotificationViewModel: ObservableObject, FirebaseErrorHandling {
             if item.before.photoPath == item.after.photoPath { return }
 
             if checkReseted(log: element, to: item.before.id) {
-                deleteImage(path: item.after.photoPath)
+                await deleteImage(path: item.after.photoPath)
             } else {
-                deleteImage(path: item.before.photoPath)
+                await deleteImage(path: item.before.photoPath)
             }
 
         case .updateUser(let user):
@@ -331,9 +331,9 @@ class NotificationViewModel: ObservableObject, FirebaseErrorHandling {
             if user.before.iconPath == user.after.iconPath { return }
 
             if checkReseted(log: element, to: user.before.id) {
-                deleteImage(path: user.after.iconPath)
+                await deleteImage(path: user.after.iconPath)
             } else {
-                deleteImage(path: user.before.iconPath)
+                await deleteImage(path: user.before.iconPath)
             }
 
         case .updateTeam(let team):
@@ -342,9 +342,9 @@ class NotificationViewModel: ObservableObject, FirebaseErrorHandling {
             if team.before.iconPath == team.after.iconPath { return }
 
             if checkReseted(log: element, to: team.before.id) {
-                deleteImage(path: team.after.iconPath)
+                await deleteImage(path: team.after.iconPath)
             } else {
-                deleteImage(path: team.before.iconPath)
+                await deleteImage(path: team.before.iconPath)
             }
 
         case .commerce, .join:
@@ -373,19 +373,13 @@ class NotificationViewModel: ObservableObject, FirebaseErrorHandling {
 
     /// データ内の画像が変更されている or データが削除された状態で、変更をキャンセルせずに通知を破棄した時、
     /// beforeデータの画像を削除するメソッド。
-    private func deleteImage(path imagePath: String?) {
+    private func deleteImage(path imagePath: String?) async {
         guard let imagePath else { return }
 
-        let storage = Storage.storage()
-        let reference = storage.reference()
-        let imageRef = reference.child(imagePath)
-
-        imageRef.delete { error in
-            if let error = error {
-                print(error)
-            } else {
-                print("beforeデータの画像削除成功!")
-            }
+        do {
+            try await FirebaseStorageManager.deleteImage(path: imagePath)
+        } catch {
+            handleErrors([error])
         }
     }
 

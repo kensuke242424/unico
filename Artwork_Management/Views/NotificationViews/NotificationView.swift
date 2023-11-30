@@ -215,7 +215,7 @@ fileprivate struct NotificationContainer: View {
 
                 //
                 if isLogReadAll {
-                    vm.deleteUnusedImageController(element: element)
+                    await vm.deleteUnusedImageController(element: element)
                 }
             }
         }
