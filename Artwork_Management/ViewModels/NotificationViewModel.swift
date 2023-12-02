@@ -265,37 +265,49 @@ class NotificationViewModel: ObservableObject, FirebaseErrorHandling {
     /// チームの各メンバーのログデータに、変更内容のキャンセル実行を反映させるメソッド。
     /// キャンセル処理の重複を避けるために必要である。
     /// ログデータの「canceledIds」にデータのcreateTimeを格納する。
-    private func setReseted(to team: Team?, id canceledDataId: String, element: Log) async throws {
+    private func setReseted(to team: Team?, id canceledDataId: String, element: Log) async {
         guard let team, let uid else { assertionFailure("team, uid: nil"); return }
 
         /// ログデータに削除済みデータのcreateTimeを格納
-        var updatedElement = element
-        updatedElement.canceledIds.append(canceledDataId)
+        var elementToUpdate = element
+        elementToUpdate.canceledIds.append(canceledDataId)
 
         /// チームのサブコレクションmembersリファレンス
-        let membersRef = db?
-            .collection("teams")
-            .document(team.id)
-            .collection("members")
-
-        let snap = try await membersRef?.getDocuments()
-        guard let documents = snap?.documents else {
-            throw NotificationError.noDocumentExist
-        }
-
-        for document in documents {
-
-            let memberId = document.documentID
-            let logRef = membersRef?
-                .document(memberId)
-                .collection("logs")
-                .document(element.id)
-            /// メンバーのログデータにキャンセル済であることを反映
-            // ログのセットタイプが.localの場合、ユーザー自身のログのみ更新する
-            if element.logType.setRule == .global || memberId == uid {
-                try await logRef?.updateData(["canceledIds": FieldValue.arrayUnion([canceledDataId])])
-            }
-        }
+//        let membersRef = db?
+//            .collection("teams")
+//            .document(team.id)
+//            .collection("members")
+//
+//        do {
+//            let memberRefs = try await JoinMember.getDocuments(.members(teamId: team.id))
+//            for memberRef in memberRefs.documents {
+//
+//                try await memberRef
+//                    .collection("logs")
+//                    .document(element.id)
+//                    .updateData(["canceledIds": FieldValue.arrayUnion([canceledDataId])])
+//            }
+//        } catch {
+//
+//        }
+//        let snap = try await membersRef?.getDocuments()
+//        guard let documents = snap?.documents else {
+//            throw NotificationError.noDocumentExist
+//        }
+//
+//        for document in documents {
+//
+//            let memberId = document.documentID
+//            let logRef = membersRef?
+//                .document(memberId)
+//                .collection("logs")
+//                .document(element.id)
+//            /// メンバーのログデータにキャンセル済であることを反映
+//            // ログのセットタイプが.localの場合、ユーザー自身のログのみ更新する
+//            if element.logType.setRule == .global || memberId == uid {
+//                try await logRef?.updateData(["canceledIds": FieldValue.arrayUnion([canceledDataId])])
+//            }
+//        }
     }
 
     /// ログ通知が画面から破棄された時に実行される画像データ削除コントローラ。
