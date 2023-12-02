@@ -159,6 +159,39 @@ extension FirestoreSerializable {
 // Log操作専用のロジック
 extension FirestoreSerializable {
 
+    static func setLogReseted(userId: String, teamId: String, log: Log, canceledDataId: String) async throws {
+        /// チームのサブコレクションmembersリファレンス
+        let memberRefs = Firestore.firestore()
+            .collection("teams")
+            .document(teamId)
+            .collection("members")
+
+        do {
+            let memberQuery = try await JoinMember.getDocuments(.members(teamId: teamId))
+
+            for memberDocument in memberQuery.documents {
+
+                let memberId = memberDocument.documentID
+                let logRef = memberRefs
+                    .document(memberId)
+                    .collection("logs")
+                    .document(log.id)
+
+                // ログのセットタイプが.localの場合、ユーザー自身のログのみ更新する
+                if log.logType.setRule == .global || memberId == userId {
+                    // リセットされた対象データのIDを、ログのパラメータに追加
+                    try await logRef.updateData(["canceledIds": FieldValue.arrayUnion([canceledDataId])])
+                }
+            }
+        } catch {
+            if let firestoreError = error as? FirestoreError {
+                throw firestoreError
+            } else {
+                throw FirestoreError.other(error)
+            }
+        }
+    }
+
     /// 対象ログをメンバー全員が既読済みかどうかを検索判定するメソッド。
     static func isLogReadByAllMembers(log: Log, teamId: String, members: [JoinMember]) async throws -> Bool {
 

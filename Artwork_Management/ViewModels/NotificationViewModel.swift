@@ -77,7 +77,7 @@ class NotificationViewModel: ObservableObject, FirebaseErrorHandling {
 
     /// ユーザーが既に表示した通知に既読を付けるメソッド。
     /// 対象のログが持っているIdを用いて、ログの既読を管理する「read」プロパティをtrueにする。
-    func setRead(team: Team?, element: Log) async {
+    func setReadLog(team: Team?, element: Log) async {
         guard let team, let uid else { assertionFailure("team, uid: nil"); return }
 
         do {
@@ -133,7 +133,7 @@ class NotificationViewModel: ObservableObject, FirebaseErrorHandling {
 
         do {
             try await Item.deleteDocument(.items(teamId: team.id), docId: addedItem.id)
-            try await setReseted(to: team, id: addedItem.id, element: element)
+            try await setLogReseted(to: team, id: addedItem.id, element: element)
 
         } catch {
             handleErrors([error])
@@ -146,7 +146,7 @@ class NotificationViewModel: ObservableObject, FirebaseErrorHandling {
 
         do {
             try await Item.setData(.items(teamId: team.id), docId: item.before.id, data: item.before)
-            try await setReseted(to: team, id: item.before.id, element: element)
+            try await setLogReseted(to: team, id: item.before.id, element: element)
 
         } catch {
             handleErrors([error])
@@ -160,7 +160,7 @@ class NotificationViewModel: ObservableObject, FirebaseErrorHandling {
         do {
             // 削除アイテムを復元
             try await Item.setData(.items(teamId: team.id), docId: deletedItem.id, data: deletedItem)
-            try await setReseted(to: team, id: deletedItem.id, element: element)
+            try await setLogReseted(to: team, id: deletedItem.id, element: element)
 
         } catch {
             handleErrors([error])
@@ -178,7 +178,7 @@ class NotificationViewModel: ObservableObject, FirebaseErrorHandling {
             let resetedItem = resetCommerceDiffCalculate(compare: item, currentItem: currentItem)
 
             try await Item.setData(.items(teamId: team.id), docId: resetedItem.id, data: resetedItem)
-            try await setReseted(to: team, id: resetedItem.id, element: element)
+            try await setLogReseted(to: team, id: resetedItem.id, element: element)
 
         } catch {
             handleErrors([error])
@@ -225,7 +225,7 @@ class NotificationViewModel: ObservableObject, FirebaseErrorHandling {
             }
 
             // ログにリセット処理済みであることを保存
-            try await setReseted(to: team, id: beforeUser.id, element: element)
+            try await setLogReseted(to: team, id: beforeUser.id, element: element)
 
         } catch {
             handleErrors([error])
@@ -255,7 +255,7 @@ class NotificationViewModel: ObservableObject, FirebaseErrorHandling {
             }
 
             // ログにリセット処理済みであることを保存
-            try await setReseted(to: beforeTeam, id: beforeTeam.id, element: element)
+            try await setLogReseted(to: beforeTeam, id: beforeTeam.id, element: element)
 
         } catch {
             handleErrors([error])
@@ -265,49 +265,12 @@ class NotificationViewModel: ObservableObject, FirebaseErrorHandling {
     /// チームの各メンバーのログデータに、変更内容のキャンセル実行を反映させるメソッド。
     /// キャンセル処理の重複を避けるために必要である。
     /// ログデータの「canceledIds」にデータのcreateTimeを格納する。
-    private func setReseted(to team: Team?, id canceledDataId: String, element: Log) async {
+    private func setLogReseted(to team: Team?, id canceledDataId: String, element: Log) async throws {
         guard let team, let uid else { assertionFailure("team, uid: nil"); return }
 
-        /// ログデータに削除済みデータのcreateTimeを格納
-        var elementToUpdate = element
-        elementToUpdate.canceledIds.append(canceledDataId)
-
-        /// チームのサブコレクションmembersリファレンス
-//        let membersRef = db?
-//            .collection("teams")
-//            .document(team.id)
-//            .collection("members")
-//
-//        do {
-//            let memberRefs = try await JoinMember.getDocuments(.members(teamId: team.id))
-//            for memberRef in memberRefs.documents {
-//
-//                try await memberRef
-//                    .collection("logs")
-//                    .document(element.id)
-//                    .updateData(["canceledIds": FieldValue.arrayUnion([canceledDataId])])
-//            }
-//        } catch {
-//
-//        }
-//        let snap = try await membersRef?.getDocuments()
-//        guard let documents = snap?.documents else {
-//            throw NotificationError.noDocumentExist
-//        }
-//
-//        for document in documents {
-//
-//            let memberId = document.documentID
-//            let logRef = membersRef?
-//                .document(memberId)
-//                .collection("logs")
-//                .document(element.id)
-//            /// メンバーのログデータにキャンセル済であることを反映
-//            // ログのセットタイプが.localの場合、ユーザー自身のログのみ更新する
-//            if element.logType.setRule == .global || memberId == uid {
-//                try await logRef?.updateData(["canceledIds": FieldValue.arrayUnion([canceledDataId])])
-//            }
-//        }
+        do {
+            try await Log.setLogReseted(userId: uid, teamId: team.id, log: element, canceledDataId: canceledDataId)
+        }
     }
 
     /// ログ通知が画面から破棄された時に実行される画像データ削除コントローラ。
@@ -380,7 +343,7 @@ class NotificationViewModel: ObservableObject, FirebaseErrorHandling {
 
     /// 対象データの 追加/更新/削除/在庫処理 の操作が取り消しされているかを判定するメソッド。
     private func checkReseted(log: Log, to dataId: String) -> Bool {
-        return log.canceledIds.contains(where:{ $0 == dataId})
+        return log.canceledIds.contains(where:{ $0 == dataId })
     }
 
     /// データ内の画像が変更されている or データが削除された状態で、変更をキャンセルせずに通知を破棄した時、
@@ -408,19 +371,4 @@ class NotificationViewModel: ObservableObject, FirebaseErrorHandling {
     deinit {
         removeListener()
     }
-}
-
-/// 通知関連のエラーを管理するクラス。
-enum NotificationError: Error {
-    case missingData
-    case missingItem
-    case resetUpdatedItem
-    case resetAddedItem
-    case resetDeletedItem
-    case resetCommerceItem
-    case resetUpdatedUser
-    case resetUpdatedTeam
-    case noSnapShotExist
-    case noDocumentExist
-    case missingCommerceIndex
 }

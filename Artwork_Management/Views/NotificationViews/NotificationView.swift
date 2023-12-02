@@ -206,7 +206,7 @@ fileprivate struct NotificationContainer: View {
         .onDisappear {
             Task {
                 // 既読セット
-                await vm.setRead(team: teamVM.team, element: element)
+                await vm.setReadLog(team: teamVM.team, element: element)
 
                 // メンバー全員が既読済みかチェック
                 let isLogReadAll = await vm.isLogReadByAllMembers(log: element,
