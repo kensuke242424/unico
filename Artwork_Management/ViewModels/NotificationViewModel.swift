@@ -81,10 +81,10 @@ class NotificationViewModel: ObservableObject, FirebaseErrorHandling {
         guard let team, let uid else { assertionFailure("team, uid: nil"); return }
 
         do {
-            var updateElement = element
-            updateElement.read = true // 既読
+            var logToUpdate = element
+            logToUpdate.read = true // 既読
 
-            try await Log.setData(.logs(teamId: team.id, memberId: uid), docId: element.id, data: updateElement)
+            try await Log.setData(.logs(teamId: team.id, memberId: uid), docId: element.id, data: logToUpdate)
 
         } catch {
             handleErrors([error])
@@ -98,7 +98,7 @@ class NotificationViewModel: ObservableObject, FirebaseErrorHandling {
     ///   - element: 現在操作を行っているログ通知の要素データ。ログの要素とタイプが格納されている。
     ///   - selectedIndex: 通知ログのタイプが複数のデータを扱うタイプの場合(カート処理など)に、
     ///   リセット対象のアイテムをハンドリングするための配列インデックス。
-    func resetLogController(to team: Team?, element: Log, index selectedIndex: Int? = nil) async throws {
+    func resetLogController(to team: Team?, element: Log, index selectedIndex: Int? = nil) async {
 
         switch element.logType {
 
