@@ -10,7 +10,7 @@ import Firebase
 import FirebaseStorage
 import FirebaseFirestore
 
-/// チームのデータ編集履歴を管理するクラス。
+/// ユーザーおよび、現在操作チームのデータ追加/削除/編集履歴を管理するクラス。
 class LogViewModel: ObservableObject, FirebaseErrorHandling {
 
     //TODO: 変更履歴が閲覧できるリストページの作成
