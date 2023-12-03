@@ -6,8 +6,7 @@
 //
 
 import SwiftUI
-import Firebase
-//import FirebaseStorage
+import FirebaseAuth
 import FirebaseFirestore
 
 /// チーム全体に届くデータの追加・更新・削除通知を管理するクラス。
@@ -16,7 +15,6 @@ class NotificationViewModel: ObservableObject, FirebaseErrorHandling {
 
     init() { print("<<<<<<<<<  NotificationViewModel_init  >>>>>>>>>") }
 
-    var db: Firestore? = Firestore.firestore() // swiftlint:disable:this identifier_name
     var listener: ListenerRegistration?
     var uid: String? { Auth.auth().currentUser?.uid }
 
