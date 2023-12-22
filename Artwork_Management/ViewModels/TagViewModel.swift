@@ -82,7 +82,9 @@ class TagViewModel: ObservableObject, FirebaseErrorHandling {
     func updateOderTagIndex(teamId: String) async {
         for (index, tag) in tags.enumerated() {
             // 最初のタグ("全て")と最後のタグ("未グループ")は位置固定&ローカル管理のため、スルー
-            if index == 0 && index == tags.count - 1 { continue }
+            if tag.tagName == "全て" || tag.tagName == "未グループ" {
+                continue
+            }
 
             var tag = tag
             tag.oderIndex = index // 更新

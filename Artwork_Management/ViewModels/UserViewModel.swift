@@ -89,7 +89,7 @@ class UserViewModel: ObservableObject, FirebaseErrorHandling {
 
     /// 参加チームデータ群「joins」の更新をリスニングするスナップショットリスナー。
     func joinsListener() async {
-        guard let uid else { assertionFailure("uid: nil"); return }
+        guard let uid else { return }
 
         joinsListener = db?
             .collection("users")
