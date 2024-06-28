@@ -70,10 +70,12 @@ struct EditTagView: View {
                             updateTagData.tagName = tagName
 
                             Task {
+                                await tagVM.addOrUpdateTag(updateTagData, teamId: teamVM.team!.id)
                                 await tagVM.updateTargetItemsTag(before: defaultTag,
                                                                  after: updateTagData,
                                                                  teamId: teamVM.team?.id,
                                                                  items: itemVM.items)
+                                tagVM.activeTag = updateTagData
                             }
 
                             withAnimation(.easeInOut(duration: 0.3)) {

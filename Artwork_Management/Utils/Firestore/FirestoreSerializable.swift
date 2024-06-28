@@ -63,7 +63,7 @@ extension FirestoreSerializable {
             try Firestore.firestore()
                 .collection(pathType.collectionPath)
                 .document(id)
-                .setData(from: data, merge: true)
+                .setData(from: data, merge: false)
 
         } catch {
             if let firestoreError = error as? FirestoreError {

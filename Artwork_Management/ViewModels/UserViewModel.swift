@@ -24,6 +24,8 @@ class UserViewModel: ObservableObject, FirebaseErrorHandling {
     @Published var user: User?
     @Published var joins: [JoinTeam] = []
 
+    @Published var isFailedFetchUser = false
+
     @Published var showErrorAlert = false
     @Published var errorMessage = ""
 
@@ -82,6 +84,7 @@ class UserViewModel: ObservableObject, FirebaseErrorHandling {
 
                 } catch {
                     self.handleErrors([error])
+                    self.isFailedFetchUser = true
                     return
                 }
             }
@@ -142,6 +145,7 @@ class UserViewModel: ObservableObject, FirebaseErrorHandling {
 
         } catch {
             handleErrors([error])
+            self.isFailedFetchUser = true
         }
     }
 

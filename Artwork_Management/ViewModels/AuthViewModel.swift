@@ -432,7 +432,25 @@ class AuthViewModel: ObservableObject {
 
         return UIImage(cgImage: cgImage)
     }
-    
+
+    func refreshAuthState() {
+        self.signedInOrNotResult = false
+
+        if let user = Auth.auth().currentUser {
+            user.reload { error in
+                if let error = error {
+                    print("Error reloading user: \(error.localizedDescription)")
+                } else {
+                    if Auth.auth().currentUser == nil {
+                        print("User is no longer valid")
+                    } else {
+                        print("User is still valid")
+                    }
+                }
+            }
+        }
+    }
+
     /// FirebaseのAuthにアタッチし、アカウントをログアウトするメソッド。
     func logOut() {
         do {

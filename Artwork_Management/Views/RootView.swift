@@ -96,6 +96,12 @@ struct RootView: View {
                 .opacity(0.01)
             }
         }
+        .onChange(of: userVM.isFailedFetchUser) { isFailed in
+            if isFailed {
+                authVM.refreshAuthState()
+                userVM.isFailedFetchUser = false
+            }
+        }
         .onAppear {
             preloads.startPreload = true
             DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
@@ -115,7 +121,10 @@ struct RootView: View {
                         await userVM.fetchUser()
                         /// ユーザーデータの所得ができなければ、ログイン画面に遷移
                         guard let user = userVM.user else {
-                            authVM.rootNavigation = .logIn
+                            userVM.isFailedFetchUser = true
+                            withAnimation(.spring(response: 1)) {
+                                authVM.rootNavigation = .logIn
+                            }
                             return
                         }
 

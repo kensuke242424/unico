@@ -813,7 +813,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nexport PATH=“$PATH:/opt/homebrew/bin”\n\nif which swiftlint; then\n    swiftlint\nelse\n  echo “warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint”\nfi\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

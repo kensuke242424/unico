@@ -297,11 +297,11 @@ struct CreateAndJoinTeamView: View {
                     /// 相手チームのチーム名とアイコンを表示するビューメソッド。
                     /// 相手チームからの参加許可に検知時に、参加アナウンスとともに表示される。
                     if selectTeamFase == .success {
-                        joinedTeamIconAndName(url:joinedTeamData?.iconURL,
+                        joinedTeamIconAndName(url: joinedTeamData?.iconURL,
                                               name: joinedTeamData?.name)
                     }
                 } // ZStack
-                
+
                 if selectTeamFase != .check && selectTeamFase != .success {
                     Button(selectTeamFase == .fase1 ? "決定して次へ" : "これで始める") {
                         if  selectTeamFase == .fase1 {
@@ -322,7 +322,7 @@ struct CreateAndJoinTeamView: View {
                     .disabled(selectedTeamCard == .join && userVM.isAnonymous ? true : false) // 匿名は使えない
                     .padding(.top, userDeviseSize == .small ? 15 : 30)
                 }
-                
+
                 Button("<戻る") {
                     withAnimation(.spring(response: 0.7)) {
                         selectTeamFase = .fase1
@@ -417,12 +417,12 @@ struct CreateAndJoinTeamView: View {
                     print("user情報が取得できません。チーム追加処理を終了しました。")
                     return
                 }
-                
+
                 Task {
                     do {
                         let userName = userVM.user?.name ?? "名無し"
                         if inputTeamName.isEmpty { inputTeamName = "\(userName)のチーム" }
-                        
+
                         // 背景、アイコン画像をリサイズして保存していく
                         let createTeamID = UUID().uuidString
                         var iconImageContainer: UIImage?
@@ -431,27 +431,27 @@ struct CreateAndJoinTeamView: View {
                         // アイコン画像が入力されていれば、リサイズ処理をしてコンテナに格納
                         if let croppedIconUIImage {
                             iconImageContainer = logInVM.resizeUIImage(image: croppedIconUIImage,
-                                                                    width: 60)
+                                                                       width: 60)
                         }
                         /// 準備したチームアイコン&背景画像をFirestorageに保存
                         let uplaodIconImageData = await teamVM.firstUploadTeamImage(iconImageContainer,
                                                                                     id: createTeamID)
-                        
+
                         let teamData = Team(id            : createTeamID,
                                             name          : inputTeamName,
                                             iconURL       : uplaodIconImageData.url,
                                             iconPath      : uplaodIconImageData.filePath,
                                             backgroundURL : backgroundContainer.imageURL,
                                             backgroundPath: backgroundContainer.imagePath)
-                        
+
                         let joinTeamData = JoinTeam(id : createTeamID,
                                                     name   : inputTeamName,
                                                     iconURL: uplaodIconImageData.url,
                                                     currentBackground: backgroundContainer)
-                        
+
                         // 作成or参加したチームをView表示する用のプロパティ
                         self.joinedTeamData = joinTeamData
-                        
+
                         await teamVM.setTeam(data: teamData)
                         await teamVM.setMember(teamId: teamData.id, data: user)
                         await userVM.addOrUpdateJoinTeam(data: joinTeamData)
@@ -524,7 +524,7 @@ struct CreateAndJoinTeamView: View {
                             .offset(x: 25, y: -12)
                     }
             }
-            
+
             if userVM.isAnonymous {
                 RoundedRectangle(cornerRadius: 10)
                     .foregroundColor(.black)
@@ -633,9 +633,9 @@ struct CreateAndJoinTeamView: View {
                 .onTapGesture { showPicker.toggle() }
                 .overlay(alignment: .top) {
                     Text("チーム情報は後から変更できます。").font(.caption)
-                    .foregroundColor(.white.opacity(0.6))
-                    .frame(width: 200)
-                    .offset(y: -30)
+                        .foregroundColor(.white.opacity(0.6))
+                        .frame(width: 200)
+                        .offset(y: -30)
                 }
 
                 TextField("", text: $inputTeamName)
