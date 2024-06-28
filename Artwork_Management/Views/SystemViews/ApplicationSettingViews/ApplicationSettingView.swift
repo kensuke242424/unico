@@ -91,7 +91,9 @@ struct ApplicationSettingView: View {
             darkModeToggle = applicationDarkMode
         }
         .onChange(of: selectedColor) { newColor in
-            userVM.updateUserThemeColor(selected: newColor ?? .blue)
+            Task {
+                await userVM.updateUserThemeColor(selected: newColor ?? .blue)
+            }
         }
         .onDisappear {
             // 画面破棄時に選択内容を保存

@@ -18,9 +18,9 @@ struct DetailView: View {
     @EnvironmentObject var navigationVM: NavigationViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
+    @EnvironmentObject var itemVM: ItemViewModel
     @EnvironmentObject var logVM: LogViewModel
 
-    @StateObject var itemVM: ItemViewModel
     @StateObject var cartVM: CartViewModel
     @Binding var inputTab: InputTab
     @Binding var show: Bool
@@ -155,9 +155,11 @@ struct DetailView: View {
         VStack(spacing: 0) {
             if !openDetail {
                 HStack(spacing: 0) {
-                    
+
                     Button {
-                        userVM.updateFavorite(item.id)
+                        Task{
+                            await userVM.updateFavorite(item.id)
+                        }
                     } label: {
                         Label("お気に入り", systemImage: favoriteStatus ? "heart.fill" : "suit.heart")
                         .font(.callout)
@@ -167,7 +169,7 @@ struct DetailView: View {
                     .disabled(openDetail ? true : false)
                     
                     Button {
-                        cartVM.addCartItem(item: item)
+                        cartVM.setItemToCart(item: item)
                     } label: {
                         Label("カートに追加", systemImage: "cart.fill.badge.plus")
                             .font(.callout)
@@ -245,12 +247,12 @@ struct DetailView: View {
                             itemVM.items.removeAll(where: { $0.id == item.id })
                         }
                         Task {
-                            itemVM.deleteImage(path: item.photoPath)
-                            itemVM.deleteItem(deleteItem: item, teamId: item.teamID)
+                            await itemVM.deleteImage(path: item.photoPath)
+                            await itemVM.deleteItem(deleteItem: item, teamId: item.teamID)
 
-                            logVM.addLog(to: teamVM.team,
-                                         by: userVM.user,
-                                         type: .deleteItem(item))
+                            await logVM.addLog(to: teamVM.team,
+                                               by: userVM.user,
+                                               type: .deleteItem(item))
                         }
                     }
                 }
@@ -389,7 +391,6 @@ struct DetailView_Previews: PreviewProvider {
     static var previews: some View {
         DetailView(item: sampleItems.first!,
                    cardHeight: 200,
-                   itemVM: ItemViewModel(),
                    cartVM: CartViewModel(),
                    inputTab: .constant(InputTab()),
                    show: .constant(true),

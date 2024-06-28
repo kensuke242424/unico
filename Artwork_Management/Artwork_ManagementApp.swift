@@ -32,22 +32,11 @@ struct ArtworkManagementApp: App {
                 .environmentObject(AuthViewModel())
                 .environmentObject(TeamViewModel())
                 .environmentObject(UserViewModel())
+                .environmentObject(ItemViewModel())
                 .environmentObject(TagViewModel())
                 .environmentObject(BackgroundViewModel())
                 .environmentObject(ProgressViewModel())
                 .environmentObject(PreloadViewModel())
         }
-    }
-    
-    private func handlePasswordlessSignIn(withURL url: URL) -> Bool {
-        // 受け取ったURLからリンクの絶対文字列(absoluteString)を取得
-        let link = url.absoluteString
-        // メールリンク用のアドレスサインイン処理を実行
-        if Auth.auth().isSignIn(withEmailLink: link) {
-            // [END is_signin_link]
-            UserDefaults.standard.set(link, forKey: "Link")
-            return true
-        }
-        return false
     }
 }

@@ -176,10 +176,10 @@ struct UserProfileEditView: View {
                 // ーーーー　データの更新が確認できたら実行　ーーーーー
                 if beforeUser != afterUser {
                     /// 自身のユーザーデータ更新
-                    try await userVM.updateUser(from: afterUser)
+                    try await userVM.addOrUpdateUser(userData: afterUser)
                     // 自身が所属するチーム群が保持している自身のメンバーデータを更新
-                    try await teamVM.updateJoinTeamsMyData(from: afterUser,
-                                                           joins: userVM.joins)
+                    try await teamVM.updateJoinTeamsMyMemberData(from: afterUser, joins: userVM.joins)
+
                     hapticSuccessNotification()
                 }
 
@@ -193,9 +193,11 @@ struct UserProfileEditView: View {
                         let compareUser = CompareUser(id    : user.id,
                                                       before: beforeUser,
                                                       after : afterUser)
-                        logVM.addLog(to: team,
-                                     by: user,
-                                     type: .updateUser(compareUser))
+                        Task {
+                            await logVM.addLog(to: team,
+                                               by: user,
+                                               type: .updateUser(compareUser))
+                        }
                     }
                 }
             } // Task ここまで
@@ -216,9 +218,3 @@ struct UserProfileEditView: View {
         }
     }
 }
-
-//struct UserProfileEditView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        UserProfileEditView()
-//    }
-//}

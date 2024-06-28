@@ -12,8 +12,7 @@ import FirebaseStorage
 import FirebaseFirestoreSwift
 
 /// チームに所属しているメンバーのメンバーIdを取得するメソッド。
-public func getMembersId(teamId: String?) async throws -> [String]? {
-    guard let teamId else { throw TeamRelatedError.missingData }
+public func getMembersId(teamId: String) async throws -> [String]? {
     var db: Firestore? = Firestore.firestore()
 
     /// membersサブコレクションのスナップショットを取得
@@ -30,7 +29,8 @@ public func getMembersId(teamId: String?) async throws -> [String]? {
 /// ユーザーが所属しているチームのチームIdを取得するメソッド。
 public func getJoinsId() async throws -> [String]? {
     guard let uid = Auth.auth().currentUser?.uid else {
-        throw UserRelatedError.missingData
+        assertionFailure("uidが存在しません")
+        return nil
     }
     var db: Firestore? = Firestore.firestore()
 

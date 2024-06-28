@@ -43,7 +43,7 @@ struct RootView: View {
     @EnvironmentObject var preloadVM: PreloadViewModel
     @EnvironmentObject var backgroundVM: BackgroundViewModel
 
-    @StateObject var itemVM: ItemViewModel = ItemViewModel()
+    @EnvironmentObject var itemVM: ItemViewModel
     @StateObject var cartVM: CartViewModel = CartViewModel()
 
     @State private var isShowStandBy: Bool = false
@@ -68,7 +68,7 @@ struct RootView: View {
                 CreateAndJoinTeamView()
 
             case .home:
-                ParentTabView(itemVM: itemVM, cartVM: cartVM)
+                ParentTabView()
                     .environment(\.resizableSheetCenter, resizableSheetCenter)
             }
         } // ZStack
@@ -88,13 +88,18 @@ struct RootView: View {
         .background {
             if preloads.startPreload {
                 Group {
-                    ItemTabView(itemVM: itemVM, cartVM: cartVM, inputTab: $preloads.inputTab)
-                    ItemEditingView(itemVM: itemVM, passItem: nil)
+                    ItemTabView(cartVM: cartVM, inputTab: $preloads.inputTab)
+                    ItemEditingView(passItem: nil)
                     CreateAndJoinTeamView()
                     PHPickerView(captureImage: $preloads.captureImage, isShowSheet: $preloads.showSheet)
-                    ItemTabView(itemVM: itemVM,  cartVM: cartVM, inputTab: $preloadVM.inputTab)
                 }
                 .opacity(0.01)
+            }
+        }
+        .onChange(of: userVM.isFailedFetchUser) { isFailed in
+            if isFailed {
+                authVM.refreshAuthState()
+                userVM.isFailedFetchUser = false
             }
         }
         .onAppear {
@@ -113,14 +118,17 @@ struct RootView: View {
                         /// MEMO: スナップショットはasync/awaitに対応してないため、
                         /// 先に取得しておく必要がある「user」と「joins」をasync/awaitメソッドで取得。
                         /// 取得に成功すれば、以降のデータ取得が進む。
-                        try await userVM.fetchUser()
+                        await userVM.fetchUser()
                         /// ユーザーデータの所得ができなければ、ログイン画面に遷移
                         guard let user = userVM.user else {
-                            authVM.rootNavigation = .logIn
+                            userVM.isFailedFetchUser = true
+                            withAnimation(.spring(response: 1)) {
+                                authVM.rootNavigation = .logIn
+                            }
                             return
                         }
 
-                        try await userVM.fetchJoinTeams()
+                        await userVM.getJoinTeams()
 
                         /// チームデータを持っていなければ、チーム追加画面へ遷移
                         if userVM.joins.isEmpty {
@@ -138,15 +146,15 @@ struct RootView: View {
                         guard let lastLogInTeamID = user.lastLogIn else { return }
                         print("ログインするチームのID: \(lastLogInTeamID)")
 
-                        await tagVM.tagDataLister(teamID: lastLogInTeamID)
+                        await tagVM.tagsLister(teamID: lastLogInTeamID)
 
                         // ---- ユーザー関連データをリスニング ----
-                        try await userVM.userListener()
-                        try await userVM.joinsListener()
+                        await userVM.userListener()
+                        await userVM.joinsListener()
                         // ---- チーム関連データをリスニング ----
-                        try await teamVM.teamListener(id: lastLogInTeamID)
-                            await teamVM.membersListener(id: lastLogInTeamID)
-                            await itemVM.itemsListener(id: lastLogInTeamID)
+                        await teamVM.teamListener(id: lastLogInTeamID)
+                        await teamVM.membersListener(id: lastLogInTeamID)
+                        await itemVM.itemsListener(id: lastLogInTeamID)
                         
                         /// ホーム画面へ遷移
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -160,31 +168,6 @@ struct RootView: View {
                                 authVM.addressSignInFase          = .start
                             }
                         }
-
-                    } catch CustomError.uidEmpty {
-                        print("Error: uidEmpty")
-                        authVM.logOut()
-                        withAnimation(.spring(response: 1)) { authVM.rootNavigation = .logIn }
-                    } catch CustomError.getRef {
-                        print("Error: getRef")
-                        authVM.logOut()
-                        withAnimation(.spring(response: 1)) { authVM.rootNavigation = .logIn }
-                    } catch CustomError.fetch {
-                        print("Error: fetch")
-                        authVM.logOut()
-                        withAnimation(.spring(response: 1)) { authVM.rootNavigation = .logIn }
-                    } catch CustomError.getDocument {
-                        print("Error: getDocument")
-                        authVM.logOut()
-                        withAnimation(.spring(response: 1)) { authVM.rootNavigation = .logIn }
-                    } catch CustomError.getUserDocument {
-                        print("Error: getUserDocument")
-                        authVM.logOut()
-                        withAnimation(.spring(response: 1)) { authVM.rootNavigation = .logIn }
-                    } catch {
-                        print("Error")
-                        authVM.logOut()
-                        withAnimation(.spring(response: 1)) { authVM.rootNavigation = .logIn }
                     }
                 } // Task
             }

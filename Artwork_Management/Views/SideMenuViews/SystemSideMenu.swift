@@ -11,7 +11,6 @@ struct SystemSideMenu: View {
 
     @Environment(\.colorScheme) var colorScheme: ColorScheme
 
-    @StateObject var itemVM: ItemViewModel
     @StateObject var homeVM: HomeViewModel
     
     @EnvironmentObject var navigationVM: NavigationViewModel
@@ -21,6 +20,7 @@ struct SystemSideMenu: View {
     @EnvironmentObject var logInVM : AuthViewModel
     @EnvironmentObject var teamVM  : TeamViewModel
     @EnvironmentObject var userVM  : UserViewModel
+    @EnvironmentObject var itemVM  : ItemViewModel
     @EnvironmentObject var tagVM   : TagViewModel
 
     @Binding var inputTab: InputTab
@@ -56,7 +56,7 @@ struct SystemSideMenu: View {
                             // フェッチするチームデータを管理するUserModel内のlastLogInの値を更新後に、再fetchを実行
                             Task {
                                 input.showChangeTeamSheet = false
-                                try await userVM.updateLastLogInTeam(teamId: input.selectedTeam?.id)
+                                try await userVM.updateLastLogInTeamId(teamId: input.selectedTeam?.id)
                                 withAnimation(.spring(response: 0.5)) {
                                     progressVM.showCubesProgress = true
                                     inputTab.showSideMenu = false
@@ -448,7 +448,9 @@ struct SystemSideMenu: View {
         // NOTE: ローカルのタグ順番操作をfirestoreに保存
         .onChange(of: input.editMode) { newEdit in
             if newEdit == .inactive {
-                tagVM.updateOderTagIndex(teamID: teamVM.team!.id)
+                Task {
+                  await tagVM.updateOderTagIndex(teamId: teamVM.team!.id)
+                }
             }
         }
         .onChange(of: inputTab.showSideMenu) { newValue in
@@ -473,20 +475,19 @@ struct SystemSideMenu: View {
             Task {
                 input.showEscapeTeamProgress = true
                 // 対象チーム内のメンバーデータ（members）から自身のメンバーデータを消去
-                try await teamVM.deleteTeamMemberDocument(teamId: selectedTeam.id, memberId: userVM.uid)
+                await teamVM.deleteTeamMemberDocument(teamId: selectedTeam.id, memberId: userVM.uid)
                 /// 自身の所属チームサブコレクション（joins）から対象チームデータを消去
-                try await userVM.deleteJoinTeamFromMyData(for: selectedTeam)
+                try await userVM.deleteJoinTeamMyMemberData(for: selectedTeam)
 
                 /// チーム内のメンバーズドキュメントIdを取得し、他メンバーがいない場合は、チームデータごと削除する
-                let membersId = try await teamVM.getMembersId(teamId: selectedTeam.id)
+                let membersId = await teamVM.getMembersId(teamId: selectedTeam.id)
+
                 if let membersId, membersId.isEmpty {
                     print("\(selectedTeam.name)のチームデータ削除実行")
-                    // チームのアイテムデータ削除
-                    try await teamVM.deleteTeamItemsDocument(teamId: selectedTeam.id)
-                    // チームのタグデータ削除
-                    try await teamVM.deleteTeamTagsDocument(teamId: selectedTeam.id)
-                    // チームドキュメントの削除
-                    try await teamVM.deleteEscapedTeamDocuments(for: selectedTeam)
+                    // チームが持っている各データ削除
+                    await teamVM.deleteItemDocuments(teamId: selectedTeam.id)
+                    await teamVM.deleteTagDocuments(teamId: selectedTeam.id)
+                    await teamVM.deleteTeamDocument(for: selectedTeam.id)
                 }
 
                 input.showEscapeTeamProgress = false
@@ -592,7 +593,7 @@ struct SystemSideMenu: View {
                             // フェッチするチームデータを管理するUserModel内のlastLogInの値を更新後に、再fetchを実行
                             Task {
                                 input.showChangeTeamSheet = false
-                                try await userVM.updateLastLogInTeam(teamId: input.selectedTeam?.id)
+                                try await userVM.updateLastLogInTeamId(teamId: input.selectedTeam?.id)
                                 withAnimation(.spring(response: 0.5)) {
                                     progressVM.showCubesProgress = true
                                     inputTab.showSideMenu = false
@@ -679,8 +680,13 @@ struct SystemSideMenu: View {
 
     func rowRemove(offsets: IndexSet) {
         for tagIndex in offsets {
-            print(tagIndex)
-            tagVM.deleteTag(deleteTag: tagVM.tags[tagIndex], teamID: teamVM.team!.id)
+            let tagToDelete = tagVM.tags[tagIndex]
+            Task {
+                await tagVM.deleteTag(deleteTag: tagToDelete,
+                                      teamId: teamVM.team!.id,
+                                      items: itemVM.items)
+            }
+
         }
     }
 

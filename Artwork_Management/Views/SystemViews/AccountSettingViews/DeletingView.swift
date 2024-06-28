@@ -52,7 +52,7 @@ struct DeletingView: View {
 
                 do {
                     // -----  teamsコレクション内のチーム関連データを削除  -----
-                    try await teamVM.deleteAllTeamDocumentsController(joins: userVM.joins)
+                    try await teamVM.deleteAllJoinsTeamDocumentsController(joins: userVM.joins)
                     // -----  usersコレクション内のユーザー関連データを削除  ------
                     try await userVM.deleteAllUserDocumentsController()
                     // -----  ユーザーがアカウント登録したAuthデータを削除  ------
@@ -65,22 +65,6 @@ struct DeletingView: View {
                     logInVM.deleteAccountCheckFase = .failure
                     dismiss()
                 }
-            }
-        }
-    }
-
-    private func excutionDeleteAll() {
-        Task {
-            guard let userID = userVM.user?.id else { return }
-
-            do {
-                try await teamVM.deleteAllTeamDocumentsController(joins: userVM.joins)
-                try await logInVM.deleteAuth()
-
-            } catch {
-                // アカウントデータの削除に失敗したら、一つ前のページに戻る
-                logInVM.deleteAccountCheckFase = .failure
-                dismiss()
             }
         }
     }

@@ -204,9 +204,20 @@ fileprivate struct NotificationContainer: View {
             }
         }
         .onDisappear {
-            print("通知が破棄されました")
-            vm.setRead(team: teamVM.team, element: element)
-            vm.deleteBeforeUIImageController(element: element)
+            Task {
+                // 既読セット
+                await vm.setReadLog(team: teamVM.team, element: element)
+
+                // メンバー全員が既読済みかチェック
+                let isLogReadAll = await vm.isLogReadByAllMembers(log: element,
+                                                                  teamId: teamVM.team?.id,
+                                                                  members: teamVM.members)
+
+                //
+                if isLogReadAll {
+                    await vm.deleteUnusedImageController(element: element)
+                }
+            }
         }
     }
     // 🍎------  アイテム通知の詳細ビュー   -------🍎
@@ -716,20 +727,16 @@ fileprivate struct NotificationContainer: View {
     func checkReseted(element: Log) -> Bool {
         switch element.logType {
         case .addItem(let item):
-            guard let itemId = item.id else { return false }
-            return element.canceledIds.contains(itemId)
+            return element.canceledIds.contains(item.id)
 
         case .updateItem(let item):
-            guard let itemId = item.before.id else { return false }
-            return element.canceledIds.contains(itemId)
+            return element.canceledIds.contains(item.before.id)
 
         case .deleteItem(let item):
-            guard let itemId = item.id else { return false }
-            return element.canceledIds.contains(itemId)
+            return element.canceledIds.contains(item.id)
 
         case .commerce(let items):
-            guard let itemId = items[showIndex].before.id else { return false }
-            return element.canceledIds.contains(itemId)
+            return element.canceledIds.contains(items[showIndex].before.id)
 
         case .join(let user, _):
             return element.canceledIds.contains(user.id)
@@ -814,7 +821,7 @@ struct ResetLogButton: View {
                 guard let resetExecution else { return }
 
                 do {
-                    try await vm.resetController(to: teamVM.team,
+                    try await vm.resetLogController(to: teamVM.team,
                                                  element: element,
                                                  index: commerceIndex)
                     self.resetExecution = nil

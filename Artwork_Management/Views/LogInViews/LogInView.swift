@@ -477,8 +477,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
         .onChange(of: inputLogIn.croppedBackgroundImage) { newImage in
             guard let newImage else { return }
             Task {
-                let resizedImage = backgroundVM.resizeUIImage(image: newImage)
-                let uploadImage = await backgroundVM.uploadUserBackgroundAtSignUp(resizedImage)
+                let uploadImage = await backgroundVM.uploadMyNewBackground(newImage)
                 let myBackground = Background(category: "original",
                                                imageName: "",
                                                imageURL: uploadImage.url,
@@ -495,7 +494,7 @@ struct LogInView: View { // swiftlint:disable:this type_body_length
 
                         SDWebImageBackgroundView(
                             imageURL: backgroundVM.selectBackground?.imageURL ??
-                                      backgroundVM.sampleBackground.imageURL,
+                                      Background.sampleData.imageURL,
                             width: proxy.size.width,
                             height: proxy.size.height
                         )

@@ -16,14 +16,15 @@ struct ParentTabView: View {
     @EnvironmentObject var logInVM: AuthViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
+    @EnvironmentObject var itemVM: ItemViewModel
     @EnvironmentObject var tagVM : TagViewModel
     @EnvironmentObject var backgroundVM: BackgroundViewModel
 
     @EnvironmentObject var logVM: LogViewModel
     @EnvironmentObject var momentLogVM: MomentLogViewModel
 
-    @StateObject var itemVM: ItemViewModel
-    @StateObject var cartVM: CartViewModel
+//    @StateObject var cartVM: CartViewModel
+    @StateObject var cartVM: CartViewModel = CartViewModel()
 
     @StateObject var homeVM = HomeViewModel()
 
@@ -47,10 +48,10 @@ struct ParentTabView: View {
                     Spacer(minLength: 0)
                     
                     TabView(selection: $inputTab.selectionTab) {
-                        HomeTabView(itemVM: itemVM, homeVM: homeVM, inputTab: $inputTab)
+                        HomeTabView(homeVM: homeVM, inputTab: $inputTab)
                             .tag(Tab.home)
 
-                        ItemTabView(itemVM: itemVM,  cartVM: cartVM, inputTab: $inputTab)
+                        ItemTabView(cartVM: cartVM, inputTab: $inputTab)
                             .tag(Tab.item)
                     } // TabView
                     .tabViewStyle(.page(indexDisplayMode: .never))
@@ -155,7 +156,7 @@ struct ParentTabView: View {
                                 }
                             })
                     }
-                    SystemSideMenu(itemVM: itemVM, homeVM: homeVM, inputTab: $inputTab)
+                    SystemSideMenu(homeVM: homeVM, inputTab: $inputTab)
                         .offset(x: inputTab.showSideMenu ? 0 : -size.width)
                 }
                 /// 🏷タグの追加や編集を行うView
@@ -348,8 +349,10 @@ struct ParentTabView: View {
         /// カートの精算実行を監視する
         .onChange(of: cartVM.doCommerce) { doCommerce in
             if doCommerce {
-                inputTab.showCart = .hidden
-                inputTab.showCommerce = .hidden
+                DispatchQueue.main.async {
+                    inputTab.showCart = .hidden
+                    inputTab.showCommerce = .hidden
+                }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     cartVM.resetCart()
                 }
@@ -495,7 +498,6 @@ struct InputTab {
     var showUpdateUser     : Bool = false
     var isActiveEditHome   : Bool = false
     var pressingAnimation  : Bool = false
-    var selectedUpdateData : SelectedUpdateData = .start
 
     /// NavigationPathによるエディット画面遷移時に渡す
     var selectedItem: Item?

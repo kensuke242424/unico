@@ -7,15 +7,7 @@
 
 import SwiftUI
 
-enum SelectedUpdateData {
-    case start, user, team
-}
-
 struct TeamProfileEditView: View {
-
-    enum ShowKeyboard {
-        case check
-    }
 
     struct InputUpdateTeam {
         var nameText: String = ""
@@ -170,7 +162,7 @@ struct TeamProfileEditView: View {
 
                 // 新規アイコンデータが存在すれば、アップロード&アイコンコンテナに格納
                 if let updateIconImage = input.captureImage {
-                    let uploadIconData = await teamVM.uploadTeamImage(updateIconImage)
+                    let uploadIconData = await teamVM.uploadTeamImage(updateIconImage, teamId: team.id)
                     afterTeam.iconURL = uploadIconData.url
                     afterTeam.iconPath = uploadIconData.filePath
                     joinTeamContainer.iconURL = uploadIconData.url
@@ -182,9 +174,9 @@ struct TeamProfileEditView: View {
                 }
                 // データの変更があれば、Firebaseへの保存処理実行
                 if beforeTeam != afterTeam {
-                    try await teamVM.updateTeam(data: afterTeam)
-                    try await userVM.updateJoinTeamToMembers(data: joinTeamContainer,
-                                                             ids: teamVM.membersId)
+                    await teamVM.setTeam(data: afterTeam)
+                    await userVM.updateJoinTeamToMembers(data: joinTeamContainer,
+                                                         ids: teamVM.memberIds)
 
                     hapticSuccessNotification()
                 }
@@ -200,9 +192,11 @@ struct TeamProfileEditView: View {
                         let compareTeam = CompareTeam(id: team.id,
                                                       before: beforeTeam,
                                                       after: afterTeam)
-                        logVM.addLog(to: teamVM.team,
-                                     by: userVM.user,
-                                     type: .updateTeam(compareTeam))
+                        Task {
+                            await logVM.addLog(to: teamVM.team,
+                                               by: userVM.user,
+                                               type: .updateTeam(compareTeam))
+                        }
                     }
                 }
             } // Task ここまで

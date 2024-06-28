@@ -18,10 +18,9 @@ struct ItemEditingView: View {
 
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
+    @EnvironmentObject var itemVM: ItemViewModel
     @EnvironmentObject var tagVM : TagViewModel
     @EnvironmentObject var logVM : LogViewModel
-
-    @StateObject var itemVM: ItemViewModel
     
     @State private var input: InputEditItem = InputEditItem()
     
@@ -272,22 +271,19 @@ struct ItemEditingView: View {
                         /// 🍎------------アイテム更新--------------🍎
                         Task {
 
-                            guard let passItemId = passItem.id else { return }
                             guard let teamID = teamVM.team?.id else { return }
                             let editInventory = Int(input.inventory) ?? 0
 
                             // croppedImageに新しい画像があれば、元の画像データを更新
                             if let croppedImage = input.croppedImage {
                                 withAnimation(.easeIn(duration: 0.1)) { input.showProgress = true }
-                                let resizedImage = itemVM.resizeUIImage(image: croppedImage,
-                                                                        width: width * 2)
-                                let uploadImageData =  await itemVM.uploadItemImage(resizedImage, teamID)
+                                let uploadImageData =  await itemVM.uploadItemImage(croppedImage, teamID)
                                 input.photoURL = uploadImageData.url
                                 input.photoPath = uploadImageData.filePath
                             }
 
                             // NOTE: Timestamp値がnilだと、データの保存&サーバー側でタイムスタンプで2回の更新が走るようだ
-                            let updatedItem = (Item(id: passItemId,
+                            let updatedItem = (Item(id: passItem.id,
                                                     createTime : passItem.createTime,
                                                     updateTime : Date(),
                                                     tag        : input.selectionTagName,
@@ -308,7 +304,7 @@ struct ItemEditingView: View {
                                                     passItem.totalInventory + (editInventory - passItem.inventory) :
                                                         passItem.totalInventory - (passItem.inventory - editInventory) ))
 
-                            itemVM.updateItemToFirestore(updatedItem, teamId: teamVM.teamID)
+                            await itemVM.addOrUpdateItem(updatedItem, teamId: teamVM.team?.id)
                             /// 編集アイテムの新規タグ設定とアイテムタブビュー内の選択タグを合わせる
                             /// 編集画面から戻った時、アイテムカードが適切にアニメーションするために必要
                             if tagVM.activeTag != tagVM.tags.first {
@@ -319,12 +315,12 @@ struct ItemEditingView: View {
                             }
 
                             /// 通知データの作成
-                            let compareItemData = CompareItem(id: passItemId,
+                            let compareItemData = CompareItem(id: passItem.id,
                                                               before: passItem,
                                                               after: updatedItem)
-                            logVM.addLog(to: teamVM.team,
-                                         by: userVM.user,
-                                         type: .updateItem(compareItemData))
+                            await logVM.addLog(to: teamVM.team,
+                                               by: userVM.user,
+                                               type: .updateItem(compareItemData))
                             dismiss()
 
                         } // Task(update Item)
@@ -337,10 +333,9 @@ struct ItemEditingView: View {
                             // croppedImageに新しい画像があれば、元の画像データを更新
                             if let croppedImage = input.croppedImage {
                                 withAnimation(.easeIn(duration: 0.1)) { input.showProgress = true }
-                                let resizedImage = itemVM.resizeUIImage(image: croppedImage, width: width)
-                                let newImageData =  await itemVM.uploadItemImage(resizedImage, teamID)
-                                input.photoURL = newImageData.url
-                                input.photoPath = newImageData.filePath
+                                let uploadImageData =  await itemVM.uploadItemImage(croppedImage, teamID)
+                                input.photoURL = uploadImageData.url
+                                input.photoPath = uploadImageData.filePath
                             }
                             
                             let newItem = Item(tag           : input.selectionTagName,
@@ -360,12 +355,12 @@ struct ItemEditingView: View {
                                                totalInventory: Int(input.inventory) ?? 0)
                             
                             // Firestoreにコーダブル保存
-                            await itemVM.addItemToFirestore(newItem, teamId: teamVM.teamID)
+                            await itemVM.addOrUpdateItem(newItem, teamId: teamVM.team?.id)
                             tagVM.setActiveTag(from: input.selectionTagName)
 
-                            logVM.addLog(to: teamVM.team,
-                                         by: userVM.user,
-                                         type: .addItem(newItem))
+                            await logVM.addLog(to: teamVM.team,
+                                               by: userVM.user,
+                                               type: .addItem(newItem))
 
                             // アイテム作成数カウントをインクリメント
                             countUpItemCreate()
@@ -547,7 +542,7 @@ struct InputEditItem {
 
 struct NewEditItemView_Previews: PreviewProvider {
     static var previews: some View {
-        ItemEditingView(itemVM: ItemViewModel(), passItem: sampleItems.first)
+        ItemEditingView(passItem: sampleItems.first)
             .environmentObject(TagViewModel())
     }
 }

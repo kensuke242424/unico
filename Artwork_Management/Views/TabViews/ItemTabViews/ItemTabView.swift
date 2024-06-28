@@ -24,9 +24,9 @@ struct ItemTabView: View {
     @EnvironmentObject var logVM: LogViewModel
     @EnvironmentObject var teamVM: TeamViewModel
     @EnvironmentObject var userVM: UserViewModel
+    @EnvironmentObject var itemVM: ItemViewModel
     @EnvironmentObject var tagVM : TagViewModel
-    
-    @StateObject var itemVM: ItemViewModel
+
     @StateObject var cartVM: CartViewModel
     
     @Binding var inputTab: InputTab
@@ -134,12 +134,12 @@ struct ItemTabView: View {
                                             guard let selectedItem else { return }
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                                 Task {
-                                                    itemVM.deleteItem(deleteItem: selectedItem,
+                                                    await itemVM.deleteItem(deleteItem: selectedItem,
                                                                       teamId: selectedItem.teamID)
 
-                                                    logVM.addLog(to: teamVM.team,
-                                                                 by: userVM.user,
-                                                                 type: .deleteItem(selectedItem))
+                                                    await logVM.addLog(to: teamVM.team,
+                                                                       by: userVM.user,
+                                                                       type: .deleteItem(selectedItem))
                                                 }
                                             }
                                         }
@@ -177,7 +177,6 @@ struct ItemTabView: View {
             if let selectedItem, let selectedItemIndex, showDetailView {
                 DetailView(item: itemVM.items[selectedItemIndex],
                            cardHeight: cardHeight,
-                           itemVM: itemVM,
                            cartVM: cartVM,
                            inputTab: $inputTab,
                            show: $showDetailView,
@@ -186,7 +185,7 @@ struct ItemTabView: View {
             }
         }
         .overlay {
-            ItemSortManuView(userColor: userVM.memberColor, itemVM: itemVM)
+            ItemSortManuView(userColor: userVM.memberColor)
                 .opacity(showDetailView ? 0 : 1)
                 .offset(y: sortViewOffsetY)
                 .onChange(of: inputTab.showCart) { showCart in
@@ -212,12 +211,11 @@ struct ItemTabView: View {
         .navigationDestination(for: EditItemPath.self) { itemPath in
             switch itemPath {
             case .create:
-                ItemEditingView(itemVM: itemVM, passItem: nil)
+                ItemEditingView(passItem: nil)
 
             case .edit:
                 if let index = selectedItemIndex {
-                    ItemEditingView(itemVM: itemVM,
-                                    passItem: itemVM.items[index])
+                    ItemEditingView(passItem: itemVM.items[index])
                 }
             }
         }
@@ -315,7 +313,7 @@ struct ItemTabView: View {
                         }
                         /// actionItemIndexは、itemVM内のアイテムとcartItem内のアイテムで同期を取るため必要
                         cartVM.actionItemIndex = newActionIndex
-                        cartVM.addCartItem(item: item)
+                        cartVM.setItemToCart(item: item)
 
                     } label: {
                         Image(systemName: "plus")
@@ -407,7 +405,9 @@ struct ItemTabView: View {
             return userVM.user?.favorites.contains(where: {$0 == item.id}) ?? false
         }
         Button {
-            userVM.updateFavorite(item.id)
+            Task {
+              await userVM.updateFavorite(item.id)
+            }
         } label: {
             if favoriteStatus {
                 Image(systemName: "heart.fill")
@@ -531,8 +531,11 @@ struct ItemTabView: View {
                                     }
                                     withAnimation(.easeInOut(duration: 0.3)) {
                                         tagVM.tags.removeAll(where: {$0 == tag})
-                                        tagVM.deleteTag(deleteTag: tag,
-                                                        teamID: teamVM.team!.id)
+                                    }
+                                    Task {
+                                        await tagVM.deleteTag(deleteTag: tag,
+                                                              teamId: teamVM.team!.id,
+                                                              items: itemVM.items)
                                     }
                                 }
                             }

@@ -49,13 +49,15 @@ struct SelectionBackgroundCards: View {
                             }
                             .alert("確認", isPresented: $backgroundVM.showDeleteAlert) {
                                 Button("削除", role: .destructive) {
-                                    // 一瞬ずらさないとアラートが瞬間だけ再表示されてしまう🧐
                                     guard let deleteTargetImage = backgroundVM.deleteTarget else { return }
+                                    // 一瞬ずらさないとアラートが瞬間だけ再表示されてしまう🧐
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                        backgroundVM.deleteBackground(path: background.imagePath)
-                                        userVM.deleteMyBackground(deleteTargetImage)
-                                        if backgroundVM.selectBackground == background {
-                                            backgroundVM.selectBackground = nil
+                                        Task {
+                                            await backgroundVM.deleteBackgroundImage(path: background.imagePath)
+                                            await userVM.removeMyBackground(deleteTargetImage)
+                                            if backgroundVM.selectBackground == background {
+                                                backgroundVM.selectBackground = nil
+                                            }
                                         }
                                     }
                                 }

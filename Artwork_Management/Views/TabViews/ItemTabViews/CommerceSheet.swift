@@ -76,15 +76,15 @@ struct CommerceSheet: View {
 
                 Button(
                     action: {
-                        /// カート内各アイテムの更新前・更新後データがメソッドの返り値として渡ってくる
-                        /// これらのデータを通知用の比較表示データとして渡す
-                        let compareItems = cartVM.updateCommerceItemsAndGetCompare(teamID: teamID)
-                        // 通知の作成
-                        logVM.addLog(to: teamVM.team,
-                                     by: userVM.user,
-                                     type: .commerce(compareItems))
-                        cartVM.doCommerce = true
-                        hapticSuccessNotification()
+                        Task {
+                            /// カート内各アイテムの更新前・更新後データがメソッドの返り値として渡ってくる
+                            /// これらのデータを通知用の比較表示データとして渡す
+                            let compareItems = await cartVM.updateCommerceItemsAndGetCompare(teamId: teamID)
+                            // 通知の作成
+                            await logVM.addLog(to: teamVM.team, by: userVM.user, type: .commerce(compareItems))
+                            cartVM.doCommerce = true
+                            hapticSuccessNotification()
+                        }
                     },
                     label: {
                         RoundedRectangle(cornerRadius: 20)
