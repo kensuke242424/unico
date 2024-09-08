@@ -29,6 +29,6 @@ extension FirebaseErrorHandling {
 
         }.joined(separator: "\n")
 
-        print(messages)
+        Logger.e(messages)
     }
 }

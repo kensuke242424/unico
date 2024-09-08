@@ -243,7 +243,8 @@ extension FirestoreSerializable {
                     .document(item.id)
                     .setData(from: item) // データセット
             } catch {
-                print("ERROR: サンプルアイテム\(item.name)の追加失敗")
+                Logger.e(error.localizedDescription)
+                Logger.e("id: \(item.id)")
             }
         }
     }
@@ -258,7 +259,8 @@ extension FirestoreSerializable {
                 .document(Tag.sampleTag.id)
                 .setData(from: Tag.sampleTag) // データセット
         } catch {
-            print("ERROR: サンプルタグの保存失敗")
+            Logger.e(error.localizedDescription)
+            Logger.e("id: \(Tag.sampleTag.id)")
         }
     }
 }
