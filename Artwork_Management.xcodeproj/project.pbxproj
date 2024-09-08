@@ -100,6 +100,7 @@
 		BEB669A12A2A370A008FC9DE /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEB669A02A2A370A008FC9DE /* HomeViewModel.swift */; };
 		BEB669CB2A2CD105008FC9DE /* CustomLongPressGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEB669CA2A2CD105008FC9DE /* CustomLongPressGesture.swift */; };
 		BEB669EE2A2DF49E008FC9DE /* CGSizeExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEB669ED2A2DF49E008FC9DE /* CGSizeExtension.swift */; };
+		BEC24F652C8D47D100524CAF /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEC24F642C8D47D100524CAF /* Logger.swift */; };
 		BECAA8CC2A60434400B07B17 /* UserProfileEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BECAA8CB2A60434400B07B17 /* UserProfileEditView.swift */; };
 		BECEBE572A2F9B260059B0DC /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = BECEBE562A2F9B260059B0DC /* Introspect */; };
 		BECEBE592A2F9B260059B0DC /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = BECEBE582A2F9B260059B0DC /* SwiftUIIntrospect */; };
@@ -247,6 +248,7 @@
 		BEB669A02A2A370A008FC9DE /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
 		BEB669CA2A2CD105008FC9DE /* CustomLongPressGesture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomLongPressGesture.swift; sourceTree = "<group>"; };
 		BEB669ED2A2DF49E008FC9DE /* CGSizeExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGSizeExtension.swift; sourceTree = "<group>"; };
+		BEC24F642C8D47D100524CAF /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		BECAA8CB2A60434400B07B17 /* UserProfileEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileEditView.swift; sourceTree = "<group>"; };
 		BEF415E22AC850B200AF6FD5 /* LaunchScreenView.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreenView.storyboard; sourceTree = "<group>"; };
 		BEFEF1882A8FAB5100131D41 /* ExternalManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalManager.swift; sourceTree = "<group>"; };
@@ -445,6 +447,7 @@
 		BEA0A5CA2B05FDA70082B445 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				BEC24F642C8D47D100524CAF /* Logger.swift */,
 				BEFEF1882A8FAB5100131D41 /* ExternalManager.swift */,
 				BEA0A5DF2B0EEC570082B445 /* ErrorHandling */,
 				BEA0A5DB2B0DE3BE0082B445 /* Firestore */,
@@ -948,6 +951,7 @@
 				BEA0A5D02B0647B60082B445 /* FirestoreError.swift in Sources */,
 				E0CC79B628E761EA00CE0B19 /* User.swift in Sources */,
 				BE8654822A8597C7006AE163 /* AnyShape.swift in Sources */,
+				BEC24F652C8D47D100524CAF /* Logger.swift in Sources */,
 				E0455FE4292C8EF0004F677D /* BounceAnimationView.swift in Sources */,
 				BEAAD8FA29CDEF6200C53138 /* DefaultEmailCheckView.swift in Sources */,
 				E01AA3A729177A76000FCD37 /* UserViewModel.swift in Sources */,
