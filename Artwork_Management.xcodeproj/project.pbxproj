@@ -69,7 +69,6 @@
 		BE599F6D2A1B25DF00821E01 /* CustomNavigationTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE599F6C2A1B25DF00821E01 /* CustomNavigationTitle.swift */; };
 		BE599F922A20F68100821E01 /* ApplicationSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE599F912A20F68100821E01 /* ApplicationSettingView.swift */; };
 		BE6E007429CD5CCA009CBD38 /* NavigationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6E007329CD5CCA009CBD38 /* NavigationViewModel.swift */; };
-		BE74E91D2A77EE9B00C1A5F2 /* Crop.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE74E91C2A77EE9B00C1A5F2 /* Crop.swift */; };
 		BE74E9212A78B2CE00C1A5F2 /* ItemSortManuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE74E9202A78B2CE00C1A5F2 /* ItemSortManuView.swift */; };
 		BE86547E2A857EF8006AE163 /* JoinedTeamInformationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE86547D2A857EF8006AE163 /* JoinedTeamInformationView.swift */; };
 		BE8654802A8586C0006AE163 /* WebImageTypesIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE86547F2A8586C0006AE163 /* WebImageTypesIcon.swift */; };
@@ -101,6 +100,7 @@
 		BEB669CB2A2CD105008FC9DE /* CustomLongPressGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEB669CA2A2CD105008FC9DE /* CustomLongPressGesture.swift */; };
 		BEB669EE2A2DF49E008FC9DE /* CGSizeExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEB669ED2A2DF49E008FC9DE /* CGSizeExtension.swift */; };
 		BEC24F652C8D47D100524CAF /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEC24F642C8D47D100524CAF /* Logger.swift */; };
+		BEC24F6B2C8D609600524CAF /* Crop.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEC24F6A2C8D609600524CAF /* Crop.swift */; };
 		BECAA8CC2A60434400B07B17 /* UserProfileEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BECAA8CB2A60434400B07B17 /* UserProfileEditView.swift */; };
 		BECEBE572A2F9B260059B0DC /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = BECEBE562A2F9B260059B0DC /* Introspect */; };
 		BECEBE592A2F9B260059B0DC /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = BECEBE582A2F9B260059B0DC /* SwiftUIIntrospect */; };
@@ -217,7 +217,6 @@
 		BE599F6C2A1B25DF00821E01 /* CustomNavigationTitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomNavigationTitle.swift; sourceTree = "<group>"; };
 		BE599F912A20F68100821E01 /* ApplicationSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationSettingView.swift; sourceTree = "<group>"; };
 		BE6E007329CD5CCA009CBD38 /* NavigationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationViewModel.swift; sourceTree = "<group>"; };
-		BE74E91C2A77EE9B00C1A5F2 /* Crop.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Crop.swift; path = ../../../Try_Tutorial/PhotoCroppingSampleApp/PhotoCroppingSampleApp/Model/Crop.swift; sourceTree = "<group>"; };
 		BE74E9202A78B2CE00C1A5F2 /* ItemSortManuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemSortManuView.swift; sourceTree = "<group>"; };
 		BE86547D2A857EF8006AE163 /* JoinedTeamInformationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinedTeamInformationView.swift; sourceTree = "<group>"; };
 		BE86547F2A8586C0006AE163 /* WebImageTypesIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebImageTypesIcon.swift; sourceTree = "<group>"; };
@@ -249,6 +248,7 @@
 		BEB669CA2A2CD105008FC9DE /* CustomLongPressGesture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomLongPressGesture.swift; sourceTree = "<group>"; };
 		BEB669ED2A2DF49E008FC9DE /* CGSizeExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGSizeExtension.swift; sourceTree = "<group>"; };
 		BEC24F642C8D47D100524CAF /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
+		BEC24F6A2C8D609600524CAF /* Crop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Crop.swift; sourceTree = "<group>"; };
 		BECAA8CB2A60434400B07B17 /* UserProfileEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileEditView.swift; sourceTree = "<group>"; };
 		BEF415E22AC850B200AF6FD5 /* LaunchScreenView.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreenView.storyboard; sourceTree = "<group>"; };
 		BEFEF1882A8FAB5100131D41 /* ExternalManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalManager.swift; sourceTree = "<group>"; };
@@ -616,9 +616,9 @@
 				BEA0A5D72B091E590082B445 /* CompareTeam.swift */,
 				BE392FEF29C20E6900BB5700 /* Tab.swift */,
 				BE07F1272A220AD5007ED1C4 /* Particle.swift */,
-				BE74E91C2A77EE9B00C1A5F2 /* Crop.swift */,
 				BE47DBB62AEABEED0098A310 /* NowTimeParts.swift */,
 				BE47DBB82AEABF060098A310 /* TeamNewsParts.swift */,
+				BEC24F6A2C8D609600524CAF /* Crop.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -857,7 +857,6 @@
 				E09F09BC28EAF33500D07669 /* FocusedLineRow.swift in Sources */,
 				BE19FD842A7AB12600AE8165 /* Log.swift in Sources */,
 				E0455FEA292D1947004F677D /* GradientBackground.swift in Sources */,
-				BE74E91D2A77EE9B00C1A5F2 /* Crop.swift in Sources */,
 				BE8734EF2A5EE99F004AA246 /* EditTeamBackgroundView.swift in Sources */,
 				BE4663D82A13B54A0072C025 /* UserEntryNavigationViewModel.swift in Sources */,
 				BE20B04129BADFC90078169B /* AccountSystemView.swift in Sources */,
@@ -933,6 +932,7 @@
 				BE245BCF29C5A41200539A04 /* NewItemUrlToUIImage.swift in Sources */,
 				BE245BD429C5DA9E00539A04 /* SDWebImageToItem.swift in Sources */,
 				BE07F1742A2732EE007ED1C4 /* CustomDragGesture.swift in Sources */,
+				BEC24F6B2C8D609600524CAF /* Crop.swift in Sources */,
 				BE254FBF29C0C396004FE9AE /* CubeCircleIcon.swift in Sources */,
 				E01E1390291D168B0001F2DA /* SystemSideMenu.swift in Sources */,
 				BE254F9329BF1104004FE9AE /* UserEntryRecommendationView.swift in Sources */,
