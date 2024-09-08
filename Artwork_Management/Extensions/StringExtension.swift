@@ -11,7 +11,7 @@ extension String {
 
     func toImage() -> UIImage? {
         guard let imageData = Data(base64Encoded: self) else { return nil }
-        print("StringExtension_toImage()実行: \(imageData)")
+        
         return UIImage(data: imageData)
     }
 }
