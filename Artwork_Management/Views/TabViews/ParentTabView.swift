@@ -200,6 +200,15 @@ struct ParentTabView: View {
                         MomentLogView()
                     }
                 }
+                .navigationDestination(for: EditItemPath.self) { itemPath in
+                    switch itemPath {
+                    case .create:
+                        ItemEditingView(passItem: nil)
+
+                    case .edit:
+                        ItemEditingView(passItem: inputTab.selectedItem)
+                    }
+                }
                 .navigationDestination(for: SystemPath.self) { systemPath in
                     switch systemPath {
                     case .root:
