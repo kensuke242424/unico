@@ -443,37 +443,90 @@ class UserViewModel: ObservableObject, FirebaseErrorHandling {
         }
     }
 
+    /// Firebase Storageに保存されているユーザーのアイコン画像を削除するメソッド。
+    func deleteUserIcon() async {
+        guard let user else {
+            assertionFailure("user: nil")
+            return
+        }
+        guard let iconPath = user.iconPath else {
+            Logger.i("ユーザーアイコン画像なし（スキップ）")
+            return
+        }
+
+        Logger.i("ユーザーアイコン画像削除開始: path=\(iconPath)")
+        do {
+            try await FirebaseStorageManager.deleteImage(path: iconPath)
+            Logger.i("✅ ユーザーアイコン画像削除成功")
+        } catch {
+            // 既に削除されている場合は警告のみで処理を続行
+            if error.localizedDescription.contains("does not exist") {
+                Logger.i("⚠️ ユーザーアイコン画像が既に削除されています（続行）")
+            } else {
+                Logger.e("❌ ユーザーアイコン画像削除失敗: \(error.localizedDescription)")
+                // 致命的でないエラーのため処理を継続（handleErrorsは呼ばない）
+            }
+        }
+    }
+
     /// Firestorageに保存されているユーザーのオリジナル背景データを全て削除するメソッド。
     func deleteUserMyBackgrounds() async {
-        guard let user else { assertionFailure("user: nil"); return }
+        guard let user else {
+            assertionFailure("user: nil")
+            return
+        }
 
-        for background in user.myBackgrounds {
+        if user.myBackgrounds.isEmpty {
+            Logger.i("ユーザー背景画像なし（スキップ）")
+            return
+        }
+
+        Logger.i("ユーザー背景画像削除開始: \(user.myBackgrounds.count)件")
+        for (index, background) in user.myBackgrounds.enumerated() {
             do {
                 try await FirebaseStorageManager.deleteImage(path: background.imagePath)
-
+                Logger.i("✅ 背景画像削除成功 (\(index + 1)/\(user.myBackgrounds.count))")
             } catch {
-                handleErrors([error])
+                // 既に削除されている場合は警告のみで処理を続行
+                if error.localizedDescription.contains("does not exist") {
+                    Logger.i("⚠️ 背景画像が既に削除されています (\(index + 1)/\(user.myBackgrounds.count))（続行）")
+                } else {
+                    Logger.e("❌ 背景画像削除失敗 (\(index + 1)/\(user.myBackgrounds.count)): \(error.localizedDescription)")
+                    // 致命的でないエラーのため処理を継続（handleErrorsは呼ばない）
+                }
             }
         }
     }
 
     /// ユーザードキュメントがサブコレクションとして持っている「joins」データをFirestoreから削除するメソッド。
     func deleteUserJoinsDocuments() async {
-        guard let user else { assertionFailure("user: nil"); return }
+        guard let user else {
+            assertionFailure("user: nil")
+            return
+        }
 
+        Logger.i("joinsサブコレクション削除開始: userId=\(user.id)")
         do {
             try await User.deleteDocuments(.joins(userId: user.id))
+            Logger.i("✅ joinsサブコレクション削除成功")
         } catch {
+            Logger.e("❌ joinsサブコレクション削除失敗: \(error.localizedDescription)")
             handleErrors([error])
         }
     }
     /// 「users」コレクション内に保存されている自身のユーザードキュメントを削除するメソッド。
     func deleteUserDocument() async {
-        guard let user else { assertionFailure("user: nil"); return }
+        guard let user else {
+            assertionFailure("user: nil")
+            return
+        }
 
+        Logger.i("ユーザードキュメント削除開始: userId=\(user.id)")
         do {
             try await User.deleteDocument(.users, docId: user.id)
+            Logger.i("✅ ユーザードキュメント削除成功")
         } catch {
+            Logger.e("❌ ユーザードキュメント削除失敗: \(error.localizedDescription)")
             handleErrors([error])
         }
     }
@@ -481,9 +534,14 @@ class UserViewModel: ObservableObject, FirebaseErrorHandling {
     /// Firestore内に保存されているユーザードキュメントを全て削除するメソッド群。
     /// ユーザーがアカウントを削除したときに実行される。
     func deleteAllUserDocumentsController() async {
+        Logger.i("🔵 === ユーザーデータ削除開始 ===")
+
+        await deleteUserIcon()
         await deleteUserMyBackgrounds()
         await deleteUserJoinsDocuments()
         await deleteUserDocument()
+
+        Logger.i("🔵 === ユーザーデータ削除完了 ===")
     }
 
     func removeListener() {

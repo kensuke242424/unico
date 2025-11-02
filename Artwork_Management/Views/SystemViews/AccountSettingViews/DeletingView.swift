@@ -16,7 +16,7 @@ struct DeletingView: View {
 
     @Environment(\.dismiss) var dismiss
 
-    @State private var deleteExecution: Bool?
+    @State private var hasStartedDeletion = false
 
     var body: some View {
         VStack(spacing: 20) {
@@ -40,30 +40,49 @@ struct DeletingView: View {
         .navigationBarBackButtonHidden()
         .customNavigationTitle(title: "削除実行中")
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear {
-            // ビューの表示と同時にデータ削除タスク実行
-            deleteExecution = true
-        }
-        .task(id: deleteExecution) {
-            guard let deleteExecution else { return }
+        .task {
+            // 既に実行済みなら何もしない（重複実行を防ぐ）
+            guard !hasStartedDeletion else { return }
+            hasStartedDeletion = true
 
-            // この画面に遷移した時点で、データ削除を開始する
-            Task {
+            do {
+                Logger.i("🔴 === アカウント削除処理開始 ===")
+                Logger.i("削除対象ユーザー: \(userVM.user?.name ?? "不明") [id=\(userVM.user?.id ?? "不明")]")
 
-                do {
-                    // -----  teamsコレクション内のチーム関連データを削除  -----
-                    try await teamVM.deleteAllJoinsTeamDocumentsController(joins: userVM.joins)
-                    // -----  usersコレクション内のユーザー関連データを削除  ------
-                    try await userVM.deleteAllUserDocumentsController()
-                    // -----  ユーザーがアカウント登録したAuthデータを削除  ------
-                    try await logInVM.deleteAuth()
-                    // 全てのデータ削除が完了したら、削除完了画面へ遷移
+                // -----  teamsコレクション内のチーム関連データを削除  -----
+                Logger.i("ステップ 1/3: チーム関連データ削除中...")
+                try await teamVM.deleteAllJoinsTeamDocumentsController(joins: userVM.joins)
+
+                // -----  usersコレクション内のユーザー関連データを削除  ------
+                Logger.i("ステップ 2/3: ユーザー関連データ削除中...")
+                try await userVM.deleteAllUserDocumentsController()
+
+                // -----  ユーザーがアカウント登録したAuthデータを削除  ------
+                Logger.i("ステップ 3/3: 認証データ削除中...")
+                try await logInVM.deleteAuth()
+
+                Logger.i("🔴 === アカウント削除処理完了 ===")
+
+                // メインスレッドで確実に画面遷移を実行
+                await MainActor.run {
+                    // 削除完了画面を表示
                     navigationVM.path.append(SystemAccountPath.deletedAccount)
 
-                } catch {
-                    // アカウントデータの削除に失敗したら、一つ前のページに戻る
+                    // Auth削除後の状態をリセット
+                    logInVM.deleteAccountCheckFase = .start
+                }
+
+            } catch {
+                Logger.e("❌ アカウント削除処理失敗: \(error.localizedDescription)")
+
+                // メインスレッドでエラー処理
+                await MainActor.run {
                     logInVM.deleteAccountCheckFase = .failure
-                    dismiss()
+
+                    // NavigationPathから確実に前の画面に戻る
+                    if !navigationVM.path.isEmpty {
+                        navigationVM.path.removeLast()
+                    }
                 }
             }
         }

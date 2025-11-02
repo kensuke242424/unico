@@ -47,9 +47,18 @@ struct DeletedView: View {
         .customNavigationTitle(title: "アカウント削除完了")
         .navigationBarTitleDisplayMode(.inline)
         .onDisappear {
-            print("アカウント削除画面の破棄を検知。ログイン画面に戻る")
-            navigationVM.path.removeLast(navigationVM.path.count)
+            // 既にログイン画面に遷移済みの場合は何もしない
+            guard logInVM.rootNavigation != .logIn else { return }
+
+            Logger.i("削除完了画面の破棄を検知")
+            // NavigationPathを完全にクリア
+            if !navigationVM.path.isEmpty {
+                navigationVM.path.removeLast(navigationVM.path.count)
+            }
+            // 状態をリセット
             logInVM.deleteAccountCheckFase = .start
+            // ログイン画面に確実に戻る
+            logInVM.rootNavigation = .logIn
         }
         
     }

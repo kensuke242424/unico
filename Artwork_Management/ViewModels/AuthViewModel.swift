@@ -466,16 +466,24 @@ class AuthViewModel: ObservableObject {
 
     /// Firebase Authのアカウントデータを消去する破壊的メソッド。
     func deleteAuth() async throws {
-        guard let user = Auth.auth().currentUser else { throw CustomError.userEmpty }
+        guard let user = Auth.auth().currentUser else {
+            Logger.e("❌ Firebase Authユーザーが存在しません")
+            throw CustomError.userEmpty
+        }
 
+        let userId = user.uid
+        let userEmail = user.email ?? "なし"
+        let isAnonymous = user.isAnonymous
+
+        Logger.i("Firebase Auth削除開始: uid=\(userId), email=\(userEmail), isAnonymous=\(isAnonymous)")
         do {
             _ = try await user.delete()
-            Logger.i("user deleted.")
+            Logger.i("✅ Firebase Auth削除成功: uid=\(userId)")
         } catch {
+            Logger.e("❌ Firebase Auth削除失敗: \(error.localizedDescription)")
             DispatchQueue.main.async {
                 self.deleteAccountCheckFase = .failure
             }
-            Logger.e(error.localizedDescription)
             throw CustomError.deleteAccount
         }
     }
