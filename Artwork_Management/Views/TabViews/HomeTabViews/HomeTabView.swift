@@ -335,7 +335,7 @@ struct HomeTabView: View {
     func TeamMembersIcon(members: [JoinMember]) -> some View {
         HStack(spacing: CGFloat(members.count - 1 * 10)) {
             ForEach(members, id: \.self) { member in
-                AsyncImageCircleIcon(photoURL: member.iconURL, size: 30)
+                SDWebImageCircleIcon(imageURL: member.iconURL, width: 30, height: 30)
             }
         }
     }
