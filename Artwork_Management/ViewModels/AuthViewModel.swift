@@ -102,14 +102,18 @@ class AuthViewModel: ObservableObject {
 
     /// ユーザーを匿名アカウントとして登録するメソッド。
     func signUpAnonymously() {
+        Logger.i("🟢 === 匿名ログイン開始 ===")
         Auth.auth().signInAnonymously { (authResult, error) in
             if let error = error {
+                Logger.e("❌ 匿名ログイン失敗: \(error.localizedDescription)")
                 self.isShowLogInFlowAlert.toggle()
                 return
             }
             if let user = authResult?.user {
+                Logger.i("✅ 匿名ログイン成功")
                 Logger.i("signIn user id: \(user.uid)")
                 Logger.i("isAnnonimous: \(user.isAnonymous)")
+                Logger.i("email: \(user.email ?? "nil")")
             }
         }
     }
@@ -216,11 +220,19 @@ class AuthViewModel: ObservableObject {
 
             do {
                 let document = try await doc.getDocument(source: .default)
-                let user = try? document.data(as: User.self)
-                Logger.d("exsist user.")
-                self.logInAlertMessage = .existsUserDocument
-                self.isShowLogInFlowAlert.toggle()
-                throw CustomError.existUserDocument
+
+                // 🔧 修正: ドキュメントが実際に存在するかチェック
+                if document.exists {
+                    let user = try? document.data(as: User.self)
+                    Logger.d("exsist user.")
+                    DispatchQueue.main.async {
+                        self.logInAlertMessage = .existsUserDocument
+                        self.isShowLogInFlowAlert.toggle()
+                    }
+                    throw CustomError.existUserDocument
+                } else {
+                    Logger.i("ユーザードキュメントは存在しません（新規ユーザー）")
+                }
             }
         }
     }
@@ -240,6 +252,18 @@ class AuthViewModel: ObservableObject {
             Logger.e("currentUser nil.")
             throw CustomError.uidEmpty
         }
+
+        // 🔍 ログ追加: 引数の内容を確認
+        Logger.i("=== setNewUserDocumentToFirestore 開始 ===")
+        Logger.i("name: \(name)")
+        Logger.i("password: \(password ?? "nil")")
+        Logger.i("imageData.url: \(imageData.url?.absoluteString ?? "nil")")
+        Logger.i("imageData.filePath: \(imageData.filePath ?? "nil")")
+        Logger.i("color: \(color)")
+        Logger.i("currentUser.uid: \(currentUser.uid)")
+        Logger.i("currentUser.email: \(currentUser.email ?? "nil")")
+        Logger.i("currentUser.isAnonymous: \(currentUser.isAnonymous)")
+
         // currentUserのuidとドキュメントIDを同じにして生成
         let newUserData = User(id: currentUser.uid,
                                name: name,
@@ -249,13 +273,18 @@ class AuthViewModel: ObservableObject {
                                iconPath: imageData.filePath,
                                userColor: color,
                                joinsId: [])
+
+        Logger.i("newUserData作成完了: \(newUserData)")
+
         do {
             try db?
                 .collection("users")
                 .document(newUserData.id)
                 .setData(from: newUserData)
+            Logger.i("✅ Firestoreへの保存成功！")
         } catch {
-            Logger.d(error.localizedDescription)
+            Logger.e("❌ Firestoreへの保存失敗: \(error.localizedDescription)")
+            Logger.e("Error details: \(error)")
             throw CustomError.setData
         }
     }
