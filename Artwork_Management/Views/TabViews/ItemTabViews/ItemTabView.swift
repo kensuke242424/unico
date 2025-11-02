@@ -49,7 +49,7 @@ struct ItemTabView: View {
     @State private var showImpossibleAlert: Bool = false
 
     /// アイテムカードの高さ
-    @State var cardHeight: CGFloat = 0
+    @State var cardHeight: CGFloat = UIScreen.main.bounds.width / 2
 
     var selectedItemIndex: Int? {
         if let selectedItem {
@@ -68,23 +68,24 @@ struct ItemTabView: View {
     var body: some View {
         GeometryReader {
             let size = $0.size
+            let filteredItems = itemVM.items.filter(
+                itemVM.filteringFavorite ?
+                {   userVM.user?.favorites.firstIndex(of: $0.id ?? "") != nil &&
+                    ($0.tag == tagVM.activeTag?.tagName ||
+                     tagVM.activeTag?.tagName == "全て") } :
+                    {   $0.tag == tagVM.activeTag?.tagName ||
+                        tagVM.activeTag?.tagName == "全て"
+                    })
+
             VStack(spacing: 15) {
-                
+
                 ItemTagsView(tags: tagVM.tags, items: itemVM.items)
                     .padding(.top, 5)
                     .opacity(showDetailView ? 0 : 1)
-                
+
                 ScrollView(.vertical, showsIndicators: false) {
                     LazyVStack(spacing: 35) {
-                        ForEach(itemVM.items.filter(
-                            itemVM.filteringFavorite ?
-                            {   userVM.user?.favorites.firstIndex(of: $0.id ?? "") != nil &&
-                                ($0.tag == tagVM.activeTag?.tagName ||
-                                 tagVM.activeTag?.tagName == "全て") } :
-                                {   $0.tag == tagVM.activeTag?.tagName ||
-                                    tagVM.activeTag?.tagName == "全て"
-                                
-                            })) { item in
+                        ForEach(filteredItems) { item in
                             ItemCardView(item)
                                     .opacity(showDetailView && inputTab.selectedItem != item ? 0 : 1)
                                     .onTapGesture {
@@ -207,18 +208,6 @@ struct ItemTabView: View {
                 .ignoresSafeArea()
             }
         }
-        /// NavigationStackによる遷移を管理します
-        .navigationDestination(for: EditItemPath.self) { itemPath in
-            switch itemPath {
-            case .create:
-                ItemEditingView(passItem: nil)
-
-            case .edit:
-                if let index = selectedItemIndex {
-                    ItemEditingView(passItem: itemVM.items[index])
-                }
-            }
-        }
         .onChange(of: showDetailView) { newValue in
             if !newValue {
                 showDarkBackground = false
@@ -247,7 +236,16 @@ struct ItemTabView: View {
         GeometryReader {
             let size = $0.size
             let rect = $0.frame(in: .named("SCROLLVIEW"))
-            
+
+            let _ = {
+                let newHeight = size.width / 2
+                if abs(cardHeight - newHeight) > 1 {  // 差が1px以上なら更新
+                    DispatchQueue.main.async {
+                        cardHeight = newHeight
+                    }
+                }
+            }()
+
             HStack(spacing: -25) {
                 /// Item Detail Card
                 VStack(alignment: .leading, spacing: 8) {
@@ -335,8 +333,7 @@ struct ItemTabView: View {
                 }
                 .offset(x: animateCurrentItem && selectedItem?.id == item.id ? -20 : 0)
                 .opacity(showDetailView ? 0 : 1)
-                .onAppear { cardHeight = size.width / 2 }
-                
+
                 /// アイテムのImageカード
                 ZStack {
                     if !(showDetailView && selectedItem?.id == item.id) {

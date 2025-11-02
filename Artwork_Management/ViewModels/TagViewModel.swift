@@ -57,7 +57,7 @@ class TagViewModel: ObservableObject, FirebaseErrorHandling {
             self.tags.insert(Tag(oderIndex: 0, tagName: "全て", tagColor: .gray), at: 0)
             self.tags.append(Tag(oderIndex: self.tags.count, tagName: "未グループ", tagColor: .gray))
 
-            // 🔧 修正: タグ取得完了後、activeTagが未設定の場合は自動的に最初のタグを設定
+            // タグ取得完了後、activeTagが未設定の場合は自動的に最初のタグを設定
             if self.activeTag == nil {
                 self.setFirstActiveTag()
             }
