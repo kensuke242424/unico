@@ -67,28 +67,7 @@ jobs:
 
             const branchName = `${branchPrefix}/${taskId}-${sanitizedTitle}`;
 
-            const comment = `## 🌿 推奨ブランチ名
-
-作業を開始する際は、以下のブランチ名をコピーしてご利用ください：
-
-\`\`\`bash
-git checkout -b ${branchName}
-\`\`\`
-
----
-
-### 📌 ブランチ命名ルール
-- **feature/**: 新機能追加
-- **bugfix/**: バグ修正
-- **hotfix/**: 緊急修正
-
-### 💡 コミットメッセージ
-コミット時、自動で \`[${taskId}]\` がメッセージ先頭に追加されます（Git hook設定済みの場合）。
-
-手動で付与する場合：
-\`\`\`bash
-git commit -m "[${taskId}] 実装内容の説明"
-\`\`\``;
+            const comment = `## 🌿 推奨ブランチ名\n\n作業を開始する際は、以下のブランチ名をコピーしてご利用ください：\n\n\`\`\`bash\ngit checkout -b ${branchName}\n\`\`\`\n\n---\n\n### 📌 ブランチ命名ルール\n- **feature/**: 新機能追加\n- **bugfix/**: バグ修正\n- **hotfix/**: 緊急修正\n\n### 💡 コミットメッセージ\nコミット時、自動で \`[${taskId}]\` がメッセージ先頭に追加されます（Git hook設定済みの場合）。\n\n手動で付与する場合：\n\`\`\`bash\ngit commit -m "[${taskId}] 実装内容の説明"\n\`\`\``;
 
             await github.rest.issues.createComment({
               owner: context.repo.owner,
