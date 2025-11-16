@@ -18,13 +18,13 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const prTitle = context.payload.pull_request.title;
-            const taskIdPattern = /\[TASK-\d{4}\]/;
+            const issueNumberPattern = /\[#\d+\]/;
 
-            const hasTaskId = taskIdPattern.test(prTitle);
+            const hasIssueNumber = issueNumberPattern.test(prTitle);
 
-            if (!hasTaskId) {
-              // PRタイトルにTASK-XXXXが含まれていない場合、コメントを追加
-              const comment = `## ⚠️ PRタイトルの形式エラー\n\nPRタイトルに \`[TASK-XXXX]\` の形式でチケットIDを含めてください。\n\n### 正しい例：\n- \`[TASK-0001] ユーザー認証機能の追加\`\n- \`[TASK-0042] バグ修正: ログイン画面のレイアウト崩れ\`\n\n### 現在のタイトル：\n\`${prTitle}\`\n\n---\n\n**修正方法：**\n1. PRタイトルを編集\n2. ブランチ名から取得したチケットIDを \`[TASK-XXXX]\` の形式で追加`;
+            if (!hasIssueNumber) {
+              // PRタイトルに#XXが含まれていない場合、コメントを追加
+              const comment = `## ⚠️ PRタイトルの形式エラー\n\nPRタイトルに \`[#XX]\` の形式でIssue番号を含めてください。\n\n### 正しい例：\n- \`[#1] ユーザー認証機能の追加\`\n- \`[#42] バグ修正: ログイン画面のレイアウト崩れ\`\n\n### 現在のタイトル：\n\`${prTitle}\`\n\n---\n\n**修正方法：**\n1. PRタイトルを編集\n2. ブランチ名から取得したIssue番号を \`[#XX]\` の形式で追加`;
 
               // 既存のコメントをチェックして重複を避ける
               const comments = await github.rest.issues.listComments({
@@ -46,7 +46,7 @@ jobs:
                 });
               }
 
-              core.setFailed('PRタイトルに [TASK-XXXX] 形式のチケットIDが含まれていません');
+              core.setFailed('PRタイトルに [#XX] 形式のIssue番号が含まれていません');
             } else {
               console.log('✅ PRタイトルの形式チェック: 成功');
             }
