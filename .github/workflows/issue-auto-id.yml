@@ -1,0 +1,98 @@
+name: Issue Auto ID
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+jobs:
+  add-task-id:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate Task ID
+        id: generate_id
+        run: |
+          ISSUE_NUMBER=${{ github.event.issue.number }}
+          TASK_ID=$(printf "TASK-%04d" $ISSUE_NUMBER)
+          echo "task_id=$TASK_ID" >> $GITHUB_OUTPUT
+          echo "Generated Task ID: $TASK_ID"
+
+      - name: Update Issue Body with Task ID
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const taskId = '${{ steps.generate_id.outputs.task_id }}';
+            const issueNumber = context.issue.number;
+            const currentBody = context.payload.issue.body || '';
+
+            // Issue本文の先頭にタスクIDを追記
+            const updatedBody = `## 📋 チケットID\n\`${taskId}\`\n\n---\n\n${currentBody}`;
+
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body: updatedBody
+            });
+
+      - name: Add Branch Name Comment
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const taskId = '${{ steps.generate_id.outputs.task_id }}';
+            const issueNumber = context.issue.number;
+            const issueTitle = context.payload.issue.title;
+            const labels = context.payload.issue.labels.map(label => label.name);
+
+            // ラベルに応じてブランチプレフィックスを決定
+            let branchPrefix = 'feature';
+            if (labels.includes('bug')) {
+              branchPrefix = 'bugfix';
+            } else if (labels.includes('hotfix')) {
+              branchPrefix = 'hotfix';
+            } else if (labels.includes('enhancement')) {
+              branchPrefix = 'feature';
+            }
+
+            // タイトルをブランチ名用に整形（小文字、スペース→ハイフン、特殊文字削除）
+            const sanitizedTitle = issueTitle
+              .toLowerCase()
+              .replace(/\s+/g, '-')
+              .replace(/[^a-z0-9\-]/g, '')
+              .substring(0, 50); // 最大50文字
+
+            const branchName = `${branchPrefix}/${taskId}-${sanitizedTitle}`;
+
+            const comment = `## 🌿 推奨ブランチ名
+
+作業を開始する際は、以下のブランチ名をコピーしてご利用ください：
+
+\`\`\`bash
+git checkout -b ${branchName}
+\`\`\`
+
+---
+
+### 📌 ブランチ命名ルール
+- **feature/**: 新機能追加
+- **bugfix/**: バグ修正
+- **hotfix/**: 緊急修正
+
+### 💡 コミットメッセージ
+コミット時、自動で \`[${taskId}]\` がメッセージ先頭に追加されます（Git hook設定済みの場合）。
+
+手動で付与する場合：
+\`\`\`bash
+git commit -m "[${taskId}] 実装内容の説明"
+\`\`\``;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body: comment
+            });
