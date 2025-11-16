@@ -63,9 +63,13 @@ jobs:
               .toLowerCase()
               .replace(/\s+/g, '-')
               .replace(/[^a-z0-9\-]/g, '')
+              .replace(/^-+|-+$/g, '') // 先頭・末尾のハイフンを削除
               .substring(0, 50); // 最大50文字
 
-            const branchName = `${branchPrefix}/${taskId}-${sanitizedTitle}`;
+            // タイトルが空の場合はタスクIDのみ、それ以外はタスクID-タイトル
+            const branchName = sanitizedTitle
+              ? `${branchPrefix}/${taskId}-${sanitizedTitle}`
+              : `${branchPrefix}/${taskId}`;
 
             const comment = `## 🌿 推奨ブランチ名\n\n作業を開始する際は、以下のブランチ名をコピーしてご利用ください：\n\n\`\`\`bash\ngit checkout -b ${branchName}\n\`\`\`\n\n---\n\n### 📌 ブランチ命名ルール\n- **feature/**: 新機能追加\n- **bugfix/**: バグ修正\n- **hotfix/**: 緊急修正\n\n### 💡 コミットメッセージ\nコミット時、自動で \`[${taskId}]\` がメッセージ先頭に追加されます（Git hook設定済みの場合）。\n\n手動で付与する場合：\n\`\`\`bash\ngit commit -m "[${taskId}] 実装内容の説明"\n\`\`\``;
 
