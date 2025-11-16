@@ -7,8 +7,9 @@ COMMIT_MSG_FILE=$1
 COMMIT_SOURCE=$2
 SHA1=$3
 
-# コミットメッセージの種類をチェック（merge, squash, template等の場合はスキップ）
-if [ -n "$COMMIT_SOURCE" ]; then
+# merge, squash, commit --amend 等の場合はスキップ
+# message (git commit -m) の場合は処理を継続
+if [ "$COMMIT_SOURCE" = "merge" ] || [ "$COMMIT_SOURCE" = "squash" ] || [ "$COMMIT_SOURCE" = "commit" ]; then
     exit 0
 fi
 
