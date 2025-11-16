@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# prepare-commit-msg フック
+# ブランチ名から TASK-XXXX を抽出し、コミットメッセージの先頭に自動追加
+
+COMMIT_MSG_FILE=$1
+COMMIT_SOURCE=$2
+SHA1=$3
+
+# コミットメッセージの種類をチェック（merge, squash, template等の場合はスキップ）
+if [ -n "$COMMIT_SOURCE" ]; then
+    exit 0
+fi
+
+# 現在のブランチ名を取得
+BRANCH_NAME=$(git symbolic-ref --short HEAD 2>/dev/null)
+
+if [ -z "$BRANCH_NAME" ]; then
+    exit 0
+fi
+
+# ブランチ名から TASK-XXXX を抽出
+TASK_ID=$(echo "$BRANCH_NAME" | grep -oE 'TASK-[0-9]{4}')
+
+if [ -z "$TASK_ID" ]; then
+    # TASK-XXXX が見つからない場合、何もしない
+    exit 0
+fi
+
+# 現在のコミットメッセージを取得
+COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+
+# すでに [TASK-XXXX] が含まれているかチェック
+if echo "$COMMIT_MSG" | grep -qE '^\[TASK-[0-9]{4}\]'; then
+    # すでに含まれている場合、何もしない
+    exit 0
+fi
+
+# [TASK-XXXX] をコミットメッセージの先頭に追加
+echo "[$TASK_ID] $COMMIT_MSG" > "$COMMIT_MSG_FILE"
+
+exit 0
