@@ -33,7 +33,7 @@ jobs:
 
             const branchPrefix_withIssueNumber = `${branchPrefix}/#${issueNumber}-`;
 
-            const comment = `## 🌿 推奨ブランチ名\n\n作業を開始する際は、以下をコピーして使用してください：\n\n\`\`\`bash\ngit checkout -b ${branchPrefix_withIssueNumber}\n# ↑ 末尾に作業内容を英語で追加してください（例: fix-modal-bug, add-user-auth）\n\`\`\`\n\n---\n\n### 📌 ブランチ命名ルール\n- **feature/#XX-<description>**: 新機能追加\n- **bugfix/#XX-<description>**: バグ修正\n- **hotfix/#XX-<description>**: 緊急修正\n\n**形式：** 小文字、ハイフン区切りで記述\n\n### 💡 コミットメッセージ\nコミット時、自動で \`[#${issueNumber}]\` がメッセージ先頭に追加されます（Git hook設定済みの場合）。\n\n手動で付与する場合：\n\`\`\`bash\ngit commit -m "[#${issueNumber}] 実装内容の説明"\n\`\`\`\n\n### 🔗 Issue自動リンク・クローズ\n- コミットメッセージやPR説明に \`#${issueNumber}\` を含めると、自動でこのIssueにリンクされます\n- PRに \`close #${issueNumber}\` と記載すると、マージ時に自動でこのIssueがクローズされます`;
+            const comment = `## 🌿 推奨ブランチ名\n\n作業を開始する際は、以下をコピーして使用してください：\n\n\`\`\`bash\ngit checkout -b ${branchPrefix_withIssueNumber}\n\`\`\`\n\n↑ 末尾に作業内容を英語で追加してください（例: \`fix-modal-bug\`, \`add-user-auth\`）\n\n---\n\n### 📌 ブランチ命名ルール\n- **feature/#XX-<description>**: 新機能追加\n- **bugfix/#XX-<description>**: バグ修正\n- **hotfix/#XX-<description>**: 緊急修正\n\n**形式：** 小文字、ハイフン区切りで記述\n\n### 💡 コミットメッセージ\nコミット時、自動で \`[#${issueNumber}]\` がメッセージ先頭に追加されます（Git hook設定済みの場合）。\n\n手動で付与する場合：\n\`\`\`bash\ngit commit -m "[#${issueNumber}] 実装内容の説明"\n\`\`\`\n\n### 🔗 Issue自動リンク・クローズ\n- コミットメッセージやPR説明に \`#${issueNumber}\` を含めると、自動でこのIssueにリンクされます\n- PRに \`close #${issueNumber}\` と記載すると、マージ時に自動でこのIssueがクローズされます`;
 
             await github.rest.issues.createComment({
               owner: context.repo.owner,
