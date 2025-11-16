@@ -19,14 +19,19 @@ jobs:
           echo "task_id=$TASK_ID" >> $GITHUB_OUTPUT
           echo "Generated Task ID: $TASK_ID"
 
-      - name: Update Issue Body with Task ID
+      - name: Update Issue Title and Body with Task ID
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const taskId = '${{ steps.generate_id.outputs.task_id }}';
             const issueNumber = context.issue.number;
+            const currentTitle = context.payload.issue.title;
             const currentBody = context.payload.issue.body || '';
+
+            // タイトルにすでにTASK-XXXXが含まれているかチェック
+            const titleHasTaskId = /^TASK-\d{4}\s/.test(currentTitle);
+            const updatedTitle = titleHasTaskId ? currentTitle : `${taskId} ${currentTitle}`;
 
             // Issue本文の先頭にタスクIDを追記
             const updatedBody = `## 📋 チケットID\n\`${taskId}\`\n\n---\n\n${currentBody}`;
@@ -35,6 +40,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: issueNumber,
+              title: updatedTitle,
               body: updatedBody
             });
 
